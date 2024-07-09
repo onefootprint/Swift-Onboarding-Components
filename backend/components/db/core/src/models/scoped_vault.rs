@@ -20,6 +20,7 @@ use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
+use db_schema::schema::business_owner;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::vault;
 use diesel::dsl::count_distinct;
@@ -132,6 +133,12 @@ pub enum ScopedVaultIdentifier<'a> {
         fp_id: &'a FpId,
         t_id: &'a TenantId,
         is_live: IsLive,
+    },
+    /// A business fp_bid owned by the provided user uv_id
+    #[from(ignore)]
+    OwnedFpBid {
+        fp_bid: &'a FpId,
+        uv_id: &'a VaultId,
     },
     Tenant {
         v_id: &'a VaultId,
@@ -347,6 +354,15 @@ impl ScopedVault {
                     .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live))
+            }
+            ScopedVaultIdentifier::OwnedFpBid { fp_bid, uv_id } => {
+                let bv_ids = business_owner::table
+                    .filter(business_owner::user_vault_id.eq(uv_id))
+                    .select(business_owner::business_vault_id);
+                query = query
+                    .filter(scoped_vault::fp_id.eq(fp_bid))
+                    .filter(scoped_vault::kind.eq(VaultKind::Business))
+                    .filter(scoped_vault::vault_id.eq_any(bv_ids))
             }
             ScopedVaultIdentifier::Tenant { v_id, t_id } => {
                 query = query

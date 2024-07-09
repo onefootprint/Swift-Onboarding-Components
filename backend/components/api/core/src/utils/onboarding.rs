@@ -13,6 +13,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::IsNew;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::models::workflow::OnboardingWorkflowArgs;
@@ -25,6 +26,7 @@ use itertools::Itertools;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
@@ -34,10 +36,16 @@ use newtypes::WorkflowId;
 use newtypes::WorkflowRequestId;
 use newtypes::WorkflowSource;
 
-pub struct NewBusinessVaultArgs {
-    pub public_key: VaultPublicKey,
-    pub e_private_key: EncryptedVaultPrivateKey,
-    pub should_create_workflow: bool,
+pub enum NewBusinessWfArgs {
+    /// Create a new business vault with the provided keypair, if no existing business vault exists
+    /// for this playbook
+    MaybeNewVault {
+        public_key: VaultPublicKey,
+        e_private_key: EncryptedVaultPrivateKey,
+    },
+    ExistingVault {
+        sb_id: ScopedVaultId,
+    },
 }
 
 pub struct NewOnboardingArgs<'a> {
@@ -49,7 +57,7 @@ pub struct NewOnboardingArgs<'a> {
     pub insight_event: Option<CreateInsightEvent>,
     // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could
     // one day
-    pub new_biz_args: Option<NewBusinessVaultArgs>,
+    pub new_biz_args: Option<NewBusinessWfArgs>,
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub kyb_fixture_result: Option<WorkflowFixtureResult>,
     pub source: WorkflowSource,
@@ -135,58 +143,106 @@ pub fn get_or_start_onboarding(
         }
     }
 
-    // If the ob config has business fields, create a business vault, scoped vault, and ob
-    let biz_wf = if let Some(new_biz_args) = new_biz_args {
-        let existing_businesses = BusinessOwner::list_businesses_for_playbook(conn, &user_vault.id, &obc.id)?;
-        let biz_wf = if let Some(existing) = existing_businesses.into_iter().next() {
-            // If the user has already started onboarding their business onto this exact
-            // ob config, we should locate it.
-            // Note, this isn't quite portablizing the business since we only locate it
-            // when onboarding onto the exact same ob config
-            existing.1 .1
-        } else {
-            let args = NewVaultArgs {
-                public_key: new_biz_args.public_key,
-                e_private_key: new_biz_args.e_private_key,
-                is_live: user_vault.is_live,
-                kind: VaultKind::Business,
-                is_fixture: false,
-                sandbox_id: user_vault.sandbox_id.clone(), // Use the same sandbox ID for business vault
-                is_created_via_api: false,
-                duplicate_of_id: None,
-            };
-            let business_vault = Vault::create(conn, args)?;
-            BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
-            let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
-            let ob_create_args = OnboardingWorkflowArgs {
-                scoped_vault_id: sb.id,
-                ob_configuration_id: obc.id.clone(),
-                authorized: true,
-                insight_event,
-                source,
-                // Default to the same fixture result for KYB as KYC if none provided
-                fixture_result: kyb_fixture_result.or(fixture_result),
-                is_one_click: false,
-                wfr: None,
-                is_neuro_enabled: false, // not now
-            };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
-            biz_wf
-        };
-        Some(biz_wf)
-    } else {
-        None
+    let args = CreateBusinessWfArgs {
+        new_biz_args,
+        obc,
+        uv: &user_vault,
+        insight_event,
+        source,
+        // Default to the same fixture result for KYB as KYC if none provided
+        fixture_result: kyb_fixture_result.or(fixture_result),
+        force_create,
     };
+    let biz_wf = maybe_create_business_wf(conn, args)?;
 
     if is_new_ob {
-        create_doc_request_if_needed(conn, &wf_id, biz_wf.as_ref(), obc)?;
+        maybe_create_doc_requests(conn, &wf_id, biz_wf.as_ref(), obc)?;
     }
 
     Ok((wf_id, biz_wf, is_new_ob))
 }
 
-/// Create a DocumentRequest associated with the provided wf if the obc requires document collection
-fn create_doc_request_if_needed(
+struct CreateBusinessWfArgs<'a> {
+    new_biz_args: Option<NewBusinessWfArgs>,
+    obc: &'a ObConfiguration,
+    uv: &'a Vault,
+    insight_event: Option<CreateInsightEvent>,
+    source: WorkflowSource,
+    fixture_result: Option<WorkflowFixtureResult>,
+    force_create: bool,
+}
+
+fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) -> FpResult<Option<Workflow>> {
+    let CreateBusinessWfArgs {
+        new_biz_args,
+        obc,
+        uv,
+        insight_event,
+        source,
+        fixture_result,
+        force_create,
+    } = args;
+    let Some(new_biz_args) = new_biz_args else {
+        return Ok(None);
+    };
+    let sb = match new_biz_args {
+        NewBusinessWfArgs::ExistingVault { sb_id } => {
+            // A scoped business has been attached to this session already, usually via user-specific
+            // sessions.
+            let sb = ScopedVault::get(conn, &sb_id)?;
+            let id = ScopedVaultIdentifier::OwnedFpBid {
+                fp_bid: &sb.fp_id,
+                uv_id: &uv.id,
+            };
+            ScopedVault::get(conn, id)?
+        }
+        NewBusinessWfArgs::MaybeNewVault {
+            public_key,
+            e_private_key,
+        } => {
+            // TODO don't always create a new business vault - once we have portable businesses,
+            // we should display to the client an ability to select the business they want to use
+            let existing_businesses = BusinessOwner::list_businesses_for_playbook(conn, &uv.id, &obc.id)?;
+            if let Some(existing) = existing_businesses.into_iter().next() {
+                // If the user has already started onboarding their business onto this exact
+                // ob config, we should locate it.
+                // Note, this isn't quite portablizing the business since we only locate it
+                // when onboarding onto the exact same ob config
+                return Ok(Some(existing.1 .1));
+            }
+            let args = NewVaultArgs {
+                public_key,
+                e_private_key,
+                is_live: uv.is_live,
+                kind: VaultKind::Business,
+                is_fixture: false,
+                sandbox_id: uv.sandbox_id.clone(), // Use the same sandbox ID for business vault
+                is_created_via_api: false,
+                duplicate_of_id: None,
+            };
+            let business_vault = Vault::create(conn, args)?;
+            BusinessOwner::create_primary(conn, uv.id.clone(), business_vault.id.clone())?;
+            let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
+            sb
+        }
+    };
+    let ob_create_args = OnboardingWorkflowArgs {
+        scoped_vault_id: sb.id,
+        ob_configuration_id: obc.id.clone(),
+        authorized: true,
+        insight_event,
+        source,
+        fixture_result,
+        is_one_click: false,
+        wfr: None,
+        is_neuro_enabled: false, // not now
+    };
+    let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
+    Ok(Some(biz_wf))
+}
+
+/// Create DocumentRequests associated with the provided wfs if the obc requires document collection
+fn maybe_create_doc_requests(
     conn: &mut TxnPgConn,
     wf_id: &WorkflowId,
     biz_wf: Option<&Workflow>,

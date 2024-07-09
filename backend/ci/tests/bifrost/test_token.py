@@ -1,10 +1,10 @@
 import arrow
 import pytest
-from tests.utils import post, create_ob_config, get, patch
+from tests.utils import post, create_ob_config, get, patch, _gen_random_ssn
 from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
-from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL, ENVIRONMENT
+from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL, ENVIRONMENT, ID_DATA
 
 
 @pytest.fixture(scope="session")
@@ -17,7 +17,7 @@ def ob_config(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_onboarded_vault(ob_config, sandbox_tenant):
+def test_reonboard_kyc(ob_config, sandbox_tenant):
     """
     Test creating a token for a user who has already onboarded onto a KYC playbook.
     Run that token through bifrost onboarding onto a different playbook.
@@ -44,6 +44,99 @@ def test_onboarded_vault(ob_config, sandbox_tenant):
     }
     assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]
     assert user2.fp_id == user.fp_id
+
+
+def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
+    """
+    Test creating a token for a user who has already onboarded onto a KYB playbook.
+    Run that token through bifrost re-onboarding onto the KYB playbook, with the fp_bid linked.
+    """
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    user = bifrost.run()
+
+    # Go through onboarding with a token made from a user that already onboarded
+    data = dict(kind="reonboard", fp_bid=user.fp_bid)
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Run bifrost
+    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    bifrost2 = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
+    )
+    user2 = bifrost2.run()
+    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
+        "collect_data",
+        "collect_business_data",
+        "authorize",
+    }
+    assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]
+    assert user2.fp_id == user.fp_id
+    assert user2.fp_bid == user.fp_bid
+
+    # Make sure the business and user have new onboardings
+    body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    assert all(
+        i["playbook_key"] == kyb_sandbox_ob_config.key.value for i in body["data"]
+    )
+    assert all(i["status"] == "pass" for i in body["data"])
+
+    body = get(f"businesses/{user.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    assert all(
+        i["playbook_key"] == kyb_sandbox_ob_config.key.value for i in body["data"]
+    )
+    assert all(i["status"] == "pass" for i in body["data"])
+
+
+def test_onboard_kyb_no_business(sandbox_tenant, kyb_sandbox_ob_config):
+    initial_data = {
+        **ID_DATA,
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+    }
+    body = post("users", initial_data, sandbox_tenant.s_sk)
+    fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
+
+    # Go through onboarding with a token made from an existing user. Don't provide an fp_bid
+    data = dict(kind="onboard", key=kyb_sandbox_ob_config.key.value)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Run bifrost
+    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    bifrost = BifrostClient.raw_auth(kyb_sandbox_ob_config, auth_token, sandbox_id)
+    user = bifrost.run()
+
+    # We should have to handle the collect_business_data requirement because no fp_bid was provided
+    assert "collect_data" in set(i["kind"] for i in bifrost.already_met_requirements)
+    assert "collect_business_data" in set(
+        i["kind"] for i in bifrost.handled_requirements
+    )
+    assert user.fp_id == fp_id
+
+
+def test_reonboard_kyb_must_own_business(
+    sandbox_tenant, kyb_sandbox_ob_config, sandbox_user
+):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    user = bifrost.run()
+
+    # Try to make a token using an fp_bid for a different user
+    data = dict(kind="reonboard", fp_bid=user.fp_bid)
+    body = post(
+        f"users/{sandbox_user.fp_id}/token",
+        data,
+        sandbox_tenant.sk.key,
+        status_code=400,
+    )
+    assert (
+        body["message"]
+        == "Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."
+    )
 
 
 def test_api_vault(sandbox_tenant, ob_config):

@@ -124,14 +124,12 @@ pub async fn get_requirements_for_person_and_maybe_business(
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&su_id))?;
             let bvw = if let Some(sb_id) = sb_id {
                 let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb_id))?;
-                let (business_workflow, _) = Workflow::get_all(
-                    conn,
-                    WorkflowIdentifier::ScopedBusinessId {
-                        sb_id: &sb_id,
-                        vault_id: &person_vault_id,
-                        is_business: (),
-                    },
-                )?;
+                let id = WorkflowIdentifier::ActiveScopedBusinessId {
+                    sb_id: &sb_id,
+                    vault_id: &person_vault_id,
+                    is_business: (),
+                };
+                let (business_workflow, _) = Workflow::get_all(conn, id)?;
                 Some((bvw, business_workflow))
             } else {
                 None
@@ -167,6 +165,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 person_decrypted_values,
                 person_requirement_opts,
             )?;
+
 
             let business_requirements =
                 if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {

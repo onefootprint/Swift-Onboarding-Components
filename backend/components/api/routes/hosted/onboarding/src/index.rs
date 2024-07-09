@@ -13,7 +13,7 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::onboarding::NewBusinessVaultArgs;
+use api_core::utils::onboarding::NewBusinessWfArgs;
 use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::PrefillKind;
@@ -66,18 +66,17 @@ pub async fn post(
         })
         .await?;
 
-    // TODO don't always create a new business vault - once we have portable businesses,
-    // we should display to the client an ability to select the business they want to use
-    let should_create_new_business_vault =
-        ob_config.kind == ObConfigurationKind::Kyb && user_auth.scoped_business_id().is_none();
-    let maybe_new_biz_args = if should_create_new_business_vault {
+    let maybe_new_biz_args = if ob_config.kind == ObConfigurationKind::Kyb {
         // If we're going to make a new business vault,
-        let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-        Some(NewBusinessVaultArgs {
-            public_key,
-            e_private_key,
-            should_create_workflow: true,
-        })
+        if let Some(sb_id) = user_auth.scoped_business_id() {
+            Some(NewBusinessWfArgs::ExistingVault { sb_id })
+        } else {
+            let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
+            Some(NewBusinessWfArgs::MaybeNewVault {
+                public_key,
+                e_private_key,
+            })
+        }
     } else {
         None
     };

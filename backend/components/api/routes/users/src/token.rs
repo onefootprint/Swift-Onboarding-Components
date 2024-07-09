@@ -50,6 +50,7 @@ pub async fn post(
     let CreateTokenRequest {
         kind,
         key,
+        fp_bid,
         third_party_auth,
         limit_auth_methods,
         ttl_min,
@@ -88,7 +89,7 @@ pub async fn post(
     let (token, session) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             if third_party_auth {
                 // Trust that the tenant has authenticated this user already. Only certain tenants
@@ -96,8 +97,8 @@ pub async fn post(
                 // We'll still portablize users with third-part auth (TODO if there's not already
                 // a portable vault for the phone number)
                 let args = NewAuthEventArgs {
-                    vault_id: sv.vault_id.clone(),
-                    scoped_vault_id: Some(sv.id.clone()),
+                    vault_id: su.vault_id.clone(),
+                    scoped_vault_id: Some(su.id.clone()),
                     insight_event_id: None,
                     kind: AuthEventKind::ThirdParty,
                     webauthn_credential_id: None,
@@ -136,7 +137,7 @@ pub async fn post(
                 // never see this intermediate token. The verify component can pick this up as proof
                 // that the user authed directly with Footprint, and this will be used to step up the
                 // token to have permissions to see one-click prefill data.
-                let portable_vw = VaultWrapper::<Any>::build_portable(conn, &sv.vault_id)?;
+                let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
                 // This is an approximation of portable_vw.get_data_to_prefill - we can't use that
                 // since we don't know the playbook the user is onboarding onto.
                 // This is might be overly restrictive now - we won't allow inheriting auth if there is
@@ -145,12 +146,12 @@ pub async fn post(
                     .populated_dis()
                     .into_iter()
                     .filter_map(|di| portable_vw.get_lifetime(&di))
-                    .any(|dl| dl.scoped_vault_id != sv.id);
-                let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+                    .any(|dl| dl.scoped_vault_id != su.id);
+                let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
                 let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
 
                 if can_auto_authorize {
-                    AuthEvent::list_recent(conn, &sv.id)?
+                    AuthEvent::list_recent(conn, &su.id)?
                 } else {
                     vec![]
                 }
@@ -168,9 +169,10 @@ pub async fn post(
             let scopes = allowed_user_scopes(kinds, RequestedTokenScope::Onboarding, false);
 
             let args = CreateTokenArgs {
-                sv,
+                su,
                 kind,
                 key,
+                fp_bid,
                 scopes,
                 auth_events,
                 limit_auth_methods,

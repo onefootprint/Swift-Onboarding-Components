@@ -128,7 +128,9 @@ impl CheckUserWfAuthContext {
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
         };
-        let identifier = WorkflowIdentifier::ScopedBusinessId {
+        // TODO: It might be beneficial to actually store the biz_wf_id in the auth session to be
+        // explicit here
+        let identifier = WorkflowIdentifier::ActiveScopedBusinessId {
             sb_id: &sb_id,
             vault_id: self.user_vault_id(),
             is_business: (),

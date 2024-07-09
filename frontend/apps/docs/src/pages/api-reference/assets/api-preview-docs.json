@@ -1707,6 +1707,10 @@
             "CreateTokenRequest": {
                 "type": "object",
                 "properties": {
+                    "fp_bid": {
+                        "description": "The existing business to be linked to this user's onboarding session. Only takes effect when\n onboarding onto a KYB playbook.\n If no `fp_bid` is provided here when onboarding onto a KYB playbook, the user will be asked\n to enter their business information and create a new business.",
+                        "type": "string"
+                    },
                     "key": {
                         "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to\n onboard. The user will be asked to provide any missing information required by playbook. If\n you provide the key here, you can omit providing it in the frontend Footprint.js SDK\n integration.",
                         "type": "string"

@@ -1,6 +1,7 @@
 use crate::*;
 use newtypes::AuthMethodKind;
 use newtypes::ContactInfoKind;
+use newtypes::FpId;
 use newtypes::ObConfigurationKey;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
@@ -34,6 +35,12 @@ pub struct CreateTokenRequest {
     /// you provide the key here, you can omit providing it in the frontend Footprint.js SDK
     /// integration.
     pub key: Option<ObConfigurationKey>,
+
+    /// The existing business to be linked to this user's onboarding session. Only takes effect when
+    /// onboarding onto a KYB playbook.
+    /// If no `fp_bid` is provided here when onboarding onto a KYB playbook, the user will be asked
+    /// to enter their business information and create a new business.
+    pub fp_bid: Option<FpId>,
 
     /// Can only be provided when the kind is `update_auth_methods`. The set of auth methods that
     /// you would like to be allowed to be updated. When not provided, the token allows updating any

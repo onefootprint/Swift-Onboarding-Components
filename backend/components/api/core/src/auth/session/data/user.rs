@@ -32,7 +32,8 @@ pub struct UserSession {
     pub su_id: Option<ScopedVaultId>,
     /// The scoped business for the auth session, if any
     pub sb_id: Option<ScopedVaultId>,
-    /// The business owner ID if we are in the process of conducting KYC for a business owner
+    /// The business owner ID if we are in the process of conducting KYC for a business owner.
+    /// This is only ever used for multi-KYC links for specific BOs.
     pub bo_id: Option<BoId>,
     /// The obc that we'll use to make a new onboarding workflow, if any
     pub obc_id: Option<ObConfigurationId>,

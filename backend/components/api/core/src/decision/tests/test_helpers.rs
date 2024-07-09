@@ -1,6 +1,6 @@
 use crate::decision::rule_engine;
 use crate::tests::fixtures::lib::random_phone_number;
-use crate::utils::onboarding::NewBusinessVaultArgs;
+use crate::utils::onboarding::NewBusinessWfArgs;
 use crate::utils::onboarding::NewOnboardingArgs;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -54,10 +54,9 @@ pub async fn create_user_and_onboarding(
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let biz_args = if create_business {
         let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
-        Some(NewBusinessVaultArgs {
+        Some(NewBusinessWfArgs::MaybeNewVault {
             public_key,
             e_private_key,
-            should_create_workflow: true,
         })
     } else {
         None

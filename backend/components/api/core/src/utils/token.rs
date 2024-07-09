@@ -10,21 +10,24 @@ use crate::FpResult;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
+use db::errors::FpOptionalExtension;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::session::Session;
-use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use db::TxnPgConn;
 use newtypes::AuthMethodKind;
+use newtypes::FpId;
 use newtypes::ObConfigurationKey;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultKind;
 
 pub struct CreateTokenArgs {
-    pub sv: ScopedVault,
+    pub su: ScopedVault,
+    pub fp_bid: Option<FpId>,
     pub kind: TokenOperationKind,
     pub key: Option<ObConfigurationKey>,
     pub scopes: Vec<UserAuthScope>,
@@ -46,7 +49,8 @@ pub fn create_token(
     duration: Duration,
 ) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
-        sv,
+        su,
+        fp_bid,
         kind,
         key,
         scopes,
@@ -54,10 +58,21 @@ pub fn create_token(
         limit_auth_methods,
     } = args;
 
-    let vault = Vault::get(conn, &sv.vault_id)?;
-    if vault.kind != VaultKind::Person {
+    if su.kind != VaultKind::Person {
         return Err(ValidationError("Cannot create a token for a non-person vault").into());
     }
+    let sb = if let Some(fp_bid) = fp_bid {
+        let id = ScopedVaultIdentifier::OwnedFpBid {
+            fp_bid: &fp_bid,
+            uv_id: &su.vault_id,
+        };
+        let sb = ScopedVault::get(conn, id)
+            .optional()?
+            .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
+        Some(sb)
+    } else {
+        None
+    };
 
     if key.is_some() && !kind.allow_obc_key() {
         return Err(ValidationError("Cannot provide playbook key for this token kind").into());
@@ -71,7 +86,7 @@ pub fn create_token(
         TokenOperationKind::User => (TokenCreationPurpose::ApiUser, None, None),
         TokenOperationKind::Inherit => {
             // Inherit the WorkflowRequest
-            let wfr = WorkflowRequest::get_active(conn, &sv.id)?
+            let wfr = WorkflowRequest::get_active(conn, &su.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
             // Do we want to replace the obc.id on the auth token?
 
@@ -79,7 +94,7 @@ pub fn create_token(
             (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
-            let (_, obc) = Workflow::latest_reonboardable(conn, &sv.id, true)?.ok_or(ValidationError(
+            let (_, obc) = Workflow::latest_reonboardable(conn, &su.id, true)?.ok_or(ValidationError(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
             (TokenCreationPurpose::ApiReonboard, Some(obc.id), None)
@@ -88,7 +103,7 @@ pub fn create_token(
             let key = key.ok_or(ValidationError(
                 "key must be provided for a token of kind onboard",
             ))?;
-            let (obc, _) = ObConfiguration::get(conn, (&key, &sv.tenant_id, sv.is_live))?;
+            let (obc, _) = ObConfiguration::get(conn, (&key, &su.tenant_id, su.is_live))?;
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
             }
@@ -102,13 +117,14 @@ pub fn create_token(
     };
 
     let context = NewUserSessionContext {
-        su_id: Some(sv.id),
+        su_id: Some(su.id),
+        sb_id: sb.map(|sb| sb.id),
         obc_id,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         ..Default::default()
     };
     let args = NewUserSessionArgs {
-        user_vault_id: sv.vault_id,
+        user_vault_id: su.vault_id,
         purposes: vec![purpose],
         context,
         scopes,
