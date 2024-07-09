@@ -16,7 +16,7 @@ import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 import fieldContext from '../field-context';
 
-type Field = React.InputHTMLAttributes<HTMLInputElement> & {
+type FormAttributes = {
   mask?: CleaveOptions;
   validations?: {
     required?: boolean | string;
@@ -29,7 +29,15 @@ type Field = React.InputHTMLAttributes<HTMLInputElement> & {
   transforms?: Record<string, boolean>;
 };
 
-const useFieldProps = () => {
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & FormAttributes;
+type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & FormAttributes;
+type Field = InputProps | SelectProps;
+type BaseProps = { name: string; id: string; 'aria-invalid': boolean };
+
+export type FormInputProps = InputProps & BaseProps;
+export type FormSelectProps = SelectProps & BaseProps;
+
+const useFieldProps = (): FormInputProps | FormSelectProps => {
   const {
     formState: { errors },
   } = useFormContext();
@@ -42,9 +50,11 @@ const useFieldProps = () => {
     throw new Error(`Field ${ctx.name} is not supported`);
   }
   const formErrors = get(errors, ctx.name);
+  const hasError = !!formErrors;
 
   return {
-    'aria-invalid': !!formErrors,
+    // @ts-ignore
+    'aria-invalid': hasError,
     id: ctx.id,
     ...props,
     name: ctx.name,
@@ -59,6 +69,7 @@ const person: Record<string, Field> = {
     mask: {
       prefix: '+',
       noImmediatePrefix: true,
+      numericOnly: true,
     },
     validations: {
       required: 'Phone is required',
@@ -275,6 +286,7 @@ const business: Record<string, Field> = {
     mask: {
       prefix: '+',
       noImmediatePrefix: true,
+      numericOnly: true,
     },
     validations: {
       required: 'Phone is required',

@@ -4,13 +4,14 @@ import Cleave from 'cleave.js';
 import React, { useEffect } from 'react';
 
 import { useFormContext } from 'react-hook-form';
-import useFieldProps from '../hooks/use-field-props';
+import useFieldProps, { FormInputProps } from '../hooks/use-field-props';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = ({ className, id, ...props }: InputProps) => {
   const { register } = useFormContext();
-  const { name, className: baseClassName, mask, validations = {}, transforms = {}, ...allProps } = useFieldProps();
+  const fieldProps = useFieldProps() as FormInputProps;
+  const { name, className: baseClassName, mask, validations = {}, transforms = {}, ...allProps } = fieldProps;
 
   useEffect(() => {
     let cleaveInstance: Cleave | null = null;
