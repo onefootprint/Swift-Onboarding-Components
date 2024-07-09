@@ -525,7 +525,7 @@ export abstract class ServiceContainers {
               },
               {
                 name: 'RUST_LOG',
-                value: 'INFO',
+                value: 'INFO,webauthn_rs_core::attestation=none,compact_jwt::jws=none',
               },
               {
                 name: 'PORT',

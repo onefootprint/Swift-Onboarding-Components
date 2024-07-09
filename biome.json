@@ -275,7 +275,8 @@
       "src/pages/api-reference/assets/api-docs.json",
       "src/pages/api-reference/assets/api-preview-docs.json",
       "src/pages/api-reference/assets/hosted-api-docs.json",
-      "src/pages/api-reference/assets/private-api-docs.json"
+      "src/pages/api-reference/assets/private-api-docs.json",
+      "backend/infra"
     ]
   }
 }
