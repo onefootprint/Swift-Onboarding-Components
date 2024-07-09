@@ -1,8 +1,9 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
-import { Checkbox, Stack } from '@onefootprint/ui';
+import { Checkbox, Divider, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import CustomDocs from '../custom-docs';
 
 const AdditionalDocuments = () => {
   const { t } = useTranslation('playbooks', {
@@ -18,6 +19,8 @@ const AdditionalDocuments = () => {
         hint={t('form.possn.hint')}
         {...register('personal.additionalDocs.possn')}
       />
+      <Divider variant="secondary" />
+      <CustomDocs />
     </Stack>
   );
 };

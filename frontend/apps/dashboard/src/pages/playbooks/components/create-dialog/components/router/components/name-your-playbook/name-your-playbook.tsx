@@ -48,7 +48,7 @@ const NameYourPlaybook = ({ kind = PlaybookKind.Kyc, onSubmit, onBack, defaultVa
   return (
     <Container>
       <FormProvider {...formMethods}>
-        <Form id="your-playbook-form" onSubmit={handleSubmit(onSubmit)}>
+        <Form id="playbook-name-form" onSubmit={handleSubmit(onSubmit)}>
           <Header>
             <Text variant="label-1" color="secondary">
               {t('title')}

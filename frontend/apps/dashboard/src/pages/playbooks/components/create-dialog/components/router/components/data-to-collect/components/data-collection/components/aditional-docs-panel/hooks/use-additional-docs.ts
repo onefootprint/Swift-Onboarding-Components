@@ -5,17 +5,21 @@ const useAdditionalDocs = () => {
   const { watch } = useFormContext<DataToCollectFormData>();
   const poa = watch('personal.additionalDocs.poa') || false;
   const possn = watch('personal.additionalDocs.possn') || false;
+  const custom = watch('personal.additionalDocs.custom') || [];
 
   const hasPoA = !!poa;
   const hasPoSsn = !!possn;
-  const hasDoc = hasPoA || hasPoSsn;
+  const hasCustom = custom.length > 0;
+  const hasDoc = hasPoA || hasPoSsn || hasCustom;
 
   return {
     poa,
     possn,
+    custom,
     meta: {
       hasPoA,
       hasPoSsn,
+      hasCustom,
       hasDoc,
     },
   };

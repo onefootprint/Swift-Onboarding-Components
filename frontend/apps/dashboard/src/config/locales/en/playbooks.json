@@ -239,6 +239,35 @@
           "possn": {
             "label": "Proof of SSN",
             "hint": "Scan of Social Security card or official document displaying your name and Social Security Number."
+          },
+          "custom": {
+            "label": "Custom"
+          }
+        }
+      },
+      "custom-docs": {
+        "title": "Custom",
+        "description": "Specify extra documents required to meet specific onboarding criteria",
+        "form": {
+          "name": {
+            "label": "Document label",
+            "placeholder": "City verification",
+            "hint": "The user-facing name for this document",
+            "errors": {
+              "required": "Please enter a label for the document."
+            }
+          },
+          "identifier": {
+            "label": "Identifier",
+            "placeholder": "document.custom.",
+            "hint": "The data identifier you can use to decrypt the document in the dashboard and via API",
+            "errors": {
+              "required": "Please enter an identifier for the document."
+            }
+          },
+          "description": {
+            "label": "Description (optional)",
+            "hint": "Describe the documents the user should submit. This information will be displayed to assist users in selecting the appropriate files."
           }
         }
       }

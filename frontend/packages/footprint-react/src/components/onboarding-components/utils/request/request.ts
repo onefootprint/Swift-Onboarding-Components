@@ -3,8 +3,6 @@ import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
 const API_BASE_URL = process.env.API_BASE_URL ?? '';
 
-console.log('API_BASE_URL', API_BASE_URL);
-
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
   data?: Record<string, unknown>;

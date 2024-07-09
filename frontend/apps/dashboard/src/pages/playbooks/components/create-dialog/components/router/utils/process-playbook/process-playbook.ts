@@ -171,7 +171,7 @@ const createGovDocsPayload = (formData: DataToCollectFormData) => {
 
 const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
   const documentsToCollect: DocumentRequestConfig[] = [];
-  const { poa, possn } = formData.personal.additionalDocs;
+  const { poa, possn, custom } = formData.personal.additionalDocs;
   if (poa) {
     documentsToCollect.push({
       kind: DocumentRequestKind.ProofOfAddress,
@@ -182,6 +182,18 @@ const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
     documentsToCollect.push({
       kind: DocumentRequestKind.ProofOfSsn,
       data: {},
+    });
+  }
+  if (custom) {
+    custom.forEach(doc => {
+      documentsToCollect.push({
+        kind: DocumentRequestKind.Custom,
+        data: {
+          description: doc.description,
+          identifier: `document.custom.${doc.identifier}`,
+          name: doc.name,
+        },
+      });
     });
   }
   return documentsToCollect;

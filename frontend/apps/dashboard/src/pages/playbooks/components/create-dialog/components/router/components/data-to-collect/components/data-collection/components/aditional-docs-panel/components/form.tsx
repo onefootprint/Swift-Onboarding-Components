@@ -19,6 +19,7 @@ const Form = ({ children, onClose }: FormProps) => {
     return {
       poa: watch('personal.additionalDocs.poa'),
       possn: watch('personal.additionalDocs.possn'),
+      custom: watch('personal.additionalDocs.custom'),
     };
   });
   const {
@@ -34,12 +35,15 @@ const Form = ({ children, onClose }: FormProps) => {
   const handleCancel = () => {
     setValue('personal.additionalDocs.poa', originalValue.poa);
     setValue('personal.additionalDocs.possn', originalValue.possn);
+    setValue('personal.additionalDocs.custom', originalValue.custom);
     onClose();
   };
 
   const handleRemoveAll = () => {
     setValue('personal.additionalDocs.poa', false);
     setValue('personal.additionalDocs.possn', false);
+    setValue('personal.additionalDocs.custom', []);
+    onClose();
   };
 
   return (

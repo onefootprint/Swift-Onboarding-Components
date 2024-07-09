@@ -1,5 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { CountryCode } from '@onefootprint/types';
+import type { CountryCode, CustomDI } from '@onefootprint/types';
 import {
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
@@ -161,6 +161,25 @@ export type DefaultValues = {
   residency: ResidencyFormData;
 };
 
+export type GovDocs = {
+  global: SupportedIdDocTypes[];
+  country: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+  selfie?: boolean;
+  idDocFirst?: boolean;
+};
+
+export type CustomDoc = {
+  name: string;
+  identifier: CustomDI;
+  description?: string;
+};
+
+export type AdditionalDocs = {
+  poa?: boolean;
+  possn?: boolean;
+  custom?: CustomDoc[];
+};
+
 export type Personal = {
   [CollectedKycDataOption.email]: boolean;
   [CollectedKycDataOption.phoneNumber]: boolean;
@@ -169,16 +188,8 @@ export type Personal = {
   [CollectedKycDataOption.address]: boolean;
   ssn: boolean;
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  docs: {
-    global: SupportedIdDocTypes[];
-    country: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
-    selfie?: boolean;
-    idDocFirst?: boolean;
-  };
-  additionalDocs: {
-    poa?: boolean;
-    possn?: boolean;
-  };
+  docs: GovDocs;
+  additionalDocs: AdditionalDocs;
   ssnOptional?: boolean;
   usTaxIdAcceptable?: boolean;
 };
@@ -222,6 +233,7 @@ export const defaultPlaybookValuesAuth = {
       additionalDocs: {
         poa: false,
         possn: false,
+        custom: [],
       },
       name: false,
       ssn: false,

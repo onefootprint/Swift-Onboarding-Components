@@ -1,26 +1,44 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
-
 import { createFontStyles } from '../../utils';
 
-const FormInputAddon = styled.div`
+type FormInputAddonSize = 'default' | 'compact';
+
+type FormInputAddonProps = {
+  children: React.ReactNode;
+  size?: FormInputAddonSize;
+};
+
+const FormInputAddon = ({ children, size = 'default' }: FormInputAddonProps) => {
+  return <Container data-size={size}>{children}</Container>;
+};
+
+const Container = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-    margin-inline-end: -1px;
-    border-top-right-radius: 0px;
+
+    align-items: center;
+    background: ${theme.backgroundColor.secondary};
     border-bottom-right-radius: 0px;
     border-inline-end-color: transparent;
-    width: auto;
-    align-items: center;
-    white-space: nowrap;
+    border-radius: ${theme.borderRadius.default} 0 0  ${theme.borderRadius.default};
     border-style: solid;
-    flex: 0 0 auto;
-    display: flex;
-    background: ${theme.backgroundColor.secondary};
+    border-top-right-radius: 0px;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     color: ${theme.color.primary};
-    border-radius: ${theme.borderRadius.default} 0 0
-      ${theme.borderRadius.default};
+    display: flex;
+    flex: 0 0 auto;
+    margin-inline-end: -1px;
+    white-space: nowrap;
+    width: auto;
+    
+    &[data-size='compact'] {
+      padding: ${theme.spacing[2]} ${theme.spacing[5]};
+    }
+
+    &[data-size='default'] {
+      padding: ${theme.spacing[3]} ${theme.spacing[5]};
+    }
   `}
 
   + .fp-input-container {
