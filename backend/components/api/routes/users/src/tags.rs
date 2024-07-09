@@ -31,8 +31,8 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateTagRequest>,
 ) -> ApiResponse<api_wire_types::UserTag> {
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -64,8 +64,8 @@ pub async fn get(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> ApiListResponse<api_wire_types::UserTag> {
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -89,8 +89,8 @@ pub async fn delete(
     path: FpIdPathPlus<TagId>,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (fp_id, tag_id) = path.into_inner();

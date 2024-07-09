@@ -24,8 +24,8 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateLabelRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    auth.check_preview_guard(PreviewApi::Labels)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    auth.check_preview_guard(PreviewApi::Labels)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -50,8 +50,8 @@ pub async fn get(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<api_wire_types::UserLabel> {
-    auth.check_preview_guard(PreviewApi::Labels)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    auth.check_preview_guard(PreviewApi::Labels)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();

@@ -404,6 +404,10 @@ impl Tenant {
         };
         Self::update(conn, id, update)
     }
+
+    pub fn can_access_preview(&self, api: &PreviewApi) -> bool {
+        self.is_demo_tenant || self.allowed_preview_apis.contains(api)
+    }
 }
 
 impl WorkosAuthIdentity for Tenant {

@@ -17,7 +17,6 @@ use db::DbError;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::DataLifetimeSource;
-use newtypes::PreviewApi;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
@@ -112,21 +111,6 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> FpResult<SecretApiKey> {
         .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()))?;
 
     Ok(tenant_sk_input)
-}
-
-impl SecretTenantAuthContext {
-    pub fn can_access_preview(&self, api: &PreviewApi) -> bool {
-        let tenant = &self.0.tenant;
-        tenant.is_demo_tenant || tenant.allowed_preview_apis.contains(api)
-    }
-
-    pub fn check_preview_guard(&self, api: PreviewApi) -> FpResult<()> {
-        if !self.can_access_preview(&api) {
-            tracing::error!(tenant_id=%self.0.tenant.id, tenant_name=%self.0.tenant.name, api=%api, "Tenant attempting to use unallowed preview API");
-            return Err(AuthError::CannotAccessPreviewApi.into());
-        }
-        Ok(())
-    }
 }
 
 impl TenantAuth for CheckedSecretTenantAuth {

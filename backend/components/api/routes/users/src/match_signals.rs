@@ -26,8 +26,8 @@ pub async fn get(
     request: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<GetFieldValidationResponse> {
-    auth.check_preview_guard(PreviewApi::MatchSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::MatchSignalsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

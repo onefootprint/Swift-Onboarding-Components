@@ -5,6 +5,7 @@ pub use client::*;
 mod firm_employee;
 use db::models::partner_tenant::PartnerTenant;
 pub use firm_employee::*;
+use newtypes::PreviewApi;
 mod firm_employee_assume;
 pub use self::firm_employee_assume::*;
 mod guards;
@@ -97,6 +98,14 @@ pub trait TenantAuth {
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
     fn dl_source(&self) -> DataLifetimeSource;
+
+    fn check_preview_guard(&self, api: PreviewApi) -> FpResult<()> {
+        if !self.tenant().can_access_preview(&api) {
+            tracing::error!(tenant_id=%self.tenant().id, tenant_name=%self.tenant().name, api=%api, "Tenant {} attempting to use unallowed preview API: {}", self.tenant().name, api);
+            return Err(AuthError::CannotAccessPreviewApi.into());
+        }
+        Ok(())
+    }
 }
 
 pub trait PartnerTenantAuth {

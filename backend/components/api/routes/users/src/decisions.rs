@@ -31,10 +31,10 @@ pub async fn post(
     request: web::Json<CreateUserDecisionRequest>,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
-    auth.check_preview_guard(PreviewApi::CreateUserDecision)?;
     // This is a kind of weird guard to use here. But ManualReview can't currently be added to API key
     // IAM roles
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    auth.check_preview_guard(PreviewApi::CreateUserDecision)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor().into();

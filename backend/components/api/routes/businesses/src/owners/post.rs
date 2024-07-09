@@ -32,8 +32,8 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: web::Json<NewBusinessOwnerRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    auth.check_preview_guard(PreviewApi::CreateBusinessOwner)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::CreateBusinessOwner)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();

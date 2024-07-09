@@ -595,9 +595,7 @@ impl Workflow {
         // legacy webhook event
         let old_composite_status = (sv_delta.old_status, mr_deltas.old_has_mrs);
         let new_composite_status = (sv_delta.new_status, mr_deltas.new_has_mrs);
-        let tenant_has_legacy_webhook = tenant
-            .allowed_preview_apis
-            .contains(&PreviewApi::LegacyOnboardingStatusWebhook);
+        let tenant_has_legacy_webhook = tenant.can_access_preview(&PreviewApi::LegacyOnboardingStatusWebhook);
         if !tenant_has_legacy_webhook || (new_composite_status == old_composite_status) {
             return Ok(());
         }

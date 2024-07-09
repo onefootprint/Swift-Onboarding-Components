@@ -39,8 +39,8 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> ApiResponse<ObConfigSessionToken> {
-    auth.check_preview_guard(PreviewApi::OnboardingSessionToken)?;
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
+    auth.check_preview_guard(PreviewApi::OnboardingSessionToken)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
 

@@ -33,8 +33,8 @@ pub async fn get(
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResponse<Json<BusinessOwnersListResponse>> {
-    auth.check_preview_guard(PreviewApi::ListBusinessOwners)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::ListBusinessOwners)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();

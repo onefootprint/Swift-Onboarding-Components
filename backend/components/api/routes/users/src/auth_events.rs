@@ -25,10 +25,10 @@ pub async fn get(
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::PublicAuthEvent>>> {
-    auth.check_preview_guard(PreviewApi::AuthEventsList)?;
     // For now, the only consumer of this is coba to get the IP address from where onboarding occurred
     // We might want to migrate them to a /cip_metadata endpoint
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::AuthEventsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

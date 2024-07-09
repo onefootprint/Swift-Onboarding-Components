@@ -62,10 +62,10 @@ pub async fn post(
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<IntegrityResponse> {
-    auth.check_preview_guard(PreviewApi::VaultIntegrity)?;
     // TODO: should we add a separate guard for checking integrity?
     // This is incorrect - won't change though since we are deprecating this soon
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    auth.check_preview_guard(PreviewApi::VaultIntegrity)?;
 
     let IntegrityRequest { fields, signing_key } = request.into_inner();
 

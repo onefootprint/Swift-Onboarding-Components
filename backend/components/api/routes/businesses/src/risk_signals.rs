@@ -27,8 +27,8 @@ pub async fn get(
     request: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> ApiListResponse<api_wire_types::PublicRiskSignal> {
-    auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

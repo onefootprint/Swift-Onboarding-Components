@@ -40,8 +40,8 @@ pub async fn get(
     auth: SecretTenantAuthContext,
     fp_id: FpIdPath,
 ) -> ApiResponse<Json<OnboardingsListResponse>> {
-    auth.check_preview_guard(PreviewApi::OnboardingsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::OnboardingsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();

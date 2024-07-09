@@ -47,9 +47,9 @@ pub async fn just_in_time(
     request: HttpRequest,
     root_span: RootSpan,
 ) -> ApiResponse<HttpResponse> {
+    let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
     auth.check_preview_guard(PreviewApi::VaultProxyJit)?;
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
-    let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
 
     invoke_vault_proxy(
         state,
@@ -79,9 +79,9 @@ pub async fn id(
     request: HttpRequest,
     root_span: RootSpan,
 ) -> ApiResponse<HttpResponse> {
-    auth.check_preview_guard(PreviewApi::VaultProxy)?;
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
+    auth.check_preview_guard(PreviewApi::VaultProxy)?;
 
     invoke_vault_proxy(
         state,
