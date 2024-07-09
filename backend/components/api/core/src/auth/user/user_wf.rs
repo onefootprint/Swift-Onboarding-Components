@@ -125,6 +125,10 @@ impl CheckUserWfAuthContext {
 
     /// Get the business workflow associated with this auth token, if any
     pub fn business_workflow(&self, conn: &mut PgConn) -> FpResult<Option<Workflow>> {
+        if let Some(biz_wf_id) = self.data.user_session.biz_wf_id.as_ref() {
+            let (wf, _) = Workflow::get_all(conn, biz_wf_id)?;
+            return Ok(Some(wf));
+        }
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
         };

@@ -37,8 +37,11 @@ pub struct UserSession {
     pub bo_id: Option<BoId>,
     /// The obc that we'll use to make a new onboarding workflow, if any
     pub obc_id: Option<ObConfigurationId>,
-    /// The workflow for the auth session, if any
+    /// The workflow for the user in this auth session, if any
     pub wf_id: Option<WorkflowId>,
+    /// The workflow for the business in this auth session, if any
+    #[serde(default)]
+    pub biz_wf_id: Option<WorkflowId>,
     /// The workflow request for the auth session, if any. This provides only-once semantics for
     /// the auth token - we don't allow making a new Workflow if you've already made one
     pub wfr_id: Option<WorkflowRequestId>,
@@ -60,6 +63,7 @@ pub struct NewUserSessionContext {
     pub bo_id: Option<BoId>,
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
+    pub biz_wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
     pub kba: Vec<DataIdentifier>,
 }
@@ -188,6 +192,7 @@ impl UserSession {
             bo_id,
             obc_id,
             wf_id,
+            biz_wf_id,
             wfr_id,
             kba,
         } = context;
@@ -199,6 +204,7 @@ impl UserSession {
             bo_id,
             obc_id,
             wf_id,
+            biz_wf_id,
             wfr_id,
             scopes,
             auth_events,
@@ -223,6 +229,7 @@ impl UserSession {
             bo_id: new_ctx.bo_id.or(old.bo_id),
             obc_id: new_ctx.obc_id.or(old.obc_id),
             wf_id: new_ctx.wf_id.or(old.wf_id),
+            biz_wf_id: new_ctx.biz_wf_id.or(old.biz_wf_id),
             wfr_id: new_ctx.wfr_id.or(old.wfr_id),
             kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
         };
@@ -251,6 +258,7 @@ impl UserSession {
             bo_id: old.bo_id,
             obc_id: old.obc_id,
             wf_id: old.wf_id,
+            biz_wf_id: old.biz_wf_id,
             wfr_id: old.wfr_id,
             kba: old.kba,
         };

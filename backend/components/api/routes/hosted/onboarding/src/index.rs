@@ -114,13 +114,15 @@ pub async fn post(
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?
+            let (biz_wf_id, sb_id) = biz_wf.map(|wf| (wf.id, wf.scoped_vault_id)).unzip();
             let args = NewUserSessionContext {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
+                biz_wf_id,
+                sb_id,
                 obc_id: user_auth
                     .ob_configuration_id()
                     .is_none()
                     .then_some(obc.id.clone()),
-                sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
             let session = user_auth.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
