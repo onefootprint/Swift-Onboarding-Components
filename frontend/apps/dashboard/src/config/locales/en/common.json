@@ -2823,10 +2823,10 @@
             "disabled-tooltip": "You are not configured to create production KYB playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           },
           "data-collection-title": "Data collection",
-          "id-doc": {
-            "title": "ID Document & Selfie only",
-            "description": "Users will upload and validate images of their ID documents (passport, driver's license, etc.) and optionally if requested, collect a selfie and verify it matches the document.",
-            "disabled-tooltip": "You are not configured to create production ID Document playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
+          "doc-only": {
+            "title": "Document only",
+            "description": "Users will upload and validate ID documents (passport, driver’s license, etc.), optionally collect a selfie to match the document, and custom documents like proof-of-address, proof-of-SSN, etc.",
+            "disabled-tooltip": "You are not configured to create production Document only playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
           }
         },
         "onboarding-templates": {

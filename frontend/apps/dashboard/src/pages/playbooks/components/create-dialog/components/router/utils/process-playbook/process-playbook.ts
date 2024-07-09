@@ -7,7 +7,7 @@ import {
   DocumentRequestKind,
 } from '@onefootprint/types';
 
-import { isAuth, isIdDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
+import { isAuth, isDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
   DataToCollectFormData,
@@ -255,7 +255,7 @@ const processPlaybook = ({
   const requiredKycFields = getRequiredKycCollectFields();
   if (isAuth(kind)) {
     mustCollectData.push(CollectedKycDataOption.email);
-  } else if (!isIdDocOnly(kind)) {
+  } else if (!isDocOnly(kind)) {
     mustCollectData.push(...requiredKycFields);
   }
 
@@ -273,7 +273,7 @@ const processPlaybook = ({
   if (personal[CollectedKycDataOption.phoneNumber]) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
-  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDocOnly(kind);
+  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isDocOnly(kind);
 
   // id doc handling
   const { global = [], country, selfie, idDocFirst } = personal.docs;
@@ -293,7 +293,7 @@ const processPlaybook = ({
   // assuming canAccess = mustCollect + optional
   const canAccessData = mustCollectData.concat(optionalData);
 
-  const skipConfirm = isIdDocOnly(kind);
+  const skipConfirm = isDocOnly(kind);
 
   return {
     canAccessData,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import AdditionalDocsForm from '../additional-docs-form';
+import AdditionalDocuments from '../additional-docs';
 import useAdditionalDocs from './hooks/use-additional-docs';
 
 import Panel from '../panel';
@@ -30,7 +30,7 @@ const AdditionalDocsWithPanel = () => {
     <Panel cta={showContent ? null : <Cta onClick={handleToggle} hasAdded={hasDoc} />} title={t('title')}>
       {showContent ? (
         <Form onClose={handleClose}>
-          <AdditionalDocsForm />
+          <AdditionalDocuments />
         </Form>
       ) : (
         <Preview />

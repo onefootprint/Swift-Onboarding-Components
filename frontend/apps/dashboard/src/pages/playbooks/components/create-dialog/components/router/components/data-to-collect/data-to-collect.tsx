@@ -4,12 +4,11 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth, isIdDocOnly } from '@/playbooks/utils/kind';
+import { isAuth, isDocOnly } from '@/playbooks/utils/kind';
 import {
   type DataToCollectFormData,
   type DataToCollectMeta,
   OnboardingTemplate,
-  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
@@ -30,6 +29,9 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
   const { handleSubmit, watch } = formMethods;
   const selectedGlobalDocs = watch('personal.docs.global');
   const selectedCountrySpecificDocs = watch('personal.docs.country');
+  const poa = watch('personal.additionalDocs.poa') || false;
+  const possn = watch('personal.additionalDocs.possn') || false;
+  const custom = watch('personal.additionalDocs.custom') || [];
 
   const onboardingTemplateToSubtitleMap = {
     [OnboardingTemplate.Custom]: t('subtitle.default'),
@@ -44,7 +46,7 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
     if (isAuth(meta.kind)) {
       return t('title.auth');
     }
-    if (isIdDocOnly(meta.kind)) {
+    if (isDocOnly(meta.kind)) {
       return t('title.id-doc');
     }
     const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
@@ -54,7 +56,7 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
 
   const getSubtitle = (): string => {
     if (isAuth(meta.kind)) return t('subtitle.auth');
-    if (isIdDocOnly(meta.kind)) return t('subtitle.id-doc');
+    if (isDocOnly(meta.kind)) return t('subtitle.id-doc');
 
     const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
 
@@ -63,12 +65,20 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
   };
 
   const isNextDisabled = () => {
-    const isIdDoc = meta.kind === PlaybookKind.IdDoc;
+    if (!isDocOnly(meta.kind)) return false;
+
     const noGlobalDocsSelected = selectedGlobalDocs.length === 0;
     const noCountrySpecificDocsSelected = Object.keys(selectedCountrySpecificDocs).length === 0;
-    const noIdDocSelected = noGlobalDocsSelected && noCountrySpecificDocsSelected;
+    const noGovDocs = noGlobalDocsSelected && noCountrySpecificDocsSelected;
 
-    return isIdDoc && noIdDocSelected;
+    const noPoa = !poa;
+    const noPossn = !possn;
+    const noCustom = custom.length === 0;
+    const noAdditionalDocs = noPoa && noPossn && noCustom;
+
+    const noIdDocSelected = noGovDocs && noAdditionalDocs;
+
+    return noIdDocSelected;
   };
 
   return (

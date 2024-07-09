@@ -12,7 +12,7 @@ export enum PlaybookKind {
   Auth = 'auth',
   Kyb = 'kyb',
   Kyc = 'kyc',
-  IdDoc = 'document',
+  DocOnly = 'document',
   Unknown = 'unknown',
 }
 
@@ -402,7 +402,7 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
 };
 
 export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
-  kind: PlaybookKind.IdDoc,
+  kind: PlaybookKind.DocOnly,
   personal: {
     email: false,
     docs: {

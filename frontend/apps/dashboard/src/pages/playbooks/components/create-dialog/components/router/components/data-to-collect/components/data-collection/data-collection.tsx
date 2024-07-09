@@ -1,15 +1,14 @@
-import { Divider, InlineAlert } from '@onefootprint/ui';
+import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAuth, isIdDocOnly, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
+import { isAuth, isDocOnly, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
 import { type DataToCollectMeta, OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
-import AdditionalDocsPanel from './components/aditional-docs-panel';
+import AdditionalDocsPanel from './components/additional-docs-panel';
 import Auth from './components/auth';
 import Business from './components/business';
-import GovDocs from './components/gov-docs';
 import GovDocsWithPanel from './components/gov-docs-with-panel';
 import Investor from './components/investor';
 import Person from './components/person';
@@ -32,10 +31,11 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     );
   }
 
-  if (isIdDocOnly(meta.kind)) {
+  if (isDocOnly(meta.kind)) {
     return (
       <Container>
-        <GovDocs />
+        <GovDocsWithPanel />
+        <AdditionalDocsPanel />
       </Container>
     );
   }

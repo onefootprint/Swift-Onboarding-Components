@@ -6,7 +6,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth, isIdDocOnly } from '@/playbooks/utils/kind';
+import { isAuth, isDocOnly } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
   DataToCollectFormData,
@@ -147,7 +147,7 @@ const Router = ({ onCreate }: RouterProps) => {
 
   const handleSubmitDataToCollect = (formData: DataToCollectFormData) => {
     const { nameForm } = state.context;
-    if (isIdDocOnly(state.context.kind) && nameForm) {
+    if (isDocOnly(state.context.kind) && nameForm) {
       const verificationChecksForm = {
         skipKyc: true,
         amlFormData: defaultValues.aml,

@@ -90,12 +90,12 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
                   label: t('data-collection-title'),
                   options: [
                     {
-                      title: t('id-doc.title'),
-                      description: t('id-doc.description'),
-                      value: PlaybookKind.IdDoc,
+                      title: t('doc-only.title'),
+                      description: t('doc-only.description'),
+                      value: PlaybookKind.DocOnly,
                       IconComponent: IcoIdCard24,
                       disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
-                      disabledHint: t('id-doc.disabled-tooltip'),
+                      disabledHint: t('doc-only.disabled-tooltip'),
                     },
                   ],
                 },

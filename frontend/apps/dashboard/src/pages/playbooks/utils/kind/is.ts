@@ -6,4 +6,4 @@ export const isKyb = (x: unknown): x is PlaybookKind.Kyb => x === PlaybookKind.K
 
 export const isKyc = (x: unknown): x is PlaybookKind.Kyc => x === PlaybookKind.Kyc;
 
-export const isIdDocOnly = (x: unknown): x is PlaybookKind.IdDoc => x === PlaybookKind.IdDoc;
+export const isDocOnly = (x: unknown): x is PlaybookKind.DocOnly => x === PlaybookKind.DocOnly;

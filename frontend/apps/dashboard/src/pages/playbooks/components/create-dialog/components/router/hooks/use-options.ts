@@ -63,7 +63,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
     [PlaybookKind.Auth]: authOptions,
     [PlaybookKind.Kyb]: kybOptions,
     [PlaybookKind.Kyc]: kycOptions,
-    [PlaybookKind.IdDoc]: docOptions,
+    [PlaybookKind.DocOnly]: docOptions,
     [PlaybookKind.Unknown]: defaultOptions,
   };
 };
