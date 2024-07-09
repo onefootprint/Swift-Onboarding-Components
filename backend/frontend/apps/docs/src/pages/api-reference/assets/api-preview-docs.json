@@ -1,0 +1,3371 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Footprint API"
+    },
+    "servers": [
+        {
+            "url": "//api.onefootprint.com"
+        }
+    ],
+    "paths": {
+        "/businesses/{fp_bid}/kyb": {
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TriggerKybRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_bid}/owners": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGets the beneficial owners of a business.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedBusinessOwner"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLink an existing fp_id to the provided business as a beneficial owner.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewBusinessOwnerRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_id}/onboardings": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicOnboarding"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_id}/risk_signals": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PublicRiskSignal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/onboarding/session": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGenerates a single-use session token for a playbook.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOnboardingSessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObConfigSessionToken"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/org/risk_signals": {
+            "get": {
+                "tags": [
+                    "Org",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nList all Footprint Risk Signals",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PublicRiskSignalDescription"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id:fp_[_A-Za-z0-9]*}/tags/{tag_id:tag_[_A-Za-z0-9]*}": {
+            "delete": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUntag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tag_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "tag_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/auth_events": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's recent device insights",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicAuthEvent"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/decisions": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserDecisionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/documents": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView the successfully uploaded documents uploaded for this user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PublicDocument"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/alpaca/account": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Alpaca",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an Alpaca account",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlpacaCreateAccountRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlpacaCreateAccountResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/alpaca/cip": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Alpaca",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nForward CIP information to Alpaca",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlpacaCipRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlpacaCipResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/apex/cip_report": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Apex",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nExport CIP information for APEX as a JSON object",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApexCipReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApexCipSummaryResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/kyc": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTrigger KYC on the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TriggerKycRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/label": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLabel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUpdate a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateLabelRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/onboardings": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks a user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicOnboarding"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/risk_signals": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PublicRiskSignal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/tags": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's tags",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserTag"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTagRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserTag"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/vault/integrity": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nChecks if provided data is valid before adding it to the vault.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IntegrityRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IntegrityResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/vault_proxy/reflect": {
+            "post": {
+                "tags": [
+                    "VaultProxy",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nDecrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-id",
+                        "description": "When reflect requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-access-reason",
+                        "description": "Access reason for any decryption operations during the reflection request",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Raw body",
+                    "content": {
+                        "application/json": {}
+                    },
+                    "required": true
+                },
+                "responses": {},
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "Dashboard Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Dashboard-Authorization",
+                "description": "Short-lived token for an authenticated dashboard user."
+            },
+            "Secret API Key": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Footprint-Secret-Key",
+                "description": "Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server."
+            }
+        },
+        "schemas": {
+            "AlpacaCipRequest": {
+                "type": "object",
+                "properties": {
+                    "account_id": {
+                        "description": "The associated user's alpaca account id",
+                        "type": "string"
+                    },
+                    "api_key": {
+                        "description": "API Key to use with alpaca",
+                        "type": "string"
+                    },
+                    "api_secret": {
+                        "description": "API Secret to use with alpaca",
+                        "type": "string"
+                    },
+                    "default_approver": {
+                        "description": "The default approver name/email to use for automatically approved users. This will be\n overwritten if done by a manual reviewer",
+                        "type": "string"
+                    },
+                    "hostname": {
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like:\n `broker-api.sandbox.alpaca.markets`)",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "account_id",
+                    "api_key",
+                    "api_secret",
+                    "default_approver",
+                    "hostname"
+                ]
+            },
+            "AlpacaCipResponse": {
+                "type": "object",
+                "properties": {
+                    "alpaca_response": {
+                        "description": "Response body from Alpaca",
+                        "type": "object"
+                    },
+                    "status_code": {
+                        "description": "Alpaca response HTTP status code",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "alpaca_response",
+                    "status_code"
+                ]
+            },
+            "AlpacaCreateAccountRequest": {
+                "type": "object",
+                "properties": {
+                    "account_type": {
+                        "type": "string",
+                        "enum": [
+                            "trading",
+                            "custodial",
+                            "donor_advised"
+                        ]
+                    },
+                    "agreements": {
+                        "type": "array",
+                        "items": {
+                            "description": "In order to comply with Alpaca\u2019s terms of service, each account owner must be presented the\n following agreements.",
+                            "type": "object",
+                            "properties": {
+                                "agreement": {
+                                    "type": "string",
+                                    "enum": [
+                                        "customer_agreement",
+                                        "crypto_agreement"
+                                    ]
+                                },
+                                "ip_address": {
+                                    "type": "string"
+                                },
+                                "revision": {
+                                    "type": "string"
+                                },
+                                "signed_at": {
+                                    "description": "string (timestamp)",
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
+                            },
+                            "required": [
+                                "agreement",
+                                "ip_address",
+                                "signed_at"
+                            ]
+                        }
+                    },
+                    "api_key": {
+                        "description": "API Key to use with alpaca",
+                        "type": "string"
+                    },
+                    "api_secret": {
+                        "description": "API Secret to use with alpaca",
+                        "type": "string"
+                    },
+                    "disclosures": {
+                        "description": "It is your responsibility as the service provider to denote if the account owner falls under\n each category defined by FINRA rules. We recommend asking these questions at any point of the\n onboarding process of each account owner in the form of Y/N and Radio Buttons.",
+                        "type": "object",
+                        "properties": {
+                            "context": {
+                                "description": "Information relevant to the user\u2019s disclosure selection should be sent through this object.",
+                                "type": "array",
+                                "items": {
+                                    "description": "If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user\n identifies with any of the disclosures before the account can be approved. This information can\n be sent through the context object to speed up the time to approve their account.",
+                                    "type": "object",
+                                    "properties": {
+                                        "company_city": {
+                                            "description": "Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM",
+                                            "type": "string"
+                                        },
+                                        "company_compliance_email": {
+                                            "description": "Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM",
+                                            "type": "string"
+                                        },
+                                        "company_country": {
+                                            "description": "Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM",
+                                            "type": "string"
+                                        },
+                                        "company_name": {
+                                            "description": "Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM",
+                                            "type": "string"
+                                        },
+                                        "company_state": {
+                                            "description": "Required if company_country = USA",
+                                            "type": "string"
+                                        },
+                                        "company_street_address": {
+                                            "description": "Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "context_type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "CONTROLLED_FIRM",
+                                                "AFFILIATE_FIRM",
+                                                "IMMEDIATE_FAMILY_EXPOSED"
+                                            ]
+                                        },
+                                        "family_name": {
+                                            "description": "Required if context_type = IMMEDIATE_FAMILY_EXPOSED",
+                                            "type": "string"
+                                        },
+                                        "given_name": {
+                                            "description": "Required if context_type = IMMEDIATE_FAMILY_EXPOSED",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "company_city",
+                                        "company_compliance_email",
+                                        "company_country",
+                                        "company_name",
+                                        "company_state",
+                                        "company_street_address",
+                                        "context_type",
+                                        "family_name",
+                                        "given_name"
+                                    ]
+                                }
+                            },
+                            "employer_address": {
+                                "type": "string"
+                            },
+                            "employer_name": {
+                                "type": "string"
+                            },
+                            "employment_position": {
+                                "type": "string"
+                            },
+                            "employment_status": {
+                                "type": "string",
+                                "enum": [
+                                    "UNEMPLOYED",
+                                    "EMPLOYED",
+                                    "STUDENT",
+                                    "RETIRED"
+                                ]
+                            },
+                            "immediate_family_exposed": {
+                                "description": "If your user\u2019s immediate family member (sibling, husband/wife, child, parent) is either\n politically exposed or holds a control position.",
+                                "type": "boolean"
+                            },
+                            "is_affiliated_exchange_or_finra": {
+                                "type": "boolean"
+                            },
+                            "is_control_person": {
+                                "description": "Whether user holds a controlling position in a publicly traded company, member of the board\n of directors or has policy making abilities in a publicly traded company.",
+                                "type": "boolean"
+                            },
+                            "is_politically_exposed": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "immediate_family_exposed",
+                            "is_affiliated_exchange_or_finra",
+                            "is_control_person",
+                            "is_politically_exposed"
+                        ]
+                    },
+                    "enabled_assets": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "us_equity",
+                                "crypto"
+                            ]
+                        }
+                    },
+                    "hostname": {
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like:\n `broker-api.sandbox.alpaca.markets`)",
+                        "type": "string"
+                    },
+                    "trusted_contact": {
+                        "description": "This model input is optional. However, the client should make reasonable effort to obtain the\n trusted contact information. See more details in FINRA Notice 17-11",
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string"
+                            },
+                            "country": {
+                                "type": "string"
+                            },
+                            "email_address": {
+                                "description": "In addition, only one of the following is required:",
+                                "type": "string"
+                            },
+                            "family_name": {
+                                "type": "string"
+                            },
+                            "given_name": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "postal_code": {
+                                "type": "string"
+                            },
+                            "state": {
+                                "type": "string"
+                            },
+                            "street_address": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "family_name",
+                            "given_name"
+                        ]
+                    }
+                },
+                "required": [
+                    "api_key",
+                    "api_secret",
+                    "hostname"
+                ]
+            },
+            "AlpacaCreateAccountResponse": {
+                "type": "object",
+                "properties": {
+                    "alpaca_response": {
+                        "description": "response from alpaca",
+                        "type": "object"
+                    },
+                    "status_code": {
+                        "description": "alpaca response HTTP status code",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "alpaca_response",
+                    "status_code"
+                ]
+            },
+            "ApexCipReportRequest": {
+                "type": "object",
+                "properties": {
+                    "default_approver": {
+                        "description": "The default approver name/email to use for automatically approved users. This will be\n overwritten if done by a manual reviewer",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "default_approver"
+                ]
+            },
+            "ApexCipSummaryResults": {
+                "type": "object",
+                "properties": {
+                    "approved_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "approved_by": {
+                        "type": "string"
+                    },
+                    "approved_reason": {
+                        "type": "string"
+                    },
+                    "check_completed_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "check_initiated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "checked_data": {
+                        "type": "object",
+                        "properties": {
+                            "address": {
+                                "type": "string"
+                            },
+                            "customer_name": {
+                                "type": "string"
+                            },
+                            "date_of_birth": {
+                                "type": "string"
+                            },
+                            "tax_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "address",
+                            "customer_name",
+                            "date_of_birth"
+                        ]
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "enum": [
+                            "clear",
+                            "consider"
+                        ]
+                    },
+                    "date_of_birth_breakdown": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "footprint",
+                                "idology",
+                                "socure",
+                                "lexis",
+                                "experian",
+                                "twilio",
+                                "middesk",
+                                "incode",
+                                "stytch",
+                                "neuro_id",
+                                "samba_safety"
+                            ]
+                        }
+                    },
+                    "ip_address": {
+                        "type": "string"
+                    },
+                    "kyc_completed_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "matched_address": {
+                        "type": "string",
+                        "enum": [
+                            "clear",
+                            "consider"
+                        ]
+                    },
+                    "matched_addresses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "footprint",
+                                "idology",
+                                "socure",
+                                "lexis",
+                                "experian",
+                                "twilio",
+                                "middesk",
+                                "incode",
+                                "stytch",
+                                "neuro_id",
+                                "samba_safety"
+                            ]
+                        }
+                    },
+                    "result": {
+                        "type": "string",
+                        "enum": [
+                            "clear",
+                            "consider"
+                        ]
+                    },
+                    "self_reported": {
+                        "type": "object",
+                        "properties": {
+                            "annual_income": {
+                                "type": "string"
+                            },
+                            "citizenships": {
+                                "type": "string"
+                            },
+                            "declarations": {
+                                "type": "string"
+                            },
+                            "employment_status": {
+                                "type": "string"
+                            },
+                            "investment_objectives": {
+                                "type": "string"
+                            },
+                            "is_employed_at_brokerage_firm": {
+                                "type": "string"
+                            },
+                            "net_worth": {
+                                "type": "string"
+                            },
+                            "occupation": {
+                                "type": "string"
+                            },
+                            "us_legal_status": {
+                                "type": "string"
+                            },
+                            "visa_kind": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "tax_id": {
+                        "type": "string",
+                        "enum": [
+                            "clear",
+                            "consider"
+                        ]
+                    },
+                    "tax_id_breakdown": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "footprint",
+                                "idology",
+                                "socure",
+                                "lexis",
+                                "experian",
+                                "twilio",
+                                "middesk",
+                                "incode",
+                                "stytch",
+                                "neuro_id",
+                                "samba_safety"
+                            ]
+                        }
+                    },
+                    "user_id": {
+                        "type": "string"
+                    },
+                    "watchlist": {
+                        "type": "object",
+                        "properties": {
+                            "adverse_media": {
+                                "type": "string",
+                                "enum": [
+                                    "clear",
+                                    "consider"
+                                ]
+                            },
+                            "check_completed_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "monitored_lists": {
+                                "type": "string",
+                                "enum": [
+                                    "clear",
+                                    "consider"
+                                ]
+                            },
+                            "politically_exposed_person": {
+                                "type": "string",
+                                "enum": [
+                                    "clear",
+                                    "consider"
+                                ]
+                            },
+                            "records": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object"
+                                }
+                            },
+                            "result": {
+                                "type": "string",
+                                "enum": [
+                                    "clear",
+                                    "consider"
+                                ]
+                            },
+                            "sanction": {
+                                "type": "string",
+                                "enum": [
+                                    "clear",
+                                    "consider"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "adverse_media",
+                            "check_completed_at",
+                            "monitored_lists",
+                            "politically_exposed_person",
+                            "records",
+                            "result",
+                            "sanction"
+                        ]
+                    }
+                },
+                "required": [
+                    "approved_at",
+                    "approved_by",
+                    "checked_data",
+                    "date_of_birth",
+                    "date_of_birth_breakdown",
+                    "ip_address",
+                    "matched_address",
+                    "matched_addresses",
+                    "result",
+                    "self_reported",
+                    "tax_id",
+                    "tax_id_breakdown",
+                    "user_id",
+                    "watchlist"
+                ]
+            },
+            "CreateLabelRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
+            "CreateOnboardingSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
+                ]
+            },
+            "CreateTagRequest": {
+                "type": "object",
+                "properties": {
+                    "tag": {
+                        "description": "any string to tag a user with",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "tag"
+                ]
+            },
+            "CreateUserDecisionRequest": {
+                "type": "object",
+                "properties": {
+                    "annotation": {
+                        "description": "Human-readable explanation for the manual review that will be displayed in the user timeline\n on the dashboard.",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass"
+                        ]
+                    }
+                },
+                "required": [
+                    "annotation",
+                    "status"
+                ]
+            },
+            "Empty": {
+                "type": "object"
+            },
+            "EntityValidateResponse": {
+                "type": "object",
+                "properties": {
+                    "fp_id": {
+                        "type": "string"
+                    },
+                    "playbook_key": {
+                        "type": "string"
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pass",
+                            "fail",
+                            "incomplete",
+                            "pending",
+                            "none"
+                        ]
+                    }
+                },
+                "required": [
+                    "fp_id",
+                    "playbook_key",
+                    "requires_manual_review",
+                    "status"
+                ]
+            },
+            "IntegrityRequest": {
+                "type": "object",
+                "properties": {
+                    "fields": {
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
+                            "type": "string",
+                            "enum": [
+                                "id.first_name",
+                                "id.middle_name",
+                                "id.last_name",
+                                "id.dob",
+                                "id.ssn4",
+                                "id.ssn9",
+                                "id.address_line1",
+                                "id.address_line2",
+                                "id.city",
+                                "id.state",
+                                "id.zip",
+                                "id.country",
+                                "id.email",
+                                "id.phone_number",
+                                "id.us_legal_status",
+                                "id.visa_kind",
+                                "id.visa_expiration_date",
+                                "id.nationality",
+                                "id.citizenships",
+                                "id.drivers_license_number",
+                                "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
+                                "custom.*",
+                                "business.name",
+                                "business.dba",
+                                "business.website",
+                                "business.phone_number",
+                                "business.tin",
+                                "business.address_line1",
+                                "business.address_line2",
+                                "business.city",
+                                "business.state",
+                                "business.zip",
+                                "business.country",
+                                "business.beneficial_owners",
+                                "business.kyced_beneficial_owners",
+                                "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
+                                "investor_profile.employment_status",
+                                "investor_profile.occupation",
+                                "investor_profile.employer",
+                                "investor_profile.annual_income",
+                                "investor_profile.net_worth",
+                                "investor_profile.investment_goals",
+                                "investor_profile.risk_tolerance",
+                                "investor_profile.declarations",
+                                "investor_profile.brokerage_firm_employer",
+                                "investor_profile.senior_executive_symbols",
+                                "investor_profile.family_member_names",
+                                "investor_profile.political_organization",
+                                "document.id_card.front.image",
+                                "document.id_card.front.mime_type",
+                                "document.id_card.back.image",
+                                "document.id_card.back.mime_type",
+                                "document.id_card.selfie.image",
+                                "document.id_card.selfie.mime_type",
+                                "document.id_card.full_name",
+                                "document.id_card.dob",
+                                "document.id_card.gender",
+                                "document.id_card.full_address",
+                                "document.id_card.document_number",
+                                "document.id_card.expires_at",
+                                "document.id_card.issued_at",
+                                "document.id_card.issuing_state",
+                                "document.id_card.issuing_country",
+                                "document.id_card.ref_number",
+                                "document.id_card.nationality",
+                                "document.id_card.curp",
+                                "document.id_card.classified_document_type",
+                                "document.id_card.curp_validation_response",
+                                "document.drivers_license.front.image",
+                                "document.drivers_license.front.mime_type",
+                                "document.drivers_license.back.image",
+                                "document.drivers_license.back.mime_type",
+                                "document.drivers_license.selfie.image",
+                                "document.drivers_license.selfie.mime_type",
+                                "document.drivers_license.full_name",
+                                "document.drivers_license.dob",
+                                "document.drivers_license.gender",
+                                "document.drivers_license.full_address",
+                                "document.drivers_license.document_number",
+                                "document.drivers_license.expires_at",
+                                "document.drivers_license.issued_at",
+                                "document.drivers_license.issuing_state",
+                                "document.drivers_license.issuing_country",
+                                "document.drivers_license.ref_number",
+                                "document.drivers_license.nationality",
+                                "document.drivers_license.curp",
+                                "document.drivers_license.classified_document_type",
+                                "document.drivers_license.curp_validation_response",
+                                "document.passport.front.image",
+                                "document.passport.front.mime_type",
+                                "document.passport.back.image",
+                                "document.passport.back.mime_type",
+                                "document.passport.selfie.image",
+                                "document.passport.selfie.mime_type",
+                                "document.passport.full_name",
+                                "document.passport.dob",
+                                "document.passport.gender",
+                                "document.passport.full_address",
+                                "document.passport.document_number",
+                                "document.passport.expires_at",
+                                "document.passport.issued_at",
+                                "document.passport.issuing_state",
+                                "document.passport.issuing_country",
+                                "document.passport.ref_number",
+                                "document.passport.nationality",
+                                "document.passport.curp",
+                                "document.passport.classified_document_type",
+                                "document.passport.curp_validation_response",
+                                "document.passport_card.front.image",
+                                "document.passport_card.front.mime_type",
+                                "document.passport_card.back.image",
+                                "document.passport_card.back.mime_type",
+                                "document.passport_card.selfie.image",
+                                "document.passport_card.selfie.mime_type",
+                                "document.passport_card.full_name",
+                                "document.passport_card.dob",
+                                "document.passport_card.gender",
+                                "document.passport_card.full_address",
+                                "document.passport_card.document_number",
+                                "document.passport_card.expires_at",
+                                "document.passport_card.issued_at",
+                                "document.passport_card.issuing_state",
+                                "document.passport_card.issuing_country",
+                                "document.passport_card.ref_number",
+                                "document.passport_card.nationality",
+                                "document.passport_card.curp",
+                                "document.passport_card.classified_document_type",
+                                "document.passport_card.curp_validation_response",
+                                "document.permit.front.image",
+                                "document.permit.front.mime_type",
+                                "document.permit.back.image",
+                                "document.permit.back.mime_type",
+                                "document.permit.selfie.image",
+                                "document.permit.selfie.mime_type",
+                                "document.permit.full_name",
+                                "document.permit.dob",
+                                "document.permit.gender",
+                                "document.permit.full_address",
+                                "document.permit.document_number",
+                                "document.permit.expires_at",
+                                "document.permit.issued_at",
+                                "document.permit.issuing_state",
+                                "document.permit.issuing_country",
+                                "document.permit.ref_number",
+                                "document.permit.nationality",
+                                "document.permit.curp",
+                                "document.permit.classified_document_type",
+                                "document.permit.curp_validation_response",
+                                "document.visa.front.image",
+                                "document.visa.front.mime_type",
+                                "document.visa.back.image",
+                                "document.visa.back.mime_type",
+                                "document.visa.selfie.image",
+                                "document.visa.selfie.mime_type",
+                                "document.visa.full_name",
+                                "document.visa.dob",
+                                "document.visa.gender",
+                                "document.visa.full_address",
+                                "document.visa.document_number",
+                                "document.visa.expires_at",
+                                "document.visa.issued_at",
+                                "document.visa.issuing_state",
+                                "document.visa.issuing_country",
+                                "document.visa.ref_number",
+                                "document.visa.nationality",
+                                "document.visa.curp",
+                                "document.visa.classified_document_type",
+                                "document.visa.curp_validation_response",
+                                "document.residence_document.front.image",
+                                "document.residence_document.front.mime_type",
+                                "document.residence_document.back.image",
+                                "document.residence_document.back.mime_type",
+                                "document.residence_document.selfie.image",
+                                "document.residence_document.selfie.mime_type",
+                                "document.residence_document.full_name",
+                                "document.residence_document.dob",
+                                "document.residence_document.gender",
+                                "document.residence_document.full_address",
+                                "document.residence_document.document_number",
+                                "document.residence_document.expires_at",
+                                "document.residence_document.issued_at",
+                                "document.residence_document.issuing_state",
+                                "document.residence_document.issuing_country",
+                                "document.residence_document.ref_number",
+                                "document.residence_document.nationality",
+                                "document.residence_document.curp",
+                                "document.residence_document.classified_document_type",
+                                "document.residence_document.curp_validation_response",
+                                "document.voter_identification.front.image",
+                                "document.voter_identification.front.mime_type",
+                                "document.voter_identification.back.image",
+                                "document.voter_identification.back.mime_type",
+                                "document.voter_identification.selfie.image",
+                                "document.voter_identification.selfie.mime_type",
+                                "document.voter_identification.full_name",
+                                "document.voter_identification.dob",
+                                "document.voter_identification.gender",
+                                "document.voter_identification.full_address",
+                                "document.voter_identification.document_number",
+                                "document.voter_identification.expires_at",
+                                "document.voter_identification.issued_at",
+                                "document.voter_identification.issuing_state",
+                                "document.voter_identification.issuing_country",
+                                "document.voter_identification.ref_number",
+                                "document.voter_identification.nationality",
+                                "document.voter_identification.curp",
+                                "document.voter_identification.classified_document_type",
+                                "document.voter_identification.curp_validation_response",
+                                "document.finra_compliance_letter",
+                                "document.proof_of_address.image",
+                                "document.ssn_card.image",
+                                "document.custom.*",
+                                "card.*.number",
+                                "card.*.expiration",
+                                "card.*.cvc",
+                                "card.*.name",
+                                "card.*.billing_address.zip",
+                                "card.*.billing_address.country",
+                                "card.*.expiration_month",
+                                "card.*.expiration_year",
+                                "card.*.number_last4",
+                                "card.*.issuer"
+                            ]
+                        }
+                    },
+                    "signing_key": {
+                        "description": "A hex-encoded key for computing `hmac-sha256` signatures",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "fields",
+                    "signing_key"
+                ]
+            },
+            "IntegrityResponse": {
+                "example": {
+                    "id.last_name": "f7ee801830...",
+                    "id.ssn9": "1cefe40fa...",
+                    "custom.credit_card": "f7dbdc6..."
+                },
+                "description": "A key-value map with the corresponding hex-encoded hash values",
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.middle_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "id.drivers_license_number",
+                            "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.id_card.curp",
+                            "document.id_card.classified_document_type",
+                            "document.id_card.curp_validation_response",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.drivers_license.curp",
+                            "document.drivers_license.classified_document_type",
+                            "document.drivers_license.curp_validation_response",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.passport.curp",
+                            "document.passport.classified_document_type",
+                            "document.passport.curp_validation_response",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
+                            "document.passport_card.curp_validation_response",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.permit.curp",
+                            "document.permit.classified_document_type",
+                            "document.permit.curp_validation_response",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.visa.curp",
+                            "document.visa.classified_document_type",
+                            "document.visa.curp_validation_response",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.residence_document.curp",
+                            "document.residence_document.classified_document_type",
+                            "document.residence_document.curp_validation_response",
+                            "document.voter_identification.front.image",
+                            "document.voter_identification.front.mime_type",
+                            "document.voter_identification.back.image",
+                            "document.voter_identification.back.mime_type",
+                            "document.voter_identification.selfie.image",
+                            "document.voter_identification.selfie.mime_type",
+                            "document.voter_identification.full_name",
+                            "document.voter_identification.dob",
+                            "document.voter_identification.gender",
+                            "document.voter_identification.full_address",
+                            "document.voter_identification.document_number",
+                            "document.voter_identification.expires_at",
+                            "document.voter_identification.issued_at",
+                            "document.voter_identification.issuing_state",
+                            "document.voter_identification.issuing_country",
+                            "document.voter_identification.ref_number",
+                            "document.voter_identification.nationality",
+                            "document.voter_identification.curp",
+                            "document.voter_identification.classified_document_type",
+                            "document.voter_identification.curp_validation_response",
+                            "document.finra_compliance_letter",
+                            "document.proof_of_address.image",
+                            "document.ssn_card.image",
+                            "document.custom.*",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "<key>",
+                    "<value>"
+                ]
+            },
+            "NewBusinessOwnerRequest": {
+                "type": "object",
+                "properties": {
+                    "fp_id": {
+                        "type": "string"
+                    },
+                    "ownership_stake": {
+                        "description": "The percentage of the business that this user owns, between 0 and 100 (inclusive).",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "fp_id",
+                    "ownership_stake"
+                ]
+            },
+            "ObConfigSessionToken": {
+                "type": "object",
+                "properties": {
+                    "session_token": {
+                        "description": "a one-time use session token for onboarding a new user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "session_token"
+                ]
+            },
+            "OffsetPaginatedBusinessOwner": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "fp_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "fp_id"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
+            "OffsetPaginatedPublicAuthEvent": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "insight": {
+                                    "description": "Information on from where the auth occurred",
+                                    "type": "object",
+                                    "properties": {
+                                        "city": {
+                                            "example": "San Francisco",
+                                            "type": "string"
+                                        },
+                                        "country": {
+                                            "example": "United States",
+                                            "type": "string"
+                                        },
+                                        "ip_address": {
+                                            "type": "string"
+                                        },
+                                        "latitude": {
+                                            "example": 37.7703,
+                                            "type": "number",
+                                            "format": "double"
+                                        },
+                                        "longitude": {
+                                            "example": -122.4407,
+                                            "type": "number",
+                                            "format": "double"
+                                        },
+                                        "postal_code": {
+                                            "example": 94117,
+                                            "type": "string"
+                                        },
+                                        "region": {
+                                            "example": "CA",
+                                            "type": "string"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "user_agent": {
+                                            "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "timestamp"
+                                    ]
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "sms",
+                                        "email",
+                                        "passkey"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "created_at",
+                                "kind"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "count"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
+            "OffsetPaginatedPublicOnboarding": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "playbook_key": {
+                                    "example": "ob_live_fZvYlX3JpanlQ3MAwE45g0",
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "pass",
+                                        "fail",
+                                        "incomplete",
+                                        "pending",
+                                        "none"
+                                    ]
+                                },
+                                "timestamp": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
+                            },
+                            "required": [
+                                "playbook_key",
+                                "status",
+                                "timestamp"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
+            "PublicDocument": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "document_type": {
+                        "description": "Document type of the successfully uploaded document. Can be used to fetch from vault",
+                        "type": "string",
+                        "enum": [
+                            "id_card",
+                            "drivers_license",
+                            "passport",
+                            "passport_card",
+                            "permit",
+                            "visa",
+                            "residence_document",
+                            "voter_identification",
+                            "ssn_card",
+                            "proof_of_address",
+                            "custom"
+                        ]
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "document_type"
+                ]
+            },
+            "PublicRiskSignal": {
+                "description": "RiskSignal information, including severity, impacted scopes, and more.",
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "note": {
+                        "type": "string"
+                    },
+                    "reason_code": {
+                        "type": "string",
+                        "enum": [
+                            "watchlist_hit_ofac",
+                            "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
+                            "watchlist_hit_pep",
+                            "adverse_media_hit",
+                            "id_not_located",
+                            "id_flagged",
+                            "credit_more_than3_inquiries_in_last30_days",
+                            "credit_established_before_ssn_date",
+                            "address_input_is_non_residential",
+                            "address_located_is_non_residential",
+                            "address_does_not_match",
+                            "address_partially_matches",
+                            "address_zip_code_does_not_match",
+                            "address_city_does_not_match",
+                            "address_city_matches",
+                            "address_street_name_does_not_match",
+                            "address_street_name_partially_matches",
+                            "address_street_number_does_not_match",
+                            "address_state_does_not_match",
+                            "address_input_is_not_deliverable",
+                            "address_input_is_po_box",
+                            "address_input_is_correctional_facility",
+                            "address_input_is_not_standard_campground",
+                            "address_input_is_not_standard_college",
+                            "address_input_is_not_standard_general_delivery",
+                            "address_input_is_not_standard_hospital",
+                            "address_input_is_not_standard_hotel",
+                            "address_input_is_not_standard_mail_drop",
+                            "address_input_is_not_standard_prison",
+                            "address_input_is_not_standard_university",
+                            "address_input_is_not_standard_uspo",
+                            "address_input_not_on_file",
+                            "address_located_is_po_box",
+                            "address_located_is_not_standard_campground",
+                            "address_located_is_not_standard_college",
+                            "address_located_is_not_standard_general_delivery",
+                            "address_located_is_not_standard_hospital",
+                            "address_located_is_not_standard_hotel",
+                            "address_located_is_not_standard_mail_drop",
+                            "address_located_is_not_standard_prison",
+                            "address_located_is_not_standard_university",
+                            "address_located_is_not_standard_uspo",
+                            "address_located_is_high_risk_address",
+                            "address_risk_alert",
+                            "address_alert_velocity",
+                            "address_alert_stability",
+                            "address_alert_longevity",
+                            "address_alert_single_address_in_file",
+                            "address_newer_record_found",
+                            "dob_yob_does_not_match",
+                            "dob_yob_does_not_match_within1_year",
+                            "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
+                            "dob_mob_not_available",
+                            "dob_yob_not_available",
+                            "dob_located_age_below_minimum",
+                            "dob_located_age_above_maximum",
+                            "dob_located_coppa_alert",
+                            "dob_does_not_match",
+                            "dob_partial_match",
+                            "dob_not_on_file",
+                            "dob_could_not_match",
+                            "dob_input_age_less_than18",
+                            "ssn_not_available",
+                            "ssn_partially_matches",
+                            "ssn_does_not_match",
+                            "ssn_does_not_match_within1_digit",
+                            "ssn_input_is_itin",
+                            "ssn_located_is_itin",
+                            "ssn_input_tied_to_multiple_names",
+                            "ssn_input_is_invalid",
+                            "ssn_located_is_invalid",
+                            "ssn_not_provided",
+                            "us_tax_id_is_itin",
+                            "itin_is_expired",
+                            "name_last_does_not_match",
+                            "name_last_partially_matches",
+                            "name_matches",
+                            "name_does_not_match",
+                            "name_partially_matches",
+                            "ip_state_does_not_match",
+                            "ip_input_invalid",
+                            "ip_not_located",
+                            "ip_location_not_available",
+                            "ip_alert_high_risk_bot",
+                            "ip_alert_high_risk_spam",
+                            "ip_alert_high_risk_tor",
+                            "ip_alert_high_risk_proxy",
+                            "ip_proxy",
+                            "ip_data_center",
+                            "ip_alert_data_center",
+                            "email_address_invalid",
+                            "email_address_or_domain_does_not_exist",
+                            "email_domain_recently_created",
+                            "email_domain_private",
+                            "email_domain_corporate",
+                            "email_recently_verified",
+                            "email_found_on_file",
+                            "email_not_found_on_file",
+                            "email_high_risk_country",
+                            "email_high_risk_fraud",
+                            "email_high_risk_tumbled",
+                            "email_high_risk_disposable",
+                            "email_high_risk_domain",
+                            "phone_number_input_invalid",
+                            "phone_number_located_is_voip",
+                            "phone_number_mobile_account_type_postpaid",
+                            "phone_number_mobile_account_type_prepaid",
+                            "phone_number_mobile_account_type_unknown",
+                            "phone_number_mobile_account_status_active",
+                            "phone_number_mobile_account_status_deactivated",
+                            "phone_number_mobile_account_status_suspended",
+                            "phone_number_mobile_account_status_absent",
+                            "phone_located_matches",
+                            "phone_located_partially_matches",
+                            "phone_located_does_not_match",
+                            "phone_located_name_matches",
+                            "phone_located_name_partially_matches",
+                            "phone_located_name_does_not_match",
+                            "phone_located_address_matches",
+                            "phone_located_address_partially_matches",
+                            "phone_located_address_does_not_match",
+                            "phone_not_provided",
+                            "multiple_records_found",
+                            "subject_deceased",
+                            "bureau_deleted_record",
+                            "ssn_issued_prior_to_dob",
+                            "ssn_issue_date_cannot_be_verified",
+                            "ssn_located_issue_date_cannot_be_verified",
+                            "ssn_potentially_belongs_to_another",
+                            "ssn_likely_belongs_to_another",
+                            "thin_file",
+                            "input_phone_number_does_not_match_input_state",
+                            "input_phone_number_does_not_match_located_state_history",
+                            "input_phone_number_does_not_match_ip_state",
+                            "drivers_license_number_different_number_found",
+                            "drivers_license_number_not_on_record",
+                            "drivers_license_number_not_valid",
+                            "drivers_license_number_is_valid",
+                            "document_upload_failed",
+                            "document_not_verified",
+                            "document_verified",
+                            "document_ocr_not_successful",
+                            "document_ocr_successful",
+                            "document_barcode_could_not_be_read",
+                            "document_barcode_could_be_read",
+                            "document_barcode_content_matches",
+                            "document_barcode_content_does_not_match",
+                            "document_barcode_detected",
+                            "document_barcode_could_not_be_detected",
+                            "document_requires_review",
+                            "document_expired",
+                            "document_not_expired",
+                            "document_from_restricted_country",
+                            "document_restricted_template_type",
+                            "document_type_not_allowed",
+                            "document_field_crosscheck_failed",
+                            "document_invalid_issuance_or_expiration_date",
+                            "document_invalid_template_layout",
+                            "document_possible_image_tampering",
+                            "document_no_image_tampering",
+                            "document_no_image_alteration_front",
+                            "document_no_image_alteration_back",
+                            "document_possible_image_alteration_front",
+                            "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
+                            "document_possible_digital_fraud",
+                            "document_selfie_used_with_different_information",
+                            "document_selfie_not_used_with_different_information",
+                            "document_selfie_mask",
+                            "document_selfie_glasses",
+                            "document_selfie_not_live_image",
+                            "document_possible_fake_image",
+                            "document_not_fake_image",
+                            "document_pdf417_data_is_valid",
+                            "document_pdf417_data_is_not_valid",
+                            "document_photo_is_screen_capture",
+                            "document_photo_is_not_screen_capture",
+                            "document_photo_is_paper_capture",
+                            "document_photo_is_not_paper_capture",
+                            "document_alignment_failed",
+                            "document_visible_photo_features_not_verified",
+                            "document_mrz_line_format_check",
+                            "document_qr_code_check",
+                            "document_could_not_classify",
+                            "document_visible_photo_features_verified",
+                            "document_low_match_score_with_selfie",
+                            "document_selfie_matches",
+                            "document_selfie_does_not_match",
+                            "document_selfie_bad_quality",
+                            "document_type_mismatch",
+                            "document_unknown_country_code",
+                            "document_country_code_mismatch",
+                            "document_is_permit_or_provisional_license",
+                            "document_selfie_was_skipped",
+                            "document_collected_via_desktop",
+                            "document_not_live_capture",
+                            "document_live_capture_failed",
+                            "document_ocr_name_does_not_match",
+                            "document_ocr_name_could_not_match",
+                            "document_ocr_name_matches",
+                            "document_ocr_address_does_not_match",
+                            "document_ocr_address_could_not_match",
+                            "document_ocr_address_matches",
+                            "document_ocr_first_name_does_not_match",
+                            "document_ocr_first_name_matches",
+                            "document_ocr_last_name_does_not_match",
+                            "document_ocr_last_name_matches",
+                            "document_ocr_dob_does_not_match",
+                            "document_ocr_dob_could_not_match",
+                            "document_ocr_dob_matches",
+                            "document_dob_crosscheck_matches",
+                            "document_dob_crosscheck_does_not_match",
+                            "document_expiration_date_crosscheck_matches",
+                            "document_expiration_date_crosscheck_does_not_match",
+                            "document_sex_crosscheck_matches",
+                            "document_sex_crosscheck_does_not_match",
+                            "document_full_name_crosscheck_matches",
+                            "document_full_name_crosscheck_does_not_match",
+                            "document_number_crosscheck_matches",
+                            "document_number_crosscheck_does_not_match",
+                            "document_expiration_check_digit_matches",
+                            "document_expiration_check_digit_does_not_match",
+                            "document_dob_check_digit_matches",
+                            "document_dob_check_digit_does_not_match",
+                            "document_number_check_digit_matches",
+                            "document_number_check_digit_does_not_match",
+                            "curp_not_valid",
+                            "curp_not_found",
+                            "curp_valid",
+                            "curp_input_curp_invalid",
+                            "curp_could_not_validate",
+                            "curp_multiple_results_for_data",
+                            "curp_service_not_available",
+                            "curp_malformed",
+                            "address_matches",
+                            "address_zip_code_matches",
+                            "address_street_name_matches",
+                            "address_street_number_matches",
+                            "address_state_matches",
+                            "dob_matches",
+                            "dob_yob_matches",
+                            "dob_mob_matches",
+                            "ssn_matches",
+                            "name_last_matches",
+                            "name_first_matches",
+                            "name_first_does_not_match",
+                            "name_first_partially_matches",
+                            "ip_state_matches",
+                            "phone_number_matches",
+                            "input_phone_number_matches_input_state",
+                            "input_phone_number_matches_located_state_history",
+                            "affiliated_with_broker_or_finra",
+                            "visa_is_other",
+                            "visa_expired_or_expiring_soon",
+                            "business_name_match",
+                            "business_name_similar_match",
+                            "business_name_alternate_match",
+                            "business_name_does_not_match",
+                            "business_name_no_watchlist_hits",
+                            "business_name_watchlist_hit",
+                            "business_dba_match",
+                            "business_dba_similar_match",
+                            "business_dba_alternate_match",
+                            "business_dba_does_not_match",
+                            "business_phone_number_match",
+                            "business_phone_number_does_not_match",
+                            "business_website_online",
+                            "business_website_offline",
+                            "business_website_verified",
+                            "business_website_unverified",
+                            "business_website_parking_page",
+                            "tin_match",
+                            "tin_not_found",
+                            "tin_invalid",
+                            "tin_does_not_match",
+                            "business_address_match",
+                            "business_address_close_match",
+                            "business_address_similar_match",
+                            "business_address_incomplete_match",
+                            "business_address_does_not_match",
+                            "business_address_commercial",
+                            "business_address_commercial_mail_receiving_agency",
+                            "business_address_residential",
+                            "business_address_deliverable",
+                            "business_address_not_deliverable",
+                            "beneficial_owners_match",
+                            "beneficial_owners_partial_match",
+                            "beneficial_owners_do_not_match",
+                            "beneficial_owner_failed_kyc",
+                            "sos_active_filing_found",
+                            "sos_filing_no_status",
+                            "sos_filing_partially_active",
+                            "sos_filing_no_active_found",
+                            "sos_filing_not_found",
+                            "sos_domestic_active_filing_found",
+                            "sos_domestic_filing_no_status",
+                            "sos_domestic_filing_partially_active",
+                            "sos_domestic_filing_not_found",
+                            "sos_domestic_filing_status_good_standing",
+                            "sos_domestic_filing_status_pending_active",
+                            "sos_domestic_filing_status_pending_inactive",
+                            "sos_domestic_filing_status_not_provided_by_state",
+                            "sos_domestic_filing_status_not_in_good_standing",
+                            "sos_domestic_filing_status_dissolved",
+                            "sos_business_address_active_filing_found",
+                            "sos_business_address_filing_status_not_available",
+                            "sos_business_address_inactive_filing_found",
+                            "sos_business_address_filing_not_found",
+                            "device_low_risk",
+                            "device_medium_risk",
+                            "device_high_risk",
+                            "device_factory_reset",
+                            "device_gps_spoofing",
+                            "ip_vpn",
+                            "ip_tor_exit_node",
+                            "device_bot_risk",
+                            "device_suspicious",
+                            "device_velocity",
+                            "device_multiple_users",
+                            "device_reputation",
+                            "browser_incognito",
+                            "browser_tampering",
+                            "browser_automation",
+                            "attested_device_apple",
+                            "attested_device_android",
+                            "attested_device_android_strong_integrity",
+                            "attested_device_android_unlicensed",
+                            "attested_device_android_risky",
+                            "attested_device_android_failed_evaluation",
+                            "attested_device_no_fraud_duplicate_risk",
+                            "attested_device_fraud_duplicate_risk_low",
+                            "attested_device_fraud_duplicate_risk_medium",
+                            "attested_device_fraud_duplicate_risk_high",
+                            "behavior_fraud_ring_risk",
+                            "behavior_high_risk",
+                            "behavior_low_risk",
+                            "behavior_automatic_activity"
+                        ]
+                    },
+                    "scopes": {
+                        "type": "array",
+                        "items": {
+                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see\n `DataAttribute` for that",
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "dob",
+                                "ssn",
+                                "itin",
+                                "address",
+                                "street_address",
+                                "city",
+                                "state",
+                                "zip",
+                                "country",
+                                "email",
+                                "phone_number",
+                                "drivers_license_number",
+                                "ip_address",
+                                "device",
+                                "native_device",
+                                "document",
+                                "selfie",
+                                "behavior",
+                                "business_address",
+                                "business_name",
+                                "business_phone_number",
+                                "business_website",
+                                "business_tin",
+                                "beneficial_owners",
+                                "business_dba"
+                            ]
+                        }
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": [
+                            "info",
+                            "low",
+                            "medium",
+                            "high"
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "description",
+                    "note",
+                    "reason_code",
+                    "scopes",
+                    "severity",
+                    "timestamp"
+                ]
+            },
+            "PublicRiskSignalDescription": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "description": "Description of the reason code",
+                        "type": "string"
+                    },
+                    "note": {
+                        "description": "Short description of the reason code",
+                        "type": "string"
+                    },
+                    "reason_code": {
+                        "type": "string",
+                        "enum": [
+                            "watchlist_hit_ofac",
+                            "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
+                            "watchlist_hit_pep",
+                            "adverse_media_hit",
+                            "id_not_located",
+                            "id_flagged",
+                            "credit_more_than3_inquiries_in_last30_days",
+                            "credit_established_before_ssn_date",
+                            "address_input_is_non_residential",
+                            "address_located_is_non_residential",
+                            "address_does_not_match",
+                            "address_partially_matches",
+                            "address_zip_code_does_not_match",
+                            "address_city_does_not_match",
+                            "address_city_matches",
+                            "address_street_name_does_not_match",
+                            "address_street_name_partially_matches",
+                            "address_street_number_does_not_match",
+                            "address_state_does_not_match",
+                            "address_input_is_not_deliverable",
+                            "address_input_is_po_box",
+                            "address_input_is_correctional_facility",
+                            "address_input_is_not_standard_campground",
+                            "address_input_is_not_standard_college",
+                            "address_input_is_not_standard_general_delivery",
+                            "address_input_is_not_standard_hospital",
+                            "address_input_is_not_standard_hotel",
+                            "address_input_is_not_standard_mail_drop",
+                            "address_input_is_not_standard_prison",
+                            "address_input_is_not_standard_university",
+                            "address_input_is_not_standard_uspo",
+                            "address_input_not_on_file",
+                            "address_located_is_po_box",
+                            "address_located_is_not_standard_campground",
+                            "address_located_is_not_standard_college",
+                            "address_located_is_not_standard_general_delivery",
+                            "address_located_is_not_standard_hospital",
+                            "address_located_is_not_standard_hotel",
+                            "address_located_is_not_standard_mail_drop",
+                            "address_located_is_not_standard_prison",
+                            "address_located_is_not_standard_university",
+                            "address_located_is_not_standard_uspo",
+                            "address_located_is_high_risk_address",
+                            "address_risk_alert",
+                            "address_alert_velocity",
+                            "address_alert_stability",
+                            "address_alert_longevity",
+                            "address_alert_single_address_in_file",
+                            "address_newer_record_found",
+                            "dob_yob_does_not_match",
+                            "dob_yob_does_not_match_within1_year",
+                            "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
+                            "dob_mob_not_available",
+                            "dob_yob_not_available",
+                            "dob_located_age_below_minimum",
+                            "dob_located_age_above_maximum",
+                            "dob_located_coppa_alert",
+                            "dob_does_not_match",
+                            "dob_partial_match",
+                            "dob_not_on_file",
+                            "dob_could_not_match",
+                            "dob_input_age_less_than18",
+                            "ssn_not_available",
+                            "ssn_partially_matches",
+                            "ssn_does_not_match",
+                            "ssn_does_not_match_within1_digit",
+                            "ssn_input_is_itin",
+                            "ssn_located_is_itin",
+                            "ssn_input_tied_to_multiple_names",
+                            "ssn_input_is_invalid",
+                            "ssn_located_is_invalid",
+                            "ssn_not_provided",
+                            "us_tax_id_is_itin",
+                            "itin_is_expired",
+                            "name_last_does_not_match",
+                            "name_last_partially_matches",
+                            "name_matches",
+                            "name_does_not_match",
+                            "name_partially_matches",
+                            "ip_state_does_not_match",
+                            "ip_input_invalid",
+                            "ip_not_located",
+                            "ip_location_not_available",
+                            "ip_alert_high_risk_bot",
+                            "ip_alert_high_risk_spam",
+                            "ip_alert_high_risk_tor",
+                            "ip_alert_high_risk_proxy",
+                            "ip_proxy",
+                            "ip_data_center",
+                            "ip_alert_data_center",
+                            "email_address_invalid",
+                            "email_address_or_domain_does_not_exist",
+                            "email_domain_recently_created",
+                            "email_domain_private",
+                            "email_domain_corporate",
+                            "email_recently_verified",
+                            "email_found_on_file",
+                            "email_not_found_on_file",
+                            "email_high_risk_country",
+                            "email_high_risk_fraud",
+                            "email_high_risk_tumbled",
+                            "email_high_risk_disposable",
+                            "email_high_risk_domain",
+                            "phone_number_input_invalid",
+                            "phone_number_located_is_voip",
+                            "phone_number_mobile_account_type_postpaid",
+                            "phone_number_mobile_account_type_prepaid",
+                            "phone_number_mobile_account_type_unknown",
+                            "phone_number_mobile_account_status_active",
+                            "phone_number_mobile_account_status_deactivated",
+                            "phone_number_mobile_account_status_suspended",
+                            "phone_number_mobile_account_status_absent",
+                            "phone_located_matches",
+                            "phone_located_partially_matches",
+                            "phone_located_does_not_match",
+                            "phone_located_name_matches",
+                            "phone_located_name_partially_matches",
+                            "phone_located_name_does_not_match",
+                            "phone_located_address_matches",
+                            "phone_located_address_partially_matches",
+                            "phone_located_address_does_not_match",
+                            "phone_not_provided",
+                            "multiple_records_found",
+                            "subject_deceased",
+                            "bureau_deleted_record",
+                            "ssn_issued_prior_to_dob",
+                            "ssn_issue_date_cannot_be_verified",
+                            "ssn_located_issue_date_cannot_be_verified",
+                            "ssn_potentially_belongs_to_another",
+                            "ssn_likely_belongs_to_another",
+                            "thin_file",
+                            "input_phone_number_does_not_match_input_state",
+                            "input_phone_number_does_not_match_located_state_history",
+                            "input_phone_number_does_not_match_ip_state",
+                            "drivers_license_number_different_number_found",
+                            "drivers_license_number_not_on_record",
+                            "drivers_license_number_not_valid",
+                            "drivers_license_number_is_valid",
+                            "document_upload_failed",
+                            "document_not_verified",
+                            "document_verified",
+                            "document_ocr_not_successful",
+                            "document_ocr_successful",
+                            "document_barcode_could_not_be_read",
+                            "document_barcode_could_be_read",
+                            "document_barcode_content_matches",
+                            "document_barcode_content_does_not_match",
+                            "document_barcode_detected",
+                            "document_barcode_could_not_be_detected",
+                            "document_requires_review",
+                            "document_expired",
+                            "document_not_expired",
+                            "document_from_restricted_country",
+                            "document_restricted_template_type",
+                            "document_type_not_allowed",
+                            "document_field_crosscheck_failed",
+                            "document_invalid_issuance_or_expiration_date",
+                            "document_invalid_template_layout",
+                            "document_possible_image_tampering",
+                            "document_no_image_tampering",
+                            "document_no_image_alteration_front",
+                            "document_no_image_alteration_back",
+                            "document_possible_image_alteration_front",
+                            "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
+                            "document_possible_digital_fraud",
+                            "document_selfie_used_with_different_information",
+                            "document_selfie_not_used_with_different_information",
+                            "document_selfie_mask",
+                            "document_selfie_glasses",
+                            "document_selfie_not_live_image",
+                            "document_possible_fake_image",
+                            "document_not_fake_image",
+                            "document_pdf417_data_is_valid",
+                            "document_pdf417_data_is_not_valid",
+                            "document_photo_is_screen_capture",
+                            "document_photo_is_not_screen_capture",
+                            "document_photo_is_paper_capture",
+                            "document_photo_is_not_paper_capture",
+                            "document_alignment_failed",
+                            "document_visible_photo_features_not_verified",
+                            "document_mrz_line_format_check",
+                            "document_qr_code_check",
+                            "document_could_not_classify",
+                            "document_visible_photo_features_verified",
+                            "document_low_match_score_with_selfie",
+                            "document_selfie_matches",
+                            "document_selfie_does_not_match",
+                            "document_selfie_bad_quality",
+                            "document_type_mismatch",
+                            "document_unknown_country_code",
+                            "document_country_code_mismatch",
+                            "document_is_permit_or_provisional_license",
+                            "document_selfie_was_skipped",
+                            "document_collected_via_desktop",
+                            "document_not_live_capture",
+                            "document_live_capture_failed",
+                            "document_ocr_name_does_not_match",
+                            "document_ocr_name_could_not_match",
+                            "document_ocr_name_matches",
+                            "document_ocr_address_does_not_match",
+                            "document_ocr_address_could_not_match",
+                            "document_ocr_address_matches",
+                            "document_ocr_first_name_does_not_match",
+                            "document_ocr_first_name_matches",
+                            "document_ocr_last_name_does_not_match",
+                            "document_ocr_last_name_matches",
+                            "document_ocr_dob_does_not_match",
+                            "document_ocr_dob_could_not_match",
+                            "document_ocr_dob_matches",
+                            "document_dob_crosscheck_matches",
+                            "document_dob_crosscheck_does_not_match",
+                            "document_expiration_date_crosscheck_matches",
+                            "document_expiration_date_crosscheck_does_not_match",
+                            "document_sex_crosscheck_matches",
+                            "document_sex_crosscheck_does_not_match",
+                            "document_full_name_crosscheck_matches",
+                            "document_full_name_crosscheck_does_not_match",
+                            "document_number_crosscheck_matches",
+                            "document_number_crosscheck_does_not_match",
+                            "document_expiration_check_digit_matches",
+                            "document_expiration_check_digit_does_not_match",
+                            "document_dob_check_digit_matches",
+                            "document_dob_check_digit_does_not_match",
+                            "document_number_check_digit_matches",
+                            "document_number_check_digit_does_not_match",
+                            "curp_not_valid",
+                            "curp_not_found",
+                            "curp_valid",
+                            "curp_input_curp_invalid",
+                            "curp_could_not_validate",
+                            "curp_multiple_results_for_data",
+                            "curp_service_not_available",
+                            "curp_malformed",
+                            "address_matches",
+                            "address_zip_code_matches",
+                            "address_street_name_matches",
+                            "address_street_number_matches",
+                            "address_state_matches",
+                            "dob_matches",
+                            "dob_yob_matches",
+                            "dob_mob_matches",
+                            "ssn_matches",
+                            "name_last_matches",
+                            "name_first_matches",
+                            "name_first_does_not_match",
+                            "name_first_partially_matches",
+                            "ip_state_matches",
+                            "phone_number_matches",
+                            "input_phone_number_matches_input_state",
+                            "input_phone_number_matches_located_state_history",
+                            "affiliated_with_broker_or_finra",
+                            "visa_is_other",
+                            "visa_expired_or_expiring_soon",
+                            "business_name_match",
+                            "business_name_similar_match",
+                            "business_name_alternate_match",
+                            "business_name_does_not_match",
+                            "business_name_no_watchlist_hits",
+                            "business_name_watchlist_hit",
+                            "business_dba_match",
+                            "business_dba_similar_match",
+                            "business_dba_alternate_match",
+                            "business_dba_does_not_match",
+                            "business_phone_number_match",
+                            "business_phone_number_does_not_match",
+                            "business_website_online",
+                            "business_website_offline",
+                            "business_website_verified",
+                            "business_website_unverified",
+                            "business_website_parking_page",
+                            "tin_match",
+                            "tin_not_found",
+                            "tin_invalid",
+                            "tin_does_not_match",
+                            "business_address_match",
+                            "business_address_close_match",
+                            "business_address_similar_match",
+                            "business_address_incomplete_match",
+                            "business_address_does_not_match",
+                            "business_address_commercial",
+                            "business_address_commercial_mail_receiving_agency",
+                            "business_address_residential",
+                            "business_address_deliverable",
+                            "business_address_not_deliverable",
+                            "beneficial_owners_match",
+                            "beneficial_owners_partial_match",
+                            "beneficial_owners_do_not_match",
+                            "beneficial_owner_failed_kyc",
+                            "sos_active_filing_found",
+                            "sos_filing_no_status",
+                            "sos_filing_partially_active",
+                            "sos_filing_no_active_found",
+                            "sos_filing_not_found",
+                            "sos_domestic_active_filing_found",
+                            "sos_domestic_filing_no_status",
+                            "sos_domestic_filing_partially_active",
+                            "sos_domestic_filing_not_found",
+                            "sos_domestic_filing_status_good_standing",
+                            "sos_domestic_filing_status_pending_active",
+                            "sos_domestic_filing_status_pending_inactive",
+                            "sos_domestic_filing_status_not_provided_by_state",
+                            "sos_domestic_filing_status_not_in_good_standing",
+                            "sos_domestic_filing_status_dissolved",
+                            "sos_business_address_active_filing_found",
+                            "sos_business_address_filing_status_not_available",
+                            "sos_business_address_inactive_filing_found",
+                            "sos_business_address_filing_not_found",
+                            "device_low_risk",
+                            "device_medium_risk",
+                            "device_high_risk",
+                            "device_factory_reset",
+                            "device_gps_spoofing",
+                            "ip_vpn",
+                            "ip_tor_exit_node",
+                            "device_bot_risk",
+                            "device_suspicious",
+                            "device_velocity",
+                            "device_multiple_users",
+                            "device_reputation",
+                            "browser_incognito",
+                            "browser_tampering",
+                            "browser_automation",
+                            "attested_device_apple",
+                            "attested_device_android",
+                            "attested_device_android_strong_integrity",
+                            "attested_device_android_unlicensed",
+                            "attested_device_android_risky",
+                            "attested_device_android_failed_evaluation",
+                            "attested_device_no_fraud_duplicate_risk",
+                            "attested_device_fraud_duplicate_risk_low",
+                            "attested_device_fraud_duplicate_risk_medium",
+                            "attested_device_fraud_duplicate_risk_high",
+                            "behavior_fraud_ring_risk",
+                            "behavior_high_risk",
+                            "behavior_low_risk",
+                            "behavior_automatic_activity"
+                        ]
+                    },
+                    "scopes": {
+                        "description": "What the reason code applies to (Name, Document, Business, etc)",
+                        "type": "array",
+                        "items": {
+                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see\n `DataAttribute` for that",
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "dob",
+                                "ssn",
+                                "itin",
+                                "address",
+                                "street_address",
+                                "city",
+                                "state",
+                                "zip",
+                                "country",
+                                "email",
+                                "phone_number",
+                                "drivers_license_number",
+                                "ip_address",
+                                "device",
+                                "native_device",
+                                "document",
+                                "selfie",
+                                "behavior",
+                                "business_address",
+                                "business_name",
+                                "business_phone_number",
+                                "business_website",
+                                "business_tin",
+                                "beneficial_owners",
+                                "business_dba"
+                            ]
+                        }
+                    },
+                    "severity": {
+                        "description": "An indication of importance",
+                        "type": "string",
+                        "enum": [
+                            "info",
+                            "low",
+                            "medium",
+                            "high"
+                        ]
+                    }
+                },
+                "required": [
+                    "description",
+                    "note",
+                    "reason_code",
+                    "scopes",
+                    "severity"
+                ]
+            },
+            "TriggerKybRequest": {
+                "type": "object",
+                "properties": {
+                    "fixture_result": {
+                        "description": "(only valid for sandbox businesses) choose the desired KYB outcome",
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review"
+                        ]
+                    },
+                    "key": {
+                        "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB\n decision.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
+                ]
+            },
+            "TriggerKycRequest": {
+                "type": "object",
+                "properties": {
+                    "fixture_result": {
+                        "description": "(only valid for sandbox users) choose the desired KYC outcome.",
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review"
+                        ]
+                    },
+                    "force_reonboard": {
+                        "description": "Run the user through KYC on the provided playbook even if they have already onboarded onto\n this playbook. Defaults to true.",
+                        "type": "boolean"
+                    },
+                    "key": {
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The\n playbook will specify required information and the rules by which to make a KYC decision.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
+                ]
+            },
+            "UserLabel": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                }
+            },
+            "UserTag": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "tag": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "tag"
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "PublicApi"
+        },
+        {
+            "name": "Preview"
+        }
+    ]
+}

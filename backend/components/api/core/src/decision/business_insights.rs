@@ -65,25 +65,33 @@ pub struct InsightBusinessName {
 /// Details about the business
 #[derive(serde::Serialize, Apiv2Response)]
 pub struct BusinessDetail {
+    /// Formation date (from vendor)
     pub formation_date: Option<String>,
+    /// Formation state (from vendor)
     pub formation_state: Option<String>,
+    /// Information about the provided TIN
     pub tin: Option<InsightTin>,
+    /// Entity type (from vendor)
     pub entity_type: Option<String>,
+    /// Info on the phone numbers provided
     pub phone_numbers: Vec<InsightPhone>,
+    /// Info on the website provided
     pub website: Option<InsightWebsite>,
 }
 
 #[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightTin {
     pub tin: Option<PiiString>,
-    // if we get tin, we'll always be verifying it, so hence, no Option here
+    /// Whether or not the TIN was verified in the IRS TIN database
     pub verified: bool,
 }
 
 #[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightPhone {
     pub phone: PiiString,
+    /// Was phone submitted
     pub submitted: Option<bool>,
+    /// Verified association with the business
     pub verified: Option<bool>,
 }
 
@@ -95,9 +103,13 @@ pub struct InsightWebsite {
 
 #[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightPerson {
+    /// Name
     pub name: Option<PiiString>,
+    /// Role at the business
     pub role: Option<String>,
+    /// People can be submitted (BOs) or found via filing records, or other sources
     pub submitted: bool,
+    /// Verified association with the business
     pub association_verified: Option<bool>, /* None means it wasn't submitted, but was found. Or it could mean we didn't run person verification for whatever reason */
     pub sources: Option<String>,
 }
