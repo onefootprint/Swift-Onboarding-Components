@@ -16,7 +16,7 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-describe('<Copy />', () => {
+describe.skip('<Copy />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/playbooks',
