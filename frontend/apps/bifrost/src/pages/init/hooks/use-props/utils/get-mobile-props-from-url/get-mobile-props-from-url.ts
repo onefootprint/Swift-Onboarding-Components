@@ -34,16 +34,16 @@ const getMobilePropsFromUrl = (path: string): Partial<FootprintVerifyDataProps> 
   const fragment = parts[1];
   const [part1, part2, part3] = fragment.split(FRAGMENT_DIVIDER);
 
-  const userData = getParsedProps(part1);
+  const bootstrapData = getParsedProps(part1);
   const options = getParsedProps(part2);
   const l10n = getParsedProps(part3);
-  if (!userData && !options && !l10n) {
+  if (!bootstrapData && !options && !l10n) {
     return undefined;
   }
 
   return {
-    // @ts-ignore
-    userData: getParsedProps(part1),
+    // @ts-expect-error: 'string' and '`custom.${string}`'
+    bootstrapData: getParsedProps(part1),
     options: getParsedProps(part2),
     l10n: getParsedProps(part3),
     authToken: undefined,

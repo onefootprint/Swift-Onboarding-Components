@@ -96,22 +96,20 @@ const Init = () => {
 
   useProps(
     (props: FootprintVerifyDataProps) => {
-      if (isPropsSaved(state.context)) {
-        return;
-      }
+      if (isPropsSaved(state.context)) return;
 
-      const { userData = {}, options = {}, l10n = {}, authToken = '', publicKey = '', isComponentsSdk = false } = props;
+      const { authToken = '', isComponentsSdk = false, l10n = {}, options = {}, publicKey = '' } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       send({
         type: 'initContextUpdated',
         payload: {
-          bootstrapData: userData as IdvBootstrapData,
+          authToken /** userData deprecated after 3.11.0 */,
+          bootstrapData: (props?.bootstrapData || props?.userData || {}) as IdvBootstrapData,
+          isComponentsSdk,
+          l10n,
+          publicKey,
           showCompletionPage,
           showLogo,
-          l10n,
-          authToken,
-          publicKey,
-          isComponentsSdk,
         },
       });
     },

@@ -66,12 +66,12 @@ describe('<Identify />', () => {
     onDone?: () => void;
   }) => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    const userData: any = {};
+    const bootstrapData: any = {};
     if (bootstrapEmail) {
-      userData.email = bootstrapEmail;
+      bootstrapData.email = bootstrapEmail;
     }
     if (bootstrapPhone) {
-      userData.phoneNumber = bootstrapPhone;
+      bootstrapData.phoneNumber = bootstrapPhone;
     }
     return customRender(
       <Layout onClose={() => undefined}>
@@ -81,7 +81,7 @@ describe('<Identify />', () => {
           isLive={config.isLive}
           isComponentsSdk={isComponentsSdk}
           obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
-          bootstrapData={bootstrapEmail || bootstrapPhone ? userData : undefined}
+          bootstrapData={bootstrapEmail || bootstrapPhone ? bootstrapData : undefined}
           initialAuthToken={initialAuthToken}
           device={
             device || {

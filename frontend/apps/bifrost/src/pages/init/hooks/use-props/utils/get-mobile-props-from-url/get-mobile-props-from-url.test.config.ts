@@ -1,15 +1,13 @@
-const getUrl = ({
-  userData,
-  options,
-  l10n,
-}: {
-  userData?: Record<string, string | string[]>;
+type GetUrlArg = {
+  bootstrapData?: Record<string, string | string[]>;
   options?: Record<string, unknown>;
   l10n?: Record<string, unknown>;
-}) => {
+};
+
+const getUrl = ({ bootstrapData, options, l10n }: GetUrlArg) => {
   let fragment = '';
-  if (userData) {
-    fragment += `${encodeURIComponent(JSON.stringify(userData))}`;
+  if (bootstrapData) {
+    fragment += `${encodeURIComponent(JSON.stringify(bootstrapData))}`;
   }
   if (options) {
     if (fragment) {

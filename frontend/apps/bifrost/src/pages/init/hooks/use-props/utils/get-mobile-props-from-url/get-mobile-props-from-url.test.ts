@@ -4,7 +4,7 @@ import getMobilePropsFromUrl from './get-mobile-props-from-url';
 import getUrl from './get-mobile-props-from-url.test.config';
 
 describe('getMobilePropsFromUrl', () => {
-  const userData = {
+  const bootstrapData = {
     [IdDI.email]: 'piip@onefootprint.com',
     [IdDI.phoneNumber]: '+15555550100',
     [IdDI.firstName]: 'Piip',
@@ -47,27 +47,27 @@ describe('getMobilePropsFromUrl', () => {
     ).toEqual(undefined);
   });
 
-  it('should be able to decode userData', () => {
-    expect(getMobilePropsFromUrl(getUrl({ userData }))).toEqual({
-      userData,
+  it('should be able to decode bootstrapData', () => {
+    expect(getMobilePropsFromUrl(getUrl({ bootstrapData }))).toEqual({
+      bootstrapData,
       options: undefined,
       l10n: undefined,
       authToken: undefined,
     });
   });
 
-  it('should be able to decode userData and options', () => {
-    expect(getMobilePropsFromUrl(getUrl({ userData, options }))).toEqual({
-      userData,
+  it('should be able to decode bootstrapData and options', () => {
+    expect(getMobilePropsFromUrl(getUrl({ bootstrapData, options }))).toEqual({
+      bootstrapData,
       options,
       l10n: undefined,
       authToken: undefined,
     });
   });
 
-  it('should be able to decode userData, options, l10n', () => {
-    expect(getMobilePropsFromUrl(getUrl({ userData, options, l10n }))).toEqual({
-      userData,
+  it('should be able to decode bootstrapData, options, l10n', () => {
+    expect(getMobilePropsFromUrl(getUrl({ bootstrapData, options, l10n }))).toEqual({
+      bootstrapData,
       options,
       l10n,
       authToken: undefined,
