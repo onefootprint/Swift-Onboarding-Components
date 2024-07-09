@@ -217,7 +217,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
             "phone_number": FIXTURE_PHONE_NUMBER,
         },
     ]
-    bifrost.run()
+    user = bifrost.run()
 
     # Just because we're not running it in this test
     expected_status = "none" if skip_kyc else "pass"
@@ -226,6 +226,19 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         "incomplete" if beneficial_owners == "collect_with_multi_kyc" else "pass"
     )
     assert bifrost.validate_response["business"]["status"] == expected_business_status
+
+    # check biz insights, we only expect to see it if the business has completed onboarding and we
+    # got a middesk response
+    should_see_biz_insights = expected_business_status == "pass"
+    insights_response = get(
+        f"/entities/{user.fp_bid}/business_insights",
+        None,
+        *sandbox_tenant.db_auths,
+        status_code=200 if should_see_biz_insights else 500,
+    )
+
+    if should_see_biz_insights:
+        assert insights_response["details"]["entity_type"]
 
 
 def test_skip_kyb(sandbox_tenant, must_collect_data):

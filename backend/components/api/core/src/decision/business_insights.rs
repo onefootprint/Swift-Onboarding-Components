@@ -9,7 +9,6 @@ use super::features::middesk::WatchlistTask;
 use super::features::middesk::WebsiteVerificationTask;
 use crate::decision::features::middesk::get_task;
 use crate::decision::features::middesk::TaskKindDiscriminant;
-use either::Either;
 use idv::middesk::response::business::Address;
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::business::Formation;
@@ -23,15 +22,14 @@ use idv::middesk::response::business::SourceType;
 use idv::middesk::response::business::Task;
 use idv::middesk::response::business::Watchlist;
 use idv::middesk::response::business::Website;
-use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use itertools::Itertools;
 use newtypes::PiiString;
-use newtypes::VendorAPI;
+use paperclip::actix::Apiv2Response;
 
 
 // TODO: sources for biz details
 //   agency info for watchlist
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
 pub struct BusinessInsights {
     /// Information about names (DBA/Legal) that were submitted and found associated with the
     /// business
@@ -47,7 +45,8 @@ pub struct BusinessInsights {
     /// Addresses (found + submitted)
     pub addresses: Vec<InsightAddress>,
 }
-#[derive(serde::Serialize)]
+
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightBusinessName {
     pub name: Option<PiiString>,
     pub submitted: bool,
@@ -64,7 +63,7 @@ pub struct InsightBusinessName {
 }
 
 /// Details about the business
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct BusinessDetail {
     pub formation_date: Option<String>,
     pub formation_state: Option<String>,
@@ -74,27 +73,27 @@ pub struct BusinessDetail {
     pub website: Option<InsightWebsite>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightTin {
     pub tin: Option<PiiString>,
     // if we get tin, we'll always be verifying it, so hence, no Option here
     pub verified: bool,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightPhone {
     pub phone: PiiString,
     pub submitted: Option<bool>,
     pub verified: Option<bool>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightWebsite {
     pub url: PiiString,
     pub verified: Option<bool>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightPerson {
     pub name: Option<PiiString>,
     pub role: Option<String>,
@@ -103,7 +102,7 @@ pub struct InsightPerson {
     pub sources: Option<String>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightRegistration {
     pub state: Option<String>,
     pub registration_date: Option<String>,
@@ -116,13 +115,13 @@ pub struct InsightRegistration {
     pub name: Option<String>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct Officer {
     pub name: Option<PiiString>,
     pub roles: Option<String>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightWatchlist {
     pub hit_count: Option<i32>,
     /// Watchlist entries for the submitted + found people
@@ -131,7 +130,7 @@ pub struct InsightWatchlist {
     pub business: Vec<WatchlistEntry>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 
 pub struct WatchlistEntry {
     /// the name we screened
@@ -140,7 +139,7 @@ pub struct WatchlistEntry {
     pub hits: Vec<WatchlistHit>,
 }
 
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, Clone, Apiv2Response)]
 pub struct WatchlistHit {
     pub entity_name: Option<PiiString>,
     pub entity_aliases: Vec<PiiString>,
@@ -152,7 +151,7 @@ pub struct WatchlistHit {
     pub list_name: Option<String>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightAddress {
     pub address_line1: Option<PiiString>,
     pub address_line2: Option<PiiString>,
@@ -170,20 +169,8 @@ pub struct InsightAddress {
     pub cmra: Option<bool>,
 }
 
-impl TryFrom<Either<MiddeskBusinessUpdateWebhookResponse, BusinessResponse>> for BusinessInsights {
-    type Error = crate::decision::Error;
-
-    fn try_from(
-        value: Either<MiddeskBusinessUpdateWebhookResponse, BusinessResponse>,
-    ) -> Result<Self, Self::Error> {
-        let business_response =
-            match value {
-                Either::Left(webhook) => webhook.business_response().cloned().ok_or(
-                    crate::decision::Error::VendorResultNotFound(VendorAPI::MiddeskBusinessUpdateWebhook),
-                )?,
-                Either::Right(biz_resp) => biz_resp,
-            };
-
+impl From<BusinessResponse> for BusinessInsights {
+    fn from(business_response: BusinessResponse) -> Self {
         let watchlist = create_watchlists(&business_response);
         let names = create_names(&business_response);
         let people = create_people(&business_response);
@@ -191,16 +178,14 @@ impl TryFrom<Either<MiddeskBusinessUpdateWebhookResponse, BusinessResponse>> for
         let registrations = create_registrations(&business_response);
         let addresses = create_addresses(&business_response);
 
-        let insight = BusinessInsights {
+        BusinessInsights {
             names,
             details,
             people,
             registrations,
             watchlist,
             addresses,
-        };
-
-        Ok(insight)
+        }
     }
 }
 
@@ -712,6 +697,7 @@ fn create_watchlists(business_response: &BusinessResponse) -> Option<InsightWatc
 #[cfg(test)]
 mod tests {
     use super::*;
+    use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
     use idv::test_fixtures;
 
     #[ignore]
@@ -720,7 +706,7 @@ mod tests {
         let parsed: MiddeskBusinessUpdateWebhookResponse =
             serde_json::from_value(test_fixtures::middesk_business_response()).unwrap();
 
-        let insight = BusinessInsights::try_from(Either::Left(parsed)).unwrap();
+        let insight = BusinessInsights::from(parsed.business_response().unwrap().clone());
 
         println!("{}", serde_json::to_value(insight).unwrap())
     }

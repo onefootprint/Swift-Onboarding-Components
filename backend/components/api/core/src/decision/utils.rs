@@ -147,7 +147,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         conn,
         (&sb.id, &di.id, VendorAPI::MiddeskBusinessUpdateWebhook).into(),
     )?;
-    let raw = idv::test_fixtures::middesk_business_response();
+    let raw = idv::test_fixtures::middesk_business_update_webhook_response();
     let e_response = vendor::verification_result::encrypt_verification_result_response(
         &raw.clone().into(),
         &uv.public_key,

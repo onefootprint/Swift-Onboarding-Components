@@ -5,6 +5,7 @@ mod actions;
 mod ai_summarize;
 mod annotations;
 mod auth_events;
+mod business_insight;
 mod business_owners;
 mod businesses;
 mod client_token;
@@ -47,6 +48,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(business_owners::get)
         .service(businesses::get)
         .service(user_insight::get)
+        .service(business_insight::get_business_insights)
         .service(dupes::get_dupes)
         .service(ai_summarize::get);
 }

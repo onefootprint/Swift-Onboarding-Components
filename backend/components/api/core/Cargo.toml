@@ -54,6 +54,7 @@ strum_macros = { workspace = true }
 actix-web-httpauth = { workspace = true }
 actix-web-prom = { path = "../../prometheus" }
 prometheus = { workspace = true }
+macros = { path = "../../macros" }
 
 webauthn-rs-core = { workspace = true }
 webauthn-rs-proto = { workspace = true }
