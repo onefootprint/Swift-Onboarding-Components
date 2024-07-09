@@ -212,9 +212,10 @@ fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<Line
     line_items
         .into_iter()
         .filter(|li| {
+            // TODO in future, just set the price to 0 instead of removing
             let should_keep = !products_to_remove.contains(&li.product);
             if !should_keep {
-                tracing::info!(product=%li.product, notional=?li.notional(), "Removing line item from invoice for minimum of clause");
+                tracing::info!(product=%li.product, count=%li.count, notional=?li.notional(), "Removing line item from invoice for minimum of clause");
             }
             should_keep
         })
