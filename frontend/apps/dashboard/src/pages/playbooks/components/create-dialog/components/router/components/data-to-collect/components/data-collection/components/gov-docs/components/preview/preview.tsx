@@ -3,11 +3,11 @@ import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useDocs from '../../../../../../../../../hooks/use-docs';
-import CountryIdDocList from './country-id-doc-list';
-import IdDocList from './id-doc-list';
+import useDocs from '../../hooks/use-docs';
+import CountryIdDocList from './components/country-id-doc-list';
+import IdDocList from './components/id-doc-list';
 
-const DocPreview = () => {
+const Preview = () => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
   const {
     globalDocs,
@@ -46,4 +46,4 @@ const DocPreview = () => {
   );
 };
 
-export default DocPreview;
+export default Preview;

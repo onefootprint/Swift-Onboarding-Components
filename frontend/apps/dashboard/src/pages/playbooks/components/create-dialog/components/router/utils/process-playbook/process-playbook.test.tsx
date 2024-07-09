@@ -608,6 +608,42 @@ describe('processPlaybook', () => {
           expect(documentsToCollect).toEqual([{ data: {}, kind: 'proof_of_ssn' }]);
         });
       });
+
+      describe('when a custom doc is selected', () => {
+        it('should generate the payload correctly', () => {
+          const { documentsToCollect } = processPlaybook({
+            playbook: {
+              ...defaultPlaybookValuesKYC,
+              personal: {
+                ...defaultPlaybookValuesKYC.personal,
+                additionalDocs: {
+                  custom: [
+                    {
+                      description: 'test description',
+                      identifier: 'proof_of_county',
+                      name: 'Proof of County',
+                    },
+                  ],
+                },
+              },
+            },
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            verificationChecks: {},
+          });
+
+          expect(documentsToCollect).toEqual([
+            {
+              data: {
+                description: 'test description',
+                identifier: 'document.custom.proof_of_county',
+                name: 'Proof of County',
+              },
+              kind: 'custom',
+            },
+          ]);
+        });
+      });
     });
   });
 

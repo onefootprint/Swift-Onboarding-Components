@@ -124,6 +124,12 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
               size="compact"
               {...register(nameAttrs.identifier, {
                 required: t('identifier.errors.required'),
+                validate: (value: string) => {
+                  if (!value.match(/^[A-Za-z0-9_-]+$/)) {
+                    return t('identifier.errors.no-special-chars');
+                  }
+                  return true;
+                },
               })}
             />
           </Form.Group>

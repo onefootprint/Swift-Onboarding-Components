@@ -170,7 +170,7 @@ export type GovDocs = {
 
 export type CustomDoc = {
   name: string;
-  identifier: CustomDI;
+  identifier: string;
   description?: string;
 };
 

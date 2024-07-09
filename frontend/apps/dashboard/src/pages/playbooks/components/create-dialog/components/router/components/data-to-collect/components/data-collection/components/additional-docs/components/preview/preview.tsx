@@ -3,9 +3,9 @@ import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useAdditionalDocs from '../hooks/use-additional-docs';
+import useAdditionalDocs from '../../hooks/use-additional-docs';
 
-const DocPreview = () => {
+const Preview = () => {
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'create.data-to-collect.additional-docs',
   });
@@ -46,4 +46,4 @@ const DocPreview = () => {
   );
 };
 
-export default DocPreview;
+export default Preview;

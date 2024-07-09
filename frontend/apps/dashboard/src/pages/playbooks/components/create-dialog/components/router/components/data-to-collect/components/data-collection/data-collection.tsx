@@ -6,10 +6,10 @@ import styled, { css } from 'styled-components';
 
 import { type DataToCollectMeta, OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
-import AdditionalDocsPanel from './components/additional-docs-panel';
+import AdditionalDocs from './components/additional-docs';
 import Auth from './components/auth';
 import Business from './components/business';
-import GovDocsWithPanel from './components/gov-docs-with-panel';
+import GovDocs from './components/gov-docs';
 import Investor from './components/investor';
 import Person from './components/person';
 
@@ -34,8 +34,8 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
   if (isDocOnly(meta.kind)) {
     return (
       <Container>
-        <GovDocsWithPanel />
-        <AdditionalDocsPanel />
+        <GovDocs />
+        <AdditionalDocs />
       </Container>
     );
   }
@@ -44,8 +44,8 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     <Container>
       {isKyb(meta.kind) && <Business />}
       <Person meta={meta} />
-      <GovDocsWithPanel />
-      <AdditionalDocsPanel />
+      <GovDocs />
+      <AdditionalDocs />
       {isKyc(meta.kind) && isCustom && <Investor />}
       {isKyb(meta.kind) && <InlineAlert variant="info">{t('alert')}</InlineAlert>}
     </Container>

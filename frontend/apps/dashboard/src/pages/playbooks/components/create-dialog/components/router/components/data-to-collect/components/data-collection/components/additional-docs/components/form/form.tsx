@@ -1,19 +1,22 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash24 } from '@onefootprint/icons';
-import { Button, LinkButton, Stack } from '@onefootprint/ui';
+import { Button, Checkbox, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useAdditionalDocs from '../hooks/use-additional-docs';
+import useAdditionalDocs from '../../hooks/use-additional-docs';
+import CustomDocs from './components/custom-docs';
 
 type FormProps = {
-  children?: React.ReactNode;
   onClose: () => void;
 };
 
-const Form = ({ children, onClose }: FormProps) => {
-  const { t } = useTranslation('common');
-  const { watch, setValue } = useFormContext<DataToCollectFormData>();
+const Form = ({ onClose }: FormProps) => {
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'create.data-to-collect.additional-docs',
+  });
+  const { watch, setValue, register } = useFormContext<DataToCollectFormData>();
   const containerRef = useRef<HTMLDivElement>(null);
   const [originalValue] = useState(() => {
     return {
@@ -48,13 +51,22 @@ const Form = ({ children, onClose }: FormProps) => {
 
   return (
     <Stack direction="column" gap={8} ref={containerRef}>
-      {children}
+      <Stack gap={4} direction="column">
+        <Checkbox label={t('form.poa.label')} hint={t('form.poa.hint')} {...register('personal.additionalDocs.poa')} />
+        <Checkbox
+          label={t('form.possn.label')}
+          hint={t('form.possn.hint')}
+          {...register('personal.additionalDocs.possn')}
+        />
+        <Divider variant="secondary" />
+        <CustomDocs />
+      </Stack>
       <Stack gap={4} direction="column">
         <Button variant="primary" fullWidth onClick={onClose}>
-          {t('save')}
+          {allT('save')}
         </Button>
         <Button variant="secondary" fullWidth onClick={handleCancel}>
-          {t('cancel')}
+          {allT('cancel')}
         </Button>
         <Stack justifyContent="center">
           <LinkButton
@@ -65,7 +77,7 @@ const Form = ({ children, onClose }: FormProps) => {
             variant="label-4"
             disabled={!hasDoc}
           >
-            {t('remove-all')}
+            {allT('remove-all')}
           </LinkButton>
         </Stack>
       </Stack>

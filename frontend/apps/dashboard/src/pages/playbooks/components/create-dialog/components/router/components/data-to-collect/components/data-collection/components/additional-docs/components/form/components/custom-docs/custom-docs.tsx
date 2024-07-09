@@ -20,7 +20,6 @@ const CustomDocs = () => {
 
   const handleAdd = () => {
     const length = fields.length;
-    // @ts-ignore: identifier should be CustomDI, however, in this case, we want to init an empty value
     append({ name: '', description: '', identifier: '' });
     setFormIndex(length);
   };

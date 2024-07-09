@@ -262,7 +262,8 @@
             "placeholder": "document.custom.",
             "hint": "The data identifier you can use to decrypt the document in the dashboard and via API",
             "errors": {
-              "required": "Please enter an identifier for the document."
+              "required": "Please enter an identifier for the document.",
+              "no-special-chars": "Only letters, numbers, underscores, and hyphens are allowed"
             }
           },
           "description": {

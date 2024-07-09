@@ -1,1 +1,1 @@
-export { default } from './additional-documents';
+export { default } from './additional-docs';

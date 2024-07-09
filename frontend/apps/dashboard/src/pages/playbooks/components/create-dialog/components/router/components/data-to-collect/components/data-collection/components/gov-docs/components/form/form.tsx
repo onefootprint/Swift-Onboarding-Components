@@ -1,17 +1,20 @@
-import useDocs from '@/create-playbook/hooks/use-docs';
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash24 } from '@onefootprint/icons';
 import { Button, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import GovDocs from '../../gov-docs';
+import styled, { css } from 'styled-components';
+import useDocs from '../../hooks/use-docs';
+import CountrySpecificIdDocPicker from './components/country-specific-id-doc-picker';
+import ExtraRequirements from './components/extra-requirements';
+import GlobalIdDocPicker from './components/global-id-doc-picker';
 
-type DocFormProps = {
+type FormProps = {
   onClose: () => void;
 };
 
-const DocForm = ({ onClose }: DocFormProps) => {
+const Form = ({ onClose }: FormProps) => {
   const { t } = useTranslation('common');
   const { watch, setValue } = useFormContext<DataToCollectFormData>();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,11 +45,22 @@ const DocForm = ({ onClose }: DocFormProps) => {
   const handleRemoveAll = () => {
     setValue('personal.docs.global', []);
     setValue('personal.docs.country', {});
+    onClose();
   };
 
   return (
     <Stack direction="column" gap={8} ref={containerRef}>
-      <GovDocs />
+      <Container>
+        <Section>
+          <GlobalIdDocPicker />
+        </Section>
+        <Section>
+          <CountrySpecificIdDocPicker />
+        </Section>
+        <Section>
+          <ExtraRequirements />
+        </Section>
+      </Container>
       <Stack gap={4} direction="column">
         <Button variant="primary" fullWidth onClick={onClose}>
           {t('save')}
@@ -75,4 +89,20 @@ const focusOnContainer = (el: HTMLDivElement) => {
   el.scrollIntoView({ behavior: 'smooth' });
 };
 
-export default DocForm;
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[6]};
+  `};
+`;
+
+const Section = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[4]};
+  `};
+`;
+
+export default Form;

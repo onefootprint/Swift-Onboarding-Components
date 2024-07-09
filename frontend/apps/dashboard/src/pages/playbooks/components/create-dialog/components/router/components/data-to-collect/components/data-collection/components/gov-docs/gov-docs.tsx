@@ -1,38 +1,33 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React, { useState } from 'react';
 
-import CountrySpecificIdDocPicker from './components/country-specific-id-doc-picker';
-import ExtraRequirements from './components/extra-requirements';
-import GlobalIdDocPicker from './components/global-id-doc-picker';
+import { useTranslation } from 'react-i18next';
+import useDocs from './hooks/use-docs';
 
-const GovDocs = () => (
-  <Container>
-    <Section>
-      <GlobalIdDocPicker />
-    </Section>
-    <Section>
-      <CountrySpecificIdDocPicker />
-    </Section>
-    <Section>
-      <ExtraRequirements />
-    </Section>
-  </Container>
-);
+import Panel from '../panel';
+import Cta from './components/cta';
+import Form from './components/form';
+import Preview from './components/preview';
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[6]};
-  `};
-`;
+const Govdocs = () => {
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
+  const [showForm, setShowForm] = useState(false);
+  const {
+    meta: { hasDoc },
+  } = useDocs();
 
-const Section = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `};
-`;
+  const handleToggle = () => {
+    setShowForm(prev => !prev);
+  };
 
-export default GovDocs;
+  const handleClose = () => {
+    setShowForm(false);
+  };
+
+  return (
+    <Panel cta={showForm ? null : <Cta onClick={handleToggle} hasAdded={hasDoc} />} title={t('title')}>
+      {showForm ? <Form onClose={handleClose} /> : <Preview />}
+    </Panel>
+  );
+};
+
+export default Govdocs;

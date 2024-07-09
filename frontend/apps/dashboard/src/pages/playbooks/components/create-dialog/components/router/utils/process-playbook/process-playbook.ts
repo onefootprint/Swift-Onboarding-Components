@@ -1,4 +1,4 @@
-import type { CollectedDataOption } from '@onefootprint/types';
+import type { CollectedDataOption, CustomDI } from '@onefootprint/types';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
@@ -190,7 +190,7 @@ const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
         kind: DocumentRequestKind.Custom,
         data: {
           description: doc.description,
-          identifier: `document.custom.${doc.identifier}`,
+          identifier: `document.custom.${doc.identifier}` as CustomDI,
           name: doc.name,
         },
       });
