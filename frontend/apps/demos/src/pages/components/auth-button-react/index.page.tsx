@@ -32,7 +32,7 @@ const AuthButtonReact = () => {
       </Head>
       <FootprintAuthButton
         publicKey={publicKey}
-        userData={userData}
+        bootstrapData={userData}
         dialogVariant="modal"
         label="Auth with Footprint (modal)"
         onCancel={() => console.log('cancel')}

@@ -13,7 +13,7 @@ type WithAuthToken = {
   updateLoginMethods: true;
 };
 
-export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant'> & {
+export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant' | 'userData'> & {
   dialogVariant?: 'modal' | 'drawer';
   label?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -23,6 +23,8 @@ export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant'> & {
 const AuthButton = (
   {
     appearance,
+    authToken = undefined,
+    bootstrapData,
     dialogVariant,
     l10n,
     label = 'Authenticate with Footprint',
@@ -32,10 +34,8 @@ const AuthButton = (
     onComplete,
     options,
     publicKey = undefined,
-    authToken = undefined,
-    updateLoginMethods = undefined,
     testID,
-    userData,
+    updateLoginMethods = undefined,
   }: AuthButtonProps,
   ref?: React.Ref<HTMLButtonElement>,
 ) => {
@@ -53,14 +53,14 @@ const AuthButton = (
 
     const config: FootprintAuthProps = {
       ...tokenProps,
-      kind: FootprintComponentKind.Auth,
       appearance,
+      bootstrapData,
+      kind: FootprintComponentKind.Auth,
       l10n,
       onCancel,
       onClose,
       onComplete,
       options,
-      userData,
       variant: dialogVariant,
     };
     const component = footprint.init(config);

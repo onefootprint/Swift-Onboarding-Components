@@ -11,12 +11,12 @@ describe('getBaseVerifyProps', () => {
   type Base = Parameters<typeof getBaseVerifyProps>[0];
   type Props = Parameters<typeof getBaseVerifyProps>[1];
 
-  it('should force kind verify and forward userData and options', () => {
+  it('should force kind verify and forward bootstrapData and options', () => {
     const base: Base = {};
     const props: Props = {
       kind: 'kind' as Props['kind'],
       options: { showCompletionPage: true, showLogo: true },
-      userData: { 'id.first_name': 'Name' },
+      bootstrapData: { 'id.first_name': 'Name' },
       variant: 'modal',
     };
     const result = getBaseVerifyProps(base, props);
@@ -24,7 +24,7 @@ describe('getBaseVerifyProps', () => {
     expect(result).toEqual({
       kind: 'verify' as Props['kind'],
       options: { showCompletionPage: true, showLogo: true },
-      userData: { 'id.first_name': 'Name' },
+      bootstrapData: { 'id.first_name': 'Name' },
       variant: 'modal',
     });
   });
@@ -34,12 +34,12 @@ describe('getBaseAuthProps', () => {
   type Base = Parameters<typeof getBaseAuthProps>[0];
   type Props = Parameters<typeof getBaseAuthProps>[1];
 
-  it('should force kind auth and modify userData and options', () => {
+  it('should force kind auth and modify bootstrapData and options', () => {
     const base: Base = {};
     const props = {
       kind: 'kind' as Props['kind'],
       options: { showCompletionPage: true, showLogo: true },
-      userData: { 'id.first_name': 'Name' },
+      bootstrapData: { 'id.first_name': 'Name' },
       variant: 'modal',
     } as Props;
     const result = getBaseAuthProps(base, props);
@@ -47,7 +47,7 @@ describe('getBaseAuthProps', () => {
     expect(result).toEqual({
       kind: 'auth' as Props['kind'],
       options: { showLogo: true },
-      userData: {},
+      bootstrapData: {},
       variant: 'modal',
     });
   });
@@ -57,12 +57,12 @@ describe('getBaseUpdateLoginMethodsProps', () => {
   type Base = Parameters<typeof getBaseUpdateLoginMethodsProps>[0];
   type Props = Parameters<typeof getBaseUpdateLoginMethodsProps>[1];
 
-  it('should force update_login_methods auth and modify userData and options', () => {
+  it('should force update_login_methods auth and modify bootstrapData and options', () => {
     const base: Base = {};
     const props = {
       kind: 'kind' as Props['kind'],
       options: { showCompletionPage: true, showLogo: false },
-      userData: { 'id.first_name': 'Name', 'id.email': 'a@b.com' },
+      bootstrapData: { 'id.first_name': 'Name', 'id.email': 'a@b.com' },
       variant: 'modal',
     } as Props;
     const result = getBaseUpdateLoginMethodsProps(base, props);
@@ -70,7 +70,7 @@ describe('getBaseUpdateLoginMethodsProps', () => {
     expect(result).toEqual({
       kind: 'update_login_methods' as Props['kind'],
       options: { showLogo: false },
-      userData: { 'id.email': 'a@b.com' },
+      bootstrapData: { 'id.email': 'a@b.com' },
       variant: 'modal',
     });
   });
@@ -82,13 +82,13 @@ describe('getUserEmailAndPhone', () => {
   it.each([
     {
       obj: {
-        userData: { 'id.email': 'a@b.com', 'id.phone_number': '+123' },
+        bootstrapData: { 'id.email': 'a@b.com', 'id.phone_number': '+123' },
       },
       x: { 'id.email': 'a@b.com', 'id.phone_number': '+123' },
     },
     {
       obj: {
-        userData: {
+        bootstrapData: {
           'id.email': 'a@b.com',
           'id.phone_number': '+123',
           'id.first_name': 'Name',
@@ -98,7 +98,7 @@ describe('getUserEmailAndPhone', () => {
     },
     {
       obj: {
-        userData: {
+        bootstrapData: {
           'id.email': 'a@b.com',
           'id.phone_number': '+123',
           banana: 1,

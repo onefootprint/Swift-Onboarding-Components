@@ -11,10 +11,10 @@ import { getVariant } from './utils';
 export const getUserEmailAndPhone = (
   p: Omit<FootprintAuthProps, AuthConditional> | FootprintUpdateLoginMethodsProps,
 ): UserDataEmailAndPhone | undefined =>
-  p.userData
+  p.bootstrapData
     ? {
-        'id.email': p.userData['id.email'],
-        'id.phone_number': p.userData['id.phone_number'],
+        'id.email': p.bootstrapData['id.email'],
+        'id.phone_number': p.bootstrapData['id.phone_number'],
       }
     : undefined;
 
@@ -26,7 +26,7 @@ export const getBaseVerifyProps = (
   kind: FootprintComponentKind.Verify,
   onAuth: p.onAuth,
   options: p.options,
-  userData: p.userData,
+  bootstrapData: p.bootstrapData,
   variant: getVariant(p),
 });
 
@@ -37,7 +37,7 @@ export const getBaseAuthProps = (
   ...base,
   kind: FootprintComponentKind.Auth,
   options: p.options ? { showLogo: p.options.showLogo } : undefined,
-  userData: getUserEmailAndPhone(p),
+  bootstrapData: getUserEmailAndPhone(p),
   variant: getVariant(p),
 });
 
@@ -48,6 +48,6 @@ export const getBaseUpdateLoginMethodsProps = (
   ...base,
   kind: FootprintComponentKind.UpdateLoginMethods,
   options: p.options ? { showLogo: p.options.showLogo } : undefined,
-  userData: getUserEmailAndPhone(p),
+  bootstrapData: getUserEmailAndPhone(p),
   variant: getVariant(p),
 });

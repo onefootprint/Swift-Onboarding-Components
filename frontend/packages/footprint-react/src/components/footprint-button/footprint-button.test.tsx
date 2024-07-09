@@ -103,7 +103,7 @@ describe('Auth', () => {
         onClick={onClickMock}
         kind={FootprintComponentKind.Auth}
         publicKey="pk_"
-        userData={{ 'id.email': 'a@b.com' }}
+        bootstrapData={{ 'id.email': 'a@b.com' }}
         options={{ showLogo: true }}
         l10n={{ language: 'es' }}
       />,
@@ -121,7 +121,7 @@ describe('Auth', () => {
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
     expect(fpInitArgs).toEqual(
-      '[{"l10n":{"language":"es"},"kind":"auth","options":{"showLogo":true},"userData":{"id.email":"a@b.com"},"variant":"modal","publicKey":"pk_"}]',
+      '[{"l10n":{"language":"es"},"kind":"auth","options":{"showLogo":true},"bootstrapData":{"id.email":"a@b.com"},"variant":"modal","publicKey":"pk_"}]',
     );
 
     /* footprint.init(fpInitArgs) */
@@ -147,7 +147,7 @@ describe('Auth', () => {
         authToken="tok_"
         updateLoginMethods
         dialogVariant="drawer"
-        userData={{ 'id.phone_number': '+1234' }}
+        bootstrapData={{ 'id.phone_number': '+1234' }}
         options={{ showLogo: true }}
         l10n={{ locale: 'es-MX' }}
       />,
@@ -165,7 +165,7 @@ describe('Auth', () => {
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
     expect(fpInitArgs).toEqual(
-      '[{"l10n":{"locale":"es-MX"},"kind":"auth","options":{"showLogo":true},"userData":{"id.phone_number":"+1234"},"variant":"drawer","authToken":"tok_","updateLoginMethods":true}]',
+      '[{"l10n":{"locale":"es-MX"},"kind":"auth","options":{"showLogo":true},"bootstrapData":{"id.phone_number":"+1234"},"variant":"drawer","authToken":"tok_","updateLoginMethods":true}]',
     );
 
     /* footprint.init(fpInitArgs) */

@@ -2,20 +2,9 @@ import type { FootprintVerifyProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import React, { forwardRef } from 'react';
 
-type NoToken = {
-  authToken?: never;
-  publicKey?: never;
-};
-
-type PublicKeyOnly = {
-  authToken?: never;
-  publicKey: string;
-};
-
-type AuthTokenOnly = {
-  authToken: string;
-  publicKey?: never;
-};
+type NoToken = { authToken?: never; publicKey?: never };
+type PublicKeyOnly = { authToken?: never; publicKey: string };
+type AuthTokenOnly = { authToken: string; publicKey?: never };
 
 export type VerifyButtonProps = Omit<FootprintVerifyProps, 'kind' | 'variant' | 'publicKey' | 'authToken'> & {
   testID?: string;
@@ -27,19 +16,20 @@ export type VerifyButtonProps = Omit<FootprintVerifyProps, 'kind' | 'variant' | 
 const VerifyButton = (
   {
     appearance,
+    authToken = undefined,
+    bootstrapData,
+    dialogVariant,
+    l10n,
     label = 'Verify with Footprint',
     onAuth,
     onCancel,
     onClick,
-    onComplete,
     onClose,
-    publicKey = undefined,
-    authToken = undefined,
-    userData,
+    onComplete,
     options,
-    dialogVariant,
+    publicKey = undefined,
     testID,
-    l10n,
+    userData /** deprecated after 3.11.0 */,
   }: VerifyButtonProps,
   ref?: React.Ref<HTMLButtonElement>,
 ): JSX.Element => {
@@ -57,16 +47,16 @@ const VerifyButton = (
 
     const component = footprint.init({
       ...tokenProps,
-      kind: FootprintComponentKind.Verify,
-      variant: dialogVariant,
       appearance,
+      bootstrapData: bootstrapData || userData,
+      kind: FootprintComponentKind.Verify,
+      l10n,
       onAuth,
       onCancel,
-      onComplete,
       onClose,
-      userData,
+      onComplete,
       options,
-      l10n,
+      variant: dialogVariant,
     } as FootprintVerifyProps);
 
     component.render();
