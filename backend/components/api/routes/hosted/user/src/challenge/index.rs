@@ -102,13 +102,14 @@ pub async fn post(
             ))?;
             let tenant = tenant.ok_or(AssertionError("Need tenant to initiate email challenge for now"))?;
 
-            let challenge_data =
+            let (rx, challenge_data) =
                 send_email_challenge_non_blocking(&state, &email, uv.id, tenant, uv.sandbox_id)?;
             let challenge_data = RegisterChallengeData::Email {
                 h_code: challenge_data.h_code,
                 email: email.email,
             };
-            (None, challenge_data, state.config.time_s_between_challenges, None)
+            let time_between_challenges = state.config.time_s_between_challenges;
+            (Some(rx), challenge_data, time_between_challenges, None)
         }
         AuthMethodKind::Passkey => {
             let webauthn = WebauthnConfig::new(&state.config);

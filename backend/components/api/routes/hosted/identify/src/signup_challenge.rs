@@ -157,7 +157,7 @@ pub async fn post(
             biometric_challenge_json: None,
             time_before_retry_s: time_before_retry_s.num_seconds(),
         };
-        (Some(rx), data)
+        (rx, data)
     } else {
         // If obc is no-phone flow, only initiate email challenge
         let email = email
@@ -172,7 +172,8 @@ pub async fn post(
             return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into());
         };
 
-        let challenge_data = send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
+        let (rx, challenge_data) =
+            send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
         let challenge_data = ChallengeData::Email(challenge_data);
 
         let data = ChallengeState { data: challenge_data };
@@ -185,14 +186,10 @@ pub async fn post(
             biometric_challenge_json: None,
             time_before_retry_s: state.config.time_s_between_challenges,
         };
-        (None, data)
+        (rx, data)
     };
 
-    let err = if let Some(rx) = rx {
-        rx_background_error(rx, 3).await.err()
-    } else {
-        None
-    };
+    let err = rx_background_error(rx, 3).await.err();
     // Since these errors return an HTTP 200, log something special on the root span if there's an error
     match err {
         Some(_) => root_span.record("meta", "error"),

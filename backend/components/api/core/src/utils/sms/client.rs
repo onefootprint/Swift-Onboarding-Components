@@ -23,11 +23,9 @@ use newtypes::SandboxId;
 use newtypes::VaultId;
 use std::fmt::Debug;
 use std::sync::Arc;
+use tokio::sync::oneshot;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::oneshot::Sender;
-use tokio::sync::oneshot::{
-    self,
-};
 use tracing::Instrument;
 use twilio::TwilioConfig;
 

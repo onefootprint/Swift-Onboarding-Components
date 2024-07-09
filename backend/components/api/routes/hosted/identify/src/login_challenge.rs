@@ -115,11 +115,12 @@ pub async fn post(
             let email = vw.get_decrypted_email(&state).await?;
             let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
-            let challenge_data =
+            let (rx, challenge_data) =
                 send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
 
             let challenge_data = ChallengeData::Email(challenge_data);
-            (None, challenge_data, state.config.time_s_between_challenges, None)
+            let time_before_retry = state.config.time_s_between_challenges;
+            (Some(rx), challenge_data, time_before_retry, None)
         }
     };
 

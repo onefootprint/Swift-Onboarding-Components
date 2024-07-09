@@ -7,6 +7,7 @@ use crate::errors::user::UserError;
 use crate::errors::ApiCoreError;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpError;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant::Tenant;
@@ -23,6 +24,8 @@ use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
 use std::collections::HashMap;
 use std::str::FromStr;
+use tokio::sync::oneshot;
+use tokio::sync::oneshot::Receiver;
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]
@@ -192,7 +195,7 @@ impl SendgridClient {
             .await
     }
 
-    #[tracing::instrument(skip_all, err)]
+    #[tracing::instrument(skip_all)]
     pub async fn send_email_otp_verify_email(
         &self,
         state: &State,
@@ -306,7 +309,7 @@ pub fn send_email_challenge_non_blocking(
     vault_id: VaultId,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
-) -> FpResult<PhoneEmailChallengeState> {
+) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for sendrid latency
     if email.is_fixture() && sandbox_id.is_none() {
@@ -322,15 +325,30 @@ pub fn send_email_challenge_non_blocking(
 
     let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name).to_owned(); // better to default name here than error probably?
 
+    // Oneshot channel to send an error back from async message sending
+    let (tx, rx) = oneshot::channel();
+
     let state = state.clone();
     let email2 = email.email.clone();
     let fut = async move {
-        let _ = state
+        let res = state
             .sendgrid_client
             .send_email_otp_verify_email(&state, email2, code, tenant_url)
             .await;
+        let Err(e) = res else {
+            return;
+        };
+        // Pass the error back on the channel in case someone is listening.
+        // Don't raise error from sending since it's possible the receiver has hung up
+        match tx.send(e) {
+            // Due to a race condition it's possible the error still isn't returned to the
+            // caller. But not super likely
+            Ok(()) => tracing::info!("Sent error to caller. But not necessarily return from API"),
+            // If we couldn't send the error to the caller, at least log it
+            Err(err) => tracing::warn!(%err, "Received error when sending async email"),
+        }
     };
     tokio::spawn(fut.in_current_span());
 
-    Ok(PhoneEmailChallengeState { vault_id, h_code })
+    Ok((rx, PhoneEmailChallengeState { vault_id, h_code }))
 }
