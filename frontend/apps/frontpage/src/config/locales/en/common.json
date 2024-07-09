@@ -13,32 +13,6 @@
         "documentation": "Documentation"
       }
     },
-    "penguin-banner": {
-      "home": {
-        "title": "Onboard more customers and enjoy peace of mind.",
-        "primary": "Get started",
-        "secondary": "Book a demo",
-        "alt-img": "Penguin fishing in the north pole"
-      },
-      "kyc": {
-        "title": "Onboard more customers and enjoy peace of mind. Today.",
-        "primary": "Get started",
-        "secondary": "Book a demo",
-        "alt-img": "Penguin fishing in the north pole"
-      },
-      "vaulting": {
-        "title": "Securely store customer data and enjoy peace of mind. Today.",
-        "primary": "Get started",
-        "secondary": "Book a demo",
-        "alt-img": "Penguin fishing in the north pole"
-      },
-      "kyb": {
-        "title": "Onboard more customers and enjoy peace of mind. Today.",
-        "primary": "Get started",
-        "secondary": "Book a demo",
-        "alt-img": "Penguin fishing in the north pole"
-      }
-    },
     "contact-us-dialog": {
       "title": "Book a demo",
       "description": "Let us know where to get back to you and we'll find some options to chat.",

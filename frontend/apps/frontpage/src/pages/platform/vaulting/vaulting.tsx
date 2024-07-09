@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import PenguinBanner from 'src/components/penguin-banner';
+import Banner from 'src/components/banner';
 import styled from 'styled-components';
 
 import SEO from '../../../components/seo';
@@ -19,11 +19,11 @@ const Vaulting = () => {
       <SEO title={t('html-title')} description={t('html-description')} slug="/platform/vaulting" />
       <Hero />
       <AllData />
-      {/* <AuditTrail />
+      <AuditTrail />
       <VaultProxy />
       <DeviceInsights />
       <AllFeatures />
-      <PenguinBanner section="vaulting" imgSrc="/vaulting/penguin-banner/vaulting.svg" /> */}
+      <Banner title={t('banner.title')} imgSrc="/vaulting/penguin-banner/vaulting.svg" />
     </Container>
   );
 };

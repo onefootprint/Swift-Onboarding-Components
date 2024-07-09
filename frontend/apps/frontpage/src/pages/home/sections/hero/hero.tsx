@@ -2,28 +2,39 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Box, Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
 
+import { sendGTMEvent } from '@next/third-parties/google';
+
+import { TrackingEventType } from 'src/@types/tracking';
 import CustomersLogos from './components/customers-logos';
 
 const Screen = dynamic(() => import('./components/screen'));
 
 const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
+const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
+
+const sendTrackingEvent = (type: TrackingEventType) => {
+  sendGTMEvent({ event: 'buttonClicked', value: type });
+};
 
 const Hero = () => {
   const [showDialog, setShowDialog] = useState(false);
-
-  const handleClickTrigger = useCallback(() => {
-    setShowDialog(true);
-  }, []);
-
   const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
 
-  const signUpUrl = useMemo(() => `${DASHBOARD_BASE_URL}/authentication/sign-up`, []);
+  const handleSignUpClick = () => {
+    window.open(SIGN_UP_URL, '_blank');
+    sendTrackingEvent('sign-up');
+  };
+
+  const handleBookCall = useCallback(() => {
+    setShowDialog(true);
+    sendTrackingEvent('book-a-call');
+  }, []);
 
   return (
     <BackgroundContainer>
@@ -37,10 +48,10 @@ const Hero = () => {
               </Subtitle>
             </Stack>
             <Stack direction="row" gap={5} marginTop={3}>
-              <Button variant="primary" size="large" onClick={() => window.open(signUpUrl, '_blank')}>
+              <Button variant="primary" size="large" onClick={handleSignUpClick}>
                 {t('hero.get-started')}
               </Button>
-              <Button variant="secondary" size="large" onClick={handleClickTrigger}>
+              <Button variant="secondary" size="large" onClick={handleBookCall}>
                 {t('hero.book-a-call')}
               </Button>
             </Stack>

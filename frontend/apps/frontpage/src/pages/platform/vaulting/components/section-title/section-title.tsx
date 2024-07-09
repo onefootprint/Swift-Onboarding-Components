@@ -11,7 +11,7 @@ type SectionTitleProps = {
 
 const SectionTitle = ({ variant, $maxWidth, children, multiline }: SectionTitleProps) => (
   <Box maxWidth={$maxWidth}>
-    <Title variant={variant} multiline={multiline} tag={variant === 'display-1' ? 'h1' : 'h2'}>
+    <Title variant={variant} $multiline={multiline} tag={variant === 'display-1' ? 'h1' : 'h2'}>
       {children}
     </Title>
   </Box>
@@ -19,9 +19,9 @@ const SectionTitle = ({ variant, $maxWidth, children, multiline }: SectionTitleP
 
 const Title = styled(Box)<{
   variant: 'display-1' | 'display-2' | 'display-3';
-  multiline?: boolean;
+  $multiline?: boolean;
 }>`
-  ${({ theme, variant, multiline }) => css`
+  ${({ theme, variant, $multiline }) => css`
     ${createFontStyles(variant)}
     text-align: center;
     background-size: 200%;
@@ -37,7 +37,7 @@ const Title = styled(Box)<{
     ${media.greaterThan('md')`
       ${createFontStyles(variant)}
       ${
-        multiline
+        $multiline
           ? `
             background-image: linear-gradient(
             180deg,

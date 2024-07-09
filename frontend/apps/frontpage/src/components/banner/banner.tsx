@@ -1,41 +1,59 @@
+import { sendGTMEvent } from '@next/third-parties/google';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Box, Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import Image from 'next/image';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TrackingEventType } from 'src/@types/tracking';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
-
 import FishingPenguin from './components/fishing-penguin';
 
 type BannerProps = {
   title: string;
+  imgSrc?: string;
 };
 
 const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
+const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
 
-const Banner = ({ title }: BannerProps) => {
+const sendTrackingEvent = (type: TrackingEventType) => {
+  sendGTMEvent({ event: 'buttonClicked', value: type });
+};
+
+const Banner = ({ title, imgSrc }: BannerProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.banner',
   });
+  const handleSignUpClick = () => {
+    window.open(SIGN_UP_URL, '_blank');
+    sendTrackingEvent('sign-up');
+  };
+
+  const handleBookCall = useCallback(() => {
+    setShowDialog(true);
+    sendTrackingEvent('book-a-call');
+  }, []);
+
   return (
     <>
       <BannerContainer>
-        <FishingPenguin />
+        {imgSrc ? (
+          <Illustration src={imgSrc} height={600} width={900} alt="penguin-illustration" />
+        ) : (
+          <FishingPenguin />
+        )}
         <TextContainer>
-          <Text variant="display-2" tag="h3">
+          <Text variant="display-2" tag="h3" color="primary">
             {title}
           </Text>
           <ButtonContainer>
-            <Button
-              variant="primary"
-              size="large"
-              onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
-            >
+            <Button variant="primary" size="large" onClick={handleSignUpClick}>
               {t('get-started')}
             </Button>
-            <Button variant="secondary" size="large" onClick={() => setShowDialog(true)}>
+            <Button variant="secondary" size="large" onClick={handleBookCall}>
               {t('book-a-demo')}
             </Button>
           </ButtonContainer>
@@ -89,6 +107,17 @@ const ButtonContainer = styled(Stack)`
       justify-content: center;
       gap: ${theme.spacing[3]};
     `}
+  `}
+`;
+
+const Illustration = styled(Image)`
+  object-fit: contain;
+  max-height: 380px;
+  height: fit-content;
+  width: 100%;
+
+  ${media.greaterThan('md')`
+    max-width: 967px;
   `}
 `;
 

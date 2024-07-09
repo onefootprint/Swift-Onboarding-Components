@@ -14,7 +14,7 @@ const IllustrationSectionTitle = ({
   removeMask,
   children,
 }: BaseillustrationSectionTitleProps) => (
-  <Outer height={height} width={width} removeMask={removeMask}>
+  <Outer height={height} width={width} $removeMask={removeMask}>
     <Inner>
       <Mask>{children}</Mask>
     </Inner>
@@ -24,9 +24,9 @@ const IllustrationSectionTitle = ({
 const Outer = styled.div<{
   height?: number;
   width?: number;
-  removeMask?: boolean;
+  $removeMask?: boolean;
 }>`
-  ${({ theme, height, width, removeMask }) => css`
+  ${({ theme, height, width, $removeMask }) => css`
     z-index: 0;
     position: relative;
     border-radius: 10px 10px 0;
@@ -43,7 +43,7 @@ const Outer = styled.div<{
     width: ${width}px;
 
     ${
-      !removeMask &&
+      !$removeMask &&
       css`
       mask: radial-gradient(
         100% 100% at 50% 0%,

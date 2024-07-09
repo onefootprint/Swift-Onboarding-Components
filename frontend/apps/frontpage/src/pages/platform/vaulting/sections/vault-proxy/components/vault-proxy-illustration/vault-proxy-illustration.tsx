@@ -60,14 +60,14 @@ const VaultProxyIllustration = () => (
     >
       <Grid.Item gridArea="left" overflow="hidden">
         {Object.values(values).map(value => (
-          <StyledTag key={value.tag} x={value.x} y={value.y} hideMobile={value.hideMobile}>
+          <StyledTag key={value.tag} x={value.x} y={value.y} $hideMobile={value.hideMobile}>
             {value.tag}
           </StyledTag>
         ))}
       </Grid.Item>
       <Grid.Item gridArea="right" overflow="hidden">
         {Object.values(values).map(value => (
-          <StyledTag key={value.tag} x={value.x - 100} y={value.y} hideMobile={value.hideMobile}>
+          <StyledTag key={value.tag} x={value.x - 100} y={value.y} $hideMobile={value.hideMobile}>
             {value.value}
           </StyledTag>
         ))}
@@ -83,10 +83,10 @@ const StyledContainer = styled(Container)`
   position: relative;
 `;
 
-const StyledTag = styled(Tag)<{ x: number; y: number; hideMobile?: boolean }>`
-  ${({ x, y, hideMobile }) => css`
+const StyledTag = styled(Tag)<{ x: number; y: number; $hideMobile?: boolean }>`
+  ${({ x, y, $hideMobile }) => css`
     position: absolute;
-    display: ${hideMobile ? 'none' : 'block'};
+    display: ${$hideMobile ? 'none' : 'block'};
     top: ${y}%;
     left: ${x}%;
     z-index: 1;

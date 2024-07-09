@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import PenguinBanner from 'src/components/penguin-banner';
+import Banner from 'src/components/banner';
 import styled, { css } from 'styled-components';
 
 import DeveloperExperience from '../../../components/developer-experience';
@@ -22,7 +22,7 @@ const KYB = () => {
       <IdentifyBos />
       <SecurelyStore />
       <DeveloperExperience />
-      <PenguinBanner section="kyb" imgSrc="/kyb/penguin-banner/kyb.svg" />
+      <Banner title={t('banner.title')} imgSrc="/kyb/penguin-banner/kyb.svg" />
     </>
   );
 };

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { sendGTMEvent } from '@next/third-parties/google';
+import { TrackingEventType } from 'src/@types/tracking';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import DesktopNavLink from './components/desktop-nav-link';
@@ -17,8 +18,6 @@ type DesktopNavProps = {
   entries: NavEntry[];
 };
 
-type TrackingEventType = 'desktop-login' | 'desktop-sign-up';
-
 const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
 
 const sendTrackingEvent = (type: TrackingEventType) => {
@@ -27,11 +26,12 @@ const sendTrackingEvent = (type: TrackingEventType) => {
 
 const handleLoginClick = () => {
   window.open(`${DASHBOARD_BASE_URL}/authentication/sign-in`, '_blank');
-  sendTrackingEvent('desktop-login');
+  sendTrackingEvent('login');
 };
+
 const handleSignUpClick = () => {
   window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank');
-  sendTrackingEvent('desktop-sign-up');
+  sendTrackingEvent('sign-up');
 };
 
 const DesktopNav = ({ entries }: DesktopNavProps) => {
