@@ -1,49 +1,36 @@
 import { Button, Text, TextInput } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 import type { NameFormData } from '@/playbooks/utils/machine/types';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import useDefaultName from './hooks/use-default-name';
 
-import getPlaceholder from './utils/get-placeholder';
-
-type NameYourPlaybookProps = {
-  kind?: PlaybookKind;
-  onSubmit: (data: NameFormData) => void;
-  onBack: () => void;
+export type NameProps = {
   defaultValues: NameFormData;
+  meta: {
+    kind: PlaybookKind;
+  };
+  onBack: () => void;
+  onSubmit: (data: NameFormData) => void;
 };
 
-const NameYourPlaybook = ({ kind = PlaybookKind.Kyc, onSubmit, onBack, defaultValues }: NameYourPlaybookProps) => {
+const name = ({ defaultValues, meta, onBack, onSubmit }: NameProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog.name-your-playbook',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.name' });
+  const defaultName = useDefaultName({ kind: meta.kind });
   const formMethods = useForm<NameFormData>({
-    defaultValues,
+    defaultValues: {
+      name: defaultValues.name || defaultName,
+    },
   });
-  const { data } = useSession();
-  const { org } = data;
-
   const {
+    formState: { errors },
     handleSubmit,
     register,
-    setValue,
-    formState: { errors },
   } = formMethods;
-  useEffect(() => {
-    setValue('kind', kind);
-  }, [setValue, kind]);
-
-  const kindString = t(kind as unknown as ParseKeys<'common'>) as unknown as string;
-  const placeholder = getPlaceholder({
-    tenantName: org?.name || '',
-    kindString,
-  });
 
   return (
     <Container>
@@ -60,18 +47,14 @@ const NameYourPlaybook = ({ kind = PlaybookKind.Kyc, onSubmit, onBack, defaultVa
           <NameContainer>
             <TextInput
               autoFocus
-              {...register('name', {
-                required: { value: true, message: t('form.errors.required') },
-              })}
-              label={t('form.name.label')}
               hasError={!!errors.name}
-              placeholder={placeholder}
+              hint={errors.name?.message}
+              label={t('form.name.label')}
+              placeholder={defaultName}
+              {...register('name', {
+                required: t('form.errors.required'),
+              })}
             />
-            {errors.name && (
-              <Text variant="body-3" color="error">
-                {t('form.errors.required')}
-              </Text>
-            )}
           </NameContainer>
           <ButtonContainer>
             <Button variant="secondary" onClick={onBack}>
@@ -84,14 +67,13 @@ const NameYourPlaybook = ({ kind = PlaybookKind.Kyc, onSubmit, onBack, defaultVa
     </Container>
   );
 };
-
-const ButtonContainer = styled.div`
+const Container = styled.div`
   ${({ theme }) => css`
-    padding-top: ${theme.spacing[5]};
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+    flex-direction: column;
+    gap: ${theme.spacing[7]};
+    width: 520px;
+    white-space: pre-wrap;
   `};
 `;
 
@@ -120,14 +102,14 @@ const NameContainer = styled.div`
   `};
 `;
 
-const Container = styled.div`
+const ButtonContainer = styled.div`
   ${({ theme }) => css`
+    align-items: center;
     display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-    width: 520px;
-    white-space: pre-wrap;
+    justify-content: space-between;
+    padding-top: ${theme.spacing[5]};
+    width: 100%;
   `};
 `;
 
-export default NameYourPlaybook;
+export default name;

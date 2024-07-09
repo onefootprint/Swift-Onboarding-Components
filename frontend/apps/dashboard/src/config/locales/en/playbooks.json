@@ -1,4 +1,10 @@
 {
+  "kinds": {
+    "auth": "Auth",
+    "kyc": "KYC",
+    "kyb": "KYB",
+    "document": "ID Document"
+  },
   "copy": {
     "title": "Copying playbook",
     "form": {
@@ -45,6 +51,18 @@
     }
   },
   "create": {
+    "name": {
+      "title": "Name your playbook",
+      "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
+      "form": {
+        "name": {
+          "label": "Playbook name"
+        },
+        "errors": {
+          "required": "Please name your Playbook"
+        }
+      }
+    },
     "data-to-collect": {
       "nav": "Your Playbook",
       "title": {

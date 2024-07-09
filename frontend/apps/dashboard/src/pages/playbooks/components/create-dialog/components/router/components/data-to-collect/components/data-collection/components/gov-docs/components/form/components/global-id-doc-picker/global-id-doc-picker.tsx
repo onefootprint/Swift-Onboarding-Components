@@ -1,5 +1,5 @@
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { Checkbox, Grid, Text } from '@onefootprint/ui';
+import { Checkbox, Grid, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ const GlobalIdDocPicker = () => {
   return (
     <>
       <Text variant="label-3">{t('title')}</Text>
-      <Container>
+      <Stack direction="column">
         <Grid.Container gap={3}>
           <Checkbox
             value={SupportedIdDocTypes.driversLicense}
@@ -50,17 +50,9 @@ const GlobalIdDocPicker = () => {
             {...register('personal.docs.global')}
           />
         </Grid.Container>
-      </Container>
+      </Stack>
     </>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    padding-left: ${theme.spacing[5]};
-  `};
-`;
 
 export default GlobalIdDocPicker;

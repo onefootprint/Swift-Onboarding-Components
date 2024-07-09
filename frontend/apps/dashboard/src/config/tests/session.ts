@@ -15,7 +15,7 @@ const baseUser: UserSession = {
 };
 
 const baseOrg: OrgSession = {
-  id: '"org_hyZP3ksCvsT0AlLqMZsgrI"',
+  id: 'org_hyZP3ksCvsT0AlLqMZsgrI',
   name: 'Acme',
   logoUrl: null,
   isSandboxRestricted: false,

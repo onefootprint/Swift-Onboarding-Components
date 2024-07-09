@@ -2883,21 +2883,7 @@
           "nav": "Your Playbook"
         },
         "name-your-playbook": {
-          "nav": "Name your Playbook",
-          "title": "Name your playbook",
-          "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
-          "auth": "Auth",
-          "kyc": "KYC",
-          "kyb": "KYB",
-          "document": "ID Document",
-          "form": {
-            "name": {
-              "label": "Playbook name"
-            },
-            "errors": {
-              "required": "Please name your Playbook"
-            }
-          }
+          "nav": "Name your Playbook"
         },
         "verification-checks": {
           "nav": "Verification checks",

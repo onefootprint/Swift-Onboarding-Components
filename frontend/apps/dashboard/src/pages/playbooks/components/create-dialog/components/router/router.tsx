@@ -17,7 +17,7 @@ import type {
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
 import DataToCollect from './components/data-to-collect';
-import Name from './components/name-your-playbook';
+import Name from './components/name';
 import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
 import VerificationChecks from './components/verification-checks';
@@ -36,7 +36,9 @@ export type RouterProps = {
 const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind, onboardingTemplate } = state.context;
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.dialog' });
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog',
+  });
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();
@@ -249,7 +251,9 @@ const Router = ({ onCreate }: RouterProps) => {
         )}
         {state.matches('nameYourPlaybook') && (
           <Name
-            kind={state.context.kind}
+            meta={{
+              kind: state.context.kind || defaultValues.playbook.kind,
+            }}
             defaultValues={defaultValues.name}
             onBack={() => {
               send('navigationBackward');

@@ -30,15 +30,11 @@ export type DataToCollectMeta = {
 };
 
 export type NameFormData = {
-  kind: PlaybookKind;
   name: string;
 };
 
-export const defaultNameValue = '';
-
 export const defaultNameFormData: NameFormData = {
-  kind: PlaybookKind.Kyc,
-  name: defaultNameValue,
+  name: '',
 };
 
 export enum CountryRestriction {

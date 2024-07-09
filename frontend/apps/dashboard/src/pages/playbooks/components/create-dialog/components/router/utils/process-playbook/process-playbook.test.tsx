@@ -390,7 +390,7 @@ describe('processPlaybook', () => {
       const { name } = processPlaybook({
         playbook: defaultPlaybookValuesKYC,
         kind: PlaybookKind.Kyc,
-        nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+        nameForm: { name: 'test name' },
         verificationChecks: {},
       });
       expect(name).toBe('test name');
@@ -407,7 +407,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: true,
               allowUsTerritories: false,
@@ -433,7 +433,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: true,
               allowUsTerritories: true,
@@ -459,7 +459,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: true,
               allowUsTerritories: false,
@@ -488,7 +488,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: true,
               allowUsTerritories: false,
@@ -518,7 +518,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: false,
               allowUsTerritories: false,
@@ -546,7 +546,7 @@ describe('processPlaybook', () => {
           } = processPlaybook({
             playbook: defaultPlaybookValuesKYC,
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             residencyForm: {
               allowUsResidents: true,
               allowUsTerritories: false,
@@ -579,7 +579,7 @@ describe('processPlaybook', () => {
               },
             },
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             verificationChecks: {},
           });
 
@@ -601,7 +601,7 @@ describe('processPlaybook', () => {
               },
             },
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             verificationChecks: {},
           });
 
@@ -628,7 +628,7 @@ describe('processPlaybook', () => {
               },
             },
             kind: PlaybookKind.Kyc,
-            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            nameForm: { name: 'test name' },
             verificationChecks: {},
           });
 
