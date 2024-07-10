@@ -206,6 +206,7 @@ fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<Line
             .flat_map(|p| line_items.iter().find(|li| &li.product == p))
             .flat_map(|li| li.notional())
             .sum();
+        tracing::info!(?products, notional=%sum_for_products, "Applying minimum of");
         (products, sum_for_products)
     });
     // Then, remove the products from the bundle whose sum is the greatest
@@ -216,10 +217,9 @@ fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<Line
     line_items
         .into_iter()
         .map(|mut li| {
-            let should_keep = !products_to_remove.contains(&li.product);
-            if !should_keep {
-                li.price = LineItemPrice::Price(dec!(0));
+            if products_to_remove.contains(&li.product) {
                 tracing::info!(product=%li.product, count=%li.count, notional=?li.notional(), "Removing line item from invoice for minimum of clause");
+                li.price = LineItemPrice::Price(dec!(0));
             }
             li
         })

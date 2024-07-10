@@ -145,7 +145,7 @@ impl Product {
             Self::VaultsWithPci => "prod_OXKHHjVIuWL7OV",
             Self::AdverseMediaPerOnboarding => "prod_P6nOzVVredzvo1",
             Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
-            Self::AdverseMediaPerYear => "prod_P6nPpoj4yjL3tj",
+            Self::AdverseMediaPerYear => "prod_QS2lZZRG3QuzT8",
             Self::CurpVerification => "prod_QE6roGU9hUeA6m",
 
             // TODO this isn't actually used
