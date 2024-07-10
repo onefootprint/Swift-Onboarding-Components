@@ -117,14 +117,18 @@ pub struct InsightPerson {
 #[derive(serde::Serialize, Apiv2Response)]
 pub struct InsightRegistration {
     pub state: Option<String>,
+    /// File date
     pub registration_date: Option<String>,
     pub registered_agent: Option<PiiString>,
     pub officers: Vec<Officer>,
     pub addresses: Vec<PiiString>,
     pub entity_type: Option<String>,
     pub status: Option<String>,
+    pub sub_status: Option<String>,
     pub source: Option<String>,
     pub name: Option<String>,
+    pub jurisdiction: Option<String>,
+    pub file_number: Option<PiiString>,
 }
 
 #[derive(serde::Serialize, Apiv2Response)]
@@ -161,6 +165,7 @@ pub struct WatchlistHit {
     pub agency: Option<String>,
     pub agency_abbr: Option<String>,
     pub list_name: Option<String>,
+    pub list_country: Option<String>,
 }
 
 #[derive(serde::Serialize, Apiv2Response)]
@@ -367,6 +372,9 @@ fn create_registrations(business_response: &BusinessResponse) -> Vec<InsightRegi
                 state,
                 source,
                 registered_agent,
+                jurisdiction,
+                sub_status,
+                file_number,
                 ..
             } = r;
 
@@ -404,6 +412,9 @@ fn create_registrations(business_response: &BusinessResponse) -> Vec<InsightRegi
                 status,
                 source,
                 name,
+                jurisdiction,
+                sub_status,
+                file_number: file_number.map(PiiString::from),
             }
         })
         .collect()
@@ -587,6 +598,7 @@ fn create_watchlists(business_response: &BusinessResponse) -> Option<InsightWatc
                         agency_information_url,
                         url,
                         id,
+                        list_country,
                         ..
                     } = res;
 
@@ -603,6 +615,7 @@ fn create_watchlists(business_response: &BusinessResponse) -> Option<InsightWatc
                         agency: agency.clone(),
                         agency_abbr: agency_abbr.clone(),
                         list_name: list_name.clone(),
+                        list_country,
                     };
 
                     (id.into(), hit)

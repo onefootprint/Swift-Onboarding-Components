@@ -168,7 +168,7 @@ pub struct Registration {
     pub sub_status: Option<String>,
     pub status_details: Option<String>,
     pub entity_type: Option<String>,
-    pub file_number: Option<String>,
+    pub file_number: Option<ScrubbedPiiString>,
     pub addresses: Option<Vec<ScrubbedPiiString>>,
     pub jurisdiction: Option<String>,
     pub officers: Option<Vec<Officer>>,
@@ -432,6 +432,7 @@ pub struct Result {
     pub entity_aliases: Option<Vec<ScrubbedPiiString>>,
     pub agency_list_url: Option<String>,
     pub agency_information_url: Option<String>,
+    pub list_country: Option<String>,
     pub score: Option<String>,
     #[serde(serialize_with = "scrub_pii_value")]
     pub addresses: Option<PiiJsonValue>, /* schema not specified in docs and wierdly its a vec of json
