@@ -35,6 +35,19 @@ describe('filterUserData', () => {
     const filteredData = filterUserData(data);
     expect(filteredData).toEqual({});
   });
+
+  it('should reject non-objects', () => {
+    // @ts-expect-error: Array is not a valid Object
+    expect(filterUserData([])).toEqual({});
+    // @ts-expect-error: Number is not a valid Object
+    expect(filterUserData(1)).toEqual({});
+    // @ts-expect-error: Symbol is not a valid Object
+    expect(filterUserData(Symbol('banana'))).toEqual({});
+    // @ts-expect-error: Map is not a valid Object
+    expect(filterUserData(new Map())).toEqual({});
+    // @ts-expect-error: Set is not a valid Object
+    expect(filterUserData(new Set())).toEqual({});
+  });
 });
 
 describe('filterBusinessData', () => {
@@ -57,5 +70,18 @@ describe('filterBusinessData', () => {
     const data = {};
     const filteredData = filterBusinessData(data);
     expect(filteredData).toEqual({});
+  });
+
+  it('should reject non-objects', () => {
+    // @ts-expect-error: Array is not a valid Object
+    expect(filterBusinessData([])).toEqual({});
+    // @ts-expect-error: Number is not a valid Object
+    expect(filterBusinessData(1)).toEqual({});
+    // @ts-expect-error: Symbol is not a valid Object
+    expect(filterBusinessData(Symbol('banana'))).toEqual({});
+    // @ts-expect-error: Map is not a valid Object
+    expect(filterBusinessData(new Map())).toEqual({});
+    // @ts-expect-error: Set is not a valid Object
+    expect(filterBusinessData(new Set())).toEqual({});
   });
 });
