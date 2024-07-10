@@ -45,8 +45,10 @@ use tracing_subscriber::Registry;
 // Initialize `tracing` using `opentelemetry-tracing` and configure logging
 pub fn init(config: &Config) -> Result<Option<BasicController>> {
     env_logger::init();
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|e| {
+        println!("Couldn't construct env filter: {e}");
+        EnvFilter::new("info")
+    });
     global::set_text_map_propagator(TraceContextPropagator::new());
 
     let mut layers = vec![];
