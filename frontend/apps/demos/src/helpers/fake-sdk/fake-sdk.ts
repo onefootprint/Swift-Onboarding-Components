@@ -17,6 +17,8 @@ import once from 'lodash/once';
 
 type ParentApi = Postmate.ParentAPI;
 
+const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
+const baseUrl = ENV === 'production' ? 'https://api.onefootprint.com' : 'https://api.dev.onefootprint.com';
 const getUniqueId = (): string => Math.random().toString(36).substring(2);
 
 const getPostmate = async (
@@ -44,7 +46,7 @@ const sendSdkArgsRecursive = async (
   payload: Record<string, unknown>,
   retries: number,
 ): Promise<{ token: string; expires_at: string }> =>
-  fetch(`https://api.dev.onefootprint.com/org/sdk_args`, {
+  fetch(`${baseUrl}/org/sdk_args`, {
     method: 'POST',
     headers: {
       'x-fp-client-version': `'footprint-js' 0 ${payload.kind}`.trim(),

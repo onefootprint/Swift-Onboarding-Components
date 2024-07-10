@@ -14,7 +14,7 @@ type DemoFormProps = { authToken: string };
 const getFormArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   appUrl:
-    o.appUrl.startsWith('https://components-') || o.appUrl.startsWith('http://localhost')
+    o.appUrl.startsWith('https://components') || o.appUrl.startsWith('http://localhost')
       ? o.appUrl
       : 'http://localhost:3010/form',
 });

@@ -13,9 +13,7 @@ const getAuthArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
   appUrl:
-    o.appUrl.startsWith('https://auth-') || o.appUrl.startsWith('http://localhost')
-      ? o.appUrl
-      : 'http://localhost:3011',
+    o.appUrl.startsWith('https://auth') || o.appUrl.startsWith('http://localhost') ? o.appUrl : 'http://localhost:3011',
 });
 
 const AuthDemo = () => {
