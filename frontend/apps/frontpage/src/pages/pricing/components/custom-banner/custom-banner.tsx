@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { sendGTMEvent } from '@next/third-parties/google';
-import { TrackingEventType } from 'src/@types/tracking';
 import ContactDialog from 'src/components/contact-dialog';
 import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
 import Illustration from './components/illustration';
@@ -17,10 +16,6 @@ type CustomBannerProps = {
   onClickSecondaryButton?: () => void;
 };
 
-const sendTrackingEvent = (type: TrackingEventType) => {
-  sendGTMEvent({ event: 'buttonClicked', value: type });
-};
-
 const CustomBanner = ({
   title,
   subtitle,
@@ -31,12 +26,10 @@ const CustomBanner = ({
 
   const handleSignUpClick = () => {
     window.open(SIGN_UP_URL, '_blank');
-    sendTrackingEvent('sign-up');
   };
 
   const handleScheduleCall = () => {
     setShowDialog(true);
-    sendTrackingEvent('book-a-call');
   };
 
   const handleClose = () => {

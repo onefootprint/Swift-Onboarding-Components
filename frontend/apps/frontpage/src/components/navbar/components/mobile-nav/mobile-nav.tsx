@@ -10,7 +10,6 @@ import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
-import { sendGTMEvent } from '@next/third-parties/google';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import MobileNavLink from './components/mobile-nav-link';
@@ -22,8 +21,6 @@ type MobileNavProps = {
   entries: NavEntry[];
   $isOnDarkSection?: boolean;
 };
-
-type TrackingEventType = 'mobile-login' | 'mobile-sign-up';
 
 const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
 
@@ -60,10 +57,6 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
     close();
   };
 
-  const sendTrackingEvent = (type: TrackingEventType) => {
-    sendGTMEvent({ event: 'buttonClicked', value: type });
-  };
-
   return (
     <AnimatePresence>
       {isOpen ? (
@@ -96,18 +89,8 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
               </LinkList>
             </NavigationMenuRoot>
             <CtaContainer>
-              <LoginLink
-                href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}
-                onClick={() => sendTrackingEvent('mobile-login')}
-              >
-                {t('login')}
-              </LoginLink>
-              <LinkButton
-                href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}
-                onClick={() => sendTrackingEvent('mobile-sign-up')}
-              >
-                {t('sign-up')}
-              </LinkButton>
+              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
+              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
             </CtaContainer>
           </Content>
         </Menu>

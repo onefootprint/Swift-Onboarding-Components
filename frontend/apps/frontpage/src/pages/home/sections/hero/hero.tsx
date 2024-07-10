@@ -10,16 +10,9 @@ import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
 
-import { sendGTMEvent } from '@next/third-parties/google';
-
-import { TrackingEventType } from 'src/@types/tracking';
 import CustomersLogos from './components/customers-logos';
 
 const Screen = dynamic(() => import('./components/screen'));
-
-const sendTrackingEvent = (type: TrackingEventType) => {
-  sendGTMEvent({ event: 'buttonClicked', value: type });
-};
 
 const Hero = () => {
   const [showDialog, setShowDialog] = useState(false);
@@ -27,12 +20,10 @@ const Hero = () => {
 
   const handleSignUpClick = () => {
     window.open(SIGN_UP_URL, '_blank');
-    sendTrackingEvent('sign-up');
   };
 
   const handleBookCall = useCallback(() => {
     setShowDialog(true);
-    sendTrackingEvent('book-a-call');
   }, []);
 
   return (

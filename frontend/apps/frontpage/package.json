@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.5",
+    "@intercom/messenger-js-sdk": "^0.0.11",
     "@lottiefiles/react-lottie-player": "^3.5.3",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
