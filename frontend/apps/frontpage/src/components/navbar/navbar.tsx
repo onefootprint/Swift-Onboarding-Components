@@ -12,9 +12,9 @@ import {
   IcoUser24,
   IcoWriting24,
 } from '@onefootprint/icons';
-import { Container, media } from '@onefootprint/ui';
+import { Overlay } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -28,21 +28,12 @@ const ARTICLE_URL = '/blog/footprint-13m-series-a-led-by-qed';
 const Navbar = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const hasScroll = useHasScroll();
   const router = useRouter();
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
 
   const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
-
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (isBannerVisible) {
-      url.searchParams.set('banner', 'true');
-    } else {
-      url.searchParams.delete('banner');
-    }
-    router.push(url.toString(), undefined, { shallow: true });
-  }, [isBannerVisible]);
 
   const handleCloseBanner = () => setIsBannerVisible(false);
   const entries: NavEntry[] = [
@@ -136,58 +127,64 @@ const Navbar = () => {
     },
   ];
 
+  const handleMobileOpen = () => {
+    setIsMobileNavOpen(true);
+    disableFloating();
+  };
+  const handleMobileClose = () => {
+    setIsMobileNavOpen(false);
+    enableFloating();
+  };
+
   return (
-    <Header $isFloating={hasScroll && isFloatingEnabled}>
-      <MessageBanner
-        showBanner={isBannerVisible}
-        onClose={handleCloseBanner}
-        articleUrl={ARTICLE_URL}
-        text={t('message-banner.text')}
-        cta={t('message-banner.cta')}
-      />
-      <Container>
-        <Inner id="navbar">
-          <MobileNav onOpen={disableFloating} onClose={enableFloating} entries={entries} />
-          <DesktopNav entries={entries} />
-        </Inner>
-      </Container>
-    </Header>
+    <>
+      <Header $isFloating={hasScroll && isFloatingEnabled} $isMobileNavOpen={isMobileNavOpen}>
+        <MessageBanner
+          showBanner={isBannerVisible}
+          onClose={handleCloseBanner}
+          articleUrl={ARTICLE_URL}
+          text={t('message-banner.text')}
+          cta={t('message-banner.cta')}
+        />
+
+        <MobileNav isOpen={isMobileNavOpen} onOpen={handleMobileOpen} onClose={handleMobileClose} entries={entries} />
+        <DesktopNav entries={entries} />
+      </Header>
+      <Overlay isVisible={isMobileNavOpen} />
+    </>
   );
 };
 
 const Header = styled.header<{
   $isFloating: boolean;
+  $isMobileNavOpen: boolean;
 }>`
-  ${({ theme, $isFloating }) => css`
-    position: sticky;
+  ${({ theme, $isFloating, $isMobileNavOpen }) => css`
     left: 0;
+    position: sticky;
+    display: flex;
+    flex-direction: column;
     right: 0;
     top: 0;
-    transition: background 200ms ease 0s, position 200ms ease 0s;
-    z-index: ${theme.zIndex.overlay};
+    z-index: ${theme.zIndex.confirmationDialog};
+    background-color: ${$isMobileNavOpen ? theme.backgroundColor.primary : 'transparent'};
+    -webkit-backdrop-filter: blur(15px) saturate(125%);
+      backdrop-filter: blur(15px) saturate(125%);
+    min-height: ${$isMobileNavOpen ? '100vh' : 'auto'};
+    transition: background-color 0.3s ease, min-height 0.3s ease;
 
     ${
       $isFloating &&
+      !$isMobileNavOpen &&
       css`
       position: fixed;
       -webkit-backdrop-filter: blur(15px) saturate(125%);
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(${theme.backgroundColor.primary}, 0.75);
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+      transition: background-color 0.3s ease, backdrop-filter 0.3s ease, border-bottom 0.3s ease;
     `
     }
-  `}
-`;
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    width: 100%;
-    padding: ${theme.spacing[6]} 0 ${theme.spacing[5]};
-
-    ${media.greaterThan('md')`
-      padding:  ${theme.spacing[3]} 0;
-    `}
   `}
 `;
 

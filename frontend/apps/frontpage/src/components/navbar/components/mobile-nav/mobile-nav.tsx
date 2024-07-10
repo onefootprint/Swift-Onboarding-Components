@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { IcoClose24, IcoMenu24, ThemedLogoFpDefault } from '@onefootprint/icons';
-import { Box, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import { IcoClose24, IcoMenu24, ThemedLogoFpCompact } from '@onefootprint/icons';
+import { Container, Stack, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
@@ -19,19 +19,16 @@ type MobileNavProps = {
   onOpen: () => void;
   onClose: () => void;
   entries: NavEntry[];
+  isOpen: boolean;
   $isOnDarkSection?: boolean;
 };
 
-const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
-
-const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProps) => {
+const MobileNav = ({ onOpen, onClose, entries, isOpen, $isOnDarkSection }: MobileNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
-  const [isOpen, setOpen] = useState(false);
   useLockedBody(isOpen);
 
   const close = useCallback(() => {
-    setOpen(false);
     onClose();
   }, [onClose]);
 
@@ -42,89 +39,117 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
   }, [breakpoint, isOpen, close]);
 
   const handleToggle = () => {
-    setOpen(currentOpen => {
-      const nextOpen = !currentOpen;
-      if (nextOpen) {
-        onOpen();
-      } else {
-        onClose();
-      }
-      return nextOpen;
-    });
+    if (isOpen) {
+      onClose();
+    } else {
+      onOpen();
+    }
   };
 
   const handleLogoClick = () => {
     close();
   };
 
+  const menuVariants = {
+    initial: { opacity: 0, y: -20 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.2, ease: 'easeOut' },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: { duration: 0.2, ease: 'easeOut' },
+    },
+  };
+
+  const iconVariant = {
+    initial: { rotate: 0 },
+    animate: {
+      rotate: isOpen ? 90 : 0,
+      transition: { duration: 0.2, ease: 'easeOut' },
+    },
+    exit: {
+      rotate: isOpen ? -90 : 0,
+      transition: { duration: 0.2, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <AnimatePresence>
-      {isOpen ? (
-        <Menu>
-          <Header>
+    <>
+      <AnimatePresence>
+        <OuterContainer>
+          <Main>
             <Logo href="/" onClick={handleLogoClick}>
-              <ThemedLogoFpDefault color="primary" />
+              <ThemedLogoFpCompact color={$isOnDarkSection ? 'quinary' : 'primary'} />
             </Logo>
-            <NavTriggerButton aria-label={t('nav-toggle.open')} onClick={handleToggle} type="button">
-              <IcoClose24 />
+            <NavTriggerButton
+              aria-label={t(isOpen ? 'nav-toggle.close' : 'nav-toggle.open')}
+              onClick={handleToggle}
+              type="button"
+            >
+              <motion.div variants={iconVariant} initial="initial" animate="animate" exit="exit">
+                {isOpen ? <IcoClose24 /> : <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />}
+              </motion.div>
             </NavTriggerButton>
-          </Header>
-          <Content
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          >
-            <NavigationMenuRoot>
-              <LinkList>
-                {entries.map(entry => {
-                  if (isNavLink(entry)) {
-                    return <MobileNavLink key={entry.text} link={entry} />;
-                  }
-                  if (isNavMenu(entry)) {
-                    return <MobileNavMenu menu={entry} key={entry.text} />;
-                  }
-                  return null;
-                })}
-              </LinkList>
-            </NavigationMenuRoot>
-            <CtaContainer>
-              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
-              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
-            </CtaContainer>
-          </Content>
-        </Menu>
-      ) : (
-        <Container>
-          <Logo href="/" onClick={handleLogoClick}>
-            <ThemedLogoFpDefault color={$isOnDarkSection ? 'quinary' : 'primary'} />
-          </Logo>
-          <NavTriggerButton aria-label={t('nav-toggle.close')} onClick={handleToggle} type="button">
-            <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />
-          </NavTriggerButton>
-        </Container>
-      )}
-    </AnimatePresence>
+          </Main>
+          {isOpen && (
+            <>
+              <NavigationMenu.Root asChild>
+                <MenuContainer initial="initial" animate="animate" exit="exit" variants={menuVariants} flex={1}>
+                  <LinkList>
+                    {entries.map(entry => {
+                      if (isNavLink(entry)) {
+                        return <MobileNavLink key={entry.text} link={entry} />;
+                      }
+                      if (isNavMenu(entry)) {
+                        return <MobileNavMenu menu={entry} key={entry.text} />;
+                      }
+                      return null;
+                    })}
+                  </LinkList>
+                  <CtaContainer>
+                    <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
+                    <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
+                  </CtaContainer>
+                </MenuContainer>
+              </NavigationMenu.Root>
+            </>
+          )}
+        </OuterContainer>
+      </AnimatePresence>
+    </>
   );
 };
 
-const Container = styled.div`
+const MenuContainer = styled(motion(Stack))`
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+`;
+
+const OuterContainer = styled(motion(Container))`
+    flex-direction: column;
+    position: relative;
+    flex: 1;
+`;
+
+const LinkList = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const Main = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: var(--mobile-header-height);
 
   ${media.greaterThan('lg')`
     display: none;
   `}
-`;
-
-const LinkList = styled(NavigationMenuList)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  align-items: flex-start;
-  justify-content: flex-start;
-  position: relative;
 `;
 
 const Logo = styled(Link)`
@@ -133,43 +158,6 @@ const Logo = styled(Link)`
     align-items: center;
     margin-right: ${theme.spacing[4]};
   `}
-`;
-
-const Menu = styled.div`
-  ${({ theme }) => css`
-    align-items: initial;
-    position: relative;
-    width: 100%;
-    background: ${theme.backgroundColor.primary};
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-
-    ${media.greaterThan('lg')`
-      display: none;
-    `}
-  `}
-`;
-
-const Header = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: ${theme.spacing[5]};
-    padding: ${theme.spacing[6]} ${theme.spacing[5]};
-  `}
-`;
-
-const Content = styled(motion.span)`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-between;
 `;
 
 const NavTriggerButton = styled.button`
@@ -187,8 +175,8 @@ const CtaContainer = styled.div`
     display: flex;
     gap: ${theme.spacing[5]};
     padding: ${theme.spacing[5]};
-
-    > a {
+  
+    & > a {
       flex: 1;
     }
   `}
