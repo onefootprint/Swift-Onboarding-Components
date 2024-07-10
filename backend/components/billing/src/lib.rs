@@ -11,6 +11,7 @@ use newtypes::Product;
 use newtypes::RevenueCategory;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
+use profile::get_or_create_price;
 use profile::BillingProfile;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
@@ -153,8 +154,10 @@ impl BillingClient {
         // Otherwise, make a new one
         let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
         match price {
-            LineItemPrice::Price(price) => {
-                new_invoice_item.price = Some(price.price_id);
+            LineItemPrice::Price(price_cents) => {
+                let price_cents = price_cents.to_string();
+                let price_id = get_or_create_price(&self.client, product.product_id(), &price_cents).await?;
+                new_invoice_item.price = Some(price_id);
             }
             LineItemPrice::Uncontracted => {
                 new_invoice_item.currency = Some(Currency::USD);
@@ -191,9 +194,9 @@ impl BillingClient {
         }
 
         // Calculate each of the line items
-        let profile = BillingProfile::get_for(&self.client, &info).await?;
+        let profile = BillingProfile::new(info.billing_profile.clone())?;
         let mut items = HashMap::new();
-        let line_items = info.counts.line_items(&profile)?;
+        let line_items = info.counts.line_items(&info.tenant_id, &profile)?;
         let monthly_spend_cents: Decimal = line_items
             .iter()
             .filter(|li| li.product.applies_to_monthly_minimum())
@@ -210,9 +213,9 @@ impl BillingClient {
 
         // If the tenant didn't hit their monthly minimum, add another line item for the remaining
         // amount
-        if let Some(monthly_minimum) = profile.get(Product::MonthlyMinimumOnIdentity) {
-            if monthly_spend_cents < monthly_minimum.price_cents {
-                let remaining_cents = monthly_minimum.price_cents - monthly_spend_cents;
+        if let Some(monthly_minimum_price) = profile.get(&Product::MonthlyMinimumOnIdentity) {
+            if monthly_spend_cents < *monthly_minimum_price {
+                let remaining_cents = monthly_minimum_price - monthly_spend_cents;
                 let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
                 let extra_metadata = [("revenue-category".into(), RevenueCategory::Identity.to_string())];
 

@@ -1,9 +1,8 @@
 use crate::is_managed;
 use crate::managed_metadata;
 use crate::BResult;
-use crate::BillingInfo;
+use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use newtypes::Product;
-use newtypes::TenantId;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -14,48 +13,22 @@ use stripe::ListPrices;
 use stripe::Price;
 use stripe::PriceBillingScheme;
 use stripe::PriceId;
-use strum::IntoEnumIterator;
 
 /// Stores all the price IDs for products we offer. This may differ per environment and occasionally
 /// per tenant
-#[derive(Debug)]
-pub struct BillingProfile {
-    pub(crate) tenant_id: TenantId,
-    prices: HashMap<Product, PriceInfo>,
-}
-
-#[derive(Debug, Clone)]
-pub struct PriceInfo {
-    /// Identifier for the price of the specific product on stripe
-    pub(crate) price_id: stripe::PriceId,
-    /// Price, in cents
-    pub(crate) price_cents: Decimal,
-}
+#[derive(Debug, derive_more::Deref)]
+pub struct BillingProfile(HashMap<Product, Decimal>);
 
 impl BillingProfile {
-    pub(crate) fn get(&self, product: Product) -> Option<&PriceInfo> {
-        self.prices.get(&product)
-    }
-
-    pub(crate) async fn get_for(client: &stripe::Client, info: &BillingInfo) -> BResult<Self> {
-        // Get prices for each product
+    /// Get prices as decimal for each product
+    pub(crate) fn new(bp: Option<DbBillingProfile>) -> BResult<Self> {
         let mut prices = HashMap::new();
-        for product in Product::iter() {
-            let bp = info.billing_profile.as_ref();
-            let price_cents = bp.and_then(|bp| bp.prices.get(&product));
-            if let Some(price_cents) = price_cents {
-                let product_id = product.product_id();
-                let price_id = get_or_create_price(client, product_id, price_cents).await?;
-                let price_cents = Decimal::from_str(price_cents)?;
-                let price_info = PriceInfo {
-                    price_id,
-                    price_cents,
-                };
-                prices.insert(product, price_info);
-            }
+        let prices_str: HashMap<_, _> = bp.map(|bp| bp.prices.into()).unwrap_or_default();
+        for (product, price) in prices_str {
+            let price_cents = Decimal::from_str(&price)?;
+            prices.insert(product, price_cents);
         }
-        let tenant_id = info.tenant_id.clone();
-        let profile = BillingProfile { tenant_id, prices };
+        let profile = BillingProfile(prices);
         Ok(profile)
     }
 }
@@ -64,7 +37,11 @@ impl BillingProfile {
 /// Lookup existing prices for the specified product. If one exists with the same numeric price,
 /// return it. Otherwise, make a new price
 #[tracing::instrument(skip(client))]
-async fn get_or_create_price(client: &stripe::Client, product_id: &str, price: &str) -> BResult<PriceId> {
+pub(super) async fn get_or_create_price(
+    client: &stripe::Client,
+    product_id: &str,
+    price: &str,
+) -> BResult<PriceId> {
     let existing_price = get_price(client, product_id, price).await?;
     if let Some(p) = existing_price {
         return Ok(p.id);

@@ -1,6 +1,5 @@
 use crate::interval::BillingInterval;
 use crate::profile::BillingProfile;
-use crate::profile::PriceInfo;
 use crate::BResult;
 use crate::Error;
 use db::models::access_event::AccessEvent;
@@ -34,18 +33,18 @@ pub(crate) struct LineItem {
 
 impl LineItem {
     pub fn notional(&self) -> Option<Decimal> {
-        let LineItemPrice::Price(price) = &self.price else {
+        let LineItemPrice::Price(price_cents) = &self.price else {
             return None;
         };
         let count = Decimal::from_i64(self.count)?;
-        let notional = price.price_cents * count;
+        let notional = price_cents * count;
         Some(notional)
     }
 }
 
 #[derive(Debug, derive_more::From)]
 pub enum LineItemPrice {
-    Price(PriceInfo),
+    Price(Decimal),
     Uncontracted,
 }
 
@@ -62,8 +61,12 @@ impl BillingCounts {
         Product::iter().map(|p| (p, self.get_count(p))).collect()
     }
 
-    pub(crate) fn line_items(&self, profile: &BillingProfile) -> BResult<Vec<LineItem>> {
-        let tenant_has = |p: Product| profile.get(p).is_some();
+    pub(crate) fn line_items(
+        &self,
+        tenant_id: &TenantId,
+        profile: &BillingProfile,
+    ) -> BResult<Vec<LineItem>> {
+        let tenant_has = |p: Product| profile.get(&p).is_some();
         if tenant_has(Product::ContinuousMonitoringPerYear) && tenant_has(Product::WatchlistChecks) {
             return Err(Error::ValidationError(
                 "Tenant can't have both WatchlistChecks and ContinuousMonitoringPerYear".into(),
@@ -85,16 +88,16 @@ impl BillingCounts {
             })
             .filter(|(_, count)| count > &0)
             // Filter out line items that have a price of 0c explicitly in the billing profile
-            .filter(|(product, _)| !profile.get(*product).is_some_and(|p| p.price_cents == dec!(0)))
+            .filter(|(product, _)| !profile.get(product).is_some_and(|p| *p == dec!(0)))
             .map(|(product, count)| -> BResult<_> {
-                let price = if let Some(price) = profile.get(product) {
+                let price = if let Some(price_cents) = profile.get(&product) {
                     // If the BillingProfile for this tenant has a price set for the product, use it
-                    price.clone().into()
+                    LineItemPrice::Price(*price_cents)
                 } else {
                     // If there is no price set up for this tenant but they have used the product,
                     // error by adding a line item to the invoice that shows the uncontracted price.
                     // These require manual human action, but we don't want to prevent invoice generation
-                    tracing::error!(tenant_id=%profile.tenant_id, product=%product, "Billing line item is uncontracted");
+                    tracing::error!(tenant_id=%tenant_id, product=%product, "Billing line item is uncontracted");
                     LineItemPrice::Uncontracted
                 };
                 Ok(LineItem { product, price, count })
@@ -102,7 +105,7 @@ impl BillingCounts {
             .collect::<BResult<Vec<_>>>()?;
 
         // For some legacy tenants, apply "minimum of" clauses. We'll be phasing these out in the future.
-        let results = apply_minimum_of(&profile.tenant_id, results);
+        let results = apply_minimum_of(tenant_id, results);
 
         Ok(results)
     }
@@ -227,7 +230,6 @@ mod test {
     use super::apply_minimum_of;
     use super::LineItem;
     use super::LineItemPrice;
-    use crate::profile::PriceInfo;
     use db::test_helpers::assert_have_same_elements;
     use newtypes::Product;
     use newtypes::TenantId;
@@ -238,10 +240,7 @@ mod test {
     fn test_minimum_of() {
         let li = |product, price, count| LineItem {
             product,
-            price: LineItemPrice::Price(PriceInfo {
-                price_id: stripe::PriceId::from_str("price_xyz").unwrap(),
-                price_cents: price,
-            }),
+            price: LineItemPrice::Price(price),
             count,
         };
 
