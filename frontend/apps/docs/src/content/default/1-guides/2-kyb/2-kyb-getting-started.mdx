@@ -58,7 +58,12 @@ In order to use our onboarding flows, you can either render a Footprint button, 
 If you would like to use a pre-built Footprint button, below is what your integration would look like for Vanilla HTML:
 
 ```html
-<div data-footprint data-public-key="pb_test_VMooXd04EUlnu3AvMYKjMW"></div>
+<div 
+  id="footprint-button"
+  data-footprint
+  data-kind="verify"
+  data-props='{"publicKey": "pb_test_VMooXd04EUlnu3AvMYKjMW"}'
+></div>
 ```
 
 Make sure to add Footprint completion handlers on the `window` object:
@@ -117,8 +122,8 @@ If you would like to use your own button and trigger Footprint, you can execute 
 const handleClick = () => {
   const component = footprint.init({
     kind: 'verify',
-    publicKey,
-    userData,
+    publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+    bootstrapData: {},
     onComplete: validationToken => {
       // TODO: User has finished the flow. This validation token can be used to see the fp_id of the
       // user, the auth method they used to log in, and their KYC status

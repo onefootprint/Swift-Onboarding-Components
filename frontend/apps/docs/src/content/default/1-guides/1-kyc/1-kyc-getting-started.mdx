@@ -58,7 +58,12 @@ In order to use our onboarding flows, you can either render a Footprint button, 
 If you would like to use a pre-built Footprint button, below is what your integration would look like for Vanilla HTML:
 
 ```html
-<div data-footprint data-public-key="pb_test_VMooXd04EUlnu3AvMYKjMW"></div>
+<div 
+  id="footprint-button"
+  data-footprint
+  data-kind="verify"
+  data-props='{"publicKey": "pb_test_VMooXd04EUlnu3AvMYKjMW"}'
+></div>
 ```
 
 Make sure to add Footprint completion handlers on the `window` object:
@@ -76,7 +81,7 @@ window.footprintCallbacks = {
 };
 ```
 
-Please refer to our guide for [Javascript](https://docs.onefootprint.com/sdks/javascript#verify-component-integration) for more details.
+Please refer to our guide for [Javascript](https://docs.onefootprint.com/sdks/javascript-typescript-introduction) for more details.
 
 ### React
 
@@ -107,7 +112,7 @@ const Page = () => {
 };
 ```
 
-Please refer to our guide for [React](https://docs.onefootprint.com/sdks/react#footprint-verify-button-integration) for more details.
+Please refer to our guide for [React](https://docs.onefootprint.com/sdks/react-introduction) for more details.
 
 ### Using your custom button
 
@@ -117,8 +122,8 @@ If you would like to use your own button and trigger Footprint, you can execute 
 const handleClick = () => {
   const component = footprint.init({
     kind: 'verify',
-    publicKey,
-    userData,
+    publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+    bootstrapData: {},
     onComplete: validationToken => {
       // TODO: Post the token to Footprint server to exchange with Footprint user ID
     },

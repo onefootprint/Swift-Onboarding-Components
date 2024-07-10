@@ -14,7 +14,7 @@ meta:
 
 If you already have certain data about your user, you can share it with Footprint to expedite the onboarding process for your users.
 We will pre-fill already available data and skip completed pages for your users. The users can always edit and correct this data
-while onboarding through Footprint. To pass user data to Footprint's flow, use the `userData` option:
+while onboarding through Footprint. To pass user data to Footprint's flow, use the `bootstrapData` option:
 
 <inline-alert variant='info'>Check out [user-specific onboarding](/integrate/user-specific-sessions) which allows bootstrapping data using a new or existing Footprint user. If you already have user data stored on your backend, you may want to create a Footprint user with this data and start a user-specific onboarding session.</inline-alert>
 
@@ -23,7 +23,7 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
-const userData = {
+const bootstrapData = {
   'id.email': 'jane.doe@acme.com',
   'id.phone_number': '+12025550179',
   'id.first_name': 'Jane',
@@ -39,32 +39,82 @@ const userData = {
   'id.state': 'MA',
   'id.country': 'US',
   'id.zip': '02117',
+  'business.name': 'Acme Bank Inc.',
+  'business.dba': 'Acme Bank',
+  'business.tin': '12-3456789',
+  'business.website': 'www.google.com',
+  'business.phone_number': '+12025550179',
+  'business.address_line1': '123 Main St',
+  'business.address_line2': 'Apt 123',
+  'business.city': 'Boston',
+  'business.state': 'MA',
+  'business.zip': '02117',
+  'business.country': 'US',
+  'business.corporation_type': 'unknown',
+  'business.formation_date': 'YYYY-MM-DD',
+  'business.formation_state': "MA",
+  'business.beneficial_owners': [
+    {
+      first_name: 'Jane',
+      middle_name: 'Samantha',
+      last_name: 'Doe',
+      email: 'jane.doe@acme.com',
+      phone_number: '+12025550179',
+      ownership_stake: '50',
+    },
+  ],
+  'business.kyced_beneficial_owners': [
+    {
+      first_name: 'Jane',
+      middle_name: 'Samantha',
+      last_name: 'Doe',
+      email: 'jane.doe@acme.com',
+      phone_number: '+12025550179',
+      ownership_stake: '50',
+    },
+  ],
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, userData });
+const component = footprint.init({ kind: 'verify', publicKey, bootstrapData });
 component.render();
 ```
 
 ### Available user data
 
-| Variable                  | Description                                                                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id.email`                | Optional. User email (e.g `jane.doe@acme.com`)                                                                                              |
-| `id.phone_number`         | Optional. User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`)                    |
-| `id.first_name`           | Optional. User's first name.                                                                                                                |
-| `id.middle_name`          | Optional. User's middle name.                                                                                                               |
-| `id.last_name`            | Optional. User's last name.                                                                                                                 |
-| `id.dob`                  | Optional. User's date of birth. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                             |
-| `id.ssn9`                 | Optional. User's 9-digit SSN number. (e.g. 123456789)                                                                                       |
-| `id.ssn4`                 | Optional. The last 4 digits of user's SSN. (e.g. 1234)                                                                                      |
-| `id.address_line1`        | Optional. The first line of user's residential address.                                                                                     |
-| `id.address_line2`        | Optional. Additional address information, like apartment or suite number. Must be a string.                                                 |
-| `id.city`                 | Optional. User's residential city. Must be a string.                                                                                        |
-| `id.state`                | Optional. User's residential state. Must be in 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format. (e.g. CA)               |
-| `id.country`              | Optional. User's residential country. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                       |
-| `id.zip`                  | Optional. User's residential zip. Must be a string.                                                                                         |
-| `id.us_legal_status`      | Optional. User's legal status in the U.S. Must be one of `'citizen'`, `'permanent_resident'`, or `'visa'`.                                  |
-| `id.nationality`          | Optional. User's nationality. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                               |
-| `id.citizenships`         | Optional. User's citizenships. Must be an array of [Alpha-2 Codes](https://www.iban.com/country-codes). (e.g. `['BR', 'IT', 'HK']`)         |
-| `id.visa_kind`            | Optional. Type of visa the user has. Must be one of `'e1'`, `'e2'`, `'e3'`, `'f1'`, `'g4'`, `'h1b'`, `'l1'`, `'o1'`, `'tn1'`, or `'other'`. |
-| `id.visa_expiration_date` | Optional. User's visa expiration date. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+| Variable                            | Description                                                                                                                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id.email`                          | Optional. User email (e.g `jane.doe@acme.com`)                                                                                              |
+| `id.phone_number`                   | Optional. User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`)                    |
+| `id.first_name`                     | Optional. User's first name.                                                                                                                |
+| `id.middle_name`                    | Optional. User's middle name.                                                                                                               |
+| `id.last_name`                      | Optional. User's last name.                                                                                                                 |
+| `id.dob`                            | Optional. User's date of birth. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                             |
+| `id.ssn9`                           | Optional. User's 9-digit SSN number. (e.g. 123456789)                                                                                       |
+| `id.ssn4`                           | Optional. The last 4 digits of user's SSN. (e.g. 1234)                                                                                      |
+| `id.address_line1`                  | Optional. The first line of user's residential address.                                                                                     |
+| `id.address_line2`                  | Optional. Additional address information, like apartment or suite number. Must be a string.                                                 |
+| `id.city`                           | Optional. User's residential city. Must be a string.                                                                                        |
+| `id.state`                          | Optional. User's residential state. Must be in 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format. (e.g. CA)               |
+| `id.country`                        | Optional. User's residential country. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                       |
+| `id.zip`                            | Optional. User's residential zip. Must be a string.                                                                                         |
+| `id.us_legal_status`                | Optional. User's legal status in the U.S. Must be one of `'citizen'`, `'permanent_resident'`, or `'visa'`.                                  |
+| `id.nationality`                    | Optional. User's nationality. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                               |
+| `id.citizenships`                   | Optional. User's citizenships. Must be an array of [Alpha-2 Codes](https://www.iban.com/country-codes). (e.g. `['BR', 'IT', 'HK']`)         |
+| `id.visa_kind`                      | Optional. Type of visa the user has. Must be one of `'e1'`, `'e2'`, `'e3'`, `'f1'`, `'g4'`, `'h1b'`, `'l1'`, `'o1'`, `'tn1'`, or `'other'`. |
+| `id.visa_expiration_date`           | Optional. User's visa expiration date. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+| `business.name`                     | Optional. Name of the business                                                                                                              |
+| `business.dba`                      | Optional. Doing-business-as alias                                                                                                           |
+| `business.tin`                      | Optional. Taxpayer identification number, 9-digit string (hyphens will be ignored and stripped out)                                         |
+| `business.website`                  | Optional. Website of the business                                                                                                           |
+| `business.phone_number`             | Optional. Phone number                                                                                                                      |
+| `business.address_line1`            | Optional. First line of the business's street address                                                                                       |
+| `business.address_line2`            | Optional. Second line of the business's street address                                                                                      |
+| `business.city`                     | Optional. City of the business's street address                                                                                             |
+| `business.state`                    | Optional. State of the business's street address                                                                                            |
+| `business.zip`                      | Optional. Postal code for the business's street address                                                                                     |
+| `business.country`                  | Optional. Country for the business's street address                                                                                         |
+| `business.corporation_type`         | Optional. One of c_corporation, s_corporation, b_corporation, llc, llp, partnership, sole_proprietorship, non_profit, unknown, trust, agent |
+| `business.formation_date`           | Optional. Date of business formation. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+| `business.formation_state`          | Optional. US State of formation for the Business                                                                                            |
+| `business.beneficial_owners`        | Optional. Information about owners of the business. Available when not KYC-ing every businss owner                                          |
+| `business.kyced_beneficial_owners`  | Optional. Information about owners of the business. Available when KYC-ing every businss owner                                              |
