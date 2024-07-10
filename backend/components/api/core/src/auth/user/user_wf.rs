@@ -13,13 +13,13 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowIdentifier;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::ScopedVaultId;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::WorkflowGuard;
+use newtypes::WorkflowId;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -123,23 +123,16 @@ impl CheckUserWfAuthContext {
         self.user_session.scoped_business_id()
     }
 
+    pub fn business_workflow_id(&self) -> Option<WorkflowId> {
+        self.user_session.business_workflow_id()
+    }
+
     /// Get the business workflow associated with this auth token, if any
     pub fn business_workflow(&self, conn: &mut PgConn) -> FpResult<Option<Workflow>> {
-        if let Some(biz_wf_id) = self.data.user_session.biz_wf_id.as_ref() {
-            let (wf, _) = Workflow::get_all(conn, biz_wf_id)?;
-            return Ok(Some(wf));
-        }
-        let Some(sb_id) = self.scoped_business_id() else {
+        let Some(biz_wf_id) = self.business_workflow_id() else {
             return Ok(None);
         };
-        // TODO: It might be beneficial to actually store the biz_wf_id in the auth session to be
-        // explicit here
-        let identifier = WorkflowIdentifier::ActiveScopedBusinessId {
-            sb_id: &sb_id,
-            vault_id: self.user_vault_id(),
-            is_business: (),
-        };
-        let (wf, _) = Workflow::get_all(conn, identifier)?;
+        let (wf, _) = Workflow::get_all(conn, &biz_wf_id)?;
         Ok(Some(wf))
     }
 }

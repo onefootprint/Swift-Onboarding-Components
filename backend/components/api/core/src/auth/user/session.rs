@@ -98,6 +98,10 @@ impl UserSessionContext {
         self.sb_id.clone()
     }
 
+    pub fn business_workflow_id(&self) -> Option<WorkflowId> {
+        self.biz_wf_id.clone()
+    }
+
     pub fn ob_config(&self) -> Option<&ObConfiguration> {
         self.obc.as_ref()
     }

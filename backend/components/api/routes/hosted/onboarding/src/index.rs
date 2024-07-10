@@ -66,13 +66,15 @@ pub async fn post(
         })
         .await?;
 
-    let maybe_new_biz_args = if ob_config.kind == ObConfigurationKind::Kyb {
+    let should_create_biz_wf =
+        ob_config.kind == ObConfigurationKind::Kyb && user_auth.business_workflow_id().is_none();
+    let maybe_new_biz_args = if should_create_biz_wf {
         // If we're going to make a new business vault,
         if let Some(sb_id) = user_auth.scoped_business_id() {
-            Some(NewBusinessWfArgs::ExistingVault { sb_id })
+            Some(NewBusinessWfArgs::NewWorkflow { sb_id })
         } else {
             let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-            Some(NewBusinessWfArgs::MaybeNewVault {
+            Some(NewBusinessWfArgs::MaybeNewVaultAndWf {
                 public_key,
                 e_private_key,
             })

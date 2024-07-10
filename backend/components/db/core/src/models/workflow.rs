@@ -134,13 +134,6 @@ pub enum WorkflowIdentifier<'a> {
         /// To prevent the auto-derive from being misused to look up by su_id
         is_business: (),
     },
-    ActiveScopedBusinessId {
-        sb_id: &'a ScopedVaultId,
-        /// Note: the ID of the user vault that owns this business
-        vault_id: &'a VaultId,
-        /// To prevent the auto-derive from being misused to look up by su_id
-        is_business: (),
-    },
     ConfigId {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
@@ -405,18 +398,6 @@ impl Workflow {
                 query = query
                     .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
                     .filter(workflow::ob_configuration_id.eq(ob_config_id))
-            }
-            WorkflowIdentifier::ActiveScopedBusinessId { sb_id, vault_id, .. } => {
-                let business_vault_ids = business_owner::table
-                    .filter(business_owner::user_vault_id.eq(vault_id))
-                    .select(business_owner::business_vault_id);
-                query = query
-                    // Since businesses aren't portable, we only need to filter on scoped_vault_id
-                    // to get a single workflow.
-                    .filter(workflow::scoped_vault_id.eq(sb_id))
-                    .filter(workflow::deactivated_at.is_null())
-                    // Used in auth to check that the user is an owner of the business.
-                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
             }
             WorkflowIdentifier::ConfigId {
                 vault_id,

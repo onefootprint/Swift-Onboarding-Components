@@ -14,7 +14,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowIdentifier;
 use db::PgConn;
 use feature_flag::BoolFlag;
 use itertools::chain;
@@ -42,7 +41,7 @@ use newtypes::OnboardingRequirementKind;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
-use newtypes::VaultId;
+use newtypes::WorkflowId;
 use newtypes::WorkflowState;
 use std::str::FromStr;
 
@@ -50,8 +49,8 @@ use std::str::FromStr;
 pub struct GetRequirementsArgs {
     pub person_obc: ObConfiguration,
     pub person_workflow: Workflow,
-    pub person_vault_id: VaultId,
     pub business_sv: Option<ScopedVaultId>,
+    pub biz_wf_id: Option<WorkflowId>,
 }
 
 impl GetRequirementsArgs {
@@ -59,8 +58,8 @@ impl GetRequirementsArgs {
         Ok(Self {
             person_obc: value.ob_config().clone(),
             person_workflow: value.workflow().clone(),
-            person_vault_id: value.user().id.clone(),
             business_sv: value.scoped_business_id(),
+            biz_wf_id: value.business_workflow_id(),
         })
     }
 }
@@ -112,8 +111,8 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let GetRequirementsArgs {
         person_obc,
         person_workflow,
-        person_vault_id,
         business_sv,
+        biz_wf_id,
     } = args;
 
     let su_id = person_workflow.scoped_vault_id.clone();
@@ -122,14 +121,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&su_id))?;
-            let bvw = if let Some(sb_id) = sb_id {
+            let bvw = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
                 let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb_id))?;
-                let id = WorkflowIdentifier::ActiveScopedBusinessId {
-                    sb_id: &sb_id,
-                    vault_id: &person_vault_id,
-                    is_business: (),
-                };
-                let (business_workflow, _) = Workflow::get_all(conn, id)?;
+                let (business_workflow, _) = Workflow::get_all(conn, &biz_wf_id)?;
                 Some((bvw, business_workflow))
             } else {
                 None

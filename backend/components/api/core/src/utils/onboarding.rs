@@ -37,15 +37,15 @@ use newtypes::WorkflowRequestId;
 use newtypes::WorkflowSource;
 
 pub enum NewBusinessWfArgs {
-    /// Create a new business vault with the provided keypair, if no existing business vault exists
-    /// for this playbook
-    MaybeNewVault {
+    /// There's no scoped business selected. Create a new business vault with the provided keypair,
+    /// if no existing business vault exists for this playbook. Then create a workflow for this new
+    /// SB.
+    MaybeNewVaultAndWf {
         public_key: VaultPublicKey,
         e_private_key: EncryptedVaultPrivateKey,
     },
-    ExistingVault {
-        sb_id: ScopedVaultId,
-    },
+    /// Theres already an existing scoped business - just create a new workflow attached to the SB.
+    NewWorkflow { sb_id: ScopedVaultId },
 }
 
 pub struct NewOnboardingArgs<'a> {
@@ -186,7 +186,7 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
         return Ok(None);
     };
     let sb = match new_biz_args {
-        NewBusinessWfArgs::ExistingVault { sb_id } => {
+        NewBusinessWfArgs::NewWorkflow { sb_id } => {
             // A scoped business has been attached to this session already, usually via user-specific
             // sessions.
             let sb = ScopedVault::get(conn, &sb_id)?;
@@ -196,7 +196,7 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
             };
             ScopedVault::get(conn, id)?
         }
-        NewBusinessWfArgs::MaybeNewVault {
+        NewBusinessWfArgs::MaybeNewVaultAndWf {
             public_key,
             e_private_key,
         } => {

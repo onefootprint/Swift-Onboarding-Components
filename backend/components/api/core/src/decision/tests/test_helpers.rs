@@ -54,7 +54,7 @@ pub async fn create_user_and_onboarding(
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let biz_args = if create_business {
         let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
-        Some(NewBusinessWfArgs::MaybeNewVault {
+        Some(NewBusinessWfArgs::MaybeNewVaultAndWf {
             public_key,
             e_private_key,
         })
