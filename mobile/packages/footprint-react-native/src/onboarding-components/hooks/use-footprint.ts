@@ -4,6 +4,7 @@ import { Context } from '../provider';
 import save from '../queries/save';
 import type { Di } from '../types/dis';
 import browser, { OnboardingStep } from '../utils/browser';
+import { formatBeforeSave } from '../utils/save-utils';
 
 const useFootprint = () => {
   const [context, setContext] = useContext(Context);
@@ -74,7 +75,11 @@ const useFootprint = () => {
       return;
     }
     try {
-      await save({ data, bootstrapDis: [], authToken: vaultingToken });
+      await save({
+        data: formatBeforeSave(data, context.locale ?? 'en-US'),
+        bootstrapDis: [],
+        authToken: vaultingToken,
+      });
       onSuccess?.();
     } catch (error: unknown) {
       onError?.(error);

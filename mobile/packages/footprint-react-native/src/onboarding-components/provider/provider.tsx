@@ -1,4 +1,7 @@
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import type {
+  PublicOnboardingConfig,
+  SupportedLocale,
+} from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import type { FootprintAppearance } from 'src/footprint.types';
@@ -13,6 +16,7 @@ export type ContextData = {
   step: OnboardingStep;
   publicKey: string;
   onboardingConfig?: PublicOnboardingConfig;
+  locale?: SupportedLocale;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -30,6 +34,7 @@ export type ProviderProps = {
   authToken?: string;
   children: React.ReactNode;
   publicKey: string;
+  locale?: SupportedLocale;
 };
 
 const Provider = ({
@@ -37,12 +42,14 @@ const Provider = ({
   authToken,
   children,
   publicKey,
+  locale = 'en-US',
 }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
     step: authToken ? OnboardingStep.Onboard : OnboardingStep.Auth,
     publicKey,
+    locale,
   });
   const value = useMemo<[ContextData, UpdateContext]>(
     () => [context, setContext],

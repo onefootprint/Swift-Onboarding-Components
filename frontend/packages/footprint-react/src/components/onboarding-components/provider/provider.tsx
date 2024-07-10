@@ -1,5 +1,5 @@
 import type { Component } from '@onefootprint/footprint-js/src/types/components';
-import type { OnboardingRequirement, PublicOnboardingConfig, SignupChallengeResponse } from '@onefootprint/types';
+import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
@@ -18,6 +18,7 @@ export type ContextData = {
   };
   onboardingConfig: PublicOnboardingConfig | null;
   publicKey: string;
+  locale?: SupportedLocale;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -27,17 +28,21 @@ const Context = createContext<[ContextData, UpdateContext]>([
     fpInstance: null,
     onboardingConfig: null,
     publicKey: '',
+    locale: 'en-US',
   },
   () => undefined,
 ]);
 
 // These are the props users can set on the provider
-export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey'> & { children: React.ReactNode };
+export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey' | 'locale'> & {
+  children: React.ReactNode;
+};
 
-const Provider = ({ appearance, authToken, children, publicKey }: ProviderProps) => {
+const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US' }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
+    locale,
     fpInstance: null,
     onboardingConfig: null,
     publicKey,

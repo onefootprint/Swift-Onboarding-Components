@@ -10,19 +10,8 @@ const getDataKind = (data: Record<string, unknown>) => {
   return { hasId, hasBusiness };
 };
 
-const removeEmpty = (obj: Record<string, unknown>) => {
-  return Object.fromEntries(Object.entries(obj).filter(e => !!e[1]));
-};
-
-const formatBeforeSave = (data: Record<string, unknown>) => {
-  if (typeof data['id.dob'] === 'string') {
-    data['id.dob'] = dateToIso8601(data['id.dob']);
-  }
-  return removeEmpty(data);
-};
-
 const save = async (payload: UserDataRequest) => {
-  const data = formatBeforeSave(payload.data);
+  const data = payload.data;
   const hasData = Object.entries(data).length;
   if (!hasData) {
     return {} as UserDataResponse;

@@ -1,3 +1,4 @@
+import type { SupportedLocale } from '@onefootprint/types';
 import get from 'lodash/get';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -7,14 +8,9 @@ import { createNumberMask, Masks } from 'react-native-mask-input';
 import { isEmail, isMobilePhone } from 'validator';
 
 import fieldContext from '../field-context';
+import { Context } from '../provider';
 import type { Di } from '../types/dis';
-import { fromUSDateToISO8601Format } from '../utils/date-formatter';
-import {
-  isDobInTheFuture,
-  isDobTooOld,
-  isDobTooYoung,
-  isValidDate,
-} from '../utils/dob-validator';
+import validateDob from '../utils/dob-validator';
 import isName from '../utils/name-validator';
 import { isSSN4, isSSN9 } from '../utils/ssn-validator';
 
@@ -31,6 +27,8 @@ type Field = TextInputProps & {
 } & MaskInputProps;
 
 const useFieldProps = () => {
+  const [context] = useContext(Context);
+  const { locale } = context;
   const {
     formState: { errors },
   } = useFormContext();
@@ -38,7 +36,7 @@ const useFieldProps = () => {
   if (!ctx.name) {
     throw new Error('Input must be used inside a Field component');
   }
-  const props = getProps(ctx.name);
+  const props = getProps(ctx.name, { locale });
   if (!props) {
     throw new Error(`Field ${ctx.name} is not supported`);
   }
@@ -52,7 +50,9 @@ const useFieldProps = () => {
   };
 };
 
-const person: Record<string, Field> = {
+const getPersonProps = (options: {
+  locale?: SupportedLocale;
+}): Record<string, Field> => ({
   phoneNumber: {
     autoComplete: 'tel',
     keyboardType: 'phone-pad',
@@ -91,25 +91,11 @@ const person: Record<string, Field> = {
     autoComplete: 'birthdate-full',
     keyboardType: 'number-pad',
     returnKeyType: 'done',
-    mask: Masks.DATE_MMDDYYYY,
+    mask:
+      options.locale === 'en-US' ? Masks.DATE_MMDDYYYY : Masks.DATE_DDMMYYYY,
     validations: {
       required: 'Dob is required',
-      validate: (value: string) => {
-        const formattedDate = fromUSDateToISO8601Format(value);
-        if (!formattedDate || !isValidDate(formattedDate)) {
-          return 'Invalid date';
-        }
-        if (isDobInTheFuture(formattedDate)) {
-          return 'Cannot be in the future';
-        }
-        if (isDobTooYoung(formattedDate)) {
-          return 'Must be at least 18 years old';
-        }
-        if (isDobTooOld(formattedDate)) {
-          return 'Cannot be before than 1900';
-        }
-        return true;
-      },
+      validate: (value: string) => validateDob(value, options.locale),
     },
   },
   ssn4: {
@@ -181,9 +167,9 @@ const person: Record<string, Field> = {
       },
     },
   },
-};
+});
 
-const common: Record<string, Field> = {
+const getCommonProps = (): Record<string, Field> => ({
   country: {
     autoComplete: 'country',
     validations: {
@@ -219,9 +205,9 @@ const common: Record<string, Field> = {
     },
   },
   custom: {},
-};
+});
 
-const business: Record<string, Field> = {
+const getBusinessProps = (): Record<string, Field> => ({
   name: {
     validations: {
       required: 'Business name cannot be empty or is invalid',
@@ -276,9 +262,9 @@ const business: Record<string, Field> = {
       required: 'Corporation type is required',
     },
   },
-};
+});
 
-const bo: Record<string, Field> = {
+const getBoProps = (): Record<string, Field> => ({
   ownershipStake: {
     keyboardType: 'number-pad',
     returnKeyType: 'done',
@@ -288,9 +274,19 @@ const bo: Record<string, Field> = {
     },
     transformValue: (value: string) => parseInt(value, 10),
   },
-};
+});
 
-const getProps = (name: string) => {
+const getProps = (
+  name: string,
+  options: {
+    locale?: SupportedLocale;
+  },
+) => {
+  const person = getPersonProps(options);
+  const common = getCommonProps();
+  const business = getBusinessProps();
+  const bo = getBoProps();
+
   if (name === 'id.phone_number') {
     return person.phoneNumber;
   }

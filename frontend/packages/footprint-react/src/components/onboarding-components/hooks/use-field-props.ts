@@ -7,14 +7,18 @@ import {
   isPhoneNumber,
   isSsn4,
   isSsn9,
+  isValidDate,
 } from '@onefootprint/core';
 import type { CleaveOptions } from 'cleave.js/options';
 import get from 'lodash/get';
 import type React from 'react';
 import { useContext } from 'react';
 
+import { SupportedLocale } from '@onefootprint/types';
 import { useFormContext } from 'react-hook-form';
 import fieldContext from '../field-context';
+import { Context } from '../provider';
+import validateDob from '../utils/validate-dob';
 
 type FormAttributes = {
   mask?: CleaveOptions;
@@ -38,6 +42,8 @@ export type FormInputProps = InputProps & BaseProps;
 export type FormSelectProps = SelectProps & BaseProps;
 
 const useFieldProps = (): FormInputProps | FormSelectProps => {
+  const [context] = useContext(Context);
+  const locale = context.locale;
   const {
     formState: { errors },
   } = useFormContext();
@@ -45,7 +51,7 @@ const useFieldProps = (): FormInputProps | FormSelectProps => {
   if (!ctx.name) {
     throw new Error('Input must be used inside a Field component');
   }
-  const props = getProps(ctx.name);
+  const props = getProps(ctx.name, { locale });
   if (!props) {
     throw new Error(`Field ${ctx.name} is not supported`);
   }
@@ -61,7 +67,7 @@ const useFieldProps = (): FormInputProps | FormSelectProps => {
   };
 };
 
-const person: Record<string, Field> = {
+const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, Field> => ({
   phoneNumber: {
     autoComplete: 'tel',
     className: 'fp-phone-input',
@@ -99,24 +105,13 @@ const person: Record<string, Field> = {
     inputMode: 'numeric',
     mask: {
       date: true,
-      datePattern: ['m', 'd', 'Y'],
+      datePattern: options.locale === 'en-US' ? ['m', 'd', 'Y'] : ['d', 'm', 'Y'],
       delimiter: '/',
       numericOnly: true,
     },
     validations: {
       required: 'Dob is required',
-      validate: (value: string) => {
-        if (isDobInTheFuture(value)) {
-          return 'Cannot be in the future';
-        }
-        if (isDobTooYoung(value)) {
-          return 'Must be at least 18 years old';
-        }
-        if (isDobTooOld(value)) {
-          return 'Cannot be before than 1900';
-        }
-        return true;
-      },
+      validate: (value: string) => validateDob(value, options.locale),
     },
   },
   ssn4: {
@@ -197,9 +192,9 @@ const person: Record<string, Field> = {
       },
     },
   },
-};
+});
 
-const common: Record<string, Field> = {
+const getCommonProps = (): Record<string, Field> => ({
   country: {
     autoComplete: 'country-name',
     className: 'fp-countrt-input',
@@ -242,9 +237,9 @@ const common: Record<string, Field> = {
   custom: {
     className: 'fp-custom-input',
   },
-};
+});
 
-const business: Record<string, Field> = {
+const getBusinessProps = (): Record<string, Field> => ({
   name: {
     className: 'fp-business-name-input',
     validations: {
@@ -304,9 +299,9 @@ const business: Record<string, Field> = {
       required: 'Corporation type is required',
     },
   },
-};
+});
 
-const bo: Record<string, Field> = {
+const getBoProps = (): Record<string, Field> => ({
   ownershipStake: {
     className: 'fp-bo-ownership-stake-input',
     type: 'number',
@@ -317,9 +312,19 @@ const bo: Record<string, Field> = {
       valueAsNumber: true,
     },
   },
-};
+});
 
-const getProps = (name: string) => {
+const getProps = (
+  name: string,
+  options: {
+    locale?: SupportedLocale;
+  },
+) => {
+  const person = getPersonProps(options);
+  const common = getCommonProps();
+  const business = getBusinessProps();
+  const bo = getBoProps();
+
   if (name === 'id.phone_number') {
     return person.phoneNumber;
   }

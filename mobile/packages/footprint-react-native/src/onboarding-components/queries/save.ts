@@ -5,7 +5,6 @@ import type {
   SaveDataRequest,
   SaveDataResponse,
 } from '../types/save-request-data';
-import { fromUSDateToISO8601Format } from '../utils/date-formatter';
 
 const getDataKind = (data: Record<string, unknown>) => {
   const hasId = Object.entries(data).some(([key]) => key.startsWith('id.'));
@@ -15,21 +14,8 @@ const getDataKind = (data: Record<string, unknown>) => {
   return { hasId, hasBusiness };
 };
 
-const removeEmpty = (obj: Record<string, unknown>) => {
-  return Object.fromEntries(Object.entries(obj).filter(e => !!e[1]));
-};
-
-const formatBeforeSave = (data: Record<string, unknown>) => {
-  if (typeof data['id.dob'] === 'string') {
-    // eslint-disable-next-line no-param-reassign
-    data['id.dob'] = fromUSDateToISO8601Format(data['id.dob']);
-  }
-  return removeEmpty(data);
-};
-
 const save = async (payload: SaveDataRequest) => {
-  const data = formatBeforeSave(payload.data);
-
+  const { data } = payload;
   if (!Object.entries(data).length) {
     // If there's no data to send to the backend, short circuit
     return {} as SaveDataResponse;

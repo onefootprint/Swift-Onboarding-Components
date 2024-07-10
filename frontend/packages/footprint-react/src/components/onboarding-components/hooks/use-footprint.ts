@@ -5,6 +5,7 @@ import { type Di } from '../../../@types';
 import { Context } from '../provider';
 import saveReq from '../queries/save';
 import { lockBody, unlockBody } from '../utils/dom-utils';
+import { formatBeforeSave } from '../utils/save-utils';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
@@ -92,7 +93,7 @@ export const useFootprint = () => {
 
     try {
       setBusy('save');
-      await saveReq({ data, bootstrapDis: [], authToken });
+      await saveReq({ data: formatBeforeSave(data, context.locale ?? 'en-US'), bootstrapDis: [], authToken });
       onSuccess?.();
     } catch (error: unknown) {
       onError?.(error);
