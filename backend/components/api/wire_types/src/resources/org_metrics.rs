@@ -8,7 +8,10 @@ use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
-pub struct OrgMetrics {
+pub struct OrgMetricsResponse {
+    pub user: OrgMetrics,
+    pub business: OrgMetrics,
+    // TODO deprecate these
     /// All vaults created, whether or not they've been through KYC
     pub new_user_vaults: i64,
     /// All onboardings created
@@ -16,6 +19,17 @@ pub struct OrgMetrics {
     pub successful_user_onboardings: i64,
     pub failed_user_onboardings: i64,
     pub incomplete_user_onboardings: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Response)]
+pub struct OrgMetrics {
+    /// All vaults created, whether or not they've been through KYC
+    pub new_vaults: i64,
+    /// All onboardings created
+    pub total_onboardings: i64,
+    pub pass_onboardings: i64,
+    pub fail_onboardings: i64,
+    pub incomplete_onboardings: i64,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]

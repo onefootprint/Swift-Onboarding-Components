@@ -22,7 +22,7 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     filters: web::Query<OrgMetricsRequest>,
-) -> ApiResponse<api_wire_types::OrgMetrics> {
+) -> ApiResponse<api_wire_types::OrgMetricsResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -32,51 +32,71 @@ async fn get(
         playbook_id,
     } = filters.into_inner();
 
-    let search_params =
-        move |statuses: Vec<OnboardingStatus>, only_has_wf: bool| -> ScopedVaultListQueryParams {
-            ScopedVaultListQueryParams {
-                tenant_id: tenant_id.clone(),
-                is_live,
-                kind: Some(VaultKind::Person),
-                search: None,
-                fp_id: None,
-                timestamp_lte,
-                timestamp_gte,
-                requires_manual_review: None,
-                watchlist_hit: None,
-                // TODO this could drift easily. Be careful changing this since it could affect the
-                // pass rate we display if we start also looking for vaults that aren't verified
-                only_active: true,
-                statuses,
-                playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
-                has_outstanding_workflow_request: None,
-                has_workflow: only_has_wf.then_some(true),
-                external_id: None,
-                labels: vec![],
-            }
-        };
+    let search_params = move |kind: VaultKind,
+                              statuses: Vec<OnboardingStatus>,
+                              only_has_wf: bool|
+          -> ScopedVaultListQueryParams {
+        ScopedVaultListQueryParams {
+            tenant_id: tenant_id.clone(),
+            is_live,
+            kind: Some(kind),
+            search: None,
+            fp_id: None,
+            timestamp_lte,
+            timestamp_gte,
+            requires_manual_review: None,
+            watchlist_hit: None,
+            // TODO this could drift easily. Be careful changing this since it could affect the
+            // pass rate we display if we start also looking for vaults that aren't verified
+            only_active: true,
+            statuses,
+            playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
+            has_outstanding_workflow_request: None,
+            has_workflow: only_has_wf.then_some(true),
+            external_id: None,
+            labels: vec![],
+        }
+    };
 
-    let result = state
+    let (user, business) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let new_user_vaults = count_for_tenant(conn, search_params(vec![], false))?;
-            let total_user_onboardings = count_for_tenant(conn, search_params(vec![], true))?;
-            let failed_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatus::Fail], true))?;
-            let successful_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatus::Pass], true))?;
-            let incomplete_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatus::Incomplete], true))?;
-            let result = api_wire_types::OrgMetrics {
-                new_user_vaults,
-                total_user_onboardings,
-                failed_user_onboardings,
-                successful_user_onboardings,
-                incomplete_user_onboardings,
+            let mut metrics_for = |kind: VaultKind| -> FpResult<_> {
+                let new_vaults = count_for_tenant(conn, search_params(kind, vec![], false))?;
+                let total_onboardings = count_for_tenant(conn, search_params(kind, vec![], true))?;
+                let fail_onboardings =
+                    count_for_tenant(conn, search_params(kind, vec![OnboardingStatus::Fail], true))?;
+                let pass_onboardings =
+                    count_for_tenant(conn, search_params(kind, vec![OnboardingStatus::Pass], true))?;
+                let incomplete_onboardings = count_for_tenant(
+                    conn,
+                    search_params(kind, vec![OnboardingStatus::Incomplete], true),
+                )?;
+                let result = api_wire_types::OrgMetrics {
+                    new_vaults,
+                    total_onboardings,
+                    fail_onboardings,
+                    pass_onboardings,
+                    incomplete_onboardings,
+                };
+                Ok(result)
             };
-            Ok(result)
+            let user = metrics_for(VaultKind::Person)?;
+            let business = metrics_for(VaultKind::Business)?;
+            Ok((user, business))
         })
         .await?;
+
+    let result = api_wire_types::OrgMetricsResponse {
+        // TODO rm
+        new_user_vaults: user.new_vaults,
+        total_user_onboardings: user.total_onboardings,
+        successful_user_onboardings: user.pass_onboardings,
+        failed_user_onboardings: user.fail_onboardings,
+        incomplete_user_onboardings: user.incomplete_onboardings,
+        user,
+        business,
+    };
 
     Ok(result)
 }
