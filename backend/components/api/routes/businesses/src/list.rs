@@ -23,7 +23,7 @@ pub async fn get(
     pagination: web::Query<CursorPaginationRequest<i64>>,
     request: web::Query<ModernSearchRequest>,
     auth: SecretTenantAuthContext,
-) -> CursorPaginatedResponse<Vec<api_wire_types::LiteUser>, i64> {
+) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let ModernSearchRequest { external_id } = request.into_inner();
@@ -55,7 +55,6 @@ pub async fn get(
         .await?;
 
     let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
-
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
 }

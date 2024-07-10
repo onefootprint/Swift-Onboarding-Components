@@ -47,7 +47,7 @@ async fn timeline(
     list_id: web::Path<ListId>,
     pagination: web::Query<CursorPaginationRequest<Base64Cursor<AuditEventCursor>>>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<Vec<ListEvent>, Base64Cursor<AuditEventCursor>> {
+) -> CursorPaginatedResponse<ListEvent, Base64Cursor<AuditEventCursor>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -104,14 +104,11 @@ async fn timeline(
     )
     .await?;
 
-    CursorPaginatedResponseInner::ok(
-        saturated_events
-            .into_iter()
-            .map(api_wire_types::ListEvent::from_db)
-            .collect(),
-        next_cursor,
-        None,
-    )
+    let results = saturated_events
+        .into_iter()
+        .map(api_wire_types::ListEvent::from_db)
+        .collect();
+    CursorPaginatedResponseInner::ok(results, page_size, next_cursor, None)
 }
 
 async fn saturate_events(

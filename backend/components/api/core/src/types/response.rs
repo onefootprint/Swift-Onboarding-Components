@@ -160,17 +160,24 @@ pub type CursorPaginatedResponse<T, C> = ApiResponse<Json<CursorPaginatedRespons
 /// Wraps the response data with metadata needed for a cursor-paginated result.
 /// Cursor pagination requests take in a cursor that identifies the start of the page (and is
 /// delivered by the last pagination request) using an ordered field.
-/// TODO need to wrap this in Json.
-/// make an alias that is ModernApiResult<Json<CursorPaginatedResponseInner>>
+/// Cursor pagination should be used when newer data can be added to the top of results, for ex when
+/// sorting by created_at desc.
 pub struct CursorPaginatedResponseInner<T, C> {
-    pub data: T,
+    pub data: Vec<T>,
     pub meta: CursorPaginatedResponseMeta<C>,
 }
 
 impl<T, C> CursorPaginatedResponseInner<T, C> {
-    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ApiResponse<Json<Self>> {
+    pub fn ok(
+        data: Vec<T>,
+        page_size: usize,
+        next: Option<C>,
+        count: Option<i64>,
+    ) -> ApiResponse<Json<Self>> {
         Ok(Json(Self {
-            data,
+            // Since cursor-paginated DB utils fetch N+1 results to see if there's a next page, we have to
+            // drop the last element
+            data: data.into_iter().take(page_size).collect(),
             meta: CursorPaginatedResponseMeta { next, count },
         }))
     }
@@ -189,20 +196,16 @@ where
         T::description()
     }
 
-    fn required() -> bool {
-        T::required()
-    }
-
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
         let mut schema = paperclip::v2::models::DefaultSchemaRaw {
             name: Self::name(),
             description: Some(T::description().to_string()),
             data_type: Some(DataType::Object),
-            items: Some(Box::new(T::raw_schema())),
-            reference: Self::name(),
             ..Default::default()
         };
-        schema.properties.insert("data".into(), Box::new(T::raw_schema()));
+        schema
+            .properties
+            .insert("data".into(), Box::new(Vec::<T>::raw_schema()));
         schema.properties.insert(
             "meta".into(),
             Box::new(CursorPaginatedResponseMeta::<C>::raw_schema()),
@@ -212,13 +215,6 @@ where
 
         schema
     }
-}
-
-impl<T, C> paperclip::actix::OperationModifier for CursorPaginatedResponseInner<T, C>
-where
-    T: paperclip::v2::schema::Apiv2Schema,
-    C: TypedData,
-{
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -267,8 +263,8 @@ where
         let mut schema = paperclip::v2::models::DefaultSchemaRaw {
             name: Self::name(),
             description: Some(Self::description().to_owned()),
-            example: None,
             data_type: Some(DataType::Object),
+            example: None,
             ..Default::default()
         };
         schema

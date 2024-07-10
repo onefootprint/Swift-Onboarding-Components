@@ -51,37 +51,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "description": "",
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/LiteUser"
-                                            }
-                                        },
-                                        "meta": {
-                                            "type": "object",
-                                            "properties": {
-                                                "count": {
-                                                    "example": 10000,
-                                                    "description": "The total number of results.",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "next": {
-                                                    "example": 1234,
-                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data",
-                                        "meta"
-                                    ]
+                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
                                 }
                             }
                         }
@@ -517,37 +487,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "description": "",
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/LiteUser"
-                                            }
-                                        },
-                                        "meta": {
-                                            "type": "object",
-                                            "properties": {
-                                                "count": {
-                                                    "example": 10000,
-                                                    "description": "The total number of results.",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "next": {
-                                                    "example": 1234,
-                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data",
-                                        "meta"
-                                    ]
+                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
                                 }
                             }
                         }
@@ -647,36 +587,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "description": "",
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/LiteUser"
-                                            }
-                                        },
-                                        "meta": {
-                                            "type": "object",
-                                            "properties": {
-                                                "count": {
-                                                    "example": 10000,
-                                                    "description": "The total number of results.",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "next": {
-                                                    "example": 1234,
-                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
-                                                    "type": "integer"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data",
-                                        "meta"
-                                    ]
+                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
                                 }
                             }
                         }
@@ -2939,6 +2850,54 @@
                     "expires_at",
                     "link",
                     "token"
+                ]
+            },
+            "CursorPaginatedLiteUser": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "external_id": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
+                                    "type": "string"
+                                },
+                                "sandbox_id": {
+                                    "description": "Only populated for users created in sandbox mode.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results.",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next": {
+                                "example": 1234,
+                                "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
                 ]
             },
             "DecryptRequest": {

@@ -33,7 +33,7 @@ async fn get(
     filters: web::Query<AuditEventRequest>,
     pagination: web::Query<CursorPaginationRequest<Base64Cursor<AuditEventCursor>>>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<Vec<AuditEvent>, Base64Cursor<AuditEventCursor>> {
+) -> CursorPaginatedResponse<AuditEvent, Base64Cursor<AuditEventCursor>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
     let page_size = pagination.page_size(&state);
@@ -78,10 +78,9 @@ async fn get(
     });
     let response = results
         .into_iter()
-        .take(page_size)
         .map(api_wire_types::AuditEvent::try_from_db)
         .collect::<FpResult<Vec<api_wire_types::AuditEvent>>>()?;
-    CursorPaginatedResponseInner::ok(response, next_cursor, None)
+    CursorPaginatedResponseInner::ok(response, page_size, next_cursor, None)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

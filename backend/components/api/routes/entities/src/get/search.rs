@@ -1,7 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::get::EntityListResponse;
 use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -60,7 +59,7 @@ pub async fn post(
     state: web::Data<State>,
     body: OptionalJson<ListEntitiesSearchRequest>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
+) -> CursorPaginatedResponse<api_wire_types::Entity, TimestampCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -138,7 +137,6 @@ pub async fn post(
     // Serialize results
     let entities = scoped_vaults
         .into_iter()
-        .take(page_size)
         .map(|(sv, _)| {
             // Zip with VW and OB
             let vw = vws.get(&sv.id).ok_or(AssertionError("VW not found"))?;
@@ -152,7 +150,7 @@ pub async fn post(
         .into_iter()
         .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
         .collect();
-    CursorPaginatedResponseInner::ok(entities, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(entities, page_size, cursor, Some(count))
 }
 
 /// Decrypt all of the data for the VWs that is visible by default without an explicit request

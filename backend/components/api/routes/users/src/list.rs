@@ -29,7 +29,7 @@ pub async fn get(
     request: web::Query<SearchUsersRequest>,
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> CursorPaginatedResponse<Vec<api_wire_types::LiteUser>, i64> {
+) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search, external_id } = request.into_inner();
@@ -79,7 +79,7 @@ pub async fn get(
     let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
 
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
 }
 
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
@@ -95,7 +95,7 @@ pub async fn post_search(
     state: web::Data<State>,
     request: web::Json<SearchUsersRequestBody>,
     auth: SecretTenantAuthContext,
-) -> CursorPaginatedResponse<Vec<api_wire_types::LiteUser>, TimestampCursor> {
+) -> CursorPaginatedResponse<api_wire_types::LiteUser, TimestampCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let SearchUsersRequestBody { pagination, search } = request.into_inner();
@@ -132,5 +132,5 @@ pub async fn post_search(
         .map(|(sv, _)| TimestampCursor(sv.last_activity_at));
 
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
 }

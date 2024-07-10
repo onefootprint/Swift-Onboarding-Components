@@ -30,8 +30,6 @@ struct AccessEventRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
-
 #[api_v2_operation(
     description = "View all access events for all users.",
     tags(Organization, Private)
@@ -42,7 +40,7 @@ async fn get(
     filters: web::Query<AccessEventRequest>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<AccessEventResponse, i64> {
+) -> CursorPaginatedResponse<api_wire_types::AccessEvent, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
     let page_size = pagination.page_size(&state);
@@ -74,8 +72,7 @@ async fn get(
         .map(|x| x.event.0.ordering_id);
     let response = results
         .into_iter()
-        .take(page_size)
         .map(api_wire_types::AccessEvent::from_db)
         .collect::<Vec<api_wire_types::AccessEvent>>();
-    CursorPaginatedResponseInner::ok(response, cursor, None)
+    CursorPaginatedResponseInner::ok(response, page_size, cursor, None)
 }
