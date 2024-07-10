@@ -110,8 +110,12 @@ impl StepUpKind {
                 DocumentRequestKind::Identity => Some(DocumentRequestConfig::Identity {
                     collect_selfie: true, // TODO: should come from config
                 }),
-                DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {}),
-                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {}),
+                DocumentRequestKind::ProofOfAddress => Some(DocumentRequestConfig::ProofOfAddress {
+                    requires_human_review: true,
+                }),
+                DocumentRequestKind::ProofOfSsn => Some(DocumentRequestConfig::ProofOfSsn {
+                    requires_human_review: true,
+                }),
                 DocumentRequestKind::Custom => None,
             })
             .collect()

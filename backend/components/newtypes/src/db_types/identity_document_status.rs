@@ -67,6 +67,8 @@ impl DocumentStatus {
 pub enum DocumentReviewStatus {
     /// The document has been created and a human or machine review has not occured.
     Unreviewed,
+    /// The document does not need review by human or machine
+    NotNeeded,
     /// The document is uploaded and we've started the process of verifying the document via a
     /// machine
     PendingMachineReview,

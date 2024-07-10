@@ -17,6 +17,7 @@ export enum UploadSource {
 }
 
 export enum DocumentReviewStatus {
+  NotNeeded = 'not_needed',
   Unreviewed = 'unreviewed',
   PendingMachineReview = 'pending_machine_review',
   ReviewedByMachine = 'reviewed_by_machine',

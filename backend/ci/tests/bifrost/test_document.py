@@ -83,25 +83,22 @@ def test_upload_documents(doc_request_sandbox_ob_config):
     assert users_docs[0]["document_type"] == "drivers_license"
 
 
-def test_upload_custom_document(sandbox_tenant, must_collect_data):
+def test_custom_document_playbook(sandbox_tenant, must_collect_data):
     """
-    Test onboarding onto a KYC playbook that also collects a custom document
+    Test onboarding onto a KYC playbook that also collects a custom document that must be reviewed by a human
     """
+    docs = [
+        dict(
+            kind="custom",
+            data=dict(
+                name="Utility bill",
+                identifier="document.custom.utility_bill",
+                description="Please upload a utility bill that shows your full name and address.",
+            ),
+        )
+    ]
     obc = create_ob_config(
-        sandbox_tenant,
-        "Custom doc",
-        must_collect_data,
-        must_collect_data,
-        documents_to_collect=[
-            dict(
-                kind="custom",
-                data=dict(
-                    name="Utility bill",
-                    identifier="document.custom.utility_bill",
-                    description="Please upload a utility bill that shows your full name and address.",
-                ),
-            )
-        ],
+        sandbox_tenant, "Custom doc", must_collect_data, documents_to_collect=docs
     )
 
     bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
@@ -151,6 +148,41 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     # And the document should be marked as reviewed
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert body[0]["review_status"] == "reviewed_by_human"
+
+
+def test_custom_document_playbook_no_review(sandbox_tenant, must_collect_data):
+    """
+    Test onboarding onto a KYC playbook that also collects a custom document that does not need to be reviewed by a human
+    """
+    docs = [
+        dict(
+            kind="custom",
+            data=dict(
+                name="Utility bill",
+                identifier="document.custom.utility_bill",
+                description="Please upload a utility bill that shows your full name and address.",
+                requires_human_review=False,
+            ),
+        )
+    ]
+    obc = create_ob_config(
+        sandbox_tenant, "Custom doc", must_collect_data, documents_to_collect=docs
+    )
+
+    bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
+    user = bifrost.run()
+
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])
+    # The user should not be put in manual review
+    assert not body["requires_manual_review"]
+    assert body["status"] == "pass"
+
+    # And check the documents API
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert body[0]["status"] == "complete"
+    assert body[0]["review_status"] == "not_needed"
+    assert body[0]["uploads"][0]["identifier"] == "document.custom.utility_bill"
 
 
 @pytest.mark.parametrize("initial_fixture_result", ["pass", "fail"])

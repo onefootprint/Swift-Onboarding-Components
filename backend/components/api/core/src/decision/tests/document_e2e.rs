@@ -132,8 +132,12 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
             DocumentRequestKind::Identity => DocumentRequestConfig::Identity {
                 collect_selfie: false,
             },
-            DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {},
-            DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {},
+            DocumentRequestKind::ProofOfAddress => DocumentRequestConfig::ProofOfAddress {
+                requires_human_review: true,
+            },
+            DocumentRequestKind::ProofOfSsn => DocumentRequestConfig::ProofOfSsn {
+                requires_human_review: true,
+            },
             // Don't support custom doc requests in these tests yet
             DocumentRequestKind::Custom => todo!(),
         };

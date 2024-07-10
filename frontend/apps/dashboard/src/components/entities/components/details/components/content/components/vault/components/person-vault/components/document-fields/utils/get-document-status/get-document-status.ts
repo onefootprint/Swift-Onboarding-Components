@@ -51,7 +51,8 @@ export const computeSingleDocumentStatus = (document: Document) => {
   if (!document.reviewStatus) {
     return DocumentStatus.UploadIncomplete;
   }
-  const reviewStatusToDocumentStatus: Record<DocumentReviewStatus, DocumentStatus> = {
+  const reviewStatusToDocumentStatus: Record<DocumentReviewStatus, DocumentStatus | null> = {
+    [DocumentReviewStatus.NotNeeded]: null,
     [DocumentReviewStatus.Unreviewed]: DocumentStatus.UploadIncomplete,
     [DocumentReviewStatus.PendingHumanReview]: DocumentStatus.PendingHumanReview,
     [DocumentReviewStatus.PendingMachineReview]: DocumentStatus.PendingMachineReview,

@@ -40,9 +40,17 @@ use strum_macros::EnumString;
     diesel(sql_type = Text)
 )]
 pub enum DocumentRequestConfig {
-    Identity { collect_selfie: bool },
-    ProofOfSsn {},
-    ProofOfAddress {},
+    Identity {
+        collect_selfie: bool,
+    },
+    ProofOfSsn {
+        #[serde(default = "yes")]
+        requires_human_review: bool,
+    },
+    ProofOfAddress {
+        #[serde(default = "yes")]
+        requires_human_review: bool,
+    },
     Custom(CustomDocumentConfig),
 }
 
@@ -55,7 +63,13 @@ pub struct CustomDocumentConfig {
     pub name: String,
     /// Optional human-readable description of the document that will be displayed to the user
     pub description: Option<String>,
+    #[serde(default = "yes")]
+    pub requires_human_review: bool,
     // pub accepted_types: Vec<DocumentType>, // image? pdf?
+}
+
+fn yes() -> bool {
+    true
 }
 
 impl DocumentRequestKind {

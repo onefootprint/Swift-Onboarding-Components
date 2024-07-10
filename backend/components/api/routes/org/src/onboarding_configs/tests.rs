@@ -183,12 +183,12 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
 
 #[test_case(vec![] => true)]
 #[test_case(vec![DocumentRequestConfig::Identity{ collect_selfie: true }] => false)]
-#[test_case(vec![DocumentRequestConfig::ProofOfAddress {}, DocumentRequestConfig::ProofOfSsn {}, DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.bye").unwrap(), name: "Bye".to_owned(), description: None})] => true; "proofofssn-proofofaddress-multiple-custom")]
-#[test_case(vec![DocumentRequestConfig::ProofOfAddress {}, DocumentRequestConfig::ProofOfAddress {}] => false)]
-#[test_case(vec![DocumentRequestConfig::ProofOfSsn {}, DocumentRequestConfig::ProofOfSsn {}] => false)]
-#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None})] => false; "two-custom-with-same-di")]
-#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "".to_owned(), description: None})] => false; "custom-with-empty-name")]
-#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("custom.hi").unwrap(), name: "Hi".to_owned(), description: None})] => false; "custom-with-non-doc-DI")]
+#[test_case(vec![DocumentRequestConfig::ProofOfAddress {requires_human_review: true}, DocumentRequestConfig::ProofOfSsn {requires_human_review: true}, DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.bye").unwrap(), name: "Bye".to_owned(), description: None, requires_human_review: true})] => true; "proofofssn-proofofaddress-multiple-custom")]
+#[test_case(vec![DocumentRequestConfig::ProofOfAddress {requires_human_review: true}, DocumentRequestConfig::ProofOfAddress {requires_human_review: true}] => false)]
+#[test_case(vec![DocumentRequestConfig::ProofOfSsn {requires_human_review: true}, DocumentRequestConfig::ProofOfSsn {requires_human_review: true}] => false)]
+#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true}), DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true})] => false; "two-custom-with-same-di")]
+#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("document.custom.hi").unwrap(), name: "".to_owned(), description: None, requires_human_review: true})] => false; "custom-with-empty-name")]
+#[test_case(vec![DocumentRequestConfig::Custom(CustomDocumentConfig{identifier: DataIdentifier::from_str("custom.hi").unwrap(), name: "Hi".to_owned(), description: None, requires_human_review: true})] => false; "custom-with-non-doc-DI")]
 fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
     let args = NewObConfigurationArgs {
         name: "Flerp".to_owned(),

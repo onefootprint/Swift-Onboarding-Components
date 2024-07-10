@@ -76,8 +76,8 @@ pub fn save_final_decision(
             .iter()
             .filter_map(|(_, dr)| match dr.config {
                 DocumentRequestConfig::Identity { .. } => None,
-                DocumentRequestConfig::ProofOfSsn {} => Some(ReviewReason::ProofOfSsnDocument),
-                DocumentRequestConfig::ProofOfAddress {} => Some(ReviewReason::ProofOfAddressDocument),
+                DocumentRequestConfig::ProofOfSsn { .. } => Some(ReviewReason::ProofOfSsnDocument),
+                DocumentRequestConfig::ProofOfAddress { .. } => Some(ReviewReason::ProofOfAddressDocument),
                 DocumentRequestConfig::Custom { .. } => Some(ReviewReason::CustomDocument),
             })
             .collect_vec();

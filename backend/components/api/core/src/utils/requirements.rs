@@ -486,8 +486,10 @@ fn get_requirement_inner(
                                 supported_country_and_doc_types,
                             }
                         }
-                        DocumentRequestConfig::ProofOfAddress {} => CollectDocumentConfig::ProofOfAddress {},
-                        DocumentRequestConfig::ProofOfSsn {} => CollectDocumentConfig::ProofOfSsn {},
+                        DocumentRequestConfig::ProofOfAddress { .. } => {
+                            CollectDocumentConfig::ProofOfAddress {}
+                        }
+                        DocumentRequestConfig::ProofOfSsn { .. } => CollectDocumentConfig::ProofOfSsn {},
                         DocumentRequestConfig::Custom(info) => CollectDocumentConfig::Custom(info),
                     };
                     // if FF'd into require capture only

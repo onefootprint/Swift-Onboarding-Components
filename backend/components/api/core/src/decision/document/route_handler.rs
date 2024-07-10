@@ -30,10 +30,12 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use feature_flag::BoolFlag;
+use newtypes::CustomDocumentConfig;
 use newtypes::DataLifetimeSource;
 use newtypes::DecisionIntentKind;
 use newtypes::DocumentFixtureResult;
 use newtypes::DocumentId;
+use newtypes::DocumentRequestConfig;
 use newtypes::DocumentRequestKind;
 use newtypes::DocumentReviewStatus;
 use newtypes::DocumentSide;
@@ -326,7 +328,6 @@ pub async fn handle_document_process(
         .await?;
 
     let is_sandbox = id_doc.fixture_result.is_some();
-    let is_non_identity_document = !dr.kind.is_identity();
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
             .await?
@@ -359,8 +360,8 @@ pub async fn handle_document_process(
         let next_side_to_collect = missing_sides.next_side_to_collect();
         if next_side_to_collect.is_none() {
             let sv_id = sv_id.clone();
-            if is_non_identity_document {
-                complete_non_identity_document(state, id_doc, sv_id).await?;
+            if !dr.kind.is_identity() {
+                complete_non_identity_document(state, dr, id_doc, sv_id).await?;
             } else {
                 decision::vendor::incode::states::save_incode_fixtures(
                     state,
@@ -384,19 +385,39 @@ pub async fn handle_document_process(
 
 pub async fn complete_non_identity_document(
     state: &State,
+    dr: DbDocumentRequest,
     id_doc: Document,
     sv_id: ScopedVaultId,
 ) -> FpResult<()> {
+    let review_status = match dr.config {
+        DocumentRequestConfig::ProofOfAddress {
+            requires_human_review,
+        }
+        | DocumentRequestConfig::ProofOfSsn {
+            requires_human_review,
+        }
+        | DocumentRequestConfig::Custom(CustomDocumentConfig {
+            requires_human_review,
+            ..
+        }) => {
+            if requires_human_review {
+                Some(DocumentReviewStatus::PendingHumanReview)
+            } else {
+                Some(DocumentReviewStatus::NotNeeded)
+            }
+        }
+        DocumentRequestConfig::Identity { .. } => None,
+    };
+
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<()> {
-            let id_doc_id = id_doc.id.clone();
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
             // Create a timeline event
             let info = newtypes::DocumentUploadedInfo {
-                id: id_doc_id.clone(),
+                id: id_doc.id.clone(),
             };
             UserTimeline::create(conn, info, uvw.vault.id.clone(), sv_id.clone())?;
             // mark identity doc as complete
@@ -410,9 +431,9 @@ pub async fn complete_non_identity_document(
                 curp_completed_seqno: None,
                 validated_country_code: None,
                 // Non-ID docs need to be reviewed by a human - put them into a review required state
-                review_status: Some(DocumentReviewStatus::PendingHumanReview),
+                review_status,
             };
-            Document::update(conn, &id_doc_id, update)?;
+            Document::update(conn, &id_doc.id, update)?;
 
             Ok(())
         })

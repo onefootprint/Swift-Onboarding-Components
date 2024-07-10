@@ -297,6 +297,7 @@ mod test {
                         identifier: DataIdentifier::from_str("document.custom.flerp").unwrap(),
                         name: "Flerp".to_string(),
                         description: None,
+                        requires_human_review: true,
                     }),
                 },
             });
