@@ -56,6 +56,61 @@
                 ]
             }
         },
+        "/businesses/{fp_bid}/onboardings": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicOnboarding"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/businesses/{fp_bid}/owners": {
             "get": {
                 "tags": [
@@ -144,61 +199,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Empty"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/businesses/{fp_id}/onboardings": {
-            "get": {
-                "tags": [
-                    "Businesses",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OffsetPaginatedPublicOnboarding"
                                 }
                             }
                         }

@@ -25,7 +25,7 @@ type OnboardingsListResponse =
 
 
 #[route_alias(get(
-    "/businesses/{fp_id}/onboardings",
+    "/businesses/{fp_bid}/onboardings",
     description = "Get the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
     tags(Businesses, Preview)
 ))]
