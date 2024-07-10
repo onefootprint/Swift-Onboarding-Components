@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.12.0
+
+### Minor Changes
+
+- 03f0cf4ca3: Add bootstrapData for user and business properties
+
 ## 3.11.0
 
 ### Minor Changes
