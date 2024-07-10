@@ -45,6 +45,7 @@ impl LineItem {
 #[derive(Debug, derive_more::From)]
 pub enum LineItemPrice {
     Price(Decimal),
+    /// The tenant doesn't have a price listed for this product.
     Uncontracted,
 }
 
@@ -214,13 +215,13 @@ fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<Line
         .unwrap_or_default();
     line_items
         .into_iter()
-        .filter(|li| {
-            // TODO in future, just set the price to 0 instead of removing
+        .map(|mut li| {
             let should_keep = !products_to_remove.contains(&li.product);
             if !should_keep {
+                li.price = LineItemPrice::Price(dec!(0));
                 tracing::info!(product=%li.product, count=%li.count, notional=?li.notional(), "Removing line item from invoice for minimum of clause");
             }
-            should_keep
+            li
         })
         .collect()
 }
@@ -231,6 +232,7 @@ mod test {
     use super::LineItem;
     use super::LineItemPrice;
     use db::test_helpers::assert_have_same_elements;
+    use itertools::Itertools;
     use newtypes::Product;
     use newtypes::TenantId;
     use rust_decimal_macros::dec;
@@ -243,6 +245,15 @@ mod test {
             price: LineItemPrice::Price(price),
             count,
         };
+        let nonzero_items = |lis: Vec<LineItem>| {
+            lis.iter()
+                .filter(|li| match &li.price {
+                    LineItemPrice::Price(price) => *price > dec!(0),
+                    LineItemPrice::Uncontracted => false,
+                })
+                .map(|li| li.product)
+                .collect_vec()
+        };
 
         // Should filter out HotVaults
         let line_items = vec![
@@ -254,7 +265,7 @@ mod test {
         let tenant_id = TenantId::from_str(TenantId::ARYEO).unwrap();
         let line_items = apply_minimum_of(&tenant_id, line_items);
         assert_have_same_elements(
-            line_items.iter().map(|li| li.product).collect(),
+            nonzero_items(line_items),
             vec![Product::Kyc, Product::VaultsWithNonPci, Product::VaultsWithPci],
         );
 
@@ -267,10 +278,7 @@ mod test {
         ];
         let tenant_id = TenantId::from_str(TenantId::ARYEO).unwrap();
         let line_items = apply_minimum_of(&tenant_id, line_items);
-        assert_have_same_elements(
-            line_items.iter().map(|li| li.product).collect(),
-            vec![Product::Kyc, Product::HotVaults],
-        );
+        assert_have_same_elements(nonzero_items(line_items), vec![Product::Kyc, Product::HotVaults]);
 
         // No minimum of for other tenants
         let line_items = vec![
@@ -282,7 +290,7 @@ mod test {
         let tenant_id = TenantId::from_str("flerp").unwrap();
         let line_items = apply_minimum_of(&tenant_id, line_items);
         assert_have_same_elements(
-            line_items.iter().map(|li| li.product).collect(),
+            nonzero_items(line_items),
             vec![
                 Product::Kyc,
                 Product::HotVaults,
