@@ -1,7 +1,7 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 
-import type { UserDatum } from '../../../../../../types';
+import type { DIMetadata } from '../../../../../../types';
 import validateBootstrapData from './validate-bootstrap-data';
 
 const config: PublicOnboardingConfig = {
@@ -27,7 +27,7 @@ describe('validateBootstrapData', () => {
   it('should filter out invalid entries', () => {
     expect(validateBootstrapData({}, config, 'es-MX')).toEqual({});
 
-    const d = <T>(value: T): UserDatum<T> => ({
+    const d = <T>(value: T): DIMetadata<T> => ({
       value,
       isBootstrap: true,
     });

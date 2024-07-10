@@ -7,8 +7,8 @@ import getInitData from './utils/get-init-data';
 
 const App = ({ idvContext, context, onDone }: CollectKycDataProps) => {
   const { authToken, device } = idvContext;
-  const { config, requirement, userData, disabledFields } = context;
-  const initData = getInitData(requirement, userData, disabledFields);
+  const { config, requirement, bootstrapUserData, disabledFields } = context;
+  const initData = getInitData(requirement, bootstrapUserData, disabledFields);
 
   const initContext = {
     authToken,

@@ -12,7 +12,7 @@ export type VerifiedMethods = {
 export type CollectKycDataContext = {
   config: PublicOnboardingConfig;
   requirement: CollectKycDataRequirement;
-  userData: UserData; // For tenant-provided initial data or email/phone from identify flows
+  bootstrapUserData: UserData; // For tenant-provided initial data or email/phone from identify flows
   disabledFields?: IdDI[]; // To disable inputs, like when KYC'ing the first BO
 };
 

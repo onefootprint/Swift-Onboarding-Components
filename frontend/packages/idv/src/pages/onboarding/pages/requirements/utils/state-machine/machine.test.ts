@@ -96,7 +96,7 @@ describe('Onboarding Requirements Machine Tests', () => {
             authToken: 'token',
           },
           config: TestOnboardingConfig,
-          userData: {
+          bootstrapData: {
             [IdDI.email]: {
               value: 'piip@onefootprint.com',
               isBootstrap: true,
@@ -118,7 +118,7 @@ describe('Onboarding Requirements Machine Tests', () => {
       expect(startedDataCollection).toBe(false);
       expect(onboardingContext).toEqual({
         config: TestOnboardingConfig,
-        userData: {
+        bootstrapData: {
           [IdDI.email]: {
             value: 'piip@onefootprint.com',
             isBootstrap: true,
@@ -157,7 +157,7 @@ describe('Onboarding Requirements Machine Tests', () => {
             authToken: 'token',
           },
           config: TestOnboardingConfig,
-          userData: {},
+          bootstrapData: {},
         }),
       );
 
@@ -230,7 +230,7 @@ describe('Onboarding Requirements Machine Tests', () => {
             authToken: 'token',
           },
           config: NoPhoneOnboardingConfig,
-          userData: {},
+          bootstrapData: {},
         }),
       );
 
@@ -279,7 +279,7 @@ describe('Onboarding Requirements Machine Tests', () => {
             isTransfer: true,
           },
           config: NoPhoneOnboardingConfig,
-          userData: {},
+          bootstrapData: {},
         }),
       );
 

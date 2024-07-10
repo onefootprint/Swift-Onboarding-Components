@@ -12,7 +12,7 @@ import { Logger, trackAction } from '../../utils';
 const Init = () => {
   const [state, send] = useIdvMachine();
   const { getErrorCode, getErrorStatusCode } = useRequestError();
-  const { obConfigAuth, authToken, device, userData = {} } = state.context;
+  const { obConfigAuth, authToken, device, bootstrapData = {} } = state.context;
 
   useDeviceInfo((newDevice: DeviceInfo) => {
     send({
@@ -25,7 +25,7 @@ const Init = () => {
 
   useEffect(() => {
     trackAction('onboarding:started', {
-      hasBootstrapData: Object.entries(userData).some(([, value]) => value),
+      hasBootstrapData: Object.entries(bootstrapData).some(([, value]) => value),
     });
     // TODO: Deprecate this action
     trackAction('idv:started');

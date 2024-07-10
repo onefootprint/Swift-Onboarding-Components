@@ -4,42 +4,36 @@ import React from 'react';
 import CollectKycData from '../../../collect-kyc-data';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
+const userDatum = (value?: string) => (value ? { value, isBootstrap: false } : undefined);
+
 const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
   const {
-    kybRequirement: { missingAttributes },
-    kycRequirement,
-    kycUserData,
+    bootstrapUserData,
+    config,
     data,
     idvContext,
-    config,
+    kybRequirement: { missingAttributes },
+    kycRequirement,
   } = state.context;
   if (!config || !kycRequirement) {
     throw new Error('Missing collect-kyc-data props in kyb');
   }
 
   const handleDone = () => {
-    send({
-      type: 'beneficialOwnerKycSubmitted',
-    });
+    send({ type: 'beneficialOwnerKycSubmitted' });
   };
 
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const primaryBeneficialOwner = requireMultiKyc
     ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
     : data?.[BusinessDI.beneficialOwners]?.[0];
-  const userData = { ...kycUserData };
+  const kycUserData = { ...bootstrapUserData };
+
   if (primaryBeneficialOwner) {
-    const userDatum = (value?: string) =>
-      value
-        ? {
-            value,
-            isBootstrap: false,
-          }
-        : undefined;
-    userData[IdDI.firstName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
-    userData[IdDI.middleName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
-    userData[IdDI.lastName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
+    kycUserData[IdDI.firstName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
+    kycUserData[IdDI.middleName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
+    kycUserData[IdDI.lastName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
   }
 
   return (
@@ -47,7 +41,7 @@ const BeneficialOwnerKyc = () => {
       idvContext={idvContext}
       context={{
         disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
-        userData,
+        bootstrapUserData: kycUserData,
         requirement: kycRequirement,
         config,
       }}

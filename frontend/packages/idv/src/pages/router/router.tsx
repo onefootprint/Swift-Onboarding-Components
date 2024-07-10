@@ -35,7 +35,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     config,
     device,
     authToken,
-    userData,
+    bootstrapData,
     isTransfer,
     componentsSdkContext,
     isInIframe,
@@ -118,8 +118,8 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
             obConfigAuth={obConfigAuth}
             isComponentsSdk={!!componentsSdkContext}
             bootstrapData={{
-              email: userData?.[IdDI.email]?.value,
-              phoneNumber: userData?.[IdDI.phoneNumber]?.value,
+              email: bootstrapData?.[IdDI.email]?.value,
+              phoneNumber: bootstrapData?.[IdDI.phoneNumber]?.value,
             }}
             logoConfig={
               showLogo
@@ -151,7 +151,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
             componentsSdkContext,
             isInIframe,
           }}
-          userData={userData}
+          bootstrapData={bootstrapData}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}

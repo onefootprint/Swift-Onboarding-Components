@@ -2,7 +2,7 @@ import type { IdDocOutcome, ObConfigAuth, OverallOutcome, PublicOnboardingConfig
 
 import type { DoneArgs } from '../../components/identify';
 import type { DeviceInfo } from '../../hooks';
-import type { UserData } from '../../types';
+import type { BusinessData, UserData } from '../../types';
 import type { AuthTokenPayload, DeviceResponseJsonPayload } from './utils/custom-listener';
 
 export enum ComponentsSdkTypes {
@@ -43,7 +43,7 @@ export type MachineContext = {
   config?: PublicOnboardingConfig;
   device?: DeviceInfo;
   authToken?: string;
-  userData: UserData;
+  bootstrapData: UserData & BusinessData;
   isTransfer?: boolean;
   componentsSdkContext?: ComponentsSdkContext;
   isInIframe?: boolean;

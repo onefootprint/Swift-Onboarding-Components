@@ -39,10 +39,10 @@ describe('Onboarding Machine Tests', () => {
     browser: 'Mobile Safari',
   };
 
-  const createMachine = ({ userData = defaultBootstrapData }: Partial<OnboardingMachineArgs> = {}) => {
+  const createMachine = ({ bootstrapData = defaultBootstrapData }: Partial<OnboardingMachineArgs> = {}) => {
     const machine = interpret(
       createOnboardingMachine({
-        userData,
+        bootstrapData,
         idvContext: {
           device: testDevice,
           authToken: 'token',
@@ -64,7 +64,7 @@ describe('Onboarding Machine Tests', () => {
         authToken: 'token',
       },
       config: testOnboardingConfig,
-      userData: defaultBootstrapData,
+      bootstrapData: defaultBootstrapData,
       validationToken: undefined,
     });
 
@@ -87,7 +87,7 @@ describe('Onboarding Machine Tests', () => {
         authToken: 'token',
       },
       config: testOnboardingConfig,
-      userData: defaultBootstrapData,
+      bootstrapData: defaultBootstrapData,
       validationToken: 'token',
     });
   });

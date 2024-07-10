@@ -17,7 +17,7 @@ type RouterProps = {
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingMachine();
   useLogStateMachine('onboarding', state);
-  const { config, idvContext, userData, overallOutcome, validationToken, idDocOutcome } = state.context;
+  const { config, idvContext, bootstrapData, overallOutcome, validationToken, idDocOutcome } = state.context;
   const { IdvTransferFromDesktopDisabled } = useFlags();
   const orgIds = new Set<string>(IdvTransferFromDesktopDisabled);
   const isTransferOnDesktopDisabled = orgIds.has(config.orgId);
@@ -37,7 +37,7 @@ const Router = ({ onDone }: RouterProps) => {
         <Requirements
           config={config}
           idvContext={idvContext}
-          userData={userData}
+          bootstrapData={bootstrapData}
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}

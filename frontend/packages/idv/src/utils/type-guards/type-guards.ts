@@ -19,7 +19,7 @@ export const isFunction = (x: unknown): x is Function => typeof x === 'function'
 
 export const isUndefined = (x: unknown): x is undefined => typeof x === 'undefined';
 
-export const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
+export const isObject = (x: unknown): x is Obj => !!x && typeof x === 'object' && !Array.isArray(x);
 export const isString = (x: unknown): x is string => typeof x === 'string';
 export const isStringValid = (x: unknown): x is string => isString(x) && !!x;
 

@@ -1,13 +1,13 @@
 import type { IdDocOutcome, OnboardingRequirement, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
-import type { UserData } from '../../../../../../types';
+import type { BusinessData, UserData } from '../../../../../../types';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 
 export type MachineContext = {
   idvContext: CommonIdvContext;
   onboardingContext: {
     config: PublicOnboardingConfig;
-    userData: UserData;
+    bootstrapData: UserData & BusinessData;
     idDocOutcome?: IdDocOutcome;
     overallOutcome?: OverallOutcome;
   };
@@ -29,16 +29,7 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'initialized';
-    }
-  | {
-      type: 'error';
-    }
-  | {
-      type: 'requirementCompleted';
-    }
-  | {
-      type: 'onboardingRequirementsReceived';
-      payload: OnboardingRequirement[];
-    };
+  | { type: 'initialized' }
+  | { type: 'error' }
+  | { type: 'requirementCompleted' }
+  | { type: 'onboardingRequirementsReceived'; payload: OnboardingRequirement[] };

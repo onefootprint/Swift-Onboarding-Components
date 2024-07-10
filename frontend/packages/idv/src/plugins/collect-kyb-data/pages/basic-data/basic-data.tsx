@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import { Logger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -17,6 +17,8 @@ type BasicDataProps = {
   onComplete?: () => void;
   onCancel?: () => void;
 };
+
+const { logError } = getLogger({ location: 'kyb-basic-data' });
 
 const BasicData = ({ ctaLabel, hideHeader, onComplete, onCancel }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
@@ -31,28 +33,17 @@ const BasicData = ({ ctaLabel, hideHeader, onComplete, onCancel }: BasicDataProp
   const { t } = useTranslation('idv');
 
   const handleSubmit = (basicData: BasicDataFields) => {
-    const handleSuccess = () => {
-      send({
-        type: 'basicDataSubmitted',
-        payload: {
-          ...basicData,
-        },
-      });
-      onComplete?.();
-    };
-
-    const handleError = (error: string) => {
-      Logger.error(`Speculatively vaulting data failed in kyb basic-data page: ${error}`, {
-        location: 'kyb-basic-data',
-      });
-    };
-
     syncData({
       authToken,
       data: basicData,
       speculative: true,
-      onSuccess: handleSuccess,
-      onError: handleError,
+      onSuccess: () => {
+        send({ type: 'basicDataSubmitted', payload: { ...basicData } });
+        onComplete?.();
+      },
+      onError: (error: string) => {
+        logError(`Speculatively vaulting data failed in kyb basic-data page: ${error}`, error);
+      },
     });
   };
 

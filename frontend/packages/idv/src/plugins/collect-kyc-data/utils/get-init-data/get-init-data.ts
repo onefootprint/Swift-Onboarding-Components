@@ -6,10 +6,14 @@ import type { UserData } from '../../../../types';
 import allAttributes from '../all-attributes';
 import type { KycData } from '../data-types';
 
-const getInitData = (requirement: CollectKycDataRequirement, userData: UserData, disabledFields?: IdDI[]): KycData => {
+const getInitData = (
+  requirement: CollectKycDataRequirement,
+  bootstrapUserData: UserData,
+  disabledFields?: IdDI[],
+): KycData => {
   const cdos = allAttributes(requirement);
   const data: KycData = {};
-  Object.entries(userData).forEach(([key, value]) => {
+  Object.entries(bootstrapUserData).forEach(([key, value]) => {
     if (value) {
       data[key as IdDI] = {
         // @ts-expect-error

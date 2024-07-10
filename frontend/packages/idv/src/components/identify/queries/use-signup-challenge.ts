@@ -4,13 +4,13 @@ import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { IS_COMPONENTS_SDK_HEADER } from '@onefootprint/types/src/api/identify';
 import { useMutation } from '@tanstack/react-query';
 
-import type { UserDatum } from '../../../types';
+import type { DIMetadata } from '../../../types';
 import calculateRetryTime from './get-retry-time';
 
 type PayloadPartKey = 'obConfigAuth' | 'sandboxId' | 'scope' | 'isComponentsSdk';
 type Payload = {
-  phoneNumber?: UserDatum<string>;
-  email?: UserDatum<string>;
+  phoneNumber?: DIMetadata<string>;
+  email?: DIMetadata<string>;
   obConfigAuth?: ObConfigAuth;
   sandboxId?: string;
   scope: IdentifyTokenScope;

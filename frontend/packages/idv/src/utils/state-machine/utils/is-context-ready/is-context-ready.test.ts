@@ -34,8 +34,8 @@ describe('isContextReady', () => {
         },
         config: { ...testOnboardingConfig },
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
-        userData: {},
         retries: 0,
+        bootstrapData: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -48,8 +48,8 @@ describe('isContextReady', () => {
       const context: MachineContext = {
         config: { ...testOnboardingConfig },
         authToken: 'token',
-        userData: {},
         retries: 0,
+        bootstrapData: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -69,8 +69,8 @@ describe('isContextReady', () => {
   describe('when init context is incomplete', () => {
     it('when context and payload have missing data', () => {
       const context: MachineContext = {
-        userData: {},
         retries: 0,
+        bootstrapData: {},
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',

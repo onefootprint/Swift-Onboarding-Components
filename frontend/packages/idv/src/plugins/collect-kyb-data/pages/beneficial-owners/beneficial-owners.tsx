@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
-import { Logger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -19,20 +19,20 @@ type BeneficialOwnersProps = {
   onCancel?: () => void;
 };
 
+const { logError } = getLogger({ location: 'kyb-beneficial-owners' });
+
 const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
     data,
     kybRequirement: { missingAttributes },
-    kycUserData,
+    bootstrapUserData,
     config,
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.pages.beneficial-owners',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
 
   const handleSubmit = (beneficialOwners: BeneficialOwner[]) => {
@@ -47,29 +47,21 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: Benefi
       ? { [BusinessDI.kycedBeneficialOwners]: beneficialOwners }
       : { [BusinessDI.beneficialOwners]: beneficialOwners };
 
-    const handleSuccess = () => {
-      send({
-        type: 'beneficialOwnersSubmitted',
-        payload: submittedData,
-      });
-      onComplete?.();
-    };
-
-    const handleError = (error: string) => {
-      Logger.error(`Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`, {
-        location: 'kyb-beneficial-owners',
-      });
-    };
-
     if (!authToken) {
       return;
     }
+
     syncData({
       authToken,
       data: submittedData,
       speculative: true,
-      onSuccess: handleSuccess,
-      onError: handleError,
+      onSuccess: () => {
+        send({ type: 'beneficialOwnersSubmitted', payload: submittedData });
+        onComplete?.();
+      },
+      onError: (error: string) => {
+        logError(`Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`, error);
+      },
     });
   };
 
@@ -79,8 +71,8 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: Benefi
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]: kycUserData?.[IdDI.email]?.value ?? '',
-      [BeneficialOwnerDataAttribute.phoneNumber]: kycUserData?.[IdDI.phoneNumber]?.value ?? '',
+      [BeneficialOwnerDataAttribute.email]: bootstrapUserData?.[IdDI.email]?.value ?? '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: bootstrapUserData?.[IdDI.phoneNumber]?.value ?? '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];

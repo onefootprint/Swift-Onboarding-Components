@@ -1,16 +1,11 @@
 import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
-import { IdDI } from '@onefootprint/types';
+import { BusinessDI, IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
-import type { UserData } from '../../types';
-import {
-  type CompletePayload,
-  type ComponentsSdkContext,
-  ConfigRequestFailureReason,
-  type MachineContext,
-  type MachineEvents,
-} from './types';
+import type { BusinessData, UserData } from '../../types';
+import { ConfigRequestFailureReason } from './types';
+import type { CompletePayload, ComponentsSdkContext, MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowIdentify from './utils/should-show-identify';
 import shouldShowSandbox from './utils/should-show-sandbox';
@@ -29,20 +24,24 @@ export type IdvMachineArgs = {
   onComplete?: (payload: CompletePayload) => void;
 };
 
-const getIdvMachineContext = (args: IdvMachineArgs): MachineContext => {
+const getIdvMachineContext = (args: IdvMachineArgs): Readonly<MachineContext> => {
   const { bootstrapData, ...restOfArgs } = args;
-  const userData: UserData = {};
-  Object.entries(bootstrapData || {}).forEach(([key, value]) => {
-    if (value) {
-      // @ts-expect-error
-      userData[key as IdDI] = { value, isBootstrap: true };
+  const obj: Partial<UserData & BusinessData> = {};
+
+  if (bootstrapData) {
+    for (const [key, value] of Object.entries(bootstrapData)) {
+      if (value) {
+        // @ts-expect-error: Type 'any' is not assignable to type 'never'
+        obj[key as IdDI | BusinessDI] = { value, isBootstrap: true };
+      }
     }
-  });
+  }
+
   return {
-    userData,
+    bootstrapData: obj as Readonly<UserData & BusinessData>,
     ...restOfArgs,
     retries: 0,
-  };
+  } as Readonly<MachineContext>;
 };
 
 const createIdvMachine = (args: IdvMachineArgs) =>
@@ -194,10 +193,10 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           // Pass the phone and email collected in the identify machine into the requirements
           // machine. In very few cases, the phone and email are needed in the requirements machine
           if (event.payload.email) {
-            context.userData[IdDI.email] = event.payload.email;
+            context.bootstrapData[IdDI.email] = event.payload.email;
           }
           if (event.payload.phoneNumber) {
-            context.userData[IdDI.phoneNumber] = event.payload.phoneNumber;
+            context.bootstrapData[IdDI.phoneNumber] = event.payload.phoneNumber;
           }
           return context;
         }),

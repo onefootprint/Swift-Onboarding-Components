@@ -1,4 +1,4 @@
-import type { UserDatum } from '../../types';
+import type { DIMetadata } from '../../types';
 import type { NavigationHeaderLeftButtonProps } from '../layout';
 
 export type HeaderProps = {
@@ -9,8 +9,8 @@ export type HeaderProps = {
 export type ObKeyHeader = { 'X-Onboarding-Config-Key': string };
 export type DoneArgs = {
   authToken: string;
-  phoneNumber?: UserDatum<string>;
-  email?: UserDatum<string>;
+  phoneNumber?: DIMetadata<string>;
+  email?: DIMetadata<string>;
 };
 
 /**

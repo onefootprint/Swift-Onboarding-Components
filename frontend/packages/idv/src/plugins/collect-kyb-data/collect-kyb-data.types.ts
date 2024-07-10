@@ -1,13 +1,14 @@
 import type { CollectKybDataRequirement, CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 
-import type { UserData } from '../../types';
+import type { BusinessData, UserData } from '../../types';
 import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type CollectKybDataContext = {
+  bootstrapBusinessData: BusinessData;
+  bootstrapUserData: UserData;
   config: PublicOnboardingConfig;
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
-  kycUserData: UserData;
 };
 
 export type CollectKybDataProps = {

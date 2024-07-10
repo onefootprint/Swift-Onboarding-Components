@@ -6,7 +6,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import type { UserData } from '../../../../types';
+import type { BusinessData, UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type BasicData = Required<Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>> &
@@ -35,7 +35,8 @@ export type MachineContext = {
   // Plugin context
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
-  kycUserData: UserData;
+  bootstrapUserData: UserData;
+  bootstrapBusinessData: BusinessData;
   idvContext: CommonIdvContext;
   config?: PublicOnboardingConfig;
   // Machine generated
