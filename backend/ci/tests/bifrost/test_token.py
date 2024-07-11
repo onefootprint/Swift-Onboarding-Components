@@ -4,7 +4,13 @@ from tests.utils import post, create_ob_config, get, patch, _gen_random_ssn
 from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
-from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL, ENVIRONMENT, ID_DATA
+from tests.constants import (
+    BUSINESS_DATA,
+    FIXTURE_PHONE_NUMBER,
+    EMAIL,
+    ENVIRONMENT,
+    ID_DATA,
+)
 
 
 @pytest.fixture(scope="session")
@@ -61,6 +67,21 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
 
     # Run bifrost
     auth_token = IdentifyClient.from_token(auth_token).step_up()
+
+    # Should be able to decrypt existing business information
+    data = dict(fields=["business.dba", "business.address_line1"])
+    body = post("hosted/business/vault/decrypt", data, auth_token)
+    assert body["business.dba"] == BUSINESS_DATA["business.dba"]
+    assert body["business.address_line1"] == BUSINESS_DATA["business.address_line1"]
+
+    # Cannot decrypt tin
+    data = dict(fields=["business.tin"])
+    body = post("hosted/business/vault/decrypt", data, auth_token, status_code=403)
+    assert (
+        body["message"]
+        == "Not allowed: required permission is missing: CanDecrypt<business.tin>"
+    )
+
     bifrost2 = BifrostClient.raw_auth(
         kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
     )

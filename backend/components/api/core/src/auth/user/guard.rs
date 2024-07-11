@@ -1,5 +1,6 @@
 use crate::auth::CanDecrypt;
 use crate::auth::IsGuardMet;
+use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::UserAuthScope;
@@ -42,6 +43,29 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                 IDK::UsTaxId | IDK::Itin | IDK::DriversLicenseNumber | IDK::Ssn4 | IDK::Ssn9 => {
                     UserAuthScope::SensitiveProfile.is_met(token_scopes)
                 }
+            },
+            DataIdentifier::Business(bdk) => match bdk {
+                BDK::Name
+                | BDK::Dba
+                | BDK::Website
+                | BDK::PhoneNumber
+                | BDK::AddressLine1
+                | BDK::AddressLine2
+                | BDK::City
+                | BDK::State
+                | BDK::Zip
+                | BDK::Country
+                | BDK::BeneficialOwners
+                | BDK::KycedBeneficialOwners
+                | BDK::CorporationType
+                | BDK::FormationDate
+                | BDK::FormationState => {
+                    // Either BasicProfile or SignUp give permissions to decrypt basic info
+                    UserAuthScope::BasicProfile
+                        .or(UserAuthScope::SignUp)
+                        .is_met(token_scopes)
+                }
+                BDK::Tin => UserAuthScope::SensitiveProfile.is_met(token_scopes),
             },
             // We don't allow decrypting business data with a user auth token right now - we
             // theoretically could, but we just don't support portable businesses yet

@@ -4,8 +4,7 @@ use crate::State;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
-use api_core::utils::vault_wrapper::VwArgs;
-use api_core::FpResult;
+use api_core::errors::ValidationError;
 use api_wire_types::DecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
@@ -28,7 +27,7 @@ pub struct UserDecryptRequest {
     tags(Vault, User, Hosted),
     description = "Decrypts the specified list of fields from the provided vault."
 )]
-#[actix::post("/hosted/user/vault/decrypt")]
+#[actix::post("/hosted/business/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
@@ -36,21 +35,19 @@ pub async fn post(
 ) -> ApiResponse<DecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
+    let sb_id = user_auth
+        .scoped_business_id()
+        .ok_or(ValidationError("No business associated with this session"))?;
 
-    let uvw = state
+    let bvw = state
         .db_pool
-        .db_query(move |conn| -> FpResult<_> {
-            let id = user_auth.user_identifier();
-            let args = VwArgs::from(&id);
-            let uvw = VaultWrapper::<Any>::build(conn, args)?;
-            Ok(uvw)
-        })
+        .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sb_id))
         .await?;
 
-    let mut results = uvw
+    let mut results = bvw
         .decrypt_unchecked_value(&state.enclave_client, &fields)
         .await?;
-    // Is this step necessary? Every key is present in the response if it was in the request?
+
     let results: HashMap<_, _> = fields
         .into_iter()
         .map(|di| (di.clone(), results.remove(&di.into())))

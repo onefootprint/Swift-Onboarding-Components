@@ -22,7 +22,6 @@ def biometric_sandbox_user_auth(sandbox_user):
         (["id.dob"], True),
         (["id.phone_number", "id.email"], True),
         (["id.ssn9"], False),
-        (["business.address_line1"], False),
         (["custom.flerp"], False),
     ],
 )
@@ -46,7 +45,6 @@ def test_decrypt_basic(sandbox_user, fields_to_decrypt, expected_success):
         (["id.first_name", "id.last_name", "id.phone_number", "id.email"], True),
         # Now, we can decrypt ssn9 because we authed via webauthn!
         (["id.ssn9", "id.dob"], True),
-        (["business.address_line1"], False),
         (["custom.flerp"], False),
     ],
 )
