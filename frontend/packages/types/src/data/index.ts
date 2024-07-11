@@ -161,6 +161,7 @@ export {
   OnboardingConfigStatus,
 } from './onboarding-config';
 export type { OnboardingDecision } from './onboarding-decision';
+export { WorkflowKind } from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';
 export type { OrgFrequentNote } from './org-frequent-note';
 export { OrgFrequentNoteKind } from './org-frequent-note';

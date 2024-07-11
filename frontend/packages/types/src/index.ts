@@ -389,6 +389,7 @@ export type {
   WorkflowTriggeredEventData,
 } from './data';
 export {
+  WorkflowKind,
   AuthMethodKind,
   AccessLogKind,
   LivenessSource,

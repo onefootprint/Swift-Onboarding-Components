@@ -17,6 +17,7 @@ import {
   TimelineEventKind,
   TriggerKind,
   Vendor,
+  WorkflowKind,
 } from '@onefootprint/types';
 import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 
@@ -117,6 +118,7 @@ export const TimelineFixture: Timeline = [
           source: {
             kind: ActorKind.footprint,
           },
+          workflowKind: WorkflowKind.Kyc,
           obConfiguration: {
             id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
             name: 'My Playbook',
@@ -149,6 +151,7 @@ export const TimelineFixture: Timeline = [
           source: {
             kind: ActorKind.footprint,
           },
+          workflowKind: WorkflowKind.Kyc,
           obConfiguration: {
             id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
             name: 'My Playbook',

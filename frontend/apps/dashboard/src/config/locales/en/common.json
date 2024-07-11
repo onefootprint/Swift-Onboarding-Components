@@ -1554,6 +1554,7 @@
             "end-prefill": "from user's existing data in Footprint"
           },
           "onboarding-decision-event": {
+            "uploaded-docs": "Finished uploading requested documents",
             "onboarded-onto": "Onboarded onto <playbook />{{outcome}}",
             "with-outcome": " with {{ status }} outcome",
             "decision-status": {

@@ -5,15 +5,17 @@ use newtypes::ManualReviewKind;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingDecisionId;
 use newtypes::RuleSetResultId;
+use newtypes::WorkflowKind;
 
-/// Describes the outcome of an onboarding decision that took place on the user
+/// Describes the outcome of an onboarding decision that took place on the user.
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
-pub struct OnboardingDecision {
+pub struct TimelineOnboardingDecision {
     pub id: OnboardingDecisionId,
     pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
     pub source: Actor,
+    pub workflow_kind: WorkflowKind,
     pub ob_configuration: TimelinePlaybook,
     pub rule_set_result_id: Option<RuleSetResultId>,
     pub cleared_manual_reviews: Vec<ManualReview>,

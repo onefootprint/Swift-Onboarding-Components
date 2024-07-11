@@ -7,8 +7,8 @@ use crate::DocumentRequest;
 use crate::DocumentUploadedTimelineEvent;
 use crate::InsightEvent;
 use crate::LivenessEvent;
-use crate::OnboardingDecision;
 use crate::Serialize;
+use crate::TimelineOnboardingDecision;
 use crate::TimelinePlaybook;
 use crate::Utc;
 use crate::VaultCreated;
@@ -42,7 +42,7 @@ pub enum UserTimelineEvent {
     Liveness(LivenessEvent),
     DocumentUploaded(DocumentUploadedTimelineEvent),
     OnboardingDecision {
-        decision: OnboardingDecision,
+        decision: TimelineOnboardingDecision,
         annotation: Option<Annotation>,
     },
     Annotation(Annotation),

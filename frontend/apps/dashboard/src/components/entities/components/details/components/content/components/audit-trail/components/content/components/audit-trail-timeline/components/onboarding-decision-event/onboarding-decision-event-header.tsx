@@ -1,5 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
+import { WorkflowKind } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
@@ -18,7 +19,7 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
   const {
-    decision: { source, status, obConfiguration: playbook, ruleSetResultId, clearedManualReviews },
+    decision: { workflowKind, source, status, obConfiguration: playbook, ruleSetResultId, clearedManualReviews },
   } = data;
   const statusToText: Record<DecisionStatus, string> = {
     [DecisionStatus.fail]: t('decision-status.fail'),
@@ -35,6 +36,19 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
     [DecisionStatus.stepUp]: 'warning',
   };
   const color = statusToColor[status];
+
+  if (source.kind === ActorKind.footprint && workflowKind === WorkflowKind.Document) {
+    // The user just finishing onboarding onto a document Workflow.
+    return (
+      <Stack direction="row" align="center" gap={2}>
+        <Stack align="center" testID="onboarding-decision-event-header">
+          <Text variant="label-3" color={color}>
+            {t('uploaded-docs')}
+          </Text>
+        </Stack>
+      </Stack>
+    );
+  }
 
   // Text differs slightly based on whether Footprint or the tenant made the decision
   if (source.kind === ActorKind.footprint) {

@@ -10,6 +10,7 @@ import {
   IdDI,
   ListKind,
   TimelineEventKind,
+  WorkflowKind,
 } from '@onefootprint/types';
 
 export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
@@ -169,6 +170,7 @@ export const timelineFixture: Timeline = [
           source: {
             kind: ActorKind.footprint,
           },
+          workflowKind: WorkflowKind.Kyc,
           obConfiguration: {
             id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
             name: 'My Playbook',

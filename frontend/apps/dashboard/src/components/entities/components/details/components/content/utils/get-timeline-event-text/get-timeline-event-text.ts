@@ -23,6 +23,7 @@ import {
   LivenessSource,
   TimelineEventKind,
   TriggerKind,
+  WorkflowKind,
 } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import {
@@ -150,7 +151,7 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
     const eventData = data as OnboardingDecisionEventData;
 
     const {
-      decision: { source, status, obConfiguration, clearedManualReviews },
+      decision: { workflowKind, source, status, obConfiguration, clearedManualReviews },
     } = eventData;
     const statusToText: Record<DecisionStatus, string> = {
       [DecisionStatus.fail]: 'Fail',
@@ -161,6 +162,9 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
     };
     const statusText = statusToText[status];
 
+    if (source.kind === ActorKind.footprint && workflowKind === WorkflowKind.Document) {
+      return 'Finished uploading requested documents';
+    }
     if (source.kind === ActorKind.footprint) {
       if (status === DecisionStatus.pass || status === DecisionStatus.fail) {
         return `Onboarded onto ${obConfiguration.name} with ${statusText} outcome`;

@@ -9,6 +9,7 @@ export type OnboardingDecision = {
   timestamp: Date;
   source: Actor;
   obConfiguration: TimelinePlaybook;
+  workflowKind: WorkflowKind;
   vendors: Vendor[];
   ruleSetResultId?: string;
   // We don't yet care about the contents of the MRs, just the count
@@ -22,3 +23,10 @@ export type TimelinePlaybook = {
   name: string;
   mustCollectData: CollectedDataOption[];
 };
+
+export enum WorkflowKind {
+  Document = 'document',
+  Kyc = 'kyc',
+  Kyb = 'kyb',
+  AlpacaKyc = 'alpaca_kyc',
+}
