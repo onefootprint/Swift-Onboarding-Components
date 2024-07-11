@@ -152,7 +152,7 @@ const Screen = () => {
 
 ## Bootstrapping user data
 
-Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. For complete details, click [here](https://docs.onefootprint.com/integrate/user-data).
+Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. For complete details, click [here](https://docs.onefootprint.com/integrate/bootstrap-data).
 
 ```typescript
 import footprint from '@onefootprint/footprint-expo';
@@ -199,7 +199,7 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 | `publicKey`   | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
 | `authToken`   | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
 | `redirectUrl` | Optional. A deep link that will be navigated to when the web browser is closed. Can be created using `Linking.createURL` from `expo-linking`.                                                                                   |
-| `userData`    | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                            |
+| `userData`    | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                            |
 | `options`     | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                         |
 | `appearance`  | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
 | `l10n`        | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |

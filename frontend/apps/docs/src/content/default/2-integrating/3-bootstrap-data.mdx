@@ -1,12 +1,12 @@
 ---
 page: default
-slug: /integrate/user-data
+slug: /integrate/bootstrap-data
 category: Integrate
 title: Bootstrapping user data
 meta:
   {
-    title: Bootstrapping User Data in Footprint,
-    description: How to pass user data to the Footprint embedded component,
+    title: Bootstrapping data in Footprint,
+    description: How to pass data to the Footprint embedded component,
   }
 ---
 
@@ -16,67 +16,38 @@ If you already have certain data about your user, you can share it with Footprin
 We will pre-fill already available data and skip completed pages for your users. The users can always edit and correct this data
 while onboarding through Footprint. To pass user data to Footprint's flow, use the `bootstrapData` option:
 
+
+## Boostraping KYC data
+
 <inline-alert variant='info'>Check out [user-specific onboarding](/integrate/user-specific-sessions) which allows bootstrapping data using a new or existing Footprint user. If you already have user data stored on your backend, you may want to create a Footprint user with this data and start a user-specific onboarding session.</inline-alert>
 
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
-const bootstrapData = {
-  'id.email': 'jane.doe@acme.com',
-  'id.phone_number': '+12025550179',
-  'id.first_name': 'Jane',
-  'id.middle_name': 'Samantha',
-  'id.last_name': 'Doe',
-  'id.dob': '01/01/2001',
-  'id.ssn9': '123456789',
-  'id.ssn4': '1234',
-  'id.nationality': 'US',
-  'id.address_line1': '123 Apple St.',
-  'id.address_line2': 'APT 123',
-  'id.city': 'Boston',
-  'id.state': 'MA',
-  'id.country': 'US',
-  'id.zip': '02117',
-  'business.name': 'Acme Bank Inc.',
-  'business.dba': 'Acme Bank',
-  'business.tin': '12-3456789',
-  'business.website': 'www.google.com',
-  'business.phone_number': '+12025550179',
-  'business.address_line1': '123 Main St',
-  'business.address_line2': 'Apt 123',
-  'business.city': 'Boston',
-  'business.state': 'MA',
-  'business.zip': '02117',
-  'business.country': 'US',
-  'business.corporation_type': 'unknown',
-  'business.formation_date': 'YYYY-MM-DD',
-  'business.formation_state': "MA",
-  'business.beneficial_owners': [
-    {
-      first_name: 'Jane',
-      middle_name: 'Samantha',
-      last_name: 'Doe',
-      email: 'jane.doe@acme.com',
-      phone_number: '+12025550179',
-      ownership_stake: '50',
-    },
-  ],
-  'business.kyced_beneficial_owners': [
-    {
-      first_name: 'Jane',
-      middle_name: 'Samantha',
-      last_name: 'Doe',
-      email: 'jane.doe@acme.com',
-      phone_number: '+12025550179',
-      ownership_stake: '50',
-    },
-  ],
+const launchFootprint = () => {
+  const component = footprint.init({
+    kind: 'verify',
+    publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+    bootstrapData: {
+      'id.email': 'jane.doe@acme.com',
+      'id.phone_number': '+12025550179',
+      'id.first_name': 'Jane',
+      'id.middle_name': 'Samantha',
+      'id.last_name': 'Doe',
+      'id.dob': '01/01/2001',
+      'id.ssn9': '123456789',
+      'id.nationality': 'US',
+      'id.address_line1': '123 Apple St.',
+      'id.address_line2': 'APT 123',
+      'id.city': 'Boston',
+      'id.state': 'MA',
+      'id.country': 'US',
+      'id.zip': '02117',
+    }
+  });
+  component.render();
 };
-
-const component = footprint.init({ kind: 'verify', publicKey, bootstrapData });
-component.render();
 ```
 
 ### Available user data
@@ -102,6 +73,61 @@ component.render();
 | `id.citizenships`                   | Optional. User's citizenships. Must be an array of [Alpha-2 Codes](https://www.iban.com/country-codes). (e.g. `['BR', 'IT', 'HK']`)         |
 | `id.visa_kind`                      | Optional. Type of visa the user has. Must be one of `'e1'`, `'e2'`, `'e3'`, `'f1'`, `'g4'`, `'h1b'`, `'l1'`, `'o1'`, `'tn1'`, or `'other'`. |
 | `id.visa_expiration_date`           | Optional. User's visa expiration date. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+
+## Boostraping KYB data
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const launchFootprint = () => {
+  const component = footprint.init({
+    kind: 'verify',
+    publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+    bootstrapData: {
+      'business.dba': 'Acme Bank',
+      'business.tin': '12-3456789',
+      'business.website': 'www.google.com',
+      'business.phone_number': '+12025550179',
+      'business.address_line1': '123 Main St',
+      'business.address_line2': 'Apt 123',
+      'business.city': 'Boston',
+      'business.state': 'MA',
+      'business.zip': '02117',
+      'business.country': 'US',
+      'business.corporation_type': 'unknown',
+      'business.formation_date': 'YYYY-MM-DD',
+      'business.formation_state': "MA",
+      'business.beneficial_owners': [
+        {
+          first_name: 'Jane',
+          middle_name: 'Samantha',
+          last_name: 'Doe',
+          email: 'jane.doe@acme.com',
+          phone_number: '+12025550179',
+          ownership_stake: '50',
+        },
+      ],
+      'business.kyced_beneficial_owners': [
+        {
+          first_name: 'Jane',
+          middle_name: 'Samantha',
+          last_name: 'Doe',
+          email: 'jane.doe@acme.com',
+          phone_number: '+12025550179',
+          ownership_stake: '50',
+        },
+      ],
+    }
+  });
+  component.render();
+};
+```
+
+### Available business data
+
+| Variable                            | Description                                                                                                                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `business.name`                     | Optional. Name of the business                                                                                                              |
 | `business.dba`                      | Optional. Doing-business-as alias                                                                                                           |
 | `business.tin`                      | Optional. Taxpayer identification number, 9-digit string (hyphens will be ignored and stripped out)                                         |
