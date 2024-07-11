@@ -41,8 +41,6 @@ pub enum Error {
     DecisionNotFound,
     #[error("CURP validation error")]
     CurpError(#[from] CurpValidationError),
-    #[error("Vendor result not found {0}")]
-    VendorResultNotFound(VendorAPI),
 }
 
 impl api_errors::FpErrorTrait for Error {

@@ -2,7 +2,6 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-use crate::decision::Error as DecisionError;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
@@ -10,6 +9,7 @@ use api_core::decision::business_insights::BusinessInsights;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use api_core::decision::vendor::vendor_api::vendor_api_struct::MiddeskBusinessUpdateWebhook;
 use api_core::decision::vendor::vendor_api::vendor_api_struct::MiddeskGetBusiness;
+use api_core::errors::ValidationError;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -17,7 +17,6 @@ use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
-use newtypes::VendorAPI;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -68,7 +67,7 @@ pub async fn get_business_insights(
 
     let business_response = webhook_biz_response
         .or(biz_response)
-        .ok_or(DecisionError::VendorResultNotFound(VendorAPI::MiddeskGetBusiness))?;
+        .ok_or(ValidationError("no vendor response found for middesk"))?;
 
 
     Ok(BusinessInsights::from(business_response))

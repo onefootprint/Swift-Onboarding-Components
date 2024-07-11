@@ -234,7 +234,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         f"/entities/{user.fp_bid}/business_insights",
         None,
         *sandbox_tenant.db_auths,
-        status_code=200 if should_see_biz_insights else 500,
+        status_code=200 if should_see_biz_insights else 400,
     )
 
     if should_see_biz_insights:
