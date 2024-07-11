@@ -25,34 +25,6 @@ const useOrgMetrics = () => {
     () => getOrgMetrics(authHeaders, { ...requestParams }),
     {
       enabled: isReady,
-      select: data => {
-        const formattedMetrics = [];
-
-        const passRateValue =
-          data.successfulUserOnboardings === 0
-            ? 0
-            : (data.successfulUserOnboardings / (data.successfulUserOnboardings + data.failedUserOnboardings)) * 100;
-        const passRate = passRateValue % 1 === 0 ? passRateValue : passRateValue.toFixed(1);
-
-        formattedMetrics.push(
-          {
-            key: 'successfulUserOnboardings',
-            value: data.successfulUserOnboardings,
-          },
-          {
-            key: 'failedUserOnboardings',
-            value: data.failedUserOnboardings,
-          },
-          {
-            key: 'incompleteUserOnboardings',
-            value: data.incompleteUserOnboardings,
-          },
-          { key: 'totalUserOnboardings', value: data.totalUserOnboardings },
-          { key: 'passRate', value: `${passRate}%` },
-          { key: 'newUserVaults', value: data.newUserVaults },
-        );
-        return formattedMetrics;
-      },
     },
   );
 };

@@ -1,4 +1,4 @@
-import type { OrgMetrics } from '../data';
+import type { OrgMetricsResponse } from '../data';
 
 export type GetOrgMetricsRequest = {
   playbook_id?: string;
@@ -6,4 +6,4 @@ export type GetOrgMetricsRequest = {
   timestamp_lte?: string | Date;
 };
 
-export type GetOrgMetricsResponse = OrgMetrics;
+export type GetOrgMetricsResponse = OrgMetricsResponse;

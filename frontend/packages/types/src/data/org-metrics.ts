@@ -1,7 +1,12 @@
+export type OrgMetricsResponse = {
+  user: OrgMetrics;
+  business: OrgMetrics;
+};
+
 export type OrgMetrics = {
-  newUserVaults: number;
-  totalUserOnboardings: number;
-  successfulUserOnboardings: number;
-  failedUserOnboardings: number;
-  incompleteUserOnboardings: number;
+  newVaults: number;
+  totalOnboardings: number;
+  passOnboardings: number;
+  failOnboardings: number;
+  incompleteOnboardings: number;
 };

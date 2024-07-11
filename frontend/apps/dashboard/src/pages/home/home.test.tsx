@@ -29,7 +29,7 @@ describe('<Home />', () => {
   const renderHomeAndWaitData = async () => {
     renderHome();
     await waitFor(() => {
-      const content = screen.getByTestId('onboarding-metrics-content');
+      const content = screen.getByTestId('user-onboarding-metrics-content');
       expect(content).toBeInTheDocument();
     });
   };
@@ -60,48 +60,31 @@ describe('<Home />', () => {
         withOrgMetrics(emptyOrgMetricsFixture);
       });
 
-      it('should show all 6 metrics', async () => {
+      it('should show all user metrics, hide business metrics', async () => {
         await renderHomeAndWaitData();
         const metricBoxes = screen.getAllByRole('group');
         expect(metricBoxes).toHaveLength(6);
+
+        const content = screen.queryByTestId('business-onboarding-metrics-content');
+        expect(content).not.toBeInTheDocument();
       });
 
-      it('should show the first row of metrics with values of 0', async () => {
+      it('should show the metrics with values of 0', async () => {
         await renderHomeAndWaitData();
 
-        const successfulOnboardings = screen.getByRole('group', {
-          name: 'Successful onboardings',
+        const userMetrics = screen.getByTestId('user-onboarding-metrics-content');
+        const expectedUserMetrics = [
+          ['Successful onboardings', '0'],
+          ['Failed onboardings', '0'],
+          ['Incomplete onboardings', '0'],
+          ['Total onboardings', '0'],
+          ['Pass rate', '0%'],
+          ['New vaults', '0'],
+        ];
+        expectedUserMetrics.forEach(([name, value]) => {
+          const metric = within(userMetrics).getByRole('group', { name });
+          expect(within(metric).getByText(value)).toBeInTheDocument();
         });
-        expect(within(successfulOnboardings).getByText('0')).toBeInTheDocument();
-
-        const failedOnboardings = screen.getByRole('group', {
-          name: 'Failed onboardings',
-        });
-        expect(within(failedOnboardings).getByText('0')).toBeInTheDocument();
-
-        const incompleteOnboardings = screen.getByRole('group', {
-          name: 'Incomplete onboardings',
-        });
-        expect(within(incompleteOnboardings).getByText('0')).toBeInTheDocument();
-      });
-
-      it('should show the second row of metrics with values of 0', async () => {
-        await renderHomeAndWaitData();
-
-        const totalOnboardings = screen.getByRole('group', {
-          name: 'Total onboardings',
-        });
-        expect(within(totalOnboardings).getByText('0')).toBeInTheDocument();
-
-        const passRate = screen.getByRole('group', {
-          name: 'Pass rate',
-        });
-        expect(within(passRate).getByText('0%')).toBeInTheDocument();
-
-        const newUserVaults = screen.getByRole('group', {
-          name: 'New user vaults',
-        });
-        expect(within(newUserVaults).getByText('0')).toBeInTheDocument();
       });
     });
 
@@ -110,48 +93,45 @@ describe('<Home />', () => {
         withOrgMetrics();
       });
 
-      it('should show all 6 metrics', async () => {
+      it('should show all 6 user metrics and 6 busines metrics', async () => {
         await renderHomeAndWaitData();
         const metricBoxes = screen.getAllByRole('group');
-        expect(metricBoxes).toHaveLength(6);
+        expect(metricBoxes).toHaveLength(12);
+
+        const content = screen.getByTestId('business-onboarding-metrics-content');
+        expect(content).toBeInTheDocument();
       });
 
-      it('should show the first row of metrics with correct values', async () => {
+      it('should show the correct values', async () => {
         await renderHomeAndWaitData();
 
-        const successfulOnboardings = screen.getByRole('group', {
-          name: 'Successful onboardings',
+        const userMetrics = screen.getByTestId('user-onboarding-metrics-content');
+        const expectedUserMetrics = [
+          ['Successful onboardings', '1,036,817'],
+          ['Failed onboardings', '17,187'],
+          ['Incomplete onboardings', '4,810'],
+          ['Total onboardings', '1,058,814'],
+          ['Pass rate', '98.4%'],
+          ['New vaults', '8,910'],
+        ];
+        expectedUserMetrics.forEach(([name, value]) => {
+          const metric = within(userMetrics).getByRole('group', { name });
+          expect(within(metric).getByText(value)).toBeInTheDocument();
         });
-        expect(within(successfulOnboardings).getByText('1,036,817')).toBeInTheDocument();
 
-        const failedOnboardings = screen.getByRole('group', {
-          name: 'Failed onboardings',
+        const businessMetrics = screen.getByTestId('business-onboarding-metrics-content');
+        const expectedBusinessMetrics = [
+          ['Successful onboardings', '11'],
+          ['Failed onboardings', '4'],
+          ['Incomplete onboardings', '5'],
+          ['Total onboardings', '20'],
+          ['Pass rate', '73.3%'],
+          ['New vaults', '30'],
+        ];
+        expectedBusinessMetrics.forEach(([name, value]) => {
+          const metric = within(businessMetrics).getByRole('group', { name });
+          expect(within(metric).getByText(value)).toBeInTheDocument();
         });
-        expect(within(failedOnboardings).getByText('17,187')).toBeInTheDocument();
-
-        const incompleteOnboardings = screen.getByRole('group', {
-          name: 'Incomplete onboardings',
-        });
-        expect(within(incompleteOnboardings).getByText('4,810')).toBeInTheDocument();
-      });
-
-      it('should show the second row of metrics with correct values', async () => {
-        await renderHomeAndWaitData();
-
-        const totalOnboardings = screen.getByRole('group', {
-          name: 'Total onboardings',
-        });
-        expect(within(totalOnboardings).getByText('1,058,814')).toBeInTheDocument();
-
-        const passRate = screen.getByRole('group', {
-          name: 'Pass rate',
-        });
-        expect(within(passRate).getByText('98.4%')).toBeInTheDocument();
-
-        const newUserVaults = screen.getByRole('group', {
-          name: 'New user vaults',
-        });
-        expect(within(newUserVaults).getByText('8,910')).toBeInTheDocument();
       });
     });
   });

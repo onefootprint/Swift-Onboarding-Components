@@ -3,23 +3,41 @@ import {
   type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
-  type OrgMetrics,
+  type OrgMetricsResponse,
 } from '@onefootprint/types/src/data';
 
 export const orgMetricsFixture = {
-  newUserVaults: 8910,
-  totalUserOnboardings: 1058814,
-  successfulUserOnboardings: 1036817,
-  failedUserOnboardings: 17187,
-  incompleteUserOnboardings: 4810,
+  user: {
+    newVaults: 8910,
+    totalOnboardings: 1058814,
+    passOnboardings: 1036817,
+    failOnboardings: 17187,
+    incompleteOnboardings: 4810,
+  },
+  business: {
+    newVaults: 30,
+    totalOnboardings: 20,
+    passOnboardings: 11,
+    failOnboardings: 4,
+    incompleteOnboardings: 5,
+  },
 };
 
 export const emptyOrgMetricsFixture = {
-  newUserVaults: 0,
-  totalUserOnboardings: 0,
-  successfulUserOnboardings: 0,
-  failedUserOnboardings: 0,
-  incompleteUserOnboardings: 0,
+  user: {
+    newVaults: 0,
+    totalOnboardings: 0,
+    passOnboardings: 0,
+    failOnboardings: 0,
+    incompleteOnboardings: 0,
+  },
+  business: {
+    newVaults: 0,
+    totalOnboardings: 0,
+    passOnboardings: 0,
+    failOnboardings: 0,
+    incompleteOnboardings: 0,
+  },
 };
 
 export const playbooksFixture: OnboardingConfig[] = [
@@ -139,7 +157,7 @@ export const playbooksFixture: OnboardingConfig[] = [
   },
 ];
 
-export const withOrgMetrics = (response: OrgMetrics = orgMetricsFixture) =>
+export const withOrgMetrics = (response: OrgMetricsResponse = orgMetricsFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/metrics',

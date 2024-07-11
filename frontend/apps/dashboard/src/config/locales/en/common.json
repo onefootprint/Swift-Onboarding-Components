@@ -1932,6 +1932,8 @@
       "header": {
         "title": "Home"
       },
+      "users": "Users",
+      "businesses": "Businesses",
       "onboarding-metrics": {
         "title": "Onboarding metrics",
         "filters": {
@@ -1948,12 +1950,12 @@
           "custom": "Custom"
         },
         "metrics": {
-          "successfulUserOnboardings": "Successful onboardings",
-          "failedUserOnboardings": "Failed onboardings",
-          "incompleteUserOnboardings": "Incomplete onboardings",
-          "totalUserOnboardings": "Total onboardings",
+          "passOnboardings": "Successful onboardings",
+          "failOnboardings": "Failed onboardings",
+          "incompleteOnboardings": "Incomplete onboardings",
+          "userOnboardings": "Total onboardings",
           "passRate": "Pass rate",
-          "newUserVaults": "New user vaults"
+          "newVaults": "New vaults"
         }
       },
       "error": "Please <refresh>refresh</refresh> this page."
