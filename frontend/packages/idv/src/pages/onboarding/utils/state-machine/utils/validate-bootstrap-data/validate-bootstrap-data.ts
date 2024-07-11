@@ -1,10 +1,10 @@
+import { isAddressLine, isEmail, isName, isSSN9Flexible, isSsn4 } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
 import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, IdDI, UsLegalStatus, VisaKind, isCountryCode } from '@onefootprint/types';
 import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import { validate as isEmail } from 'isemail';
 
 import type { DIMetadata, UserData } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
@@ -16,8 +16,9 @@ type Predicate = (...args: string[]) => boolean;
 
 const { logWarn } = getLogger({ location: 'validate-bootstrap-data' });
 
-// TODO: FP-7861 Move these validation functions to @onefootprint/core or a similar location.
-const isEmailValid = (str: string): boolean => isStringValid(str) && isEmail(str);
+const isNameValid = (str: string, allowEmpty?: boolean): boolean => {
+  return !allowEmpty && !str?.trim()?.length ? false : isName(str);
+};
 
 const getIsoDateString = (dateStr: string, locale: SupportedLocale): string | undefined => {
   if (!isStringValid(dateStr)) return undefined;
@@ -48,30 +49,6 @@ const isPhoneValid = (str: string): boolean => {
   } catch (_) {
     return false;
   }
-};
-
-const isNameValid = (str: string, allowEmpty?: boolean): boolean => {
-  const trimmedName = str?.trim();
-  if (!trimmedName?.length && !allowEmpty) {
-    return false;
-  }
-  const allowedChars = /^([^@#$%^*()_+=~/\\<>~`[\]{}!?;:]+)$/;
-  return allowedChars.test(trimmedName);
-};
-
-const isSsn9Valid = (str: string): boolean => {
-  const ssn9Regex = /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/;
-  return isStringValid(str) && ssn9Regex.test(str);
-};
-
-const isSsn4Valid = (str: string): boolean => {
-  const ssn4Regex = /^((?!(0000))\d{4})$/;
-  return isStringValid(str) && ssn4Regex.test(str);
-};
-
-const isAddressLine1Valid = (str: string): boolean => {
-  const addressLine1Regex = /^(?!p\.?o\.?\s*?(?:box)?\s*?[0-9]+?).*$/i;
-  return isStringValid(str) && addressLine1Regex.test(str);
 };
 
 const isStateValid = (state: string, country?: string): boolean =>
@@ -123,28 +100,28 @@ const validateBootstrapData = (
   if (!isObject(bootstrapData)) return {};
 
   const FieldsValidator: Record<IdDI | BusinessDI, Predicate> = {
-    [IdDI.addressLine1]: isAddressLine1Valid,
+    [IdDI.addressLine1]: isAddressLine,
     [IdDI.addressLine2]: isStringValid,
     [IdDI.citizenships]: isCitizenshipsValid,
     [IdDI.city]: isStringValid,
     [IdDI.country]: (s: string) => isCountryValid(config, s),
     [IdDI.dob]: (s: string) => isDobValid(locale, s),
-    [IdDI.email]: isEmailValid,
+    [IdDI.email]: (s: string) => isEmail(s),
     [IdDI.firstName]: (s: string) => isNameValid(s),
     [IdDI.itin]: () => true,
     [IdDI.lastName]: (s: string) => isNameValid(s),
     [IdDI.middleName]: (s: string) => isNameValid(s, true),
     [IdDI.nationality]: isCountryCode,
     [IdDI.phoneNumber]: isPhoneValid,
-    [IdDI.ssn4]: isSsn4Valid,
-    [IdDI.ssn9]: isSsn9Valid,
+    [IdDI.ssn4]: isSsn4,
+    [IdDI.ssn9]: isSSN9Flexible,
     [IdDI.state]: (state: string, country?: string) => isStateValid(state, country),
     [IdDI.usLegalStatus]: isUsLegalStatusValid,
     [IdDI.usTaxId]: () => true,
     [IdDI.visaExpirationDate]: (s: string) => isVisaExpirationDateValid(locale, s),
     [IdDI.visaKind]: isVisaKindValid,
     [IdDI.zip]: isStringValid,
-    [BusinessDI.addressLine1]: isAddressLine1Valid,
+    [BusinessDI.addressLine1]: isAddressLine,
     [BusinessDI.addressLine2]: isStringValid,
     [BusinessDI.beneficialOwners]: () => true, // TODO: Add real validators for this field
     [BusinessDI.city]: isStringValid,

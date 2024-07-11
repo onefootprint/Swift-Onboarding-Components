@@ -1,8 +1,9 @@
+import { describe, expect, it } from 'bun:test';
 import isEmail from './is-email';
 
 describe('isEmail', () => {
   describe('valid emails', () => {
-    test('should return true', () => {
+    it('should return true', () => {
       const validEmails = [
         'email@example.com',
         'jane.doe@example.com',
@@ -24,6 +25,7 @@ describe('isEmail', () => {
         'Outerspace@this is not allowed.com',
         'john.doe@example..com',
         'a"b(c)d,e:f;g<h>i[j\\k]l@example.com',
+        '',
       ];
 
       invalidEmails.forEach(email => {

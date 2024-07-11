@@ -1,1 +1,1 @@
-export { default } from './is-ssn9';
+export { default, isSSN9Flexible } from './is-ssn9';

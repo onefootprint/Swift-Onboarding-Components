@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isDob, { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate } from './is-dob';
 
 describe('DOB Validator', () => {

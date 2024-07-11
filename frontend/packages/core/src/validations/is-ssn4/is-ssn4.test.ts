@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isSSN4 from './is-ssn4';
 
 describe('isSSN4', () => {
@@ -27,6 +28,8 @@ describe('isSSN4', () => {
         '0123 ', // Space after the digits
         ' 0123', // Space before the digits
         '9a2b', // Contains non-digit characters
+        '', // empty string
+        '  ', // spaces
       ];
 
       invalidSSN4.forEach(ssn4 => {

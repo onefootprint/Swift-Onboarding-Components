@@ -25,6 +25,7 @@
     "@datadog/browser-rum": "^5.18.0",
     "@formkit/auto-animate": "^1.0.0-beta.6",
     "@onefootprint/appearance": "*",
+    "@onefootprint/core": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
     "@onefootprint/footprint-js": "*",
@@ -47,7 +48,6 @@
     "framer-motion": "^10.12.4",
     "google-libphonenumber": "^3.2.32",
     "heic2any": "^0.0.4",
-    "isemail": "^3.2.0",
     "launchdarkly-react-client-sdk": "^3.0.9",
     "lodash": "^4.17.21",
     "opencv-react-ts": "^0.0.11",
@@ -87,11 +87,15 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"],
+    "setupFiles": [
+      "<rootDir>/src/config/initializers/i18next-test.ts"
+    ],
     "moduleNameMapper": {
       "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1",
       "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
     },
-    "setupFilesAfterEnv": ["<rootDir>/src/utils/tests/setupTests.js"]
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/utils/tests/setupTests.js"
+    ]
   }
 }

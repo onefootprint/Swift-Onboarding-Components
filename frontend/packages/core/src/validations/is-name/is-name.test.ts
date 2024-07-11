@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isName from './is-name';
 
 describe('Name Validation', () => {

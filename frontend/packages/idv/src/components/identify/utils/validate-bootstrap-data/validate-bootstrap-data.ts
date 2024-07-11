@@ -1,5 +1,5 @@
+import { isEmail } from '@onefootprint/core';
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import { validate as isEmail } from 'isemail';
 
 import type { IdentifyBootstrapData } from '../../state/types';
 

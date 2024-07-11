@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 /**
  * Open Issue importing from validator/es/
  * @see https://github.com/validatorjs/validator.js/issues/1759
