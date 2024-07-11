@@ -12,7 +12,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::rule_set_version::RuleSetVersion;
 use db::DbError;
-use db::OffsetPagination;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -32,9 +31,7 @@ async fn get_list(
 ) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
     let OnboardingConfigFilters {
         status,
         search,

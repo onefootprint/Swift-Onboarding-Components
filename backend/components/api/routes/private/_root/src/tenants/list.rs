@@ -12,7 +12,6 @@ use api_core::State;
 use api_wire_types::PrivateTenantFilters;
 use db::models::tenant::PrivateTenantFilters as DbPrivateTenantFilters;
 use db::models::tenant::Tenant;
-use db::OffsetPagination;
 use itertools::Itertools;
 
 #[get("/private/tenants")]
@@ -57,7 +56,7 @@ async fn get(
         .skip(page_size * page.unwrap_or_default())
         .collect_vec();
 
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
     let (results, next_page) = pagination.results(results);
 
     let result = OffsetPaginatedResponse::ok(results, next_page, count as i64);

@@ -11,7 +11,6 @@ use api_core::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_role::TenantRoleListFilters;
-use db::OffsetPagination;
 use newtypes::TenantRoleId;
 use newtypes::TenantRoleKind;
 use newtypes::TenantRoleKindDiscriminant;
@@ -30,8 +29,7 @@ pub async fn get(
     let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
 
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
+    let pagination = pagination.db_pagination(&state);
     let OrgRoleFilters { search, kind } = filters.into_inner();
 
     let (results, next_page, count) = state
@@ -44,7 +42,6 @@ pub async fn get(
                 kind,
                 is_live,
             };
-            let pagination = OffsetPagination::new(page, page_size);
             let (results, next_page) = TenantRole::list_active(conn, &filters, pagination)?;
             let count = TenantRole::count_active(conn, &filters)?;
             Ok((results, next_page, count))

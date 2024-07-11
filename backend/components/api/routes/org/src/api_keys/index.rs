@@ -14,7 +14,6 @@ use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
-use db::OffsetPagination;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::ApiKeyStatus;
 use newtypes::TenantApiKeyId;
@@ -42,8 +41,6 @@ pub async fn get(
     auth: TenantSessionAuth,
 ) -> ApiResponse<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
     let ApiKeyFilters {
         role_ids,
         status,
@@ -58,7 +55,7 @@ pub async fn get(
         status,
         search,
     };
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
     let (keys, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {

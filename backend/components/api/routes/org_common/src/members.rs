@@ -17,7 +17,6 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_rolebinding::TenantRolebindingFilters;
 use db::models::tenant_rolebinding::TenantRolebindingUpdate;
 use db::models::tenant_user::TenantUser;
-use db::OffsetPagination;
 use newtypes::OrgIdentifierRef;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantUserId;
@@ -33,8 +32,7 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
     let authed_org_ident = auth.org_identifier().clone_into();
 
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
+    let pagination = pagination.db_pagination(&state);
     let OrgMemberFilters {
         role_ids,
         search,
@@ -52,7 +50,6 @@ pub async fn get(
                 search,
                 is_invite_pending,
             };
-            let pagination = OffsetPagination::new(page, page_size);
             let (results, next_page) = TenantRolebinding::list(conn, &filters, pagination)?;
             let count = TenantRolebinding::count(conn, &filters)?;
             Ok((results, next_page, count))

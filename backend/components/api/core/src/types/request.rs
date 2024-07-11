@@ -1,4 +1,5 @@
 use crate::State;
+use db::OffsetPagination;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
 
@@ -72,5 +73,11 @@ impl OffsetPaginationRequest {
         } else {
             state.config.default_page_size
         }
+    }
+
+    pub fn db_pagination(&self, state: &web::Data<State>) -> OffsetPagination {
+        let page = self.page;
+        let page_size = self.page_size(state);
+        OffsetPagination::new(page, page_size)
     }
 }

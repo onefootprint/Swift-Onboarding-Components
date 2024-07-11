@@ -13,7 +13,6 @@ use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::BusinessOwnerQuery;
 use db::models::scoped_vault::ScopedVault;
-use db::OffsetPagination;
 use newtypes::PreviewApi;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -39,10 +38,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();
 
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
-
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
     let (bos, next_page) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {

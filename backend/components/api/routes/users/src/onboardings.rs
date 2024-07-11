@@ -12,7 +12,6 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use db::OffsetPagination;
 use macros::route_alias;
 use newtypes::PreviewApi;
 use newtypes::WorkflowKind;
@@ -46,10 +45,7 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
 
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
-
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
     let (wfs, next_page) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {

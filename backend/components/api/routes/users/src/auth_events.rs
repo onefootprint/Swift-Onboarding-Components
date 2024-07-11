@@ -10,7 +10,6 @@ use api_core::ApiResponse;
 use api_core::FpResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
-use db::OffsetPagination;
 use newtypes::PreviewApi;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -32,9 +31,7 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
 
     let (events, next_page, count) = state
         .db_pool

@@ -10,7 +10,6 @@ use api_core::State;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::rule_instance::RuleInstance;
-use db::OffsetPagination;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -31,9 +30,7 @@ pub async fn list_for_tenant(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
-    let pagination = OffsetPagination::new(page, page_size);
+    let pagination = pagination.db_pagination(&state);
 
     let (lists, next_page, count, entries, list_ids_used_in_playbook) = state
         .db_pool
