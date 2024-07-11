@@ -19,17 +19,17 @@ const DEV_FRAME_SRC = (IS_DEV ? ['http://localhost:3000'] : []).join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com getform.io/f/pbygomeb *.pusher.com wss://*.pusher.com vercel.live aplo-evnt.com usefathom.com *.usefathom.com www.youtube.com api.onefootprint.com unifyintent.com *.unifyintent.com px.ads.linkedin.com www.google-analytics.com;
+  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com getform.io/f/pbygomeb *.pusher.com wss://*.pusher.com vercel.live aplo-evnt.com usefathom.com *.usefathom.com *.youtube.com api.onefootprint.com unifyintent.com *.unifyintent.com px.ads.linkedin.com *.google-analytics.com *.intercom.io wss://nexus-websocket-a.intercom.io;
   default-src 'self' vitals.vercel-insights.com;
-  font-src 'self' fonts.googleapis.com fonts.gstatic.com;
+  font-src 'self' fonts.googleapis.com fonts.gstatic.com *.intercomcdn.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' ${DEV_FRAME_SRC} *.onefootprint.com vercel.live www.youtube.com form.typeform.com;
-  img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net unifyintent.com *.unifyintent.com cdn.jsdelivr.net px.ads.linkedin.com www.googleadservices.com;
+  frame-src 'self' ${DEV_FRAME_SRC} *.onefootprint.com vercel.live *.youtube.com form.typeform.com;
+  img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net unifyintent.com *.unifyintent.com cdn.jsdelivr.net px.ads.linkedin.com *.googleadservices.com *.google.com *.googletagmanager.com *.googleads.g.doubleclick.net *.intercomassets.com *.intercomcdn.com;
   media-src 'self' https footprint-blog.ghost.io;
   object-src 'self' data:;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com unifyintent.com *.unifyintent.com *.apollo.io *.vercel-scripts.com snap.licdn.com googleads.g.doubleclick.net www.googleadservices.com widget.intercom.io www.google-analytics.com;
-  style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com cdn.jsdelivr.net;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com *.tagmanager.google.com *.googletagmanager.com platform.twitter.com *.youtube.com static.ads-twitter.com connect.facebook.net *.facebook.com unifyintent.com *.unifyintent.com *.apollo.io *.vercel-scripts.com snap.licdn.com googleads.g.doubleclick.net *.googleadservices.com *.intercom.io *.google-analytics.com js.intercomcdn.com;
+  style-src 'self' 'unsafe-inline' *.tagmanager.google.com fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
 
