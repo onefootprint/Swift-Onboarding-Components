@@ -8,6 +8,7 @@ import common from '../locales/en/common.json';
 import domainRestrictions from '../locales/en/domain-restrictions.json';
 import entityDetails from '../locales/en/entity-details.json';
 import entityDocuments from '../locales/en/entity-documents.json';
+import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import playbooks from '../locales/en/playbooks.json';
@@ -30,6 +31,7 @@ const configureReactI18next = () => {
         playbooks,
         ui,
         users,
+        home,
       },
     },
     lng: 'en',
@@ -47,6 +49,7 @@ const configureReactI18next = () => {
       'switch-org',
       'ui',
       'users',
+      'home',
     ],
     returnNull: false,
     interpolation: {

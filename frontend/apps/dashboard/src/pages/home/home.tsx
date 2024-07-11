@@ -12,7 +12,7 @@ import PlaybooksFilter from './components/playbooks-filter';
 import useOrgMetrics from './hooks/use-org-metrics';
 
 const Home = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
+  const { t } = useTranslation('home');
   const metrics = useOrgMetrics();
 
   return (

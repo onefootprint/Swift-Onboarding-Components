@@ -13,7 +13,8 @@ const ErrorComponent = ({ error }: ErrorProps) => (
   <Container>
     {`${getErrorMessage(error)}. `}
     <Trans
-      i18nKey="pages.home.error"
+      ns="home"
+      i18nKey="error"
       components={{
         refresh: (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid

@@ -7,8 +7,8 @@ import useFilters from '../../hooks/use-filters';
 import usePlaybookOptions from '../../hooks/use-playbook-options';
 
 const PlaybooksFilter = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.home.onboarding-metrics.filters',
+  const { t } = useTranslation('home', {
+    keyPrefix: 'onboarding-metrics.filters',
   });
   const filters = useFilters();
   const { data, isLoading } = usePlaybookOptions({});

@@ -29,7 +29,7 @@ describe('<Home />', () => {
   const renderHomeAndWaitData = async () => {
     renderHome();
     await waitFor(() => {
-      const content = screen.getByTestId('user-onboarding-metrics-content');
+      const content = screen.getByRole('group', { name: 'Users' });
       expect(content).toBeInTheDocument();
     });
   };
@@ -62,17 +62,17 @@ describe('<Home />', () => {
 
       it('should show all user metrics, hide business metrics', async () => {
         await renderHomeAndWaitData();
-        const metricBoxes = screen.getAllByRole('group');
+        const metricBoxes = screen.getAllByRole('region');
         expect(metricBoxes).toHaveLength(6);
 
-        const content = screen.queryByTestId('business-onboarding-metrics-content');
+        const content = screen.queryByRole('group', { name: 'Business' });
         expect(content).not.toBeInTheDocument();
       });
 
       it('should show the metrics with values of 0', async () => {
         await renderHomeAndWaitData();
 
-        const userMetrics = screen.getByTestId('user-onboarding-metrics-content');
+        const userMetrics = screen.getByRole('group', { name: 'Users' });
         const expectedUserMetrics = [
           ['Successful onboardings', '0'],
           ['Failed onboardings', '0'],
@@ -82,7 +82,7 @@ describe('<Home />', () => {
           ['New vaults', '0'],
         ];
         expectedUserMetrics.forEach(([name, value]) => {
-          const metric = within(userMetrics).getByRole('group', { name });
+          const metric = within(userMetrics).getByRole('region', { name });
           expect(within(metric).getByText(value)).toBeInTheDocument();
         });
       });
@@ -95,17 +95,17 @@ describe('<Home />', () => {
 
       it('should show all 6 user metrics and 6 busines metrics', async () => {
         await renderHomeAndWaitData();
-        const metricBoxes = screen.getAllByRole('group');
+        const metricBoxes = screen.getAllByRole('region');
         expect(metricBoxes).toHaveLength(12);
 
-        const content = screen.getByTestId('business-onboarding-metrics-content');
+        const content = screen.getByRole('group', { name: 'Businesses' });
         expect(content).toBeInTheDocument();
       });
 
       it('should show the correct values', async () => {
         await renderHomeAndWaitData();
 
-        const userMetrics = screen.getByTestId('user-onboarding-metrics-content');
+        const userMetrics = screen.getByRole('group', { name: 'Users' });
         const expectedUserMetrics = [
           ['Successful onboardings', '1,036,817'],
           ['Failed onboardings', '17,187'],
@@ -115,11 +115,11 @@ describe('<Home />', () => {
           ['New vaults', '8,910'],
         ];
         expectedUserMetrics.forEach(([name, value]) => {
-          const metric = within(userMetrics).getByRole('group', { name });
+          const metric = within(userMetrics).getByRole('region', { name });
           expect(within(metric).getByText(value)).toBeInTheDocument();
         });
 
-        const businessMetrics = screen.getByTestId('business-onboarding-metrics-content');
+        const businessMetrics = screen.getByRole('group', { name: 'Businesses' });
         const expectedBusinessMetrics = [
           ['Successful onboardings', '11'],
           ['Failed onboardings', '4'],
@@ -129,7 +129,7 @@ describe('<Home />', () => {
           ['New vaults', '30'],
         ];
         expectedBusinessMetrics.forEach(([name, value]) => {
-          const metric = within(businessMetrics).getByRole('group', { name });
+          const metric = within(businessMetrics).getByRole('region', { name });
           expect(within(metric).getByText(value)).toBeInTheDocument();
         });
       });

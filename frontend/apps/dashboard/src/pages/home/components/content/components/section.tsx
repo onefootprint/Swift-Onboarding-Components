@@ -9,11 +9,10 @@ import { OrgMetrics } from '@onefootprint/types/src/data';
 
 type SectionProps = {
   metrics: OrgMetrics;
-  testId: string;
 };
 
-const Section = ({ metrics, testId }: SectionProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
+const Section = ({ metrics }: SectionProps) => {
+  const { t } = useTranslation('home');
 
   const formattedMetrics = [];
 
@@ -25,50 +24,48 @@ const Section = ({ metrics, testId }: SectionProps) => {
 
   formattedMetrics.push(
     {
-      key: 'passOnboardings',
+      key: 'pass',
       value: metrics.passOnboardings,
     },
     {
-      key: 'failOnboardings',
+      key: 'fail',
       value: metrics.failOnboardings,
     },
     {
-      key: 'incompleteOnboardings',
+      key: 'incomplete',
       value: metrics.incompleteOnboardings,
     },
-    { key: 'userOnboardings', value: metrics.totalOnboardings },
-    { key: 'passRate', value: `${passRate}%` },
-    { key: 'newVaults', value: metrics.newVaults },
+    { key: 'total', value: metrics.totalOnboardings },
+    { key: 'pass-rate', value: `${passRate}%` },
+    { key: 'new-vaults', value: metrics.newVaults },
   );
 
   return (
-    <div data-testid={testId}>
-      <Grid.Container gap={5} columns={['repeat(3, 1fr)']}>
-        <AnimatePresence>
-          {formattedMetrics.map(({ key, value }) => (
-            <BorderBox
-              key={key}
-              role="group"
-              initial={{ opacity: 0, filter: 'blur(1px)' }}
-              animate={{ opacity: 1, filter: 'blur(0px)' }}
-              exit={{
-                opacity: 0,
-                filter: 'blur(1px)',
-                transition: { duration: 0.2 },
-              }}
-              aria-label={t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}
-            >
-              <Grid.Item gridArea={key}>
-                <Stack direction="column" gap={7}>
-                  <Text variant="body-3">{t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}</Text>
-                  <Text variant="display-3">{value.toLocaleString('en-US')}</Text>
-                </Stack>
-              </Grid.Item>
-            </BorderBox>
-          ))}
-        </AnimatePresence>
-      </Grid.Container>
-    </div>
+    <Grid.Container gap={5} columns={['repeat(3, 1fr)']}>
+      <AnimatePresence>
+        {formattedMetrics.map(({ key, value }) => (
+          <BorderBox
+            key={key}
+            role="region"
+            initial={{ opacity: 0, filter: 'blur(1px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{
+              opacity: 0,
+              filter: 'blur(1px)',
+              transition: { duration: 0.2 },
+            }}
+            aria-label={t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}
+          >
+            <Grid.Item gridArea={key}>
+              <Stack direction="column" gap={7}>
+                <Text variant="body-3">{t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}</Text>
+                <Text variant="display-3">{value.toLocaleString('en-US')}</Text>
+              </Stack>
+            </Grid.Item>
+          </BorderBox>
+        ))}
+      </AnimatePresence>
+    </Grid.Container>
   );
 };
 

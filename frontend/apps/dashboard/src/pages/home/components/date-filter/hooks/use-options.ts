@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { DateRangeSelectOption } from '../date-filter.types';
 
 const useOptions = (): DateRangeSelectOption[] => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
+  const { t } = useTranslation('home');
 
   return [
     {

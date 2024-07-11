@@ -7,6 +7,7 @@ import type commonResource from '../config/locales/en/common.json';
 import type domainRestrictionsResource from '../config/locales/en/domain-restrictions.json';
 import type entityDetails from '../config/locales/en/entity-details.json';
 import type entityDocuments from '../config/locales/en/entity-documents.json';
+import type homeResource from '../config/locales/en/home.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
@@ -31,6 +32,7 @@ declare module 'i18next' {
       request: typeof requestResource;
       ui: typeof uiResource;
       users: typeof usersResource;
+      home: typeof homeResource;
     };
   }
 }

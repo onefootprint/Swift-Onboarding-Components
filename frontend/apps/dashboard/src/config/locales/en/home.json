@@ -1,0 +1,33 @@
+{
+  "page-title": "Footprint | Home",
+  "header": {
+    "title": "Home"
+  },
+  "users": "Users",
+  "businesses": "Businesses",
+  "onboarding-metrics": {
+    "title": "Onboarding metrics",
+    "filters": {
+      "all-playbooks": "All playbooks",
+      "today": "Today",
+      "last-7-days": "Last 7 days",
+      "last-4-weeks": "Last 4 weeks",
+      "last-3-months": "Last 3 months",
+      "last-12-months": "Last 12 months",
+      "month-to-date": "Month to date",
+      "quarter-to-date": "Quarter to date",
+      "year-to-date": "Year to date",
+      "all-time": "All time",
+      "custom": "Custom"
+    },
+    "metrics": {
+      "pass": "Successful onboardings",
+      "fail": "Failed onboardings",
+      "incomplete": "Incomplete onboardings",
+      "total": "Total onboardings",
+      "pass-rate": "Pass rate",
+      "new-vaults": "New vaults"
+    }
+  },
+  "error": "Please <refresh>refresh</refresh> this page."
+}
