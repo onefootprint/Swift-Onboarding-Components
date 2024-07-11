@@ -69,8 +69,6 @@ pub fn create_token(
     }
     let vw_dis = vw.populated_dis();
     if !vw_dis.contains(&DI::Id(IDK::PhoneNumber)) && !vw_dis.contains(&DI::Id(IDK::Email)) {
-        // TODO remove this log
-        tracing::error!("FYI: tenant trying to create token for user with no contact info");
         return ValidationError("Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email").into();
     }
 
