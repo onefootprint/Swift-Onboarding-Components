@@ -4,7 +4,7 @@ class FootprintConfiguration {
   final FootprintAppearance? appearance;
   final FootprintL10n? l10n;
   final FootprintOptions? options;
-  final FootprintUserData? userData;
+  final FootprintBootstrapData? bootstrapData;
   final Function(String)? onComplete;
   final String? authToken;
   final String? publicKey;
@@ -20,7 +20,7 @@ class FootprintConfiguration {
     this.options,
     this.publicKey,
     required this.redirectUrl,
-    this.userData,
+    this.bootstrapData,
   });
 
   Map<String, dynamic> _toJson() {
@@ -28,7 +28,7 @@ class FootprintConfiguration {
       'l10n': l10n?._toJson(),
       'options': options?._toJson(),
       'public_key': publicKey,
-      'user_data': userData?._toJson(),
+      'user_data': bootstrapData?._toJson(),
       'appearance': appearance?._toJson(),
     };
     map.removeWhere((key, value) => value == null);

@@ -13,7 +13,7 @@ part 'types/appearance.dart';
 part 'types/configuration.dart';
 part 'types/l10n.dart';
 part 'types/options.dart';
-part 'types/user_data.dart';
+part 'types/bootstrap_data.dart';
 part 'utils/create_url.dart';
 part 'utils/send_sdk_args.dart';
 part 'utils/send_sdk_telemetry.dart';
