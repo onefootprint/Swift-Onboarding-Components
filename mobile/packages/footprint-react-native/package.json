@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react-native",
   "private": false,
   "type": "module",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0-beta.1",
   "main": "./dist/footprint-react-native.cjs",
   "module": "./dist/footprint-react-native.js",
   "unpkg": "./dist/footprint-react-native.js",
@@ -39,7 +39,7 @@
     "validator": "^13.12.0"
   },
   "peerDependencies": {
-    "react": "> 18",
+    "react": ">= 18",
     "react-native": ">= 0.70"
   },
   "publishConfig": {
