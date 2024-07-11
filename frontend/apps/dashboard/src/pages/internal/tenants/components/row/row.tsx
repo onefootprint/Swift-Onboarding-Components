@@ -2,6 +2,7 @@ import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import type { Tenant } from '@onefootprint/types';
 import { CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
+import Actions from './components/actions/actions';
 
 type TenantProps = {
   tenant: Tenant;
@@ -29,6 +30,9 @@ const Row = ({ tenant, onAssumeTenant }: TenantProps) => (
     <td>{tenant.numLiveVaults}</td>
     <td>{tenant.numSandboxVaults}</td>
     <td>{tenant.createdAt}</td>
+    <td>
+      <Actions tenant={tenant} />
+    </td>
   </>
 );
 
