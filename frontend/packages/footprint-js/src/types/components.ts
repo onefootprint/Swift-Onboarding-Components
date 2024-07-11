@@ -12,18 +12,24 @@ export enum ComponentKind {
 }
 
 export type SupportedLocale = 'en-US' | 'es-MX';
+
 export type SupportedLanguage = 'en' | 'es';
+
 export type L10n = { locale?: SupportedLocale; language?: SupportedLanguage };
+
 export type Options = { showCompletionPage?: boolean; showLogo?: boolean };
+
 export type Variant = 'modal' | 'drawer' | 'inline';
 
 export type AdditionalComponentsSdkFunctionality = {
   relayFromComponents?: () => void;
 };
+
 export type Component = {
   destroy: () => void;
   render: () => Promise<void>;
 } & AdditionalComponentsSdkFunctionality;
+
 export type Footprint = {
   init: (props: Props) => Component;
 };
@@ -48,10 +54,15 @@ export type PropsBase = {
 
 /** verify */
 export type VerifyAuthToken = { authToken: string; publicKey?: never };
+
 export type VerifyPublicKey = { publicKey: string; authToken?: never };
+
 type VerifyVariant = 'modal' | 'drawer';
+
 type BootstrapKeys = 'userData' | 'bootstrapData';
+
 type VerifyDataKeys = BootstrapKeys | 'publicKey' | 'options' | 'authToken' | 'l10n';
+
 type VerifyPropsBase<TAuth> = PropsBase & {
   readonly bootstrapData?: BootstrapData;
   readonly onAuth?: (validationToken: string) => void;
@@ -116,6 +127,7 @@ export type FormOptions = {
   readonly hideCancelButton?: boolean;
   readonly hideFootprintLogo?: boolean;
 };
+
 export type FormProps = PropsBase & {
   readonly authToken: string;
   readonly containerId?: string; // required for inline variant
@@ -128,6 +140,7 @@ export type FormProps = PropsBase & {
   readonly title?: string;
   readonly variant?: Variant; // supports all variants, falls back to modal, so optional
 };
+
 export type FormDataProps = Pick<FormProps, 'authToken' | 'options' | 'title' | 'l10n'>;
 
 /** auth */
@@ -149,6 +162,7 @@ export type AuthProps = AuthPropsBase & {
   /** @deprecated after version 3.9.0 */
   readonly updateLoginMethods?: true;
 };
+
 export type AuthDataProps = Pick<
   AuthProps,
   BootstrapKeys | 'authToken' | 'updateLoginMethods' | 'publicKey' | 'l10n' | 'options'
@@ -167,6 +181,7 @@ export type UpdateLoginMethodsProps = PropsBase & {
   readonly userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
   readonly variant?: 'modal' | 'drawer';
 };
+
 export type UpdateLoginMethodsDataProps = Pick<
   UpdateLoginMethodsProps,
   BootstrapKeys | 'authToken' | 'l10n' | 'options'

@@ -4,13 +4,12 @@ import type {
 } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
-import type { FootprintAppearance } from 'src/footprint.types';
 
+import { type Appearance, OnboardingStep } from '../../types';
 import getOnboardingConfigReq from '../queries/get-onboarding-config-req';
-import { OnboardingStep } from '../utils/browser';
 
 export type ContextData = {
-  appearance?: FootprintAppearance;
+  appearance?: Appearance;
   authToken?: string;
   vaultingToken?: string;
   step: OnboardingStep;
@@ -30,7 +29,7 @@ const Context = createContext<[ContextData, UpdateContext]>([
 ]);
 
 export type ProviderProps = {
-  appearance?: FootprintAppearance;
+  appearance?: Appearance;
   authToken?: string;
   children: React.ReactNode;
   publicKey: string;

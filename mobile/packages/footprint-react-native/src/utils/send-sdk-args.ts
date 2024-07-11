@@ -1,4 +1,4 @@
-import type { FootprintVerifyProps } from '../footprint.types';
+import type { VerifyProps } from '../types';
 import { API_BASE_URL, SDK_KIND, SDK_NAME, SDK_VERSION } from './constants';
 import transformKeys from './transform-keys';
 
@@ -7,8 +7,8 @@ const NUM_RETRIES = 3;
 type SendSdkArgsRequest = {
   kind: string;
   data: Pick<
-    FootprintVerifyProps,
-    'publicKey' | 'authToken' | 'userData' | 'options' | 'l10n'
+    VerifyProps,
+    'publicKey' | 'authToken' | 'bootstrapData' | 'options' | 'l10n'
   >;
   is_components_sdk?: boolean;
 };
@@ -21,8 +21,8 @@ type SendSdkArgsResponse = {
 const sendSdkArgsRecursive = async (
   payload: SendSdkArgsRequest,
   numRetries: number,
-): Promise<SendSdkArgsResponse> =>
-  fetch(`${API_BASE_URL}/org/sdk_args`, {
+): Promise<SendSdkArgsResponse> => {
+  return fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
       'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION}`,
@@ -38,6 +38,7 @@ const sendSdkArgsRecursive = async (
     }
     return undefined;
   });
+};
 
 const sendSdkArgs = async (
   data: SendSdkArgsRequest['data'],
@@ -47,7 +48,13 @@ const sendSdkArgs = async (
     {
       kind: SDK_KIND,
       data: {
-        ...transformKeys(data),
+        ...transformKeys({
+          publicKey: data.publicKey,
+          authToken: data.authToken,
+          userData: data.bootstrapData,
+          options: data.options,
+          l10n: data.l10n,
+        }),
         is_components_sdk: options?.isComponentSdk,
       },
     },

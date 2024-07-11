@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 
-export type FootprintAppearanceVariables = Partial<{
+export type AppearanceVariables = Partial<{
   // globals
   borderRadius: CSS.Property.BorderRadius;
   colorError: CSS.Property.Color;
@@ -108,9 +108,7 @@ export type FootprintAppearanceVariables = Partial<{
   dropdownFooterBg: CSS.Property.Background;
 }>;
 
-export type FootprintAppearanceTheme = 'light' | 'dark';
-
-export type FootprintAppearanceRules = Partial<{
+export type AppearanceRules = Partial<{
   button: CSS.Properties;
   'button:hover': CSS.Properties;
   'button:focus': CSS.Properties;
@@ -130,73 +128,8 @@ export type FootprintAppearanceRules = Partial<{
   'linkButton:active': CSS.Properties;
 }>;
 
-export type FootprintAppearance = {
+export type Appearance = {
   fontSrc?: string;
-  rules?: FootprintAppearanceRules;
-  theme?: FootprintAppearanceTheme;
-  variables?: FootprintAppearanceVariables;
-};
-
-type VerifyAuthToken = {
-  authToken: string;
-  publicKey?: never;
-};
-
-type VerifyPublicKey = {
-  publicKey: string;
-  authToken?: never;
-};
-
-export type FootprintVerifyProps = (VerifyAuthToken | VerifyPublicKey) & {
-  appearance?: FootprintAppearance;
-  userData?: FootprintUserData;
-  options?: FootprintOptions;
-  l10n?: FootprintL10n;
-  onCancel?: () => void;
-  onComplete?: (validationToken: string) => void;
-  onError?: (error: string) => void;
-};
-
-export type Footprint = {
-  open: (options: FootprintVerifyProps) => Promise<void>;
-  close: () => Promise<void>;
-};
-
-export enum FootprintPublicEvent {
-  closed = 'closed',
-  completed = 'completed',
-  canceled = 'canceled',
-}
-
-export type FootprintUserData = Partial<{
-  'id.email': string;
-  'id.phone_number': string;
-  'id.first_name': string;
-  'id.last_name': string;
-  'id.dob': string;
-  'id.address_line1': string;
-  'id.address_line2': string;
-  'id.city': string;
-  'id.state': string;
-  'id.country': string; // 2 letter country code
-  'id.zip': string;
-  'id.ssn9': string;
-  'id.ssn4': string;
-  'id.nationality': string; // 2 letter country code;
-  'id.us_legal_status': string;
-  'id.citizenships': string[]; // array of 2 letter country codes
-  'id.visa_kind': string;
-  'id.visa_expiration_date': string;
-}>;
-
-export type FootprintSupportedLocale = 'en-US' | 'es-MX';
-export type FootprintSupportedLanguage = 'en' | 'es';
-export type FootprintL10n = {
-  locale?: FootprintSupportedLocale;
-  language?: FootprintSupportedLanguage;
-};
-
-export type FootprintOptions = {
-  showCompletionPage?: boolean;
-  showLogo?: boolean;
+  rules?: AppearanceRules;
+  variables?: AppearanceVariables;
 };

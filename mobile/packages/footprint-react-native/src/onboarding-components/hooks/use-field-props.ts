@@ -9,7 +9,6 @@ import { isEmail, isMobilePhone } from 'validator';
 
 import fieldContext from '../field-context';
 import { Context } from '../provider';
-import type { Di } from '../types/dis';
 import validateDob from '../utils/dob-validator';
 import isName from '../utils/name-validator';
 import { isSSN4, isSSN9 } from '../utils/ssn-validator';
@@ -23,7 +22,7 @@ type Field = TextInputProps & {
     };
     validate?: (value: string) => string | boolean;
   };
-  transformValue?: (value: string) => Di[keyof Di];
+  transformValue?: (value: string) => string | number;
 } & MaskInputProps;
 
 const useFieldProps = () => {

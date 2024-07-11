@@ -1,9 +1,10 @@
 import { useContext } from 'react';
 
+import { OnboardingStep } from '../../types';
 import { Context } from '../provider';
 import save from '../queries/save';
 import type { Di } from '../types/dis';
-import browser, { OnboardingStep } from '../utils/browser';
+import fp from '../utils/browser';
 import { formatBeforeSave } from '../utils/save-utils';
 
 const useFootprint = () => {
@@ -21,14 +22,20 @@ const useFootprint = () => {
       onCancel?: () => void;
     } = {},
   ) => {
-    browser.open({
+    const component = fp.init({
       appearance: context.appearance,
       publicKey: context.publicKey,
-      userData: {
+      bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,
       },
-      onAuthComplete: ({ authToken, vaultingToken }) => {
+      onAuthComplete: ({
+        authToken,
+        vaultingToken,
+      }: {
+        authToken: string;
+        vaultingToken: string;
+      }) => {
         setContext(prev => ({
           ...prev,
           authToken,
@@ -45,6 +52,7 @@ const useFootprint = () => {
       },
       step: OnboardingStep.Auth,
     });
+    component.render();
   };
 
   const vaultData = async (
@@ -100,7 +108,7 @@ const useFootprint = () => {
       onError?.(new Error('No authToken found. Please authenticate first'));
       return;
     }
-    browser.open({
+    const component = fp.init({
       appearance,
       authToken,
       onComplete: (validationToken: string) => {
@@ -114,6 +122,7 @@ const useFootprint = () => {
       },
       step: OnboardingStep.Onboard,
     });
+    component.render();
   };
 
   return {

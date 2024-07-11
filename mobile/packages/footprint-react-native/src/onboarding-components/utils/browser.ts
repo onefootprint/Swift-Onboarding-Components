@@ -2,8 +2,7 @@ import queryString from 'query-string';
 import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
-import type { FootprintVerifyProps } from '../../footprint.types';
-import type { SessionResult } from '../../types';
+import { type OnboardingProps, OnboardingStep } from '../../types';
 import createUrl from '../../utils/create-url';
 import { logError, logWarn } from '../../utils/logger';
 import sendSdkArgs from '../../utils/send-sdk-args';
@@ -15,25 +14,39 @@ const getDeepLink = () => {
   return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
 };
 
-export enum OnboardingStep {
-  Auth = 'auth',
-  Onboard = 'onboard',
-}
-
-type OnboardingProps = FootprintVerifyProps & {
-  step: OnboardingStep;
-  onAuthComplete?: (tokens: {
-    authToken: string;
-    vaultingToken: string;
-  }) => void;
-};
-
 const footprint = () => {
   let isOpen = false;
-  InAppBrowser.warmup(); // Async, can be called multiple times. Speeds up android implementation.
 
-  const open = async (props: OnboardingProps) => {
+  const handleError = (props: OnboardingProps, error: string) => {
+    closeWebView();
+    const errorMessage = logError(error);
+    props.onError?.(`${LOGGER_PREFIX}: ${errorMessage}`);
+  };
+
+  const handleCancel = (props: OnboardingProps) => {
+    closeWebView();
+    props.onCancel?.();
+  };
+
+  const handleComplete = (props: OnboardingProps, validationToken: string) => {
+    closeWebView();
+    props.onComplete?.(validationToken);
+  };
+
+  const handleAuthComplete = (
+    props: OnboardingProps,
+    { authToken, vaultingToken }: { authToken: string; vaultingToken: string },
+  ) => {
+    closeWebView();
+    props.onAuthComplete?.({
+      authToken,
+      vaultingToken,
+    });
+  };
+
+  const render = async (props: OnboardingProps) => {
     if (isOpen) {
+      logWarn('Footprint is already open.');
       return;
     }
     isOpen = true;
@@ -42,89 +55,45 @@ const footprint = () => {
       {
         publicKey: props.publicKey,
         authToken: props.authToken,
-        userData: props.userData,
+        bootstrapData: props.bootstrapData,
         options: props.options,
         l10n: props.l10n,
       },
       { isComponentSdk: true },
     );
     if (!token) {
-      handleBrowserSessionEnd(props, {
-        kind: 'error',
-        error: 'Unable to get SDK args token.',
-      });
+      handleError(props, 'Unable to get SDK args token.');
       return;
     }
-
     try {
-      const result = await startBrowserSession(props, token);
-      if (!result) {
-        handleBrowserSessionEnd(props, {
-          kind: 'error',
-          error: 'InAppBrowser is not available.',
-        });
-        return;
-      }
+      const result = await openWebView(props, token);
       if (result.type !== 'success') {
         // Triggered if user closes the web browser
-        handleBrowserSessionEnd(props, { kind: 'cancel' });
+        handleCancel(props);
       } else {
-        handleBrowserUrlChange(props, result.url);
+        handleWebViewUrlChange(props, result.url);
       }
     } catch (error) {
-      handleBrowserSessionEnd(props, { kind: 'error', error: `${error}` });
+      handleError(props, `${error}`);
     }
   };
 
-  const close = () => {
-    isOpen = false;
-    dismissBrowser();
+  const init = (props: OnboardingProps) => {
+    InAppBrowser.warmup();
+    return {
+      render: () => render(props),
+    };
   };
 
-  const dismissBrowser = () => {
-    try {
-      InAppBrowser.close();
-    } catch (error) {
-      /* noop */
-    }
+  const destroy = () => {
+    closeWebView();
   };
 
-  const handleBrowserSessionEnd = (
-    props: OnboardingProps,
-    result: SessionResult,
-  ) => {
-    isOpen = false;
-    dismissBrowser();
-
-    switch (result.kind) {
-      case 'auth_complete': {
-        props.onAuthComplete?.({
-          authToken: result.authToken,
-          vaultingToken: result.vaultingToken,
-        });
-        break;
-      }
-      case 'complete': {
-        props.onComplete?.(result.validationToken);
-        break;
-      }
-      case 'cancel': {
-        props.onCancel?.();
-        break;
-      }
-      case 'error': {
-        const errorMessage = logError(result.error);
-        props.onError?.(`${LOGGER_PREFIX}: ${errorMessage}`);
-        break;
-      }
-    }
-  };
-
-  const handleBrowserUrlChange = (props: OnboardingProps, url: string) => {
+  const handleWebViewUrlChange = (props: OnboardingProps, url: string) => {
     const { step } = props;
     if (!url) {
       logWarn(`${LOGGER_PREFIX}: Missing result URL.`);
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
+      handleCancel(props);
       return;
     }
 
@@ -132,7 +101,7 @@ const footprint = () => {
     const search = url.replace(deepLink, '');
     const urlParams = queryString.parse(search);
     if (urlParams.canceled) {
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
+      handleCancel(props);
       return;
     }
 
@@ -141,24 +110,17 @@ const footprint = () => {
       const vaultingToken = urlParams.components_vault_token;
       if (!authToken || typeof authToken !== 'string') {
         logError(`${LOGGER_PREFIX}: Missing auth token after auth step.`);
-        handleBrowserSessionEnd(props, {
-          kind: 'error',
-          error: 'User authetication failed - missing auth token',
-        });
+        handleError(props, 'User authetication failed - missing auth token');
         return;
       }
       if (!vaultingToken || typeof vaultingToken !== 'string') {
         logError(`${LOGGER_PREFIX}: Missing vaulting token after auth step.`);
-        handleBrowserSessionEnd(props, {
-          kind: 'error',
-          error: 'User authetication failed - missing vaulting token',
-        });
+        handleError(props, 'User authetication failed - missing auth token');
         return;
       }
-      handleBrowserSessionEnd(props, {
-        kind: 'auth_complete',
+      handleAuthComplete(props, {
         authToken,
-        vaultingToken,
+        vaultingToken: vaultingToken as string,
       });
       return;
     }
@@ -166,17 +128,13 @@ const footprint = () => {
     const validationToken = urlParams.validation_token;
     if (!validationToken || typeof validationToken !== 'string') {
       logWarn(`${LOGGER_PREFIX}: Missing validation token.`);
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
+      handleCancel(props);
       return;
     }
-
-    handleBrowserSessionEnd(props, { kind: 'complete', validationToken });
+    handleComplete(props, validationToken);
   };
 
-  const startBrowserSession = async (
-    props: FootprintVerifyProps,
-    token: string,
-  ) => {
+  const openWebView = async (props: OnboardingProps, token: string) => {
     const deepLink = getDeepLink();
     const url = createUrl({
       appearance: props.appearance,
@@ -187,18 +145,26 @@ const footprint = () => {
 
     const isAvailable = await InAppBrowser.isAvailable();
     if (!isAvailable) {
-      return undefined;
+      throw new Error('InAppBrowser is not available.');
     }
-
     const result = await InAppBrowser.openAuth(url, deepLink, {
       ephemeralWebSession: true, // To prevent sharing cookies & permission popup
     });
     return result;
   };
 
+  const closeWebView = () => {
+    isOpen = false;
+    try {
+      InAppBrowser.close();
+    } catch (_) {
+      // do nothing
+    }
+  };
+
   return {
-    open,
-    close,
+    init,
+    destroy,
   };
 };
 

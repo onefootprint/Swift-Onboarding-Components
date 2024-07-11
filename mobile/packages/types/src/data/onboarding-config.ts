@@ -1,4 +1,4 @@
-import { AuthMethodKind } from '../api';
+import type { AuthMethodKind } from '../api';
 import type { FootprintAppearance } from './appearance';
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';

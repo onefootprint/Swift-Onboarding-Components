@@ -25,7 +25,7 @@ const Input = ({ ...props }: InputProps) => {
         return (
           <MaskInput
             onBlur={onBlur}
-            onChangeText={val => {
+            onChangeText={(val: string) => {
               if (transformValue) {
                 onChange(transformValue(val));
                 return;
