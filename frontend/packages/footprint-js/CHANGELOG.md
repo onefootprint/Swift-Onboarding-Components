@@ -1,5 +1,12 @@
 # @onefootprint/footprint
 
+## 3.12.1
+
+### Patch Changes
+
+- e0efa2d3dc: Make business owners properties optional
+  Change ownership_stake from string to number
+
 ## 3.12.0
 
 ### Minor Changes
