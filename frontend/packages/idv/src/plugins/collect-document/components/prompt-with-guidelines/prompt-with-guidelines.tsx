@@ -27,7 +27,7 @@ const PromptWithGuidelines = ({
         {title}
       </Text>
       {description && (
-        <Text variant="body-2" color="secondary" textAlign="center">
+        <Text variant="body-2" color="secondary" textAlign="center" whiteSpace="pre-wrap">
           {description}
         </Text>
       )}
