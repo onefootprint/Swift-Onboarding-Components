@@ -40,7 +40,7 @@ export type Props =
 export type PropsBase = {
   readonly appearance?: Appearance;
   readonly containerId?: string;
-  readonly kind: ComponentKind;
+  readonly kind: `${ComponentKind}`;
   readonly l10n?: L10n;
   readonly onError?: (error: string) => void;
   readonly variant?: Variant;
@@ -64,7 +64,7 @@ type VerifyPropsBase<TAuth> = PropsBase & {
 } & TAuth;
 
 export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
-  readonly kind: ComponentKind.Verify;
+  readonly kind: `${ComponentKind.Verify}`;
   readonly variant?: VerifyVariant;
 };
 
@@ -76,7 +76,7 @@ export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
 /** Components SDK. Just a subset of Verify */
 export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey> & {
   readonly onRelayToComponents?: (authToken: string) => void;
-  readonly kind: ComponentKind.Components;
+  readonly kind: `${ComponentKind.Components}`;
   readonly variant?: VerifyVariant;
 };
 
@@ -84,7 +84,7 @@ export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey> & {
 export type VerifyButtonProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
   readonly containerId: string;
   readonly dialogVariant?: VerifyVariant;
-  readonly kind: ComponentKind.VerifyButton;
+  readonly kind: `${ComponentKind.VerifyButton}`;
   readonly label?: string;
   readonly onClick?: () => void;
   readonly variant: 'inline';
@@ -98,7 +98,7 @@ export type RenderProps = PropsBase & {
   readonly containerId: string;
   readonly defaultHidden?: boolean;
   readonly id: string; // a valid data identifier
-  readonly kind: ComponentKind.Render;
+  readonly kind: `${ComponentKind.Render}`;
   readonly label?: string; // defaults to a nice string chosen for that data identifier
   readonly showHiddenToggle?: boolean;
   readonly variant: 'inline';
@@ -120,7 +120,7 @@ export type FormProps = PropsBase & {
   readonly authToken: string;
   readonly containerId?: string; // required for inline variant
   readonly getRef?: (ref: FormRef) => void; // returns a ref on mount that the tenants can trigger form actions from
-  readonly kind: ComponentKind.Form;
+  readonly kind: `${ComponentKind.Form}`;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: () => void;
@@ -133,7 +133,7 @@ export type FormDataProps = Pick<FormProps, 'authToken' | 'options' | 'title' | 
 /** auth */
 type AuthPropsBase = PropsBase & {
   readonly bootstrapData?: Pick<BootstrapData, 'id.email' | 'id.phone_number'>;
-  readonly kind: ComponentKind.Auth;
+  readonly kind: `${ComponentKind.Auth}`;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
@@ -158,7 +158,7 @@ export type AuthDataProps = Pick<
 export type UpdateLoginMethodsProps = PropsBase & {
   readonly authToken?: string;
   readonly bootstrapData?: Pick<BootstrapData, 'id.email' | 'id.phone_number'>;
-  readonly kind: ComponentKind.UpdateLoginMethods;
+  readonly kind: `${ComponentKind.UpdateLoginMethods}`;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;

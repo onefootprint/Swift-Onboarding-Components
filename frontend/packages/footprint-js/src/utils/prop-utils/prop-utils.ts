@@ -45,7 +45,7 @@ const validateContainerIdForVariant = (variant: Variant, containerId?: string): 
   }
 };
 
-export const validateComponentVariant = (kind: ComponentKind, variant?: Variant): void | never => {
+export const validateComponentVariant = (kind: `${ComponentKind}`, variant?: Variant): void | never => {
   if (!variant) {
     return;
   }
@@ -59,7 +59,7 @@ export const validateComponentVariant = (kind: ComponentKind, variant?: Variant)
   }
 };
 
-export const getDefaultVariantForKind = (kind: ComponentKind): Variant | never => {
+export const getDefaultVariantForKind = (kind: `${ComponentKind}`): Variant | never => {
   const supportedVariants = VariantsByKind[kind] ?? [];
   if (!supportedVariants.length) {
     throw new Error(`Invalid kind: ${kind}`);
@@ -67,12 +67,12 @@ export const getDefaultVariantForKind = (kind: ComponentKind): Variant | never =
   return supportedVariants[0];
 };
 
-export const validateComponentKind = (kind: ComponentKind): void | never => {
+export const validateComponentKind = (kind: `${ComponentKind}`): void | never => {
   if (!kind) {
     throw new Error('Kind is required');
   }
   const validKinds = Object.values(ComponentKind);
-  const isValid = validKinds.includes(kind);
+  const isValid = validKinds.includes(kind as ComponentKind);
   if (!isValid) {
     throw new Error(`Invalid kind: ${kind}. Valid kinds are: ${validKinds.join(', ')}`);
   }
