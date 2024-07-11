@@ -96,7 +96,7 @@ const launchFootprint = () => {
       'business.zip': '02117',
       'business.country': 'US',
       'business.corporation_type': 'unknown',
-      'business.formation_date': 'YYYY-MM-DD',
+      'business.formation_date': '1999-12-25',
       'business.formation_state': "MA",
       'business.beneficial_owners': [
         {
@@ -105,7 +105,7 @@ const launchFootprint = () => {
           last_name: 'Doe',
           email: 'jane.doe@acme.com',
           phone_number: '+12025550179',
-          ownership_stake: '50',
+          ownership_stake: 50,
         },
       ],
       'business.kyced_beneficial_owners': [
@@ -115,7 +115,7 @@ const launchFootprint = () => {
           last_name: 'Doe',
           email: 'jane.doe@acme.com',
           phone_number: '+12025550179',
-          ownership_stake: '50',
+          ownership_stake: 50,
         },
       ],
     }
@@ -140,7 +140,7 @@ const launchFootprint = () => {
 | `business.zip`                      | Optional. Postal code for the business's street address                                                                                     |
 | `business.country`                  | Optional. Country for the business's street address                                                                                         |
 | `business.corporation_type`         | Optional. One of c_corporation, s_corporation, b_corporation, llc, llp, partnership, sole_proprietorship, non_profit, unknown, trust, agent |
-| `business.formation_date`           | Optional. Date of business formation. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+| `business.formation_date`           | Optional. Date of business formation. Must be in YYYY-MM-DD format. (e.g. 1999-12-25)                                                       |
 | `business.formation_state`          | Optional. US State of formation for the Business                                                                                            |
 | `business.beneficial_owners`        | Optional. Information about owners of the business. Available when not KYC-ing every businss owner                                          |
 | `business.kyced_beneficial_owners`  | Optional. Information about owners of the business. Available when KYC-ing every businss owner                                              |

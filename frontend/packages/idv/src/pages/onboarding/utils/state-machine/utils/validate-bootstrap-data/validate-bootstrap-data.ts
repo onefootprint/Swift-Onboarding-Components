@@ -1,20 +1,33 @@
 import { isAddressLine, isEmail, isName, isSSN9Flexible, isSsn4 } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
+import { BeneficialOwnerDataAttribute, CorporationType } from '@onefootprint/types';
 import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, IdDI, UsLegalStatus, VisaKind, isCountryCode } from '@onefootprint/types';
 import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
+import snakeCase from 'lodash/snakeCase';
 
 import type { DIMetadata, UserData } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
 import { getLogger } from '../../../../../../utils/logger';
+// TODO: Move fromUSDateToISO8601Format, strInputToUSDate to @onefootprint/core, it's being used in footprint-react too
 import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../../../utils/string';
 
 type UnvalidatedUserData = Partial<{ [K in IdDI]: DIMetadata<unknown> }>;
 type Predicate = (...args: string[]) => boolean;
 
 const { logWarn } = getLogger({ location: 'validate-bootstrap-data' });
+
+const isNumberBetween25to100 = (x: unknown): boolean =>
+  typeof x !== 'number' ? false : !Number.isNaN(x) && x >= 25 && x <= 100;
+
+const keysToSnakeCase = (inObj: Record<string, unknown>) => {
+  return Object.entries(inObj).reduce((outObj, [key, value]) => {
+    outObj[snakeCase(key)] = value;
+    return outObj;
+  }, Object.create(null));
+};
 
 const isNameValid = (str: string, allowEmpty?: boolean): boolean => {
   return !allowEmpty && !str?.trim()?.length ? false : isName(str);
@@ -92,6 +105,27 @@ const isCountryValid = (config: PublicOnboardingConfig, country: string): boolea
   return true;
 };
 
+const isCorporationTypeValid = (str: string): boolean =>
+  isStringValid(str) && Object.values(CorporationType).includes(str as CorporationType);
+
+export const isBeneficialOwnerValid = (obj: unknown) => {
+  if (!isObject(obj)) return false;
+
+  const propValidators: [BeneficialOwnerDataAttribute, (x: unknown) => boolean][] = [
+    [BeneficialOwnerDataAttribute.firstName, x => isStringValid(x) && isName(x)],
+    [BeneficialOwnerDataAttribute.middleName, x => isStringValid(x)],
+    [BeneficialOwnerDataAttribute.lastName, x => isStringValid(x) && isName(x)],
+    [BeneficialOwnerDataAttribute.ownershipStake, x => isNumberBetween25to100(x)],
+    [BeneficialOwnerDataAttribute.email, x => isStringValid(x) && isEmail(x)],
+    [BeneficialOwnerDataAttribute.phoneNumber, x => isStringValid(x) && isPhoneValid(x)],
+  ];
+
+  return !propValidators.some(([prop, predicateFn]) => {
+    const value = obj[prop];
+    return value != null && !predicateFn(value);
+  });
+};
+
 const validateBootstrapData = (
   bootstrapData: UnvalidatedUserData,
   config: PublicOnboardingConfig,
@@ -123,14 +157,22 @@ const validateBootstrapData = (
     [IdDI.zip]: isStringValid,
     [BusinessDI.addressLine1]: isAddressLine,
     [BusinessDI.addressLine2]: isStringValid,
-    [BusinessDI.beneficialOwners]: () => true, // TODO: Add real validators for this field
+    [BusinessDI.beneficialOwners]: (boList: unknown) => {
+      if (!Array.isArray(boList)) return false;
+      const invalidFound = boList.map(keysToSnakeCase).some(bo => !isBeneficialOwnerValid(bo));
+      return !invalidFound;
+    },
     [BusinessDI.city]: isStringValid,
-    [BusinessDI.corporationType]: () => true, // TODO: Add real validators for this field
+    [BusinessDI.corporationType]: isCorporationTypeValid,
     [BusinessDI.country]: (s: string) => isCountryValid(config, s),
-    [BusinessDI.doingBusinessAs]: () => true, // TODO: Add real validators for this field
+    [BusinessDI.doingBusinessAs]: isStringValid,
     [BusinessDI.formationDate]: () => true, // TODO: Add real validators for this field
-    [BusinessDI.formationState]: () => true, // TODO: Add real validators for this field
-    [BusinessDI.kycedBeneficialOwners]: () => true, // TODO: Add real validators for this field
+    [BusinessDI.formationState]: (state: string, country?: string) => isStateValid(state, country),
+    [BusinessDI.kycedBeneficialOwners]: (boList: unknown) => {
+      if (!Array.isArray(boList)) return false;
+      const invalidFound = boList.map(keysToSnakeCase).some(bo => !isBeneficialOwnerValid(bo));
+      return !invalidFound;
+    },
     [BusinessDI.name]: isStringValid,
     [BusinessDI.phoneNumber]: isPhoneValid,
     [BusinessDI.state]: (state: string, country?: string) => isStateValid(state, country),

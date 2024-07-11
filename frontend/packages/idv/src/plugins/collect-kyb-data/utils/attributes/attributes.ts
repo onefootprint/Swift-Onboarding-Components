@@ -4,7 +4,7 @@ import type { MachineContext } from '../state-machine/types';
 
 const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
   return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
-    if (typeof value === 'string') {
+    if (typeof value === 'string' || typeof value === 'number') {
       if (key === 'firstName') output.first_name = value;
       if (key === 'middleName') output.middle_name = value;
       if (key === 'lastName') output.last_name = value;

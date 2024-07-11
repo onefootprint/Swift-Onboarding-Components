@@ -4,7 +4,7 @@ import React from 'react';
 import CollectKycData from '../../../collect-kyc-data';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
-const userDatum = (value?: string) => (value ? { value, isBootstrap: false } : undefined);
+const toDImetadata = (value?: string) => (value ? { value, isBootstrap: false } : undefined);
 
 const BeneficialOwnerKyc = () => {
   const [state, send] = useCollectKybDataMachine();
@@ -31,9 +31,9 @@ const BeneficialOwnerKyc = () => {
   const kycUserData = { ...bootstrapUserData };
 
   if (primaryBeneficialOwner) {
-    kycUserData[IdDI.firstName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
-    kycUserData[IdDI.middleName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
-    kycUserData[IdDI.lastName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
+    kycUserData[IdDI.firstName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
+    kycUserData[IdDI.middleName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
+    kycUserData[IdDI.lastName] = toDImetadata(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
   }
 
   return (
