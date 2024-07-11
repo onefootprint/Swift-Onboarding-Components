@@ -358,12 +358,12 @@
       }
     },
     "business": {
-      "name": "Name",
+      "name": "Business name",
       "dba": "Doing Business As",
       "corporation_type": "Legal entity type",
       "website": "Website",
       "phone_number": "Phone number",
-      "tin": "Taxpayer Identification Number (TIN)",
+      "tin": "TIN (EIN)",
       "beneficial_owners": "Beneficial owner",
       "kyced_beneficial_owners": "Beneficial owner",
       "address_line1": "Address line 1",
@@ -1714,6 +1714,42 @@
             },
             "no-rules": "None"
           }
+        }
+      },
+      "business-insights": {
+        "title": "Business insights",
+        "tags": {
+          "verified": "Verified",
+          "not-verified": "Not verified",
+          "submitted": "Submitted",
+          "not-submitted": "Not submitted"
+        },
+        "name": {
+          "title": "Business name",
+          "table": {
+            "aria-label": "Business names",
+            "empty-state": "No names",
+            "header": {
+              "name": "Name",
+              "type": "Type",
+              "notes": "Notes"
+            },
+            "source": "Source: {{sources}}",
+            "legal": "Legal",
+            "dba": "Doing business as"
+          }
+        },
+        "details": {
+          "title": "Other business details"
+        },
+        "people": {
+          "title": "People"
+        },
+        "secretary-of-state": {
+          "title": "Secretary of State filings"
+        },
+        "watchlist": {
+          "title": "Watchlist"
         }
       },
       "risk-signals": {

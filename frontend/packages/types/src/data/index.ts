@@ -180,6 +180,8 @@ export type {
 export { default as ReviewStatus } from './review-status';
 export type { RiskSignal } from './risk-signal';
 export { RiskSignalSeverity } from './risk-signal';
+export { BusinessNameKind } from './business-name';
+export type { BusinessName } from './business-name';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export type {
   BasicRoleScope,
