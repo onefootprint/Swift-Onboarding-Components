@@ -48,6 +48,7 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
+    tracing::info!(fixture_result_provided=?fixture_result.is_some(), "Fixture result provided in process");
 
     // Verify there are no unmet requirements
     let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
