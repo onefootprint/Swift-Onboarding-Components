@@ -171,17 +171,21 @@ const createGovDocsPayload = (formData: DataToCollectFormData) => {
 
 const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
   const documentsToCollect: DocumentRequestConfig[] = [];
-  const { poa, possn, custom } = formData.personal.additionalDocs;
+  const { poa, possn, custom, requireManualReview } = formData.personal.additionalDocs;
   if (poa) {
     documentsToCollect.push({
       kind: DocumentRequestKind.ProofOfAddress,
-      data: {},
+      data: {
+        requiresHumanReview: !!requireManualReview,
+      },
     });
   }
   if (possn) {
     documentsToCollect.push({
       kind: DocumentRequestKind.ProofOfSsn,
-      data: {},
+      data: {
+        requiresHumanReview: !!requireManualReview,
+      },
     });
   }
   if (custom) {
@@ -192,6 +196,7 @@ const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
           description: doc.description,
           identifier: `document.custom.${doc.identifier}` as CustomDI,
           name: doc.name,
+          requiresHumanReview: !!requireManualReview,
         },
       });
     });

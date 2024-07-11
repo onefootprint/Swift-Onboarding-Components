@@ -171,6 +171,7 @@ export type CustomDoc = {
 };
 
 export type AdditionalDocs = {
+  requireManualReview?: boolean;
   poa?: boolean;
   possn?: boolean;
   custom?: CustomDoc[];

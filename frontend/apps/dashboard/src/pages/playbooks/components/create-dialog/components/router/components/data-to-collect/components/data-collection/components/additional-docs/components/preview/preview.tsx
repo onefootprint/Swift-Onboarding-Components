@@ -11,6 +11,7 @@ const Preview = () => {
   });
   const {
     custom,
+    requireManualReview,
     meta: { hasDoc, hasPoA, hasPoSsn, hasCustom },
   } = useAdditionalDocs();
 
@@ -36,6 +37,12 @@ const Preview = () => {
           <Text variant="body-3" color="tertiary">
             {custom.map(doc => doc.name).join(', ')}
           </Text>
+        </Stack>
+      ) : null}
+      {hasDoc ? (
+        <Stack justifyContent="space-between">
+          <Text variant="label-3">{t('form.require-manual-review.label')}</Text>
+          {requireManualReview ? <IcoCheck24 /> : <IcoClose24 />}
         </Stack>
       ) : null}
     </Stack>

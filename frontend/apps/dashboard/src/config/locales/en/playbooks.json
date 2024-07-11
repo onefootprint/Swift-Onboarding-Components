@@ -250,6 +250,10 @@
         "title": "Additional documents",
         "description": "Additional proofs that may help you analyze the user",
         "form": {
+          "require-manual-review": {
+            "label": "Require manual review",
+            "description": "After the user uploads any of these documents, they will be flagged for manual review."
+          },
           "poa": {
             "label": "Proof of address",
             "hint": "Official documents displaying the user's name and address."
@@ -265,7 +269,7 @@
       },
       "custom-docs": {
         "title": "Custom",
-        "description": "Specify extra documents required to meet specific onboarding criteria",
+        "description": "Specify extra documents required to meet specific onboarding criteria.",
         "form": {
           "name": {
             "label": "Document label",

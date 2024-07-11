@@ -68,12 +68,12 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
         } else if (kind === RequestMoreInfoKind.ProofOfSsn) {
           configs.push({
             kind: DocumentRequestKind.ProofOfSsn,
-            data: {},
+            data: { requiresHumanReview: true },
           });
         } else if (kind === RequestMoreInfoKind.ProofOfAddress) {
           configs.push({
             kind: DocumentRequestKind.ProofOfAddress,
-            data: {},
+            data: { requiresHumanReview: true },
           });
         } else if (kind === RequestMoreInfoKind.CustomDocument && customDocument) {
           customDocument.forEach(doc => {
@@ -83,6 +83,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
                 name: doc.customDocumentName,
                 identifier: doc.customDocumentIdentifier,
                 description: doc.customDocumentDescription,
+                requiresHumanReview: true,
               },
             });
           });

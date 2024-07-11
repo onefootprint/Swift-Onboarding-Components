@@ -9,11 +9,15 @@ export type DocumentRequestConfig =
     }
   | {
       kind: DocumentRequestKind.ProofOfSsn;
-      data: {};
+      data: {
+        requiresHumanReview: boolean;
+      };
     }
   | {
       kind: DocumentRequestKind.ProofOfAddress;
-      data: {};
+      data: {
+        requiresHumanReview: boolean;
+      };
     }
   | {
       kind: DocumentRequestKind.Custom;
@@ -21,6 +25,7 @@ export type DocumentRequestConfig =
         name: string;
         identifier: DataIdentifier;
         description?: string;
+        requiresHumanReview: boolean;
       };
     };
 

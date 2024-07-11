@@ -583,7 +583,7 @@ describe('processPlaybook', () => {
             verificationChecks: {},
           });
 
-          expect(documentsToCollect).toEqual([{ data: {}, kind: 'proof_of_address' }]);
+          expect(documentsToCollect).toEqual([{ data: { requiresHumanReview: false }, kind: 'proof_of_address' }]);
         });
       });
 
@@ -597,6 +597,7 @@ describe('processPlaybook', () => {
                 additionalDocs: {
                   poa: false,
                   possn: true,
+                  requireManualReview: true,
                 },
               },
             },
@@ -605,7 +606,7 @@ describe('processPlaybook', () => {
             verificationChecks: {},
           });
 
-          expect(documentsToCollect).toEqual([{ data: {}, kind: 'proof_of_ssn' }]);
+          expect(documentsToCollect).toEqual([{ data: { requiresHumanReview: true }, kind: 'proof_of_ssn' }]);
         });
       });
 
@@ -638,6 +639,7 @@ describe('processPlaybook', () => {
                 description: 'test description',
                 identifier: 'document.custom.proof_of_county',
                 name: 'Proof of County',
+                requiresHumanReview: false,
               },
               kind: 'custom',
             },

@@ -6,6 +6,7 @@ const useAdditionalDocs = () => {
   const poa = watch('personal.additionalDocs.poa') || false;
   const possn = watch('personal.additionalDocs.possn') || false;
   const custom = watch('personal.additionalDocs.custom') || [];
+  const requireManualReview = watch('personal.additionalDocs.requireManualReview') || false;
 
   const hasPoA = !!poa;
   const hasPoSsn = !!possn;
@@ -16,6 +17,7 @@ const useAdditionalDocs = () => {
     poa,
     possn,
     custom,
+    requireManualReview,
     meta: {
       hasPoA,
       hasPoSsn,

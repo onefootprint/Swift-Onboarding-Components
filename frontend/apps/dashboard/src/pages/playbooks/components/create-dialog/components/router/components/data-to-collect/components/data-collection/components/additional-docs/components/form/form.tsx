@@ -4,6 +4,7 @@ import { Button, Checkbox, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import AnimatedContainer from 'src/components/animated-container';
 import useAdditionalDocs from '../../hooks/use-additional-docs';
 import CustomDocs from './components/custom-docs';
 
@@ -23,6 +24,7 @@ const Form = ({ onClose }: FormProps) => {
       poa: watch('personal.additionalDocs.poa'),
       possn: watch('personal.additionalDocs.possn'),
       custom: watch('personal.additionalDocs.custom'),
+      requireManualReview: watch('personal.additionalDocs.requireManualReview'),
     };
   });
   const {
@@ -39,6 +41,7 @@ const Form = ({ onClose }: FormProps) => {
     setValue('personal.additionalDocs.poa', originalValue.poa);
     setValue('personal.additionalDocs.possn', originalValue.possn);
     setValue('personal.additionalDocs.custom', originalValue.custom);
+    setValue('personal.additionalDocs.requireManualReview', originalValue.requireManualReview);
     onClose();
   };
 
@@ -46,6 +49,7 @@ const Form = ({ onClose }: FormProps) => {
     setValue('personal.additionalDocs.poa', false);
     setValue('personal.additionalDocs.possn', false);
     setValue('personal.additionalDocs.custom', []);
+    setValue('personal.additionalDocs.requireManualReview', false);
     onClose();
   };
 
@@ -60,6 +64,16 @@ const Form = ({ onClose }: FormProps) => {
         />
         <Divider variant="secondary" />
         <CustomDocs />
+        <AnimatedContainer isExpanded={hasDoc}>
+          <Stack gap={4} direction="column">
+            <Divider variant="secondary" />
+            <Checkbox
+              label={t('form.require-manual-review.label')}
+              hint={t('form.require-manual-review.description')}
+              {...register('personal.additionalDocs.requireManualReview')}
+            />
+          </Stack>
+        </AnimatedContainer>
       </Stack>
       <Stack gap={4} direction="column">
         <Button variant="primary" fullWidth onClick={onClose}>
