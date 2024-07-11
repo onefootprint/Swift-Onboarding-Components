@@ -88,6 +88,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
             if third_party_auth {
                 // Trust that the tenant has authenticated this user already. Only certain tenants
@@ -145,7 +146,6 @@ pub async fn post(
                     .into_iter()
                     .filter_map(|di| portable_vw.get_lifetime(&di))
                     .any(|dl| dl.scoped_vault_id != su.id);
-                let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
                 let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
 
                 if can_auto_authorize {
@@ -167,6 +167,7 @@ pub async fn post(
             let scopes = allowed_user_scopes(kinds, RequestedTokenScope::Onboarding, false);
 
             let args = CreateTokenArgs {
+                vw: &vw,
                 su,
                 kind,
                 key,

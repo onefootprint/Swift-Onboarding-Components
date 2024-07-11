@@ -57,6 +57,7 @@ pub async fn post(
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su.id)?;
 
             let args = CreateTokenArgs {
+                vw: &vw,
                 su,
                 fp_bid: None,
                 kind,

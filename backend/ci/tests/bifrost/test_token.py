@@ -207,6 +207,22 @@ def test_api_vault(sandbox_tenant, ob_config):
     assert user.fp_id == fp_id
 
 
+def test_api_vault_no_token(sandbox_tenant, ob_config):
+    """
+    Test creating a token for a user created via API that has no contact info.
+    """
+    initial_data = {"id.first_name": "Blah"}
+    body = post("users", initial_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(kind="onboard", key=ob_config.key.value)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+        body["message"]
+        == "Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email"
+    )
+
+
 def test_3p_auth(sandbox_tenant, ob_config):
     """
     Test creating a token for a user created via API with third party auth, where the tenant

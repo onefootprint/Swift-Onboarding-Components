@@ -1,4 +1,6 @@
 use super::session::AuthSession;
+use super::vault_wrapper::Any;
+use super::vault_wrapper::TenantVw;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::session::user::NewUserSessionArgs;
 use crate::auth::session::user::NewUserSessionContext;
@@ -19,13 +21,16 @@ use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use db::TxnPgConn;
 use newtypes::AuthMethodKind;
+use newtypes::DataIdentifier as DI;
 use newtypes::FpId;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKey;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultKind;
 
-pub struct CreateTokenArgs {
+pub struct CreateTokenArgs<'a> {
+    pub vw: &'a TenantVw<Any>,
     pub su: ScopedVault,
     pub fp_bid: Option<FpId>,
     pub kind: TokenOperationKind,
@@ -49,6 +54,7 @@ pub fn create_token(
     duration: Duration,
 ) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
+        vw,
         su,
         fp_bid,
         kind,
@@ -59,8 +65,15 @@ pub fn create_token(
     } = args;
 
     if su.kind != VaultKind::Person {
-        return Err(ValidationError("Cannot create a token for a non-person vault").into());
+        return ValidationError("Cannot create a token for a non-person vault").into();
     }
+    let vw_dis = vw.populated_dis();
+    if !vw_dis.contains(&DI::Id(IDK::PhoneNumber)) && !vw_dis.contains(&DI::Id(IDK::Email)) {
+        // TODO remove this log
+        tracing::error!("FYI: tenant trying to create token for user with no contact info");
+        return ValidationError("Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email").into();
+    }
+
     let sb = if let Some(fp_bid) = fp_bid {
         let id = ScopedVaultIdentifier::OwnedFpBid {
             fp_bid: &fp_bid,
