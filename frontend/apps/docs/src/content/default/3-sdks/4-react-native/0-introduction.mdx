@@ -1,0 +1,67 @@
+---
+page: default
+slug: /sdks/react-native-introduction
+category: SDKs
+subcategory: React Native
+title: Introduction
+meta:
+  {
+    title: 'Footprint React Native Integration',
+    description: 'Discover how to integrate Footprint with a React Native Codebase',
+  }
+---
+
+## Before starting
+
+React Native is a popular framework for building mobile applications using JavaScript and leveraging the power of native platforms. One of the strengths of React Native is the ability to write code once and run it on both iOS and Android, without sacrificing the user experience.
+
+If your application is built with Expo, please refer to our [Expo SDK](https://docs.onefootprint.com/sdk/expo)
+
+## Available Components
+
+| Dependency            | Minimum Version |
+| --------------------- | --------------- |
+| Onboarding (Hosted)   | Available       |
+| Onboarding Components | Available       |
+| Auth (Hosted)         | Not available   |
+| Auth (Components)     | Not available   |
+| Secure form           | Not available   |
+
+## React support
+
+Before proceeding with the installation, make sure your environment meets the minimum version requirements:
+
+| Dependency   | Minimum Version |
+| ------------ | --------------- |
+| React        | 18.0.0          |
+| React Native | 0.70.0          |
+
+## Installation
+
+To begin, install `@onefootprint/footprint-react-native`:
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-react-native
+
+# With yarn
+yarn add @onefootprint/footprint-react-native
+```
+
+Since `@onefootprint/footprint-react-native` relies on `react-native-inappbrowser-reborn`, you need to install it separately due to current limitations of React Native's autolinking:
+
+```bash
+# With NPM
+npm install react-native-inappbrowser-reborn
+
+# With yarn
+yarn add react-native-inappbrowser-reborn
+```
+
+After the installation, you need to link the InAppBrowser dependency. For iOS, make sure to run:
+
+```bash
+cd ios && pod install && cd ..
+```
+
+Each component has specific integration steps and options, which will be detailed in the following sections of the documentation.

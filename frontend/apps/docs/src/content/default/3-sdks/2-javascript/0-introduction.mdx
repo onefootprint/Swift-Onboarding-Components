@@ -13,6 +13,18 @@ meta:
 
 Our `footprint-js` library lets you integrate your application with Footprint. It can be used together with any framework or library, such as Angular, React, Vue, or simply plain Javascript. Under the hood, it launch iframes from your website, and exchange secure messages between Footprint and your application.
 
+## Available Components
+
+Our SDKs support a variety of component kinds.
+
+| Dependency            | Minimum Version |
+| --------------------- | --------------- |
+| Onboarding (Hosted)   | Available       |
+| Onboarding Components | Not available   |
+| Auth (Hosted)         | Available       |
+| Auth (Components)     | Not available   |
+| Secure form           | Available       |
+
 ## Browser support
 
 Footprint libraries supports all recent versions of major browsers. For the sake of security and providing the best experience to the majority of customers, we do not support less popular browsers that no longer receive security updates.
@@ -28,16 +40,6 @@ Footprint libraries supports all recent versions of major browsers. For the sake
 | Android default browser | Last 3 major versions |
 
 Footprint products depend on certain native browser functionality. Polyfilling certain browser features (e.g Promises API) may prevent footprint.js from working normally. If footprint.js isn't functioning as expected, try removing polyfills to determine if they might be causing the issue.
-
-## Available Components
-
-Our SDKs support a variety of component kinds.
-
-| Component | Description                                                                                                       |
-| --------- | ----------------------------------------------------------------------------------------------------------------- |
-| `verify`  | Our onboarding flow that launches in a modal or drawer.                                                           |
-| `form`    | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
-| `auth`    | Our authentication flow that launches in a modal or drawer.                                                       |
 
 ## Installation
 
@@ -59,5 +61,7 @@ In your implementation, you will need to import both of the following files:
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 ```
+
+## Usage
 
 Each component has specific integration steps and options, which will be detailed in the following sections of the documentation.
