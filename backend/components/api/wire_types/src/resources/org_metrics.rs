@@ -11,14 +11,6 @@ use serde::Serialize;
 pub struct OrgMetricsResponse {
     pub user: OrgMetrics,
     pub business: OrgMetrics,
-    // TODO deprecate these
-    /// All vaults created, whether or not they've been through KYC
-    pub new_user_vaults: i64,
-    /// All onboardings created
-    pub total_user_onboardings: i64,
-    pub successful_user_onboardings: i64,
-    pub failed_user_onboardings: i64,
-    pub incomplete_user_onboardings: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Response)]

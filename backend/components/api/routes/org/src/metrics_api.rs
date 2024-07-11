@@ -87,16 +87,7 @@ async fn get(
         })
         .await?;
 
-    let result = api_wire_types::OrgMetricsResponse {
-        // TODO rm
-        new_user_vaults: user.new_vaults,
-        total_user_onboardings: user.total_onboardings,
-        successful_user_onboardings: user.pass_onboardings,
-        failed_user_onboardings: user.fail_onboardings,
-        incomplete_user_onboardings: user.incomplete_onboardings,
-        user,
-        business,
-    };
+    let result = api_wire_types::OrgMetricsResponse { user, business };
 
     Ok(result)
 }
