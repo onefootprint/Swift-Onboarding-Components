@@ -32,6 +32,8 @@ pub enum DbError {
     DbInteract(#[from] deadpool_diesel::InteractError),
     #[error("Database error: {0}")]
     DbError(diesel::result::Error),
+    #[error("The DB connection has been closed")]
+    ConnectionClosed,
     #[error("Data not found")]
     DataNotFound,
     #[error("Operation not allowed: foreign key constraint violation")]
@@ -128,6 +130,7 @@ impl From<diesel::result::Error> for DbError {
     fn from(value: diesel::result::Error) -> Self {
         match value {
             diesel::result::Error::NotFound => Self::DataNotFound,
+            DieselDbError(DatabaseErrorKind::ClosedConnection, _) => Self::ConnectionClosed,
             DieselDbError(DatabaseErrorKind::ForeignKeyViolation, _) => Self::ForeignKeyViolation,
             DieselDbError(DatabaseErrorKind::CheckViolation, _) => Self::CheckConstraintViolation,
             DieselDbError(DatabaseErrorKind::UniqueViolation, _) => Self::UniqueConstraintViolation,
@@ -146,6 +149,7 @@ impl FpErrorTrait for DbError {
             Self::MigrationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ConnectionClosed => StatusCode::INTERNAL_SERVER_ERROR,
             Self::DataNotFound => StatusCode::NOT_FOUND,
             Self::ForeignKeyViolation => StatusCode::BAD_REQUEST,
             Self::CheckConstraintViolation => StatusCode::BAD_REQUEST,
