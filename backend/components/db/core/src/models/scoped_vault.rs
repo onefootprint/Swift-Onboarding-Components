@@ -600,6 +600,14 @@ impl ScopedVault {
         Ok(results)
     }
 
+    #[tracing::instrument("ScopedVault::list", skip_all)]
+    pub fn list(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<Self>> {
+        let results = scoped_vault::table
+            .filter(scoped_vault::vault_id.eq(v_id))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     /// Count the number of scoped vaults that are billable for PII storage
     #[tracing::instrument("ScopedVault::count_billable", skip_all)]
     pub fn count_billable(

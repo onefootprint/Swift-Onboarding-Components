@@ -109,45 +109,29 @@ pub async fn post(
                 AuthEvent::save(args, conn)?;
             }
 
-            let can_use_implied_auth = if tenant.can_access_preview(&PreviewApi::ImplicitAuth) {
-                // As customers start to use us for auth, there will be situations in which:
-                // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
-                // - The user then signs up for a credit card with Grid, which requires KYC through the
-                //   Footprint verify component. When this happens, we want to avoid the user needing to
-                //   re-log in inside the Footprint verify component with an SMS OTP since they just did that
-                //   a few minutes ago.
-                // We could achieve this behavior by having the tenant physically pass us some
-                // proof that the user already logged into Grid.
-                // But for a better ergonomic experience, we inherit "implied" auth events -
-                // if Grid generates a token to launch the user into the Footprint verify component,
-                // we already have server-side state that says that the user already authenticated
-                // with Grid in the last hour, so there's no need for physical token exchange.
+            // As customers start to use us for auth, there will be situations in which:
+            // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
+            // - The user then signs up for a credit card with Grid, which requires KYC through the Footprint
+            //   verify component. When this happens, we want to avoid the user needing to re-log in inside
+            //   the Footprint verify component with an SMS OTP since they just did that a few minutes ago.
+            // We could achieve this behavior by having the our SDK physically pass us some
+            // proof that the user already logged into Grid.
+            // But for a better ergonomic experience, we inherit "implied" auth events -
+            // if Grid generates a token to launch the user into the Footprint verify component,
+            // we already have server-side state that says that the user already authenticated
+            // with Grid in the last hour, so there's no need for physical token exchange.
 
-                // Don't allow inheriting auth if the user token has more permissions than the tenant.
-                // This notably makes the experience worse for users who are one-clicking onto a tenant
-                // who uses us for both auth and verify.
-                // The problem is user-specific tokens in one-click scenarios have more permissions
-                // than the tenant (since we're prefilling info that was added by other tenants).
-                // Tenant who use us for auth AND verify get to see a user-specific token - so we have
-                // to disallow them from using that token to see information they don't have permission
-                // to see.
-                // In the future, we will try to improve that experience by having the auth component
-                // leave a token inside domain-scoped local storage in the browser. The tenant will
-                // never see this intermediate token. The verify component can pick this up as proof
-                // that the user authed directly with Footprint, and this will be used to step up the
-                // token to have permissions to see one-click prefill data.
-                let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-                // This is an approximation of portable_vw.get_data_to_prefill - we can't use that
-                // since we don't know the playbook the user is onboarding onto.
-                // This is might be overly restrictive now - we won't allow inheriting auth if there is
-                // any portable data added by another tenant.
-                let has_prefill_data = portable_vw
-                    .populated_dis()
-                    .into_iter()
-                    .filter_map(|di| portable_vw.get_lifetime(&di))
-                    .any(|dl| dl.scoped_vault_id != su.id);
-                // Can use implicit auth for this user if the workflow could be auto-authorized
-                vw.can_auto_authorize(has_prefill_data)
+            // There is some risk that an implied auth token could end up registering other auth
+            // credentials for a user. So for now, we will limit implied auth to _only_ work for users
+            // who only have an account at this tenant.
+            // Maybe we can open this up when we have a better distinction around (1) vaulting PII and (2)
+            // creating a login method.
+            let can_use_implied_auth = if tenant.can_access_preview(&PreviewApi::ImplicitAuth) {
+                let only_sv = ScopedVault::list(conn, &su.vault_id)?
+                    .iter()
+                    .all(|sv| sv.tenant_id == tenant.id);
+                let can_decrypt_all_dis = vw.populated_dis().into_iter().all(|di| vw.tenant_can_decrypt(di));
+                only_sv && can_decrypt_all_dis
             } else {
                 false
             };
