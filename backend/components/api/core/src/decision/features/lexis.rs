@@ -164,13 +164,28 @@ fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) 
     vec![first_name_frc, last_name_frc, overall_name_frc]
 }
 
+// LexisNAS - The InstantID NAS summary is an index from 0 through 12 that indicates the level of
+// the match of the submitted name, address, and SSN.
+// Risk Indicator code 30 - Input address may have been miskeyed
+// - e.g Considered miskeyed if it has a match score of 80% or better. (460 Whisper Lake matches to
+//   4660 Whisper Lake Dr **Apt 4**). Unsure if we can configure this 80%.
 fn address_match_code(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> FRC {
+    // check if Lexis is saying this might be a close/miskey match (e.g. it matched >= 80%)
     let address_was_partial_match = risk_indicator_codes.contains(&newtypes::RiskIndicatorCode::R30);
+    // Note: We can control whether the NAS only return match if exact match (via `RequireExactMatch` in
+    // the flex ID request). We do not currently require exact matches.
+    //
+    // So we interpret:
+    //  - NAS Address matched (it may be non-exact per the flexid request setting)
+    //  - was it miskeyed (it was a partial match via the Risk indicator)
+    // in order to determine if it's an exact match
     match (nas.address_match, address_was_partial_match) {
         (true, true) => FRC::AddressPartiallyMatches,
         (true, false) => FRC::AddressMatches,
         (false, true) => {
-            tracing::error!("Unexpected Lexis response address match combination: address_match = false, address_was_partial_match = true");
+            // it's unclear if there's 2 thresholds here for computing the NAS and the risk indicator, so we
+            // just log
+            tracing::info!("Unexpected Lexis response address match combination: address_match = false, address_was_partial_match = true");
             FRC::AddressDoesNotMatch
         }
         (false, false) => FRC::AddressDoesNotMatch,
