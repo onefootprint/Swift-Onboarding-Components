@@ -212,7 +212,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
                 actions: ['assignAuthToken'],
               },
             ],
-            identifyResult: LOGIN_CHALLENGE_TRANSITIONS,
+            identifyResult: [...LOGIN_CHALLENGE_TRANSITIONS, { target: 'loginChallengeNotPossible' }],
           },
         },
         emailIdentification: {
@@ -333,12 +333,9 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             },
           },
         },
-        authTokenInvalid: {
-          type: 'final',
-        },
-        success: {
-          type: 'final',
-        },
+        loginChallengeNotPossible: { type: 'final' },
+        authTokenInvalid: { type: 'final' },
+        success: { type: 'final' },
       },
     },
     {

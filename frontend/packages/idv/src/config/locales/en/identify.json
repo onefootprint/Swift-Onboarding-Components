@@ -32,6 +32,8 @@
   "use-camera-or-qr-reader": "Use your camera app or QR code reader on your mobile device and we`ll continue from there.",
   "verified": "Verified",
   "notification": {
+    "404-auth-method-description": "An email or phone number is needed to verify your account and continue onboarding.",
+    "404-auth-method-title": "Contact information required",
     "404-token-description": "Please verify the provided token and try again.",
     "404-token-title": "Token not found",
     "404-user-description": "The user was not found or the provided token has expired. Please contact the business that sent you this link.",

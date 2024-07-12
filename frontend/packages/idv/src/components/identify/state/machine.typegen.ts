@@ -35,6 +35,7 @@ export interface Typegen0 {
     | 'init'
     | 'initAuthToken'
     | 'initBootstrap'
+    | 'loginChallengeNotPossible'
     | 'phoneIdentification'
     | 'phoneKbaChallenge'
     | 'smsChallenge'

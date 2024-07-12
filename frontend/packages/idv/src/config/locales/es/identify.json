@@ -32,6 +32,8 @@
   "use-camera-or-qr-reader": "Utiliza la cámara o lector de códigos QR en tu móvil y continúa desde allí.",
   "verified": "Verificado",
   "notification": {
+    "404-auth-method-description": "Se requiere una dirección de correo electrónico o un número de teléfono para continuar.",
+    "404-auth-method-title": "Información de contacto requerida",
     "404-token-description": "Verifica el token proporcionado e inténtalo de nuevo.",
     "404-token-title": "Token no encontrado",
     "404-user-description": "No hemos encontrado un usuario con estos datos, o el token proporcionado ha expirado. Por favor, contacta a quienes te enviaron este enlace e inténtalo de nuevo.",
