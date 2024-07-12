@@ -67,6 +67,7 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                 }
                 BDK::Tin => UserAuthScope::SensitiveProfile.is_met(token_scopes),
             },
+            DataIdentifier::InvestorProfile(_) => true,
             // We don't allow decrypting business data with a user auth token right now - we
             // theoretically could, but we just don't support portable businesses yet
             _ => false,
