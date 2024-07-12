@@ -78,7 +78,7 @@ pub async fn post(
             let result = BusinessOwner::create(conn, sb, owner_su.vault_id, ownership_stake);
             match result {
                 Ok(_) => (),
-                Err(DbError::UniqueConstraintViolation) => {
+                Err(DbError::UniqueConstraintViolation(_)) => {
                     return ValidationError("The provided user is already an owner of the provided business")
                         .into()
                 }

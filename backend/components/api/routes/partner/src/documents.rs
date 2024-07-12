@@ -100,7 +100,7 @@ pub async fn post(
             .create(conn)
             .map_err(|e| -> FpError {
                 match e {
-                    DbError::UniqueConstraintViolation => {
+                    DbError::UniqueConstraintViolation(_) => {
                         ValidationError("A compliance document request already exists for this template")
                             .into()
                     }

@@ -145,7 +145,7 @@ impl TenantRolebinding {
             .get_result(conn.conn())
             .map_err(DbError::from)
             .map_err(|e| match e {
-                DbError::UniqueConstraintViolation => DbError::TenantRolebindingAlreadyExists,
+                DbError::UniqueConstraintViolation(_) => DbError::TenantRolebindingAlreadyExists,
                 _ => e,
             })?;
         Ok((rb, tenant_role.into_inner()))

@@ -239,7 +239,7 @@ impl TenantRole {
             .get_result(conn)
             .map_err(DbError::from)
             .map_err(|e| match e {
-                DbError::UniqueConstraintViolation => DbError::TenantRoleAlreadyExists,
+                DbError::UniqueConstraintViolation(_) => DbError::TenantRoleAlreadyExists,
                 _ => e,
             })?;
         Ok(result)
@@ -346,7 +346,7 @@ impl TenantRole {
             .load(conn.conn())
             .map_err(DbError::from)
             .map_err(|e| match e {
-                DbError::UniqueConstraintViolation => DbError::TenantRoleAlreadyExists,
+                DbError::UniqueConstraintViolation(_) => DbError::TenantRoleAlreadyExists,
                 _ => e,
             })?;
 
