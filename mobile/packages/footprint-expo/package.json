@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-expo",
   "private": false,
   "type": "module",
-  "version": "2.0.0-beta.0",
+  "version": "2.0.0",
   "main": "./dist/footprint-expo.cjs",
   "module": "./dist/footprint-expo.js",
   "unpkg": "./dist/footprint-expo.js",

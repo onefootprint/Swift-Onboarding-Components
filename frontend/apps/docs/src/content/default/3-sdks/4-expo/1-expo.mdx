@@ -22,10 +22,9 @@ While we also offer a React Native package, you should use footprint-expo if you
 
 Before proceeding with the installation, make sure your environment meets the minimum version requirements:
 
-| Dependency   | Minimum Version |
-| ------------ | --------------- |
-| React        | 17.0.0          |
-| React Native | 0.70.0          |
+| Dependency | Minimum Version       |
+| ---------- | --------------------- |
+| Expo       | Last 3 major versions |
 
 If you're using older versions, please consider upgrading to ensure compatibility with `@onefootprint/footprint-expo`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
 
@@ -54,7 +53,7 @@ import footprint from '@onefootprint/footprint-expo';
 
 export default function App() {
   const handleButtonPress = async () => {
-    footprint.open({
+    const component = footprint.init({
       publicKey: 'pb_test_ilBQgKtvrgQrQNV8U2rb7e',
       onComplete: validationToken => {
         alert(validationToken);
@@ -67,6 +66,7 @@ export default function App() {
         console.error(error);
       },
     });
+    component.render();
   };
 
   return (
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-## Customizing the appearence
+### Customizing the appearence
 
 Take advantage of the `appearance` option to extend the default styles. You can utilize the same variables and rules as in the [web integration](https://docs.onefootprint.com/integrate/customization).
 
@@ -150,9 +150,9 @@ const Screen = () => {
 };
 ```
 
-## Bootstrapping user data
+### Bootstraping data
 
-Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. For complete details, click [here](https://docs.onefootprint.com/integrate/bootstrap-data).
+Utilize the `bootstrapData` option to pre-fill any available data and bypass completed pages for your users. For complete details, click [here](https://docs.onefootprint.com/integrate/bootstrap-data).
 
 ```typescript
 import footprint from '@onefootprint/footprint-expo';
@@ -164,7 +164,7 @@ const Screen = () => {
     footprint.open({
       scheme: 'footprint', // this has to match the expo scheme from app.json for Android integration to work
       publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
-      userData: {
+      bootstrapData: {
         'id.email': 'jane.doe@acme.com',
         'id.phone_number': '+12025550179',
         'id.first_name': 'Jane',
@@ -194,15 +194,15 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 
 ### Available Props
 
-| Variable      | Description                                                                                                                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`   | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
-| `authToken`   | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
-| `redirectUrl` | Optional. A deep link that will be navigated to when the web browser is closed. Can be created using `Linking.createURL` from `expo-linking`.                                                                                   |
-| `userData`    | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                            |
-| `options`     | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                         |
-| `appearance`  | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
-| `l10n`        | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |
-| `onComplete`  | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
-| `onCancel`    | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
-| `onError`     | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
+| Variable        | Description                                                                                                                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
+| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
+| `redirectUrl`   | Optional. A deep link that will be navigated to when the web browser is closed. Can be created using `Linking.createURL` from `expo-linking`.                                                                                   |
+| `bootstrapData` | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                            |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                         |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |

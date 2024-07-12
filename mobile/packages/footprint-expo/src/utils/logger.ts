@@ -1,5 +1,4 @@
 import * as Linking from 'expo-linking';
-import type { FootprintVerifyProps } from 'src/footprint.types';
 
 import sendSdkTelemetry from './send-sdk-telemetry';
 
@@ -26,32 +25,40 @@ export const getStringMessage = (msg?: unknown | Error): string => {
 
 const messagePrefix = '@onefootprint/footprint-expo';
 
-export const logError = (props: FootprintVerifyProps, error: unknown) => {
+export const logError = (error: unknown) => {
   const errorMessage = getStringMessage(error);
   const errorMessageWithPrefix = `${messagePrefix}: ${errorMessage}`;
   if (debugMode) {
     console.error(errorMessageWithPrefix);
   } else {
-    sendSdkTelemetry(
-      errorMessage,
-      'error',
-      props.redirectUrl ?? Linking.createURL('/'),
-    );
+    Linking.getInitialURL()
+      .then(tenantDomain => {
+        sendSdkTelemetry(errorMessage, 'error', tenantDomain ?? '');
+      })
+      .catch(() => {
+        // Ignore any errors and send without tenant domain
+        sendSdkTelemetry(errorMessage, 'error');
+      });
   }
+
   return errorMessageWithPrefix;
 };
 
-export const logWarn = (props: FootprintVerifyProps, error: unknown) => {
+export const logWarn = (error: unknown) => {
   const warnMessage = getStringMessage(error);
   const warnMessageWithPrefix = `${messagePrefix}: ${warnMessage}`;
   if (debugMode) {
     console.warn(warnMessageWithPrefix);
   } else {
-    sendSdkTelemetry(
-      warnMessage,
-      'warn',
-      props.redirectUrl ?? Linking.createURL('/'),
-    );
+    Linking.getInitialURL()
+      .then(tenantDomain => {
+        sendSdkTelemetry(warnMessage, 'warn', tenantDomain ?? '');
+      })
+      .catch(() => {
+        // Ignore any errors and send without tenant domain
+        sendSdkTelemetry(warnMessage, 'warn');
+      });
   }
+
   return warnMessageWithPrefix;
 };

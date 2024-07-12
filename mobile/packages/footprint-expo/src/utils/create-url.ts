@@ -1,10 +1,4 @@
-import type { FootprintVerifyProps } from '../footprint.types';
-
-const encode = (obj?: Record<string, unknown>): string => {
-  return obj && Object.keys(obj).length
-    ? encodeURIComponent(JSON.stringify(obj))
-    : '';
-};
+import type { Appearance, L10n } from '../types';
 
 const createUrl = ({
   appearance,
@@ -12,14 +6,39 @@ const createUrl = ({
   redirectUrl,
   token,
 }: {
-  appearance?: FootprintVerifyProps['appearance'];
-  l10n?: FootprintVerifyProps['l10n'];
-  redirectUrl: string;
+  appearance?: Appearance;
+  l10n?: L10n;
+  redirectUrl?: string;
   token: string;
 }) => {
-  const searchParams = new URLSearchParams();
-  searchParams.append('redirect_url', redirectUrl);
+  const baseUrl = createComponentUrl();
+  const searchParams = createSearchParams({ appearance, l10n, redirectUrl });
+  return `${baseUrl}?${searchParams}#${token}`;
+};
 
+const encode = (obj?: Record<string, unknown>): string => {
+  return obj && Object.keys(obj).length
+    ? encodeURIComponent(JSON.stringify(obj))
+    : '';
+};
+
+const createComponentUrl = () => {
+  return 'https://id.onefootprint.com';
+};
+
+const createSearchParams = ({
+  appearance,
+  l10n,
+  redirectUrl,
+}: {
+  appearance?: Appearance;
+  l10n?: L10n;
+  redirectUrl?: string;
+}) => {
+  const searchParams = new URLSearchParams();
+  if (redirectUrl) {
+    searchParams.append('redirect_url', redirectUrl);
+  }
   if (appearance) {
     const variables = encode(appearance.variables);
     const rules = encode(appearance.rules);
@@ -37,8 +56,7 @@ const createUrl = ({
       searchParams.append('lng', l10n.language);
     }
   }
-
-  return `https://id.onefootprint.com?${searchParams.toString()}#${token}`;
+  return searchParams.toString();
 };
 
 export default createUrl;

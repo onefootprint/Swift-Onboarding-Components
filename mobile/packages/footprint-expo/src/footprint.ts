@@ -1,18 +1,33 @@
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
-import type { FootprintVerifyProps } from './footprint.types';
-import type { SessionResult } from './types';
+import type { ComponentProps } from './types';
 import createUrl from './utils/create-url';
 import { logError, logWarn } from './utils/logger';
 import sendSdkArgs from './utils/send-sdk-args';
 
 const footprint = () => {
   let isOpen = false;
-  WebBrowser.warmUpAsync(); // Async, can be called multiple times. Speeds up android implementation.
 
-  const open = async (props: FootprintVerifyProps) => {
+  const handleError = (props: ComponentProps, error: string) => {
+    closeWebView();
+    const errorMessage = logError(error);
+    props.onError?.(errorMessage);
+  };
+
+  const handleCancel = (props: ComponentProps) => {
+    closeWebView();
+    props.onCancel?.();
+  };
+
+  const handleComplete = (props: ComponentProps, validationToken: string) => {
+    closeWebView();
+    props.onComplete?.(validationToken);
+  };
+
+  const render = async (props: ComponentProps) => {
     if (isOpen) {
+      logWarn('Footprint is already open.');
       return;
     }
     isOpen = true;
@@ -20,15 +35,12 @@ const footprint = () => {
     const token = await sendSdkArgs({
       publicKey: props.publicKey,
       authToken: props.authToken,
-      userData: props.userData,
+      bootstrapData: props.bootstrapData,
       options: props.options,
       l10n: props.l10n,
     });
     if (!token) {
-      handleBrowserSessionEnd(props, {
-        kind: 'error',
-        error: 'Unable to get SDK args token.',
-      });
+      handleError(props, 'Unable to get SDK args token.');
       return;
     }
 
@@ -39,14 +51,14 @@ const footprint = () => {
       ({ url: eventUrl }) => {
         if (!isUpdateHandled) {
           isUpdateHandled = true;
-          handleBrowserUrlChange(props, eventUrl);
+          handleWebViewUrlChange(props, eventUrl);
           subscription.remove();
         }
       },
     );
 
     try {
-      const result = await startBrowserSession(props, token);
+      const result = await openWebView(props, token);
       if (isUpdateHandled) {
         subscription.remove();
         return;
@@ -54,84 +66,53 @@ const footprint = () => {
 
       if (result.type !== 'success') {
         // Triggered if user closes the web browser
-        handleBrowserSessionEnd(props, { kind: 'cancel' });
+        handleCancel(props);
       } else {
-        handleBrowserUrlChange(props, result.url);
+        handleWebViewUrlChange(props, result.url);
       }
     } catch (error) {
-      handleBrowserSessionEnd(props, { kind: 'error', error: `${error}` });
+      handleError(props, `${error}`);
     }
 
     subscription.remove();
   };
 
-  const close = () => {
-    isOpen = false;
-    dismissBrowser();
+  const init = (props: ComponentProps) => {
+    WebBrowser.warmUpAsync();
+    return {
+      render: () => render(props),
+    };
   };
 
-  const dismissBrowser = () => {
-    // These methods may not be available depending on whether we are on iOS or Android.
-    // Will throw error if not available - safe to ignore.
-    try {
-      WebBrowser.dismissAuthSession();
-      WebBrowser.dismissBrowser();
-    } catch (error) {
-      /* noop */
-    }
+  const destroy = () => {
+    closeWebView();
   };
 
-  const handleBrowserSessionEnd = (
-    props: FootprintVerifyProps,
-    result: SessionResult,
-  ) => {
-    isOpen = false;
-    dismissBrowser();
-
-    switch (result.kind) {
-      case 'complete': {
-        props.onComplete?.(result.validationToken);
-        break;
-      }
-      case 'cancel': {
-        props.onCancel?.();
-        break;
-      }
-      case 'error': {
-        const errorMessage = logError(props, result.error);
-        props.onError?.(errorMessage);
-        break;
-      }
-    }
-  };
-
-  const handleBrowserUrlChange = (props: FootprintVerifyProps, url: string) => {
+  const handleWebViewUrlChange = (props: ComponentProps, url: string) => {
     if (!url) {
-      logWarn(props, 'Missing result URL.');
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
+      logWarn('Missing result URL.');
+      handleCancel(props);
       return;
     }
 
     const { queryParams } = Linking.parse(url);
     const isCanceled = !queryParams || queryParams.canceled;
+
     if (isCanceled) {
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
-      return;
-    }
-    const validationToken = queryParams.validation_token;
-    if (!validationToken || typeof validationToken !== 'string') {
-      logWarn(props, 'Missing validation token.');
-      handleBrowserSessionEnd(props, { kind: 'cancel' });
+      handleCancel(props);
       return;
     }
 
-    handleBrowserSessionEnd(props, { kind: 'complete', validationToken });
+    const validationToken = queryParams.validation_token;
+    if (validationToken && typeof validationToken === 'string') {
+      handleComplete(props, validationToken);
+    } else {
+      logWarn('Missing validation token.');
+      handleCancel(props);
+    }
   };
 
-  const startBrowserSession = async (
-    props: FootprintVerifyProps,
-    token: string,
-  ) => {
+  const openWebView = async (props: ComponentProps, token: string) => {
     // If redirectUrl is not provided, return to the root of the app when flow is done
     const redirectUrlOrFallback = props.redirectUrl ?? Linking.createURL('/');
     const url = createUrl({
@@ -143,14 +124,24 @@ const footprint = () => {
     const result = await WebBrowser.openAuthSessionAsync(
       url,
       redirectUrlOrFallback,
-      { preferEphemeralSession: true }, // To prevent sharing cookies & permission popup
+      { preferEphemeralSession: true },
     );
     return result;
   };
 
+  const closeWebView = () => {
+    isOpen = false;
+    try {
+      WebBrowser.dismissAuthSession();
+      WebBrowser.dismissBrowser();
+    } catch (_) {
+      // do nothing
+    }
+  };
+
   return {
-    open,
-    close,
+    init,
+    destroy,
   };
 };
 

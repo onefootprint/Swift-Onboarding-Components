@@ -15,7 +15,7 @@ type SdkTelemetryRequest = {
 const sendSdkTelemetry = (
   message: string,
   level: 'error' | 'warn',
-  domain: string,
+  domain?: string,
 ) => {
   const body: SdkTelemetryRequest = {
     tenantDomain: domain,
