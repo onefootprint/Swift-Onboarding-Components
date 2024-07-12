@@ -2,7 +2,7 @@ import Foundation
 
 // Exactly one of publicKey or authToken should be provided
 public struct FootprintConfiguration: Encodable {
-    public var userData: FootprintUserData?
+    public var bootstrapData: FootprintBootstrapData?
     public var publicKey: String?
     public var authToken: String?
     public var scheme: String
@@ -15,7 +15,7 @@ public struct FootprintConfiguration: Encodable {
     
     public init(authToken: String,
                 scheme: String,
-                userData: FootprintUserData? = nil,
+                bootstrapData: FootprintBootstrapData? = nil,
                 options: FootprintOptions? = nil,
                 l10n: FootprintL10n? = nil,
                 appearance: FootprintAppearance? = nil,
@@ -26,7 +26,7 @@ public struct FootprintConfiguration: Encodable {
         self.publicKey = nil
         self.authToken = authToken
         self.scheme = scheme
-        self.userData = userData
+        self.bootstrapData = bootstrapData
         self.onCancel = onCancel
         self.onComplete = onComplete
         self.onError = onError
@@ -37,7 +37,7 @@ public struct FootprintConfiguration: Encodable {
     
     public init(publicKey: String,
                 scheme: String,
-                userData: FootprintUserData? = nil,
+                bootstrapData: FootprintBootstrapData? = nil,
                 options: FootprintOptions? = nil,
                 l10n: FootprintL10n? = nil,
                 appearance: FootprintAppearance? = nil,
@@ -48,7 +48,7 @@ public struct FootprintConfiguration: Encodable {
         self.publicKey = publicKey
         self.authToken = nil
         self.scheme = scheme
-        self.userData = userData
+        self.bootstrapData = bootstrapData
         self.onCancel = onCancel
         self.onComplete = onComplete
         self.onError = onError
@@ -61,7 +61,7 @@ public struct FootprintConfiguration: Encodable {
     private enum CodingKeys: String, CodingKey {
         case publicKey = "public_key"
         case authToken = "auth_token"
-        case userData = "user_data"
+        case bootstrapData = "user_data"
         case options = "options"
         case l10n = "l10n"
     }
@@ -70,7 +70,7 @@ public struct FootprintConfiguration: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(self.publicKey, forKey: .publicKey)
         try container.encodeIfPresent(self.authToken, forKey: .authToken)
-        try container.encodeIfPresent(self.userData, forKey: .userData)
+        try container.encodeIfPresent(self.bootstrapData, forKey: .bootstrapData)
         try container.encodeIfPresent(self.options, forKey: .options)
         try container.encodeIfPresent(self.l10n, forKey: .l10n)
     }
