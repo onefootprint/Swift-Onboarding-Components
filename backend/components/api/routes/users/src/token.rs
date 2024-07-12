@@ -28,6 +28,7 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
+use newtypes::PreviewApi;
 use newtypes::RequestedTokenScope;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -70,7 +71,7 @@ pub async fn post(
     } else {
         return Err(ValidationError("Missing field kind").into());
     };
-    let tenant_id = auth.tenant().id.clone();
+    let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
@@ -79,7 +80,7 @@ pub async fn post(
     let can_provide_3p_auth = auth.tenant().is_demo_tenant
         || state
             .ff_client
-            .flag(BoolFlag::CanProvideThirdPartyAuth(&tenant_id));
+            .flag(BoolFlag::CanProvideThirdPartyAuth(&tenant.id));
     if third_party_auth && !can_provide_3p_auth {
         return Err(ValidationError("You are not able to provide third-party authentication.").into());
     }
@@ -87,7 +88,7 @@ pub async fn post(
     let (token, session) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
             if third_party_auth {
@@ -108,8 +109,7 @@ pub async fn post(
                 AuthEvent::save(args, conn)?;
             }
 
-            // TODO put this behind a feature gate
-            let implied_auth_events = {
+            let can_use_implied_auth = if tenant.can_access_preview(&PreviewApi::ImplicitAuth) {
                 // As customers start to use us for auth, there will be situations in which:
                 // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
                 // - The user then signs up for a credit card with Grid, which requires KYC through the
@@ -146,15 +146,17 @@ pub async fn post(
                     .into_iter()
                     .filter_map(|di| portable_vw.get_lifetime(&di))
                     .any(|dl| dl.scoped_vault_id != su.id);
-                let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
-
-                if can_auto_authorize {
-                    AuthEvent::list_recent(conn, &su.id)?
-                } else {
-                    vec![]
-                }
+                // Can use implicit auth for this user if the workflow could be auto-authorized
+                vw.can_auto_authorize(has_prefill_data)
+            } else {
+                false
             };
-            tracing::info!(num_events=%implied_auth_events.len(), %tenant_id, %is_live, "Creating token with implied auth events");
+            let implied_auth_events = if can_use_implied_auth {
+                AuthEvent::list_recent(conn, &su.id)?
+            } else {
+                vec![]
+            };
+            tracing::info!(num_events=%implied_auth_events.len(), tenant_id=%tenant.id, %is_live, "Creating token with implied auth events");
             let kinds = implied_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
             let auth_events = implied_auth_events

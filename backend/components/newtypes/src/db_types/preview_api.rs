@@ -30,7 +30,10 @@ pub enum PreviewApi {
     MatchSignalsList,
     LivenessList,
     AuthEventsList,
+    /// Only findigs uses this, we really don't want anyone else to be using it.
     DocumentsList,
+    /// We have a mixed stance on this. Generally we don't want tenants to be doing their own
+    /// analysis on risk signals since this should be the job of the rules engine
     RiskSignalsList,
     OnboardingSessionToken,
     VaultIntegrity,
@@ -45,6 +48,7 @@ pub enum PreviewApi {
     VaultProxyJit,
     OnboardingsList,
     DecisionsList,
+    /// When enabled, sends the legacy footprint.onboarding.status_changed webhook
     LegacyOnboardingStatusWebhook,
     /// Support implicit auth when making a token in the `POST /users/<>/token` API
     ImplicitAuth,
