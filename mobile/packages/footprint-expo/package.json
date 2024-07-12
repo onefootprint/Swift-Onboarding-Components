@@ -2,16 +2,14 @@
   "name": "@onefootprint/footprint-expo",
   "private": false,
   "type": "module",
-  "version": "1.6.5",
+  "version": "2.0.0-beta.0",
   "main": "./dist/footprint-expo.cjs",
   "module": "./dist/footprint-expo.js",
   "unpkg": "./dist/footprint-expo.js",
   "types": "./dist/footprint-expo.d.ts",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
@@ -24,8 +22,8 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.8",
-    "expo": "~49.0.13",
-    "react-native": "0.71.15",
+    "expo": "~51.0.20",
+    "react-native": "0.74.3",
     "react": "^18.2.0",
     "tsconfig": "*",
     "tsup": "^6.5.0",
@@ -33,12 +31,12 @@
   },
   "dependencies": {
     "csstype": "^3.1.2",
-    "expo-linking": "^5.0.2",
-    "expo-web-browser": "~12.3.2"
+    "expo-linking": "^6.3.1",
+    "expo-web-browser": "~13.0.2"
   },
   "peerDependencies": {
-    "expo": "> 48",
-    "react": "> 17",
+    "expo": ">= 51",
+    "react": ">= 18",
     "react-native": ">= 0.70"
   },
   "jest": {
