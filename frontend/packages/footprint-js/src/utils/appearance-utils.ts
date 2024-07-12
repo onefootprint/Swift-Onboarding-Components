@@ -24,7 +24,6 @@ export const getAppearanceForVanilla = (): Appearance => {
   return {
     fontSrc: appearance.fontSrc,
     rules: appearance.rules,
-    theme: appearance.theme,
     variables: appearance.variables,
   };
 };

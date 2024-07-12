@@ -127,8 +127,6 @@ export type AppearanceVariables = Partial<{
   radioSelectComponentsIconSelectedBg: CSS.Property.Background;
 }>;
 
-export type AppearanceTheme = 'light' | 'dark';
-
 export type AppearanceRules = Partial<{
   button: CSS.Properties;
   'button:hover': CSS.Properties;
@@ -157,6 +155,5 @@ export type Appearance = {
   variant?: 'modal' | 'drawer' | 'inline';
   fontSrc?: string;
   rules?: AppearanceRules;
-  theme?: AppearanceTheme;
   variables?: AppearanceVariables;
 };

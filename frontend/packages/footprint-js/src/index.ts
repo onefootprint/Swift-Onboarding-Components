@@ -7,7 +7,6 @@ vanillaIntegration(footprint);
 export type {
   Appearance as FootprintAppearance,
   AppearanceRules as FootprintAppearanceRules,
-  AppearanceTheme as FootprintAppearanceTheme,
   AppearanceVariables as FootprintAppearanceVariables,
 } from './types/appearance';
 export type {
