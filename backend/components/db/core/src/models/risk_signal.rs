@@ -328,6 +328,7 @@ mod tests {
     use crate::models::decision_intent::DecisionIntent;
     use crate::models::onboarding_decision::NewDecisionArgs;
     use crate::models::onboarding_decision::OnboardingDecision;
+    use crate::models::onboarding_decision::OnboardingDecisionFilters;
     use crate::models::scoped_vault::ScopedVault;
     use crate::models::verification_request::VerificationRequest;
     use crate::models::verification_result::VerificationResult;
@@ -335,6 +336,7 @@ mod tests {
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
+    use crate::OffsetPagination;
     use itertools::Itertools;
     use macros::db_test_case;
     use newtypes::DataLifetimeSeqno;
@@ -489,10 +491,12 @@ mod tests {
                 }
             });
 
-        let latest_obd =
-            OnboardingDecision::latest_footprint_actor_decision(conn, &sv.fp_id, &sv.tenant_id, sv.is_live)
-                .unwrap()
-                .unwrap();
+        let filters = OnboardingDecisionFilters {
+            made_by_footprint: Some(true),
+        };
+        let (decisions, _) =
+            OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1)).unwrap();
+        let (latest_obd, _, _) = decisions.first().unwrap();
         let rs = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &latest_obd.id).unwrap();
         assert_have_same_elements(
             expected_risk_signals,

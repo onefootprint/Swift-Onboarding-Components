@@ -145,4 +145,12 @@ impl ManualReview {
             .get_results(conn)?;
         Ok(results)
     }
+
+    #[tracing::instrument("ManualReview::get", skip_all)]
+    pub fn list_cleared_by(conn: &mut PgConn, id: &OnboardingDecisionId) -> DbResult<Vec<Self>> {
+        let results = manual_review::table
+            .filter(manual_review::completed_by_decision_id.eq(id))
+            .get_results(conn)?;
+        Ok(results)
+    }
 }

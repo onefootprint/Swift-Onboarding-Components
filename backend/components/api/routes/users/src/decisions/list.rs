@@ -46,7 +46,8 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let (decisions, next_page) = OnboardingDecision::list(conn, &sv.id, pagination)?;
+            let (decisions, next_page) =
+                OnboardingDecision::list(conn, &sv.id, Default::default(), pagination)?;
             Ok((decisions, next_page))
         })
         .await?;

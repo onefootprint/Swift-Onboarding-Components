@@ -17,7 +17,6 @@ use db_schema::schema::manual_review;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::onboarding_decision;
 use db_schema::schema::onboarding_decision_verification_result_junction;
-use db_schema::schema::scoped_vault;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -28,12 +27,10 @@ use newtypes::AnnotationId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
-use newtypes::FpId;
 use newtypes::OnboardingDecisionId;
 use newtypes::OnboardingDecisionInfo;
 use newtypes::RuleSetResultId;
 use newtypes::ScopedVaultId;
-use newtypes::TenantId;
 use newtypes::VaultId;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
@@ -224,8 +221,10 @@ impl OnboardingDecision {
     pub fn list(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
+        filters: OnboardingDecisionFilters,
         pagination: OffsetPagination,
     ) -> DbResult<OffsetPaginatedResult<(Self, Workflow, ObConfiguration)>> {
+        let OnboardingDecisionFilters { made_by_footprint } = filters;
         let mut query = onboarding_decision::table
             .inner_join(workflow::table.inner_join(ob_configuration::table))
             .filter(workflow::scoped_vault_id.eq(sv_id))
@@ -235,54 +234,20 @@ impl OnboardingDecision {
         if let Some(offset) = pagination.offset() {
             query = query.offset(offset);
         }
+        if let Some(made_by_footprint) = made_by_footprint {
+            let q_made_by_fp = onboarding_decision::actor.eq(DbActor::Footprint);
+            match made_by_footprint {
+                true => query = query.filter(q_made_by_fp),
+                false => query = query.filter(not(q_made_by_fp)),
+            }
+        }
         let results = query.get_results(conn)?;
         let results = results.into_iter().map(|(d, (wf, obc))| (d, wf, obc)).collect();
         Ok(pagination.results(results))
     }
+}
 
-    // TODO rm
-    #[tracing::instrument("OnboardingDecision::latest_footprint_actor_decision", skip_all)]
-    pub fn latest_footprint_actor_decision(
-        conn: &mut PgConn,
-        fp_id: &FpId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> DbResult<Option<Self>> {
-        use db_schema::schema::workflow;
-        let res: Option<OnboardingDecision> = onboarding_decision::table
-            .filter(onboarding_decision::actor.eq(DbActor::Footprint))
-            .inner_join(workflow::table.inner_join(scoped_vault::table))
-            .filter(scoped_vault::fp_id.eq(fp_id))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(is_live))
-            .order_by(onboarding_decision::created_at.desc())
-            .select(onboarding_decision::all_columns)
-            .first(conn)
-            .optional()?;
-        Ok(res)
-    }
-
-    // TODO rm
-    #[tracing::instrument("OnboardingDecision::latest_non_footprint_actor_decision", skip_all)]
-    pub fn latest_non_footprint_actor_decision(
-        conn: &mut PgConn,
-        sv_id: &ScopedVaultId,
-    ) -> DbResult<Option<(Self, Option<ManualReview>)>> {
-        let res: Option<(OnboardingDecision, Option<ManualReview>)> = onboarding_decision::table
-            .filter(not(onboarding_decision::actor.eq(DbActor::Footprint)))
-            .inner_join(workflow::table.inner_join(scoped_vault::table))
-            .left_join(
-                manual_review::table
-                    .on(manual_review::completed_by_decision_id.eq(onboarding_decision::id.nullable())),
-            )
-            .filter(scoped_vault::id.eq(sv_id))
-            .order_by(onboarding_decision::created_at.desc())
-            .select((
-                onboarding_decision::all_columns,
-                manual_review::all_columns.nullable(),
-            ))
-            .first(conn)
-            .optional()?;
-        Ok(res)
-    }
+#[derive(Default)]
+pub struct OnboardingDecisionFilters {
+    pub made_by_footprint: Option<bool>,
 }

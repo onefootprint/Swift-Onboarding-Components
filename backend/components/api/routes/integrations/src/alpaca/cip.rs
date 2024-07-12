@@ -43,12 +43,14 @@ use db::models::insight_event::InsightEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
+use db::models::onboarding_decision::OnboardingDecisionFilters;
 use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::workflow::Workflow;
+use db::OffsetPagination;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::watchlist::response::WatchlistResultResponse;
@@ -242,9 +244,13 @@ pub(crate) async fn create_cip_request(
     ) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let fp_obd =
-                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
-                    .ok_or(CipError::EntityDecisionDoesNotExist)?;
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let filters = OnboardingDecisionFilters {
+                made_by_footprint: Some(true),
+            };
+            let (mut decisions, _) =
+                OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
+            let (fp_obd, _, _) = decisions.pop().ok_or(CipError::EntityDecisionDoesNotExist)?;
             let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
@@ -257,9 +263,18 @@ pub(crate) async fn create_cip_request(
                 DecisionStatus::Pass => (None, None, None),
                 DecisionStatus::Fail | DecisionStatus::StepUp | DecisionStatus::None => {
                     // footprint did not decide to pass, see if a manual decision override exists
-                    let (obd_manual, mr) =
-                        OnboardingDecision::latest_non_footprint_actor_decision(conn, &sv.id)?
-                            .ok_or(CipError::EntityDecisionStatusNotPass)?;
+                    let filters = OnboardingDecisionFilters {
+                        made_by_footprint: Some(false),
+                    };
+                    let (mut decisions, _) =
+                        OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
+                    let (obd_manual, _, _) = decisions.pop().ok_or(CipError::EntityDecisionStatusNotPass)?;
+                    let mrs = ManualReview::list_cleared_by(conn, &obd_manual.id)?;
+                    // The alpaca CIP only cares about the MR that has review reasons, not document reviews
+                    let mr = mrs
+                        .into_iter()
+                        .sorted_by_key(|mr| mr.review_reasons.len())
+                        .next_back();
                     let annotation = Annotation::get_for_obd(conn, &obd_manual.id)?;
 
                     if obd_manual.status != DecisionStatus::Pass {
