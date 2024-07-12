@@ -1,7 +1,5 @@
 part of "../footprint_flutter.dart";
 
-enum FootprintAppearanceTheme { light, dark }
-
 class FootprintAppearanceVariables {
   final String? borderRadius;
   final String? colorError;
@@ -340,13 +338,11 @@ class FootprintAppearanceRules {
 class FootprintAppearance {
   final String? fontSrc;
   final FootprintAppearanceRules? rules;
-  final FootprintAppearanceTheme? theme;
   final FootprintAppearanceVariables? variables;
 
   FootprintAppearance({
     this.fontSrc,
     this.rules,
-    this.theme,
     this.variables,
   });
 
