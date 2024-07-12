@@ -29,7 +29,7 @@ use paperclip::actix::Apiv2Response;
 
 // TODO: sources for biz details
 //   agency info for watchlist
-#[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
+#[derive(serde::Serialize, macros::JsonResponder, Apiv2Response, Clone)]
 pub struct BusinessInsights {
     /// Information about names (DBA/Legal) that were submitted and found associated with the
     /// business
@@ -46,7 +46,7 @@ pub struct BusinessInsights {
     pub addresses: Vec<InsightAddress>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightBusinessName {
     pub name: Option<PiiString>,
     pub submitted: bool,
@@ -63,7 +63,7 @@ pub struct InsightBusinessName {
 }
 
 /// Details about the business
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct BusinessDetail {
     /// Formation date (from vendor)
     pub formation_date: Option<String>,
@@ -79,14 +79,14 @@ pub struct BusinessDetail {
     pub website: Option<InsightWebsite>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightTin {
     pub tin: Option<PiiString>,
     /// Whether or not the TIN was verified in the IRS TIN database
     pub verified: bool,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightPhone {
     pub phone: PiiString,
     /// Was phone submitted
@@ -95,13 +95,13 @@ pub struct InsightPhone {
     pub verified: Option<bool>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightWebsite {
     pub url: PiiString,
     pub verified: Option<bool>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightPerson {
     /// Name
     pub name: Option<PiiString>,
@@ -114,7 +114,7 @@ pub struct InsightPerson {
     pub sources: Option<String>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightRegistration {
     pub state: Option<String>,
     /// File date
@@ -131,13 +131,13 @@ pub struct InsightRegistration {
     pub file_number: Option<PiiString>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct Officer {
     pub name: Option<PiiString>,
     pub roles: Option<String>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightWatchlist {
     pub hit_count: Option<i32>,
     /// Watchlist entries for the submitted + found people
@@ -146,7 +146,7 @@ pub struct InsightWatchlist {
     pub business: Vec<WatchlistEntry>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 
 pub struct WatchlistEntry {
     /// the name we screened
@@ -168,7 +168,7 @@ pub struct WatchlistHit {
     pub list_country: Option<String>,
 }
 
-#[derive(serde::Serialize, Apiv2Response)]
+#[derive(serde::Serialize, Apiv2Response, Clone)]
 pub struct InsightAddress {
     pub address_line1: Option<PiiString>,
     pub address_line2: Option<PiiString>,
@@ -555,12 +555,8 @@ fn create_watchlists(business_response: &BusinessResponse) -> Option<InsightWatc
         })
         .unwrap_or_default();
 
-    if wl_hit_ids.is_empty() {
-        if !matches!(wl_task, WatchlistTask::NoHits) {
-            tracing::warn!("mismatch in watchlist task source list and watch list task label");
-        }
-
-        return None;
+    if wl_hit_ids.is_empty() && !matches!(wl_task, WatchlistTask::NoHits) {
+        tracing::warn!("mismatch in watchlist task source list and watch list task label");
     }
 
     // Create a mapping from watchlist source ID to person and name
@@ -725,14 +721,47 @@ mod tests {
     use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
     use idv::test_fixtures;
 
-    #[ignore]
     #[test]
     fn test_business_insights() {
         let parsed: MiddeskBusinessUpdateWebhookResponse =
-            serde_json::from_value(test_fixtures::middesk_business_response()).unwrap();
+            serde_json::from_value(test_fixtures::middesk_business_update_webhook_response()).unwrap();
 
         let insight = BusinessInsights::from(parsed.business_response().unwrap().clone());
 
-        println!("{}", serde_json::to_value(insight).unwrap())
+        // assertions
+        let details = insight.details.clone().unwrap();
+        assert_eq!(details.entity_type, Some("CORPORATION".to_string()));
+        assert!(details.phone_numbers.is_empty());
+        assert_eq!(
+            details.website.as_ref().map(|w| w.url.clone()),
+            Some("https://www.wafflehouse.com".into())
+        );
+
+        assert_eq!(insight.names.len(), 2);
+        assert_eq!(insight.registrations.len(), 1);
+        assert_eq!(insight.addresses.len(), 2);
+
+        let maybe_person = insight.people.first();
+        let person = maybe_person.as_ref().unwrap();
+        assert_eq!(person.sources, Some("FL - SOS".to_string()));
+        assert!(person.submitted);
+        assert!(person.association_verified.unwrap());
+
+
+        let watchlist = insight.watchlist.unwrap();
+        assert_eq!(watchlist.hit_count, Some(1));
+        assert_eq!(
+            watchlist
+                .people
+                .first()
+                .as_ref()
+                .unwrap()
+                .screened_entity_name
+                .clone()
+                .unwrap(),
+            "Jane watchlist hit".into()
+        );
+        assert_eq!(watchlist.business.len(), 2);
+        assert!(watchlist.business.iter().all(|b| b.hits.is_empty()));
     }
 }
