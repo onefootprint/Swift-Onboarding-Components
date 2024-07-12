@@ -5,11 +5,13 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::ValidationError;
 use api_wire_types::PrivateUpdateTvc;
 use db::models::billing_profile::BillingProfile;
 use db::models::billing_profile::UpdateBillingProfile;
 use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
+use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl;
 use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
 use newtypes::TenantId;
@@ -40,6 +42,11 @@ async fn patch(
                 bp
             };
             let tvc = if let Some(tvc_update) = tvc_update {
+                if tvc_update.lexis_enabled.is_some_and(|enabled| enabled) {
+                    let _ = TenantBusinessInfo::get(conn, &tenant.id)?.ok_or(ValidationError(
+                        "Cannot enable lexis without adding TenantBusinessInfo first",
+                    ))?;
+                }
                 let bp = TenantVendorControl::update_or_create(conn, &tenant.id, tvc_update)?;
                 Some(bp)
             } else {
