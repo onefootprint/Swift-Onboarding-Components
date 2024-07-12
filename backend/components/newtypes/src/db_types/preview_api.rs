@@ -44,6 +44,7 @@ pub enum PreviewApi {
     VaultProxy,
     VaultProxyJit,
     OnboardingsList,
+    DecisionsList,
     LegacyOnboardingStatusWebhook,
     /// Support implicit auth when making a token in the `POST /users/<>/token` API
     ImplicitAuth,

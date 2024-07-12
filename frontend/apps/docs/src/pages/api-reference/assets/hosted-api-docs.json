@@ -72,6 +72,43 @@
                 ]
             }
         },
+        "/hosted/business/vault/decrypt": {
+            "post": {
+                "tags": [
+                    "Vault",
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Decrypts the specified list of fields from the provided vault.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserDecryptRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DecryptResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/business/vault/validate": {
             "post": {
                 "tags": [
@@ -6155,7 +6192,6 @@
                 "type": "object",
                 "properties": {
                     "fields": {
-                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `business.name`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",

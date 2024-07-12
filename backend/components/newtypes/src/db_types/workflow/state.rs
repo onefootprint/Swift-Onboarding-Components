@@ -66,6 +66,18 @@ impl WorkflowState {
     }
 }
 
+impl WorkflowKind {
+    /// Returns true if the decision for this workflow should be visible to tenants via API
+    pub fn has_tenant_facing_decision(&self) -> bool {
+        match self {
+            Self::Kyb | Self::Kyc | Self::AlpacaKyc => true,
+            // Don't show status of document-only workflows triggered via the dashboard. Onboardings onto
+            // document playbooks actually use the Kyc workflow (which is shown above)
+            Self::Document => false,
+        }
+    }
+}
+
 impl std::fmt::Display for WorkflowState {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = self.as_ref();

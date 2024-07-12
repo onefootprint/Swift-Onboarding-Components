@@ -19,6 +19,7 @@ mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     onboardings::configure_get_aliases(config);
+    decisions::routes(config);
     config
         .service(post::post)
         .service(list::get)
@@ -30,7 +31,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(liveness::get)
         .service(token::post)
         .service(auth_events::get)
-        .service(decisions::post)
         .service(detail::detail)
         .service(kyc::post)
         .service(label::get)

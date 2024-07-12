@@ -245,6 +245,8 @@ pub struct OffsetPaginatedResponse<T, TMeta = OffsetPaginatedResponseMeta> {
     pub meta: TMeta,
 }
 
+pub type OffsetPaginatedResponseNoCount<T> = OffsetPaginatedResponse<T, OffsetPaginatedResponseMetaNoCount>;
+
 
 impl<T, TMeta> paperclip::v2::schema::Apiv2Schema for OffsetPaginatedResponse<T, TMeta>
 where

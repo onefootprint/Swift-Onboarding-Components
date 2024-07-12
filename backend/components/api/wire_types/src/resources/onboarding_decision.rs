@@ -1,8 +1,10 @@
 use crate::*;
+use macros::JsonResponder;
 use newtypes::CollectedDataOption;
 use newtypes::DecisionStatus;
 use newtypes::ManualReviewKind;
 use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKey;
 use newtypes::OnboardingDecisionId;
 use newtypes::RuleSetResultId;
 use newtypes::WorkflowKind;
@@ -36,4 +38,25 @@ pub struct TimelinePlaybook {
     pub id: ObConfigurationId,
     pub name: String,
     pub must_collect_data: Vec<CollectedDataOption>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonResponder)]
+
+pub struct PublicOnboardingDecision {
+    pub status: DecisionStatus,
+    pub timestamp: DateTime<Utc>,
+    pub playbook_key: Option<ObConfigurationKey>,
+    pub kind: OnboardingDecisionKind,
+}
+
+#[derive(
+    Debug, Clone, strum_macros::Display, serde_with::SerializeDisplay, Apiv2Schema, macros::SerdeAttr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum OnboardingDecisionKind {
+    /// Decision made manually by a human
+    Manual,
+    /// Decision made automatically by a playbook run
+    PlaybookRun,
 }

@@ -4782,7 +4782,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/OrgMetrics"
+                                    "$ref": "#/components/schemas/OrgMetricsResponse"
                                 }
                             }
                         }
@@ -13215,6 +13215,7 @@
                         "type": "string",
                         "enum": [
                             "unreviewed",
+                            "not_needed",
                             "pending_machine_review",
                             "reviewed_by_machine",
                             "pending_human_review",
@@ -24329,38 +24330,81 @@
                     "requires_onboarding"
                 ]
             },
-            "OrgMetrics": {
+            "OrgMetricsResponse": {
                 "type": "object",
                 "properties": {
-                    "failed_user_onboardings": {
-                        "type": "integer",
-                        "format": "int64"
+                    "business": {
+                        "type": "object",
+                        "properties": {
+                            "fail_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "incomplete_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "new_vaults": {
+                                "description": "All vaults created, whether or not they've been through KYC",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "pass_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "total_onboardings": {
+                                "description": "All onboardings created",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "fail_onboardings",
+                            "incomplete_onboardings",
+                            "new_vaults",
+                            "pass_onboardings",
+                            "total_onboardings"
+                        ]
                     },
-                    "incomplete_user_onboardings": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "new_user_vaults": {
-                        "description": "All vaults created, whether or not they've been through KYC",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "successful_user_onboardings": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "total_user_onboardings": {
-                        "description": "All onboardings created",
-                        "type": "integer",
-                        "format": "int64"
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "fail_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "incomplete_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "new_vaults": {
+                                "description": "All vaults created, whether or not they've been through KYC",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "pass_onboardings": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "total_onboardings": {
+                                "description": "All onboardings created",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "fail_onboardings",
+                            "incomplete_onboardings",
+                            "new_vaults",
+                            "pass_onboardings",
+                            "total_onboardings"
+                        ]
                     }
                 },
                 "required": [
-                    "failed_user_onboardings",
-                    "incomplete_user_onboardings",
-                    "new_user_vaults",
-                    "successful_user_onboardings",
-                    "total_user_onboardings"
+                    "business",
+                    "user"
                 ]
             },
             "Organization": {

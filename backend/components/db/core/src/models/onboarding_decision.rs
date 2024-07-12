@@ -7,11 +7,14 @@ use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::models::workflow::Workflow;
 use crate::DbResult;
+use crate::OffsetPaginatedResult;
+use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::manual_review;
+use db_schema::schema::ob_configuration;
 use db_schema::schema::onboarding_decision;
 use db_schema::schema::onboarding_decision_verification_result_junction;
 use db_schema::schema::scoped_vault;
@@ -50,6 +53,8 @@ pub struct OnboardingDecision {
     pub status: DecisionStatus,
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
+    // TODO we should add scoped_vault_id to this table since not all decisions really affect a workflow
+    // anymore
     pub workflow_id: WorkflowId,
     /// If this is an OBD from a workflow, this will be the corresponding rule result making that
     /// decision Note: this is NOT currently backfilled so will be null for historical workflows
@@ -215,6 +220,27 @@ impl OnboardingDecision {
         Ok(res)
     }
 
+    #[tracing::instrument("OnboardingDecision::list", skip_all)]
+    pub fn list(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        pagination: OffsetPagination,
+    ) -> DbResult<OffsetPaginatedResult<(Self, Workflow, ObConfiguration)>> {
+        let mut query = onboarding_decision::table
+            .inner_join(workflow::table.inner_join(ob_configuration::table))
+            .filter(workflow::scoped_vault_id.eq(sv_id))
+            .order_by(onboarding_decision::created_at.desc())
+            .limit(pagination.limit())
+            .into_boxed();
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset);
+        }
+        let results = query.get_results(conn)?;
+        let results = results.into_iter().map(|(d, (wf, obc))| (d, wf, obc)).collect();
+        Ok(pagination.results(results))
+    }
+
+    // TODO rm
     #[tracing::instrument("OnboardingDecision::latest_footprint_actor_decision", skip_all)]
     pub fn latest_footprint_actor_decision(
         conn: &mut PgConn,
@@ -236,6 +262,7 @@ impl OnboardingDecision {
         Ok(res)
     }
 
+    // TODO rm
     #[tracing::instrument("OnboardingDecision::latest_non_footprint_actor_decision", skip_all)]
     pub fn latest_non_footprint_actor_decision(
         conn: &mut PgConn,

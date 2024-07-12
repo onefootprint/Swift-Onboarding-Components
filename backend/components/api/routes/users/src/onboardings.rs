@@ -14,7 +14,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use macros::route_alias;
 use newtypes::PreviewApi;
-use newtypes::WorkflowKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -25,11 +24,11 @@ type OnboardingsListResponse =
 
 #[route_alias(get(
     "/businesses/{fp_bid}/onboardings",
-    description = "Get the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+    description = "Get the list of playbooks this business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
     tags(Businesses, Preview)
 ))]
 #[api_v2_operation(
-    description = "Get the list of playbooks a user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+    description = "Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
     tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/onboardings")]
@@ -58,12 +57,7 @@ pub async fn get(
     let results = wfs
         .into_iter()
         .filter_map(|(wf, obc)| obc.map(|obc| (wf, obc)))
-        .filter(|(wf, _)| match wf.kind {
-            WorkflowKind::Kyb | WorkflowKind::Kyc | WorkflowKind::AlpacaKyc => true,
-            // Don't show status of document-only workflows triggered via the dashboard. Onboardings onto
-            // document playbooks actually use the Kyc workflow (which is shown above)
-            WorkflowKind::Document => false,
-        })
+        .filter(|(wf, _)| wf.kind.has_tenant_facing_decision())
         // Start by only showing workflows with a terminal decision
         .filter(|(wf, _)| wf.status.is_terminal())
         .map(api_wire_types::PublicOnboarding::from_db)

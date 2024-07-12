@@ -30,7 +30,7 @@ impl OffsetPagination {
     }
 
     /// Truncate the results to the requested page size and return the next page, if any
-    pub fn results<T>(&self, results: Vec<T>) -> (Vec<T>, NextPage) {
+    pub fn results<T>(&self, results: Vec<T>) -> OffsetPaginatedResult<T> {
         let has_next_page = results.len() > self.page_size;
         let next_page = has_next_page.then_some(self.page.unwrap_or_default() + 1);
         let results = results.into_iter().take(self.page_size).collect();
