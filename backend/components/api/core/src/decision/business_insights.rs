@@ -557,7 +557,7 @@ fn create_watchlists(business_response: &BusinessResponse) -> Option<InsightWatc
 
     if wl_hit_ids.is_empty() {
         if !matches!(wl_task, WatchlistTask::NoHits) {
-            tracing::error!("mismatch in watchlist task source list and watch list task label");
+            tracing::warn!("mismatch in watchlist task source list and watch list task label");
         }
 
         return None;
