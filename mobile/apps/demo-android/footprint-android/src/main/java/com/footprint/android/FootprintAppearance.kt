@@ -7,7 +7,6 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class FootprintAppearance(
-    val theme: FootprintAppearanceTheme? = null,
     val fontSrc: String? = null,
     val rules: FootprintAppearanceRules? = null,
     val variables: FootprintAppearanceVariables? = null,
@@ -20,12 +19,6 @@ data class FootprintAppearance(
         fontSrc?.let { appearanceJson["fontSrc"] = fontSrc }
         return if (appearanceJson.isEmpty()) null else appearanceJson
     }
-}
-
-@Serializable
-enum class FootprintAppearanceTheme {
-    @SerialName("light") LIGHT,
-    @SerialName("dark") DARK
 }
 
 @Serializable

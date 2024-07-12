@@ -4,16 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import com.footprint.android.BusinessBeneficialOwners
 import com.footprint.android.FootprintAndroid
 import com.footprint.android.FootprintAppearance
 import com.footprint.android.FootprintAppearanceRules
-import com.footprint.android.FootprintAppearanceTheme
 import com.footprint.android.FootprintAppearanceVariables
+import com.footprint.android.FootprintBootstrapData
 import com.footprint.android.FootprintConfiguration
 import com.footprint.android.FootprintL10n
 import com.footprint.android.FootprintOptions
 import com.footprint.android.FootprintSupportedLocale
-import com.footprint.android.FootprintUserData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
-            val userData = FootprintUserData(
+            val bootstrapData = FootprintBootstrapData(
                 email = "example@gmail.com",
                 phoneNumber = "+15555550100",
                 firstName = "Piip",
@@ -41,16 +41,34 @@ class MainActivity : AppCompatActivity() {
                 usLegalStatus = "citizen",
                 citizenships = listOf("US", "TR"),
                 visaKind = "f1",
-                visaExpirationDate = "05/12/2024"
+                visaExpirationDate = "05/12/2024",
+                businessAddressLine1 = "1 Main St",
+                businessAddressLine2 = "Apt 10",
+                businessBeneficialOwners = listOf(BusinessBeneficialOwners(
+                    boEmail = "example@gmail.com",
+                    boFirstName = "Piip",
+                    boLastName = "Foot",
+                    boPhoneNumber = "+15555550100"
+                )),
+                businessCity = "San Francisco",
+                businessState = "CA",
+                businessCountry = "US",
+                businessCorporationType = "llc",
+                businessDba = "Test",
+                businessFormationDate = "2010-01-01",
+                businessName = "Acme",
+                businessPhoneNumber = "+15555550100",
+                businessTin = "12-3456789",
+                businessWebsite = "test.test.com",
+                businessZip = "94107"
             )
             val config = FootprintConfiguration(
                 redirectActivityName = "com.onefootprint.demo_android.MainActivity",
-                publicKey = "pb_test_w4lkmHZzpp3tsJKCcYGTmT",
-                userData = userData,
+                publicKey = "pb_test_pZoERpZeZkGW7RRVeBawSm", // KYB pb_key to test all bootstrap data
+                bootstrapData = bootstrapData,
                 options = FootprintOptions(showLogo = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
                 appearance = FootprintAppearance(
-                    theme = FootprintAppearanceTheme.DARK,
                     rules = FootprintAppearanceRules(button = mapOf("transition" to "all .2s linear")),
                     variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
                 ),

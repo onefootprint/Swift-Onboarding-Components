@@ -9,7 +9,7 @@ data class FootprintConfiguration(
     @Transient val redirectActivityName: String? = null,
     @SerialName("public_key") val publicKey: String? = null,
     @SerialName("auth_token") val authToken: String? = null,
-    @SerialName("user_data") val userData: FootprintUserData? = null,
+    @SerialName("user_data") val bootstrapData: FootprintBootstrapData? = null,
     val options: FootprintOptions? = null,
     val l10n: FootprintL10n? = null,
     @Transient val cloudProjectNumber: Long? = null, // used for generating device attestations
@@ -26,7 +26,7 @@ data class FootprintConfiguration(
 }
 
 @Serializable
-data class FootprintUserData(
+data class FootprintBootstrapData(
     @SerialName("id.email") val email: String? = null,
     @SerialName("id.phone_number") val phoneNumber: String? = null,
     @SerialName("id.first_name") val firstName: String? = null,
@@ -45,7 +45,37 @@ data class FootprintUserData(
     @SerialName("id.us_legal_status") val usLegalStatus: String? = null,
     @SerialName("id.citizenships") val citizenships: List<String>? = null,
     @SerialName("id.visa_kind") val visaKind: String? = null,
-    @SerialName("id.visa_expiration_date") val visaExpirationDate: String? = null
+    @SerialName("id.itin") val itin: String? = null,
+    @SerialName("id.us_tax_id") val usTaxId: String? = null,
+    @SerialName("id.drivers_license_number") val driversLicenseNumber: String? = null,
+    @SerialName("id.drivers_license_state") val driversLicenseState: String? = null,
+    @SerialName("id.visa_expiration_date") val visaExpirationDate: String? = null,
+    @SerialName("business.address_line1") val businessAddressLine1: String? = null,
+    @SerialName("business.address_line2") val businessAddressLine2: String? = null,
+    @SerialName("business.beneficial_owners") val businessBeneficialOwners: List<BusinessBeneficialOwners>? = null,
+    @SerialName("business.city") val businessCity: String? = null,
+    @SerialName("business.corporation_type") val businessCorporationType: String? = null,
+    @SerialName("business.country") val businessCountry: String? = null,
+    @SerialName("business.dba") val businessDba: String? = null,
+    @SerialName("business.formation_date") val businessFormationDate: String? = null,
+    @SerialName("business.formation_state") val businessFormationState: String? = null,
+    @SerialName("business.kyced_beneficial_owners") val businessKycedBeneficialOwners: List<BusinessBeneficialOwners>? = null,
+    @SerialName("business.name") val businessName: String? = null,
+    @SerialName("business.phone_number") val businessPhoneNumber: String? = null,
+    @SerialName("business.state") val businessState: String? = null,
+    @SerialName("business.tin") val businessTin: String? = null,
+    @SerialName("business.website") val businessWebsite: String? = null,
+    @SerialName("business.zip") val businessZip: String? = null
+)
+
+@Serializable
+data class BusinessBeneficialOwners(
+    @SerialName("email") val boEmail: String? = null,
+    @SerialName("first_name") val boFirstName: String? = null,
+    @SerialName("last_name") val boLastName: String? = null,
+    @SerialName("middle_name") val boMiddleName: String? = null,
+    @SerialName("ownership_stake") val boOwnershipStack: Int? = null,
+    @SerialName("phone_number") val boPhoneNumber: String? = null
 )
 
 @Serializable
