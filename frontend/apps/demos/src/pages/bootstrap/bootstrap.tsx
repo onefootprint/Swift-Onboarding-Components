@@ -1,14 +1,14 @@
-import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import footprint from '@onefootprint/footprint-js';
+import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const publicKey = process.env.NEXT_PUBLIC_BOOTSTRAP_PK as string;
 
-const handleOpen = () => {
+const launchFootprint = () => {
   const component = footprint.init({
-    kind: FootprintComponentKind.Verify,
+    kind: 'verify',
     publicKey,
     bootstrapData: {
       'id.email': 'jane@acme.com',
@@ -36,8 +36,9 @@ const Bootstrap = () => (
       <title>Footprint Bootstrap</title>
     </Head>
     <Container>
-      <FootprintVerifyButton onClick={handleOpen} />
-      <div data-testid="result" />
+      <Button size="large" onClick={launchFootprint}>
+        Verify with Footprint
+      </Button>
     </Container>
   </>
 );

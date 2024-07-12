@@ -1,6 +1,6 @@
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import footprint from '@onefootprint/footprint-js';
 import { LogoFpDefault } from '@onefootprint/icons';
-import { Stack, Text, media } from '@onefootprint/ui';
+import { FootprintButton, Stack, Text, media } from '@onefootprint/ui';
 import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY ?? '';
 const Live = () => {
   const { t } = useTranslation('common', { keyPrefix: 'home' });
   const router = useRouter();
+  const theme = useTheme();
   const type = router?.query.type;
 
   const getPublicKey = (): string => {
@@ -32,9 +33,19 @@ const Live = () => {
     }
   };
 
-  const publicKey = getPublicKey();
+  const handleOpen = () => {
+    const component = footprint.init({
+      kind: 'verify',
+      publicKey: getPublicKey(),
+      onComplete: () => {
+        router.push('/ending');
+      },
+    });
+
+    component.render();
+  };
+
   const translationsKey = type === 'kyb' ? 'kyb' : 'kyc';
-  const theme = useTheme();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -95,13 +106,7 @@ const Live = () => {
               </Text>
             </MotionStack>
             <MotionStack variants={childrenVariants}>
-              <FootprintVerifyButton
-                publicKey={publicKey}
-                label={t(`${translationsKey}.cta`)}
-                onComplete={() => {
-                  router.push('/ending');
-                }}
-              />
+              <FootprintButton onClick={handleOpen} />
             </MotionStack>
             <MotionStack variants={childrenVariants}>
               <Text tag="p" variant="body-2" color="tertiary" maxWidth="520px">

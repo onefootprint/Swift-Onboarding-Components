@@ -1,5 +1,5 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from '@onefootprint/footprint-react';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -61,11 +61,12 @@ const Demo = () => {
       </Head>
       <Container>
         {publicKey && locale && bootstrapData ? (
-          <FootprintVerifyButton
+          <FootprintButton
             bootstrapData={bootstrapData}
-            publicKey={publicKey}
+            kind="verify"
             l10n={{ locale: locale as SupportedLocale }}
             onComplete={onComplete}
+            publicKey={publicKey}
           />
         ) : (
           <AnimatedLoadingSpinner animationStart />

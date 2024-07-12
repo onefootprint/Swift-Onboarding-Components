@@ -13,7 +13,7 @@ meta:
 
 ## Getting started
 
-In order to launch the auth flow, you need to use the `<FootprintVerifyButton />` component and specify the `kind` prop to `auth`.
+In order to launch the auth flow, you need to use the `<FootprintButton />` component and specify the `kind` prop to `auth`.
 This component will render a button that will launch the auth flow when clicked. The steps are similar to our [javascript integration](/sdks/js-auth):
 
 1. **Access Your Dashboard**:
@@ -128,7 +128,7 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from '@onefootprint/footprint-react';
 
 const Page = () => {
   return (

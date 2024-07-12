@@ -20,14 +20,14 @@ At a high level, the Footprint Auth component will prompt the user to authentica
 
 2. Add the `@onefootprint/footprint-js` dependency to your app and render the Auth component.
 
-Here's what your integration may look like if you use React/Typescript:
+Here's what your integration may look like if you use Javascript:
 
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const Page = () => {
-  const launchAuth = () => {
+  const handleOpen = () => {
     const component = footprint.init({
       kind: 'auth',
       publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
@@ -38,7 +38,9 @@ const Page = () => {
     component.render();
   };
 
-  return <button onClick={launchAuth}>Launch Auth</button>;
+  return (
+    <button onClick={handleOpen}>Launch Auth</button>
+  );
 };
 ```
 
@@ -110,18 +112,26 @@ You may then invoke Footprint KYC with the provided onboarding token. The user w
 
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import footprint from '@onefootprint/footprint-js';
 
-const MyComponent = () => {
+const App = () => {
   const handleComplete = (validationToken: string) => {
     // TODO: Post to Footprint server to fetch user ID and verification status
   };
+  
+  const handleOpen = () => {
+    const component = footprint.init({
+      kind: 'auth',
+      authToken: 'tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
+      onComplete: (validationToken: string) => {
+        // TODO: Post to Footprint server to fetch user ID
+      },
+    });
+    component.render();
+  };
 
   return (
-    <FootprintVerifyButton
-      authToken="tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
-      onComplete={handleComplete}
-    />
+    <button onClick={handleOpen}>Launch Auth</button>
   );
 };
 ```

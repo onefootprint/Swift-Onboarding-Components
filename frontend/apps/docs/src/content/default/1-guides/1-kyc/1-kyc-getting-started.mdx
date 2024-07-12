@@ -19,25 +19,7 @@ meta:
 
 2. Grab the Onboarding Publishable Key, for example `pb_test_VMooXd04EUlnu3AvMYKjMW`.
 
-3. Add the `footprint.js` script to your app.
-
-```html
-<head>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.css"
-  />
-</head>
-<body>
-  ...
-  <script
-    crossorigin
-    src="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.umd.js"
-  ></script>
-</body>
-```
-
-or
+3. Add the `footprint.js` script to your app:
 
 ```bash
 # With NPM
@@ -51,109 +33,30 @@ yarn add @onefootprint/footprint-js
 
 4. Render Footprint
 
-In order to use our onboarding flows, you can either render a Footprint button, or use your own button and trigger Footprint when clicked.
-
-### Vanilla HTML
-
-If you would like to use a pre-built Footprint button, below is what your integration would look like for Vanilla HTML:
-
-```html
-<div 
-  id="footprint-button"
-  data-footprint
-  data-kind="verify"
-  data-props='{"publicKey": "pb_test_VMooXd04EUlnu3AvMYKjMW"}'
-></div>
-```
-
-Make sure to add Footprint completion handlers on the `window` object:
+On your app, initialize Footprint when needed, passing the `publicKey` and `onComplete` callback. The `onComplete` callback will be called with a validation token that you can use to verify the user server-side.
 
 ```javascript
-window.footprintCallbacks = {
-  onComplete: function (token) {
-    // TODO: User has finished the flow. This validation token can be used to see the fp_id of the
-    // user, the auth method they used to log in, and their KYC status
-  },
-  onAuth: function (token) => {
-    // User has authenticated. Optionally, this validation token can be used to see the fp_id
-    // of the authenticated user and the auth method they used to log in
-  },
-};
-```
-
-Please refer to our guide for [Javascript](https://docs.onefootprint.com/sdks/javascript-typescript-introduction) for more details.
-
-### React
-
-If your app is built using React, you can use our React integration:
-
-```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import footprint from '@onefootprint/footprint-js';
 
-const Page = () => {
-  const handleCancel = () => {
-    console.log('user canceled');
-  };
-
-  const handleComplete = (validationToken: string) => {
-    console.log(validationToken);
+const App = () => {
+  const handleClick = () => {
+    const component = footprint.init({
+      kind: 'verify',
+      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+      bootstrapData: {},
+      onComplete: validationToken => {
+        // TODO: Post the token to Footprint server to exchange with Footprint user ID
+      },
+    });
+    component.render();
   };
 
   return (
-    <main>
-      <FootprintVerifyButton
-        publicKey="pb_test_VMooXd04EUlnu3AvMYKjMW"
-        onComplete={handleComplete}
-        onCancel={handleCancel}
-      />
-    </main>
+    <button onClick={handleClick}>Verify with Footprint</button>
   );
-};
+}
 ```
-
-Please refer to our guide for [React](https://docs.onefootprint.com/sdks/react-introduction) for more details.
-
-### Using your custom button
-
-If you would like to use your own button and trigger Footprint, you can execute the following on click:
-
-```javascript
-const handleClick = () => {
-  const component = footprint.init({
-    kind: 'verify',
-    publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
-    bootstrapData: {},
-    onComplete: validationToken => {
-      // TODO: Post the token to Footprint server to exchange with Footprint user ID
-    },
-  });
-  component.render();
-};
-```
-
-5. To customize the button placement, the easiest way is to wrap the button in a div and apply the styles to this div:
-
-```html
-<style>
-  .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-</style>
-
-<div class="container">
-  <div
-    data-footprint
-    data-kind="verify-button"
-    data-props='{"publicKey": "pb_test_VMooXd04EUlnu3AvMYKjMW"}'
-  ></div>
-</div>
-```
-
-Click [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js) to check out a full example.
 
 ## Verify the Footprint token server-side
 

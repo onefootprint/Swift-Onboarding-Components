@@ -1,18 +1,20 @@
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from '@onefootprint/footprint-react';
 import React from 'react';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 
 const VerifyButtonReactIntegration = () => (
   <>
-    <FootprintVerifyButton
+    <FootprintButton
+      kind="verify"
       label="Verify with Footprint (modal)"
       publicKey={publicKey}
       onComplete={(validationToken: string) => console.log('complete ', validationToken)}
       onClose={() => console.log('close')}
       onCancel={() => console.log('cancel')}
     />
-    <FootprintVerifyButton
+    <FootprintButton
+      kind="verify"
       label="Verify with Footprint (drawer)"
       publicKey={publicKey}
       dialogVariant="drawer"

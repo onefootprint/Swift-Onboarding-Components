@@ -1,4 +1,4 @@
-import { FootprintAuthButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from '@onefootprint/footprint-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -35,7 +35,8 @@ const AuthButtonReact = () => {
       <Head>
         <title>Auth Button React</title>
       </Head>
-      <FootprintAuthButton
+      <FootprintButton
+        kind="auth"
         bootstrapData={bootstrapData}
         dialogVariant="modal"
         label="Auth with Footprint (modal)"

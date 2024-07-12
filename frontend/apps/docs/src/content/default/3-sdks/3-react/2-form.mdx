@@ -71,7 +71,7 @@ Footprint provides some events based on some actions performed by the user.
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import { FootprintForm } from '@onefootprint/footprint-react';
 
 const Page = () => {
   const handleComplete = (validationToken: string) => {
@@ -92,7 +92,7 @@ const Page = () => {
 
   return (
     <main>
-      <FootprintVerifyButton
+      <FootprintForm
         authToken={secretAuthToken}
         onComplete={handleComplete}
         onError={handleError}
@@ -113,12 +113,12 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import { FootprintForm } from '@onefootprint/footprint-react';
 
 const Page = () => {
   return (
     <main>
-      <FootprintVerifyButton
+      <FootprintForm
         authToken={secretAuthToken}
         appearance={{
           variables: {
