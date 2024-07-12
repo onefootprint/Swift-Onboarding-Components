@@ -5,8 +5,8 @@ category: SDKs
 title: Android (Kotlin/Java)
 meta:
   {
-    title: 'Footprint Android Integration (Kotlin/Java)',
-    description: 'Discover how to integrate Footprint with a Android (Kotlin/Java) Codebase',
+    title: "Footprint Android Integration (Kotlin/Java)",
+    description: "Discover how to integrate Footprint with a Android (Kotlin/Java) Codebase",
   }
 ---
 
@@ -109,9 +109,9 @@ Instead of a `publicKey`, you can also use an `authToken` that you generate for 
 
 For a complete example, click [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-android-ui).
 
-### Bootstrapping user data
+### Bootstrapping data
 
-Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/integrate/bootstrap-data) to find out more about the formatting and validation requirements we have for these inputs.
+Utilize the `bootstrapData` option to pre-fill any available data and bypass completed pages for your users or businesses. You can click [here](https://docs.onefootprint.com/integrate/bootstrap-data) to find out more about the formatting and validation requirements we have for these inputs.
 
 ```kotlin
 package com.example.footprint_verification
@@ -122,7 +122,7 @@ import android.util.Log
 import android.widget.Button
 import com.footprint.android.FootprintAndroid
 import com.footprint.android.FootprintConfig
-import com.footprint.android.FootprintUserData
+import com.footprint.android.FootprintBootstrapData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
-            val userData = FootprintUserData(
+            val bootstrapData = FootprintBootstrapData(
                 email = "example@gmail.com",
                 phoneNumber = "+15555550100",
                 firstName = "Piip",
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             val config = FootprintConfig(
                 redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
-                userData = userData,
+                bootstrapData = bootstrapData,
                 onComplete = {token: String ->
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 }
@@ -167,8 +167,73 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
 ```
+
+The bootstrap data fields we currently support are as follows:
+
+##### KYC fields
+
+<br />
+
+| Variable             | Type            |
+| -------------------- | --------------- |
+| email                | `String?`       |
+| phoneNumber          | `String?`       |
+| firstName            | `String?`       |
+| middleName           | `String?`       |
+| lastName             | `String?`       |
+| dob                  | `String?`       |
+| addressLine1         | `String?`       |
+| addressLine2         | `String?`       |
+| city                 | `String?`       |
+| state                | `String?`       |
+| country              | `String?`       |
+| zip                  | `String?`       |
+| ssn9                 | `String?`       |
+| ssn4                 | `String?`       |
+| nationality          | `String?`       |
+| usLegalStatus        | `String?`       |
+| citizenships         | `List<String>?` |
+| visaKind             | `String?`       |
+| itin                 | `String?`       |
+| usTaxId              | `String?`       |
+| driversLicenseNumber | `String?`       |
+| driversLicenseState  | `String?`       |
+| visaExpirationDate   | `String?`       |
+
+##### KYB fields
+
+<br />
+
+| Variable                      | Type                              |
+| ----------------------------- | --------------------------------- |
+| businessAddressLine1          | `String?`                         |
+| businessAddressLine2          | `String?`                         |
+| businessBeneficialOwners      | `List<BusinessBeneficialOwners>?` |
+| businessCity                  | `String?`                         |
+| businessCorporationType       | `String?`                         |
+| businessCountry               | `String?`                         |
+| businessDba                   | `String?`                         |
+| businessFormationDate         | `String?`                         |
+| businessFormationState        | `String?`                         |
+| businessKycedBeneficialOwners | `List<BusinessBeneficialOwners>?` |
+| businessName                  | `String?`                         |
+| businessPhoneNumber           | `String?`                         |
+| businessState                 | `String?`                         |
+| businessTin                   | `String?`                         |
+| businessWebsite               | `String?`                         |
+| businessZip                   | `String?`                         |
+
+The `BusinessBeneficialOwners` type contains the following fields:
+
+| Variable         | Type      |
+| ---------------- | --------- |
+| boEmail          | `String?` |
+| boFirstName      | `String?` |
+| boLastName       | `String?` |
+| boMiddleName     | `String?` |
+| boOwnershipStack | `int?`    |
+| boPhoneNumber    | `String?` |
 
 ### Customizing the appearance
 
@@ -184,7 +249,6 @@ import android.widget.Button
 import com.footprint.android.FootprintAndroid
 import com.footprint.android.FootprintAppearance
 import com.footprint.android.FootprintAppearanceRules
-import com.footprint.android.FootprintAppearanceTheme
 import com.footprint.android.FootprintAppearanceVariables
 import com.footprint.android.FootprintConfig
 
@@ -200,7 +264,6 @@ class MainActivity : AppCompatActivity() {
                 redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 appearance = FootprintAppearance(
-                    theme = FootprintAppearanceTheme.DARK,
                     rules = FootprintAppearanceRules(button = mapOf("transition" to "all .2s linear")),
                     variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
                 ),
@@ -244,7 +307,6 @@ class MainActivity : AppCompatActivity() {
             val config = FootprintConfig(
                 redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
-                userData = userData,
                 options = FootprintOptions(showLogo = true),
                 onComplete = {token: String ->
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
@@ -292,7 +354,6 @@ class MainActivity : AppCompatActivity() {
             val config = FootprintConfig(
                 redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
-                userData = userData,
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
                 onComplete = {token: String ->
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
@@ -314,7 +375,7 @@ class MainActivity : AppCompatActivity() {
 | `redirectActivityName` | Required. The activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package` , the destination activity name will be `com.example.package.MainActivity` |
 | `publicKey`            | Optional. Onboarding configuration public key.                                                                                                                                                                                                                                                                                                       |
 | `authToken`            | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions).                                                                                                                      |
-| `userData`             | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                                                                                                                                                 |
+| `bootstrapData`        | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                                                                                                                                                 |
 | `options`              | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                                                                                                                                              |
 | `appearance`           | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                                                                                                                |
 | `l10n`                 | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                                                                                                                                             |
