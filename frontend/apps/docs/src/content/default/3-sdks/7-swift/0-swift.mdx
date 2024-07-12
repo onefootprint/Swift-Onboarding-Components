@@ -5,8 +5,8 @@ category: SDKs
 title: Swift
 meta:
   {
-    title: 'Footprint Swift Integration',
-    description: 'Discover how to integrate Footprint with a Swift Codebase',
+    title: "Footprint Swift Integration",
+    description: "Discover how to integrate Footprint with a Swift Codebase",
   }
 ---
 
@@ -79,9 +79,9 @@ Instead of a `publicKey`, you can also use an `authToken` that you generate for 
 
 For a complete example, click [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-swift-ui).
 
-### Bootstrapping user data
+### Bootstrapping data
 
-Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/integrate/bootstrap-data) to find out more about the formatting and validation requirements we have for these inputs.
+Utilize the `bootstrapData` option to pre-fill any available data and bypass completed pages for your users and businesses. You can click [here](https://docs.onefootprint.com/integrate/bootstrap-data) to find out more about the formatting and validation requirements we have for these inputs.
 
 ```swift
 import SwiftUI
@@ -91,7 +91,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Button("Verify") {
-                let userData = FootprintUserData(
+                let bootstrapData = FootprintBootstrapData(
                     email: "piip@gmail.com",
                     phoneNumber: "+15555550100",
                     firstName: "Piip",
@@ -115,7 +115,7 @@ struct ContentView: View {
                 let config = FootprintConfiguration(
                     publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
                     scheme: "my-app",
-                    userData: userData,
+                    bootstrapData: bootstrapData,
                     onComplete: { validationToken in
                         print("Validation token: \(validationToken)")
                     }
@@ -129,6 +129,72 @@ struct ContentView: View {
 }
 
 ```
+
+The bootstrap data fields we currently support are as follows:
+
+##### KYC fields
+
+<br />
+
+| Variable             | Type        |
+| -------------------- | ----------- |
+| email                | `String?`   |
+| phoneNumber          | `String?`   |
+| firstName            | `String?`   |
+| middleName           | `String?`   |
+| lastName             | `String?`   |
+| dob                  | `String?`   |
+| addressLine1         | `String?`   |
+| addressLine2         | `String?`   |
+| city                 | `String?`   |
+| state                | `String?`   |
+| country              | `String?`   |
+| zip                  | `String?`   |
+| ssn9                 | `String?`   |
+| ssn4                 | `String?`   |
+| nationality          | `String?`   |
+| usLegalStatus        | `String?`   |
+| citizenships         | `[String]?` |
+| visaKind             | `String?`   |
+| visaExpirationDate   | `String?`   |
+| itin                 | `String?`   |
+| usTaxId              | `String?`   |
+| driversLicenseNumber | `String?`   |
+| driversLicenseState  | `String?`   |
+
+##### KYB fields
+
+<br />
+
+| Variable                      | Type                          |
+| ----------------------------- | ----------------------------- |
+| businessAddressLine1          | `String?`                     |
+| businessAddressLine2          | `String?`                     |
+| businessBeneficialOwners      | `[BusinessBeneficialOwners]?` |
+| businessCity                  | `String?`                     |
+| businessCorporationType       | `String?`                     |
+| businessCountry               | `String?`                     |
+| businessDba                   | `String?`                     |
+| businessFormationDate         | `String?`                     |
+| businessFormationState        | `String?`                     |
+| businessKycedBeneficialOwners | `[BusinessBeneficialOwners]?` |
+| businessName                  | `String?`                     |
+| businessPhoneNumber           | `String?`                     |
+| businessState                 | `String?`                     |
+| businessTin                   | `String?`                     |
+| businessWebsite               | `String?`                     |
+| businessZip                   | `String?`                     |
+
+The `BusinessBeneficialOwners` type contains the following fields:
+
+| Variable         | Type      |
+| ---------------- | --------- |
+| boEmail          | `String?` |
+| boFirstName      | `String?` |
+| boLastName       | `String?` |
+| boMiddleName     | `String?` |
+| boOwnershipStack | `int?`    |
+| boPhoneNumber    | `String?` |
 
 ### Customizing the appearance
 
@@ -144,7 +210,6 @@ struct ContentView: View {
         VStack {
             Button("Verify") {
                 let appearance = FootprintAppearance(
-                    theme: .light,
                     rules: FootprintAppearanceRules(button: ["transition": "all .2s linear"]),
                     variables: FootprintAppearanceVariables(
                         colorError: "#E33D19",
@@ -264,14 +329,14 @@ struct ContentView: View {
 
 ## All configuration fields
 
-| Variable     | Description                                                                                                                                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`  | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
-| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
-| `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                            |
-| `options`    | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                         |
-| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
-| `l10n`       | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |
-| `onComplete` | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
-| `onCancel`   | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
-| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
+| Variable        | Description                                                                                                                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
+| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
+| `bootstrapData` | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/bootstrap-data).                                            |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                         |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                        |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
