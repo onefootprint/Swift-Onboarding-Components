@@ -473,7 +473,7 @@ describe('<Idv />', () => {
       await waitFor(() => {
         expect(screen.getByText('Capture or upload your ID document')).toBeInTheDocument();
       });
-      expect(screen.getByText('We need some more information from you.')).toBeInTheDocument();
+      expect(screen.getByText('Please take a clear photo of your document in a bright location')).toBeInTheDocument();
     });
   });
 

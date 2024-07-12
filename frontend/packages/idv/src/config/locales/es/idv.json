@@ -296,7 +296,7 @@
             }
           },
           "last-name": {
-            "label": "Apellido(s)",
+            "label": "Apellido (Paterno y Materno)",
             "placeholder": "Doe",
             "error": {
               "empty": "El apellido no puede quedar vacío",
@@ -327,13 +327,13 @@
       "residential-address": {
         "form": {
           "address-line-1": {
-            "label": "Dirección - Calle y número",
+            "label": "Calle y Número (Exterior e Interior)",
             "international-label": "Dirección",
             "placeholder": "Calle y número de casa",
             "error": "La dirección no puede quedar vacía y debe ser una dirección residencial (p. ej., no puede ser un PO Box)"
           },
           "address-line-2": {
-            "international-label": "Colonia, apartamento, barrio (opcional)",
+            "international-label": "Colonia (opcional)",
             "label": "Detalles adicionales (opcional)",
             "international-placeholder": "Nombre del barrio, número de suite, etc.",
             "placeholder": "Apartamento, suite, etc."
@@ -363,7 +363,7 @@
           }
         },
         "title": "¿Cuál es tu dirección?",
-        "subtitle": "Asegúrate de proporcionar tu dirección residencial actualizada (no apartados postales)."
+        "subtitle": "Asegúrate de proporcionar una dirección que coincida con un comprobante de domicilio y tu nombre completo"
       },
       "legal-status": {
         "title": "¿Cuál es tu situación legal en EE.UU.?",
@@ -1347,7 +1347,7 @@
         },
         "country-and-type-selection": {
           "title": "Captura o subir tu documento de identificación",
-          "subtitle": "Necesitamos más información de tu parte.",
+          "subtitle": "Asegúrate de tomar una foto clara de tu documento real en un lugar iluminado",
           "form": {
             "country": "País",
             "hint": {

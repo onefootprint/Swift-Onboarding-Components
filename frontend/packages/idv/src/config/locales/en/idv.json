@@ -1346,7 +1346,7 @@
         },
         "country-and-type-selection": {
           "title": "Capture or upload your ID document",
-          "subtitle": "We need some more information from you.",
+          "subtitle": "Please take a clear photo of your document in a bright location",
           "form": {
             "country": "Country",
             "hint": {
