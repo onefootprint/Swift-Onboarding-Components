@@ -27,6 +27,7 @@ class FootprintConfiguration {
     var map = {
       'l10n': l10n?._toJson(),
       'options': options?._toJson(),
+      'auth_token': authToken,
       'public_key': publicKey,
       'user_data': bootstrapData?._toJson(),
       'appearance': appearance?._toJson(),

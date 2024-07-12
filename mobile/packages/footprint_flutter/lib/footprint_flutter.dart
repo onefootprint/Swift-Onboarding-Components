@@ -56,16 +56,24 @@ class _Footprint {
 
     if (response.failed) {
       _logError(response.error);
+      return;
+    }
+    
+    var token = response.data;
+    if (token == null) {
+      _logError('Token is null');
+      return;
     }
 
-    var token = response.data;
-    if (token != null && !_isBrowserOpen) {
-      var url = _createUrl(token: token, config: config);
-      _openBrowser(url);
+    if (_isBrowserOpen) {
+      return;
     }
+
+    var url = _createUrl(token: token, config: config);
+    _openWebView(url);
   }
 
-  void _openBrowser(String url) {
+  void _openWebView(String url) {
     _browser.open(
         url: Uri.parse(url),
         options: ChromeSafariBrowserClassOptions(
