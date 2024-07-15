@@ -249,6 +249,7 @@
       "additional-docs": {
         "title": "Additional documents",
         "description": "Additional proofs that may help you analyze the user",
+        "extra-requirements": "Extra requirements",
         "form": {
           "require-manual-review": {
             "label": "Require manual review",

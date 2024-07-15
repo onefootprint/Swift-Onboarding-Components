@@ -40,9 +40,14 @@ const Preview = () => {
         </Stack>
       ) : null}
       {hasDoc ? (
-        <Stack justifyContent="space-between">
-          <Text variant="label-3">{t('form.require-manual-review.label')}</Text>
-          {requireManualReview ? <IcoCheck24 /> : <IcoClose24 />}
+        <Stack justifyContent="space-between" flexDirection="column" gap={5}>
+          <Text variant="label-3">{t('extra-requirements')}</Text>
+          <Stack justifyContent="space-between">
+            <Text variant="body-3" color="tertiary">
+              {t('form.require-manual-review.label')}
+            </Text>
+            {requireManualReview ? <IcoCheck24 /> : <IcoClose24 />}
+          </Stack>
         </Stack>
       ) : null}
     </Stack>
