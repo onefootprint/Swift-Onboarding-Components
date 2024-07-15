@@ -12,12 +12,12 @@ use strum::EnumIter;
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
-// For now, we just have 1 singular KYC waterfall ordering for all vendors. We start with Experian
-// and then waterfall to Idology if needed. (we still only make vendor calls that are available to
-// the tenant as dictated by tvc)
+// For now, we just have 1 singular KYC waterfall ordering for all vendors.
+// we only make vendor calls that are available to the tenant as dictated by enabled vendors on
+// TenantVendorControl (with no TVC, we default to Ido)
 pub enum WaterfallVendorAPI {
-    Experian,
     Lexis,
+    Experian,
     Idology,
 }
 
@@ -69,6 +69,7 @@ impl WaterfallVendorAPI {
     }
 
     // assumes we have a static ordering, which may not be the case. in future we'll define these
+    // somewhere tenant-specific perhaps
     pub fn ordered_apis(available_apis: Vec<VendorAPI>) -> Vec<Self> {
         Self::iter()
             .filter(|v| {
@@ -95,7 +96,7 @@ mod tests {
     use std::cmp::Ordering;
     use test_case::test_case;
     #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Idology => Ordering::Less)]
-    #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Lexis => Ordering::Less)]
+    #[test_case(WaterfallVendorAPI::Lexis, WaterfallVendorAPI::Experian => Ordering::Less)]
     #[test_case(WaterfallVendorAPI::Lexis, WaterfallVendorAPI::Idology => Ordering::Less)]
     fn test_cmp_waterfall_vendor(s1: WaterfallVendorAPI, s2: WaterfallVendorAPI) -> Ordering {
         s1.cmp(&s2)
