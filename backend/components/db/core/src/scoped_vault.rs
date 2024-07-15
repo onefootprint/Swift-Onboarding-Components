@@ -228,7 +228,7 @@ macro_rules! list_query {
     }};
 }
 
-#[instrument(skip_all)]
+#[instrument("ScopedVault::vaults_matching_search", skip_all)]
 fn vaults_matching_search(
     conn: &mut PgConn,
     search: SearchQuery,
@@ -280,7 +280,7 @@ fn vaults_matching_search(
     Ok(all_ids)
 }
 
-#[instrument(skip_all)]
+#[instrument("ScopedVault::list", skip_all)]
 fn list(
     conn: &mut PgConn,
     params: &ScopedVaultListQueryParams<Vec<ScopedVaultId>>,
@@ -319,7 +319,7 @@ fn list(
 }
 
 /// lists all scoped_vaults across all configurations
-#[instrument(skip_all)]
+#[instrument("ScopedVault::list_authorized_for_tenant", skip_all)]
 pub fn list_authorized_for_tenant(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,
@@ -331,7 +331,7 @@ pub fn list_authorized_for_tenant(
     list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
 }
 
-#[instrument(skip_all)]
+#[instrument("ScopedVault::count_for_tenant", skip_all)]
 pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
     let params = &params.map_search(conn)?;
     let count = list_query!(params).count().get_result(conn)?;
@@ -341,7 +341,7 @@ pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -
 /// List and count all scoped vaults matching the search params. Use this if you need both the
 /// count of results and the results themselves - this util saves and reuses some intermediate
 /// computation
-#[instrument(skip_all)]
+#[instrument("ScopedVault::list_and_count_authorized_for_tenant", skip_all)]
 pub fn list_and_count_authorized_for_tenant(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,

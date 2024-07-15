@@ -20,6 +20,7 @@ use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
+use tracing::Instrument;
 use tracing_actix_web::RootSpan;
 
 #[derive(Debug, Clone)]
@@ -47,6 +48,7 @@ impl FromRequest for SecretTenantAuthContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
+    #[tracing::instrument("SecretTenantAuthContext::from_request", skip_all)]
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         // get the tenant header
         let tenant_sk_input = parse_auth_key(req);
@@ -56,7 +58,7 @@ impl FromRequest for SecretTenantAuthContext {
 
         let root_span = RootSpan::from_request(req, payload);
 
-        Box::pin(async move {
+        let extractor = async move {
             let root_span = root_span
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
@@ -92,7 +94,8 @@ impl FromRequest for SecretTenantAuthContext {
                 api_key,
                 role,
             }))
-        })
+        };
+        Box::pin(extractor.in_current_span())
     }
 }
 

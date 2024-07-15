@@ -25,8 +25,10 @@ use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::Parameter;
 use paperclip::v2::models::SecurityScheme;
 use paperclip::v2::schema::Apiv2Schema;
+use std::any::type_name;
 use std::marker::PhantomData;
 use std::pin::Pin;
+use tracing::Instrument;
 use tracing_actix_web::RootSpan;
 
 /// Abstract Session Context Type
@@ -115,7 +117,7 @@ where
         auth_token: Option<PiiString>,
         req: RequestInfo,
     ) -> Pin<Box<dyn Future<Output = ApiResponse<Self>>>> {
-        Box::pin(async move {
+        let extractor = async move {
             let root_span = root_span
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
@@ -128,10 +130,11 @@ where
             let session = AuthSession::get(&state, &auth_token).await?;
 
             // Explicit type annotation here (T:: try_from) automatically ensures that a malicious user
-            // cannot re-use session tokens for different purposes -- the API endpoints declare the session
-            // type "T" that they allow (example: UserSession<OnboardingSessionData>)
-            // and if the session associated with the token cannot be converted to type T (in this case,
-            // OnboardingSession) we fail
+            // cannot re-use session tokens for different purposes -- the API endpoints declare the
+            // session type "T" that they allow (example:
+            // UserSession<OnboardingSessionData>) and if the session associated with the
+            // token cannot be converted to type T (in this case, OnboardingSession) we
+            // fail
             let raw_session_data = session.data.clone();
             let ff_client = state.ff_client.clone();
 
@@ -148,7 +151,8 @@ where
                 session,
                 phantom: PhantomData,
             })
-        })
+        };
+        Box::pin(extractor.in_current_span())
     }
 }
 
@@ -159,7 +163,11 @@ where
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
+    #[tracing::instrument("SessionContext::<T>::from_request", skip_all, fields(T=tracing::field::Empty))]
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
+        let span = tracing::Span::current();
+        span.record("T", type_name::<T>());
+
         #[allow(clippy::unwrap_used)]
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
         let root_span = RootSpan::from_request(req, payload);

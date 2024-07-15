@@ -12,6 +12,7 @@ use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::marker::PhantomData;
 use std::pin::Pin;
+use tracing::Instrument;
 
 /// Extracts a publishable key from the X-Onboarding-Config-Key header
 /// which indicates the tenant and onboarding configuration context
@@ -35,6 +36,7 @@ impl FromRequest for PublicOnboardingContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
+    #[tracing::instrument("PublicOnboardingContext::from_request", skip_all)]
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
         // get the tenant header
         let config_key = req
@@ -48,7 +50,7 @@ impl FromRequest for PublicOnboardingContext {
 
         let root_span = RootSpan::from_request(req, payload);
 
-        Box::pin(async move {
+        let extractor = async move {
             let root_span = root_span
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
@@ -84,7 +86,8 @@ impl FromRequest for PublicOnboardingContext {
                 ob_config,
                 phantom: PhantomData,
             })
-        })
+        };
+        Box::pin(extractor.in_current_span())
     }
 
     fn extract(req: &actix_web::HttpRequest) -> Self::Future {

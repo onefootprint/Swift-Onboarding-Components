@@ -6,6 +6,7 @@ use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::marker::PhantomData;
 use std::pin::Pin;
+use tracing::Instrument;
 
 /// Protected custodian context guards protected custodian APIs
 #[derive(Debug, Clone, Apiv2Security)]
@@ -26,6 +27,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
+    #[tracing::instrument("ProtectedCustodianAuthContext::from_request", skip_all)]
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let custodian_key = req
             .headers()
@@ -41,7 +43,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
             .protected_custodian_key
             .clone();
 
-        Box::pin(async move {
+        let extractor = async move {
             let Some(expected_custodian_key) = expected_custodian_key else {
                 tracing::error!("protected custodian key not set, aborting");
                 return Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into());
@@ -53,6 +55,7 @@ impl FromRequest for ProtectedCustodianAuthContext {
             } else {
                 Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into())
             }
-        })
+        };
+        Box::pin(extractor.in_current_span())
     }
 }
