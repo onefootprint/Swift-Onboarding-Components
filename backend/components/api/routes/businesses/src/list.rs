@@ -9,6 +9,7 @@ use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_wire_types::ModernSearchRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use newtypes::PreviewApi;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::VaultKind;
@@ -28,6 +29,7 @@ pub async fn get(
     auth: SecretTenantAuthContext,
 ) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::LegacyListUsersBusinesses)?;
     let tenant = auth.tenant();
     let ModernSearchRequest { external_id } = request.into_inner();
 

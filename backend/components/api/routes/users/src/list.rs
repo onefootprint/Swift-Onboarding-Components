@@ -12,6 +12,7 @@ use api_core::utils::search_utils::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::PiiString;
+use newtypes::PreviewApi;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::TimestampCursor;
@@ -34,6 +35,7 @@ pub async fn get(
     root_span: RootSpan,
 ) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
+    auth.check_preview_guard(PreviewApi::LegacyListUsersBusinesses)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search, external_id } = request.into_inner();
     let has_search = search.is_some();
