@@ -1,0 +1,52 @@
+---
+page: default
+slug: /sdks/expo-introduction
+category: SDKs
+subcategory: Expo
+title: Introduction
+meta:
+  {
+    title: "Footprint Expo Integration",
+    description: "Discover how to integrate Footprint with a Expo Codebase",
+  }
+---
+
+## Before starting
+
+Expo is a powerful open-source platform that allows developers to build, deploy, and quickly iterate on native iOS, Android, and web apps from the same JavaScript codebase. It provides a set of tools and services for building applications that target a wide range of platforms with a single codebase, making the process of app development faster and easier.
+
+Footprint's integration with Expo is designed specifically to leverage Expo's unique environment. This package - footprint-expo - allows Footprint to work seamlessly within Expo's framework. The implementation, though similar to our web-based solution, uses an in-app browser (webview) instead of iframes, providing a smooth, native-like experience for the user.
+
+While we also offer a React Native package, you should use footprint-expo if your application is built with Expo, as it ensures optimal compatibility and performance. If you aren't using Expo, then our [React Native SDK](/sdks/react-native) package would be more suitable.
+
+## Available Components
+
+| Dependency            | Minimum Version |
+| --------------------- | --------------- |
+| Onboarding (Hosted)   | Available       |
+| Onboarding Components | Not available   |
+| Auth (Hosted)         | Not available   |
+| Auth (Components)     | Not available   |
+| Secure form           | Not available   |
+
+## Minimum version requirements
+
+Before proceeding with the installation, make sure your environment meets the minimum version requirements:
+
+| Dependency | Minimum Version       |
+| ---------- | --------------------- |
+| Expo       | Last 3 major versions |
+
+## Installation
+
+To begin, install `@onefootprint/footprint-expo`:
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-expo
+
+# With yarn
+yarn add @onefootprint/footprint-expo
+```
+
+Each component has specific integration steps and options, which will be detailed in the following sections of the documentation.
