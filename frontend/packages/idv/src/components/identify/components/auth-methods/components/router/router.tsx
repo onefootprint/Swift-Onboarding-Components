@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 import { useDeviceInfo } from '../../../../../../hooks/ui/use-device-info';
+import { getLogger } from '../../../../../../utils';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';
 import type { HeaderProps } from '../../../../types';
@@ -18,6 +19,8 @@ type AuthMethodsRouterProps = {
   Loading: JSX.Element;
   onDone: React.MouseEventHandler<HTMLButtonElement>;
 };
+
+const { logWarn } = getLogger({ location: 'auth-methods-router' });
 
 const getHeader = (
   _ctx: MachineContext,
@@ -34,7 +37,7 @@ const AuthMethodsRouter = ({ Loading, onDone }: AuthMethodsRouterProps): JSX.Ele
   const isDone = matches('success');
   const Header = getHeader(context, getHeaderLeftNavButton(state, send));
   const [device, setDevice] = useState<DeviceInfo>();
-  useDeviceInfo(setDevice);
+  useDeviceInfo(setDevice, () => logWarn('Unable to collect device info'));
 
   if (isDone) return null;
   if (matches('init')) return Loading;

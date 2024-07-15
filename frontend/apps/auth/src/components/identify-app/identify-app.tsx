@@ -26,7 +26,7 @@ type IdentifyAppProps = { variant?: Variant; fallback: JSX.Element };
 
 const voidObj: Record<string, never> = {};
 const { canceled, closed, completed } = FootprintPublicEvent;
-const { logError, logInfo } = getLogger({ location: 'identify-app' });
+const { logError, logInfo, logWarn } = getLogger({ location: 'identify-app' });
 
 const onValidationTokenError = (error: unknown) => {
   logError('Error while validating auth token', error);
@@ -47,10 +47,13 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const { t } = useTranslation('common');
   const [device, setDevice] = useState<DeviceInfo>();
 
-  useDeviceInfo(info => {
-    setDevice(info);
-    logInfo(`Webauthn support:${info.hasSupportForWebauthn}`, info);
-  });
+  useDeviceInfo(
+    info => {
+      setDevice(info);
+      logInfo(`Webauthn support:${info.hasSupportForWebauthn}`, info);
+    },
+    () => logWarn('Unable to collect device info'),
+  );
 
   useProps<AuthDataPropsWithToken>(
     (authProps, authConfig) => {

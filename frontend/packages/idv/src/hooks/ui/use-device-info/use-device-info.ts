@@ -1,15 +1,8 @@
 import UAParser from 'ua-parser-js';
 import { useEffectOnce } from 'usehooks-ts';
 
-export type BasicDeviceInfo = {
-  type: string;
-  osName: string;
-  browser: string;
-};
-
-export type DeviceInfo = BasicDeviceInfo & {
-  hasSupportForWebauthn: boolean;
-};
+export type BasicDeviceInfo = { browser: string; osName: string; type: string };
+export type DeviceInfo = BasicDeviceInfo & { hasSupportForWebauthn: boolean };
 
 // UAParser device type can have an undefined type, because
 // it could get executed on the server side. We assign a default
@@ -25,31 +18,29 @@ export const getBasicDevice = () => {
   const os = uaParser.getOS();
   const browser = uaParser.getBrowser();
   const info: BasicDeviceInfo = {
-    type: device.type || DEFAULT_DEVICE_TYPE,
-    osName: os.name || DEFAULT_OS_TYPE,
     browser: browser.name || DEFAULT_BROWSER_TYPE,
+    osName: os.name || DEFAULT_OS_TYPE,
+    type: device.type || DEFAULT_DEVICE_TYPE,
   };
   return info;
 };
 
 export const checkDeviceInfo = async () => {
   let hasSupportForWebauthn = false;
-  if (window.PublicKeyCredential) {
-    hasSupportForWebauthn = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  if (typeof window !== 'undefined' && window.PublicKeyCredential) {
+    try {
+      hasSupportForWebauthn = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    } catch (error) {
+      console.error('Error checking for WebAuthn support:', error);
+    }
   }
   const basicInfo = getBasicDevice();
-  const info: DeviceInfo = {
-    hasSupportForWebauthn,
-    ...basicInfo,
-  };
-  return info;
+  return { hasSupportForWebauthn, ...basicInfo };
 };
 
-const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void) => {
+const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void, onError?: () => void) => {
   useEffectOnce(() => {
-    checkDeviceInfo().then(info => {
-      onComplete(info);
-    });
+    checkDeviceInfo().then(onComplete).catch(onError);
   });
 };
 

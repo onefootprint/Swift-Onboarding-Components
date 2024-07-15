@@ -7,21 +7,19 @@ import { InitShimmer } from '../../components';
 import type { DeviceInfo } from '../../hooks';
 import { useDeviceInfo, useGetOnboardingConfig } from '../../hooks';
 import useIdvMachine from '../../hooks/ui/use-idv-machine';
-import { Logger, trackAction } from '../../utils';
+import { getLogger, trackAction } from '../../utils';
+
+const { logError, logWarn } = getLogger({ location: 'idv-init' });
 
 const Init = () => {
   const [state, send] = useIdvMachine();
   const { getErrorCode, getErrorStatusCode } = useRequestError();
   const { obConfigAuth, authToken, device, bootstrapData = {} } = state.context;
 
-  useDeviceInfo((newDevice: DeviceInfo) => {
-    send({
-      type: 'initContextUpdated',
-      payload: {
-        device: device ?? newDevice,
-      },
-    });
-  });
+  useDeviceInfo(
+    (info: DeviceInfo) => send({ type: 'initContextUpdated', payload: { device: device ?? info } }),
+    () => logWarn('Unable to collect device info'),
+  );
 
   useEffect(() => {
     trackAction('onboarding:started', {
@@ -44,9 +42,7 @@ const Init = () => {
       },
       onError: error => {
         trackAction('onboarding:started-failed', { error: getErrorMessage(error) });
-        Logger.error(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, {
-          location: 'idv-init',
-        });
+        logError(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, error);
         const errorCode = getErrorCode(error);
         const errorStatusCode = getErrorStatusCode(error);
         let reason: ConfigRequestFailureReason = ConfigRequestFailureReason.other;
