@@ -1,5 +1,5 @@
 use crate::task::ExecuteTask;
-use crate::task::TaskError;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::ApiKeyListFilters;
@@ -20,7 +20,7 @@ impl LogNumTenantApiKeysTask {
 
 #[async_trait]
 impl ExecuteTask<LogNumTenantApiKeysArgs> for LogNumTenantApiKeysTask {
-    async fn execute(&self, args: &LogNumTenantApiKeysArgs) -> Result<(), TaskError> {
+    async fn execute(&self, args: &LogNumTenantApiKeysArgs) -> FpResult<()> {
         let tenant_id = args.tenant_id.clone();
         let is_live = args.is_live;
         let cnt = self

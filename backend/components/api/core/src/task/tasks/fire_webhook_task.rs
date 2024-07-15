@@ -1,6 +1,6 @@
 use crate::task::ExecuteTask;
-use crate::task::TaskError;
 use crate::State;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use newtypes::FireWebhookArgs;
 use webhooks::events::WebhookEvent;
@@ -18,7 +18,7 @@ impl FireWebhookTask {
 
 #[async_trait]
 impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
-    async fn execute(&self, args: &FireWebhookArgs) -> Result<(), TaskError> {
+    async fn execute(&self, args: &FireWebhookArgs) -> FpResult<()> {
         let t_id = args.tenant_id.clone();
         let is_live = args.is_live;
         let event = WebhookEvent::from(args.webhook_event.clone());

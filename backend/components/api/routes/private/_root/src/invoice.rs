@@ -4,9 +4,9 @@ use actix_web::web::{
     self,
 };
 use api_core::types::ApiResponse;
+use api_core::FpResult;
 use api_core::State;
 use billing::create_bill_for_tenant;
-use billing::BResult;
 use chrono::Duration;
 use chrono::NaiveDate;
 use chrono::Utc;
@@ -65,7 +65,7 @@ async fn post_all(
         .unwrap_or((Utc::now() - Duration::hours(8)).date_naive());
 
     let mut tasks = futures::stream::FuturesUnordered::<
-        std::pin::Pin<Box<dyn std::future::Future<Output = BResult<()>>>>,
+        std::pin::Pin<Box<dyn std::future::Future<Output = FpResult<()>>>>,
     >::new();
     for t in tenants {
         tasks.push(Box::pin(create_bill_for_tenant(

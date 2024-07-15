@@ -3,6 +3,8 @@ use crate::BResult;
 use crate::BillingClient;
 use crate::BillingCounts;
 use crate::BillingInfo;
+use api_errors::FpResult;
+use api_errors::ValidationError;
 use chrono::NaiveDate;
 use db::models::billing_profile::BillingProfile;
 use db::models::tenant::Tenant;
@@ -18,18 +20,16 @@ pub async fn create_bill_for_tenant(
     db_pool: &DbPool,
     tenant: Tenant,
     billing_date: NaiveDate,
-) -> BResult<()> {
+) -> FpResult<()> {
     let i = get_billing_interval(billing_date)?;
 
     // Count the number of billable uses of each product for this tenant
     let t_id = tenant.id.clone();
     let (billing_profile, counts) = db_pool
-        .db_query(move |conn| -> BResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &t_id)?;
             if tenant.super_tenant_id.is_some() {
-                return Err(crate::Error::ValidationError(
-                    "Cannot generate invoice for subtenant".into(),
-                ));
+                return ValidationError("Cannot generate invoice for subtenant").into();
             }
             let children = Tenant::list_children(conn, &t_id)?;
             let billing_profile = BillingProfile::get(conn, &t_id)?;

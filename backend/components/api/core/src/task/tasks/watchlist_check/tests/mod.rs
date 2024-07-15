@@ -1,7 +1,6 @@
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::task::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
 use crate::task::ExecuteTask;
-use crate::task::TaskError;
 use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
@@ -103,7 +102,7 @@ async fn create_user_and_task(
     (sv, task)
 }
 
-async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) -> Result<(), TaskError> {
+async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) -> FpResult<()> {
     let wct = WatchlistCheckTask::new(state.clone(), task_id.clone());
     let args = WatchlistCheckArgs {
         scoped_vault_id: sv_id.clone(),

@@ -1,5 +1,4 @@
 use crate::task::tasks::watchlist_check::tests::*;
-use crate::task::TaskError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -140,9 +139,7 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     // ASSERTIONS
     let (wc, di, vreqs, ut, rs) = get_data(&state.db_pool, sv.id).await;
 
-    let TaskError::ApiError(e) = res.err().unwrap() else {
-        panic!();
-    };
+    let e = res.err().unwrap();
     assert!(
         e.message()
             == "Incode error: Incode API Error: IncodeAPIResponseError Something bad happened yo:  in >"

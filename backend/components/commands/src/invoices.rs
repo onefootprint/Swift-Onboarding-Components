@@ -1,9 +1,9 @@
 use anyhow::anyhow;
 use anyhow::Result;
 use api_core::config::Config;
+use api_core::FpResult;
 use api_core::State;
 use billing::create_bill_for_tenant;
-use billing::BResult;
 use chrono::Duration;
 use chrono::NaiveDate;
 use chrono::Utc;
@@ -35,7 +35,7 @@ impl GenerateInvoices {
             .map_err(|e| anyhow!("{}", e))?;
 
         let mut tasks = futures::stream::FuturesUnordered::<
-            std::pin::Pin<Box<dyn std::future::Future<Output = BResult<()>>>>,
+            std::pin::Pin<Box<dyn std::future::Future<Output = FpResult<()>>>>,
         >::new();
         let num_tenants = tenants.len();
         for t in tenants {

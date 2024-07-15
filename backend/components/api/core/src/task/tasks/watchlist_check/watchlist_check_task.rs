@@ -4,7 +4,6 @@ use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
 use crate::errors::AssertionError;
 use crate::task::ExecuteTask;
-use crate::task::TaskError;
 use crate::task::{
     self,
 };
@@ -13,6 +12,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use api_errors::FpError;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -85,7 +85,7 @@ impl WatchlistVendorResult {
 
 #[async_trait]
 impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
-    async fn execute(&self, args: &WatchlistCheckArgs) -> Result<(), TaskError> {
+    async fn execute(&self, args: &WatchlistCheckArgs) -> FpResult<()> {
         let sv_id = args.scoped_vault_id.clone();
         let task_id = self.task_id.clone();
 
@@ -97,7 +97,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let (tenant, sv, obc, uvw, wc) = self
             .state
             .db_pool
-            .db_transaction(move |conn| -> Result<_, TaskError> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
                 // extra safe
                 let _task = Task::lock(conn, &task_id)?;
@@ -177,7 +177,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             ) => {
                 // logic that enqeues this Task should prevent this, but extra precaution
                 if !continuous_monitoring {
-                    return Err(FpError::from(AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str())).into());
+                    return AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str()).into();
                 }
                 if idv::requirements::vendor_api_requirements_are_satisfied(
                     &VendorAPI::IncodeWatchlistCheck,

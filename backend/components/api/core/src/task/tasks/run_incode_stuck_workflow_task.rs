@@ -4,10 +4,9 @@ use crate::decision::{
     self,
 };
 use crate::task::ExecuteTask;
-use crate::task::TaskError;
-use crate::ApiCoreError;
 use crate::State;
-use api_errors::FpError;
+use api_errors::AssertionError;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::workflow::Workflow;
 use newtypes::RunIncodeStuckWorkflowArgs;
@@ -25,7 +24,7 @@ impl RunIncodeStuckWorkflowTask {
 
 #[async_trait]
 impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
-    async fn execute(&self, args: &RunIncodeStuckWorkflowArgs) -> Result<(), TaskError> {
+    async fn execute(&self, args: &RunIncodeStuckWorkflowArgs) -> FpResult<()> {
         let wfid = args.workflow_id.clone();
         let wf = self
             .state
@@ -36,7 +35,7 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
         let run = decision::state::run_incode_machine_and_workflow(&self.state, ww).await?;
         match run {
             RunIncodeMachineAndWorkflowResult::IncodeStuck => {
-                Err(FpError::from(ApiCoreError::AssertionError("IncodeStuck".to_owned())).into())
+                return AssertionError("IncodeStuck").into();
             }
             RunIncodeMachineAndWorkflowResult::WorkflowRan => Ok(()),
         }

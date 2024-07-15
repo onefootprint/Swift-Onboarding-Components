@@ -3,8 +3,8 @@ use self::tasks::log_message_task::LogMessageTask;
 use self::tasks::log_num_tenant_api_keys_task::LogNumTenantApiKeysTask;
 use self::tasks::run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask;
 use self::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
-use crate::FpError;
 use crate::State;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::task::Task;
 use db::models::task_execution::TaskExecution;
@@ -16,24 +16,9 @@ use newtypes::TaskExecutionId;
 use newtypes::TaskId;
 use newtypes::TaskKind;
 use newtypes::TaskStatus;
-use thiserror::Error;
 use tracing::Instrument;
 
 mod tasks;
-
-#[derive(Debug, Error)]
-pub enum TaskError {
-    #[error("{0}")]
-    Database(#[from] DbError),
-    #[error("{0}")]
-    ApiError(#[from] FpError),
-    #[error("{0}")]
-    IdologyError(#[from] idv::idology::error::Error),
-    #[error("{0}")]
-    IdvError(#[from] idv::Error),
-    #[error("{0}")]
-    WebhookError(#[from] webhooks::Error),
-}
 
 pub fn execute_webhook_tasks(state: State) {
     poll_and_execute_tasks_non_blocking(state, 10, Some(TaskKind::FireWebhook))
@@ -102,7 +87,7 @@ pub async fn poll_and_execute_tasks(
         .collect::<Result<Vec<Task>, DbError>>()
 }
 
-async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
+async fn execute_task(task: &Task, state: &State) -> FpResult<()> {
     match &task.task_data {
         newtypes::TaskData::LogMessage(args) => LogMessageTask {}.execute(args).await,
         newtypes::TaskData::LogNumTenantApiKeys(args) => {
@@ -122,7 +107,7 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
     }
 }
 
-fn task_result_to_status(task: &Task, task_result: Result<(), TaskError>) -> TaskStatus {
+fn task_result_to_status(task: &Task, task_result: FpResult<()>) -> TaskStatus {
     match task_result {
         Ok(_) => TaskStatus::Completed,
         Err(_) => {
@@ -156,7 +141,7 @@ async fn update_task(
 
 #[async_trait]
 trait ExecuteTask<T> {
-    async fn execute(&self, args: &T) -> Result<(), TaskError>;
+    async fn execute(&self, args: &T) -> FpResult<()>;
 }
 
 #[cfg(test)]
