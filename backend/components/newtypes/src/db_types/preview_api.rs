@@ -39,7 +39,6 @@ pub enum PreviewApi {
     VaultIntegrity,
     ReonboardUser,
     CreateUserDecision,
-    CreateUserToken,
     Labels,
     Tags,
     CreateBusinessOwner,
