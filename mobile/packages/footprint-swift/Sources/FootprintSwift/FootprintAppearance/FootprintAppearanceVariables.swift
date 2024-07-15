@@ -220,6 +220,9 @@ public struct FootprintAppearanceVariables: Codable {
                 dropdownColorSecondary: String? = nil,
                 dropdownFooterBg: String? = nil,
                 radioSelectBg: String? = nil,
+                radioSelectColor: String? = nil,
+                radioSelectHoverColor: String? = nil,
+                radioSelectSelectedColor: String? = nil,
                 radioSelectBorderRadius: String? = nil,
                 radioSelectBorderWidth: String? = nil,
                 radioSelectBorderColor: String? = nil,
@@ -323,6 +326,9 @@ public struct FootprintAppearanceVariables: Codable {
         self.dropdownColorSecondary = dropdownColorSecondary
         self.dropdownFooterBg = dropdownFooterBg
         self.radioSelectBg = radioSelectBg
+        self.radioSelectColor = radioSelectColor
+        self.radioSelectHoverColor = radioSelectHoverColor
+        self.radioSelectSelectedColor = radioSelectSelectedColor
         self.radioSelectBorderRadius = radioSelectBorderRadius
         self.radioSelectBorderWidth = radioSelectBorderWidth
         self.radioSelectBorderColor = radioSelectBorderColor
@@ -428,6 +434,9 @@ public struct FootprintAppearanceVariables: Codable {
         case dropdownColorSecondary
         case dropdownFooterBg
         case radioSelectBg
+        case radioSelectColor
+        case radioSelectHoverColor
+        case radioSelectSelectedColor
         case radioSelectBorderRadius
         case radioSelectBorderWidth
         case radioSelectBorderColor
@@ -534,6 +543,9 @@ public struct FootprintAppearanceVariables: Codable {
         try container.encodeIfPresent(self.dropdownColorSecondary, forKey: .dropdownColorSecondary)
         try container.encodeIfPresent(self.dropdownFooterBg, forKey: .dropdownFooterBg)
         try container.encodeIfPresent(self.radioSelectBg, forKey: .radioSelectBg)
+        try container.encodeIfPresent(self.radioSelectColor, forKey: .radioSelectColor)
+        try container.encodeIfPresent(self.radioSelectHoverColor, forKey: .radioSelectHoverColor)
+        try container.encodeIfPresent(self.radioSelectSelectedColor, forKey: .radioSelectSelectedColor)
         try container.encodeIfPresent(self.radioSelectBorderRadius, forKey: .radioSelectBorderRadius)
         try container.encodeIfPresent(self.radioSelectBorderWidth, forKey: .radioSelectBorderWidth)
         try container.encodeIfPresent(self.radioSelectBorderColor, forKey: .radioSelectBorderColor)
