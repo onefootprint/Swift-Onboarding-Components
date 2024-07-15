@@ -9,6 +9,61 @@
         }
     ],
     "paths": {
+        "/businesses": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "external_id",
+                        "description": "Filter users by an external id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/businesses/{fp_bid}/decisions": {
             "get": {
                 "tags": [
@@ -368,6 +423,60 @@
                     {
                         "Dashboard Token": []
                     },
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up users based on external ID. This API is not intended to be used to paginate through all of your organization's users.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "external_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
                     {
                         "Secret API Key": []
                     }
@@ -1782,6 +1891,54 @@
                 "required": [
                     "annotation",
                     "status"
+                ]
+            },
+            "CursorPaginatedLiteUser": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "external_id": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
+                                    "type": "string"
+                                },
+                                "sandbox_id": {
+                                    "description": "Only populated for users created in sandbox mode.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results.",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next": {
+                                "example": 1234,
+                                "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
                 ]
             },
             "Empty": {

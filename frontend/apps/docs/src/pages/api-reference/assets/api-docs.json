@@ -10,59 +10,6 @@
     ],
     "paths": {
         "/businesses": {
-            "get": {
-                "tags": [
-                    "Businesses",
-                    "PublicApi"
-                ],
-                "description": "Get the list of businesses",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "cursor",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "external_id",
-                        "description": "Filter users by an external id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            },
             "post": {
                 "tags": [
                     "Businesses",
@@ -447,58 +394,6 @@
             }
         },
         "/users": {
-            "get": {
-                "tags": [
-                    "Users",
-                    "PublicApi"
-                ],
-                "description": "Get the list of users",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "cursor",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "external_id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CursorPaginatedLiteUser"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            },
             "post": {
                 "tags": [
                     "Users",

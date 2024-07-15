@@ -21,7 +21,10 @@ use paperclip::actix::get;
 use paperclip::actix::post;
 use paperclip::actix::web;
 
-#[api_v2_operation(description = "Get the list of users", tags(Users, PublicApi))]
+#[api_v2_operation(
+    description = "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users.",
+    tags(Users, Preview)
+)]
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,

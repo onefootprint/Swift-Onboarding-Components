@@ -16,7 +16,10 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
 
-#[api_v2_operation(description = "Get the list of businesses", tags(Businesses, PublicApi))]
+#[api_v2_operation(
+    description = "Look up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.",
+    tags(Businesses, Preview)
+)]
 #[get("/businesses")]
 pub async fn get(
     state: web::Data<State>,
