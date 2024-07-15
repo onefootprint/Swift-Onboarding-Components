@@ -1,6 +1,7 @@
+use newtypes::scrub_pii_value;
+use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::SambaReportId;
-use newtypes::ScrubbedPiiJsonValue;
 use serde::Deserialize;
 use serde::Serialize;
 use std::str::FromStr;
@@ -91,11 +92,14 @@ pub struct Record {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct DlRecord {
-    pub criteria: Option<ScrubbedPiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub criteria: Option<PiiJsonValue>,
     pub result: Result,
     pub license_validation: Option<LicenseValidation>,
-    pub driver: Option<ScrubbedPiiJsonValue>,
-    pub current_license: Option<ScrubbedPiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub driver: Option<PiiJsonValue>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub current_license: Option<PiiJsonValue>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq)]
