@@ -88,9 +88,16 @@ impl DbPool {
 
         // Check if the connection experienced an irrecoverable error
         if let Err(e) = result.as_ref() {
-            if e.code() == Some(FpErrorCode::DbConnectionClosed)
-                || e.code() == Some(FpErrorCode::DbBrokenTransactionManager)
-            {
+            let irrecoverable_error_codes = &[
+                FpErrorCode::DbConnectionClosed,
+                FpErrorCode::DbBrokenTransactionManager,
+                // When we're cutting over in a blue/green deployment, one database will instantly become
+                // read-only. We should close the connection and attempt to re-open.
+                // Note: we could have some problems here once we start to actually use read replicas
+                FpErrorCode::DbReadOnlyTransaction,
+                // TODO should we also reopen the conn when we receive an unknown error?
+            ];
+            if e.code().is_some_and(|c| irrecoverable_error_codes.contains(&c)) {
                 // Remove the connection from the pool since it can no longer be reused
                 tracing::error!(err=?e, message=?e.message(), code=?e.code(), "Removed broken connection from DB pool");
                 let _ = deadpool::managed::Object::<ManagedPgConn>::take(conn);

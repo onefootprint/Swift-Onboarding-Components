@@ -17,6 +17,8 @@ pub enum FpErrorCode {
     DbConnectionClosed,
     #[strum(serialize = "I106")]
     DbBrokenTransactionManager,
+    #[strum(serialize = "I107")]
+    DbReadOnlyTransaction,
 
     // Errors used by our client
     #[strum(serialize = "E101")]
@@ -86,6 +88,7 @@ impl FpErrorCode {
             Self::MissingHeader => false,
             Self::DbConnectionClosed => false,
             Self::DbBrokenTransactionManager => false,
+            Self::DbReadOnlyTransaction => false,
 
             // Errors used by our client
             Self::InvalidStatusTransition => true,

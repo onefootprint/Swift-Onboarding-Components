@@ -227,6 +227,10 @@ impl FpErrorTrait for DbError {
             Self::DbError(diesel::result::Error::BrokenTransactionManager) => {
                 Some(api_errors::FpErrorCode::DbBrokenTransactionManager)
             }
+            Self::DbError(diesel::result::Error::DatabaseError(
+                DatabaseErrorKind::ReadOnlyTransaction,
+                _,
+            )) => Some(api_errors::FpErrorCode::DbReadOnlyTransaction),
             _ => None,
         }
     }
