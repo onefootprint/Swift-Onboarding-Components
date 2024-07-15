@@ -8,6 +8,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import { useRouter } from 'next/router';
 import MessageBanner from 'src/components/layout/message-banner';
+import { LINTRK_CONVERSION_ID } from 'src/config/constants';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import DesktopNavLink from './components/desktop-nav-link';
@@ -21,10 +22,12 @@ type DesktopNavProps = {
 };
 
 const handleLoginClick = () => {
+  window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
   window.open(`${DASHBOARD_BASE_URL}/authentication/sign-in`, '_blank');
 };
 
 const handleSignUpClick = () => {
+  window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
   window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank');
 };
 

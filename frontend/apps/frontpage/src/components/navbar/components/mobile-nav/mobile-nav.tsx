@@ -11,6 +11,7 @@ import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
 import _ from 'lodash';
+import { LINTRK_CONVERSION_ID } from 'src/config/constants';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import MobileNavLink from './components/mobile-nav-link';
@@ -36,6 +37,14 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
 
   const handleLogoClick = () => {
     setIsOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
+  };
+
+  const handleSignUpClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
   };
 
   useLockedBody(isOpen);
@@ -107,8 +116,12 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
                     })}
                   </LinkList>
                   <CtaContainer>
-                    <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
-                    <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
+                    <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`} onClick={handleLoginClick}>
+                      {t('login')}
+                    </LoginLink>
+                    <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`} onClick={handleSignUpClick}>
+                      {t('sign-up')}
+                    </LinkButton>
                   </CtaContainer>
                 </MenuContainer>
               </NavigationMenu.Root>

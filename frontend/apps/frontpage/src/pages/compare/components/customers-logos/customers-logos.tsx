@@ -3,6 +3,7 @@ import { Button, Container, Stack, Text, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
+import { LINTRK_CONVERSION_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import Logos from './logos';
 
@@ -13,6 +14,21 @@ const CustomersLogos = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.compare.logos-section',
   });
+
+  const handleBookDemoClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
+    setShowDialog(true);
+  };
+
+  const handleGetStartedClick = () => {
+    window.lintrk('track', { conversion_id: LINTRK_CONVERSION_ID });
+    window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank');
+  };
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+  };
+
   return (
     <>
       <StyledContainer direction="column" gap={9} align="center" paddingBottom={11} marginTop={9}>
@@ -23,19 +39,15 @@ const CustomersLogos = () => {
         </Stack>
         <Logos />
         <ButtonContainer>
-          <Button
-            variant="primary"
-            size="large"
-            onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
-          >
+          <Button variant="primary" size="large" onClick={handleGetStartedClick}>
             {t('get-started')}
           </Button>
-          <Button variant="secondary" size="large" onClick={() => setShowDialog(true)}>
+          <Button variant="secondary" size="large" onClick={handleBookDemoClick}>
             {t('book-a-demo')}
           </Button>
         </ButtonContainer>
       </StyledContainer>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleCloseDialog} />
     </>
   );
 };
