@@ -78,11 +78,23 @@ export const hasMissingAddressData = (ctx: MachineContext): boolean => {
 
 export const hasMissingBeneficialOwners = (ctx: MachineContext): boolean => {
   const data = getBusinessDataFromContext(ctx);
-  const beneficialOwners = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
+  const propList = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
   if (!ctx.kybRequirement || !Array.isArray(ctx.kybRequirement.missingAttributes)) return false;
 
   return ctx.kybRequirement.missingAttributes.some(reqId => {
     const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
-    return beneficialOwners.includes(reqId) && requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
+    return (
+      propList.includes(reqId) &&
+      requiredAttributes &&
+      requiredAttributes.some(vaultId => {
+        const bOwners = data[vaultId];
+        return (
+          !bOwners ||
+          !Array.isArray(bOwners) ||
+          bOwners.length === 0 ||
+          bOwners.some(bOwner => !bOwner.first_name || !bOwner.last_name || !bOwner.ownership_stake)
+        );
+      })
+    );
   });
 };

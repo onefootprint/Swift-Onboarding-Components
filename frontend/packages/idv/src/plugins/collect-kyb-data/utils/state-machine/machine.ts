@@ -28,31 +28,18 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       states: {
         init: {
           always: [
-            {
-              target: 'introduction',
-              cond: hasAnyMissingRequiredAttribute,
-            },
+            { target: 'introduction', cond: hasAnyMissingRequiredAttribute },
+            { target: 'introduction', cond: hasMissingBeneficialOwners },
             { target: 'confirm' },
           ],
         },
         introduction: {
           on: {
             introductionCompleted: [
-              {
-                target: 'basicData',
-                cond: hasMissingBasicData,
-              },
-              {
-                target: 'businessAddress',
-                cond: hasMissingAddressData,
-              },
-              {
-                target: 'beneficialOwners',
-                cond: hasMissingBeneficialOwners,
-              },
-              {
-                target: 'confirm',
-              },
+              { target: 'basicData', cond: hasMissingBasicData },
+              { target: 'businessAddress', cond: hasMissingAddressData },
+              { target: 'beneficialOwners', cond: hasMissingBeneficialOwners },
+              { target: 'confirm' },
             ],
           },
         },
@@ -92,14 +79,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               },
             ],
             navigatedToPrevPage: [
-              {
-                target: 'businessAddress',
-                cond: hasMissingAddressData,
-              },
-              {
-                target: 'basicData',
-                cond: hasMissingBasicData,
-              },
+              { target: 'businessAddress', cond: hasMissingAddressData },
+              { target: 'basicData', cond: hasMissingBasicData },
               { target: 'introduction' },
             ],
           },

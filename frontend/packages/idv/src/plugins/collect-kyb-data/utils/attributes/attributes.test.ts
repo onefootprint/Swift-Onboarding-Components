@@ -247,6 +247,64 @@ describe('hasMissingBeneficialOwners', () => {
     expect(hasMissingBeneficialOwners(ctx)).toBe(true);
   });
 
+  it('should return true if last_name are not present', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.beneficialOwners] },
+      bootstrapBusinessData: {},
+      data: {
+        [BusinessDI.beneficialOwners]: [
+          {
+            first_name: 'first',
+            middle_name: 'middle',
+            ownership_stake: 10,
+            email: 'email@onefootprint.com',
+            phone_number: '+15555550100',
+          },
+        ],
+      },
+    } as unknown as MachineContext;
+    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+  });
+
+  it('should return true if first_name are not present', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.beneficialOwners] },
+      bootstrapBusinessData: {},
+      data: {
+        [BusinessDI.beneficialOwners]: [
+          {
+            middle_name: 'middle',
+            last_name: 'last',
+            ownership_stake: 10,
+            email: 'email@onefootprint.com',
+            phone_number: '+15555550100',
+          },
+        ],
+      },
+    } as unknown as MachineContext;
+    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+  });
+
+  it('should return true if ownership_stake are not present', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.beneficialOwners] },
+      bootstrapBusinessData: {},
+      data: {
+        [BusinessDI.beneficialOwners]: [
+          {
+            first_name: 'first',
+            middle_name: 'middle',
+            last_name: 'last',
+            email: 'email@onefootprint.com',
+            phone_number: '+15555550100',
+            ownership_stake: '',
+          },
+        ],
+      },
+    } as unknown as MachineContext;
+    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+  });
+
   it('should return false if all required attributes are present', () => {
     const ctx = {
       kybRequirement: { missingAttributes: [CollectedKybDataOption.beneficialOwners] },
@@ -257,7 +315,7 @@ describe('hasMissingBeneficialOwners', () => {
             first_name: 'first',
             middle_name: 'middle',
             last_name: 'last',
-            ownership_stake: '10',
+            ownership_stake: 10,
             email: 'email@onefootprint.com',
             phone_number: '+15555550100',
           },
