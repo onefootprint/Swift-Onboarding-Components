@@ -62,6 +62,8 @@ impl SimpleConnection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
+            called_fn="batch_execute",
+            db.statement=field::Empty,
         ),
         skip(self, query),
         err,
@@ -69,7 +71,9 @@ impl SimpleConnection for InstrumentedPgConnection {
     fn batch_execute(&mut self, query: &str) -> QueryResult<()> {
         debug!("executing batch query");
         self.inner.batch_execute(query)?;
-        // TODO should we instrument this?
+        let span = tracing::Span::current();
+        span.record("db.statement", query);
+        span.record("otel.name", query);
 
         Ok(())
     }
@@ -116,7 +120,6 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=field::Empty,
             net.peer.port=field::Empty,
-            db.statement=field::Empty,
         ),
         skip(database_url),
         err,
@@ -145,7 +148,6 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            db.statement=field::Empty,
         ),
         skip(self, f),
     )]
@@ -165,7 +167,9 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
+            called_fn="execute_returning_count",
             db.statement=%DebugQuery::new(source),
+            otel.name=%DebugQuery::new(source),
             db.row_count=field::Empty,
         ),
         skip(self, source),
@@ -198,7 +202,9 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
+            called_fn="load",
             db.statement=%DebugQuery::new(&source),
+            otel.name=%DebugQuery::new(&source),
             db.row_count=field::Empty,
         ),
         skip(self, source),
@@ -224,7 +230,6 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
 
 impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
     #[instrument(
-        "load_row_by_row",
         fields(
             db.name=%self.info.current_database,
             db.system="postgresql",
@@ -232,7 +237,9 @@ impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
+            called_fn="LoadConnection<PgRowByRowLoadingMode>::load",
             db.statement=%DebugQuery::new(&source),
+            otel.name=%DebugQuery::new(&source),
         ),
         skip(self, source),
         err,
