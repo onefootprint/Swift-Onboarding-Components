@@ -24,15 +24,16 @@ pub fn load_vault_dr_data_lifetime_batch(
     batch_size: u32,
     fp_id_filter: Option<Vec<FpId>>,
 ) -> DbResult<Vec<DataLifetime>> {
+    // n.b. This query has been tuned for performance.
     let mut query = data_lifetime::table
         .inner_join(scoped_vault::table)
-        .left_join(
-            vault_dr_blob::table.on(vault_dr_blob::dl_created_seqno
-                .eq(data_lifetime::created_seqno)
-                .and(vault_dr_blob::config_id.eq(config_id))),
-        )
         .filter(scoped_vault::tenant_id.eq(tenant_id))
         .filter(scoped_vault::is_live.eq(is_live))
+        .filter(diesel::dsl::not(diesel::dsl::exists(
+            vault_dr_blob::table
+                .filter(vault_dr_blob::dl_created_seqno.eq(data_lifetime::created_seqno))
+                .filter(vault_dr_blob::config_id.eq(config_id)),
+        )))
         .into_boxed();
 
     if let Some(fp_ids) = fp_id_filter {
@@ -40,7 +41,6 @@ pub fn load_vault_dr_data_lifetime_batch(
     }
 
     let dls = query
-        .filter(vault_dr_blob::id.is_null())
         .select(DataLifetime::as_select())
         .order(data_lifetime::created_seqno)
         .limit(batch_size as i64)
