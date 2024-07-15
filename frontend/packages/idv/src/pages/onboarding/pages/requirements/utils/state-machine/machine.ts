@@ -2,7 +2,7 @@ import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onef
 import { assign, createMachine } from 'xstate';
 
 import type { BusinessData, UserData } from '../../../../../../types';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
 import { NextRequirementTargets, RequirementCompletedTransition, shouldWaitForComponentsSdk } from './machine.utils';
@@ -16,6 +16,8 @@ export type OnboardingRequirementsMachineArgs = {
   overallOutcome?: OverallOutcome;
   isTransferOnDesktopDisabled?: boolean;
 };
+
+const { logError } = getLogger({ location: 'onboarding-requirements' });
 
 const createOnboardingRequirementsMachine = ({
   config,
@@ -93,15 +95,15 @@ const createOnboardingRequirementsMachine = ({
         },
         kybData: {
           // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
-          exit: ['markCollectedKycData', 'markLastHandledRequirement'],
+          exit: ['setKycDataCollected', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         investorProfile: {
-          exit: ['markLastHandledRequirement'],
+          exit: ['setInvestorProfileCollected', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         kycData: {
-          exit: ['markCollectedKycData', 'markLastHandledRequirement'],
+          exit: ['setKycDataCollected', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         waitForComponentsSdk: {
@@ -137,36 +139,23 @@ const createOnboardingRequirementsMachine = ({
     },
     {
       actions: {
-        assignRequirements: assign((context, event) => {
-          const isRepeat = isRepeatRequirement(context.lastHandledRequirement, event.payload[0]);
+        assignRequirements: assign((ctx, event) => {
+          const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
             // If the highest priority requirement hasn't changed after a refetch, the user is
             // stuck on a screen
-            Logger.error(`User is stuck on ${context.lastHandledRequirement?.kind} requirement`, {
-              location: 'requirements',
-            });
+            logError(`User is stuck on ${ctx.lastHandledRequirement?.kind} requirement`);
           }
           return {
-            ...context,
+            ...ctx,
             requirements: [...event.payload],
           };
         }),
-        markLastHandledRequirement: assign(context => ({
-          ...context,
-          lastHandledRequirement: context.requirements[0],
-        })),
-        markDidRunTransfer: assign(context => ({
-          ...context,
-          didRunTransfer: true,
-        })),
-        startDataCollection: assign(context => ({
-          ...context,
-          startedDataCollection: true,
-        })),
-        markCollectedKycData: assign(context => ({
-          ...context,
-          collectedKycData: true,
-        })),
+        markDidRunTransfer: assign(ctx => ({ ...ctx, didRunTransfer: true })),
+        markLastHandledRequirement: assign(ctx => ({ ...ctx, lastHandledRequirement: ctx.requirements[0] })),
+        setInvestorProfileCollected: assign(ctx => ({ ...ctx, isInvestorProfileCollected: true })),
+        setKycDataCollected: assign(ctx => ({ ...ctx, isKycDataCollected: true })),
+        startDataCollection: assign(ctx => ({ ...ctx, startedDataCollection: true })),
       },
     },
   );

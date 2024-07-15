@@ -13,7 +13,7 @@ const Init = () => {
   const [state, send] = useCollectKycDataMachine();
   const {
     authToken,
-    requirement: { populatedAttributes: populatedCdos },
+    requirement: { populatedAttributes },
   } = state.context;
   const handleSuccess = (data: KycData) => {
     send({ type: 'initialized', payload: data });
@@ -24,13 +24,13 @@ const Init = () => {
     // If we fail to decrypt the existing information on the vault, it's no big deal - we can move
     // forward and just have the user re-enter their info instead of taking the already portable info
     // But log anyways because this shouldn't happen :)
-    logError(`Kyc init page failed to decrypt data fields (${populatedCdos.join(', ')}) requested.`, err);
+    logError(`Kyc init page failed to decrypt data fields (${populatedAttributes.join(', ')}) requested.`, err);
     send({ type: 'initialized', payload: {} });
   };
 
   useDecryptKycData({
     authToken,
-    populatedCdos,
+    populatedCdos: populatedAttributes,
     onSuccess: handleSuccess,
     onError: handleError,
   });

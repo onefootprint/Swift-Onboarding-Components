@@ -4,11 +4,7 @@ export const withUserVaultValidate = () => {
   mockRequest({
     method: 'post',
     path: '/hosted/user/vault/validate',
-    response: {
-      data: {
-        data: 'success',
-      },
-    },
+    response: { data: { data: 'success' } },
   });
 };
 
@@ -16,11 +12,7 @@ export const withUserVault = () =>
   mockRequest({
     method: 'patch',
     path: '/hosted/user/vault',
-    response: {
-      data: {
-        data: 'success',
-      },
-    },
+    response: { data: { data: 'success' } },
   });
 
 export const onboardingConfigFixture = {
@@ -40,7 +32,12 @@ export const withOnboardingConfig = (data = onboardingConfigFixture) =>
   mockRequest({
     method: 'get',
     path: '/hosted/onboarding/config',
-    response: {
-      data,
-    },
+    response: { data },
+  });
+
+export const withDecryptUser = () =>
+  mockRequest({
+    method: 'post',
+    path: '/hosted/user/vault/decrypt',
+    response: {},
   });

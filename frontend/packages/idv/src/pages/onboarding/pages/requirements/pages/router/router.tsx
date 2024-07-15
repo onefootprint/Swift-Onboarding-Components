@@ -30,7 +30,7 @@ const Router = ({ onDone }: RouterProps) => {
   const {
     idvContext,
     onboardingContext: { bootstrapData, config, idDocOutcome },
-    collectedKycData,
+    isKycDataCollected,
     requirements,
   } = state.context;
   const { orgId } = config;
@@ -95,7 +95,7 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <InvestorProfile
         idvContext={idvContext}
-        context={{ showTransition: !!collectedKycData }}
+        context={{ showTransition: !!isKycDataCollected }}
         onDone={handleRequirementCompleted}
       />
     );

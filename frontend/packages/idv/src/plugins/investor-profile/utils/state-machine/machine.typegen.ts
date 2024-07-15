@@ -17,6 +17,7 @@ export interface Typegen0 {
       | 'declarationsSubmitted'
       | 'employmentSubmitted'
       | 'incomeSubmitted'
+      | 'initDone'
       | 'investmentGoalsSubmitted'
       | 'netWorthSubmitted'
       | 'riskToleranceSubmitted';
@@ -30,8 +31,10 @@ export interface Typegen0 {
     | 'declarations'
     | 'employment'
     | 'income'
+    | 'init'
     | 'investmentGoals'
     | 'netWorth'
+    | 'redirectTo'
     | 'riskTolerance';
   tags: never;
 }

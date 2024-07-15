@@ -6,7 +6,7 @@ import React from 'react';
 import { Layout } from 'src/components/layout';
 
 import InvestorProfile from './index';
-import { withOnboardingConfig, withUserVault, withUserVaultValidate } from './index.test.config';
+import { withDecryptUser, withOnboardingConfig, withUserVault, withUserVaultValidate } from './index.test.config';
 import type { InvestorProfileProps } from './investor-profile.types';
 
 describe('<InvestorProfile />', () => {
@@ -28,6 +28,7 @@ describe('<InvestorProfile />', () => {
     withOnboardingConfig();
     withUserVaultValidate();
     withUserVault();
+    withDecryptUser();
   });
 
   const renderPlugin = ({ onDone }: Pick<InvestorProfileProps, 'onDone'>) => {

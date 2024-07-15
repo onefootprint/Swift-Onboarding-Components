@@ -6,7 +6,7 @@ import { Logger, getLogger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
 
-const { logInfo } = getLogger({ location: 'onboarding-check-requirements' });
+const { logInfo, logError } = getLogger({ location: 'onboarding-check-requirements' });
 
 const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
   logInfo(
@@ -29,9 +29,10 @@ const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
 const CheckRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    startedDataCollection,
     idvContext: { authToken, isTransfer, componentsSdkContext },
-    collectedKycData,
+    isInvestorProfileCollected,
+    isKycDataCollected,
+    startedDataCollection,
   } = state.context;
 
   useGetOnboardingStatus({
@@ -41,19 +42,17 @@ const CheckRequirements = () => {
         logOnboardingStatusResponse(response);
 
         const context = {
+          isComponentsSdk: !!componentsSdkContext,
+          isInvestorProfileCollected: !!isInvestorProfileCollected,
+          isKycDataCollected: !!isKycDataCollected,
           isTransfer: !!isTransfer,
           startedDataCollection,
-          hasRunCollectedKycData: !!collectedKycData,
-          isComponentsSdk: !!componentsSdkContext,
         };
         const payload = computeRequirementsToShow(context, response);
-
         send({ type: 'onboardingRequirementsReceived', payload });
       },
       onError: (err: unknown) => {
-        Logger.error(`Error while checking requirements from onboarding status: ${getErrorMessage(err)}`, {
-          location: 'onboarding-check-requirements',
-        });
+        logError(`Error while checking requirements from onboarding status: ${getErrorMessage(err)}`, err);
         send('error');
       },
     },

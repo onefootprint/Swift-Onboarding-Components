@@ -5,22 +5,27 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
 import { trackAction } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import Animation from '../animation';
 import Confirm from '../confirm/confirm';
 import Declarations from '../declarations';
 import Employment from '../employment';
 import Income from '../income';
+import Init from '../init';
 import InvestmentGoals from '../investment-goals';
 import NetWorth from '../net-worth';
 import RiskTolerance from '../risk-tolerance';
 
 type RouterProps = { onDone: () => void };
 
+const { logError } = getLogger({ location: 'investor-profile-route' });
+
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useInvestorProfileMachine();
-  const { showTransition, data } = state.context;
-  const isDone = state.matches('completed');
+  const { matches, context } = state;
+  const { showTransition, data } = context;
+  const isDone = matches('completed');
   const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages' });
   const [displayAnimation, setDisplayAnimation] = useState(() => showTransition && Object.keys(data).length === 0);
 
@@ -39,7 +44,21 @@ const Router = ({ onDone }: RouterProps) => {
     }
   }, [isDone, onDone]);
 
-  if (state.matches('employment')) {
+  if (matches('init')) {
+    return (
+      <Init
+        authToken={state.context.authToken}
+        onSuccess={payload => send({ type: 'initDone', payload })}
+        onError={error => {
+          logError('error fetching investor_profile.*', error);
+          send({ type: 'initFailed' });
+        }}
+      >
+        {displayAnimation ? <Animation onAnimationEnd={() => setDisplayAnimation(false)} /> : null}
+      </Init>
+    );
+  }
+  if (matches('employment')) {
     return displayAnimation ? (
       <Animation onAnimationEnd={() => setDisplayAnimation(false)} />
     ) : (
@@ -50,7 +69,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('income')) {
+  if (matches('income')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
@@ -59,7 +78,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('netWorth')) {
+  if (matches('netWorth')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
@@ -68,7 +87,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('investmentGoals')) {
+  if (matches('investmentGoals')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
@@ -77,7 +96,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('riskTolerance')) {
+  if (matches('riskTolerance')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
@@ -86,7 +105,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('declarations')) {
+  if (matches('declarations')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
@@ -95,7 +114,7 @@ const Router = ({ onDone }: RouterProps) => {
       </>
     );
   }
-  if (state.matches('confirm')) {
+  if (matches('confirm')) {
     return (
       <>
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />

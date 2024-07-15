@@ -15,9 +15,10 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignRequirements: 'onboardingRequirementsReceived';
-    markCollectedKycData: 'error' | 'xstate.stop';
     markDidRunTransfer: 'error' | 'xstate.stop';
     markLastHandledRequirement: 'error' | 'xstate.stop';
+    setInvestorProfileCollected: 'error' | 'xstate.stop';
+    setKycDataCollected: 'error' | 'xstate.stop';
     startDataCollection: 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};

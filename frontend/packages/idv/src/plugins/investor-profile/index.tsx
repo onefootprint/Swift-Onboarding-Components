@@ -4,7 +4,7 @@ import { MachineProvider } from './components/machine-provider';
 import type { InvestorProfileProps } from './investor-profile.types';
 import Router from './pages/router';
 
-const AppWithMachine = ({ idvContext, context, onDone }: InvestorProfileProps) => {
+const InvestorProfile = ({ idvContext, context, onDone }: InvestorProfileProps) => {
   const { authToken, device } = idvContext;
   const initContext = {
     device,
@@ -19,4 +19,4 @@ const AppWithMachine = ({ idvContext, context, onDone }: InvestorProfileProps) =
   );
 };
 
-export default AppWithMachine;
+export default InvestorProfile;

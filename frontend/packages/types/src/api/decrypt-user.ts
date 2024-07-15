@@ -1,7 +1,7 @@
 import type { DataIdentifier } from '../data';
 
 export type DecryptUserRequest = {
-  fields: DataIdentifier[];
+  fields: `${DataIdentifier}`[];
   authToken: string;
 };
 

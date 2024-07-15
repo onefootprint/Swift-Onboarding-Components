@@ -10,6 +10,37 @@ export type CreateInvestorProfileArgs = {
   showTransition?: boolean;
 };
 
+export const isMissingEmploymentData = ({ data }: MachineContext): boolean => {
+  const employmentStatus = data?.[InvestorProfileDI.employmentStatus];
+  const occupation = data?.[InvestorProfileDI.occupation];
+  const employer = data?.[InvestorProfileDI.employer];
+
+  if (!employmentStatus) return true;
+  return employmentStatus === 'employed' && (!occupation || !employer);
+};
+
+export const isMissingIncomeData = ({ data }: MachineContext): boolean => {
+  return !data?.[InvestorProfileDI.annualIncome];
+};
+
+export const isMissingNetWorthData = ({ data }: MachineContext): boolean => {
+  return !data?.[InvestorProfileDI.netWorth];
+};
+
+export const isMissingInvestmentGoalsData = ({ data }: MachineContext): boolean => {
+  const goals = data?.[InvestorProfileDI.investmentGoals];
+  if (!goals || !Array.isArray(goals)) return true;
+  return goals.length === 0;
+};
+
+export const isMissingRiskToleranceData = ({ data }: MachineContext): boolean => {
+  return !data?.[InvestorProfileDI.riskTolerance];
+};
+
+export const isMissingDeclarationsData = (_: MachineContext): boolean => {
+  return false; /** Declarations are not mandatory step */
+};
+
 const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransition }: CreateInvestorProfileArgs) =>
   createMachine(
     {
@@ -21,7 +52,7 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
       },
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'employment',
+      initial: 'init',
       context: {
         device,
         authToken,
@@ -29,6 +60,23 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
         data: {},
       },
       states: {
+        init: {
+          on: {
+            initDone: { target: 'redirectTo', actions: ['assignData'] },
+            initFailed: { target: 'employment' },
+          },
+        },
+        redirectTo: {
+          always: [
+            { target: 'employment', cond: isMissingEmploymentData },
+            { target: 'income', cond: isMissingIncomeData },
+            { target: 'netWorth', cond: isMissingNetWorthData },
+            { target: 'investmentGoals', cond: isMissingInvestmentGoalsData },
+            { target: 'riskTolerance', cond: isMissingRiskToleranceData },
+            { target: 'declarations', cond: isMissingDeclarationsData },
+            { target: 'confirm' },
+          ],
+        },
         employment: {
           on: {
             employmentSubmitted: [

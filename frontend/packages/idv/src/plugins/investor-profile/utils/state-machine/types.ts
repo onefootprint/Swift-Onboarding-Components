@@ -42,6 +42,8 @@ export type MachineEvents =
   | { type: 'declarationsSubmitted'; payload: { data: DeclarationData; files?: File[] } }
   | { type: 'employmentSubmitted'; payload: EmploymentData }
   | { type: 'incomeSubmitted'; payload: IncomeData }
+  | { type: 'initDone'; payload: InvestorProfileData }
+  | { type: 'initFailed' }
   | { type: 'investmentGoalsSubmitted'; payload: InvestmentGoalsData }
   | { type: 'navigatedToPrevPage' }
   | { type: 'netWorthSubmitted'; payload: NetWorthData }

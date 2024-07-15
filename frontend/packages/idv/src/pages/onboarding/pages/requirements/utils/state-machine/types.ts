@@ -17,7 +17,7 @@ export type MachineContext = {
   // TODO we might want a more generic list of requirement s that have already been handled.
   // One day, when more plugins have confirm screens, we'l l need this information to determine
   // whether to render the plugin for a requirement that's already been met
-  collectedKycData?: boolean;
+  isKycDataCollected?: boolean;
   // Record whether transfer plugin already ran. If the user chose to continue on desktop,
   // don't render transfer again
   didRunTransfer?: boolean;
@@ -26,10 +26,11 @@ export type MachineContext = {
   lastHandledRequirement?: OnboardingRequirement;
   // We have a feature flag to disable transfers on desktops for some customers
   isTransferOnDesktopDisabled?: boolean;
+  isInvestorProfileCollected?: boolean; // To remember if investor profile was visited already
 };
 
 export type MachineEvents =
-  | { type: 'initialized' }
   | { type: 'error' }
-  | { type: 'requirementCompleted' }
-  | { type: 'onboardingRequirementsReceived'; payload: OnboardingRequirement[] };
+  | { type: 'initialized' }
+  | { type: 'onboardingRequirementsReceived'; payload: OnboardingRequirement[] }
+  | { type: 'requirementCompleted' };

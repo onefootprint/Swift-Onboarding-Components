@@ -5,7 +5,7 @@ import Router from './pages/router';
 import type { CollectKycDataProps } from './types';
 import getInitData from './utils/get-init-data';
 
-const App = ({ idvContext, context, onDone }: CollectKycDataProps) => {
+const CollectKycData = ({ idvContext, context, onDone }: CollectKycDataProps) => {
   const { authToken, device } = idvContext;
   const { config, requirement, bootstrapUserData, disabledFields } = context;
   const initData = getInitData(requirement, bootstrapUserData, disabledFields);
@@ -26,4 +26,4 @@ const App = ({ idvContext, context, onDone }: CollectKycDataProps) => {
   );
 };
 
-export default App;
+export default CollectKycData;
