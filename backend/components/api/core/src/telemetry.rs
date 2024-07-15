@@ -285,6 +285,8 @@ where
                 if let Some((trace_id, span_id)) = lookup_trace_ids(span_ref) {
                     s.serialize_entry("dd.trace_id", &trace_id.to_string())?;
                     s.serialize_entry("dd.span_id", &span_id.to_string())?;
+                    // Emit the trace ID to support finding other logs from this trace
+                    s.serialize_entry("trace_id", &trace_id.to_string())?;
                 }
             }
 
@@ -361,6 +363,7 @@ where
                 | "ip_address"
                 | "country"
                 | "user_agent"
+                | "support_id"
                 | "exception.message"
                 | "exception.details"
                 | "http.status_code"
