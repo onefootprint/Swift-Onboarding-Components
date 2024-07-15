@@ -7,7 +7,9 @@ use newtypes::TenantRoleKindDiscriminant;
 use newtypes::TenantScopeDiscriminants;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, strum_macros::Display)]
+/// Opening and closing a transaction requires sending `BEGIN` and `COMMIT` instructions to the
+/// database behind the scenes. So, the return type of the closure passed to
 pub enum TransactionError<E> {
     DbError(#[from] diesel::result::Error),
     ApplicationError(E),
@@ -217,6 +219,24 @@ impl FpErrorTrait for DbError {
             Self::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::UnsupportedAuthMethod => StatusCode::UNAUTHORIZED,
         }
+    }
+
+    fn code(&self) -> Option<api_errors::FpErrorCode> {
+        match self {
+            Self::ConnectionClosed(_) => Some(api_errors::FpErrorCode::DbConnectionClosed),
+            Self::DbError(diesel::result::Error::BrokenTransactionManager) => {
+                Some(api_errors::FpErrorCode::DbBrokenTransactionManager)
+            }
+            _ => None,
+        }
+    }
+}
+
+impl std::ops::Deref for DbError {
+    type Target = dyn FpErrorTrait;
+
+    fn deref(&self) -> &Self::Target {
+        self as &dyn FpErrorTrait
     }
 }
 

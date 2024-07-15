@@ -1,4 +1,5 @@
 pub use actix_web::http::StatusCode;
+pub use actix_web::HttpResponseBuilder;
 
 pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error + Send {
     /// The HTTP status code representing this error
@@ -21,8 +22,15 @@ pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error 
 
 /// The magical error type that can hold any type T that implements FpErrorTrait.
 /// As crates create their own Error struct, they only need to implement FpErrorTrait.
-#[derive(derive_more::Deref)]
 pub struct FpError(pub Box<dyn FpErrorTrait>);
+
+impl std::ops::Deref for FpError {
+    type Target = dyn FpErrorTrait;
+
+    fn deref(&self) -> &Self::Target {
+        &*self.0 as &dyn FpErrorTrait
+    }
+}
 
 /// Most functions should return an FpResult<T> in order to properly handle all errors from around
 /// the Footprint ecosystem

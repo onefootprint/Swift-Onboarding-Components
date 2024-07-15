@@ -15,6 +15,8 @@ pub mod models;
 mod connection;
 
 mod pagination;
+use api_errors::FpErrorCode;
+use api_errors::FpErrorTrait;
 pub use pagination::*;
 mod instrumented_connection;
 
@@ -57,8 +59,8 @@ pub type PgConn = instrumented_connection::InstrumentedPgConnection;
 pub type DbResult<T> = Result<T, DbError>;
 pub use connection::TxnPgConn;
 
-pub type Manager = deadpool_diesel::Manager<PgConn>;
-pub type Pool = deadpool::managed::Pool<Manager, deadpool::managed::Object<Manager>>;
+pub type ManagedPgConn = deadpool_diesel::Manager<PgConn>;
+pub type Pool = deadpool::managed::Pool<ManagedPgConn, deadpool::managed::Object<ManagedPgConn>>;
 #[derive(Clone)]
 pub struct DbPool(Pool);
 
@@ -67,21 +69,35 @@ impl DbPool {
     where
         F: FnOnce(&mut PgConn) -> Result<R, E> + Send + 'static,
         E: From<DbError> + Send + 'static + std::fmt::Debug,
+        // The E here just needs to be dereferencable into a trait object for FpErrorTrait for us to call
+        // .code()
+        E: std::ops::Deref<Target = dyn FpErrorTrait>,
         R: Send + 'static,
     {
         let current_span = tracing::info_span!("db_query::interact");
-        let result = self
-            .0
-            .get()
-            .await
-            .map_err(DbError::from)?
+        let conn: deadpool::managed::Object<ManagedPgConn> = self.0.get().await.map_err(DbError::from)?;
+
+        let result = conn
             .interact(move |conn| {
                 // Without adding a span inside here, none of the traces inside f will appear...
                 let _guard = current_span.enter();
                 f(conn)
             })
-            .await
-            .map_err(DbError::from)??;
+            .await;
+        let result: Result<R, E> = (move || result.map_err(DbError::from)?)();
+
+        // Check if the connection experienced an irrecoverable error
+        if let Err(e) = result.as_ref() {
+            if e.code() == Some(FpErrorCode::DbConnectionClosed)
+                || e.code() == Some(FpErrorCode::DbBrokenTransactionManager)
+            {
+                // Remove the connection from the pool since it can no longer be reused
+                tracing::error!(err=?e, message=?e.message(), code=?e.code(), "Removed broken connection from DB pool");
+                let _ = deadpool::managed::Object::<ManagedPgConn>::take(conn);
+            }
+        }
+
+        let result = result?;
         Ok(result)
     }
 
@@ -89,25 +105,27 @@ impl DbPool {
     where
         F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,
         E: From<DbError> + Send + 'static + std::fmt::Debug,
+        E: std::ops::Deref<Target = dyn FpErrorTrait>,
         R: Send + 'static,
     {
         let result = self
             .db_query(|c: &mut PgConn| {
-                c.transaction(|conn| -> Result<R, TransactionError<E>> {
-                    // Any error returned by f() is an ApplicationError
+                let result = c.transaction(|conn| -> Result<R, TransactionError<E>> {
                     let mut conn = TxnPgConn::new(conn);
+                    // Any error returned by f() is an ApplicationError.
+                    // Errors issuing the `BEGIN` or `COMMIT` instructions are a DbError
                     f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
+                });
+                result.map_err(|txn_error| match txn_error {
+                    TransactionError::ApplicationError(e) => e,
+                    TransactionError::DbError(e) => E::from(DbError::from(e)),
                 })
             })
             .await;
         if let Err(e) = &result {
             tracing::info!(e=?e, "Rolling back transaction due to error");
         }
-        // Return ApplicationErrors as-is. Map DbErrors to E
-        result.map_err(|txn_error| match txn_error {
-            TransactionError::ApplicationError(e) => e,
-            TransactionError::DbError(e) => E::from(DbError::from(e)),
-        })
+        result
     }
 }
 
@@ -116,7 +134,7 @@ const CONNECTION_RECYCLE_MAX_AGE_SECS: u64 = 600;
 
 /// Initialize our DB
 pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> Result<DbPool, DbError> {
-    let manager = Manager::new(url, Runtime::Tokio1);
+    let manager = ManagedPgConn::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
         // .wait_timeout(Some(Duration::from_secs(1)))
@@ -149,7 +167,7 @@ pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> Result<
             );
             Ok(())
         }))
-        .post_create(Hook::<Manager>::async_fn(move |conn, metrics| {
+        .post_create(Hook::<ManagedPgConn>::async_fn(move |conn, metrics| {
             Box::pin(async move {
                 conn.interact(move |conn| -> QueryResult<_> {
                     let statement_timeout = statement_timeout.as_millis();

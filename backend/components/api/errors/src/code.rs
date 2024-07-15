@@ -1,4 +1,6 @@
-#[derive(Copy, Clone, Eq, PartialEq, strum::EnumIter, strum::Display, serde_with::SerializeDisplay)]
+#[derive(
+    Debug, Copy, Clone, Eq, PartialEq, strum::EnumIter, strum::Display, serde_with::SerializeDisplay,
+)]
 pub enum FpErrorCode {
     // Internal errors whose serialization generally don't matter
     #[strum(serialize = "I100")]
@@ -11,6 +13,10 @@ pub enum FpErrorCode {
     ParseNomFailure,
     #[strum(serialize = "I104")]
     MissingHeader,
+    #[strum(serialize = "I105")]
+    DbConnectionClosed,
+    #[strum(serialize = "I106")]
+    DbBrokenTransactionManager,
 
     // Errors used by our client
     #[strum(serialize = "E101")]
@@ -78,6 +84,8 @@ impl FpErrorCode {
             Self::MigrationDryRun => false,
             Self::ParseNomFailure => false,
             Self::MissingHeader => false,
+            Self::DbConnectionClosed => false,
+            Self::DbBrokenTransactionManager => false,
 
             // Errors used by our client
             Self::InvalidStatusTransition => true,
