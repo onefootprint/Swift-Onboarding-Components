@@ -114,6 +114,9 @@ type AppearanceVariables = Partial<{
 
   // Radio select
   radioSelectBg: CSS.Property.Background;
+  radioSelectColor: CSS.Property.Color;
+  radioSelectHoverColor: CSS.Property.Color;
+  radioSelectSelectedColor: CSS.Property.Color;
   radioSelectBorderRadius: CSS.Property.BorderRadius;
   radioSelectBorderWidth: CSS.Property.BorderWidth;
   radioSelectBorderColor: CSS.Property.BorderColor;

@@ -18,6 +18,10 @@ const getHandoffMeta = async (authToken: string) => {
 const useHandoffMeta = (authToken: string = '') => {
   return useQuery(['appearance', authToken], () => getHandoffMeta(authToken), {
     enabled: !!authToken,
+    onError: e => {
+      console.log('error');
+      console.log(e.message);
+    },
   });
 };
 

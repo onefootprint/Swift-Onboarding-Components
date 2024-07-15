@@ -542,7 +542,7 @@ const tokens: Tokens = {
       borderColor: borderColor.tertiary,
       color: textColor.primary,
       hover: {
-        default: {
+        initial: {
           bg: backgroundColor.secondary,
           borderColor: borderColor.primary,
           color: textColor.primary,

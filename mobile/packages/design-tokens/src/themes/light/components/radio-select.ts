@@ -8,10 +8,12 @@ const radioSelect: RadioSelect = {
   borderColor: t.radioSelectBorderColor,
   color: t.radioSelectColor,
   hover: {
+    color: t.radioSelectHoverColor,
     bg: t.radioSelectHoverBg,
     borderColor: t.radioSelectHoverBorderColor,
   },
   selected: {
+    color: t.radioSelectSelectedColor,
     bg: t.radioSelectSelectedBg,
     borderColor: t.radioSelectSelectedBorderColor,
   },

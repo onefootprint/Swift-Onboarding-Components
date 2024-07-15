@@ -7,10 +7,12 @@ export type RadioSelect = {
   borderColor: CSS.Property.BorderColor;
   color: CSS.Property.Color;
   hover: {
+    color: CSS.Property.Color;
     bg: CSS.Property.BackgroundColor;
     borderColor: CSS.Property.BorderColor;
   };
   selected: {
+    color: CSS.Property.Color;
     bg: CSS.Property.BackgroundColor;
     borderColor: CSS.Property.BorderColor;
   };

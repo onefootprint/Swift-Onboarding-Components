@@ -47,9 +47,8 @@ export const getErrorMessage = (error?: unknown | Error): string => {
 
 const getRequestOptions = async (requestConfig: AxiosRequestConfig) => {
   const sessionId = await getSessionId();
-
   return {
-    baseURL: process.env.API_BASE_URL ?? 'https://api.onefootprint.com',
+    baseURL: process.env.API_BASE_URL ?? 'https://api.dev.onefootprint.com',
     timeout: 60000,
     withCredentials: true,
     ...requestConfig,

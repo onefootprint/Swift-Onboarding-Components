@@ -117,6 +117,7 @@ const ButtonContainer = styled.button<{
 }>`
   ${({ theme, $variant, size }) => {
     const { button } = theme.components;
+    console.log(button);
 
     return css`
       ${createText(button.size[size].typography)}

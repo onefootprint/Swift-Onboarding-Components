@@ -19,24 +19,6 @@ Footprint supports visual customization, allowing you to match the design of you
 <br />
 Do you want to see a project example? Go [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vite-vanilla).
 
-## Themes
-
-You'll need to pick one theme to extend it. We offer two themes: `light` and `dark`. If you don't
-provide any themes, the `light` theme will be used by default.
-
-```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
-
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
-const appearance = {
-  theme: 'dark',
-};
-
-const component = footprint.init({ kind: 'verify', publicKey, appearance });
-component.render();
-```
-
 ## Variables
 
 The easiest way to create custom themes is by extending the theme variables. Under the hood, they are just CSS variables, so you can inspect
@@ -50,7 +32,6 @@ import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
 const appearance = {
-  theme: 'dark',
   variables: {
     borderRadius: '0px',
     buttonPrimaryBg: '#315E4C',
@@ -71,7 +52,7 @@ In the Footprint SDK, visual token inheritance operates on a hierarchical system
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `borderRadius`     | `buttonBorderRadius`, `containerBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                        |
 | `colorError`       | `borderColorError`, `hintErrorColor`, `linkButtonDestructiveColor`                                                                                                           |
-| `colorAccent`      | `linkColor`, `linkButtonColor`, `linkButtonHoverColor`, `linkButtonActiveColor`, `radioSelectColor`, `radioSelectSelectedBorderColor`, `radioSelectComponentsIconSelectedBg` |
+| `colorAccent`      | `linkColor`, `linkButtonColor`, `linkButtonHoverColor`, `linkButtonActiveColor`, `radioSelectSelectedColor`, `radioSelectSelectedBorderColor`, `radioSelectComponentsIconSelectedBg` |
 | `borderColorError` | `inputErrorBorderColor`                                                                                                                                                      |
 
 You can define these tokens to easily propagate design choices across multiple lower-level tokens. However, should you need to customize a specific token, setting it individually will override the higher-level default. This allows you to maintain broad stylistic consistency across your interface while still providing granular control over specific components.
@@ -283,6 +264,9 @@ Radio Select is used in two important areas within the Footprint interface. Firs
 | Variable                              | Description                                           |
 | ------------------------------------- | ----------------------------------------------------- |
 | `radioSelectBg`                       | The background of the radio select component          |
+| `radioSelectColor`                    | The text color when is not selected                   |
+| `radioSelectHoverColor`               | The hover text color when is not selected             |
+| `radioSelectSelectedColor`            | The text color when is selected                       |
 | `radioSelectBorderRadius`             | The border radius of the radio select component       |
 | `radioSelectBorderWidth`              | The border width of the radio select component        |
 | `radioSelectBorderColor`              | The border color of the radio select component        |
@@ -304,7 +288,6 @@ import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
 const appearance = {
-  theme: 'light',
   rules: {
     button: {
       transition: 'all .2s linear',

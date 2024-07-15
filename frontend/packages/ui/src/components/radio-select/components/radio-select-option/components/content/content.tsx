@@ -46,11 +46,7 @@ const Content = ({ size, selected, disabled, IconComponent, title, description, 
           <Title $disabled={disabled} $hovered={hovered} $selected={selected} $size={size}>
             {title}
           </Title>
-          {size === 'default' && (
-            <Subtitle $selected={selected} $hovered={hovered} $disabled={disabled}>
-              {description}
-            </Subtitle>
-          )}
+          {size === 'default' && <Description $disabled={disabled}>{description}</Description>}
         </OptionLabel>
       </Stack>
     </Container>
@@ -70,7 +66,6 @@ const Container = styled.button<{
       all: unset;
       border-radius: ${theme.borderRadius.default};
       border: ${theme.borderWidth[1]} solid ${radioSelect.borderColor};
-      color: ${radioSelect.color};
       display: flex;
       margin: 0;
       overflow: hidden;
@@ -84,17 +79,17 @@ const Container = styled.button<{
         ${
           $selected &&
           css`
-          background-color: ${radioSelect.selected.bg};
-          border-color: ${radioSelect.selected.borderColor};
-        `
+            background-color: ${radioSelect.selected.bg};
+            border-color: ${radioSelect.selected.borderColor};
+          `
         }
 
         ${
           $hovered &&
           !$selected &&
           css`
-          background-color: ${radioSelect.hover.default.bg};
-          border-color: ${radioSelect.hover.default.borderColor};
+            background-color: ${radioSelect.hover.initial.bg};
+            border-color: ${radioSelect.hover.initial.borderColor};
         `
         }
 
@@ -127,7 +122,6 @@ const Title = styled.div<{
 
     return css`
       ${$size === 'compact' ? createFontStyles('label-3') : createFontStyles('label-2')};
-
       color: ${radioSelect.color};
 
       ${
@@ -141,8 +135,8 @@ const Title = styled.div<{
         !$selected &&
         $hovered &&
         css`
-        color: ${radioSelect.hover.default.color};
-      `
+          color: ${radioSelect.hover.initial.color};
+        `
       };
 
       ${
@@ -155,12 +149,12 @@ const Title = styled.div<{
   }}
 `;
 
-const Subtitle = styled.p<{
+const Description = styled.p<{
   $selected?: boolean;
   $hovered?: boolean;
   $disabled?: boolean;
 }>`
-  ${({ theme, $selected, $hovered, $disabled }) => {
+  ${({ theme, $disabled }) => {
     const {
       components: { radioSelect },
     } = theme;
@@ -168,21 +162,6 @@ const Subtitle = styled.p<{
     return css`
       ${createFontStyles('body-4')}
       color: ${radioSelect.color};
-
-      ${
-        $selected &&
-        css`
-        color: ${radioSelect.color};
-      `
-      };
-
-      ${
-        !$selected &&
-        $hovered &&
-        css`
-        color: ${radioSelect.hover.default.color};
-      `
-      };
 
       ${
         $disabled &&

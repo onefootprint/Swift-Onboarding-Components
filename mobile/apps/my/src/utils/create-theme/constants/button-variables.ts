@@ -15,7 +15,11 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonPrimaryBg',
     {
       var: 'components.button.variant.primary.bg',
-      assignDefault: ['buttonPrimaryActiveBg'],
+      assignDefault: [
+        'buttonPrimaryActiveBg',
+        'buttonPrimaryLoadingBg',
+        'buttonPrimaryDisabledBg',
+      ],
     },
   ],
   [
@@ -96,7 +100,11 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonSecondaryColor',
     {
       var: 'components.button.variant.secondary.color',
-      assignDefault: ['buttonSecondaryActiveColor'],
+      assignDefault: [
+        'buttonSecondaryActiveBg',
+        'buttonSecondaryLoadingBg',
+        'buttonSecondaryDisabledBg',
+      ],
     },
   ],
   [
@@ -145,6 +153,7 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonSecondaryLoadingBg',
     {
       var: 'components.button.variant.secondary.loading.bg',
+      assignDefault: ['buttonPrimaryLoadingBg'],
     },
   ],
   [

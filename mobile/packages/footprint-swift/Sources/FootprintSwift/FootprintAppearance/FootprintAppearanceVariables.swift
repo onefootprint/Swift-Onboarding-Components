@@ -114,6 +114,9 @@ public struct FootprintAppearanceVariables: Codable {
     
     // Radio select
     public var radioSelectBg: String?
+    public var radioSelectColor: String?
+    public var radioSelectHoverColor: String?
+    public var radioSelectSelectedColor: String?
     public var radioSelectBorderRadius: String?
     public var radioSelectBorderWidth: String?
     public var radioSelectBorderColor: String?

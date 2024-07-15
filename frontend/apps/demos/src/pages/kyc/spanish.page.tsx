@@ -5,7 +5,7 @@ import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const publicKey = process.env.NEXT_PUBLIC_DEFAULT_TENANT_PK as string;
+const publicKey = process.env.NEXT_PUBLIC_KYC_KEY as string;
 
 const handleOpen = () => {
   const component = footprint.init({
@@ -26,8 +26,9 @@ const Spanish = () => (
       <title>Footprint Spanish</title>
     </Head>
     <Container>
-      <Button onClick={handleOpen}>Verificar com Footprint</Button>
-      <div data-testid="result" />
+      <Button onClick={handleOpen} size="large">
+        Verificar com Footprint
+      </Button>
     </Container>
   </>
 );

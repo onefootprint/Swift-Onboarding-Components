@@ -161,6 +161,9 @@ data class FootprintAppearanceVariables(
 
     // Radio select
     val radioSelectBg: String? = null,
+    val radioSelectColor: String? = null,
+    val radioSelectHoverColor: String? = null,
+    val radioSelectSelectedColor: String? = null,
     val radioSelectBorderRadius: String? = null,
     val radioSelectBorderWidth: String? = null,
     val radioSelectBorderColor: String? = null,

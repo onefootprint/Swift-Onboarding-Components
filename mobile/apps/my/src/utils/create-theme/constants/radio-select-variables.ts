@@ -30,6 +30,18 @@ const radioSelectVariables = new Map<string, { var: string }>([
     },
   ],
   [
+    'radioSelectHoverColor',
+    {
+      var: 'components.radioSelect.hover.initial.color',
+    },
+  ],
+  [
+    'radioSelectSelectedColor',
+    {
+      var: 'components.radioSelect.selected.color',
+    },
+  ],
+  [
     'radioSelectHoverBg',
     {
       var: 'components.radioSelect.hover.bg',

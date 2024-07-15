@@ -4,7 +4,7 @@ import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const publicKey = process.env.NEXT_PUBLIC_BOOTSTRAP_PK as string;
+const publicKey = process.env.NEXT_PUBLIC_KYC_KEY as string;
 
 const launchFootprint = () => {
   const component = footprint.init({

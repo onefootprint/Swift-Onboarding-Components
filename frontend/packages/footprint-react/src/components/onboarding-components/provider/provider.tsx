@@ -3,11 +3,11 @@ import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/type
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import type { Appearance } from '../../../@types';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
 
 export type ContextData = {
-  appearance?: Appearance;
+  appearance?: FootprintAppearance;
   authToken?: string;
   fpInstance: Component | null;
   handoffCallbacks?: {

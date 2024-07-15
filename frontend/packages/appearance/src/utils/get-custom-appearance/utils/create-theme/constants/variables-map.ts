@@ -53,7 +53,7 @@ const variablesMap = new Map<string, { var: string; assignDefault?: string[] }>(
         'linkButtonColor',
         'linkButtonHoverColor',
         'linkButtonActiveColor',
-        'radioSelectColor',
+        'radioSelectSelectedColor',
         'radioSelectSelectedBorderColor',
         'radioSelectComponentsIconSelectedBg',
       ],

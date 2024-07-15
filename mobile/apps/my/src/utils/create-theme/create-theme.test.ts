@@ -36,6 +36,9 @@ describe('create theme', () => {
         const { button } = expectedTheme.components;
         button.variant.primary.bg = 'green';
         button.variant.primary.active.bg = 'green';
+        button.variant.primary.loading.bg = 'green';
+        button.variant.primary.disabled.bg = 'green';
+
         expect(createTokens(defaultTheme, variables)).toEqual(expectedTheme);
       });
     });
@@ -105,6 +108,8 @@ describe('create theme', () => {
       radioSelect.borderRadius = '0px';
       button.variant.primary.bg = 'purple';
       button.variant.primary.active.bg = 'purple';
+      button.variant.primary.loading.bg = 'purple';
+      button.variant.primary.disabled.bg = 'purple';
       expect(createTheme(defaultTheme, styleParams)).toEqual(expectedTheme);
     });
   });
