@@ -33,6 +33,7 @@ export enum TenantPreviewApi {
   DecisionsList = 'decisions_list',
   ImplicitAuth = 'implicit_auth',
   LegacyOnboardingStatusWebhook = 'legacy_onboarding_status_webhook',
+  LegacyListUsersBusinesses = 'legacy_list_users_businesses',
 }
 
 export enum TenantBillingProfileProduct {
