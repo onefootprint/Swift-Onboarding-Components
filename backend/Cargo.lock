@@ -4451,6 +4451,7 @@ dependencies = [
  "serde",
  "serde_json",
  "termcolor",
+ "test-case",
  "vault_dr_client",
 ]
 

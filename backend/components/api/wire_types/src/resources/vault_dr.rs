@@ -24,9 +24,7 @@ pub struct VaultDrEnrolledStatus {
 
     // We expose the org public keys so clients can verify their own private key.
     pub org_public_keys: Vec<String>,
-    // TODO:
-    // - Latest backup record timestamp
-    // - Latest online record timestamp
-    // - Lag time
-    // - Lag record count
+
+    pub latest_backup_record_timestamp: Option<DateTime<Utc>>,
+    pub latest_online_record_timestamp: Option<DateTime<Utc>>,
 }

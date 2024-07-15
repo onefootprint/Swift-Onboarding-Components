@@ -41,3 +41,16 @@ def test_footprint_dr_backup(tenant):
     }, CUSTODIAN_AUTH)
 
     assert resp["num_blobs"] == 6
+
+
+    with footprint_dr("status", "--live") as cmd:
+        cmd.expect(r"Latest backup record timestamp: ([0-9:\.\- ]+ UTC)")
+
+        # The latest online record timestamp should be the same as the latest backup record timestamp, indicating no lag
+        ts = cmd.match.group(1).decode("utf-8")
+        cmd.expect_exact("Latest online record timestamp: " + ts)
+
+        cmd.expect("Lag: 0s")
+
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0

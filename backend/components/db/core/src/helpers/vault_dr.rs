@@ -2,6 +2,8 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::models::ob_configuration::IsLive;
 use crate::DbResult;
 use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::data_lifetime;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::vault_dr_blob;
@@ -45,4 +47,34 @@ pub fn load_vault_dr_data_lifetime_batch(
         .load(conn)?;
 
     Ok(dls)
+}
+
+pub fn get_latest_vault_dr_backup_record_timestamp(
+    conn: &mut PgConn,
+    config_id: &VaultDrConfigId,
+) -> DbResult<Option<DateTime<Utc>>> {
+    let ts = vault_dr_blob::table
+        .inner_join(data_lifetime::table)
+        .filter(vault_dr_blob::config_id.eq(config_id))
+        .select(data_lifetime::created_at)
+        .order(vault_dr_blob::dl_created_seqno.desc())
+        .first(conn)
+        .optional()?;
+    Ok(ts)
+}
+
+pub fn get_latest_vault_dr_online_record_timestamp(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    is_live: IsLive,
+) -> DbResult<Option<DateTime<Utc>>> {
+    let ts = data_lifetime::table
+        .inner_join(scoped_vault::table)
+        .filter(scoped_vault::tenant_id.eq(tenant_id))
+        .filter(scoped_vault::is_live.eq(is_live))
+        .select(data_lifetime::created_at)
+        .order(data_lifetime::created_seqno.desc())
+        .first(conn)
+        .optional()?;
+    Ok(ts)
 }

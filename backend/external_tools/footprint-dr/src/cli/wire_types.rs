@@ -23,6 +23,9 @@ pub struct VaultDrEnrolledStatus {
     pub s3_bucket_name: String,
 
     pub org_public_keys: Vec<String>,
+
+    pub latest_backup_record_timestamp: Option<DateTime<Utc>>,
+    pub latest_online_record_timestamp: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
