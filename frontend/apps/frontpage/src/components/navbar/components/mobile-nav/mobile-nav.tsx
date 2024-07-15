@@ -1,15 +1,16 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoClose24, IcoMenu24, ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Container, Stack, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import { Box, Container, Overlay, Stack, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
+import _ from 'lodash';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import MobileNavLink from './components/mobile-nav-link';
@@ -23,44 +24,33 @@ type MobileNavProps = {
   $isOnDarkSection?: boolean;
 };
 
-const MobileNav = ({ onOpen, onClose, entries, isOpen, $isOnDarkSection }: MobileNavProps) => {
+const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
-  const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
-  useLockedBody(isOpen);
 
-  const close = useCallback(() => {
-    onClose();
-  }, [onClose]);
-
-  useEffect(() => {
-    if (breakpoint && isOpen) {
-      close();
-    }
-  }, [breakpoint, isOpen, close]);
+  const [isOpen, setIsOpen] = useState(false);
+  const menuContainerRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
-    if (isOpen) {
-      onClose();
-    } else {
-      onOpen();
-    }
+    setIsOpen(!isOpen);
   };
 
   const handleLogoClick = () => {
-    close();
+    setIsOpen(false);
   };
 
+  useLockedBody(isOpen);
+
   const menuVariants = {
-    initial: { opacity: 0, y: -20 },
+    initial: { opacity: 0, y: -10 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.2, ease: 'easeOut' },
+      transition: { duration: 0.1, ease: 'easeOut' },
     },
     exit: {
       opacity: 0,
-      y: -20,
-      transition: { duration: 0.2, ease: 'easeOut' },
+      y: -10,
+      transition: { duration: 0.1, ease: 'easeOut' },
     },
   };
 
@@ -78,30 +68,37 @@ const MobileNav = ({ onOpen, onClose, entries, isOpen, $isOnDarkSection }: Mobil
 
   return (
     <>
-      <AnimatePresence>
-        <OuterContainer>
-          <Main>
-            <Logo href="/" onClick={handleLogoClick}>
-              <ThemedLogoFpCompact color={$isOnDarkSection ? 'quinary' : 'primary'} />
-            </Logo>
-            <NavTriggerButton
-              aria-label={t(isOpen ? 'nav-toggle.close' : 'nav-toggle.open')}
-              onClick={handleToggle}
-              type="button"
-            >
-              <motion.div variants={iconVariant} initial="initial" animate="animate" exit="exit">
-                {isOpen ? <IcoClose24 /> : <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />}
-              </motion.div>
-            </NavTriggerButton>
-          </Main>
+      <OuterContainer $isOpen={isOpen}>
+        <Main>
+          <Logo href="/" onClick={handleLogoClick}>
+            <ThemedLogoFpCompact color={$isOnDarkSection ? 'quinary' : 'primary'} />
+          </Logo>
+          <NavTriggerButton
+            aria-label={t(isOpen ? 'nav-toggle.close' : 'nav-toggle.open')}
+            onClick={handleToggle}
+            type="button"
+          >
+            <motion.div variants={iconVariant} initial="initial" animate="animate" exit="exit">
+              {isOpen ? <IcoClose24 /> : <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />}
+            </motion.div>
+          </NavTriggerButton>
+        </Main>
+        <AnimatePresence>
           {isOpen && (
             <>
               <NavigationMenu.Root asChild>
-                <MenuContainer initial="initial" animate="animate" exit="exit" variants={menuVariants} flex={1}>
+                <MenuContainer
+                  ref={menuContainerRef}
+                  variants={menuVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  flex={1}
+                >
                   <LinkList>
                     {entries.map(entry => {
                       if (isNavLink(entry)) {
-                        return <MobileNavLink key={entry.text} link={entry} />;
+                        return <MobileNavLink key={_.uniqueId()} link={entry} />;
                       }
                       if (isNavMenu(entry)) {
                         return <MobileNavMenu menu={entry} key={entry.text} />;
@@ -117,39 +114,73 @@ const MobileNav = ({ onOpen, onClose, entries, isOpen, $isOnDarkSection }: Mobil
               </NavigationMenu.Root>
             </>
           )}
-        </OuterContainer>
-      </AnimatePresence>
+        </AnimatePresence>
+      </OuterContainer>
+      <Overlay isVisible={isOpen} />
     </>
   );
 };
 
-const MenuContainer = styled(motion(Stack))`
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 1;
+const OuterContainer = styled(Box)<{ $isOpen: boolean }>`
+  ${({ theme, $isOpen }) => css`
+    position: fixed;
+    top: ${theme.spacing[3]};
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100vw - 2 * ${theme.spacing[3]});
+    border-radius: ${theme.borderRadius.lg};
+    overflow: hidden;
+    z-index: ${theme.zIndex.dialog};
+    background: rgba(${theme.backgroundColor.primary}, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: height 0.2s ease-out;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+
+    ${
+      $isOpen &&
+      css`
+        height: calc(100vh - 2 * ${theme.spacing[3]});
+        background: ${theme.backgroundColor.primary};
+      `
+    }
+
+    ${media.greaterThan('lg')`
+      display: none;
+    `}
+  `}
 `;
 
-const OuterContainer = styled(motion(Container))`
+const MenuContainer = styled(motion(Box))`
+    display: flex;
     flex-direction: column;
-    position: relative;
+    justify-content: space-between;
+    width: 100%;
+    overflow-y: auto;
     flex: 1;
 `;
 
 const LinkList = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
   flex: 1;
 `;
 
-const Main = styled.div`
+const Main = styled(Container)`
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  height: var(--mobile-header-height);
-
-  ${media.greaterThan('lg')`
-    display: none;
-  `}
+  min-height: var(--mobile-header-height);
+  width: 100%;
 `;
 
 const Logo = styled(Link)`
@@ -185,10 +216,10 @@ const CtaContainer = styled.div`
 const LoginLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-1')};
-    align-items: center;
-    color: ${theme.color.primary};
     display: flex;
+    align-items: center;
     justify-content: center;
+    color: ${theme.color.primary};
     text-decoration: none;
   `}
 `;

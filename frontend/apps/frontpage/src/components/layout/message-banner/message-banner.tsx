@@ -67,7 +67,6 @@ const Container = styled(motion(Stack))`
     display: flex;
     min-height: 72px;
     position: relative;
-    background-color: ${theme.backgroundColor.primary};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     text-align: center;
     width: 100%;

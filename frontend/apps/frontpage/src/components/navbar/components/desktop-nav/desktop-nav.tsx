@@ -1,16 +1,20 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Container, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Button, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
+import { useRouter } from 'next/router';
+import MessageBanner from 'src/components/layout/message-banner';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
 import LogoCopyAssets from './components/logo-copy-assets';
+
+const ARTICLE_URL = '/blog/footprint-13m-series-a-led-by-qed';
 
 type DesktopNavProps = {
   entries: NavEntry[];
@@ -26,46 +30,78 @@ const handleSignUpClick = () => {
 
 const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
+  const router = useRouter();
+  const isArticlePage = router.pathname.includes(ARTICLE_URL);
+  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
 
+  const handleCloseBanner = () => setIsBannerVisible(false);
   return (
     <NavigationMenu.Root asChild>
-      <StyledContainer>
-        <LogoCopyAssets />
-        <MainNav>
-          {entries.map(entry => {
-            if (isNavLink(entry)) {
-              return <DesktopNavLink link={entry} key={entry.text} />;
-            }
-            if (isNavMenu(entry)) {
-              return <DesktopNavMenu menu={entry} key={entry.text} />;
-            }
-            return null;
-          })}
-        </MainNav>
-        <SecondaryNav>
-          <Login onClick={handleLoginClick}>{t('login')}</Login>
-          <Button onClick={handleSignUpClick} size="compact">
-            {t('sign-up')}
-          </Button>
-        </SecondaryNav>
-      </StyledContainer>
+      <NavContainer>
+        <MessageBanner
+          showBanner={isBannerVisible}
+          onClose={handleCloseBanner}
+          articleUrl={ARTICLE_URL}
+          text={t('message-banner.text')}
+          cta={t('message-banner.cta')}
+        />
+        <StyledContainer>
+          <LogoCopyAssets />
+          <MainNav>
+            {entries.map(entry => {
+              if (isNavLink(entry)) {
+                return <DesktopNavLink link={entry} key={entry.text} />;
+              }
+              if (isNavMenu(entry)) {
+                return <DesktopNavMenu menu={entry} key={entry.text} />;
+              }
+              return null;
+            })}
+          </MainNav>
+          <SecondaryNav>
+            <Login onClick={handleLoginClick}>{t('login')}</Login>
+            <Button onClick={handleSignUpClick}>{t('sign-up')}</Button>
+          </SecondaryNav>
+        </StyledContainer>
+      </NavContainer>
     </NavigationMenu.Root>
   );
 };
 
-const StyledContainer = styled(Container)`
+const NavContainer = styled(Container)`
   ${({ theme }) => css`
-    display: none;
+    display: none; 
 
     ${media.greaterThan('lg')`
-        display: flex;
-        flex-direction: row; 
-        align-items: center;
-        gap: ${theme.spacing[7]};
-        justify-content: space-between;
-        height: var(--desktop-header-height);
-      };
+      display: flex;
+      position: fixed;
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius.lg};
+      top: ${theme.spacing[3]};
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(${theme.backgroundColor.primary}, 0.9);
+      backdrop-filter: blur(20px);
+      @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+        background: rgba(${theme.backgroundColor.primary}, 0.9);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+      }
     `}
+  `}
+`;
+
+const StyledContainer = styled(Box)`
+  ${({ theme }) => css`
+      display: flex;
+      flex-direction: row; 
+      align-items: center;
+      padding: 0 ${theme.spacing[5]} 0 ${theme.spacing[6]};
+      gap: ${theme.spacing[7]};
+      justify-content: space-between;
+      height: var(--desktop-header-height);
+    };
   `}
 `;
 

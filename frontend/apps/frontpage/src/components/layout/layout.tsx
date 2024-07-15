@@ -1,6 +1,6 @@
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Footer from '../footer';
 import Navbar from '../navbar';
@@ -22,12 +22,14 @@ const Layout = ({ children }: LayoutProps) => {
 };
 
 const Content = styled.main`
+  ${({ theme }) => css`
   position: relative;
-  padding-top: calc(var(--mobile-header-height));
+  padding-top: calc(var(--mobile-header-height) + ${theme.spacing[10]});
   transition: padding-top 0.5s ease-in-out;
 
-  ${media.greaterThan('lg')`
-    padding-top: calc(var(--desktop-header-height));
+    ${media.greaterThan('lg')`
+      padding-top: calc(var(--desktop-header-height) + ${theme.spacing[11]});
+    `}
   `}
 `;
 

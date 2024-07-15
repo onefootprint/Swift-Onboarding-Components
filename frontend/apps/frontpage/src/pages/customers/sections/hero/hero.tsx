@@ -53,6 +53,7 @@ const HeroContainer = styled(motion(Stack))`
   ${({ theme }) => css`
     flex-direction: column;
     gap: ${theme.spacing[9]};
+    padding-top: ${theme.spacing[9]};
   `}
 `;
 

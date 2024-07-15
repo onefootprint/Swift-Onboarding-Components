@@ -91,8 +91,8 @@ const GlobalStyle = createGlobalStyle`
     font-family: ${defaultFont.style.fontFamily};
     --font-family-default: ${defaultFont.style.fontFamily};
     --font-family-code: ${codeFont.style.fontFamily};
-     --desktop-header-height: 64px;
-     --mobile-header-height: 72px;
+     --desktop-header-height: 56px;
+     --mobile-header-height: 56px;
      --custom-gray: #fcfcfc;
      font-size: 16px;
    }

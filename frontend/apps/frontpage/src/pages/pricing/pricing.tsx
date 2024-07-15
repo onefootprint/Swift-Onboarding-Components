@@ -14,7 +14,7 @@ const Pricing = () => {
     <>
       <SEO title={t('html-title')} description={t('html-description')} slug="/pricing" />
       <Container>
-        <Stack direction="column" align="center" justify="center" gap={9}>
+        <Stack direction="column" align="center" justify="center" gap={9} paddingTop={9}>
           <Heading title={t('hero.title')} subtitle={t('hero.subtitle')} />
           <PlansTable />
           <CustomBanner

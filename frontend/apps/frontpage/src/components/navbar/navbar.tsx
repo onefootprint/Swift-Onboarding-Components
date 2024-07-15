@@ -1,4 +1,3 @@
-import { useHasScroll, useToggle } from '@onefootprint/hooks';
 import {
   IcoBank24,
   IcoBuilding24,
@@ -12,30 +11,16 @@ import {
   IcoUser24,
   IcoWriting24,
 } from '@onefootprint/icons';
-import { Overlay } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
-import MessageBanner from '../layout/message-banner';
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import type { NavEntry } from './types';
 
-const ARTICLE_URL = '/blog/footprint-13m-series-a-led-by-qed';
-
 const Navbar = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
-  const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const hasScroll = useHasScroll();
-  const router = useRouter();
-  const isArticlePage = router.pathname.includes(ARTICLE_URL);
 
-  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
-
-  const handleCloseBanner = () => setIsBannerVisible(false);
   const entries: NavEntry[] = [
     {
       text: t('entries.platform.text'),
@@ -129,63 +114,17 @@ const Navbar = () => {
 
   const handleMobileOpen = () => {
     setIsMobileNavOpen(true);
-    disableFloating();
   };
   const handleMobileClose = () => {
     setIsMobileNavOpen(false);
-    enableFloating();
   };
 
   return (
     <>
-      <Header $isFloating={hasScroll && isFloatingEnabled} $isMobileNavOpen={isMobileNavOpen}>
-        <MessageBanner
-          showBanner={isBannerVisible}
-          onClose={handleCloseBanner}
-          articleUrl={ARTICLE_URL}
-          text={t('message-banner.text')}
-          cta={t('message-banner.cta')}
-        />
-
-        <MobileNav isOpen={isMobileNavOpen} onOpen={handleMobileOpen} onClose={handleMobileClose} entries={entries} />
-        <DesktopNav entries={entries} />
-      </Header>
-      <Overlay isVisible={isMobileNavOpen} />
+      <MobileNav isOpen={isMobileNavOpen} onOpen={handleMobileOpen} onClose={handleMobileClose} entries={entries} />
+      <DesktopNav entries={entries} />
     </>
   );
 };
-
-const Header = styled.header<{
-  $isFloating: boolean;
-  $isMobileNavOpen: boolean;
-}>`
-  ${({ theme, $isFloating, $isMobileNavOpen }) => css`
-    left: 0;
-    position: sticky;
-    display: flex;
-    flex-direction: column;
-    right: 0;
-    top: 0;
-    z-index: ${theme.zIndex.confirmationDialog};
-    background-color: ${$isMobileNavOpen ? theme.backgroundColor.primary : 'transparent'};
-    -webkit-backdrop-filter: blur(15px) saturate(125%);
-      backdrop-filter: blur(15px) saturate(125%);
-    min-height: ${$isMobileNavOpen ? '100vh' : 'auto'};
-    transition: background-color 0.3s ease, min-height 0.3s ease;
-
-    ${
-      $isFloating &&
-      !$isMobileNavOpen &&
-      css`
-      position: fixed;
-      -webkit-backdrop-filter: blur(15px) saturate(125%);
-      backdrop-filter: blur(15px) saturate(125%);
-      background-color: rgba(${theme.backgroundColor.primary}, 0.75);
-      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-      transition: background-color 0.3s ease, backdrop-filter 0.3s ease, border-bottom 0.3s ease;
-    `
-    }
-  `}
-`;
 
 export default Navbar;
