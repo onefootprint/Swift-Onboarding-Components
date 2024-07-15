@@ -9,7 +9,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error, strum_macros::Display)]
 /// Opening and closing a transaction requires sending `BEGIN` and `COMMIT` instructions to the
-/// database behind the scenes. So, the return type of the closure passed to
+/// database behind the scenes. So, we use this type to represent the difference between errors
+/// running the user-provided closure vs errors opening/committing the transaction
 pub enum TransactionError<E> {
     DbError(#[from] diesel::result::Error),
     ApplicationError(E),

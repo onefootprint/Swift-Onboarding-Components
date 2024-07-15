@@ -3657,6 +3657,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8db70494c13cae4ce67b4b4dafdaf828cf0df7237ab5b9e2fcabee4965d0a0a"
 dependencies = [
  "deadpool-runtime",
+ "tracing",
 ]
 
 [[package]]

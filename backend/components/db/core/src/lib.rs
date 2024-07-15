@@ -18,6 +18,7 @@ mod pagination;
 use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
 pub use pagination::*;
+use tokio::time::Instant;
 mod instrumented_connection;
 
 pub use crate::errors::DbError;
@@ -74,16 +75,11 @@ impl DbPool {
         E: std::ops::Deref<Target = dyn FpErrorTrait>,
         R: Send + 'static,
     {
-        let current_span = tracing::info_span!("db_query::interact");
+        let start = Instant::now();
         let conn: deadpool::managed::Object<ManagedPgConn> = self.0.get().await.map_err(DbError::from)?;
+        tracing::info!(wait_time_s=%start.elapsed().as_secs_f64(), "Fetched DB conn from pool");
 
-        let result = conn
-            .interact(move |conn| {
-                // Without adding a span inside here, none of the traces inside f will appear...
-                let _guard = current_span.enter();
-                f(conn)
-            })
-            .await;
+        let result = conn.interact(move |conn| f(conn)).await;
         let result: Result<R, E> = (move || result.map_err(DbError::from)?)();
 
         // Check if the connection experienced an irrecoverable error
@@ -95,7 +91,7 @@ impl DbPool {
                 // read-only. We should close the connection and attempt to re-open.
                 // Note: we could have some problems here once we start to actually use read replicas
                 FpErrorCode::DbReadOnlyTransaction,
-                // TODO should we also reopen the conn when we receive an unknown error?
+                // TODO should we also close and re-open the conn when we receive an unknown error?
             ];
             if e.code().is_some_and(|c| irrecoverable_error_codes.contains(&c)) {
                 // Remove the connection from the pool since it can no longer be reused
