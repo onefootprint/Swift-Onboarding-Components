@@ -1,7 +1,4 @@
-import type {
-  CollectKycDataRequirement,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -28,14 +25,7 @@ type ConfirmProps = {
   onConfirm: (data: KycData) => void;
 };
 
-const Confirm = ({
-  requirement,
-  data,
-  authToken,
-  onComplete,
-  onConfirm,
-  config,
-}: ConfirmProps) => {
+const Confirm = ({ requirement, data, authToken, onComplete, onConfirm, config }: ConfirmProps) => {
   const { t } = useTranslation('pages.confirm');
   const { mutation: syncDataMutation, syncData } = useSyncData();
   const { mutation: syncEmailMutation, syncEmail } = useSyncEmail();
@@ -64,9 +54,7 @@ const Confirm = ({
           });
           return;
         }
-        const fields = Object.keys(fieldErrors).filter(di =>
-          Object.values(IdDI).includes(di as IdDI),
-        );
+        const fields = Object.keys(fieldErrors).filter(di => Object.values(IdDI).includes(di as IdDI));
         if (fields.length === 0) {
           toast.show({
             title: t('errors.invalid-inputs.title'),
@@ -90,10 +78,7 @@ const Confirm = ({
   const handleConfirm = () => {
     // If email is missing, we need to sync it successfully before we can
     // sync the rest of the kyc data.
-    const attributes = [
-      ...requirement.missingAttributes,
-      ...requirement.optionalAttributes,
-    ];
+    const attributes = [...requirement.missingAttributes, ...requirement.optionalAttributes];
     if (!isMissingEmailAttribute(attributes)) {
       handleSyncData();
       return;
@@ -118,12 +103,7 @@ const Confirm = ({
       onClickConfirm={handleConfirm}
       isLoading={isLoading}
     >
-      <BasicInfoSection
-        authToken={authToken}
-        requirement={requirement}
-        data={data}
-        onConfirm={onConfirm}
-      />
+      <BasicInfoSection authToken={authToken} requirement={requirement} data={data} onConfirm={onConfirm} />
       <AddressSection
         authToken={authToken}
         requirement={requirement}
@@ -131,12 +111,7 @@ const Confirm = ({
         onConfirm={onConfirm}
         config={config}
       />
-      <IdentitySection
-        data={data}
-        onConfirm={onConfirm}
-        requirement={requirement}
-        authToken={authToken}
-      />
+      <IdentitySection data={data} onConfirm={onConfirm} requirement={requirement} authToken={authToken} />
     </ConfirmCollectedData>
   );
 };

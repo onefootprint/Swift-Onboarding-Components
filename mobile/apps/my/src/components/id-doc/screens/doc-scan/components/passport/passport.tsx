@@ -17,8 +17,7 @@ export type PassportProps = {
 
 const Passport = ({ onBack, onSubmit }: PassportProps) => {
   const { t } = useTranslation('scan.passport');
-  const { object, detector, frameProcessor, disableDetection } =
-    useFrameProcessor();
+  const { object, detector, frameProcessor, disableDetection } = useFrameProcessor();
 
   return (
     <Camera

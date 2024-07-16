@@ -1,6 +1,6 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
 import type { CountryCode, IdDocRequirement } from '@onefootprint/types';
-import { isIdentitydDoc, UploadDocumentSide } from '@onefootprint/types';
+import { UploadDocumentSide, isIdentitydDoc } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
@@ -14,7 +14,6 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
         requirement,
@@ -61,8 +60,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
               },
               {
                 target: 'selfie',
-                cond: (_, event) =>
-                  event.payload.nextSideToCollect === 'selfie',
+                cond: (_, event) => event.payload.nextSideToCollect === 'selfie',
                 actions: 'assignNextSideToCollect',
               },
               {
@@ -80,8 +78,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
             imageSubmitted: [
               {
                 target: 'selfie',
-                cond: (_, event) =>
-                  event.payload.nextSideToCollect === 'selfie',
+                cond: (_, event) => event.payload.nextSideToCollect === 'selfie',
                 actions: 'assignNextSideToCollect',
               },
               {
@@ -150,8 +147,7 @@ const getInitialCountry = (requirement: IdDocRequirement) => {
     const { supportedCountryAndDocTypes } = requirement.config;
 
     // Check for 'US' considering case sensitivity
-    const hasUS =
-      supportedCountryAndDocTypes.US || supportedCountryAndDocTypes.us;
+    const hasUS = supportedCountryAndDocTypes.US || supportedCountryAndDocTypes.us;
     if (hasUS) {
       const value = getCountryFromCode('US')?.value;
       if (value) return value;

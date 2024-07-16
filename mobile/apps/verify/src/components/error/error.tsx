@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components/native';
 import useTranslation from '@/hooks/use-translation';
 
 // TODO: Add navigation header
-const Error = () => {
+const ErrorComponent = () => {
   const { t } = useTranslation('components.error');
 
   return (
@@ -41,4 +41,4 @@ const ErrorContainer = styled.View`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

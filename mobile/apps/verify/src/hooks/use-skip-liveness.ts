@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  SkipLivenessRequest,
-  SkipLivenessResponse,
-} from '@onefootprint/types';
+import type { SkipLivenessRequest, SkipLivenessResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 

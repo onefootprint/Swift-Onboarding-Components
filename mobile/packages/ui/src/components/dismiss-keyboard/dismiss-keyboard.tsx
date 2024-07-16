@@ -8,10 +8,7 @@ export type DismissKeyboardProps = {
   children: React.ReactNode;
 };
 
-const DismissKeyboard = ({
-  accessible = false,
-  children,
-}: DismissKeyboardProps) => (
+const DismissKeyboard = ({ accessible = false, children }: DismissKeyboardProps) => (
   <TouchableWithoutFeedback accessible={accessible} onPress={Keyboard.dismiss}>
     <Box>{children}</Box>
   </TouchableWithoutFeedback>

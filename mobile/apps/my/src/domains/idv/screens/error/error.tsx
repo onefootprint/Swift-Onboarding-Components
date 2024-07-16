@@ -4,13 +4,13 @@ import React, { useEffect } from 'react';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-const Error = () => {
+const ErrorComponent = () => {
   const { t } = useTranslation('screens.error');
   const analytics = useAnalytics();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     analytics.track(Events.FEnded, { result: 'error' });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -25,4 +25,4 @@ const Error = () => {
   );
 };
 
-export default Error;
+export default ErrorComponent;

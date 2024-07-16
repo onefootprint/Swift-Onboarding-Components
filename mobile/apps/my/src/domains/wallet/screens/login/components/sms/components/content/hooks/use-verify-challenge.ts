@@ -1,16 +1,11 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  IdentifyVerifyRequest,
-  IdentifyVerifyResponse,
-} from '@onefootprint/types';
+import type { IdentifyVerifyRequest, IdentifyVerifyResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 
 import useTranslation from '@/hooks/use-translation';
 
-const identifyVerify = async (
-  payload: IdentifyVerifyRequest & { isApple: boolean },
-) => {
+const identifyVerify = async (payload: IdentifyVerifyRequest & { isApple: boolean }) => {
   const { isApple, ...remainingPayload } = payload;
   if (isApple) {
     return {

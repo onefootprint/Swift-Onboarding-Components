@@ -1,9 +1,4 @@
-import type {
-  CountryCode,
-  CountryCode3,
-  IdDocOutcome,
-  SupportedIdDocTypes,
-} from '../data';
+import type { CountryCode, CountryCode3, IdDocOutcome, SupportedIdDocTypes } from '../data';
 
 export type SubmitDocTypeRequest = {
   authToken: string;

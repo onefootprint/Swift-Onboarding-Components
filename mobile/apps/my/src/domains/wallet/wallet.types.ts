@@ -16,7 +16,4 @@ export type Navigation = {
   Settings: undefined;
 };
 
-export type ScreenProps<T extends keyof Navigation> = NativeStackScreenProps<
-  Navigation,
-  T
->;
+export type ScreenProps<T extends keyof Navigation> = NativeStackScreenProps<Navigation, T>;

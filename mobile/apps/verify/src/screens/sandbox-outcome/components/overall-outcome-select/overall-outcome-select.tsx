@@ -11,22 +11,13 @@ import useSandboxOutcomeOptions from '../../hooks/use-sandbox-outcome-options';
 const OverallOutcomeSelect = () => {
   const { t } = useTranslation('pages.sandbox-outcome.overall-outcome');
   const {
-    overallOutcomeOptions: {
-      overallOutcomeSuccess,
-      overallOutcomeFail,
-      overallOutcomeManualReview,
-    },
+    overallOutcomeOptions: { overallOutcomeSuccess, overallOutcomeFail, overallOutcomeManualReview },
   } = useSandboxOutcomeOptions();
   const { control } = useFormContext();
 
-  const options = [
-    overallOutcomeSuccess,
-    overallOutcomeFail,
-    overallOutcomeManualReview,
-  ];
+  const options = [overallOutcomeSuccess, overallOutcomeFail, overallOutcomeManualReview];
 
-  const hasValueInOptions = (value: OverallOutcome) =>
-    options.some(option => option.value === value);
+  const hasValueInOptions = (value: OverallOutcome) => options.some(option => option.value === value);
 
   return (
     <OverallOutcomeContainer>

@@ -1,4 +1,4 @@
-import { ApiError } from '../../../../@types';
+import { ApiError } from '../../../../types';
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
 const API_BASE_URL = process.env.API_BASE_URL ?? '';

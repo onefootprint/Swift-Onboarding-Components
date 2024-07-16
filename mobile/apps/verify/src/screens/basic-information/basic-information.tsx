@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  type CollectKycDataRequirement,
-  CollectedKycDataOption,
-  IdDI,
-} from '@onefootprint/types';
+import { type CollectKycDataRequirement, CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -58,8 +54,7 @@ const BasicInformation = ({
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);
-  const isNameDisabled =
-    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled = data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   // TODO: add support to show country of birth
 
@@ -148,10 +143,7 @@ const BasicInformation = ({
               <Box flex={1}>
                 <Controller
                   control={control}
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => {
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
                     return (
                       <TextInput
                         autoComplete="name-given"
@@ -179,10 +171,7 @@ const BasicInformation = ({
               <Box flex={1}>
                 <Controller
                   control={control}
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => {
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
                     return (
                       <TextInput
                         autoComplete="name-middle-initial"
@@ -211,10 +200,7 @@ const BasicInformation = ({
             </Row>
             <Controller
               control={control}
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => {
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
                 return (
                   <TextInput
                     autoComplete="name-family"
@@ -244,10 +230,7 @@ const BasicInformation = ({
         {requiresDob && (
           <Controller
             control={control}
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => {
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
               return (
                 <TextInput
                   autoComplete="birthdate-day"

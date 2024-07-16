@@ -1,9 +1,5 @@
 import type { DataIdentifier } from '@onefootprint/types';
-import {
-  isVaultDataEmpty,
-  isVaultDataEncrypted,
-  isVaultDataText,
-} from '@onefootprint/types';
+import { isVaultDataEmpty, isVaultDataEncrypted, isVaultDataText } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -38,9 +34,7 @@ const Field = ({ di }: FieldProps) => {
       </Box>
       {isDataEncrypted && <Typography variant="body-3">•••••••••</Typography>}
       {isVaultDataEmpty(value) && <Typography variant="body-3">-</Typography>}
-      {isVaultDataText(value) ? (
-        <Typography variant="body-3">{value}</Typography>
-      ) : null}
+      {isVaultDataText(value) ? <Typography variant="body-3">{value}</Typography> : null}
     </Box>
   );
 };

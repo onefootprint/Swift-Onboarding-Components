@@ -5,6 +5,4 @@ export type DecryptUserRequest = {
   authToken: string;
 };
 
-export type DecryptUserResponse = Partial<
-  Record<DataIdentifier, string | undefined>
->;
+export type DecryptUserResponse = Partial<Record<DataIdentifier, string | undefined>>;

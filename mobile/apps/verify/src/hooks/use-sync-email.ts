@@ -13,13 +13,7 @@ const useSyncEmail = () => {
   const userEmailMutation = useUserEmail();
   const showRequestErrorToast = useRequestErrorToast();
 
-  const syncEmail = ({
-    authToken,
-    email,
-    speculative,
-    onSuccess,
-    onError,
-  }: SyncEmailArgs) => {
+  const syncEmail = ({ authToken, email, speculative, onSuccess, onError }: SyncEmailArgs) => {
     if (!email || !authToken || userEmailMutation.isLoading) {
       return;
     }

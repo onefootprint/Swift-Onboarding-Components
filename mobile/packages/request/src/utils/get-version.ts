@@ -1,8 +1,5 @@
 import { Platform } from 'react-native';
-import {
-  getBuildNumber,
-  getVersion as getAppVersion,
-} from 'react-native-device-info';
+import { getVersion as getAppVersion, getBuildNumber } from 'react-native-device-info';
 
 const getPlatform = () => {
   if (Platform.OS === 'ios') {

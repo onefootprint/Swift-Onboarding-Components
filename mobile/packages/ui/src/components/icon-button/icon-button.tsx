@@ -10,19 +10,11 @@ export type IconButtonProps = {
   onPress?: () => void;
 };
 
-const IconButton = ({
-  'aria-label': ariaLabel,
-  children,
-  onPress,
-}: IconButtonProps) => {
+const IconButton = ({ 'aria-label': ariaLabel, children, onPress }: IconButtonProps) => {
   const [active, setActive] = useState(false);
 
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={() => setActive(true)}
-      onPressOut={() => setActive(false)}
-    >
+    <Pressable onPress={onPress} onPressIn={() => setActive(true)} onPressOut={() => setActive(false)}>
       <Box
         aria-label={ariaLabel}
         backgroundColor={active ? 'senary' : 'secondary'}

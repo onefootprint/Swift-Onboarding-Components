@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  GetSdkArgsRequest,
-  GetSdkArgsResponse,
-} from '@onefootprint/types';
+import type { GetSdkArgsRequest, GetSdkArgsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 const isValidTokenFormat = (x: string): boolean => Boolean(x) && /tok_/.test(x);

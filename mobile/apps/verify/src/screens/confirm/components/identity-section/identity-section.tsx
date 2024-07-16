@@ -2,18 +2,11 @@ import { IcoUserCircle24 } from '@onefootprint/icons';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
 import React, { useEffect, useState } from 'react';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '@/components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '@/components/confirm-collected-data';
 import { Section, SectionItem } from '@/components/confirm-collected-data';
 import useTranslation from '@/hooks/use-translation';
 import Ssn from '@/screens/ssn';
-import {
-  getSsnKind,
-  getSsnValue,
-  ssnFormatter,
-} from '@/screens/ssn/utils/ssn-utils';
+import { getSsnKind, getSsnValue, ssnFormatter } from '@/screens/ssn/utils/ssn-utils';
 import type { KycData } from '@/types';
 import isCountryUsOrTerritories from '@/utils/is-country-us-or-territories';
 
@@ -32,12 +25,7 @@ type IdentitySectionProps = {
 
 // TODO: Handle step-up case
 // TODO: Handle userFound case
-const IdentitySection = ({
-  authToken,
-  data,
-  onConfirm,
-  requirement,
-}: IdentitySectionProps) => {
+const IdentitySection = ({ authToken, data, onConfirm, requirement }: IdentitySectionProps) => {
   const { t, allT } = useTranslation('pages.confirm');
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
@@ -67,11 +55,7 @@ const IdentitySection = ({
     if (ssnValueType === SsnValue.skipped) {
       ssnDisplayVal = t('identity.ssn-skipped-subtext');
     } else {
-      ssnDisplayVal = ssnFormatter(
-        ssnKind,
-        ssn?.value,
-        ssnValueType === SsnValue.hidden,
-      );
+      ssnDisplayVal = ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
     }
     identity.push({
       text: ssnKind === 'ssn-full' ? t('identity.ssn9') : t('identity.ssn4'),
@@ -90,16 +74,9 @@ const IdentitySection = ({
 
   const getSectionContent = () => {
     if (!editing) {
-      const identityItems = identity.map(
-        ({ text, subtext, textColor }: SectionItemProps) => (
-          <SectionItem
-            key={text}
-            text={text}
-            subtext={subtext}
-            textColor={textColor}
-          />
-        ),
-      );
+      const identityItems = identity.map(({ text, subtext, textColor }: SectionItemProps) => (
+        <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+      ));
       return identityItems;
     }
     return (

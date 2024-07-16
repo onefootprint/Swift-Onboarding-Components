@@ -1,8 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Camera as VisionCamera,
-  useCameraDevice,
-} from 'react-native-vision-camera';
+import { useEffect, useRef, useState } from 'react';
+import { Camera as VisionCamera, useCameraDevice } from 'react-native-vision-camera';
 import styled, { css } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
 
@@ -21,6 +18,7 @@ const AUTO_CAPTURE_TIMEOUT = 3500;
 type CameraProps = {
   children?: (countdown: number | null) => React.ReactNode;
   disabled?: boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   frameProcessor?: any;
   object: Detection;
   onBack?: () => void;
@@ -67,12 +65,10 @@ const Camera = ({
       takePhoto({ manual: false });
     },
   });
-  const showCountdown =
-    cameraDetection.countdown && cameraDetection.countdown <= 3;
+  const showCountdown = cameraDetection.countdown && cameraDetection.countdown <= 3;
 
   useEffect(() => {
     return () => cameraDetection.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const takePhoto = async (meta: Record<string, boolean>) => {
@@ -133,20 +129,14 @@ const Camera = ({
       <Buttons>
         {isAutoCaptureEnabled && showFeedback ? (
           <>
-            {object.feedback && cameraDetection.countdown < 3 && (
-              <Feedback>{object.feedback}</Feedback>
-            )}
-            {object.isDetected && cameraDetection.countdown > 3 && (
-              <Feedback>Hold still...</Feedback>
-            )}
+            {object.feedback && cameraDetection.countdown < 3 && <Feedback>{object.feedback}</Feedback>}
+            {object.isDetected && cameraDetection.countdown > 3 && <Feedback>Hold still...</Feedback>}
           </>
         ) : null}
         {showFeedback ? (
           <CaptureButton
             onPress={handleTakePhotoManually}
-            selected={
-              cameraDetection.countdown && cameraDetection.countdown <= 3
-            }
+            selected={cameraDetection.countdown && cameraDetection.countdown <= 3}
           />
         ) : null}
       </Buttons>

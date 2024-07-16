@@ -1,9 +1,6 @@
 import { Pressable } from '@onefootprint/ui';
 import React from 'react';
-import Reanimated, {
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import Reanimated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import styled, { css } from 'styled-components/native';
 
 type CaptureButtonProps = {
@@ -43,9 +40,7 @@ const OuterCircle = styled.View`
 
 const AnimatedInnerCircle = styled(Reanimated.View)<{ selected: boolean }>`
   ${({ selected, theme }) => css`
-    background-color: ${selected
-      ? theme.backgroundColor.secondary
-      : theme.backgroundColor.primary};
+    background-color: ${selected ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
     height: 56px;
     width: 56px;
     box-shadow: 0px 1px 4px rgba(0, 0, 0, ${selected ? 0 : 0.12});

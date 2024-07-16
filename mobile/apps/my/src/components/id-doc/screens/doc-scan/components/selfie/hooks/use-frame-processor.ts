@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import {
-  runAtTargetFps,
-  useFrameProcessor as useVCFrameProcessor,
-} from 'react-native-vision-camera';
+import { runAtTargetFps, useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
 import { Worklets } from 'react-native-worklets-core';
 
 import { detectFace } from '@/utils/vision-camera';

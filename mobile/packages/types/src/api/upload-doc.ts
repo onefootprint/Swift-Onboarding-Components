@@ -8,8 +8,8 @@ export type UploadDocRequest = {
   authToken: string;
   data: FormData;
   docId: string;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
   side?: UploadDocumentSide;
 };
 
-export type UploadDocResponse = {};
+export type UploadDocResponse = null;

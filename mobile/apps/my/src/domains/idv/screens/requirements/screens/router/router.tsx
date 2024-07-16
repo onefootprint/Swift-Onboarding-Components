@@ -57,11 +57,7 @@ const Router = ({ authToken, onDone }: RouterProps) => {
         />
       )}
       {state.matches('idDoc') && idDoc && (
-        <IdDoc
-          requirement={idDoc}
-          authToken={authToken}
-          onDone={() => send({ type: 'requirementCompleted' })}
-        />
+        <IdDoc requirement={idDoc} authToken={authToken} onDone={() => send({ type: 'requirementCompleted' })} />
       )}
     </>
   );

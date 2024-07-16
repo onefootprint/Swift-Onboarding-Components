@@ -80,8 +80,7 @@ const filterProps = (props: BoxProps) => {
   Object.keys(props).forEach(key => {
     if (styleKeyProps.includes(key)) {
       // @ts-ignore
-      styleProps[key as keyof BoxStyleProps] =
-        props[key as keyof BoxStyleProps];
+      styleProps[key as keyof BoxStyleProps] = props[key as keyof BoxStyleProps];
     } else {
       // @ts-ignore
       viewProps[key as keyof ViewProps] = props[key as keyof ViewProps];

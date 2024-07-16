@@ -1,11 +1,5 @@
-import {
-  DEFAULT_COUNTRY,
-  getCountryFromCode,
-} from '@onefootprint/global-constants';
-import type {
-  DocumentRequirementConfig,
-  IdDocRequirement,
-} from '@onefootprint/types';
+import { DEFAULT_COUNTRY, getCountryFromCode } from '@onefootprint/global-constants';
+import type { DocumentRequirementConfig, IdDocRequirement } from '@onefootprint/types';
 import { isIdentitydDoc } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -26,13 +20,8 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const analytics = useAnalytics();
   const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
-  const { shouldCollectConsent, supportedCountryAndDocTypes } = getIdDocConfig(
-    requirement.config,
-  );
-  const country =
-    getCountryFromCode(
-      collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
-    ) ?? DEFAULT_COUNTRY;
+  const { shouldCollectConsent, supportedCountryAndDocTypes } = getIdDocConfig(requirement.config);
+  const country = getCountryFromCode(collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value) ?? DEFAULT_COUNTRY;
 
   useEffect(() => {
     if (state.done) {
@@ -41,7 +30,6 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       });
       onDone();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, onDone]);
 
   if (state.matches('docSelection')) {
@@ -70,11 +58,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     return null;
   }
 
-  if (
-    state.matches('frontImage') ||
-    state.matches('backImage') ||
-    state.matches('selfie')
-  ) {
+  if (state.matches('frontImage') || state.matches('backImage') || state.matches('selfie')) {
     return (
       <DocScan
         authToken={authToken}

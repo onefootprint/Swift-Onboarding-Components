@@ -1,9 +1,8 @@
 import { useContext } from 'react';
 
-import { OnboardingStep } from '../../types';
+import { type FormValues, OnboardingStep } from '../../types';
 import { Context } from '../provider';
 import save from '../queries/save';
-import type { Di } from '../types/dis';
 import fp from '../utils/browser';
 import { formatBeforeSave } from '../utils/save-utils';
 
@@ -56,7 +55,7 @@ const useFootprint = () => {
   };
 
   const vaultData = async (
-    data: Di,
+    formValues: FormValues,
     {
       onSuccess,
       onError,
@@ -71,11 +70,7 @@ const useFootprint = () => {
       return;
     }
     if (!onboardingConfig) {
-      onError?.(
-        new Error(
-          'No onboardingConfig found. Please make sure that the publicKey is correct',
-        ),
-      );
+      onError?.(new Error('No onboardingConfig found. Please make sure that the publicKey is correct'));
       return;
     }
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
@@ -84,7 +79,7 @@ const useFootprint = () => {
     }
     try {
       await save({
-        data: formatBeforeSave(data, context.locale ?? 'en-US'),
+        data: formatBeforeSave(formValues, context.locale ?? 'en-US'),
         bootstrapDis: [],
         authToken: vaultingToken,
       });

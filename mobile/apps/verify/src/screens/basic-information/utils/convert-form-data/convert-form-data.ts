@@ -15,8 +15,7 @@ const convertFormData = ({
   data?: KycData;
   formData: FormData;
 }) => {
-  const isNameDisabled =
-    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled = data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);

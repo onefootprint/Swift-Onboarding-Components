@@ -1,15 +1,12 @@
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { RNHoleView } from 'react-native-hole-view';
-import Reanimated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Reanimated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import styled, { css } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
 
 type FrameProps = {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   detector: any;
   aspectRatio: number;
   children?: React.ReactNode;
@@ -34,11 +31,7 @@ const Frame = ({ children, detector, aspectRatio = 1.586 }: FrameProps) => {
 
   return (
     <>
-      <StyledFrame
-        style={animatedStyles}
-        frameWidth={frameWidth}
-        frameHeight={frameHeight}
-      >
+      <StyledFrame style={animatedStyles} frameWidth={frameWidth} frameHeight={frameHeight}>
         {children}
       </StyledFrame>
       <Hole

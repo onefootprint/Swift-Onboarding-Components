@@ -1,9 +1,6 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
 import type { PasskeyAttemptContext } from '@onefootprint/types';
-import {
-  SkipLivenessClientType,
-  SkipLivenessReason,
-} from '@onefootprint/types';
+import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types';
 import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { Passkey } from 'react-native-passkey';
@@ -12,9 +9,7 @@ import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-import useRegisterPasskey, {
-  isRegisterPasskeyError,
-} from './hooks/use-register-passkey';
+import useRegisterPasskey, { isRegisterPasskeyError } from './hooks/use-register-passkey';
 import useSkipPasskey from './hooks/use-skip-passkey';
 
 export type PasskeysProps = {
@@ -31,9 +26,7 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
   const analytics = useAnalytics();
   const isSupported = Passkey.isSupported();
 
-  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<
-    PasskeyAttemptContext[]
-  >([]);
+  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<PasskeyAttemptContext[]>([]);
 
   const handleRegister = () => {
     analytics.track(Events.PasskeysRegistrationStarted);
@@ -63,10 +56,7 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
           errorMessage: message,
           elapsedTimeInOsPromptMs,
         };
-        setPasskeyRegisterAttempts([
-          ...passkeyRegisterAttempts,
-          passkeyFailure,
-        ]);
+        setPasskeyRegisterAttempts([...passkeyRegisterAttempts, passkeyFailure]);
       },
     });
   };
@@ -98,7 +88,6 @@ const RegisterPasskey = ({ authToken, onDone }: PasskeysProps) => {
     if (!isSupported) {
       handleNotSupported();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   let title;

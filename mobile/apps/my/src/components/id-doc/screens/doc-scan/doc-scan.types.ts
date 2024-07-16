@@ -8,5 +8,5 @@ export type Document = {
 export type Detection = {
   isDetected: boolean;
   feedback: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 };

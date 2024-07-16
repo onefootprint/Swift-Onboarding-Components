@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import get from 'lodash/get';
 import React, { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -20,9 +19,7 @@ const FieldErrors = ({ ...props }: FieldErrorsProps) => {
   }
   const error = get(errors, name);
 
-  return error?.message ? (
-    <Text {...props}>{error?.message.toString()}</Text>
-  ) : null;
+  return error?.message ? <Text {...props}>{error?.message.toString()}</Text> : null;
 };
 
 export default FieldErrors;

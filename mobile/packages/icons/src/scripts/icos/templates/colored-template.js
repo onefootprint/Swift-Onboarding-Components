@@ -1,7 +1,4 @@
-const template = (
-  { imports, interfaces, componentName, props, jsx, exports },
-  { tpl },
-) => tpl`
+const template = ({ componentName, jsx, exports }, { tpl }) => tpl`
   import React from 'react';
   import Svg, { Path } from "react-native-svg"
 

@@ -39,13 +39,7 @@ const Passkey = ({ identifiedAuthToken, onSuccess }: PasskeyProps) => {
       padding={7}
       width="100%"
     >
-      <Box
-        backgroundColor="primary"
-        borderRadius="default"
-        center
-        height={40}
-        width={40}
-      >
+      <Box backgroundColor="primary" borderRadius="default" center height={40} width={40}>
         <IcoFaceid24 />
       </Box>
       <Button onPress={handlePress} loading={isLoading}>

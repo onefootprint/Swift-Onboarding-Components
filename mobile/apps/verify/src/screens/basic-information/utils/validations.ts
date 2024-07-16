@@ -12,11 +12,9 @@ export const validateDateFormat = (date: string) => {
   return isValid(new Date(date));
 };
 
-export const validateYearOfBirth = (date: string) =>
-  new Date(date).getFullYear() >= MAX_YEAR_OF_BIRTH;
+export const validateYearOfBirth = (date: string) => new Date(date).getFullYear() >= MAX_YEAR_OF_BIRTH;
 
-export const validateNotFutureDate = (date: string) =>
-  !isFuture(new Date(date));
+export const validateNotFutureDate = (date: string) => !isFuture(new Date(date));
 
 export const validateMinimumAge = (date: string) => {
   const age = differenceInYears(new Date(), new Date(date));

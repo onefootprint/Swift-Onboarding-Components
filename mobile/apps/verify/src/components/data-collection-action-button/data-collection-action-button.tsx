@@ -31,11 +31,7 @@ const DataCollectionActionButton = ({
         <Button variant="secondary" onPress={onCancel} disabled={isLoading}>
           {t('cancel')}
         </Button>
-        <Button
-          loading={isLoading}
-          testID={submitButtonTestID}
-          onPress={onComplete}
-        >
+        <Button loading={isLoading} testID={submitButtonTestID} onPress={onComplete}>
           {t('save')}
         </Button>
       </EndJustifiedButtons>
@@ -45,11 +41,7 @@ const DataCollectionActionButton = ({
   if (onSkip && skipLabel) {
     return (
       <VerticalButtons>
-        <Button
-          loading={isLoading}
-          testID={submitButtonTestID}
-          onPress={onComplete}
-        >
+        <Button loading={isLoading} testID={submitButtonTestID} onPress={onComplete}>
           {ctaLabel ?? t('continue')}
         </Button>
         <LinkButton onPress={onSkip}>{skipLabel}</LinkButton>
@@ -58,11 +50,7 @@ const DataCollectionActionButton = ({
   }
 
   return (
-    <Button
-      loading={isLoading}
-      testID={submitButtonTestID}
-      onPress={onComplete}
-    >
+    <Button loading={isLoading} testID={submitButtonTestID} onPress={onComplete}>
       {ctaLabel ?? t('continue')}
     </Button>
   );

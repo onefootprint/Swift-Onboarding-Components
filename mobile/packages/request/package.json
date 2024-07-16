@@ -6,8 +6,8 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
+    "lint": "biome check src --fix",
+    "lint:ci": "biome ci src",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
@@ -15,7 +15,6 @@
     "@react-native-async-storage/async-storage": "1.19.3",
     "@types/node": "^20.10.0",
     "@types/uuid": "^9.0.0",
-    "eslint-config-footprint": "*",
     "react-native-device-info": "^10.11.0",
     "react-native": "^0.71.15",
     "tsconfig": "*",

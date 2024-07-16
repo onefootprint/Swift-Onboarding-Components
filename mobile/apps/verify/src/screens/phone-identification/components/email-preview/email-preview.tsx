@@ -24,13 +24,7 @@ const EmailPreview = ({ email, onEdit }: EmailPreviewProps) => {
       borderRadius="default"
       marginBottom={7}
     >
-      <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        gap={3}
-        maxWidth="60%"
-      >
+      <Box display="flex" flexDirection="row" alignItems="center" gap={3} maxWidth="60%">
         <IcoEmail24 />
         <Typography variant="label-3" color="primary">
           {email}

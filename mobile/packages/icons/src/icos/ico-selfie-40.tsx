@@ -16,15 +16,7 @@ const IcoSelfie40 = ({ color = 'primary', style }: IconProps) => {
         strokeWidth={2.4}
         strokeLinecap="round"
       />
-      <Rect
-        x={8}
-        y={6}
-        width={24}
-        height={30}
-        rx={5}
-        stroke={theme.color[color]}
-        strokeWidth={3.5}
-      />
+      <Rect x={8} y={6} width={24} height={30} rx={5} stroke={theme.color[color]} strokeWidth={3.5} />
       <Path
         d="M33.879 8.99a.696.696 0 0 0-.08.635l2.282 6.168c.247.669-.55 1.232-1.098.776l-5.074-4.227a.696.696 0 0 0-.582-.148l-4.827.967a.696.696 0 0 1-.69-1.103l2.77-3.646a.696.696 0 0 0 .098-.662L24.404 1.6c-.247-.668.55-1.232 1.098-.776l5.054 4.211a.696.696 0 0 0 .623.138l4.687-1.232c.624-.165 1.116.535.75 1.067l-2.737 3.98Z"
         fill="#fff"

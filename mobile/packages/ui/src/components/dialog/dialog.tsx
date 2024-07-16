@@ -22,14 +22,7 @@ export type DialogProps = {
   disableClose?: boolean;
 };
 
-const Dialog = ({
-  children,
-  cta,
-  onClose,
-  open = false,
-  title,
-  disableClose = false,
-}: DialogProps) => {
+const Dialog = ({ children, cta, onClose, open = false, title, disableClose = false }: DialogProps) => {
   const handleBackdropPress = () => {
     if (!disableClose && onClose) {
       onClose();
@@ -48,13 +41,7 @@ const Dialog = ({
         useNativeDriverForBackdrop
       >
         <Box backgroundColor="primary" borderRadius="large">
-          <Box
-            alignItems="flex-end"
-            marginBottom={2}
-            marginHorizontal={5}
-            marginTop={4}
-            height={32}
-          >
+          <Box alignItems="flex-end" marginBottom={2} marginHorizontal={5} marginTop={4} height={32}>
             {disableClose ? null : (
               <IconButton aria-label="Close" onPress={onClose}>
                 <IcoClose32 />

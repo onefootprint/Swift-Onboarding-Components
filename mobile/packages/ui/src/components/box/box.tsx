@@ -1,11 +1,4 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type {
-  BackgroundColor,
-  BorderColor,
-  BorderRadius,
-  Elevation,
-  Spacing,
-} from '@onefootprint/design-tokens';
+import type { BackgroundColor, BorderColor, BorderRadius, Elevation, Spacing } from '@onefootprint/design-tokens';
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 
@@ -15,12 +8,7 @@ import filterProps from './box.utils';
 const Box = ({ children, center, style, ...props }: BoxProps) => {
   const { styleProps, viewProps } = filterProps(props);
   return (
-    <Container
-      center={center}
-      style={style}
-      styleProps={styleProps}
-      {...viewProps}
-    >
+    <Container center={center} style={style} styleProps={styleProps} {...viewProps}>
       {children}
     </Container>
   );
@@ -55,16 +43,10 @@ const Container = styled.View<{
           } else if (prop.includes('Radius')) {
             return `${prop}: ${theme.borderRadius[value as BorderRadius]};`;
           } else if (prop === 'backgroundColor') {
-            return `background-color: ${
-              theme.backgroundColor[value as BackgroundColor]
-            };`;
+            return `background-color: ${theme.backgroundColor[value as BackgroundColor]};`;
           } else if (prop === 'elevation') {
             return `box-shadow: ${theme.elevation[value as Elevation]};`;
-          } else if (
-            prop === 'gap' ||
-            prop === 'rowGap' ||
-            prop === 'columnGap'
-          ) {
+          } else if (prop === 'gap' || prop === 'rowGap' || prop === 'columnGap') {
             return `${prop}: ${theme.spacing[value as Spacing]};`;
           } else {
             if (value !== undefined && typeof value === 'string') {

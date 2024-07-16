@@ -9,11 +9,7 @@ export type SectionItemProps = {
   subtext?: string;
 };
 
-const SectionItem = ({
-  text,
-  subtext,
-  textColor = 'tertiary',
-}: SectionItemProps) => (
+const SectionItem = ({ text, subtext, textColor = 'tertiary' }: SectionItemProps) => (
   <Container>
     <Typography variant="label-3" color={textColor}>
       {text}

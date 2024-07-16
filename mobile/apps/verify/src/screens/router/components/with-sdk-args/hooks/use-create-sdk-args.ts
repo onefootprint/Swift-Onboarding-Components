@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  SendSdkArgsRequest,
-  SendSdkArgsResponse,
-} from '@onefootprint/types';
+import type { SendSdkArgsRequest, SendSdkArgsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const createSdkArgs = async (data: SendSdkArgsRequest) => {

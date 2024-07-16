@@ -1,7 +1,4 @@
-import type {
-  PublicOnboardingConfig,
-  SupportedLocale,
-} from '@onefootprint/types';
+import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
@@ -36,13 +33,7 @@ export type ProviderProps = {
   locale?: SupportedLocale;
 };
 
-const Provider = ({
-  appearance,
-  authToken,
-  children,
-  publicKey,
-  locale = 'en-US',
-}: ProviderProps) => {
+const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US' }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
@@ -50,10 +41,7 @@ const Provider = ({
     publicKey,
     locale,
   });
-  const value = useMemo<[ContextData, UpdateContext]>(
-    () => [context, setContext],
-    [context],
-  );
+  const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
   const getOnboardingConfig = async (pKey?: string) => {
     if (!pKey) {

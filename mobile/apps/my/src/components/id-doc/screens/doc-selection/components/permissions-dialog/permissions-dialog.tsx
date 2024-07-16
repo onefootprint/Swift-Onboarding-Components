@@ -15,35 +15,25 @@ type PermissionsDialogProps = {
 const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
   const { t } = useTranslation('scan.doc-selection.permissions-dialog');
   const [open, setOpen] = useState(false);
-  const [permissions, setPermission] = useState<CameraPermissionStatus | null>(
-    null,
-  );
+  const [permissions, setPermission] = useState<CameraPermissionStatus | null>(null);
   const isDenied = permissions === 'denied';
   const analytics = useAnalytics();
   const isAndroid = Platform.OS === 'android';
-  const [
-    androidCameraPermissionPromptDenied,
-    setAndroidCameraPermissionPromptDenied,
-  ] = useState(false);
-  const shouldPromptAndroidCameraPermission =
-    isAndroid && !androidCameraPermissionPromptDenied;
+  const [androidCameraPermissionPromptDenied, setAndroidCameraPermissionPromptDenied] = useState(false);
+  const shouldPromptAndroidCameraPermission = isAndroid && !androidCameraPermissionPromptDenied;
 
   const checkPermissions = useCallback(async () => {
     try {
       if (isAndroid) {
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        );
+        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA);
         if (hasPermission) {
           return 'granted';
-        } else {
-          return 'denied';
         }
-      } else {
-        const newPermissions = await Camera.getCameraPermissionStatus();
-        return newPermissions;
+        return 'denied';
       }
-    } catch (error) {
+      const newPermissions = await Camera.getCameraPermissionStatus();
+      return newPermissions;
+    } catch (_) {
       return null;
     }
   }, [isAndroid]);
@@ -73,7 +63,9 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
       if (response === 'denied') {
         analytics.track(Events.DocCameraPermissionsDenied);
       }
-    } catch (error) {}
+    } catch (_) {
+      // do nothing
+    }
   };
 
   const handleOpenSettings = () => {

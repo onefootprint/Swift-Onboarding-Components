@@ -3,10 +3,7 @@ import { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { Platform } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import {
-  runAtTargetFps,
-  useFrameProcessor as useVCFrameProcessor,
-} from 'react-native-vision-camera';
+import { runAtTargetFps, useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
 import { Worklets } from 'react-native-worklets-core';
 
 import { detectBarcodes, detectDocument } from '@/utils/vision-camera';
@@ -15,10 +12,7 @@ import type { Detection } from '../../../doc-scan.types';
 
 const DEFAULT_BARCODE_RESULT = { barcodes: [] };
 
-const useFrameProcessor = (
-  side: UploadDocumentSide,
-  country: CountryRecord,
-) => {
+const useFrameProcessor = (side: UploadDocumentSide, country: CountryRecord) => {
   const detector = useSharedValue(false);
   const [object, setObject] = useState<Detection>({
     isDetected: false,
@@ -27,10 +21,7 @@ const useFrameProcessor = (
   });
 
   // TODO: Remove this once we support barcode detection on Android
-  const requiresCode =
-    side === UploadDocumentSide.Back &&
-    country.value === 'US' &&
-    Platform.OS === 'ios';
+  const requiresCode = side === UploadDocumentSide.Back && country.value === 'US' && Platform.OS === 'ios';
   const setObjectJs = Worklets.createRunInJsFn(setObject);
   const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
     detector.value = value;
@@ -46,19 +37,14 @@ const useFrameProcessor = (
 
         if (!shouldDetect) return;
         const documentResult = detectDocument(frame);
-        const barcodeResult = requiresCode
-          ? detectBarcodes(frame)
-          : DEFAULT_BARCODE_RESULT;
+        const barcodeResult = requiresCode ? detectBarcodes(frame) : DEFAULT_BARCODE_RESULT;
 
         const hasBarcode = barcodeResult.barcodes.length > 0;
-        const isDetected =
-          documentResult.isDocument && (requiresCode ? hasBarcode : true);
+        const isDetected = documentResult.isDocument && (requiresCode ? hasBarcode : true);
 
         setObjectJs({
           isDetected,
-          feedback: isDetected
-            ? ''
-            : `Scan the ${side.toUpperCase()} of your driver's license`,
+          feedback: isDetected ? '' : `Scan the ${side.toUpperCase()} of your driver's license`,
           data: {
             barcodes: barcodeResult.barcodes,
           },

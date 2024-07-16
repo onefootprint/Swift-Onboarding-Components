@@ -3,7 +3,7 @@ import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import Error from '@/components/error';
+import ErrorComponent from '@/components/error';
 import useOnboardingProcess from '@/hooks/use-onboarding-process';
 
 export type ProcessProps = {
@@ -28,7 +28,7 @@ const Process = ({ onDone, authToken, overallOutcome }: ProcessProps) => {
     );
   });
 
-  return isError ? <Error /> : <LoadingIndicator />;
+  return isError ? <ErrorComponent /> : <LoadingIndicator />;
 };
 
 export default Process;

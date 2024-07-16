@@ -9,7 +9,7 @@ type ErrorProps = {
   errors: string[];
 };
 
-const Error = ({ errors, onReset }: ErrorProps) => {
+const ErrorComponent = ({ errors, onReset }: ErrorProps) => {
   const { t } = useTranslation('scan.upload.errors');
 
   return (
@@ -37,4 +37,4 @@ const Error = ({ errors, onReset }: ErrorProps) => {
   );
 };
 
-export default Error;
+export default ErrorComponent;

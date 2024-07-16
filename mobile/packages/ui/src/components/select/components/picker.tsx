@@ -63,12 +63,7 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
   };
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
-      presentationStyle="formSheet"
-      visible={open}
-    >
+    <Modal animationType="slide" onRequestClose={onClose} presentationStyle="formSheet" visible={open}>
       <PickerContainer>
         <Box flexDirection="row" margin={5} center position="relative">
           <Typography variant="label-2">{title}</Typography>
@@ -78,12 +73,7 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
             </IconButton>
           </Box>
         </Box>
-        <Box
-          borderBottomColor="tertiary"
-          borderBottomWidth={1}
-          paddingHorizontal={4}
-          paddingVertical={5}
-        >
+        <Box borderBottomColor="tertiary" borderBottomWidth={1} paddingHorizontal={4} paddingVertical={5}>
           <SearchInput
             autoCorrect={false}
             autoFocus
@@ -123,13 +113,7 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
           }
           keyExtractor={item => item.value.toString()}
           renderItem={({ item }) => {
-            return (
-              <Item
-                label={item.label}
-                onPress={() => onChange?.(item)}
-                selected={value?.value === item.value}
-              />
-            );
+            return <Item label={item.label} onPress={() => onChange?.(item)} selected={value?.value === item.value} />;
           }}
         />
       </PickerContainer>

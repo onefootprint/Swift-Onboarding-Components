@@ -6,11 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from '@/domains/wallet/hooks/use-session';
 import useSession from '@/domains/wallet/hooks/use-session';
 
-const getVaultData = async (
-  authHeaders: AuthHeaders,
-  fields: IdDI[],
-  isApple: boolean,
-) => {
+const getVaultData = async (authHeaders: AuthHeaders, fields: IdDI[], isApple: boolean) => {
   if (isApple) {
     return {
       [IdDI.city]: 'San Francisco',
@@ -38,14 +34,7 @@ const getVaultData = async (
   return response.data;
 };
 
-const basicProfile = [
-  IdDI.city,
-  IdDI.state,
-  IdDI.country,
-  IdDI.zip,
-  IdDI.firstName,
-  IdDI.lastName,
-];
+const basicProfile = [IdDI.city, IdDI.state, IdDI.country, IdDI.zip, IdDI.firstName, IdDI.lastName];
 
 const completeProfile = [
   ...basicProfile,
@@ -63,9 +52,7 @@ const useUserVault = () => {
   const { data, authHeaders } = useSession();
   const isSms = data?.challengeKind === ChallengeKind.sms;
   const fields = isSms ? basicProfile : completeProfile;
-  return useQuery(['user', 'vault'], () =>
-    getVaultData(authHeaders, fields, data.isApple),
-  );
+  return useQuery(['user', 'vault'], () => getVaultData(authHeaders, fields, data.isApple));
 };
 
 export default useUserVault;

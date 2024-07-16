@@ -1027,9 +1027,7 @@ export const COUNTRIES: CountryRecord[] = [
 export const [DEFAULT_COUNTRY] = COUNTRIES;
 
 export const getCountryFromCode = (countryCode?: CountryCode) => {
-  const match = COUNTRIES.find(
-    country => country.value.toLowerCase() === countryCode?.toLowerCase(),
-  );
+  const match = COUNTRIES.find(country => country.value.toLowerCase() === countryCode?.toLowerCase());
   return match;
 };
 

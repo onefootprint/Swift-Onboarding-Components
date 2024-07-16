@@ -26,11 +26,7 @@ export type CollectedDataEvent = {
 };
 
 export type CollectedDataEventData = {
-  attributes: (
-    | CollectedKybDataOption
-    | CollectedKycDataOption
-    | CollectedInvestorProfileDataOption
-  )[];
+  attributes: (CollectedKybDataOption | CollectedKycDataOption | CollectedInvestorProfileDataOption)[];
 };
 
 export type FreeFormNoteEvent = {

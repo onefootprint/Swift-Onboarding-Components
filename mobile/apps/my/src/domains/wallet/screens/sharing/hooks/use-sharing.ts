@@ -34,9 +34,7 @@ const getSharing = async (authHeaders: AuthHeaders, isApple: boolean) => {
 
 const useSharing = () => {
   const { authHeaders, data } = useSession();
-  return useQuery(['user', 'sharing'], () =>
-    getSharing(authHeaders, data.isApple),
-  );
+  return useQuery(['user', 'sharing'], () => getSharing(authHeaders, data.isApple));
 };
 
 export default useSharing;

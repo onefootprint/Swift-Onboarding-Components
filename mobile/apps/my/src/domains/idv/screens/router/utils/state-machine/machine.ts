@@ -29,9 +29,7 @@ const createHandoffMachine = (authToken: string) =>
         },
         {
           target: 'completed',
-          cond: (_, event) =>
-            event.payload.status === D2PStatus.completed ||
-            event.payload.status === D2PStatus.failed,
+          cond: (_, event) => event.payload.status === D2PStatus.completed || event.payload.status === D2PStatus.failed,
         },
       ],
     },

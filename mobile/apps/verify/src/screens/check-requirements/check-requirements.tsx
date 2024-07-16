@@ -1,12 +1,9 @@
-import type {
-  OnboardingRequirement,
-  OnboardingStatusResponse,
-} from '@onefootprint/types';
+import type { OnboardingRequirement, OnboardingStatusResponse } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import Error from '@/components/error';
+import ErrorComponent from '@/components/error';
 import useGetOnboardingStatus from '@/hooks/use-get-onboarding-status';
 import useOnboarding from '@/hooks/use-onboarding';
 
@@ -27,8 +24,7 @@ const CheckRequirements = ({
 }: CheckRequirementsProps) => {
   const [error, setError] = useState(false);
   const onboardingMutation = useOnboarding();
-  const onboardingInitialized =
-    startedDataCollection || onboardingMutation.isSuccess;
+  const onboardingInitialized = startedDataCollection || onboardingMutation.isSuccess;
 
   useEffectOnce(() => {
     // Only initialize the onboarding once at the start (before fetching the requirements)
@@ -47,11 +43,7 @@ const CheckRequirements = ({
 
   const handleOnboardingStatus = (response: OnboardingStatusResponse) => {
     // TODO: this call requires isTransfer argument when we add transfer support
-    const payload = computeRequirementsToShow(
-      !!startedDataCollection,
-      !!collectedKycData,
-      response,
-    );
+    const payload = computeRequirementsToShow(!!startedDataCollection, !!collectedKycData, response);
     onComplete(payload);
   };
 
@@ -68,7 +60,7 @@ const CheckRequirements = ({
     },
   });
 
-  return error ? <Error /> : <LoadingIndicator />;
+  return error ? <ErrorComponent /> : <LoadingIndicator />;
 };
 
 export default CheckRequirements;

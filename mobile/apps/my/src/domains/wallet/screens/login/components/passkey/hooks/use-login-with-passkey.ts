@@ -71,9 +71,7 @@ const loginWithPasskey = async (authToken: string) => {
   const {
     challengeData: { biometricChallengeJson, challengeToken },
   } = await loginChallenge(authToken);
-  const challengeResponse = await generateDeviceResponse(
-    biometricChallengeJson,
-  );
+  const challengeResponse = await generateDeviceResponse(biometricChallengeJson);
   const response = await identifyVerify({ challengeResponse, challengeToken });
   return response;
 };

@@ -1,6 +1,6 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -66,7 +66,7 @@ const Step3 = () => (
 const Step4 = () => {
   const fp = useFootprint();
 
-  const handleSubmit = (formValues: Di) => {
+  const handleSubmit = (formValues: FormValues) => {
     fp.launchIdentify(
       {
         email: formValues['id.email'],
@@ -106,7 +106,7 @@ const Step5 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
-  const handleSubmitIdentify = (formValues: Di) => {
+  const handleSubmitIdentify = (formValues: FormValues) => {
     fp.launchIdentify(
       {
         email: formValues['id.email'],
@@ -120,7 +120,7 @@ const Step5 = () => {
     );
   };
 
-  const handleSubmitData = (formValues: Di) => {
+  const handleSubmitData = (formValues: FormValues) => {
     fp.save(formValues, {
       onSuccess: () => {
         console.log('done');
@@ -216,7 +216,7 @@ const Step6 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
-  const handleSubmitIdentify = (formValues: Di) => {
+  const handleSubmitIdentify = (formValues: FormValues) => {
     fp.launchIdentify(
       {
         email: formValues['id.email'],
@@ -230,7 +230,7 @@ const Step6 = () => {
     );
   };
 
-  const handleSubmitData = (formValues: Di) => {
+  const handleSubmitData = (formValues: FormValues) => {
     fp.save(formValues, {
       onSuccess: fp.handoff,
     });

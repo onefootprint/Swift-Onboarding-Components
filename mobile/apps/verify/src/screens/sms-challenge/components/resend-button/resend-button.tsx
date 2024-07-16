@@ -11,11 +11,7 @@ export type ResendButtonProps = {
   onResend: () => void;
 };
 
-const ResendButton = ({
-  isResendLoading,
-  resendDisabledUntil,
-  onResend,
-}: ResendButtonProps) => {
+const ResendButton = ({ isResendLoading, resendDisabledUntil, onResend }: ResendButtonProps) => {
   const { t } = useTranslation('pages.sms-challenge.resend-button');
   const { setDate, countdown } = useCountdown();
   const [resendClicked, setResendClicked] = useState(false);
@@ -43,7 +39,6 @@ const ResendButton = ({
 
   useEffect(() => {
     updateCountdown();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resendDisabledUntil]);
 
   const handleClick = () => {
@@ -59,11 +54,7 @@ const ResendButton = ({
     <LoadingIndicator />
   ) : (
     <ResendButtonContainer>
-      <LinkButton
-        disabled={resendClicked && countdown > 0}
-        onPress={handleClick}
-        size="compact"
-      >
+      <LinkButton disabled={resendClicked && countdown > 0} onPress={handleClick} size="compact">
         {t('cta')}
       </LinkButton>
       {resendClicked && countdown > 0 && (

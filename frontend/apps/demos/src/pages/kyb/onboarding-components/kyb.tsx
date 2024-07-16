@@ -1,4 +1,4 @@
-import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, InlineAlert, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -93,7 +93,7 @@ const Demo = () => {
 const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (formValues: Di) => {
+  const handleSubmit = (formValues: FormValues) => {
     fp.launchIdentify(
       {
         email: formValues['id.email'],
@@ -134,7 +134,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
 const BusinessData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: Di) => {
+  const handleSubmit = (data: FormValues) => {
     fp.save(data, { onSuccess: onDone });
   };
 
@@ -205,7 +205,7 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
 const BoData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: Di) => {
+  const handleSubmit = (data: FormValues) => {
     fp.save(data, { onSuccess: onDone });
   };
 
@@ -223,7 +223,7 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
         </InlineAlert>
         <Stack gap={4} direction="column">
           <Fp.Field name="business.beneficial_owners[0].first_name">
-            <Fp.Label>First name</Fp.Label>
+            <Fp.Label>First name</Fp.Label>c
             <Fp.Input placeholder="Jane" />
             <Fp.FieldErrors />
           </Fp.Field>
@@ -255,7 +255,7 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
 const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: Di) => {
+  const handleSubmit = (data: FormValues) => {
     fp.save(data, { onSuccess: () => fp.handoff({ onComplete: onDone }) });
   };
 

@@ -8,18 +8,9 @@ export type LoadingIndicatorProps = {
   color?: Color;
 };
 
-const LoadingIndicator = ({
-  'aria-label': ariaLabel = 'Loading...',
-  color = 'primary',
-}: LoadingIndicatorProps) => {
+const LoadingIndicator = ({ 'aria-label': ariaLabel = 'Loading...', color = 'primary' }: LoadingIndicatorProps) => {
   const theme = useTheme();
-  return (
-    <ActivityIndicator
-      aria-label={ariaLabel}
-      color={theme.color[color]}
-      size="small"
-    />
-  );
+  return <ActivityIndicator aria-label={ariaLabel} color={theme.color[color]} size="small" />;
 };
 
 export default LoadingIndicator;

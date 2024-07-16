@@ -54,7 +54,6 @@ const Picker = ({
       resetSearch();
       reset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const handleChangeText = (text: string) => {
@@ -95,12 +94,7 @@ const Picker = ({
   };
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
-      presentationStyle="formSheet"
-      visible={open}
-    >
+    <Modal animationType="slide" onRequestClose={onClose} presentationStyle="formSheet" visible={open}>
       <PickerContainer>
         <Box flexDirection="row" margin={5} center position="relative">
           <Typography variant="label-2">{title}</Typography>
@@ -110,12 +104,7 @@ const Picker = ({
             </IconButton>
           </Box>
         </Box>
-        <Box
-          borderBottomColor="tertiary"
-          borderBottomWidth={1}
-          paddingHorizontal={4}
-          paddingVertical={5}
-        >
+        <Box borderBottomColor="tertiary" borderBottomWidth={1} paddingHorizontal={4} paddingVertical={5}>
           <SearchInput
             autoCorrect={false}
             autoFocus

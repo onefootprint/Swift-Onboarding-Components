@@ -12,19 +12,13 @@ type SmsProps = {
   onSuccess: (authToken) => void;
 };
 
-const Sms = ({
-  isApple,
-  identifier,
-  identifiedAuthToken,
-  onSuccess,
-}: SmsProps) => {
+const Sms = ({ isApple, identifier, identifiedAuthToken, onSuccess }: SmsProps) => {
   const { isLoading, data, mutate } = useLoginChallenge();
 
   const createChallenge = () => {
     mutate({ identifier, authToken: identifiedAuthToken });
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(createChallenge, []);
 
   return (

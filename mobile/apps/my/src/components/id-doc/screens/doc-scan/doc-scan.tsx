@@ -19,16 +19,7 @@ export type DocScanProps = {
   type: SupportedIdDocTypes;
 };
 
-const DocScan = ({
-  country,
-  authToken,
-  docId,
-  onBack,
-  onRetryLimitExceeded,
-  onDone,
-  side,
-  type,
-}: DocScanProps) => {
+const DocScan = ({ country, authToken, docId, onBack, onRetryLimitExceeded, onDone, side, type }: DocScanProps) => {
   const renderDocumentType = () => {
     if (side === UploadDocumentSide.Selfie) {
       return <Selfie />;

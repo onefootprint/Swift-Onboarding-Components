@@ -1,10 +1,4 @@
-import type {
-  BackgroundColor,
-  BorderColor,
-  BorderRadius,
-  Elevation,
-  Spacing,
-} from '@onefootprint/design-tokens';
+import type { BackgroundColor, BorderColor, BorderRadius, Elevation, Spacing } from '@onefootprint/design-tokens';
 import type { FlexStyle, TransformsStyle, ViewProps } from 'react-native';
 
 export type BoxStyleProps = Omit<

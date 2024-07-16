@@ -6,10 +6,7 @@ const NUM_RETRIES = 3;
 
 type SendSdkArgsRequest = {
   kind: string;
-  data: Pick<
-    VerifyProps,
-    'publicKey' | 'authToken' | 'bootstrapData' | 'options' | 'l10n'
-  >;
+  data: Pick<VerifyProps, 'publicKey' | 'authToken' | 'bootstrapData' | 'options' | 'l10n'>;
   is_components_sdk?: boolean;
 };
 
@@ -18,10 +15,7 @@ type SendSdkArgsResponse = {
   expires_at: string;
 };
 
-const sendSdkArgsRecursive = async (
-  payload: SendSdkArgsRequest,
-  numRetries: number,
-): Promise<SendSdkArgsResponse> => {
+const sendSdkArgsRecursive = async (payload: SendSdkArgsRequest, numRetries: number): Promise<SendSdkArgsResponse> => {
   return fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
@@ -40,10 +34,7 @@ const sendSdkArgsRecursive = async (
   });
 };
 
-const sendSdkArgs = async (
-  data: SendSdkArgsRequest['data'],
-  options?: { isComponentSdk?: boolean },
-) => {
+const sendSdkArgs = async (data: SendSdkArgsRequest['data'], options?: { isComponentSdk?: boolean }) => {
   const result = await sendSdkArgsRecursive(
     {
       kind: SDK_KIND,

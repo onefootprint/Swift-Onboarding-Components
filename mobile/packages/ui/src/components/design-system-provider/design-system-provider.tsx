@@ -13,16 +13,10 @@ export type DesignSystemProviderProps = {
   theme: Theme;
 };
 
-const DesignSystemProvider = ({
-  children,
-  theme,
-}: DesignSystemProviderProps) => (
+const DesignSystemProvider = ({ children, theme }: DesignSystemProviderProps) => (
   <SafeAreaProvider>
     <ThemeProvider theme={theme}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.backgroundColor.secondary}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.backgroundColor.secondary} />
       <Host>
         {children}
         <Portal>

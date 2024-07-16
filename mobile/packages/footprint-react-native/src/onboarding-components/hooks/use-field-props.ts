@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { TextInputProps } from 'react-native';
 import type { MaskInputProps } from 'react-native-mask-input';
-import { createNumberMask, Masks } from 'react-native-mask-input';
+import { Masks, createNumberMask } from 'react-native-mask-input';
 import { isEmail, isMobilePhone } from 'validator';
 
 import fieldContext from '../field-context';
@@ -90,8 +90,7 @@ const getPersonProps = (options: {
     autoComplete: 'birthdate-full',
     keyboardType: 'number-pad',
     returnKeyType: 'done',
-    mask:
-      options.locale === 'en-US' ? Masks.DATE_MMDDYYYY : Masks.DATE_DDMMYYYY,
+    mask: options.locale === 'en-US' ? Masks.DATE_MMDDYYYY : Masks.DATE_DDMMYYYY,
     validations: {
       required: 'Dob is required',
       validate: (value: string) => validateDob(value, options.locale),

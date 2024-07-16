@@ -10,18 +10,13 @@ import useTranslation from '@/hooks/use-translation';
 import type { FormData } from '../../types';
 
 type AddressInputProps = {
-  control: Control<FormData, any>;
+  control: Control<FormData, unknown>;
   country: CountryRecord;
   onAddressSelect: (prediction?: AddressPrediction | null) => Promise<void>;
   addressLine2Ref: React.RefObject<RNTextInput>;
 };
 
-const AddressLinesInput = ({
-  control,
-  country,
-  onAddressSelect,
-  addressLine2Ref,
-}: AddressInputProps) => {
+const AddressLinesInput = ({ control, country, onAddressSelect, addressLine2Ref }: AddressInputProps) => {
   const { t } = useTranslation('pages.residential-address');
   const isCountryUs = country.value === 'US';
 
@@ -29,20 +24,13 @@ const AddressLinesInput = ({
     <>
       <Controller
         control={control}
-        render={({
-          field: { onChange, onBlur, value },
-          fieldState: { error },
-        }) => {
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
           return (
             <AddressInput
               country={country.value}
               hasError={!!error}
               hint={error?.message}
-              label={
-                isCountryUs
-                  ? t('form.address-line1.label')
-                  : t('form.address-line1.international-label')
-              }
+              label={isCountryUs ? t('form.address-line1.label') : t('form.address-line1.international-label')}
               onBlur={onBlur}
               onChange={onAddressSelect}
               onChangeText={onChange}
@@ -65,10 +53,7 @@ const AddressLinesInput = ({
       />
       <Controller
         control={control}
-        render={({
-          field: { onChange, onBlur, value },
-          fieldState: { error },
-        }) => {
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
           return (
             <TextInput
               autoComplete="address-line2"
@@ -77,18 +62,12 @@ const AddressLinesInput = ({
               hasError={!!error}
               hint={error?.message}
               inputMode="text"
-              label={
-                isCountryUs
-                  ? t('form.address-line2.label')
-                  : t('form.address-line2.international-label')
-              }
+              label={isCountryUs ? t('form.address-line2.label') : t('form.address-line2.international-label')}
               onBlur={onBlur}
               onChangeText={onChange}
               onSubmitEditing={() => addressLine2Ref.current?.focus()}
               placeholder={
-                isCountryUs
-                  ? t('form.address-line2.placeholder')
-                  : t('form.address-line2.international-placeholder')
+                isCountryUs ? t('form.address-line2.placeholder') : t('form.address-line2.international-placeholder')
               }
               private
               ref={addressLine2Ref}

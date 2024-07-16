@@ -20,13 +20,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates:
-    | 'backImage'
-    | 'completed'
-    | 'docSelection'
-    | 'frontImage'
-    | 'init'
-    | 'selfie'
-    | 'tooManyAttempts';
+  matchesStates: 'backImage' | 'completed' | 'docSelection' | 'frontImage' | 'init' | 'selfie' | 'tooManyAttempts';
   tags: never;
 }

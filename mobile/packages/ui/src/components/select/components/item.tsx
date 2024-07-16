@@ -16,11 +16,7 @@ const Item = ({ label, selected, onPress }: ItemProps) => {
   const [active, setActive] = useState(false);
 
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={() => setActive(true)}
-      onPressOut={() => setActive(false)}
-    >
+    <Pressable onPress={onPress} onPressIn={() => setActive(true)} onPressOut={() => setActive(false)}>
       <ItemContainer active={active}>
         <Label variant="body-4">{label}</Label>
         <Box>{selected ? <IcoCheck24 /> : null}</Box>

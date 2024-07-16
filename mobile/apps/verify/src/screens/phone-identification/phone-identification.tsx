@@ -27,13 +27,7 @@ type FormData = {
   phoneNumber: string;
 };
 
-const PhoneIdentification = ({
-  email,
-  onComplete,
-  obConfigAuth,
-  onEmailEdit,
-  sandboxId,
-}: PhoneIdentificationProps) => {
+const PhoneIdentification = ({ email, onComplete, obConfigAuth, onEmailEdit, sandboxId }: PhoneIdentificationProps) => {
   const { t } = useTranslation('pages.phone-identification');
   const schema = z.object({
     phoneNumber: z
@@ -87,10 +81,7 @@ const PhoneIdentification = ({
       <Box gap={7} marginBottom={7}>
         <Controller
           control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
             return (
               <TextInput
                 autoFocus
@@ -116,10 +107,7 @@ const PhoneIdentification = ({
           }}
           name="phoneNumber"
         />
-        <DataCollectionActionButton
-          onComplete={handleSubmit(onSubmit)}
-          isLoading={isLoading}
-        />
+        <DataCollectionActionButton onComplete={handleSubmit(onSubmit)} isLoading={isLoading} />
       </Box>
     </Box>
   );

@@ -71,11 +71,7 @@ const TestIdInput = () => {
           {idInputLocked ? (
             <InlineButtonsLayout>
               <CopyButton text={getValues('testID')} />
-              <InlineButton
-                ariaLabel={t('test-id.button.edit')}
-                onClick={handleSaveOrEdit}
-                icon={IcoPencil24}
-              />
+              <InlineButton ariaLabel={t('test-id.button.edit')} onClick={handleSaveOrEdit} icon={IcoPencil24} />
             </InlineButtonsLayout>
           ) : (
             <InlineButtonsLayout>
@@ -85,11 +81,7 @@ const TestIdInput = () => {
                 icon={IcoCheck24}
                 disabled={!!errors?.testID}
               />
-              <InlineButton
-                ariaLabel={t('test-id.button.reset')}
-                onClick={handleReset}
-                icon={IcoClose24}
-              />
+              <InlineButton ariaLabel={t('test-id.button.reset')} onClick={handleReset} icon={IcoClose24} />
             </InlineButtonsLayout>
           )}
         </Box>

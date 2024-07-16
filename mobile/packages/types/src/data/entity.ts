@@ -34,9 +34,7 @@ export type Entity = {
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);
-  return values.some(investorProfileDi =>
-    entity.attributes.some(attribute => attribute === investorProfileDi),
-  );
+  return values.some(investorProfileDi => entity.attributes.some(attribute => attribute === investorProfileDi));
 };
 
 export const hasEntityDocuments = (entity: Entity) => {
@@ -62,8 +60,7 @@ const getEntityStatus = (entity: Entity): EntityStatus => {
   if (!entity.isIdentifiable) {
     return EntityStatus.vaultOnly;
   }
-  return (entity.onboarding?.status ||
-    EntityStatus.incomplete) as unknown as EntityStatus;
+  return (entity.onboarding?.status || EntityStatus.incomplete) as unknown as EntityStatus;
 };
 
 const getEntityManualReview = (entity: Entity) => {

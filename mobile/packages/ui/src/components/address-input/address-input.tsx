@@ -71,7 +71,7 @@ const AddressInput = forwardRef<AddressInputRef, AddressInputProps>(
         onFocus: handleFocus,
         onBlur: handleBlur,
       }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+
       [],
     );
 

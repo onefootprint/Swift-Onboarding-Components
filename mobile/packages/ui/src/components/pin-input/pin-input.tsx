@@ -1,11 +1,6 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
-import type {
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
-  TextInputKeyPressEventData,
-} from 'react-native';
+import type { NativeSyntheticEvent, TextInputChangeEventData, TextInputKeyPressEventData } from 'react-native';
 
 import Box from '../box';
 import Hint from '../hint';
@@ -21,12 +16,7 @@ export type PinInputProps = TextInputProps & {
   onComplete?: (value: string) => void;
 };
 
-const PinInput = ({
-  hasError = false,
-  hint,
-  onComplete,
-  ...props
-}: PinInputProps) => {
+const PinInput = ({ hasError = false, hint, onComplete, ...props }: PinInputProps) => {
   const { autoFocus, disabled, ...inputProps } = props;
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
@@ -40,8 +30,7 @@ const PinInput = ({
 
   const moveToNextOrComplete = (pin: string, index: number) => {
     const isLastIndex = index === INPUT_FIELDS_COUNT - 1;
-    const areAllTheFieldsFilled =
-      pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
+    const areAllTheFieldsFilled = pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
 
     if (isLastIndex && areAllTheFieldsFilled) {
       onComplete?.(pin);
@@ -53,46 +42,40 @@ const PinInput = ({
     }
   };
 
-  const handleChange =
-    (pinIndex: number) =>
-    (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-      const eventValue = event.nativeEvent.text;
-      const currentValue = enteredPin[pinIndex];
-      const nextValue = getNextValue(currentValue, eventValue);
-      if (nextValue === '') {
-        updatePin('', pinIndex);
+  const handleChange = (pinIndex: number) => (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+    const eventValue = event.nativeEvent.text;
+    const currentValue = enteredPin[pinIndex];
+    const nextValue = getNextValue(currentValue, eventValue);
+    if (nextValue === '') {
+      updatePin('', pinIndex);
+    }
+    const wasPinPastedOrAutoCompleted = eventValue.length > 2;
+    if (wasPinPastedOrAutoCompleted) {
+      if (isNumber(eventValue)) {
+        const nextPin = Array.from(eventValue).filter((_, index) => index < INPUT_FIELDS_COUNT);
+        setEnteredPin(nextPin);
+        moveToNextOrComplete(nextPin.join(''), nextPin.length - 1);
       }
-      const wasPinPastedOrAutoCompleted = eventValue.length > 2;
-      if (wasPinPastedOrAutoCompleted) {
-        if (isNumber(eventValue)) {
-          const nextPin = Array.from(eventValue).filter(
-            (_, index) => index < INPUT_FIELDS_COUNT,
-          );
-          setEnteredPin(nextPin);
-          moveToNextOrComplete(nextPin.join(''), nextPin.length - 1);
-        }
-      } else if (isNumber(nextValue)) {
-        const nextPin = updatePin(nextValue, pinIndex);
-        moveToNextOrComplete(nextPin.join(''), pinIndex);
-      }
-    };
+    } else if (isNumber(nextValue)) {
+      const nextPin = updatePin(nextValue, pinIndex);
+      moveToNextOrComplete(nextPin.join(''), pinIndex);
+    }
+  };
 
-  const handleKeyPress =
-    (pinIndex: number) =>
-    (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-      if (event.nativeEvent.key === 'Backspace') {
-        const previousInput = pinInputs.previous(pinIndex);
-        if (previousInput) {
-          updatePin('', pinIndex - 1);
-          previousInput.focus();
-        }
+  const handleKeyPress = (pinIndex: number) => (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    if (event.nativeEvent.key === 'Backspace') {
+      const previousInput = pinInputs.previous(pinIndex);
+      if (previousInput) {
+        updatePin('', pinIndex - 1);
+        previousInput.focus();
       }
-    };
+    }
+  };
 
   return (
     <Box>
       <Box gap={3} flexDirection="row" center>
-        {pins.map((pinPosition, pinIndex) => {
+        {pins.map((_, pinIndex) => {
           const key = pinIndex;
           const isDisabled = disabled || pinIndex > enteredPin.length;
           return (

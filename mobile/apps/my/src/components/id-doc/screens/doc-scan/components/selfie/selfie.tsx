@@ -14,8 +14,7 @@ export type SelfieProps = {
 
 const Selfie = ({ onSubmit }: SelfieProps) => {
   const { t } = useTranslation('scan.selfie');
-  const { object, detector, frameProcessor, disableDetection } =
-    useFrameProcessor();
+  const { object, detector, frameProcessor, disableDetection } = useFrameProcessor();
 
   return (
     <Camera

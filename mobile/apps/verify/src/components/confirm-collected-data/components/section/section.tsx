@@ -18,13 +18,7 @@ export type SectionProps = {
   testID?: string;
 };
 
-const Section = ({
-  title,
-  IconComponent,
-  actions,
-  content,
-  testID,
-}: SectionProps) => {
+const Section = ({ title, IconComponent, actions, content, testID }: SectionProps) => {
   const hasActions = actions && actions?.length > 0;
 
   return (
@@ -32,10 +26,7 @@ const Section = ({
       <Header>
         <TitleContainer>
           {IconComponent && <IconComponent />}
-          <Typography
-            marginLeft={IconComponent ? 2 : undefined}
-            variant="label-2"
-          >
+          <Typography marginLeft={IconComponent ? 2 : undefined} variant="label-2">
             {title}
           </Typography>
         </TitleContainer>

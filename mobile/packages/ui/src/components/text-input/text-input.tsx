@@ -1,11 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import type {
   NativeSyntheticEvent,
   TextInput as RNTextInput,
-  TextInputFocusEventData,
   TextInputProps as RNTextInputProps,
+  TextInputFocusEventData,
 } from 'react-native';
 import styled, { css, useTheme } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
@@ -58,16 +57,12 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
       localRef.current?.focus();
     };
 
-    const handleFocus = (
-      event: NativeSyntheticEvent<TextInputFocusEventData>,
-    ) => {
+    const handleFocus = (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
       setFocus(true);
       onFocus?.(event);
     };
 
-    const handleBlur = (
-      event: NativeSyntheticEvent<TextInputFocusEventData>,
-    ) => {
+    const handleBlur = (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
       setFocus(false);
       onBlur?.(event);
     };
@@ -80,9 +75,7 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
           </Label>
         )}
         <Box position="relative">
-          {prefixComponent && (
-            <PrefixContainer>{prefixComponent}</PrefixContainer>
-          )}
+          {prefixComponent && <PrefixContainer>{prefixComponent}</PrefixContainer>}
           <Input
             {...props}
             disabled={disabled}
@@ -96,9 +89,7 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
             ref={mergeRefs([ref, localRef])}
             underlineColorAndroid="transparent"
           />
-          {suffixComponent && (
-            <SuffixContainer>{suffixComponent}</SuffixContainer>
-          )}
+          {suffixComponent && <SuffixContainer>{suffixComponent}</SuffixContainer>}
         </Box>
         {!!hint && (
           <Hint marginTop={3} hasError={hasError}>
@@ -131,23 +122,29 @@ const Input = styled.TextInput<{
       height: ${input.size.default.height};
       padding-horizontal: ${theme.spacing[5]};
 
-      ${hasFocus &&
-      css`
+      ${
+        hasFocus &&
+        css`
         background: ${input.state.default.focus.bg};
         border: ${input.state.default.focus.border};
-      `}
+      `
+      }
 
-      ${hasError &&
-      css`
+      ${
+        hasError &&
+        css`
         background: ${input.state.error.focus.bg};
         border: ${input.state.error.focus.border};
-      `}
+      `
+      }
 
-      ${disabled &&
-      css`
+      ${
+        disabled &&
+        css`
         background: ${input.state.disabled.bg};
         border: ${input.state.disabled.border};
-      `}
+      `
+      }
     `;
   }}
 `;

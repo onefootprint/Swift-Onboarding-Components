@@ -1,7 +1,7 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext, useState } from 'react';
 
-import { type Di } from '../../../@types';
+import { type FormValues } from '../../../types';
 import { Context } from '../provider';
 import saveReq from '../queries/save';
 import { lockBody, unlockBody } from '../utils/dom-utils';
@@ -66,7 +66,7 @@ export const useFootprint = () => {
   };
 
   const save = async (
-    data: Di,
+    data: FormValues,
     {
       onSuccess,
       onError,

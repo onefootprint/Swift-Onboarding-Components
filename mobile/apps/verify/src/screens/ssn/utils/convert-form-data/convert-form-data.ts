@@ -17,9 +17,7 @@ const convertFormData = ({
 }) => {
   const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
   const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
-  const requiresSsn9 = allAttributes(requirement).includes(
-    CollectedKycDataOption.ssn9,
-  );
+  const requiresSsn9 = allAttributes(requirement).includes(CollectedKycDataOption.ssn9);
 
   const convertedData: KycData = {};
   const { ssn } = formData;

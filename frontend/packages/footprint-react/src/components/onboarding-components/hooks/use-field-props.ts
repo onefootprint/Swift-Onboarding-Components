@@ -1,14 +1,4 @@
-import {
-  isDobInTheFuture,
-  isDobTooOld,
-  isDobTooYoung,
-  isEmail,
-  isName,
-  isPhoneNumber,
-  isSsn4,
-  isSsn9,
-  isValidDate,
-} from '@onefootprint/core';
+import { isEmail, isName, isPhoneNumber, isSsn4, isSsn9 } from '@onefootprint/core';
 import type { CleaveOptions } from 'cleave.js/options';
 import get from 'lodash/get';
 import type React from 'react';
@@ -33,12 +23,18 @@ type FormAttributes = {
   transforms?: Record<string, boolean>;
 };
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement> & FormAttributes;
-type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & FormAttributes;
-type Field = InputProps | SelectProps;
 type BaseProps = { name: string; id: string; 'aria-invalid': boolean };
 
+type WithoutAriaInvalid<T> = Omit<T, 'aria-invalid'>;
+
+type InputProps = WithoutAriaInvalid<React.InputHTMLAttributes<HTMLInputElement>> & FormAttributes;
+
+type SelectProps = WithoutAriaInvalid<React.SelectHTMLAttributes<HTMLSelectElement>> & FormAttributes;
+
+type Field = InputProps | SelectProps;
+
 export type FormInputProps = InputProps & BaseProps;
+
 export type FormSelectProps = SelectProps & BaseProps;
 
 const useFieldProps = (): FormInputProps | FormSelectProps => {
@@ -59,7 +55,6 @@ const useFieldProps = (): FormInputProps | FormSelectProps => {
   const hasError = !!formErrors;
 
   return {
-    // @ts-ignore
     'aria-invalid': hasError,
     id: ctx.id,
     ...props,

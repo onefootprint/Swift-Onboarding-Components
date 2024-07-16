@@ -1,7 +1,4 @@
-import {
-  SkipLivenessClientType,
-  SkipLivenessReason,
-} from '@onefootprint/types';
+import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -14,11 +11,7 @@ type SkipLivenessProps = {
   onError: () => void;
 };
 
-const SkipLiveness = ({
-  onComplete,
-  onError,
-  authToken,
-}: SkipLivenessProps) => {
+const SkipLiveness = ({ onComplete, onError, authToken }: SkipLivenessProps) => {
   const skipLivenessMutation = useSkipLiveness();
 
   useEffectOnce(() => {

@@ -20,19 +20,13 @@ export type DefaultDocumentProps = {
   type: SupportedIdDocTypes;
 };
 
-const DefaultDocument = ({
-  onBack,
-  onSubmit,
-  side,
-  type,
-}: DefaultDocumentProps) => {
+const DefaultDocument = ({ onBack, onSubmit, side, type }: DefaultDocumentProps) => {
   const { t } = useTranslation(`scan.${kebabCase(type)}`);
   const documentName = t('name');
-  const { object, detector, frameProcessor, disableDetection } =
-    useFrameProcessor({
-      side,
-      documentName,
-    });
+  const { object, detector, frameProcessor, disableDetection } = useFrameProcessor({
+    side,
+    documentName,
+  });
   const hasBackButton = side === UploadDocumentSide.Front;
 
   return (

@@ -27,14 +27,7 @@ export type SsnProps = {
   hideHeader?: boolean;
 };
 
-const Ssn = ({
-  kycData,
-  requirement,
-  authToken,
-  onComplete,
-  onCancel,
-  hideHeader,
-}: SsnProps) => {
+const Ssn = ({ kycData, requirement, authToken, onComplete, onCancel, hideHeader }: SsnProps) => {
   const { t } = useTranslation('pages.ssn');
   const {
     mutation: { isLoading },
@@ -48,8 +41,7 @@ const Ssn = ({
       .max(11, { message: t('form.errors.invalid') })
       .refine(
         value => {
-          const pattern =
-            /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/;
+          const pattern = /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/;
           return pattern.test(value);
         },
         { message: t('form.errors.invalid') },
@@ -112,9 +104,7 @@ const Ssn = ({
     const firstThree = numericVal.slice(0, Math.min(3, numericVal.length));
     const secondTwo = numericVal.slice(3, Math.min(5, numericVal.length));
     const lastFour = numericVal.slice(5, Math.min(9, numericVal.length));
-    const fullSsn = `${firstThree}${secondTwo ? '-' : ''}${secondTwo}${
-      lastFour ? '-' : ''
-    }${lastFour}`;
+    const fullSsn = `${firstThree}${secondTwo ? '-' : ''}${secondTwo}${lastFour ? '-' : ''}${lastFour}`;
     return fullSsn;
   };
 
@@ -125,10 +115,7 @@ const Ssn = ({
         {ssnKind === 'ssn-full' ? (
           <Controller
             control={control}
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => {
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
               return (
                 <TextInput
                   autoCapitalize="none"
@@ -158,10 +145,7 @@ const Ssn = ({
         ) : (
           <Controller
             control={control}
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => {
+            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
               return (
                 <TextInput
                   autoCapitalize="none"
@@ -193,20 +177,14 @@ const Ssn = ({
           <Disclaimer>
             <IcoShield40 />
             <Box gap={3} paddingTop={1} flex={1}>
-              <Typography variant="label-3">
-                {t('form.disclaimer.title')}
-              </Typography>
+              <Typography variant="label-3">{t('form.disclaimer.title')}</Typography>
               <Typography variant="body-3" color="secondary">
                 {t('form.disclaimer.description')}
               </Typography>
             </Box>
           </Disclaimer>
         )}
-        <DataCollectionActionButton
-          onComplete={handleSubmit(onSubmit)}
-          isLoading={isLoading}
-          onCancel={onCancel}
-        />
+        <DataCollectionActionButton onComplete={handleSubmit(onSubmit)} isLoading={isLoading} onCancel={onCancel} />
       </Box>
     </Box>
   );

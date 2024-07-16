@@ -3,11 +3,11 @@ import cx from 'classnames';
 import type { HTMLAttributes } from 'react';
 import React, { useId, useMemo } from 'react';
 
-import type { Di } from '../../../@types';
+import type { FormValues } from '../../../types';
 import FieldContext from '../field-context';
 
 export type FieldProps = {
-  name: keyof Di;
+  name: keyof FormValues;
   children?: React.ReactNode;
 } & HTMLAttributes<HTMLDivElement>;
 

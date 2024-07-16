@@ -18,22 +18,9 @@ export type NotificationProps = {
   variant: NotificationVariants;
 };
 
-const Notification = ({
-  title,
-  cta,
-  description,
-  onClose,
-  variant,
-}: NotificationProps) => {
+const Notification = ({ title, cta, description, onClose, variant }: NotificationProps) => {
   return (
-    <Box
-      backgroundColor="primary"
-      marginHorizontal={3}
-      marginTop={10}
-      padding={4}
-      elevation={2}
-      borderRadius="default"
-    >
+    <Box backgroundColor="primary" marginHorizontal={3} marginTop={10} padding={4} elevation={2} borderRadius="default">
       <Box marginBottom={2} flexDirection="row" alignItems="center">
         <Box flexDirection="row" alignItems="center" gap={3} flexGrow={1}>
           {variant === 'error' && <IcoWarning24 color="error" />}

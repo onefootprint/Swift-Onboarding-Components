@@ -1,23 +1,9 @@
-import type {
-  ImageProps,
-  ImageStyle,
-  StyleProp,
-  TextStyle,
-  ViewStyle,
-} from 'react-native';
-import type {
-  ColorTheme,
-  Icon,
-  MessageOptions,
-  Position,
-} from 'react-native-flash-message';
+import type { ImageProps, ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import type { ColorTheme, Icon, MessageOptions, Position } from 'react-native-flash-message';
 
 export type NotificationVariants = 'success' | 'info' | 'error';
 
-export type FlashVariants = keyof Pick<
-  ColorTheme,
-  'danger' | 'info' | 'success'
->;
+export type FlashVariants = keyof Pick<ColorTheme, 'danger' | 'info' | 'success'>;
 
 export type Message = {
   autoHide: boolean;

@@ -4,12 +4,6 @@ import type { CollectKycDataRequirement } from '@onefootprint/types';
 /// collected or not.
 /// This _may_ differ from the ob config's mustCollectData in rare cases
 const allAttributes = (req?: CollectKycDataRequirement) =>
-  req
-    ? [
-        ...req.missingAttributes,
-        ...req.populatedAttributes,
-        ...req.optionalAttributes,
-      ]
-    : [];
+  req ? [...req.missingAttributes, ...req.populatedAttributes, ...req.optionalAttributes] : [];
 
 export default allAttributes;

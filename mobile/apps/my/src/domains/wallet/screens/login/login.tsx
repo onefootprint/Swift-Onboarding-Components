@@ -20,11 +20,10 @@ const Login = ({ route, navigation }: LoginProps) => {
   const session = useSession();
   const isApple = identifier.email === 'apple@onefootprint.com';
 
-  const handleSuccess =
-    (challengeKind: ChallengeKind) => (authToken: string) => {
-      session.logIn(challengeKind, authToken, isApple);
-      navigation.navigate('MainTabs');
-    };
+  const handleSuccess = (challengeKind: ChallengeKind) => (authToken: string) => {
+    session.logIn(challengeKind, authToken, isApple);
+    navigation.navigate('MainTabs');
+  };
 
   return (
     <Container>
@@ -61,10 +60,7 @@ const Login = ({ route, navigation }: LoginProps) => {
           onSuccess={handleSuccess(ChallengeKind.sms)}
         />
       ) : (
-        <Passkey
-          identifiedAuthToken={identifiedAuthToken}
-          onSuccess={handleSuccess(ChallengeKind.biometric)}
-        />
+        <Passkey identifiedAuthToken={identifiedAuthToken} onSuccess={handleSuccess(ChallengeKind.biometric)} />
       )}
     </Container>
   );

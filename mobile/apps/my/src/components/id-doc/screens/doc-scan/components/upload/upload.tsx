@@ -1,9 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type {
-  ProcessDocResponse,
-  SupportedIdDocTypes,
-  UploadDocumentSide,
-} from '@onefootprint/types';
+import type { ProcessDocResponse, SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import { Container } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Platform } from 'react-native';
@@ -14,7 +10,7 @@ import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
 import type { Document } from '../../doc-scan.types';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import Success from './components/success';
 import TooManyAttempts from './components/too-many-attempts';
@@ -33,16 +29,7 @@ export type UploadProps = {
   type: SupportedIdDocTypes;
 };
 
-const Upload = ({
-  country,
-  side,
-  authToken,
-  onRetryLimitExceeded,
-  onSuccess,
-  docId,
-  type,
-  children,
-}: UploadProps) => {
+const Upload = ({ country, side, authToken, onRetryLimitExceeded, onSuccess, docId, type, children }: UploadProps) => {
   const { t, allT } = useTranslation('scan.upload');
   const uploadMutation = useUploadDoc();
   const processMutation = useProcessDoc();
@@ -188,7 +175,7 @@ const Upload = ({
       {uploadMutation.isLoading && <Loading />}
       {showSuccess && <Success />}
       {showRetryExceeded && <TooManyAttempts />}
-      {showErrors && <Error errors={errors} onReset={handleReset} />}
+      {showErrors && <ErrorComponent errors={errors} onReset={handleReset} />}
     </Container>
   ) : (
     <>

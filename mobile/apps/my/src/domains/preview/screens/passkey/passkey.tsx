@@ -1,11 +1,5 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
-import {
-  Box,
-  Button,
-  Container,
-  LinkButton,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Button, Container, LinkButton, Typography } from '@onefootprint/ui';
 import base64url from 'base64url';
 import React from 'react';
 import { Passkey } from 'react-native-passkey';

@@ -2,14 +2,7 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
-import {
-  Box,
-  Button,
-  CountrySelect,
-  Divider,
-  RadioSelect,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Button, CountrySelect, Divider, RadioSelect, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import ScrollLayout from '@/components/scroll-layout';
@@ -31,12 +24,9 @@ export type DocSelectionProps = {
   defaultCountry?: CountryRecord;
   defaultType?: SupportedIdDocTypes;
   onConsentCompleted: () => void;
-  onSubmit: (
-    countryCode: CountryCode,
-    docType: SupportedIdDocTypes,
-    docId: string,
-  ) => void;
+  onSubmit: (countryCode: CountryCode, docType: SupportedIdDocTypes, docId: string) => void;
   shouldCollectConsent: boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   supportedCountryAndDocTypes: any;
 };
 
@@ -55,28 +45,18 @@ const DocSelection = ({
   const app = useApp();
   const docTypeMutation = useSubmitDocType();
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
-  const docTypeOptions = useDocumentOptions(
-    supportedCountryAndDocTypes,
-    country,
-  );
+  const docTypeOptions = useDocumentOptions(supportedCountryAndDocTypes, country);
   const countryOptions = useCountryOptions(supportedCountryAndDocTypes);
-  const [docType, setDocType] = useState<SupportedIdDocTypes>(
-    defaultType || docTypeOptions[0].value,
-  );
+  const [docType, setDocType] = useState<SupportedIdDocTypes>(defaultType || docTypeOptions[0].value);
   const analytics = useAnalytics();
 
-  const oneCountrySupported =
-    Object.keys(supportedCountryAndDocTypes).length === 1;
-  const countrySelectHint =
-    oneCountrySupported && t('country-select.hint', { country: country.label });
+  const oneCountrySupported = Object.keys(supportedCountryAndDocTypes).length === 1;
+  const countrySelectHint = oneCountrySupported && t('country-select.hint', { country: country.label });
   const isPreview = authToken === PREVIEW_AUTH_TOKEN;
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
-    const docs = getSupportedCountryByCode(
-      supportedCountryAndDocTypes,
-      newCountry.value,
-    );
+    const docs = getSupportedCountryByCode(supportedCountryAndDocTypes, newCountry.value);
     const firstDoc = docs?.at(0);
     if (firstDoc) {
       setDocType(firstDoc);
@@ -161,11 +141,7 @@ const DocSelection = ({
           </Box>
         </Box>
       </ScrollLayout>
-      <ConsentDialog
-        authToken={authToken}
-        onSubmit={handleConsentSubmit}
-        open={showConsent}
-      />
+      <ConsentDialog authToken={authToken} onSubmit={handleConsentSubmit} open={showConsent} />
     </>
   );
 };

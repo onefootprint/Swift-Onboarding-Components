@@ -44,10 +44,7 @@ const Header = ({ children, onBack }: HeaderProps) => {
           </Pressable>
         </Box>
       </Container>
-      <InstructionsModal
-        visible={showInstructions}
-        onClose={handleToggleInstructions}
-      />
+      <InstructionsModal visible={showInstructions} onClose={handleToggleInstructions} />
     </>
   );
 };

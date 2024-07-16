@@ -1,7 +1,6 @@
 const getRandomID = (length = 13) => {
   let result = '';
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const totalCharacters = characters.length;
   let counter = 0;
   while (counter < length) {

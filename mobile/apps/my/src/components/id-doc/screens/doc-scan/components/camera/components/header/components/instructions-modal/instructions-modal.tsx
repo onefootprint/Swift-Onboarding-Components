@@ -1,10 +1,4 @@
-import {
-  IcoClose24,
-  IcoLayer24,
-  IcoSmartphone224,
-  IcoSparkles24,
-  IcoSquareFrame24,
-} from '@onefootprint/icons';
+import { IcoClose24, IcoLayer24, IcoSmartphone224, IcoSparkles24, IcoSquareFrame24 } from '@onefootprint/icons';
 import { Box, Pressable, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Modal } from 'react-native';
@@ -37,19 +31,8 @@ const InstructionsModal = ({ visible, onClose }) => {
   ];
 
   return (
-    <Modal
-      visible={visible}
-      onRequestClose={onClose}
-      animationType="slide"
-      presentationStyle="formSheet"
-    >
-      <Box
-        padding={5}
-        alignItems="center"
-        justifyContent="center"
-        flexDirection="row"
-        position="relative"
-      >
+    <Modal visible={visible} onRequestClose={onClose} animationType="slide" presentationStyle="formSheet">
+      <Box padding={5} alignItems="center" justifyContent="center" flexDirection="row" position="relative">
         <Box>
           <Typography variant="label-2">{t('title')}</Typography>
         </Box>

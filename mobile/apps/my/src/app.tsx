@@ -17,8 +17,7 @@ import AnalyticsProvider from './utils/analytics';
 configureSentry();
 
 const App = () => {
-  const { linkingUrl, shouldOpen, isPreview, isDemo, isDebug } =
-    useShouldOpenIdv();
+  const { linkingUrl, shouldOpen, isPreview, isDemo, isDebug } = useShouldOpenIdv();
 
   const handleLoad = useCallback(async () => {
     SplashScreen.hide();

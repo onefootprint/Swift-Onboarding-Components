@@ -12,10 +12,7 @@ import { Events, useAnalytics } from '@/utils/analytics';
 
 const { DeviceAttestation } = NativeModules;
 
-const getSignalsAsync = async (
-  deviceResponseJson: string | null,
-  challenge: string,
-): Promise<string> => {
+const getSignalsAsync = async (deviceResponseJson: string | null, challenge: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     DeviceAttestation.attest(deviceResponseJson, challenge, (error, result) => {
       if (error) {
@@ -27,10 +24,7 @@ const getSignalsAsync = async (
   });
 };
 
-const getDeviceAttestationChallenge = async (
-  authToken: string,
-  payload: GetDeviceAttestationChallengeRequest,
-) => {
+const getDeviceAttestationChallenge = async (authToken: string, payload: GetDeviceAttestationChallengeRequest) => {
   const { data } = await request<GetDeviceAttestationChallengeResponse>({
     method: 'POST',
     url: '/hosted/user/attest_device/challenge',
@@ -43,10 +37,7 @@ const getDeviceAttestationChallenge = async (
   return data;
 };
 
-const createDeviceAttestation = async (
-  authToken: string,
-  payload: CreateDeviceAttestationRequest,
-) => {
+const createDeviceAttestation = async (authToken: string, payload: CreateDeviceAttestationRequest) => {
   const { data } = await request({
     method: 'POST',
     url: '/hosted/user/attest_device',
@@ -67,16 +58,10 @@ const getAttestation = async ({
   deviceResponseJson: string | null;
 }) => {
   if (Platform.OS !== 'ios') return null;
-  const { attestationChallenge, state } = await getDeviceAttestationChallenge(
-    authToken,
-    {
-      deviceType: 'ios',
-    },
-  );
-  const attestation = await getSignalsAsync(
-    deviceResponseJson,
-    attestationChallenge,
-  );
+  const { attestationChallenge, state } = await getDeviceAttestationChallenge(authToken, {
+    deviceType: 'ios',
+  });
+  const attestation = await getSignalsAsync(deviceResponseJson, attestationChallenge);
   if (attestation) {
     await createDeviceAttestation(authToken, {
       attestation,

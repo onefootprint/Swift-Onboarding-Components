@@ -1,16 +1,11 @@
 import { AUTH_HEADER } from '@onefootprint/types';
 import { API_BASE_URL } from 'src/utils/constants';
 
-import type {
-  SaveDataRequest,
-  SaveDataResponse,
-} from '../types/save-request-data';
+import type { SaveDataRequest, SaveDataResponse } from '../types/save-request-data';
 
 const getDataKind = (data: Record<string, unknown>) => {
   const hasId = Object.entries(data).some(([key]) => key.startsWith('id.'));
-  const hasBusiness = Object.entries(data).some(([key]) =>
-    key.startsWith('business.'),
-  );
+  const hasBusiness = Object.entries(data).some(([key]) => key.startsWith('business.'));
   return { hasId, hasBusiness };
 };
 

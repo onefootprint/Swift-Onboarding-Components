@@ -1,4 +1,4 @@
-import { type MixpanelProperties, Mixpanel } from 'mixpanel-react-native';
+import { Mixpanel, type MixpanelProperties } from 'mixpanel-react-native';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import { IS_DEV, MIXPANEL_TOKEN } from '../../config/constants';
@@ -14,8 +14,7 @@ type AnalyticsContextType = {
 };
 
 export const AnalyticsContext = createContext<AnalyticsContextType>({
-  track: (eventName: string, properties?: MixpanelProperties) =>
-    console.log('track', eventName, properties),
+  track: (eventName: string, properties?: MixpanelProperties) => console.log('track', eventName, properties),
   timeEvent: (eventName: string) => console.log('timeEvent', eventName),
 });
 
@@ -35,11 +34,7 @@ const Provider = ({ debug, children }: AnalyticsProps) => {
     setAnalytics(mixpanel);
   }, [debug]);
 
-  return (
-    <AnalyticsContext.Provider value={analytics}>
-      {children}
-    </AnalyticsContext.Provider>
-  );
+  return <AnalyticsContext.Provider value={analytics}>{children}</AnalyticsContext.Provider>;
 };
 
 export default Provider;

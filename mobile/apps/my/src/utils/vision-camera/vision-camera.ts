@@ -1,8 +1,7 @@
 import type { Frame } from 'react-native-vision-camera';
 import { VisionCameraProxy } from 'react-native-vision-camera';
 
-const getPlugin = (name: string) =>
-  VisionCameraProxy.initFrameProcessorPlugin(name);
+const getPlugin = (name: string) => VisionCameraProxy.initFrameProcessorPlugin(name);
 
 const detectDocumentPlugin = getPlugin('detectDocument');
 const detectFacePlugin = getPlugin('detectFace');
@@ -28,6 +27,7 @@ export const detectDocument = (frame: Frame) => {
   return detectDocumentPlugin.call(frame) as DetectDocumentResponse;
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const detectFace = (frame: Frame, options: any) => {
   'worklet';
 
@@ -43,5 +43,7 @@ export const detectBarcodes = (frame: Frame) => {
   if (detectBarcodePlugin == null) {
     throw new Error('Failed to load Frame Processor Plugin!');
   }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   return detectBarcodePlugin.call(frame) as any;
 };

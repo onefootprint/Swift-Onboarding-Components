@@ -5,11 +5,9 @@ import type { TextInput } from 'react-native';
 const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<TextInput>[]>([]);
 
-  const previous = (referenceIndex: number): TextInput | null | undefined =>
-    refs[referenceIndex - 1]?.current;
+  const previous = (referenceIndex: number): TextInput | null | undefined => refs[referenceIndex - 1]?.current;
 
-  const next = (referenceIndex: number): TextInput | null | undefined =>
-    refs[referenceIndex + 1]?.current;
+  const next = (referenceIndex: number): TextInput | null | undefined => refs[referenceIndex + 1]?.current;
 
   useEffect(() => {
     setRefs(elRefs =>

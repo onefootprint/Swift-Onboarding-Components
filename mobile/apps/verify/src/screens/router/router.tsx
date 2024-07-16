@@ -3,7 +3,7 @@ import { Container } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
-import Error from '@/components/error';
+import ErrorComponent from '@/components/error';
 import createMachine from '@/utils/state-machine/machine';
 import type { IdentifyResultProps } from '@/utils/state-machine/types';
 
@@ -300,11 +300,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     if (authToken) {
       return (
         <Container center>
-          <Process
-            authToken={authToken}
-            onDone={() => send('done')}
-            overallOutcome={sandboxOutcome?.overallOutcome}
-          />
+          <Process authToken={authToken} onDone={() => send('done')} overallOutcome={sandboxOutcome?.overallOutcome} />
         </Container>
       );
     }
@@ -329,7 +325,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('error')) {
     return (
       <Container center>
-        <Error />
+        <ErrorComponent />
       </Container>
     );
   }

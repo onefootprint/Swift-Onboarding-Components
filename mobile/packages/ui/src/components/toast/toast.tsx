@@ -1,8 +1,5 @@
 import React from 'react';
-import FlashMessage, {
-  hideMessage,
-  showMessage,
-} from 'react-native-flash-message';
+import FlashMessage, { hideMessage, showMessage } from 'react-native-flash-message';
 
 import Notification from './components/notification';
 import type { MessageComponentProps, ShowToast } from './toast.types';
@@ -28,7 +25,8 @@ export const ToastProvider = () => (
 
 export const useToast = () => {
   const show = ({ description, title, variant, cta }: ShowToast) => {
-    return showMessage({ description, message: title, cta, variant } as any);
+    // @ts-ignore
+    return showMessage({ description, message: title, cta, variant });
   };
 
   const hide = hideMessage;

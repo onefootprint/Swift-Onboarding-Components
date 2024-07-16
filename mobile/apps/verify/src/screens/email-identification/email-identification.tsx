@@ -21,11 +21,7 @@ type FormData = {
   email: string;
 };
 
-const EmailIdentification = ({
-  onComplete,
-  obConfigAuth,
-  sandboxId,
-}: EmailIdentificationProps) => {
+const EmailIdentification = ({ onComplete, obConfigAuth, sandboxId }: EmailIdentificationProps) => {
   const { t } = useTranslation('pages.email-identification');
   const schema = z.object({
     email: z
@@ -81,10 +77,7 @@ const EmailIdentification = ({
       <Box marginBottom={7}>
         <Controller
           control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
+          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
             return (
               <TextInput
                 autoCapitalize="none"
@@ -110,10 +103,7 @@ const EmailIdentification = ({
           name="email"
         />
       </Box>
-      <DataCollectionActionButton
-        onComplete={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-      />
+      <DataCollectionActionButton onComplete={handleSubmit(onSubmit)} isLoading={isLoading} />
     </DismissKeyboard>
   );
 };

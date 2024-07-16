@@ -27,14 +27,9 @@ const Router = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={isLoggedIn ? 'MainTabs' : 'EmailIdentification'}
-      >
+      <Stack.Navigator initialRouteName={isLoggedIn ? 'MainTabs' : 'EmailIdentification'}>
         <Stack.Group screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="EmailIdentification"
-            component={EmailIdentification}
-          />
+          <Stack.Screen name="EmailIdentification" component={EmailIdentification} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Group>
         <Stack.Group
@@ -103,16 +98,11 @@ const MainTabs = () => {
         options={{
           headerShown: false,
           tabBarLabel: ({ focused }) => (
-            <Typography
-              variant="caption-3"
-              color={focused ? 'accent' : 'tertiary'}
-            >
+            <Typography variant="caption-3" color={focused ? 'accent' : 'tertiary'}>
               Vault
             </Typography>
           ),
-          tabBarIcon: ({ focused }) => (
-            <IcoFootprint24 color={focused ? 'accent' : 'tertiary'} />
-          ),
+          tabBarIcon: ({ focused }) => <IcoFootprint24 color={focused ? 'accent' : 'tertiary'} />,
         }}
       />
       <Tab.Screen
@@ -122,10 +112,7 @@ const MainTabs = () => {
           headerShown: false,
           tabBarLabel: ({ focused }) => {
             return (
-              <Typography
-                variant="caption-3"
-                color={focused ? 'accent' : 'tertiary'}
-              >
+              <Typography variant="caption-3" color={focused ? 'accent' : 'tertiary'}>
                 Sharing
               </Typography>
             );

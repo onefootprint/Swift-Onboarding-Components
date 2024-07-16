@@ -3,10 +3,7 @@ import type { CollectKycDataRequirement } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '@/components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '@/components/confirm-collected-data';
 import { Section, SectionItem } from '@/components/confirm-collected-data';
 import useTranslation from '@/hooks/use-translation';
 import BasicInformation from '@/screens/basic-information';
@@ -19,12 +16,7 @@ type BasicInfoSectionProps = {
   onConfirm: (data: KycData) => void;
 };
 
-const BasicInfoSection = ({
-  data,
-  onConfirm,
-  authToken,
-  requirement,
-}: BasicInfoSectionProps) => {
+const BasicInfoSection = ({ data, onConfirm, authToken, requirement }: BasicInfoSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm');
   const [editing, setEditing] = useState(false);
 
@@ -80,12 +72,7 @@ const BasicInfoSection = ({
   const getSectionContent = (list: SectionItemProps[]) =>
     !editing ? (
       list.map(({ text, subtext, textColor }) => (
-        <SectionItem
-          key={text}
-          text={text}
-          subtext={subtext}
-          textColor={textColor}
-        />
+        <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
       ))
     ) : (
       <BasicInformation

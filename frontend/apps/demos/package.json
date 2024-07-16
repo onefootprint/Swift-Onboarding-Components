@@ -21,7 +21,7 @@
     "@onefootprint/core": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
-    "@onefootprint/footprint-react": "7.0.0-beta.6",
+    "@onefootprint/footprint-react": "7.0.0-beta.7",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",

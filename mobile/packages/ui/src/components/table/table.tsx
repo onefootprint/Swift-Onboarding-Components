@@ -32,14 +32,7 @@ const Table = ({ options }: TableProps) => (
       >
         {group.options.map(
           (
-            {
-              'aria-label': ariaLabel,
-              content,
-              endIcon: EndIcon,
-              endText,
-              onPress,
-              startIcon: StartIcon,
-            },
+            { 'aria-label': ariaLabel, content, endIcon: EndIcon, endText, onPress, startIcon: StartIcon },
             optionIndex,
           ) => {
             const isLast = optionIndex === group.options.length - 1;
@@ -66,11 +59,7 @@ const Table = ({ options }: TableProps) => (
                       </Box>
                     )}
                     <Box flexGrow={1} alignItems="flex-start">
-                      {typeof content === 'string' ? (
-                        <Typography variant="body-2">{content}</Typography>
-                      ) : (
-                        content
-                      )}
+                      {typeof content === 'string' ? <Typography variant="body-2">{content}</Typography> : content}
                     </Box>
                     {endText && (
                       <Typography color="tertiary" variant="body-4">

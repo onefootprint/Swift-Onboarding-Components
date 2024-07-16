@@ -3,8 +3,8 @@ import React, { useId, useMemo } from 'react';
 import type { FieldError, FieldErrorsImpl, Merge } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 
+import type { FormValues } from '../../types';
 import FieldContext from '../field-context';
-import type { Di } from '../types/dis';
 
 type FieldOptions = {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -12,7 +12,7 @@ type FieldOptions = {
 };
 
 export type FieldProps = {
-  name: keyof Di;
+  name: keyof FormValues;
   children?: (options: FieldOptions) => React.ReactNode;
 };
 
@@ -24,11 +24,7 @@ const Field = ({ name, children }: FieldProps) => {
   } = useFormContext();
   const error = get(errors, name);
 
-  return (
-    <FieldContext.Provider value={contextValues}>
-      {children?.({ error })}
-    </FieldContext.Provider>
-  );
+  return <FieldContext.Provider value={contextValues}>{children?.({ error })}</FieldContext.Provider>;
 };
 
 export default Field;

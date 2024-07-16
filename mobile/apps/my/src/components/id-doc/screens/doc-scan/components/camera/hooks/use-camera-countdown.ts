@@ -10,6 +10,7 @@ let timerId: ReturnType<typeof setTimeout> | null = null;
 let notDetectedTimerId: ReturnType<typeof setTimeout> | null = null;
 
 const useCameraCountdown = (props: {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   object: any;
   disabled?: boolean;
   onDone: () => void;
@@ -19,13 +20,17 @@ const useCameraCountdown = (props: {
 
   const reset = () => {
     setCountdown(COUNTDOWN_SECONDS);
-    clearInterval(timerId);
+    if (timerId) {
+      clearInterval(timerId);
+    }
     timerId = null;
     resetNotDetected();
   };
 
   const resetNotDetected = () => {
-    clearInterval(notDetectedTimerId);
+    if (notDetectedTimerId) {
+      clearInterval(notDetectedTimerId);
+    }
     notDetectedTimerId = null;
   };
 
@@ -51,6 +56,7 @@ const useCameraCountdown = (props: {
     }, NOT_DETECTED_TOLERANCE);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (disabled) {
       reset();
@@ -63,12 +69,9 @@ const useCameraCountdown = (props: {
       } else {
         resetNotDetected();
       }
-    } else {
-      if (timerId) {
-        handleNotDetected();
-      }
+    } else if (timerId) {
+      handleNotDetected();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [object.isDetected, disabled]);
 
   return {

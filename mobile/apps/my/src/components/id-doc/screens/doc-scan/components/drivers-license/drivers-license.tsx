@@ -19,15 +19,9 @@ export type DriversLicenseProps = {
 
 const DEFAULT_ASPECT_RATIO = 1.586;
 
-const DriversLicense = ({
-  country,
-  onBack,
-  onSubmit,
-  side,
-}: DriversLicenseProps) => {
+const DriversLicense = ({ country, onBack, onSubmit, side }: DriversLicenseProps) => {
   const { t } = useTranslation('scan.drivers-license');
-  const { object, detector, frameProcessor, disableDetection } =
-    useFrameProcessor(side, country);
+  const { object, detector, frameProcessor, disableDetection } = useFrameProcessor(side, country);
   const hasBackButton = side === UploadDocumentSide.Front;
 
   return (

@@ -8,7 +8,7 @@ import useTranslation from '@/hooks/use-translation';
 import type { FormData } from '../../types';
 
 type CityInputProps = {
-  control: Control<FormData, any>;
+  control: Control<FormData, unknown>;
   currInputRef: React.RefObject<RNTextInput>;
   nextInputRef: React.RefObject<RNTextInput>;
 };
@@ -20,10 +20,7 @@ const CityInput = ({ control, currInputRef, nextInputRef }: CityInputProps) => {
     <Box flex={1}>
       <Controller
         control={control}
-        render={({
-          field: { onChange, onBlur, value },
-          fieldState: { error },
-        }) => {
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
           return (
             <TextInput
               autoComplete="address-line1"

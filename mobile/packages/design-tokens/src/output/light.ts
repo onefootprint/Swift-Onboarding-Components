@@ -121,8 +121,7 @@ export const elevation0 = '0px 0px 0px 0px rgb(0, 0, 0)';
 export const elevation1 = '0px 1px 4px rgba(0,0,0,0.12156862745098039)';
 export const elevation2 = '0px 1px 8px rgba(0,0,0,0.1411764705882353)';
 export const elevation3 = '0px 1px 12px rgba(0,0,0,0.1803921568627451)';
-export const elevationDialog =
-  '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
+export const elevationDialog = '0px 1px 8px 0px rgba(0, 0, 0, 0.1411764705882353)';
 export const fontFamilyDefault = 'DM Sans';
 export const fontFamilyCode = 'Source Code Pro';
 export const typographyDisplay1 = '600 60px/76px "DMSans-Bold"';
@@ -364,17 +363,13 @@ export const baseInputsSpacingPaddingsHorizontalCompact = 16;
 export const baseInputsSpacingPaddingsVerticalDefault = 10;
 export const baseInputsSpacingPaddingsVerticalCompact = 6;
 export const baseInputsTypographyDefaultLabel = '500 14px/20px "DMSans-Medium"';
-export const baseInputsTypographyDefaultInputContent =
-  '400 15px/20px "DMSans-Regular"';
+export const baseInputsTypographyDefaultInputContent = '400 15px/20px "DMSans-Regular"';
 export const baseInputsTypographyDefaultHint = '500 13px/16px "DMSans-Medium"';
 export const baseInputsTypographyCompactLabel = '500 13px/16px "DMSans-Medium"';
-export const baseInputsTypographyCompactInputContent =
-  '400 14px/20px "DMSans-Regular"';
+export const baseInputsTypographyCompactInputContent = '400 14px/20px "DMSans-Regular"';
 export const baseInputsTypographyCompactHint = '500 13px/16px "DMSans-Medium"';
-export const baseInputsElevationFocus =
-  '0px 8px 8px rgba(74,36,219,0.12156862745098039)';
-export const baseInputsElevationFocusError =
-  '0px 0px 4px rgba(191,20,10,0.12156862745098039)';
+export const baseInputsElevationFocus = '0px 8px 8px rgba(74,36,219,0.12156862745098039)';
+export const baseInputsElevationFocusError = '0px 0px 4px rgba(191,20,10,0.12156862745098039)';
 export const baseInputsBorderWidth = 1;
 
 // Dropdown

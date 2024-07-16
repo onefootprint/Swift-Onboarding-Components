@@ -15,15 +15,9 @@ import { SupportedIdDocTypes } from '@onefootprint/types';
 import getSupportedCountryByCode from '@/components/id-doc/utils/get-supported-country-by-code';
 import useTranslation from '@/hooks/use-translation';
 
-const useDocumentOptions = (
-  supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes,
-  country: CountryRecord,
-) => {
+const useDocumentOptions = (supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes, country: CountryRecord) => {
   const { t } = useTranslation('scan.doc-selection');
-  const availableDocTypes = getSupportedCountryByCode(
-    supportedCountryAndDocTypes,
-    country.value,
-  );
+  const availableDocTypes = getSupportedCountryByCode(supportedCountryAndDocTypes, country.value);
   const options = {
     [SupportedIdDocTypes.driversLicense]: {
       title: t('options.dl'),

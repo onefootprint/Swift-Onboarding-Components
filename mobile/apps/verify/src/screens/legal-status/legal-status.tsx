@@ -1,13 +1,5 @@
 import { VisaKind } from '@onefootprint/types';
-import {
-  Box,
-  Button,
-  Container,
-  CountrySelect,
-  LinkButton,
-  Select,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Button, Container, CountrySelect, LinkButton, Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 
 import Header from '@/components/header';

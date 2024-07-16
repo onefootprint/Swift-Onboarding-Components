@@ -17,7 +17,7 @@ const createRequirementsMachine = () =>
         idDoc: null,
       },
     },
-    tsTypes: {} as Typegen0,
+    tsTypes: {} as import('./machine.typegen').Typegen0,
     initial: 'check',
     states: {
       check: {
@@ -25,7 +25,7 @@ const createRequirementsMachine = () =>
           remainingRequirementsReceived: [
             {
               target: 'passkeys',
-              cond: (context, { payload }) => {
+              cond: (_, { payload }) => {
                 return !!payload.remainingRequirements.liveness;
               },
               actions: assign((context, { payload }) => {
@@ -35,7 +35,7 @@ const createRequirementsMachine = () =>
             },
             {
               target: 'idDoc',
-              cond: (context, { payload }) => {
+              cond: (_, { payload }) => {
                 return !!payload.remainingRequirements.idDoc;
               },
               actions: assign((context, { payload }) => {

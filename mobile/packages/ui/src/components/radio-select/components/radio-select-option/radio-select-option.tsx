@@ -4,16 +4,12 @@ import styled, { css } from 'styled-components/native';
 import Box from '../../../box';
 import Pressable from '../../../pressable';
 import Typography from '../../../typography';
-import type {
-  RadioSelectOption,
-  StringOrNumber,
-} from '../../radio-select.types';
+import type { RadioSelectOption, StringOrNumber } from '../../radio-select.types';
 
-export type RadioSelectOptionProps<T extends StringOrNumber = string> =
-  RadioSelectOption<T> & {
-    onPress: () => void;
-    selected: boolean;
-  };
+export type RadioSelectOptionProps<T extends StringOrNumber = string> = RadioSelectOption<T> & {
+  onPress: () => void;
+  selected: boolean;
+};
 
 const Option = <T extends StringOrNumber = string>({
   value,
@@ -63,19 +59,23 @@ const OptionContainer = styled(Pressable)<{
       gap: ${theme.spacing[4]};
       padding: ${theme.spacing[4]};
 
-      ${selected &&
-      css`
+      ${
+        selected &&
+        css`
         z-index: 1;
         background-color: ${radioSelect.selected.bg};
         border-color: ${radioSelect.selected.borderColor};
-      `}
+      `
+      }
 
-      ${active &&
-      !selected &&
-      css`
+      ${
+        active &&
+        !selected &&
+        css`
         background-color: ${radioSelect.hover.bg};
         border-color: ${radioSelect.hover.borderColor};
-      `}
+      `
+      }
     `;
   }}
 `;
@@ -92,17 +92,21 @@ const IconContainer = styled.View<{ selected?: boolean; active?: boolean }>`
       justify-content: center;
       width: 40px;
 
-      ${selected &&
-      css`
+      ${
+        selected &&
+        css`
         border: none;
         background-color: ${radioSelect.components.icon.selected.bg};
-      `}
+      `
+      }
 
-      ${active &&
-      !selected &&
-      css`
+      ${
+        active &&
+        !selected &&
+        css`
         background-color: ${radioSelect.components.icon.hover.bg};
-      `}
+      `
+      }
     `;
   }}
 `;

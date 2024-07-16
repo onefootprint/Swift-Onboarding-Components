@@ -1,9 +1,4 @@
-import type {
-  ChallengeData,
-  ChallengeKind,
-  Identifier,
-  ObConfigAuth,
-} from '../data';
+import type { ChallengeData, ChallengeKind, Identifier, ObConfigAuth } from '../data';
 
 export type LoginChallengeRequest = {
   identifier: Identifier;

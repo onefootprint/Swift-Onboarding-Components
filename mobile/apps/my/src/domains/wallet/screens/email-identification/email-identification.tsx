@@ -1,12 +1,5 @@
 import { ChallengeKind } from '@onefootprint/types';
-import {
-  Box,
-  Button,
-  Container,
-  DismissKeyboard,
-  TextInput,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Button, Container, DismissKeyboard, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -40,9 +33,7 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
           if (!user) return;
           navigation.push('Login', {
             identifier: { email },
-            canUseBiometric: user.availableChallengeKinds.includes(
-              ChallengeKind.biometric,
-            ),
+            canUseBiometric: user.availableChallengeKinds.includes(ChallengeKind.biometric),
             identifiedAuthToken: user.token,
           });
         },
@@ -83,10 +74,7 @@ const EmailIdentification = ({ navigation }: EmailIdentificationProps) => {
             )}
             name="email"
           />
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            loading={identifyMutation.isLoading}
-          >
+          <Button onPress={handleSubmit(onSubmit)} loading={identifyMutation.isLoading}>
             {t('form.cta')}
           </Button>
         </Box>

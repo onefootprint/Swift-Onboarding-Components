@@ -1,9 +1,9 @@
 import { createContext } from 'react';
 
-import type { Di } from '../../../@types';
+import type { FormValues } from '../../../types';
 
 export default createContext<{
-  name: keyof Di;
+  name: keyof FormValues;
   id: string;
 }>({
   name: 'id.email',

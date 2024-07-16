@@ -9,7 +9,7 @@ import useTranslation from '@/hooks/use-translation';
 import type { FormData } from '../../types';
 
 type ZipInputProps = {
-  control: Control<FormData, any>;
+  control: Control<FormData, unknown>;
   currInputRef: React.RefObject<RNTextInput>;
   nextInputRef: React.RefObject<SelectRef | RNTextInput>;
 };
@@ -21,10 +21,7 @@ const ZipInput = ({ control, currInputRef, nextInputRef }: ZipInputProps) => {
     <Box flex={1}>
       <Controller
         control={control}
-        render={({
-          field: { onChange, onBlur, value },
-          fieldState: { error },
-        }) => {
+        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
           return (
             <TextInput
               autoComplete="postal-code"

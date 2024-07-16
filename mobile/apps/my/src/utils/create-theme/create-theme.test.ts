@@ -97,8 +97,7 @@ describe('create theme', () => {
 
   describe('createTheme', () => {
     it('should generate the theme correctly', () => {
-      const styleParams =
-        '{"variables":{"borderRadius": "0px", "buttonPrimaryBg": "purple"}}';
+      const styleParams = '{"variables":{"borderRadius": "0px", "buttonPrimaryBg": "purple"}}';
 
       const expectedTheme = structuredClone(defaultTheme);
       const { button, input, radioSelect } = expectedTheme.components;

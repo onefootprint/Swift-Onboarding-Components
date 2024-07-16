@@ -1,8 +1,8 @@
 import request from '@onefootprint/request';
 import {
+  AuthMethodKind,
   type BiometricRegisterChallengeJson,
   type BiometricRegisterResponse,
-  AuthMethodKind,
   UpdateAuthMethodActionKind,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
@@ -38,9 +38,7 @@ const biometricInit = async (authToken: string) => {
   return data;
 };
 
-const generateDeviceResponse = async ({
-  publicKey,
-}: BiometricRegisterChallengeJson) => {
+const generateDeviceResponse = async ({ publicKey }: BiometricRegisterChallengeJson) => {
   const result = (await Passkey.register({
     challenge: base64url.toBase64(publicKey.challenge as unknown as string),
     rp: {
@@ -107,12 +105,8 @@ export const isRegisterPasskeyError = (e: unknown): e is RegisterPasskeyError =>
   (e as RegisterPasskeyError)?.kind === 'registerPasskeyError';
 
 const registerPasskey = async (authToken: string) => {
-  const { challengeToken, biometricChallengeJson } = await biometricInit(
-    authToken,
-  );
-  const challenge = JSON.parse(
-    biometricChallengeJson,
-  ) as BiometricRegisterChallengeJson;
+  const { challengeToken, biometricChallengeJson } = await biometricInit(authToken);
+  const challenge = JSON.parse(biometricChallengeJson) as BiometricRegisterChallengeJson;
 
   const startPasskeyRegister = new Date();
   let challengeResponse;
@@ -120,8 +114,7 @@ const registerPasskey = async (authToken: string) => {
     challengeResponse = await generateDeviceResponse(challenge);
   } catch (error) {
     const endPasskeyRegister = new Date();
-    const elapsedTimeInOsPromptMs =
-      endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
+    const elapsedTimeInOsPromptMs = endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
     const e: RegisterPasskeyError = {
       kind: 'registerPasskeyError',
       elapsedTimeInOsPromptMs,

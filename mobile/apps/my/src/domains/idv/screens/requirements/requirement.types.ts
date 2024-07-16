@@ -1,7 +1,4 @@
-import type {
-  IdDocRequirement,
-  LivenessRequirement,
-} from '@onefootprint/types';
+import type { IdDocRequirement, LivenessRequirement } from '@onefootprint/types';
 
 export type RemainingRequirements = {
   liveness: LivenessRequirement | null;

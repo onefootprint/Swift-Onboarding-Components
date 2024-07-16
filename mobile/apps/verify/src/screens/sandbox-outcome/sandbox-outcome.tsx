@@ -1,9 +1,5 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { zodResolver } from '@hookform/resolvers/zod';
-import type {
-  OverallOutcome,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -28,11 +24,7 @@ type SandboxOutcomeProps = {
   onIdDocRequirement: () => void;
 };
 
-export const SandboxOutcome = ({
-  onSubmit,
-  config,
-  onIdDocRequirement,
-}: SandboxOutcomeProps) => {
+export const SandboxOutcome = ({ onSubmit, config, onIdDocRequirement }: SandboxOutcomeProps) => {
   const { t } = useTranslation('pages.sandbox-outcome');
   const {
     overallOutcomeOptions: { overallOutcomeSuccess },

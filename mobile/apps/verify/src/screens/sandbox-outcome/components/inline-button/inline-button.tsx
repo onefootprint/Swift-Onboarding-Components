@@ -11,22 +11,12 @@ type InlineButtonProps = {
   ariaLabel?: string;
 };
 
-const InlineButton = ({
-  icon: Icon,
-  onClick,
-  disabled,
-  ariaLabel,
-}: InlineButtonProps) => {
+const InlineButton = ({ icon: Icon, onClick, disabled, ariaLabel }: InlineButtonProps) => {
   const icon = Icon && <Icon color={disabled ? 'quaternary' : 'primary'} />;
 
   return onClick ? (
     <Pressable onPress={onClick} disabled={disabled}>
-      <InlineButtonContainer
-        role="button"
-        aria-label={ariaLabel}
-        data-disabled={disabled}
-        aria-disabled={disabled}
-      >
+      <InlineButtonContainer role="button" aria-label={ariaLabel} data-disabled={disabled} aria-disabled={disabled}>
         {icon}
       </InlineButtonContainer>
     </Pressable>

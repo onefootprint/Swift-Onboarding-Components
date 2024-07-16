@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled, { css } from 'styled-components/native';
 
@@ -9,7 +9,7 @@ export type ContainerProps = {
   keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
   scroll?: boolean;
   style?: StyleProp<ViewStyle>;
-  onLayout?: (event: any) => void;
+  onLayout?: (event: LayoutChangeEvent) => void;
 };
 
 const Container = ({

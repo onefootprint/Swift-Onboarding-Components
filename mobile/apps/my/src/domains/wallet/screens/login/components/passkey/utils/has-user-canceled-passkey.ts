@@ -1,4 +1,4 @@
-const hasUserCancelledPasskey = (error: any) => {
+const hasUserCancelledPasskey = (error: unknown) => {
   return error?.error === 'UserCancelled';
 };
 

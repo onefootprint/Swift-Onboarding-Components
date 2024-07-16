@@ -1,8 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import {
-  OnboardingRequirementKind,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { OnboardingRequirementKind, SupportedIdDocTypes } from '@onefootprint/types';
 import { Box, DesignSystemProvider } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import SplashScreen from 'react-native-splash-screen';

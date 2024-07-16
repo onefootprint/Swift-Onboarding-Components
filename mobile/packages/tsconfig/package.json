@@ -6,5 +6,8 @@
   "files": [
     "all.json",
     "library.json"
-  ]
+  ],
+  "devDependencies": {
+    "@tsconfig/react-native": "^3.0.5"
+  }
 }

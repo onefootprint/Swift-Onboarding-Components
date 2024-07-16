@@ -26,10 +26,7 @@ const computeRequirementsToShow = (
       return true;
     }
     // There are special, requirement-kind-specific cases where we show a met requirement
-    if (
-      r.kind === OnboardingRequirementKind.collectKycData &&
-      !collectedKycData
-    ) {
+    if (r.kind === OnboardingRequirementKind.collectKycData && !collectedKycData) {
       // Show the CollectKycData plugin one time, even if it's met, to make sure we show the
       // confirm page
       return true;

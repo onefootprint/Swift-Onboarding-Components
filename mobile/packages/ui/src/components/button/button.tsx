@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import React, { useState } from 'react';
@@ -52,13 +51,7 @@ const Button = ({
         onPressOut={() => setActive(false)}
         variant={variant}
       >
-        <Box
-          display="flex"
-          gap={3}
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="row"
-        >
+        <Box display="flex" gap={3} justifyContent="center" alignItems="center" flexDirection="row">
           {PrefixIcon && <PrefixIcon color={iconColor} />}
           {!loading ? (
             <ButtonText variant={variant} disabled={disabled}>
@@ -71,20 +64,14 @@ const Button = ({
         <LoadingContainer loading={loading}>
           {loadingLabel ? (
             <Box flexDirection="row" justifyContent="space-between">
-              <LoadingIndicator
-                aria-label={loadingLabel}
-                color={variant === 'primary' ? 'quinary' : 'primary'}
-              />
+              <LoadingIndicator aria-label={loadingLabel} color={variant === 'primary' ? 'quinary' : 'primary'} />
               <ButtonText variant={variant} disabled={disabled}>
                 {loadingLabel}
               </ButtonText>
               <Box />
             </Box>
           ) : (
-            <LoadingIndicator
-              aria-label={loadingLabel}
-              color={variant === 'primary' ? 'quinary' : 'primary'}
-            />
+            <LoadingIndicator aria-label={loadingLabel} color={variant === 'primary' ? 'quinary' : 'primary'} />
           )}
         </LoadingContainer>
       </StyledPressable>

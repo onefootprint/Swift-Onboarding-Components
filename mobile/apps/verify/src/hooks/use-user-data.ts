@@ -1,10 +1,6 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
 import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
-import {
-  ALLOW_EXTRA_FIELDS_HEADER,
-  AUTH_HEADER,
-  IdDI,
-} from '@onefootprint/types';
+import { ALLOW_EXTRA_FIELDS_HEADER, AUTH_HEADER, IdDI } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const userDataRequest = async (payload: UserDataRequest) => {
@@ -36,8 +32,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     data,
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [ALLOW_EXTRA_FIELDS_HEADER]:
-        payload.speculative && payload.allowExtraFields ? true : undefined,
+      [ALLOW_EXTRA_FIELDS_HEADER]: payload.speculative && payload.allowExtraFields ? true : undefined,
     },
   });
   return response.data;

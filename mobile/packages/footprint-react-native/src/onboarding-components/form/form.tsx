@@ -1,35 +1,34 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import isPlainObject from 'lodash/isPlainObject';
 import React from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { Di } from '../types/dis';
+import type { FormValues } from '../../types';
 
-type DiKey = keyof Di;
+type DiKey = keyof FormValues;
 
 type FormOptions = {
   handleSubmit: () => void;
-  setValue: (name: DiKey, value: Di[DiKey]) => void;
-  errors: FieldErrors<Di>;
+  setValue: (name: DiKey, value: FormValues[DiKey]) => void;
+  errors: FieldErrors<FormValues>;
 };
 
 export type FormProps = {
   children: (options: FormOptions) => React.ReactNode;
-  onSubmit: (values: Di) => void;
-  defaultValues?: Di;
+  onSubmit: (values: FormValues) => void;
+  defaultValues?: FormValues;
 };
 
 const Form = ({ children, defaultValues, onSubmit }: FormProps) => {
-  const methods = useForm<Di>({ defaultValues });
+  const methods = useForm<FormValues>({ defaultValues });
   const {
     handleSubmit,
     setValue,
     formState: { errors },
   } = methods;
 
-  const handleBeforeSubmit = (formValues: Di) => {
-    onSubmit(flattenObject(formValues) as Di);
+  const handleBeforeSubmit = (formValues: FormValues) => {
+    onSubmit(flattenObject(formValues) as FormValues);
   };
 
   return (
@@ -53,16 +52,12 @@ const flattenObject = (
   Object.keys(obj).forEach(key => {
     const newKey = parentKey ? `${parentKey}${sep}${key}` : key;
     if (isPlainObject(obj[key])) {
-      const flatObject = flattenObject(
-        obj[key] as Record<string, unknown>,
-        newKey,
-        sep,
-      );
+      const flatObject = flattenObject(obj[key] as Record<string, unknown>, newKey, sep);
       Object.keys(flatObject).forEach(x => {
-        toReturn[x] = flatObject[x] as Di;
+        toReturn[x] = flatObject[x] as FormValues;
       });
     } else {
-      toReturn[newKey] = obj[key] as Di;
+      toReturn[newKey] = obj[key] as FormValues;
     }
   });
 

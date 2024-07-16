@@ -46,16 +46,13 @@ const footprint = () => {
 
     // Only handle once either via listener or via openAuthSessionAsync result.
     let isUpdateHandled = false;
-    const subscription = Linking.addEventListener(
-      'url',
-      ({ url: eventUrl }) => {
-        if (!isUpdateHandled) {
-          isUpdateHandled = true;
-          handleWebViewUrlChange(props, eventUrl);
-          subscription.remove();
-        }
-      },
-    );
+    const subscription = Linking.addEventListener('url', ({ url: eventUrl }) => {
+      if (!isUpdateHandled) {
+        isUpdateHandled = true;
+        handleWebViewUrlChange(props, eventUrl);
+        subscription.remove();
+      }
+    });
 
     try {
       const result = await openWebView(props, token);
@@ -121,11 +118,7 @@ const footprint = () => {
       redirectUrl: redirectUrlOrFallback,
       token,
     });
-    const result = await WebBrowser.openAuthSessionAsync(
-      url,
-      redirectUrlOrFallback,
-      { preferEphemeralSession: true },
-    );
+    const result = await WebBrowser.openAuthSessionAsync(url, redirectUrlOrFallback, { preferEphemeralSession: true });
     return result;
   };
 

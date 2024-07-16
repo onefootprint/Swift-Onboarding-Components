@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 
@@ -25,9 +24,7 @@ const Label = ({ children, onPress, hasError, ...props }: LabelProps) => {
 const Text = styled.Text<{ hasError?: boolean }>`
   ${({ theme, hasError }) => {
     const { label } = theme.components;
-    const color = hasError
-      ? label.states.error.color
-      : label.states.default.color;
+    const color = hasError ? label.states.error.color : label.states.default.color;
 
     return css`
       color: ${color};

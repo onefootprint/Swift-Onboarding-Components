@@ -30,10 +30,7 @@ const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    setHasReadConsent(
-      e.nativeEvent.contentOffset.y >
-        e.nativeEvent.contentSize.height - SHOW_CTA_THRESHOLD,
-    );
+    setHasReadConsent(e.nativeEvent.contentOffset.y > e.nativeEvent.contentSize.height - SHOW_CTA_THRESHOLD);
     setShowSheetHeader(e.nativeEvent.contentOffset.y > SHOW_HEADER_THRESHOLD);
   };
 
@@ -62,11 +59,7 @@ const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
   };
 
   return (
-    <StyledModal
-      visible={open}
-      animationType="slide"
-      presentationStyle="formSheet"
-    >
+    <StyledModal visible={open} animationType="slide" presentationStyle="formSheet">
       <Box height={HEADER_HEIGHT}>
         <Typography variant="label-2" center paddingBottom={5} paddingTop={5}>
           {showSheetHeader ? t('title') : ''}
@@ -84,17 +77,8 @@ const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
           </Typography>
           <Box marginTop={5} paddingHorizontal={6}>
             <Typography variant="body-3">{t('description')}</Typography>
-            <Box
-              backgroundColor="secondary"
-              borderRadius="default"
-              flexDirection="row"
-              padding={5}
-            >
-              <Checkbox
-                label={t('third-party')}
-                onValueChange={handleThirdParty}
-                value={isThirdPartyConsented}
-              />
+            <Box backgroundColor="secondary" borderRadius="default" flexDirection="row" padding={5}>
+              <Checkbox label={t('third-party')} onValueChange={handleThirdParty} value={isThirdPartyConsented} />
             </Box>
           </Box>
         </ScrollView>

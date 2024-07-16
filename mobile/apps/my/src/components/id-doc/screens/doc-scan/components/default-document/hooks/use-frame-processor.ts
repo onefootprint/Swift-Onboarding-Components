@@ -1,10 +1,7 @@
 import type { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
-import {
-  runAtTargetFps,
-  useFrameProcessor as useVCFrameProcessor,
-} from 'react-native-vision-camera';
+import { runAtTargetFps, useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
 import { Worklets } from 'react-native-worklets-core';
 
 import { detectDocument } from '@/utils/vision-camera';

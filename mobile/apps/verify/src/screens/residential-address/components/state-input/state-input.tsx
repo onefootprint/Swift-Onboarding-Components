@@ -1,8 +1,4 @@
-import {
-  type CountryRecord,
-  COUNTRIES_WITH_PROVINCES,
-  COUNTRIES_WITH_STATES,
-} from '@onefootprint/global-constants';
+import { COUNTRIES_WITH_PROVINCES, COUNTRIES_WITH_STATES, type CountryRecord } from '@onefootprint/global-constants';
 import type { SelectRef } from '@onefootprint/ui';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -15,7 +11,7 @@ import useTranslation from '@/hooks/use-translation';
 import type { FormData } from '../../types';
 
 type StateInputProps = {
-  control: Control<FormData, any>;
+  control: Control<FormData, unknown>;
   country: CountryRecord;
   stateRef: React.RefObject<SelectRef | RNTextInput>;
 };
@@ -24,8 +20,7 @@ const StateInput = ({ control, country, stateRef }: StateInputProps) => {
   const { t } = useTranslation('pages.residential-address');
   const isCountryUs = country.value === 'US';
   const shouldCollectState =
-    COUNTRIES_WITH_STATES.includes(country.value) ||
-    COUNTRIES_WITH_PROVINCES.includes(country.value);
+    COUNTRIES_WITH_STATES.includes(country.value) || COUNTRIES_WITH_PROVINCES.includes(country.value);
 
   if (!shouldCollectState) {
     return null;
@@ -34,10 +29,7 @@ const StateInput = ({ control, country, stateRef }: StateInputProps) => {
   return (
     <Controller
       control={control}
-      render={({
-        field: { onChange, onBlur, value },
-        fieldState: { error },
-      }) => {
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
         return isCountryUs ? (
           <Select
             hasError={!!error}

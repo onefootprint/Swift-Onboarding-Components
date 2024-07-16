@@ -57,29 +57,6 @@ jobs:
         working-directory: ./mobile
         run: yarn lint:ci
 
-  format:
-    needs: install-dependencies
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
-    steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install node_modules
-        working-directory: ./mobile
-        run: yarn install --frozen-lockfile
-
-      - name: Prettier
-        working-directory: ./mobile
-        run: yarn format:ci
-
   test:
     needs: install-dependencies
     runs-on: ${{ matrix.os }}

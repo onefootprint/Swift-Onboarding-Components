@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 
@@ -13,12 +12,7 @@ export type HintProps = BoxProps & {
   size?: 'compact' | 'default';
 };
 
-const Hint = ({
-  children,
-  hasError = false,
-  size = 'default',
-  ...props
-}: HintProps) => (
+const Hint = ({ children, hasError = false, size = 'default', ...props }: HintProps) => (
   <Box {...props}>
     <HintContainer hasError={hasError} size={size}>
       {children}
@@ -32,9 +26,7 @@ const HintContainer = styled.Text<{ hasError: boolean; size: HintSize }>`
 
     return css`
       text-align: left;
-      font: ${size === 'compact'
-        ? hint.size.compact.typography
-        : hint.size.default.typography};
+      font: ${size === 'compact' ? hint.size.compact.typography : hint.size.default.typography};
       color: ${hasError ? hint.states.error.color : hint.states.default.color};
     `;
   }}

@@ -1,8 +1,4 @@
-import {
-  type CollectKycDataRequirement,
-  type UserDataError,
-  IdDI,
-} from '@onefootprint/types';
+import { type CollectKycDataRequirement, IdDI, type UserDataError } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
 
@@ -31,14 +27,7 @@ const useSyncData = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
 
-  const syncData = ({
-    data: rawData,
-    speculative,
-    authToken,
-    requirement,
-    onSuccess,
-    onError,
-  }: SyncDataArgs) => {
+  const syncData = ({ data: rawData, speculative, authToken, requirement, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),
@@ -63,17 +52,14 @@ const useSyncData = () => {
         {
           onSuccess,
           onError: (err: unknown) => {
-            const errors = (err as AxiosError<UserDataError>)?.response?.data
-              .error.message;
+            const errors = (err as AxiosError<UserDataError>)?.response?.data.error.message;
             if (typeof errors === 'string') {
               showRequestErrorToast(err);
               return;
             }
             const validDis = new Set(Object.values(IdDI));
             const fieldErrors = Object.fromEntries(
-              Object.entries(errors || {}).filter(([key]) =>
-                validDis.has(key as IdDI),
-              ),
+              Object.entries(errors || {}).filter(([key]) => validDis.has(key as IdDI)),
             );
             if (Object.keys(fieldErrors).length > 0) {
               onError?.(fieldErrors);
@@ -87,7 +73,7 @@ const useSyncData = () => {
           },
         },
       );
-    } catch (e) {
+    } catch (_) {
       toast.show({
         title: t('request-data.title'),
         description: t('request-data.description'),

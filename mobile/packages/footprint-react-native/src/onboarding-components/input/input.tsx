@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import type { TextInputProps } from 'react-native';
@@ -10,12 +9,7 @@ export type InputProps = TextInputProps;
 
 const Input = ({ ...props }: InputProps) => {
   const { control } = useFormContext();
-  const {
-    name,
-    validations = {},
-    transformValue,
-    ...allProps
-  } = useFieldProps();
+  const { name, validations = {}, transformValue, ...allProps } = useFieldProps();
 
   return (
     <Controller

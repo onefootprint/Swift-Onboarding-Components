@@ -13,7 +13,7 @@ const get = async () => {
   try {
     const sessionId = await AsyncStorage.getItem(key);
     return sessionId;
-  } catch (e) {
+  } catch (_) {
     // do nothing
     return null;
   }

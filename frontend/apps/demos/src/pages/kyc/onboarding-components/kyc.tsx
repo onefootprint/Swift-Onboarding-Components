@@ -1,4 +1,4 @@
-import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -69,7 +69,7 @@ const Demo = () => {
 const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (formValues: Di) => {
+  const handleSubmit = (formValues: FormValues) => {
     fp.launchIdentify(
       {
         email: formValues['id.email'],
@@ -110,7 +110,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
 const BasicData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: Di) => {
+  const handleSubmit = (data: FormValues) => {
     fp.save(data, {
       onSuccess: () => {
         fp.handoff({ onComplete: onDone });

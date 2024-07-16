@@ -10,10 +10,7 @@ type CheckRequirementsProps = {
   onSuccess: (remainingRequirements: RemainingRequirements) => void;
 };
 
-const CheckRequirements = ({
-  authToken,
-  onSuccess,
-}: CheckRequirementsProps) => {
+const CheckRequirements = ({ authToken, onSuccess }: CheckRequirementsProps) => {
   useGetOnboardingStatus(authToken, {
     onSuccess: ({ allRequirements }) => {
       const remainingRequirements = getRemainingRequirements(allRequirements);

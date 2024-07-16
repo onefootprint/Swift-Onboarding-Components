@@ -1,5 +1,4 @@
-const camelToSnakeCase = (str: string) =>
-  str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 
 const fixKeys = (fn: Function) => (obj: unknown) => {
   if (!obj || typeof obj !== 'object') {

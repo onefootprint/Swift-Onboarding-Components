@@ -5,9 +5,7 @@ type InlineButtonsLayoutProps = {
   children: React.ReactNode;
 };
 
-const InlineButtonsLayout = ({ children }: InlineButtonsLayoutProps) => (
-  <Container>{children}</Container>
-);
+const InlineButtonsLayout = ({ children }: InlineButtonsLayoutProps) => <Container>{children}</Container>;
 
 const Container = styled.View`
   ${({ theme }) => css`

@@ -17,9 +17,7 @@ const createUrl = ({
 };
 
 const encode = (obj?: Record<string, unknown>): string => {
-  return obj && Object.keys(obj).length
-    ? encodeURIComponent(JSON.stringify(obj))
-    : '';
+  return obj && Object.keys(obj).length ? encodeURIComponent(JSON.stringify(obj)) : '';
 };
 
 const createComponentUrl = () => {

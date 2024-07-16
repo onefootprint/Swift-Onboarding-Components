@@ -7,8 +7,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
+    "lint": "biome check src --fix",
+    "lint:ci": "biome ci src",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit"
   },

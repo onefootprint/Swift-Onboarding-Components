@@ -44,24 +44,19 @@ const useGoogleMapsPredictions = (countryCode: string) => {
 
       const json = await response.json();
       if (json.status !== 'OK') {
-        throw new Error(
-          `Google Maps API returned an error: ${json.error_message}`,
-        );
+        throw new Error(`Google Maps API returned an error: ${json.error_message}`);
       }
 
       setData(json.predictions);
       cache.current[cacheKey] = json.predictions;
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('An unknown error occurred'),
-      );
+      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
       setData([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedPredictions = useCallback(
     debounce(fetchPredictions, 200, {
       leading: true,

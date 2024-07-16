@@ -4,10 +4,7 @@ import { assign, createMachine } from 'xstate';
 import allAttributes from '../all-attributes';
 import isCountryUsOrTerritories from '../is-country-us-or-territories';
 import mergeUpdatedData from '../merge-data/merge-data';
-import {
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from '../missing-attributes';
+import { isMissingResidentialAttribute, isMissingSsnAttribute } from '../missing-attributes';
 import { NextTargetsFromRequirement, shouldShowSandbox } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -20,7 +17,6 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
@@ -66,12 +62,12 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             identified: [
               {
                 target: 'incompatibleRequirements',
-                cond: (context, event) => !!event.payload.userFound, // TODO: handle userFound cases later
+                cond: (_, event) => !!event.payload.userFound, // TODO: handle userFound cases later
               },
               {
                 target: 'phoneIdentification',
                 actions: ['assignIdentifyResult'],
-                cond: (context, event) =>
+                cond: (_, event) =>
                   !event.payload.userFound ||
                   !event.payload.availableChallengeKinds ||
                   event.payload.availableChallengeKinds.length === 0,
@@ -88,7 +84,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             identified: [
               {
                 target: 'incompatibleRequirements',
-                cond: (context, event) => !!event.payload.userFound, // TODO: handle userFound cases later
+                cond: (_, event) => !!event.payload.userFound, // TODO: handle userFound cases later
               },
               {
                 target: 'smsChallenge',
@@ -126,32 +122,18 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                 target: 'residentialAddress',
                 actions: ['assignKycData'],
                 cond: (context, event) => {
-                  const allData = mergeUpdatedData(
-                    context.kyc.kycData ?? {},
-                    event.payload,
-                  );
-                  return isMissingResidentialAttribute(
-                    allAttributes(context.kyc.requirement),
-                    allData,
-                    true,
-                  );
+                  const allData = mergeUpdatedData(context.kyc.kycData ?? {}, event.payload);
+                  return isMissingResidentialAttribute(allAttributes(context.kyc.requirement), allData, true);
                 },
               },
               {
                 target: 'ssn',
                 actions: ['assignKycData'],
                 cond: (context, event) => {
-                  const allData = mergeUpdatedData(
-                    context.kyc.kycData ?? {},
-                    event.payload,
-                  );
+                  const allData = mergeUpdatedData(context.kyc.kycData ?? {}, event.payload);
                   return (
                     isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      allAttributes(context.kyc.requirement),
-                      allData,
-                      true,
-                    )
+                    isMissingSsnAttribute(allAttributes(context.kyc.requirement), allData, true)
                   );
                 },
               },
@@ -169,17 +151,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                 target: 'ssn',
                 actions: ['assignKycData'],
                 cond: (context, event) => {
-                  const allData = mergeUpdatedData(
-                    context.kyc.kycData ?? {},
-                    event.payload,
-                  );
+                  const allData = mergeUpdatedData(context.kyc.kycData ?? {}, event.payload);
                   return (
                     isCountryUsOrTerritories(allData) &&
-                    isMissingSsnAttribute(
-                      allAttributes(context.kyc.requirement),
-                      allData,
-                      true,
-                    )
+                    isMissingSsnAttribute(allAttributes(context.kyc.requirement), allData, true)
                   );
                 },
               },
@@ -257,11 +232,8 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             hasSyncablePassKey,
             userFound,
           } = event.payload;
-          const isEmailChanged =
-            email && context.identify.identifyResult?.email !== email;
-          const isPhoneChanged =
-            phoneNumber &&
-            context.identify.identifyResult?.phoneNumber !== phoneNumber;
+          const isEmailChanged = email && context.identify.identifyResult?.email !== email;
+          const isPhoneChanged = phoneNumber && context.identify.identifyResult?.phoneNumber !== phoneNumber;
           if (isEmailChanged || isPhoneChanged) {
             context.identify.challengeData = undefined;
           }
@@ -271,8 +243,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
           }
           context.identify.identifyResult.userFound = userFound;
           context.identify.identifyResult.isUnverified = isUnverified;
-          context.identify.identifyResult.hasSyncablePassKey =
-            hasSyncablePassKey;
+          context.identify.identifyResult.hasSyncablePassKey = hasSyncablePassKey;
           if (email) {
             context.identify.identifyResult.email = email;
           }
@@ -280,12 +251,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             context.identify.identifyResult.phoneNumber = phoneNumber;
           }
           if (availableChallengeKinds) {
-            context.identify.identifyResult.availableChallengeKinds =
-              availableChallengeKinds;
+            context.identify.identifyResult.availableChallengeKinds = availableChallengeKinds;
           }
           if (successfulIdentifier) {
-            context.identify.identifyResult.successfulIdentifier =
-              successfulIdentifier;
+            context.identify.identifyResult.successfulIdentifier = successfulIdentifier;
           }
           return context;
         }),
@@ -302,10 +271,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
           return context;
         }),
         assignKycData: assign((context, event) => {
-          context.kyc.kycData = mergeUpdatedData(
-            context.kyc.kycData ?? {},
-            event.payload,
-          );
+          context.kyc.kycData = mergeUpdatedData(context.kyc.kycData ?? {}, event.payload);
           context.startedDataCollection = true;
           return context;
         }),

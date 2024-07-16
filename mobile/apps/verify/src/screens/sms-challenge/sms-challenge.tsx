@@ -1,9 +1,9 @@
 import {
   type ChallengeData,
+  ChallengeKind,
   type IdentifyVerifyResponse,
   type ObConfigAuth,
   type SignupChallengeResponse,
-  ChallengeKind,
 } from '@onefootprint/types';
 import { Box, PinInput, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -32,24 +32,16 @@ export type SmsChallengeProps = {
 };
 
 // TODO: implement loginChallengeMutation for user-found case
-const SmsChallenge = ({
-  identify,
-  onComplete,
-  obConfigAuth,
-  onChallengeReceived,
-  sandboxId,
-}: SmsChallengeProps) => {
+const SmsChallenge = ({ identify, onComplete, obConfigAuth, onChallengeReceived, sandboxId }: SmsChallengeProps) => {
   const { t } = useTranslation('pages.sms-challenge');
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const requestError = useRequestError();
   const signupChallengeMutation = useSignupChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
-  const { email, phoneNumber, successfulIdentifier } =
-    identify?.identifyResult || {};
+  const { email, phoneNumber, successfulIdentifier } = identify?.identifyResult || {};
   const data = identify?.challengeData;
-  const challengeData: ChallengeData | undefined =
-    data || signupChallengeMutation.data?.challengeData;
+  const challengeData: ChallengeData | undefined = data || signupChallengeMutation.data?.challengeData;
 
   const { isLoading } = signupChallengeMutation;
   const isPending = isLoading || !challengeData;
@@ -63,9 +55,7 @@ const SmsChallenge = ({
     challengeData,
   });
 
-  const handlePinValidationSucceeded = ({
-    authToken,
-  }: IdentifyVerifyResponse) => {
+  const handlePinValidationSucceeded = ({ authToken }: IdentifyVerifyResponse) => {
     if (!authToken) {
       return;
     }
@@ -141,9 +131,7 @@ const SmsChallenge = ({
         onSuccess: handleRequestChallengeSuccess,
         onError: (error: unknown) => {
           if (requestError.getErrorCode(error) === 'E120') {
-            console.error(
-              'Entered signup challenge when the user already has a vault. Initiating login challenge',
-            );
+            console.error('Entered signup challenge when the user already has a vault. Initiating login challenge');
             // TODO perform login challenge
             return;
           }
@@ -159,14 +147,11 @@ const SmsChallenge = ({
   };
 
   const getShouldRequestNewChallenge = () => {
-    const hasPreferredChallengeKind =
-      challengeData?.challengeKind === ChallengeKind.sms;
+    const hasPreferredChallengeKind = challengeData?.challengeKind === ChallengeKind.sms;
     if (!hasPreferredChallengeKind) {
       return true;
     }
-    const isRetryDisabled =
-      challengeData?.retryDisabledUntil &&
-      challengeData.retryDisabledUntil > new Date();
+    const isRetryDisabled = challengeData?.retryDisabledUntil && challengeData.retryDisabledUntil > new Date();
     if (isRetryDisabled) {
       return false;
     }
@@ -194,10 +179,7 @@ const SmsChallenge = ({
   // TODO: User can have option to choose a different method of verification
   return (
     <Box width="100%">
-      <Header
-        title={t('title')}
-        subtitle={t('subtitle', { scrubbedPhoneNumber })}
-      />
+      <Header title={t('title')} subtitle={t('subtitle', { scrubbedPhoneNumber })} />
       {shouldShowPinInput ? (
         <InputContainer>
           <PinInput

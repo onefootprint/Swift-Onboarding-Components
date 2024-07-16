@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import styled, { css } from 'styled-components/native';
 
@@ -14,13 +13,7 @@ export type SegmentedControlProps = BoxProps & {
   value: string;
 };
 
-const SegmentedControl = ({
-  'aria-label': ariaLabel,
-  onChange,
-  options,
-  value,
-  ...props
-}: SegmentedControlProps) => (
+const SegmentedControl = ({ 'aria-label': ariaLabel, onChange, options, value, ...props }: SegmentedControlProps) => (
   <Box flexDirection="row" {...props}>
     <SegmentedControlContainer aria-label={ariaLabel}>
       {options.map(({ value: optionValue, label, IconComponent }) => (

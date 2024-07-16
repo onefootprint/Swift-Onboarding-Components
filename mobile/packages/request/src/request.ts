@@ -30,8 +30,7 @@ const preservedKeys = [...DataIdentifierKeys];
 export const isFootprintError = (error: unknown): error is RequestError =>
   (error as RequestError)?.response?.data !== undefined;
 
-export const isUnhandledError = (error: unknown): error is Error =>
-  (error as Error)?.message !== undefined;
+export const isUnhandledError = (error: unknown): error is Error => (error as Error)?.message !== undefined;
 
 export const getErrorMessage = (error?: unknown | Error): string => {
   if (isFootprintError(error)) {
@@ -60,17 +59,13 @@ const getRequestOptions = async (requestConfig: AxiosRequestConfig) => {
   };
 };
 
-const request = async <Response = any>(
-  requestConfig: AxiosRequestConfig = {},
-) => {
+const request = async <Response = unknown>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create(), { preservedKeys });
   const options = await getRequestOptions(requestConfig); // Await the requestOptions
   return client.request<Response>(options);
 };
 
-export const requestWithoutCaseConverter = async <Response = unknown>(
-  requestConfig: AxiosRequestConfig = {},
-) => {
+export const requestWithoutCaseConverter = async <Response = unknown>(requestConfig: AxiosRequestConfig = {}) => {
   const clientWithCaseApplied = axios.create();
   const options = await getRequestOptions(requestConfig);
   return clientWithCaseApplied.request<Response>(options);

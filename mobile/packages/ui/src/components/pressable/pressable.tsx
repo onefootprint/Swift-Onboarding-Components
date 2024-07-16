@@ -11,14 +11,7 @@ export type PressableProps = {
   style?: ViewStyle;
 };
 
-const Pressable = ({
-  children,
-  disabled = false,
-  onPress,
-  onPressIn,
-  onPressOut,
-  style = {},
-}: PressableProps) => {
+const Pressable = ({ children, disabled = false, onPress, onPressIn, onPressOut, style = {} }: PressableProps) => {
   const handlePress = (event: GestureResponderEvent) => {
     onPress?.(event);
   };

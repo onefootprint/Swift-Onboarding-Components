@@ -31,9 +31,7 @@ const LinkButton = ({
   variant = 'default',
 }: LinkButtonProps) => {
   const [active, setActive] = useState(false);
-  const renderedIcon = Icon && (
-    <Icon color={variant === 'default' ? 'accent' : 'error'} />
-  );
+  const renderedIcon = Icon && <Icon color={variant === 'default' ? 'accent' : 'error'} />;
 
   return (
     <StyledPressable
@@ -45,12 +43,7 @@ const LinkButton = ({
       size={size}
     >
       {iconPosition === 'left' && renderedIcon}
-      <LinkButtonText
-        variant={variant}
-        size={size}
-        active={active}
-        disabled={disabled}
-      >
+      <LinkButtonText variant={variant} size={size} active={active} disabled={disabled}>
         {children}
       </LinkButtonText>
       {iconPosition === 'right' && renderedIcon}

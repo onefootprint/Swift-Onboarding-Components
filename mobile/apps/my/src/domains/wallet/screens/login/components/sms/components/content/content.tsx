@@ -1,10 +1,4 @@
-import {
-  Box,
-  DismissKeyboard,
-  LinkButton,
-  PinInput,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, DismissKeyboard, LinkButton, PinInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
@@ -16,20 +10,13 @@ import useVerifyChallenge from './hooks/use-verify-challenge';
 type ContentProps = {
   isApple: boolean;
   challengeToken: string;
-  onSuccess: (authToken) => void;
+  onSuccess: (authToken: string) => void;
   phoneNumber: string;
 };
 
-const Content = ({
-  isApple,
-  challengeToken,
-  onSuccess,
-  phoneNumber,
-}: ContentProps) => {
+const Content = ({ isApple, challengeToken, onSuccess, phoneNumber }: ContentProps) => {
   const { t } = useTranslation('screens.login.sms');
   const { isLoading, isSuccess, mutate } = useVerifyChallenge();
-
-  const handleResend = () => {};
 
   const handleComplete = (pin: string) => {
     mutate(
@@ -60,7 +47,7 @@ const Content = ({
       </Box>
       <Box gap={7}>
         <PinInput onComplete={handleComplete} autoFocus />
-        <LinkButton onPress={handleResend}>{t('cta')}</LinkButton>
+        <LinkButton>{t('cta')}</LinkButton>
       </Box>
     </DismissKeyboard>
   );

@@ -15,11 +15,7 @@ const Item = ({ onPress, subtitle, title }: ItemProps) => {
   const [active, setActive] = useState(false);
 
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={() => setActive(true)}
-      onPressOut={() => setActive(false)}
-    >
+    <Pressable onPress={onPress} onPressIn={() => setActive(true)} onPressOut={() => setActive(false)}>
       <ItemContainer active={active}>
         <Box gap={2}>
           <Title variant="label-3">{title}</Title>

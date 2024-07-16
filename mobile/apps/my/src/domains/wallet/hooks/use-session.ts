@@ -52,11 +52,7 @@ const useSession = () => {
   const isLoggedIn = !!data;
   const authHeaders = { [AUTH_HEADER]: data?.authToken };
 
-  const logIn = async (
-    challengeKind: ChallengeKind,
-    authToken: string,
-    isApple: boolean,
-  ) => {
+  const logIn = async (challengeKind: ChallengeKind, authToken: string, isApple: boolean) => {
     update({ challengeKind, authToken, isApple });
   };
 

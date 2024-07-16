@@ -5,13 +5,7 @@ import { Platform } from 'react-native';
 
 import { AUTH_HEADER } from '@/config/constants';
 
-const uploadDoc = async ({
-  authToken,
-  data,
-  docId,
-  meta,
-  side,
-}: UploadDocRequest) => {
+const uploadDoc = async ({ authToken, data, docId, meta, side }: UploadDocRequest) => {
   const response = await request<UploadDocResponse>({
     method: 'POST',
     url: `/hosted/documents/${docId}/upload/${side}`,

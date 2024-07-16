@@ -9,13 +9,12 @@
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "dev": "tsup --watch",
-    "lint:ci": "eslint src",
-    "lint": "eslint src --fix",
+    "lint:ci": "biome ci src",
+    "lint": "biome check src --fix",
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@onefootprint/types": "*",
-    "eslint-config-footprint": "*",
     "tsconfig": "*",
     "typescript": "^5.5.2"
   }

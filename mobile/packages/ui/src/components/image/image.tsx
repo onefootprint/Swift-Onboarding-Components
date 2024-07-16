@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type { Ref } from 'react';
 import React, { forwardRef, useState } from 'react';
 import type { ImageProps as RNImageProps } from 'react-native';
@@ -33,9 +32,7 @@ const Image = forwardRef<RNImage, ImageProps>((props, ref) => {
 
 const StyledImage = styled(RNImage)<{ loaded: boolean }>`
   ${({ theme, loaded }) => css`
-    background-color: ${loaded
-      ? theme.backgroundColor.tertiary
-      : theme.backgroundColor.secondary};
+    background-color: ${loaded ? theme.backgroundColor.tertiary : theme.backgroundColor.secondary};
   `}
 `;
 

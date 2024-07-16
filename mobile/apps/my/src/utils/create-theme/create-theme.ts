@@ -17,9 +17,10 @@ const mutateTheme = (options: {
 
 const iterateOverVariables = (options: {
   theme: Theme;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   variables: Record<string, any>;
   tokenName: string;
-  tokenValue: any;
+  tokenValue: string;
 }) => {
   let { theme } = options;
   const { variables, tokenName, tokenValue } = options;
@@ -49,10 +50,7 @@ const iterateOverVariables = (options: {
   return theme;
 };
 
-export const createTokens = (
-  baseTheme: Theme,
-  variables: FootprintAppearanceVariables,
-): Theme => {
+export const createTokens = (baseTheme: Theme, variables: FootprintAppearanceVariables): Theme => {
   if (!variables || Object.keys(variables).length === 0) return baseTheme;
   return Object.entries(variables).reduce((theme, [tokenName, tokenValue]) => {
     return iterateOverVariables({ theme, variables, tokenName, tokenValue });

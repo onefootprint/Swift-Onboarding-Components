@@ -1,16 +1,10 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoBuilding24 } from '@onefootprint/icons';
-import type {
-  CollectKycDataRequirement,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '@/components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '@/components/confirm-collected-data';
 import { Section, SectionItem } from '@/components/confirm-collected-data';
 import useTranslation from '@/hooks/use-translation';
 import ResidentialAddress from '@/screens/residential-address';
@@ -26,13 +20,7 @@ type BasicInfoSectionProps = {
   onConfirm: (data: KycData) => void;
 };
 
-const AddressSection = ({
-  data,
-  onConfirm,
-  requirement,
-  authToken,
-  config,
-}: BasicInfoSectionProps) => {
+const AddressSection = ({ data, onConfirm, requirement, authToken, config }: BasicInfoSectionProps) => {
   const { t, allT } = useTranslation('pages.confirm');
 
   const address = [];
@@ -44,14 +32,7 @@ const AddressSection = ({
   const zip = data[IdDI.zip]?.value;
   const [editing, setEditing] = useState(false);
 
-  if (
-    !addressLine1 &&
-    !addressLine2 &&
-    !city &&
-    !stateName &&
-    !country &&
-    !zip
-  ) {
+  if (!addressLine1 && !addressLine2 && !city && !stateName && !country && !zip) {
     return null;
   }
 
@@ -61,16 +42,9 @@ const AddressSection = ({
     textColor: 'primary' as Color,
   });
 
-  const addressItem = address.map(
-    ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
-    ),
-  );
+  const addressItem = address.map(({ text, subtext, textColor }: SectionItemProps) => (
+    <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+  ));
 
   const handleComplete = (kycData: KycData) => {
     onConfirm(kycData);

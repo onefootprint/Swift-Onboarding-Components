@@ -1,9 +1,4 @@
-import type {
-  CountryCode,
-  IdDocRequirement,
-  SupportedIdDocTypes,
-  UploadDocumentSide,
-} from '@onefootprint/types';
+import type { CountryCode, IdDocRequirement, SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 
 export type MachineContext = {
   requirement?: IdDocRequirement;

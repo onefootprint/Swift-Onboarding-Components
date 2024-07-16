@@ -16,12 +16,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates:
-    | 'canceled'
-    | 'completed'
-    | 'error'
-    | 'expired'
-    | 'init'
-    | 'requirements';
+  matchesStates: 'canceled' | 'completed' | 'error' | 'expired' | 'init' | 'requirements';
   tags: never;
 }

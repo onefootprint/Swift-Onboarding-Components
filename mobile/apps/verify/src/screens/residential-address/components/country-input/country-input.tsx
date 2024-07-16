@@ -9,31 +9,22 @@ import useTranslation from '@/hooks/use-translation';
 import type { FormData } from '../../types';
 
 type CountryInputProps = {
-  control: Control<FormData, any>;
+  control: Control<FormData, unknown>;
   supportedCountries?: CountryCode[];
   onCountryChange: () => void;
 };
 
-const CountryInput = ({
-  control,
-  supportedCountries,
-  onCountryChange,
-}: CountryInputProps) => {
+const CountryInput = ({ control, supportedCountries, onCountryChange }: CountryInputProps) => {
   const { t } = useTranslation('pages.residential-address');
   const allowedCountries = new Set(supportedCountries);
   const shouldDisableCountry = allowedCountries.size === 1;
-  const countryOptions = COUNTRIES.filter(entry =>
-    allowedCountries.has(entry.value),
-  );
+  const countryOptions = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
   // TODO: We need to update l10n using locale on country change
 
   return (
     <Controller
       control={control}
-      render={({
-        field: { onChange, onBlur, value },
-        fieldState: { error },
-      }) => {
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => {
         return (
           <CountrySelect
             hasError={!!error}

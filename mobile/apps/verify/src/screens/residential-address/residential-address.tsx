@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import type {
-  CollectKycDataRequirement,
-  CountryCode,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
 import type { AddressPrediction, SelectRef } from '@onefootprint/ui';
 import { Box } from '@onefootprint/ui';
@@ -70,11 +66,7 @@ const ResidentialAddress = ({
   let defaultCountry: CountryCode | undefined;
   if (countryFromContext && isCountryCode(countryFromContext)) {
     defaultCountry = countryFromContext;
-  } else if (
-    config.allowInternationalResidents &&
-    config.supportedCountries &&
-    config.supportedCountries.length > 0
-  ) {
+  } else if (config.allowInternationalResidents && config.supportedCountries && config.supportedCountries.length > 0) {
     [defaultCountry] = config.supportedCountries;
   }
 
@@ -83,9 +75,7 @@ const ResidentialAddress = ({
       label: z.string().min(1, { message: t('form.country.errors.required') }),
       value: z.string().min(1, { message: t('form.country.errors.required') }),
     }),
-    addressLine1: z
-      .string()
-      .min(1, { message: t('form.address-line1.errors.required') }),
+    addressLine1: z.string().min(1, { message: t('form.address-line1.errors.required') }),
     addressLine2: z.optional(z.string()),
     city: z.string().min(1, { message: t('form.city.errors.required') }),
     // TODO:
@@ -102,15 +92,7 @@ const ResidentialAddress = ({
       })
       .or(z.string().min(1, { message: t('form.state.errors.required') })),
   });
-  const {
-    control,
-    setValue,
-    watch,
-    handleSubmit,
-    resetField,
-    setFocus,
-    setError,
-  } = useForm<FormData>({
+  const { control, setValue, watch, handleSubmit, resetField, setFocus, setError } = useForm<FormData>({
     defaultValues: {
       addressLine1: kycData[IdDI.addressLine1]?.value,
       addressLine2: kycData[IdDI.addressLine2]?.value,
@@ -171,9 +153,7 @@ const ResidentialAddress = ({
       }
       if (result.state) {
         if (country.value === 'US') {
-          const possibleState = states.find(
-            stateOption => stateOption.label === result.state,
-          );
+          const possibleState = states.find(stateOption => stateOption.label === result.state);
           if (possibleState) {
             setValue('state', possibleState);
           }
@@ -217,23 +197,11 @@ const ResidentialAddress = ({
           addressLine2Ref={addressLine2Ref}
         />
         <Row>
-          <CityInput
-            control={control}
-            currInputRef={cityRef}
-            nextInputRef={zipRef}
-          />
-          <ZipInput
-            control={control}
-            currInputRef={zipRef}
-            nextInputRef={stateRef}
-          />
+          <CityInput control={control} currInputRef={cityRef} nextInputRef={zipRef} />
+          <ZipInput control={control} currInputRef={zipRef} nextInputRef={stateRef} />
         </Row>
         <StateInput control={control} stateRef={stateRef} country={country} />
-        <DataCollectionActionButton
-          onComplete={handleSubmit(onSubmit)}
-          isLoading={isLoading}
-          onCancel={onCancel}
-        />
+        <DataCollectionActionButton onComplete={handleSubmit(onSubmit)} isLoading={isLoading} onCancel={onCancel} />
       </Box>
     </Box>
   );

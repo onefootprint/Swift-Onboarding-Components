@@ -22,10 +22,7 @@ export type SelectProps<T extends BaseOption = BaseOption<string>> = {
   onFocus?: () => void;
   options?: SelectOption<T>[];
   placeholder?: string;
-  renderTrigger?: (
-    placeholder: string,
-    selectedOption?: SelectOption<T>,
-  ) => React.ReactNode;
+  renderTrigger?: (placeholder: string, selectedOption?: SelectOption<T>) => React.ReactNode;
   searchInputProps?: TextInputProps;
   searchTitle?: string;
   value?: SelectOption<T>;
@@ -107,9 +104,7 @@ const Select = <T extends BaseOption = BaseOption<string>>(
           {renderTrigger ? (
             renderTrigger(placeholder, value)
           ) : (
-            <Typography variant="body-4">
-              {selectedValueText || placeholder}
-            </Typography>
+            <Typography variant="body-4">{selectedValueText || placeholder}</Typography>
           )}
           <IcoChevronDown16 />
         </Box>
@@ -134,8 +129,6 @@ const Select = <T extends BaseOption = BaseOption<string>>(
   );
 };
 
-export default forwardRef(Select) as <
-  T extends BaseOption = BaseOption<string>,
->(
+export default forwardRef(Select) as <T extends BaseOption = BaseOption<string>>(
   props: SelectProps<T> & React.RefAttributes<SelectRef>,
 ) => JSX.Element;

@@ -45,7 +45,6 @@ const useCountdown = (
       onCompleted?.();
       clearCounter();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown, disabled]);
 
   const setSeconds = (seconds: number) => {

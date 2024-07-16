@@ -1,12 +1,4 @@
-import type {
-  Button,
-  Dropdown,
-  Hint,
-  Input,
-  Label,
-  LinkButton,
-  RadioSelect,
-} from './components';
+import type { Button, Dropdown, Hint, Input, Label, LinkButton, RadioSelect } from './components';
 
 export type UIStates = {
   accent: string;

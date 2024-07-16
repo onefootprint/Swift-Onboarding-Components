@@ -3,7 +3,7 @@ import React from 'react';
 
 import Canceled from '../canceled';
 import Completed from '../completed';
-import Error from '../error';
+import ErrorComponent from '../error';
 import Expired from '../expired';
 import Init from '../init';
 import Requirements from '../requirements';
@@ -39,12 +39,9 @@ const Router = ({ authToken }: RouterProps) => {
         />
       )}
       {state.matches('requirements') && (
-        <Requirements
-          authToken={authToken}
-          onDone={() => send({ type: 'requirementsCompleted' })}
-        />
+        <Requirements authToken={authToken} onDone={() => send({ type: 'requirementsCompleted' })} />
       )}
-      {state.matches('error') && <Error />}
+      {state.matches('error') && <ErrorComponent />}
       {state.matches('canceled') && <Canceled />}
       {state.matches('expired') && <Expired />}
       {state.matches('completed') && <Completed authToken={authToken} />}

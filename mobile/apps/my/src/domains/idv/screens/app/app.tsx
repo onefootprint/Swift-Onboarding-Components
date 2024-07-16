@@ -8,7 +8,7 @@ import configureReactI18next from '@/config/initializers/react-i18next';
 import createTheme from '@/utils/create-theme';
 
 import AppContext from '../../components/app-context';
-import Error from '../error';
+import ErrorComponent from '../error';
 import Router from '../router';
 import useAuthToken from './hooks/use-auth-token';
 import useHandoffMeta from './hooks/use-handoff-meta';
@@ -34,7 +34,7 @@ const App = ({ linkingUrl, onLoad }: AppProps) => {
       <I18nextProvider i18n={configureReactI18next(language)}>
         <DesignSystemProvider theme={themes.light}>
           <Container onLayout={onLoad}>
-            <Error />
+            <ErrorComponent />
           </Container>
         </DesignSystemProvider>
       </I18nextProvider>
