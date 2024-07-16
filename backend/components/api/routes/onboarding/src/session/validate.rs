@@ -17,6 +17,7 @@ use api_wire_types::ValidateRequest;
 use api_wire_types::ValidateResponse;
 use db::models::auth_event::AuthEvent;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
@@ -60,7 +61,8 @@ pub async fn post(
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
                 let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
-                let user_mrs = ManualReview::get_active(conn, &sv.id)?;
+                let mr_filters = ManualReviewFilters::get_active();
+                let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
                 let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if obc.kind == ObConfigurationKind::Kyb {
                     let id = WorkflowIdentifier::BusinessOwner {
@@ -69,7 +71,7 @@ pub async fn post(
                         is_business: (),
                     };
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
-                    let biz_mrs = ManualReview::get_active(conn, &biz_sv.id)?;
+                    let biz_mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;
                     Some((biz_sv, biz_wf, biz_mrs, obc.clone()))
                 } else {
                     None

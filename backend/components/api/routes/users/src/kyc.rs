@@ -29,6 +29,7 @@ use api_wire_types::SimpleFixtureResult;
 use api_wire_types::TriggerKycRequest;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
@@ -205,7 +206,8 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
-            let mrs = ManualReview::get_active(conn, &sv.id)?;
+            let mr_filters = ManualReviewFilters::get_active();
+            let mrs = ManualReview::get(conn, &sv.id, mr_filters)?;
             Ok((wf, sv, mrs))
         })
         .await?;

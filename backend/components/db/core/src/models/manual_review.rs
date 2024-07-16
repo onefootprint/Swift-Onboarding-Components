@@ -87,7 +87,8 @@ impl ManualReview {
         decision: &OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
     ) -> DbResult<ManualReviewDelta> {
-        let existing_mrs = Self::get_active(conn, &workflow.scoped_vault_id)?;
+        let filters = ManualReviewFilters::get_active();
+        let existing_mrs = Self::get(conn, &workflow.scoped_vault_id, filters)?;
         let old_has_mrs = !existing_mrs.is_empty();
         for ManualReviewArgs { kind, action } in mrs {
             let existing = existing_mrs.iter().find(|mr| mr.kind == kind);
@@ -129,7 +130,8 @@ impl ManualReview {
                 }
             }
         }
-        let new_has_mrs = !Self::get_active(conn, &workflow.scoped_vault_id)?.is_empty();
+        let filters = ManualReviewFilters::get_active();
+        let new_has_mrs = !Self::get(conn, &workflow.scoped_vault_id, filters)?.is_empty();
         let result = ManualReviewDelta {
             old_has_mrs,
             new_has_mrs,
@@ -137,20 +139,54 @@ impl ManualReview {
         Ok(result)
     }
 
-    #[tracing::instrument("ManualReview::get_active", skip_all)]
-    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
-        let results = manual_review::table
-            .filter(manual_review::completed_at.is_null())
-            .filter(manual_review::scoped_vault_id.eq(sv_id))
-            .get_results(conn)?;
-        Ok(results)
-    }
-
     #[tracing::instrument("ManualReview::get", skip_all)]
-    pub fn list_cleared_by(conn: &mut PgConn, id: &OnboardingDecisionId) -> DbResult<Vec<Self>> {
-        let results = manual_review::table
-            .filter(manual_review::completed_by_decision_id.eq(id))
-            .get_results(conn)?;
-        Ok(results)
+    pub fn get<'a, T: Into<ManualReviewIdentifier<'a>>>(
+        conn: &mut PgConn,
+        id: T,
+        filters: ManualReviewFilters,
+    ) -> DbResult<Vec<Self>> {
+        let mut query = manual_review::table.into_boxed();
+
+        match id.into() {
+            ManualReviewIdentifier::WorkflowId(wf_id) => {
+                query = query.filter(manual_review::workflow_id.eq(wf_id))
+            }
+            ManualReviewIdentifier::ScopedVaultId(sv_id) => {
+                query = query.filter(manual_review::scoped_vault_id.eq(sv_id))
+            }
+        }
+
+        if filters.only_active {
+            query = query.filter(manual_review::completed_at.is_null())
+        }
+
+        if let Some(kinds) = filters.kinds {
+            query = query.filter(manual_review::kind.eq_any(kinds))
+        }
+
+        let res = query.get_results(conn)?;
+
+        Ok(res)
     }
+}
+
+#[derive(Clone)]
+pub struct ManualReviewFilters {
+    pub only_active: bool,
+    pub kinds: Option<Vec<ManualReviewKind>>,
+}
+
+impl ManualReviewFilters {
+    pub fn get_active() -> Self {
+        Self {
+            only_active: true,
+            kinds: None,
+        }
+    }
+}
+
+#[derive(derive_more::From)]
+pub enum ManualReviewIdentifier<'a> {
+    WorkflowId(&'a WorkflowId),
+    ScopedVaultId(&'a ScopedVaultId),
 }

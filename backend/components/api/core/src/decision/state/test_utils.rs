@@ -19,6 +19,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::AtSeqno;
@@ -225,7 +226,8 @@ pub async fn query_data(
 
             let wf = Workflow::get(conn, &wfid)?;
             let obd = OnboardingDecision::get_active(conn, &wfid)?;
-            let mrs = ManualReview::get_active(conn, &svid)?;
+            let mr_filters = ManualReviewFilters::get_active();
+            let mrs = ManualReview::get(conn, &svid, mr_filters)?;
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
 
             Ok((wf, wfe, mrs, obd, rs))

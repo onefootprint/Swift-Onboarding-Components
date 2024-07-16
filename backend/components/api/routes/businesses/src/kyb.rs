@@ -21,6 +21,7 @@ use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::OnboardingWorkflowArgs;
@@ -168,7 +169,8 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf.id)?;
-            let mrs = ManualReview::get_active(conn, &biz_sv.id)?;
+            let mr_filters = ManualReviewFilters::get_active();
+            let mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;
             Ok((biz_wf, biz_sv, mrs))
         })
         .await?;

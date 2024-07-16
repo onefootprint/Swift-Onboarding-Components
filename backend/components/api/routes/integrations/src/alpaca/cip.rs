@@ -41,6 +41,7 @@ use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::OnboardingDecisionFilters;
@@ -67,6 +68,7 @@ use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::IdDocKind;
 use newtypes::IdentityDataKind;
+use newtypes::ManualReviewKind;
 use newtypes::MatchLevel;
 use newtypes::OcrDataKind;
 use newtypes::PiiJsonValue;
@@ -248,6 +250,7 @@ pub(crate) async fn create_cip_request(
             let filters = OnboardingDecisionFilters {
                 made_by_footprint: Some(true),
             };
+            // Get the most recent FP decision
             let (mut decisions, _) =
                 OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
             let (fp_obd, _, _) = decisions.pop().ok_or(CipError::EntityDecisionDoesNotExist)?;
@@ -262,6 +265,19 @@ pub(crate) async fn create_cip_request(
             let (mr, manual_obd, annotation) = match fp_obd.status {
                 DecisionStatus::Pass => (None, None, None),
                 DecisionStatus::Fail | DecisionStatus::StepUp | DecisionStatus::None => {
+                    // Get the MR associated with FPs initial decision
+                    let mr_filters = ManualReviewFilters {
+                        only_active: false,
+                        kinds: Some(vec![ManualReviewKind::RuleTriggered]),
+                    };
+                    let mrs = ManualReview::get(conn, &wf.id, mr_filters)?;
+                    // take the one with longest review reasons, although in practice this will just be 1
+                    // review
+                    let mr = mrs
+                        .into_iter()
+                        .sorted_by_key(|mr| mr.review_reasons.len())
+                        .next_back();
+
                     // footprint did not decide to pass, see if a manual decision override exists
                     let filters = OnboardingDecisionFilters {
                         made_by_footprint: Some(false),
@@ -269,17 +285,14 @@ pub(crate) async fn create_cip_request(
                     let (mut decisions, _) =
                         OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
                     let (obd_manual, _, _) = decisions.pop().ok_or(CipError::EntityDecisionStatusNotPass)?;
-                    let mrs = ManualReview::list_cleared_by(conn, &obd_manual.id)?;
-                    // The alpaca CIP only cares about the MR that has review reasons, not document reviews
-                    let mr = mrs
-                        .into_iter()
-                        .sorted_by_key(|mr| mr.review_reasons.len())
-                        .next_back();
-                    let annotation = Annotation::get_for_obd(conn, &obd_manual.id)?;
 
                     if obd_manual.status != DecisionStatus::Pass {
                         return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                     }
+
+                    // randomly take the latest review annotation, hoping this is the one that is most like
+                    // "good to go"
+                    let annotation = Annotation::get_for_obd(conn, &obd_manual.id)?;
 
                     (mr, Some(obd_manual), annotation)
                 }

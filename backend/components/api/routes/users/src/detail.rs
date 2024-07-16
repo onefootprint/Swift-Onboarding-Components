@@ -7,6 +7,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use db::models::manual_review::ManualReview;
+use db::models::manual_review::ManualReviewFilters;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
 use paperclip::actix::api_v2_operation;
@@ -32,7 +33,8 @@ pub async fn detail(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let mrs = ManualReview::get_active(conn, &sv.id)?;
+            let mr_filters = ManualReviewFilters::get_active();
+            let mrs = ManualReview::get(conn, &sv.id, mr_filters)?;
             let wfr = WorkflowRequest::get_active(conn, &sv.id)?;
             Ok((sv, mrs, wfr))
         })
