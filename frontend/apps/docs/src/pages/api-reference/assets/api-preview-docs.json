@@ -1047,48 +1047,6 @@
                     }
                 ]
             }
-        },
-        "/vault_proxy/reflect": {
-            "post": {
-                "tags": [
-                    "VaultProxy",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nDecrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
-                "parameters": [
-                    {
-                        "in": "header",
-                        "name": "x-fp-id",
-                        "description": "When reflect requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "header",
-                        "name": "x-fp-access-reason",
-                        "description": "Access reason for any decryption operations during the reflection request",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "description": "Raw body",
-                    "content": {
-                        "application/json": {}
-                    },
-                    "required": true
-                },
-                "responses": {},
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
         }
     },
     "components": {

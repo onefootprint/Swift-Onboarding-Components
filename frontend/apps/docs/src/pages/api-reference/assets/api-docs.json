@@ -1713,6 +1713,48 @@
                 ]
             }
         },
+        "/vault_proxy/reflect": {
+            "post": {
+                "tags": [
+                    "VaultProxy",
+                    "PublicApi"
+                ],
+                "description": "Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy. Tokens use the same syntax as the vault proxy. More information on vault proxy tokens can be found [here](https://docs.onefootprint.com/vault/proxy#basics-token-body-template-format).",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-id",
+                        "description": "When reflect requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-access-reason",
+                        "description": "Access reason for any decryption operations during the reflection request",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Raw body",
+                    "content": {
+                        "application/json": {}
+                    },
+                    "required": true
+                },
+                "responses": {},
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/vault_proxy/{id}": {
             "post": {
                 "tags": [
