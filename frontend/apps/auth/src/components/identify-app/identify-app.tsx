@@ -48,7 +48,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const [device, setDevice] = useState<DeviceInfo>();
 
   useDeviceInfo(
-    info => {
+    (info: DeviceInfo) => {
       setDevice(info);
       logInfo(`Webauthn support:${info.hasSupportForWebauthn}`, info);
     },
@@ -92,7 +92,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
           { authToken: args.authToken },
           {
             onError: onValidationTokenError,
-            onSuccess: validationToken => {
+            onSuccess: ({ validationToken }) => {
               fpProvider.send(completed, validationToken);
               fpProvider.send(closed);
             },
@@ -115,7 +115,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
         });
       },
     }),
-    [], // eslint-disable-line react-hooks/exhaustive-deps
+    [],
   );
 
   const { authToken, options = voidObj, publicKey } = props || voidObj;
