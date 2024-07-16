@@ -50,7 +50,6 @@ export function NeonDBOutput(
     readOnlyDatabaseUrl: pulumi.secret(neonDb.databaseUrl),
     databaseUrlSecretName: dbSecretName,
     databaseUrlSecretParam,
-    databaseUrlRoSecretParam: databaseUrlSecretParam,
     db: undefined,
     instances: [],
   };

@@ -66,7 +66,7 @@ async fn status(state: web::Data<State>) -> StringResponse {
     let after_enclave = chrono::Utc::now().timestamp_millis();
 
     let before_db = chrono::Utc::now().timestamp_millis();
-    state.db_pool.db_query(db::health_check).await?;
+    db::health_check(&state.db_pool).await?;
     let after_db = chrono::Utc::now().timestamp_millis();
 
     Ok(format!(
@@ -74,17 +74,6 @@ async fn status(state: web::Data<State>) -> StringResponse {
         after_enclave - before_enclave,
         after_db - before_db,
     ))
-}
-
-#[api_v2_operation(tags(Private), description = "Performs health check to the RO database")]
-#[tracing::instrument(name = "status", skip(state))]
-#[get("/ro_status")]
-async fn ro_status(state: web::Data<State>) -> StringResponse {
-    let before_db = chrono::Utc::now().timestamp_millis();
-    db::ro_health_check(&state.config.database_ro_url)?;
-    let after_db = chrono::Utc::now().timestamp_millis();
-
-    Ok(format!("RO DB: healthy RT {}ms", after_db - before_db,))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]

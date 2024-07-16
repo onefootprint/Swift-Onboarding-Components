@@ -13,7 +13,6 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(health::handler)
         .service(health::status)
         .service(health::status2)
-        .service(health::ro_status)
         .service(health::enclave)
         .service(health::enclave_decrypt)
         .service(health::fail_handler);

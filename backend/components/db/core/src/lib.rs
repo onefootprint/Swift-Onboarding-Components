@@ -211,7 +211,7 @@ pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> Result<
 }
 
 #[tracing::instrument(skip_all)]
-pub fn run_migrations(url: &str) -> DbResult<()> {
+pub fn run_migrations(url: &str) -> Result<(), DbError> {
     use crate::diesel_migrations::MigrationHarness;
     let mut conn = DieselPgConnection::establish(url)?;
     log::info!("Running migrations");
@@ -226,14 +226,10 @@ pub fn run_migrations(url: &str) -> DbResult<()> {
     Ok(())
 }
 
-pub fn health_check(conn: &mut PgConn) -> DbResult<()> {
-    diesel::sql_query("SELECT 1").execute(conn)?;
-    Ok(())
-}
+pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
+    pool.db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn).map_err(DbError::from))
+        .await?;
 
-pub fn ro_health_check(ro_url: &str) -> DbResult<()> {
-    let mut conn = PgConn::establish(ro_url)?;
-    health_check(&mut conn)?;
     Ok(())
 }
 

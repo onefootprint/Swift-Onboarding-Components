@@ -46,9 +46,6 @@ pub struct Config {
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
 
-    #[envconfig(from = "DATABASE_RO_URL")]
-    pub database_ro_url: String,
-
     #[envconfig(from = "DATABASE_STATEMENT_TIMEOUT_SEC", default = "70")]
     pub database_statement_timeout_sec: u64,
 
