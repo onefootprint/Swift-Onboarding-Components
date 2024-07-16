@@ -1,5 +1,5 @@
 use newtypes::PiiJsonValue;
-use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiVendorResponse;
 use newtypes::UsStateAndTerritories;
 use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
@@ -29,11 +29,11 @@ where
         }
     }
 
-    pub fn scrub(&self) -> Result<ScrubbedPiiJsonValue, error::Error> {
+    pub fn scrub(&self) -> Result<ScrubbedPiiVendorResponse, error::Error> {
         let res = match self {
-            SambaAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
+            SambaAPIResult::Success(s) => ScrubbedPiiVendorResponse::new(s),
             // If we have an unhandled error, there's no T to serialize
-            SambaAPIResult::Error(_) => ScrubbedPiiJsonValue::scrub(serde_json::json!({})),
+            SambaAPIResult::Error(_) => ScrubbedPiiVendorResponse::new(serde_json::json!({})),
         }?;
 
         Ok(res)

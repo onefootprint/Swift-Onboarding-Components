@@ -187,34 +187,18 @@ impl TryFrom<PiiBytes> for PiiJsonValue {
     }
 }
 
-#[derive(Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct ScrubbedPiiJsonValue(serde_json::Value);
-impl ScrubbedPiiJsonValue {
-    pub fn scrub<T: serde::Serialize>(s: T) -> Result<Self, serde_json::Error> {
-        let val = serde_json::to_value(s)?;
-        Ok(Self(val))
-    }
 
-    pub fn inner(self) -> serde_json::Value {
-        self.0
-    }
-}
-
-impl From<ScrubbedPiiJsonValue> for serde_json::Value {
-    fn from(v: ScrubbedPiiJsonValue) -> Self {
-        v.0
-    }
-}
-
-impl From<serde_json::Value> for ScrubbedPiiJsonValue {
-    fn from(v: serde_json::Value) -> Self {
-        Self(v)
-    }
-}
+/// This struct is used to scrub a PiiJsonValue
+#[derive(Clone, serde::Serialize, serde::Deserialize, Default, derive_more::Deref, PartialEq, Eq)]
+pub struct ScrubbedPiiJsonValue(
+    #[serde(serialize_with = "scrub_pii_value")]
+    #[deref]
+    PiiJsonValue,
+);
 
 impl From<ScrubbedPiiJsonValue> for PiiJsonValue {
     fn from(s: ScrubbedPiiJsonValue) -> Self {
-        Self(s.0)
+        s.0
     }
 }
 
@@ -223,5 +207,44 @@ impl Debug for ScrubbedPiiJsonValue {
         f.debug_struct("ScrubbedPiiJsonValue")
             .field("data", &"<redacted>")
             .finish()
+    }
+}
+
+fn scrub_pii_value<S>(_v: &PiiJsonValue, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    s.serialize_str("<SCRUBBED Value>")
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Deserialize, Serialize, Debug)]
+    pub struct SomeVendorResponse {
+        pub pii: ScrubbedPiiJsonValue,
+    }
+
+    #[test]
+    fn test_scrubbed_pii_json_value() {
+        let raw = serde_json::json!({
+            "pii": "SSN 12345"
+        });
+        let deserialized: SomeVendorResponse = serde_json::from_value(raw).unwrap();
+
+        assert_eq!(
+            "SomeVendorResponse { pii: ScrubbedPiiJsonValue { data: \"<redacted>\" } }",
+            format!("{:?}", deserialized)
+        );
+
+        let reserialized = serde_json::to_value(&deserialized).unwrap();
+        assert_eq!(
+            serde_json::json!({
+                "pii": "<SCRUBBED Value>"
+            }),
+            reserialized
+        );
     }
 }

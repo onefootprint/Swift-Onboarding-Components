@@ -1,8 +1,7 @@
 use chrono::DateTime;
 use chrono::Utc;
 use itertools::Itertools;
-use newtypes::scrub_pii_value;
-use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiJsonValue;
 use newtypes::ScrubbedPiiString;
 use serde::Deserialize;
 use serde::Serialize;
@@ -32,13 +31,12 @@ pub struct BusinessResponse {
     pub policy_results: Option<Vec<PolicyResult>>,
     pub documents: Option<Vec<Document>>,
     pub subscription: Option<Subscription>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub bankruptcies: Option<PiiJsonValue>, /* This is a premium feature we aren't using, and the schema
-                                             * is also not really specified by Middesk */
+    pub bankruptcies: Option<ScrubbedPiiJsonValue>, /* This is a premium feature we aren't using, and the
+                                                     * schema
+                                                     * is also not really specified by Middesk */
     pub phone_numers: Option<Vec<PhoneNumber>>,
     pub industry_classification: Option<IndustryClassification>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub liens: Option<PiiJsonValue>, // premium feature we aren't using
+    pub liens: Option<ScrubbedPiiJsonValue>, // premium feature we aren't using
     pub tags: Option<Vec<String>>,
     pub fmcsa_registrations: Option<Vec<FmcsaRegistration>>,
 }
@@ -175,8 +173,7 @@ pub struct Registration {
     pub registration_date: Option<String>,
     pub state: Option<String>,
     pub source: Option<String>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub registered_agent: Option<PiiJsonValue>, // not in docs, but in response
+    pub registered_agent: Option<ScrubbedPiiJsonValue>, // not in docs, but in response
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -362,10 +359,8 @@ pub struct Website {
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
     pub business_name_match: Option<bool>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub phone_numbers: Option<PiiJsonValue>, // schema not specified in docs
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub addresses: Option<PiiJsonValue>, // schema not specified in docs
+    pub phone_numbers: Option<ScrubbedPiiJsonValue>, // schema not specified in docs
+    pub addresses: Option<ScrubbedPiiJsonValue>,     // schema not specified in docs
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -409,8 +404,7 @@ pub struct PeopleWatchlist {
     pub submitted: Option<bool>,
     pub sources: Option<Vec<Source>>,
     pub titles: Option<Vec<Title>>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub people_bankrupcies: Option<PiiJsonValue>,
+    pub people_bankrupcies: Option<ScrubbedPiiJsonValue>,
 }
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct List {
@@ -434,9 +428,9 @@ pub struct Result {
     pub agency_information_url: Option<String>,
     pub list_country: Option<String>,
     pub score: Option<String>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub addresses: Option<PiiJsonValue>, /* schema not specified in docs and wierdly its a vec of json
-                                          * objects */
+    pub addresses: Option<ScrubbedPiiJsonValue>, /* schema not specified in docs and wierdly its a vec of
+                                                  * json
+                                                  * objects */
     pub url: Option<String>,
 }
 
@@ -453,8 +447,7 @@ pub struct Person {
     pub titles: Option<Vec<Title>>,
     pub submitted: Option<bool>,
     pub sources: Option<Vec<Source>>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub kyc: Option<PiiJsonValue>, // We are not using Middesk for KYC so this should never be set
+    pub kyc: Option<ScrubbedPiiJsonValue>, // We are not using Middesk for KYC so this should never be set
 }
 
 impl Person {
@@ -501,8 +494,7 @@ pub struct Profile {
     pub type_: Option<String>,
     pub external_id: Option<String>,
     pub url: Option<String>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub metadata: Option<PiiJsonValue>, // not given a schema in Middesk docs
+    pub metadata: Option<ScrubbedPiiJsonValue>, // not given a schema in Middesk docs
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]

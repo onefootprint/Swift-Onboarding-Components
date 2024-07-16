@@ -1,6 +1,6 @@
 use super::error;
 use newtypes::PiiJsonValue;
-use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiVendorResponse;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::DeserializeFromStr;
@@ -292,12 +292,14 @@ impl NeuroAPIResult {
         }
     }
 
-    pub fn scrub(&self) -> Result<ScrubbedPiiJsonValue, error::Error> {
+    pub fn scrub(&self) -> Result<ScrubbedPiiVendorResponse, error::Error> {
         let res = match self {
-            NeuroAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
-            NeuroAPIResult::ResponseErrorWithResponse(e) => ScrubbedPiiJsonValue::scrub(e),
+            NeuroAPIResult::Success(s) => ScrubbedPiiVendorResponse::new(s),
+            NeuroAPIResult::ResponseErrorWithResponse(e) => ScrubbedPiiVendorResponse::new(e),
             // If we have an unhandled error, there's no T to serialize
-            NeuroAPIResult::ResponseErrorUnhandled(_) => ScrubbedPiiJsonValue::scrub(serde_json::json!({})),
+            NeuroAPIResult::ResponseErrorUnhandled(_) => {
+                ScrubbedPiiVendorResponse::new(serde_json::json!({}))
+            }
         }?;
 
         Ok(res)

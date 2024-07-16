@@ -1,11 +1,9 @@
 use crate::experian::error::Error as ExperianError;
-use newtypes::scrub_pii_value;
-use newtypes::scrub_value;
 use newtypes::ExperianDobMatchReasonCodes;
 use newtypes::ExperianFraudShieldCodes;
 use newtypes::ExperianPhoneMatchReasonCodes;
 use newtypes::ExperianSSNReasonCodes;
-use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiJsonValue;
 use newtypes::ScrubbedPiiString;
 use std::str::FromStr;
 
@@ -16,8 +14,7 @@ use std::str::FromStr;
 pub struct PreciseIDAPIResponse {
     #[serde(rename(deserialize = "sessionID"))]
     pub session_id: Option<String>,
-    #[serde(serialize_with = "scrub_pii_value")] // TODO: can we just make all these ScrubbedPiiJsonValue
-    pub header: Option<PiiJsonValue>,
+    pub header: Option<ScrubbedPiiJsonValue>,
     pub summary: Option<Summary>,
     // Gives per-data attribute matching details and summaries
     //
@@ -31,12 +28,10 @@ pub struct PreciseIDAPIResponse {
     pub precise_match: Option<PreciseMatch>,
     // Unclear if we get this, but just in case
     #[serde(rename(deserialize = "onFileSSN"))]
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub on_file_ssn: Option<PiiJsonValue>,
+    pub on_file_ssn: Option<ScrubbedPiiJsonValue>,
     // in the docs this is included but isn't populated yet as it's
     // a future feature. Might as well start recording it
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub ip_address: Option<PiiJsonValue>,
+    pub ip_address: Option<ScrubbedPiiJsonValue>,
     // GLB refers to the Gramm-Leach-Bliley Act. Experian uses this terminology
     // to refer to their data around consumers (as opposed to Credit-related-FCRA-regulated data. or
     // something.)
@@ -291,33 +286,26 @@ pub struct PreciseMatch {
     #[serde(rename(deserialize = "preciseMatchTransactionID"))]
     pub precise_match_transaction_id: Option<String>,
     pub precise_match_score: Option<serde_json::Value>,
-    #[serde(serialize_with = "scrub_value")]
-    pub precise_match_decision: Option<serde_json::Value>,
+    pub precise_match_decision: Option<ScrubbedPiiJsonValue>,
     // get this from cross core
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub addresses: Option<PiiJsonValue>,
+    pub addresses: Option<ScrubbedPiiJsonValue>,
     pub phones: Option<PhoneMatch>,
     #[serde(rename(deserialize = "consumerID"))]
     pub consumer_id: Option<ConsumerIdMatch>,
     // get this from cross core
     pub date_of_birth: Option<DateOfBirthMatch>,
-    pub driver_license: Option<PiiJsonValue>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub change_of_addresses: Option<PiiJsonValue>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub ofac: Option<PiiJsonValue>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub previous_addresses: Option<PiiJsonValue>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub ssn_finder: Option<PiiJsonValue>,
+    pub driver_license: Option<ScrubbedPiiJsonValue>,
+    pub change_of_addresses: Option<ScrubbedPiiJsonValue>,
+    pub ofac: Option<ScrubbedPiiJsonValue>,
+    pub previous_addresses: Option<ScrubbedPiiJsonValue>,
+    pub ssn_finder: Option<ScrubbedPiiJsonValue>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConsumerIdMatch {
     pub summary: Option<ConsumerIdMatchSummary>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub detail: Option<PiiJsonValue>,
+    pub detail: Option<ScrubbedPiiJsonValue>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -355,8 +343,7 @@ pub struct PhoneMatch {
 pub struct PhoneMatchItem {
     pub summary: Option<PhoneMatchItemSummary>,
     // has a lot of good stuff in here we could potentially use
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub detail: Option<PiiJsonValue>,
+    pub detail: Option<ScrubbedPiiJsonValue>,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

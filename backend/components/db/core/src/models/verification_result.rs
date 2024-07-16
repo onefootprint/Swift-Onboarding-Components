@@ -13,7 +13,7 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::ScopedVaultId;
-use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiVendorResponse;
 use newtypes::SealedVaultBytes;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
@@ -25,7 +25,7 @@ pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,
     #[diesel(deserialize_as = serde_json::Value)]
-    response: ScrubbedPiiJsonValue,
+    response: ScrubbedPiiVendorResponse,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -34,7 +34,7 @@ pub struct VerificationResult {
 }
 
 impl VerificationResult {
-    pub fn response_for_test(&self) -> ScrubbedPiiJsonValue {
+    pub fn response_for_test(&self) -> ScrubbedPiiVendorResponse {
         self.response.clone()
     }
 }
@@ -46,7 +46,7 @@ pub struct NewVerificationResult {
     // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have
     // been scrubbed and you need to use the e_response
     #[diesel(serialize_as = serde_json::Value)]
-    pub response: ScrubbedPiiJsonValue,
+    pub response: ScrubbedPiiVendorResponse,
     pub timestamp: DateTime<Utc>,
     pub e_response: Option<SealedVaultBytes>,
     pub is_error: bool,
@@ -58,7 +58,7 @@ impl VerificationResult {
         conn: &mut PgConn,
         request_id: VerificationRequestId,
         // To be removed once we are finished testing
-        response: ScrubbedPiiJsonValue,
+        response: ScrubbedPiiVendorResponse,
         e_response: SealedVaultBytes,
         is_error: bool,
     ) -> Result<VerificationResult, DbError> {

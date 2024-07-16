@@ -5,7 +5,7 @@ use newtypes::IncodeConfigurationId;
 use newtypes::IncodeFailureReason;
 use newtypes::IncodeSessionId;
 use newtypes::PiiJsonValue;
-use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiVendorResponse;
 use serde::de::DeserializeOwned;
 
 pub mod client;
@@ -91,12 +91,14 @@ impl<T: IncodeClientErrorCustomFailureReasons + serde::Serialize> IncodeAPIResul
         }
     }
 
-    pub fn scrub(&self) -> Result<ScrubbedPiiJsonValue, error::Error> {
+    pub fn scrub(&self) -> Result<ScrubbedPiiVendorResponse, error::Error> {
         let res = match self {
-            IncodeAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
-            IncodeAPIResult::ResponseErrorHandled(e) => ScrubbedPiiJsonValue::scrub(e),
+            IncodeAPIResult::Success(s) => ScrubbedPiiVendorResponse::new(s),
+            IncodeAPIResult::ResponseErrorHandled(e) => ScrubbedPiiVendorResponse::new(e),
             // If we have an unhandled error, there's no T to serialize
-            IncodeAPIResult::ResponseErrorUnhandled(_) => ScrubbedPiiJsonValue::scrub(serde_json::json!({})),
+            IncodeAPIResult::ResponseErrorUnhandled(_) => {
+                ScrubbedPiiVendorResponse::new(serde_json::json!({}))
+            }
         }?;
 
         Ok(res)

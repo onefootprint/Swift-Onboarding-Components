@@ -18,7 +18,7 @@ use newtypes::DocumentId;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::PiiJsonValue;
 use newtypes::ScopedVaultId;
-use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiVendorResponse;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
@@ -37,7 +37,7 @@ pub fn save_verification_results(
         .iter()
         .map(|(req, res)| {
             // For testing rollout of footprint
-            let scrubbed_json = ScrubbedPiiJsonValue::scrub(&res.response)?;
+            let scrubbed_json = ScrubbedPiiVendorResponse::new(&res.response)?;
 
             let e_response = encrypt_verification_result_response(&res.raw_response, user_vault_public_key)?;
 
@@ -72,11 +72,11 @@ pub fn save_error_verification_results(
                     Some(e_response),
                     // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in
                     // sync with both success/error API responses
-                    ScrubbedPiiJsonValue::from(serde_json::json!({})),
+                    ScrubbedPiiVendorResponse::from(serde_json::json!({})),
                 )
             } else {
                 // response is non-optional on vres. This is a hack
-                let empty_response = ScrubbedPiiJsonValue::from(serde_json::json!({}));
+                let empty_response = ScrubbedPiiVendorResponse::from(serde_json::json!({}));
                 (None, empty_response)
             };
 
@@ -186,7 +186,7 @@ pub enum ShouldSaveVerificationRequest {
 pub struct SaveVerificationResultArgs {
     pub is_error: bool,
     pub raw_response: PiiJsonValue,
-    pub scrubbed_response: ScrubbedPiiJsonValue,
+    pub scrubbed_response: ScrubbedPiiVendorResponse,
     pub vault_public_key: VaultPublicKey,
     pub should_save_verification_request: ShouldSaveVerificationRequest,
     pub decision_intent_id: DecisionIntentId,

@@ -3,11 +3,11 @@ use crate::incode::IncodeClientErrorCustomFailureReasons;
 use chrono::DateTime;
 use chrono::Utc;
 use derive_more::Deref;
-use newtypes::scrub_pii_value;
 use newtypes::IncodeFailureReason;
 use newtypes::IncodeWatchlistResultRef;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
+use newtypes::ScrubbedPiiJsonValue;
 use newtypes::ScrubbedPiiString;
 
 impl IncodeClientErrorCustomFailureReasons for WatchlistResultResponse {
@@ -81,8 +81,7 @@ pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
     pub matching_name: Option<ScrubbedPiiString>,
     pub names_matches: Option<Vec<NameMatch>>,
-    #[serde(serialize_with = "scrub_pii_value")]
-    pub secondary_matches: Option<PiiJsonValue>, // TODO: dunno schema for this bad boy
+    pub secondary_matches: Option<ScrubbedPiiJsonValue>, // TODO: dunno schema for this bad boy
     pub sources: Option<Vec<String>>,
 }
 
@@ -167,7 +166,7 @@ impl From<MatchTypeDetail> for LeakedMatchTypeDetail {
             names_matches: value
                 .names_matches
                 .map(|x| x.into_iter().map(|y| y.into()).collect()),
-            secondary_matches: value.secondary_matches,
+            secondary_matches: value.secondary_matches.map(PiiJsonValue::from),
             sources: value.sources,
         }
     }
