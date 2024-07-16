@@ -20,7 +20,6 @@ use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::TxnPgConn;
 use either::Either;
-use feature_flag::BoolFlag;
 use idv::stytch::StytchLookupRequest;
 use idv::stytch::StytchLookupResponse;
 use idv::ParsedResponse;
@@ -31,6 +30,7 @@ use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
+use newtypes::VerificationCheckKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -71,10 +71,9 @@ pub async fn post(
     let wf_id = user_auth.workflow_id();
 
     // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing
-    let obc_key_for_flag = user_auth.ob_config().map(|o| o.key.clone());
-    let should_hide_risk_signals = obc_key_for_flag
-        .as_ref()
-        .map(|obc_key| state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(obc_key)))
+    let should_hide_risk_signals = user_auth
+        .ob_config()
+        .map(|o| o.get_verification_check(VerificationCheckKind::NeuroId).is_some())
         .unwrap_or(false);
 
     state

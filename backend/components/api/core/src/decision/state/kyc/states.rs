@@ -51,7 +51,6 @@ use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
-use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
@@ -64,6 +63,7 @@ use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RuleSetResultKind;
 use newtypes::VendorAPI;
+use newtypes::VerificationCheckKind;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowFixtureResult;
 use std::collections::HashMap;
@@ -202,9 +202,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let is_neuro_enabled_ff = state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
+        let is_neuro_enabled_obc = obc
+            .get_verification_check(VerificationCheckKind::NeuroId)
+            .is_some();
         let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
-        let neuro_result = if is_neuro_enabled_ff && is_neuro_enabled_for_workflow {
+        let neuro_result = if is_neuro_enabled_obc && is_neuro_enabled_for_workflow {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
@@ -214,9 +216,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             }
         } else {
             // if FF and workflow get out of sync, make some noise
-            if is_neuro_enabled_ff != is_neuro_enabled_for_workflow {
+            if is_neuro_enabled_obc != is_neuro_enabled_for_workflow {
                 tracing::warn!(
-                    ?is_neuro_enabled_ff,
+                    ?is_neuro_enabled_obc,
                     ?is_neuro_enabled_for_workflow,
                     "Neuro wf and ff disagree, not running neuro API call"
                 )

@@ -9,6 +9,7 @@ use db::models::tenant_client_config::TenantClientConfig;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant;
+use newtypes::VerificationCheckKind;
 use std::sync::Arc;
 
 pub type ObConfigInfo = (
@@ -24,6 +25,10 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let supported_countries = ob_config.supported_countries_for_residential_address();
         let is_stepup_enabled = ob_config.is_stepup_enabled();
         let required_auth_methods = ob_config.required_auth_methods();
+        // just hide neuro id as much as possible. total overkill
+        let nid_enabled = ob_config
+            .get_verification_check(VerificationCheckKind::NeuroId)
+            .map(|_| true);
 
         let ObConfiguration {
             name,
@@ -53,10 +58,6 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let doc_scan_required_if_ssn_skipped = doc_scan_for_optional_ssn.map(|_| true);
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
-        // just hide neuro id as much as possible. total overkill
-        let nid_enabled = ff_client
-            .flag(BoolFlag::IsNeuroEnabledForObc(&key))
-            .then_some(true);
         let can_make_real_doc_scan_calls_in_sandbox = (!ob_config.is_live)
             .then(|| ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)))
             .unwrap_or(false);

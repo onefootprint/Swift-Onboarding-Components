@@ -24,8 +24,8 @@ use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use feature_flag::BoolFlag;
 use newtypes::ObConfigurationKind;
+use newtypes::VerificationCheckKind;
 use newtypes::WorkflowSource;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -90,7 +90,9 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let is_neuro_enabled = state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
+    let is_neuro_enabled = obc
+        .get_verification_check(VerificationCheckKind::NeuroId)
+        .is_some();
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, FpError> {

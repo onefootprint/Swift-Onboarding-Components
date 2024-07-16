@@ -74,8 +74,6 @@ pub enum BoolFlag<'a> {
     StepUpOnAmlHit(&'a ObConfigurationKey),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
-    #[strum(to_string = "IsNeuroEnabledForObc")]
-    IsNeuroEnabledForObc(&'a ObConfigurationKey),
     #[strum(to_string = "RequireCaptureOnStepUp")]
     RequireCaptureOnStepUp(&'a ObConfigurationKey),
     #[strum(to_string = "TenantCanViewNeuro")]
@@ -136,7 +134,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::PreferWhatsapp(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
-            Self::IsNeuroEnabledForObc(k) => Some(k.to_string()),
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
             Self::TenantCanViewNeuro(k) => Some(k.to_string()),
             Self::UseKycWaterfallV2Rollout(k) => Some(k.to_string()),
@@ -182,7 +179,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(_) => false,
             Self::PreferWhatsapp(_) => false,
             Self::MakeLexisCall(_) => false,
-            Self::IsNeuroEnabledForObc(_) => false,
             Self::RequireCaptureOnStepUp(_) => false,
             Self::TenantCanViewNeuro(_) => false,
             Self::UseKycWaterfallV2Rollout(_) => false,
@@ -232,7 +228,6 @@ impl<'a> BoolFlag<'a> {
             | Self::CreateKycWorkflowForAlpacaOnboardings(_)
             | Self::StepUpOnAmlHit(_)
             | Self::MakeLexisCall(_)
-            | Self::IsNeuroEnabledForObc(_)
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
             | Self::TenantCanViewNeuro(_)

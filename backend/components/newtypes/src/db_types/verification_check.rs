@@ -46,4 +46,5 @@ pub enum VerificationCheck {
     // Note: selfie is stashed on `documents_to_collect`
     IdentityDocument {},
     StytchDevice {},
+    NeuroId {},
 }
