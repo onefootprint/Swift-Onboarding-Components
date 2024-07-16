@@ -66,10 +66,6 @@ const DEFAULT_PG_CLUSTER_PARAMETERS = [
     name: 'log_autovacuum_min_duration',
     value: '1000',
   },
-  {
-    name: 'rds.logical_replication',
-    value: 'logical',
-  }
 ];
 
 export type DatabaseOutput = {
@@ -165,20 +161,6 @@ export async function CreateDB(
   new aws.rds.ParameterGroup(instanceParameterGroupName, {
     name: instanceParameterGroupName,
     family: 'aurora-postgresql14',
-    parameters: DEFAULT_PG_PARAMETERS,
-  });
-
-  const _newClusterParameterGroupName = `fpc-pg-cluster-${clusterIdentifier}-16`;
-  new aws.rds.ClusterParameterGroup(clusterParameterGroupName, {
-    name: clusterParameterGroupName,
-    family: 'aurora-postgresql16',
-    parameters: DEFAULT_PG_PARAMETERS.concat(DEFAULT_PG_CLUSTER_PARAMETERS),
-  });
-
-  const _newInstanceParameterGroupName = `fpc-pg-instance-${clusterIdentifier}-16`;
-  new aws.rds.ParameterGroup(instanceParameterGroupName, {
-    name: instanceParameterGroupName,
-    family: 'aurora-postgresql16',
     parameters: DEFAULT_PG_PARAMETERS,
   });
 
