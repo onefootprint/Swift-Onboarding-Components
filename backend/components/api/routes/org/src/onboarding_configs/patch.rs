@@ -45,7 +45,7 @@ async fn patch(
     let (obc, actor, rs) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status)?;
+            let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status, None)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))

@@ -22,7 +22,7 @@ use strum::EnumDiscriminants;
 #[strum_discriminants(
     name(VerificationCheckKind),
     vis(pub),
-    derive(strum_macros::EnumString, strum_macros::Display, Hash),
+    derive(strum_macros::EnumString, strum_macros::Display, Hash, serde::Deserialize),
     strum(serialize_all = "snake_case")
 )]
 #[serde(rename_all = "snake_case")]

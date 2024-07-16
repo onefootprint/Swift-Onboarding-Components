@@ -441,6 +441,7 @@ pub enum ObConfigIdentifier<'a> {
 struct ObConfigurationUpdate {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
+    verification_checks: Option<Vec<VerificationCheck>>,
 }
 
 #[derive(Debug, Clone)]
@@ -679,8 +680,13 @@ impl ObConfiguration {
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
+        verification_checks: Option<Vec<VerificationCheck>>,
     ) -> DbResult<Self> {
-        let update = ObConfigurationUpdate { name, status };
+        let update = ObConfigurationUpdate {
+            name,
+            status,
+            verification_checks,
+        };
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
             .filter(ob_configuration::tenant_id.eq(tenant_id))

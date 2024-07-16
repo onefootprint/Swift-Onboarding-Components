@@ -44,6 +44,7 @@ fn test_ob_config(conn: &mut TestPgConn) {
         true,
         None,
         Some(ApiKeyStatus::Disabled),
+        None,
     )
     .expect("Couldn't update");
 
