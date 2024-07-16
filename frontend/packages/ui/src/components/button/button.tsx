@@ -1,104 +1,104 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import type { Color } from "@onefootprint/design-tokens";
-import type { Icon } from "@onefootprint/icons";
-import type { ButtonHTMLAttributes } from "react";
-import React, { forwardRef } from "react";
-import styled, { css } from "styled-components";
+import type { Color } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
+import type { ButtonHTMLAttributes } from 'react';
+import React, { forwardRef } from 'react';
+import styled, { css } from 'styled-components';
 
-import { createText } from "../../utils/mixins";
-import AnimatedLoadingSpinner from "../animated-loading-spinner";
-import Box from "../box";
-import Stack from "../stack";
-import type { ButtonSize, ButtonVariant } from "./button.types";
+import { createText } from '../../utils/mixins';
+import AnimatedLoadingSpinner from '../animated-loading-spinner';
+import Box from '../box';
+import Stack from '../stack';
+import type { ButtonSize, ButtonVariant } from './button.types';
 
 export type ButtonProps = {
-	children: React.ReactNode;
-	className?: string;
-	disabled?: boolean;
-	form?: string;
-	fullWidth?: boolean;
-	iconColor?: Color;
-	loading?: boolean;
-	loadingAriaLabel?: string;
-	prefixIcon?: Icon;
-	size?: ButtonSize;
-	testID?: string;
-	type?: "button" | "submit" | "reset";
-	variant?: ButtonVariant;
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  form?: string;
+  fullWidth?: boolean;
+  iconColor?: Color;
+  loading?: boolean;
+  loadingAriaLabel?: string;
+  prefixIcon?: Icon;
+  size?: ButtonSize;
+  testID?: string;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: ButtonVariant;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	(
-		{
-			children,
-			disabled = false,
-			form,
-			fullWidth,
-			loading,
-			loadingAriaLabel,
-			size = "default",
-			testID,
-			type = "button",
-			variant = "primary",
-			prefixIcon: PrefixIcon,
-			iconColor,
-			...props
-		}: ButtonProps,
-		ref,
-	) => {
-		const getContent = () => (
-			<IconContainer
-				$variant={variant}
-				align="center"
-				gap={3}
-				justify="center"
-				tag="span"
-				visibility={loading ? "hidden" : "visible"}
-			>
-				{PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
-				<LabelContainer>{children}</LabelContainer>
-			</IconContainer>
-		);
+  (
+    {
+      children,
+      disabled = false,
+      form,
+      fullWidth,
+      loading,
+      loadingAriaLabel,
+      size = 'default',
+      testID,
+      type = 'button',
+      variant = 'primary',
+      prefixIcon: PrefixIcon,
+      iconColor,
+      ...props
+    }: ButtonProps,
+    ref,
+  ) => {
+    const getContent = () => (
+      <IconContainer
+        $variant={variant}
+        align="center"
+        gap={3}
+        justify="center"
+        tag="span"
+        visibility={loading ? 'hidden' : 'visible'}
+      >
+        {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
+        <LabelContainer>{children}</LabelContainer>
+      </IconContainer>
+    );
 
-		return (
-			<ButtonContainer
-				/** Do not change/remove these classes */
-				{...props}
-				className="fp-button fp-custom-appearance"
-				data-full-width={fullWidth}
-				data-loading={loading}
-				data-size={size}
-				data-testid={testID}
-				data-variant={variant}
-				disabled={disabled}
-				form={form}
-				ref={ref}
-				size={size}
-				tabIndex={0}
-				type={type}
-				$variant={variant}
-			>
-				{getContent()}
-				<Box visibility={loading ? "visible" : "hidden"} position="absolute">
-					<AnimatedLoadingSpinner
-						animationStart={loading ?? false}
-						ariaLabel={loadingAriaLabel}
-						color={variant === "primary" ? "quinary" : "tertiary"}
-						size={size === "large" ? 20 : 16}
-					/>
-				</Box>
-			</ButtonContainer>
-		);
-	},
+    return (
+      <ButtonContainer
+        /** Do not change/remove these classes */
+        {...props}
+        className="fp-button fp-custom-appearance"
+        data-full-width={fullWidth}
+        data-loading={loading}
+        data-size={size}
+        data-testid={testID}
+        data-variant={variant}
+        disabled={disabled}
+        form={form}
+        ref={ref}
+        size={size}
+        tabIndex={0}
+        type={type}
+        $variant={variant}
+      >
+        {getContent()}
+        <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
+          <AnimatedLoadingSpinner
+            animationStart={loading ?? false}
+            ariaLabel={loadingAriaLabel}
+            color={variant === 'primary' ? 'quinary' : 'tertiary'}
+            size={size === 'large' ? 20 : 16}
+          />
+        </Box>
+      </ButtonContainer>
+    );
+  },
 );
 
 const IconContainer = styled(Stack)<{
-	$variant: ButtonVariant;
+  $variant: ButtonVariant;
 }>`
   ${({ theme, $variant }) => {
-		const { button } = theme.components;
+    const { button } = theme.components;
 
-		return css`
+    return css`
       svg[data-colored='false'] {
         path {
           stroke: ${button.variant[$variant].color};
@@ -108,17 +108,17 @@ const IconContainer = styled(Stack)<{
         }
       }
     `;
-	}}
+  }}
 `;
 
 const ButtonContainer = styled.button<{
-	size: ButtonSize;
-	$variant: ButtonVariant;
+  size: ButtonSize;
+  $variant: ButtonVariant;
 }>`
   ${({ theme, $variant, size }) => {
-		const { button } = theme.components;
+    const { button } = theme.components;
 
-		return css`
+    return css`
       ${createText(button.size[size].typography)}
       align-items: center;
       display: flex;
@@ -178,7 +178,7 @@ const ButtonContainer = styled.button<{
         width: 100%;
       }
     `;
-	}}
+  }}
 `;
 
 const LabelContainer = styled.span`
