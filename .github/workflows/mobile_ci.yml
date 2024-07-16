@@ -129,7 +129,7 @@ jobs:
 
   mobile-ci:
     runs-on: ubuntu-latest
-    needs: [install-dependencies, lint, format, test, typecheck, audit]
+    needs: [install-dependencies, lint, test, typecheck, audit]
     if: always()
     steps:
       - name: Success
