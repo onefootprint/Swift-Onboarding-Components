@@ -42,15 +42,12 @@ def test_footprint_dr_backup(tenant):
 
     assert resp["num_blobs"] == 6
 
-
     with footprint_dr("status", "--live") as cmd:
         cmd.expect(r"Latest backup record timestamp: ([0-9:\.\- ]+ UTC)")
-
-        # The latest online record timestamp should be the same as the latest backup record timestamp, indicating no lag
-        ts = cmd.match.group(1).decode("utf-8")
-        cmd.expect_exact("Latest online record timestamp: " + ts)
-
-        cmd.expect("Lag: 0s")
+        # We can't actually assert anything about the backup lag
+        # since we aren't running the real worker in the test,
+        # and only processing DLs for the fp_ids we created.
+        cmd.expect("Backup lag:")
 
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0

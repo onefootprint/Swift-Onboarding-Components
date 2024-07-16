@@ -62,19 +62,3 @@ pub fn get_latest_vault_dr_backup_record_timestamp(
         .optional()?;
     Ok(ts)
 }
-
-pub fn get_latest_vault_dr_online_record_timestamp(
-    conn: &mut PgConn,
-    tenant_id: &TenantId,
-    is_live: IsLive,
-) -> DbResult<Option<DateTime<Utc>>> {
-    let ts = data_lifetime::table
-        .inner_join(scoped_vault::table)
-        .filter(scoped_vault::tenant_id.eq(tenant_id))
-        .filter(scoped_vault::is_live.eq(is_live))
-        .select(data_lifetime::created_at)
-        .order(data_lifetime::created_seqno.desc())
-        .first(conn)
-        .optional()?;
-    Ok(ts)
-}

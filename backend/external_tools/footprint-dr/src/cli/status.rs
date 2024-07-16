@@ -47,21 +47,9 @@ pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
             .map(|ts| ts.to_string())
             .unwrap_or("n/a".to_owned())
     );
-    println!(
-        "Latest online record timestamp: {}",
-        status
-            .latest_online_record_timestamp
-            .map(|ts| ts.to_string())
-            .unwrap_or("n/a".to_owned())
-    );
 
-    let lag = status.latest_online_record_timestamp.and_then(|online_ts| {
-        status
-            .latest_backup_record_timestamp
-            .map(|backup_ts| online_ts - backup_ts)
-    });
-
-    println!("Lag: {}", lag.map(humanize_duration).unwrap_or("n/a".to_owned()),);
+    let lag = Duration::seconds(status.backup_lag_seconds);
+    println!("Backup lag: {}", humanize_duration(lag));
 
     Ok(())
 }

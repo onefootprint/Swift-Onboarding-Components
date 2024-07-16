@@ -26,5 +26,5 @@ pub struct VaultDrEnrolledStatus {
     pub org_public_keys: Vec<String>,
 
     pub latest_backup_record_timestamp: Option<DateTime<Utc>>,
-    pub latest_online_record_timestamp: Option<DateTime<Utc>>,
+    pub backup_lag_seconds: i64,
 }
