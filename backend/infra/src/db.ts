@@ -209,6 +209,8 @@ export async function CreateDB(
       minCapacity: dbConfig.minAcus,
     },
     backupRetentionPeriod: 7,
+  }, {
+    ignoreChanges: ["engineVersion"],
   });
 
   const enhancedMonitoringRoleName = `${clusterIdentifier}-rds-monitoring-role`;
