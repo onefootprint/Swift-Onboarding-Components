@@ -31,14 +31,14 @@ const CaptureButton = ({ onClick, disabled = false, variant }: CaptureButtonProp
         aria-disabled={disabled}
         data-disabled={disabled}
         onClick={onClick}
-        outerRadius={DEFAULT_OUTER_RADIUS}
+        $outerRadius={DEFAULT_OUTER_RADIUS}
         data-dd-action-name="doc:take-photo"
       >
         {variant === 'round' ? (
           <InnerCircle
             aria-disabled={disabled}
             data-disabled={disabled}
-            innerRadius={DEFAULT_INNER_RADIUS}
+            $innerRadius={DEFAULT_INNER_RADIUS}
             data-dd-action-name="doc:take-photo"
           />
         ) : (
@@ -49,15 +49,13 @@ const CaptureButton = ({ onClick, disabled = false, variant }: CaptureButtonProp
   </>
 );
 
-const RoundButton = styled.div<{
-  outerRadius: number;
-}>`
-  ${({ theme, outerRadius }) => css`
+const RoundButton = styled.div<{ $outerRadius: number }>`
+  ${({ theme, $outerRadius }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: ${outerRadius}px;
-    width: ${outerRadius}px;
+    height: ${$outerRadius}px;
+    width: ${$outerRadius}px;
     background-color: none;
     border: calc(${theme.spacing[3]} - ${theme.spacing[1]}) solid
       ${theme.backgroundColor.secondary};
@@ -80,12 +78,10 @@ const RoundButton = styled.div<{
   `}
 `;
 
-const InnerCircle = styled.button<{
-  innerRadius: number;
-}>`
-  ${({ theme, innerRadius }) => css`
-    height: ${innerRadius}px;
-    width: ${innerRadius}px;
+const InnerCircle = styled.button<{ $innerRadius: number }>`
+  ${({ theme, $innerRadius }) => css`
+    height: ${$innerRadius}px;
+    width: ${$innerRadius}px;
     background-color: ${theme.backgroundColor.primary};
     border: none;
     border-radius: ${theme.borderRadius.full};

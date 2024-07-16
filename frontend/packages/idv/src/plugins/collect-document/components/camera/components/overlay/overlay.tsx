@@ -26,7 +26,7 @@ const Overlay = ({
   outlineHeight,
   timerAnimationVal,
 }: OverlayProps) => (
-  <Container width={width} height={height} videoHeight={videoHeight}>
+  <Container width={width} height={height} $videoHeight={videoHeight}>
     {captureKind === 'face' && (
       <>
         <FullFrameOutline width={width} height={height} $outlineWidth={outlineWidth} $outlineHeight={outlineHeight}>
@@ -98,13 +98,13 @@ const Overlay = ({
 const Container = styled.div<{
   width: number;
   height: number;
-  videoHeight: number;
+  $videoHeight: number;
 }>`
-  ${({ width, theme, videoHeight }) => css`
+  ${({ width, theme, $videoHeight }) => css`
     position: relative;
     width: ${width}px;
-    height: ${videoHeight}px;
-    margin-top: calc(-1 * ${videoHeight}px); // Show overlay on top of the video
+    height: ${$videoHeight}px;
+    margin-top: calc(-1 * ${$videoHeight}px); // Show overlay on top of the video
     overflow: hidden;
     border-radius: ${theme.borderRadius.default};
   `}

@@ -417,7 +417,7 @@ const Camera = ({
   return (
     <>
       {!isCameraVisible ? (
-        <LoadingContainer data-device-kind={deviceKind} desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}>
+        <LoadingContainer data-device-kind={deviceKind} $desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}>
           <AnimatePresence>
             <AnimatedLoadingSpinner animationStart />
             {showCameraLoadingFeedback && (
@@ -539,10 +539,8 @@ const TextContainer = styled(motion(Stack))`
   `}
 `;
 
-const LoadingContainer = styled.div<{
-  desktopHeight: number;
-}>`
-  ${({ theme, desktopHeight }) => css`
+const LoadingContainer = styled.div<{ $desktopHeight: number }>`
+  ${({ theme, $desktopHeight }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -560,7 +558,7 @@ const LoadingContainer = styled.div<{
 
     &[data-device-kind='desktop'] {
       position: relative;
-      min-height: ${desktopHeight}px;
+      min-height: ${$desktopHeight}px;
       background-color: ${theme.backgroundColor.secondary};
       border-radius: ${theme.borderRadius.default};
 
