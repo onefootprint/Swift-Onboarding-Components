@@ -60,6 +60,13 @@ impl CleanAndValidate for IPK {
                 }
             })?,
             Self::PoliticalOrganization => value.as_string()?,
+            Self::FundingSources => utils::parse_json_and_validate::<Vec<FundingSource>, _>(value, |l| {
+                if l.is_empty() {
+                    Err(Error::InvalidLength)
+                } else {
+                    Ok(())
+                }
+            })?,
         };
         let value = utils::validate_not_empty(value)?;
 
@@ -175,4 +182,15 @@ impl Declaration {
     pub fn requires_finra_compliance_doc(&self) -> bool {
         matches!(self, Self::AffiliatedWithUsBroker | Self::SeniorExecutive)
     }
+}
+
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
+#[strum(serialize_all = "snake_case")]
+pub enum FundingSource {
+    EmploymentIncome,
+    Investments,
+    Inheritance,
+    BusinessIncome,
+    Savings,
+    Family,
 }

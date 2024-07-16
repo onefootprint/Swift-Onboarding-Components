@@ -26,6 +26,7 @@ pub enum InvestorProfileKind {
     FamilyMemberNames,
     /// If a senior political figure, name of the political organization
     PoliticalOrganization,
+    FundingSources,
 }
 
 impl From<InvestorProfileKind> for DataIdentifier {
@@ -57,6 +58,8 @@ impl InvestorProfileKind {
                 | Self::SeniorExecutiveSymbols
                 | Self::FamilyMemberNames
                 | Self::PoliticalOrganization
+                // TODO make required after frontend starts to provide
+                | Self::FundingSources
         )
     }
 }
