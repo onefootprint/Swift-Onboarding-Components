@@ -27,11 +27,14 @@ export type ECSRolesOutput = {
 export async function CreateECSRoles(g: GlobalState): Promise<ECSRolesOutput> {
   const stackMetadata = GetStackMetadata();
 
-  const execRole = createTaskExecutionRole(
-    g.secretsStore,
-    stackMetadata.shortStackName,
-    g.database.databaseUrlSecretName,
-  );
+  const execRole = pulumi
+    .all([g.database.databaseUrlSecretParam.name, g.database.databaseUrlRoSecretParam.name])
+    .apply(([dbUrlSecretName, dbRoUrlSecretName]) => createTaskExecutionRole(
+      g.secretsStore,
+      stackMetadata.shortStackName,
+      dbUrlSecretName,
+      dbRoUrlSecretName,
+    ));
 
   const taskRole = createTaskContainerRole(
     (await aws.getCallerIdentity({})).accountId,
@@ -53,7 +56,8 @@ export async function CreateECSRoles(g: GlobalState): Promise<ECSRolesOutput> {
 function createTaskExecutionRole(
   secretsStore: StaticSecrets,
   serviceName: string,
-  dbSecretName: string,
+  dbUrlSecretName: string,
+  dbRoUrlSecretName: string,
 ): aws.iam.Role {
   const taskExecRole = new aws.iam.Role(`fpc-task-exec-role-${serviceName}`, {
     assumeRolePolicy: {
@@ -110,7 +114,12 @@ function createTaskExecutionRole(
             {
               Action: ['ssm:GetParameter', 'ssm:GetParameters'],
               Effect: 'Allow',
-              Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
+              Resource: `arn:aws:ssm:*:*:parameter${dbUrlSecretName}`,
+            },
+            {
+              Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${dbRoUrlSecretName}`,
             },
           ],
         }),

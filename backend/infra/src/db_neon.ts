@@ -48,8 +48,8 @@ export function NeonDBOutput(
   return {
     databaseUrl: pulumi.secret(neonDb.databaseUrl),
     readOnlyDatabaseUrl: pulumi.secret(neonDb.databaseUrl),
-    databaseUrlSecretName: dbSecretName,
     databaseUrlSecretParam,
+    databaseUrlRoSecretParam: databaseUrlSecretParam,
     db: undefined,
     instances: [],
   };

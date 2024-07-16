@@ -170,6 +170,7 @@ export abstract class ServiceContainers {
         secretsStore.enclaveSealedEncIkek.arn,
         secretsStore.enclaveSealedHmacIkek.arn,
         database.databaseUrlSecretParam.arn,
+        database.databaseUrlRoSecretParam.arn,
         secretsStore.cookieSessionKey.arn,
         signingKeyDescriptor.rootKeyId,
         secretsStore.workosSecretKey.arn,
@@ -231,6 +232,7 @@ export abstract class ServiceContainers {
           sealedEncIkekHexArn,
           sealedHmacIkekHexArn,
           databaseUrlArn,
+          databaseRoUrlArn,
           cookieSessionKeyArn,
           signingKeyId,
           workosSecretKey,
@@ -304,6 +306,10 @@ export abstract class ServiceContainers {
               {
                 name: 'DATABASE_URL',
                 valueFrom: databaseUrlArn,
+              },
+              {
+                name: 'DATABASE_RO_URL',
+                valueFrom: databaseRoUrlArn,
               },
               {
                 name: 'COOKIE_SESSION_KEY',
