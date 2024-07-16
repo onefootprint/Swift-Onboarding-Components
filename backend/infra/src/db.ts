@@ -68,7 +68,7 @@ const DEFAULT_PG_CLUSTER_PARAMETERS = [
   },
   {
     name: 'rds.logical_replication',
-    value: 'logical',
+    value: '1',
   }
 ];
 
