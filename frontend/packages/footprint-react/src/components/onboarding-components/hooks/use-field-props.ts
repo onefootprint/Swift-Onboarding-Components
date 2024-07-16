@@ -67,11 +67,6 @@ const getPersonProps = (options: { locale?: SupportedLocale }): Record<string, F
     autoComplete: 'tel',
     className: 'fp-phone-input',
     type: 'tel',
-    mask: {
-      prefix: '+',
-      noImmediatePrefix: true,
-      numericOnly: true,
-    },
     validations: {
       required: 'Phone is required',
       validate: (value: string) => {
