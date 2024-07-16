@@ -13,7 +13,7 @@ use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
-    tags(Users, Deprecated)
+    tags(Users, PhasedOut)
 )]
 #[get("/users/{fp_id}/liveness")]
 pub async fn get(

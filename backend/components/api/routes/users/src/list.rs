@@ -23,7 +23,7 @@ use paperclip::actix::post;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users.",
+    description = "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `GET /users/search` API.",
     tags(Users, Preview)
 )]
 #[get("/users")]
@@ -94,7 +94,7 @@ pub struct SearchUsersRequestBody {
     pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
 }
 
-#[api_v2_operation(description = "Search users by fingerprint", tags(Users, PublicApi))]
+#[api_v2_operation(description = "Search users by fingerprinted PII.", tags(Users, PublicApi))]
 #[post("/users/search")]
 pub async fn post_search(
     state: web::Data<State>,

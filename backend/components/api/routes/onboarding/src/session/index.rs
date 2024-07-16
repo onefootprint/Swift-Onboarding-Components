@@ -31,7 +31,7 @@ pub struct ObConfigSessionToken {
 
 #[api_v2_operation(
     description = "Generates a single-use session token for a playbook.",
-    tags(Onboarding, Preview)
+    tags(Onboarding, PhasedOut)
 )]
 #[post("/onboarding/session")]
 pub async fn post(

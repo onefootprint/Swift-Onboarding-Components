@@ -15,8 +15,8 @@ use paperclip::actix::get;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "View the successfully uploaded documents uploaded for this user.",
-    tags(Users, Preview)
+    description = "View the documents uploaded successfully by this user.",
+    tags(Users, PhasedOut)
 )]
 #[get("/users/{fp_id}/documents")]
 pub async fn get(

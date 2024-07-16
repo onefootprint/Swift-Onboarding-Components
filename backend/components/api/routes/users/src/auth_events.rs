@@ -16,7 +16,7 @@ use paperclip::actix::get;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 
-#[api_v2_operation(description = "View a user's recent device insights", tags(Users, Preview))]
+#[api_v2_operation(description = "View a user's recent device insights", tags(Users, PhasedOut))]
 #[get("/users/{fp_id}/auth_events")]
 pub async fn get(
     state: web::Data<State>,

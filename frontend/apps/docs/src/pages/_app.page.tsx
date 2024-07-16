@@ -7,10 +7,11 @@ import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Providers from '../components/providers';
-import { API_REFERENCE_PATH, INTERNAL_API_REFERENCE_PATH } from '../config/constants';
+import { API_REFERENCE_PATH, INTERNAL_API_REFERENCE_PATH, PHASED_OUT_API_REFERENCE_PATH } from '../config/constants';
 import ApiReference from './api-reference';
 import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
+import PhasedOutApiReference from './phased-out-api-reference';
 
 const defaultFont = DM_Sans({
   display: 'swap',
@@ -32,7 +33,8 @@ const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
   const isInternalApiReference = router.asPath.startsWith(INTERNAL_API_REFERENCE_PATH);
-  const isDocsSite = !isApiReference && !isInternalApiReference;
+  const isPhasedOutApiReference = router.asPath.startsWith(PHASED_OUT_API_REFERENCE_PATH);
+  const isDocsSite = !isApiReference && !isInternalApiReference && !isPhasedOutApiReference;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -49,6 +51,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <GlobalStyle />
         {isApiReference && <ApiReference />}
         {isInternalApiReference && <InternalApiReference />}
+        {isPhasedOutApiReference && <PhasedOutApiReference />}
         {isDocsSite && (
           <Docs article={pageProps.article} navigation={pageProps.page?.navigation}>
             <Component {...pageProps} />

@@ -27,17 +27,9 @@ use strum_macros::EnumIter;
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum PreviewApi {
-    MatchSignalsList,
-    LivenessList,
-    AuthEventsList,
-    /// Only findigs uses this, we really don't want anyone else to be using it.
-    DocumentsList,
     /// We have a mixed stance on this. Generally we don't want tenants to be doing their own
     /// analysis on risk signals since this should be the job of the rules engine
     RiskSignalsList,
-    OnboardingSessionToken,
-    VaultIntegrity,
-    ReonboardUser,
     CreateUserDecision,
     Labels,
     Tags,
@@ -52,8 +44,18 @@ pub enum PreviewApi {
     LegacyListUsersBusinesses,
     /// Support implicit auth when making a token in the `POST /users/<>/token` API
     ImplicitAuth,
+
     /// A catch-all variant here since we'll be scarily manually writing these values in a DB shell
     Other(String),
+
+    //
+    // The below variants are for deprecated / phased-out APIs
+    MatchSignalsList,
+    LivenessList,
+    AuthEventsList,
+    DocumentsList,
+    OnboardingSessionToken,
+    VaultIntegrity,
 }
 
 impl_enum_string_diesel!(PreviewApi);

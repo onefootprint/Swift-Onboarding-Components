@@ -1,7 +1,8 @@
 import type { Content, ContentSchema } from '../api-reference.types';
-import staticAPIData from '../assets/api-docs.json';
+import staticApiData from '../assets/api-docs.json';
 import staticPreviewData from '../assets/api-preview-docs.json';
 import hostedApiData from '../assets/hosted-api-docs.json';
+import phasedOutApiData from '../assets/phased-out-api-docs.json';
 import privateApiData from '../assets/private-api-docs.json';
 
 export const evaluateSchemaRef = (ref: string) => {
@@ -11,11 +12,14 @@ export const evaluateSchemaRef = (ref: string) => {
 };
 
 const getSchema = (schemaKey: string) => {
-  const schema = staticAPIData.components.schemas[schemaKey as keyof typeof staticAPIData.components.schemas] as
+  const schema = staticApiData.components.schemas[schemaKey as keyof typeof staticApiData.components.schemas] as
     | ContentSchema
     | undefined;
   const previewSchema = staticPreviewData.components.schemas[
     schemaKey as keyof typeof staticPreviewData.components.schemas
+  ] as ContentSchema | undefined;
+  const phasedOutSchema = phasedOutApiData.components.schemas[
+    schemaKey as keyof typeof phasedOutApiData.components.schemas
   ] as ContentSchema | undefined;
   // TODO this logic is pretty messy... we shouldn't do this with globals
   const hostedSchemas = hostedApiData.components.schemas[schemaKey as keyof typeof hostedApiData.components.schemas] as
@@ -25,7 +29,7 @@ const getSchema = (schemaKey: string) => {
     schemaKey as keyof typeof privateApiData.components.schemas
   ] as ContentSchema | undefined;
 
-  return schema || previewSchema || hostedSchemas || privateSchema || undefined;
+  return schema || previewSchema || phasedOutSchema || hostedSchemas || privateSchema || undefined;
 };
 
 export const getSchemaFromComponent = (component?: Content) => {

@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 
 import staticAPIData from './assets/api-docs.json';
 import staticPreviewAPIData from './assets/api-preview-docs.json';
+import phasedOutApiData from './assets/phased-out-api-docs.json';
 import Articles from './components/articles/articles';
 import Cmd from './components/cmd';
 import PageNav from './components/page-nav';

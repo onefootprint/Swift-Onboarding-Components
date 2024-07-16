@@ -18,7 +18,7 @@ use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the match signals for the provided user. This API is deprecated.",
-    tags(Users, Deprecated)
+    tags(Users, PhasedOut)
 )]
 #[get("/users/{fp_id}/match_signals")]
 pub async fn get(

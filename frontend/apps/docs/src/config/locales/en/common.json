@@ -229,6 +229,9 @@
         "private": "Private API"
       }
     },
+    "phased-out-reference": {
+      "title": "Phased out API"
+    },
     "404": {
       "title": "Oops! Page couldn't be found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",

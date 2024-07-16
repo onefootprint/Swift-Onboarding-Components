@@ -27568,6 +27568,14 @@
                                 "type": "string",
                                 "format": "date-time"
                             },
+                            "latest_backup_record_timestamp": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "latest_online_record_timestamp": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
                             "org_public_keys": {
                                 "type": "array",
                                 "items": {

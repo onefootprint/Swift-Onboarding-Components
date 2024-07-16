@@ -465,7 +465,7 @@
                     "Users",
                     "PublicApi"
                 ],
-                "description": "Search users by fingerprint",
+                "description": "Search users by fingerprinted PII.",
                 "requestBody": {
                     "content": {
                         "application/json": {

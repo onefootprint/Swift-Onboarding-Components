@@ -6,10 +6,17 @@ from urllib.parse import unquote
 
 
 # Every API endpoint must have only one of these tag values
-IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview", "Deprecated"]
+IDENTIFYING_TAG_VALUES = [
+    "Private",
+    "PublicApi",
+    "Hosted",
+    "Preview",
+    "Deprecated",
+    "PhasedOut",
+]
 
 # APIs with these identifying tags are shown in our docs site - we should apply more scrutiny to them
-PUBLIC_TAG_VALUES = ["PublicApi", "Preview"]
+PUBLIC_TAG_VALUES = ["PublicApi", "Preview", "PhasedOut"]
 
 # Only APIs that take one of these auth methods should ever be publicly documented - otherwise,
 # the API isn't usable
@@ -81,6 +88,9 @@ class Endpoint:
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\n{description}"
+        if self.identifying_tag == "PhasedOut":
+            # Add a disclaimer tag to all PhasedOut APIs
+            description = f"This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\n{description}"
         if self.identifying_tag == "Deprecated":
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
@@ -182,6 +192,7 @@ if __name__ == "__main__":
     specs = [
         ("PublicApi", "api-docs.json"),
         ("Preview", "api-preview-docs.json"),
+        ("PhasedOut", "phased-out-api-docs.json"),
         ("Hosted", "hosted-api-docs.json"),
         ("Private", "private-api-docs.json"),
     ]
