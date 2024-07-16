@@ -145,8 +145,32 @@ impl VaultDrWriter {
             })
             .await?;
 
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            len_dls=dls.len(),
+            "DEBUG: Number of dls"
+        );
+
         let mut dls_by_id = dls.into_iter().map(|dl| (dl.id.clone(), dl)).collect();
         let pii_by_dl = bulk_decrypt_dls_unchecked(state, &self.tenant_id, self.is_live, &dls_by_id).await?;
+
+
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            len_dls_by_id=dls_by_id.len(),
+            "DEBUG: Number of unique dl IDs"
+        );
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            len_pii_by_dl=dls_by_id.len(),
+            "DEBUG: Number of decrypted DLs"
+        );
 
         // Encrypt and write records to S3 in parallel tasks.
         let concurrency_limit = state.config.vault_dr_config.record_task_concurrency;
@@ -173,12 +197,30 @@ impl VaultDrWriter {
             blob_futs.push(fut);
         }
 
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            concurrency_limit,
+            len_blob_futs=blob_futs.len(),
+            "DEBUG: Number of blob_futs"
+        );
+
         let new_blobs = futures::stream::iter(blob_futs)
             .buffer_unordered(concurrency_limit)
             .collect::<Vec<FpResult<_>>>()
             .await
             .into_iter()
             .collect::<FpResult<Vec<_>>>()?;
+
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            concurrency_limit,
+            len_new_blobs=new_blobs.len(),
+            "DEBUG: Number of new_blobs"
+        );
 
         let blob_count = new_blobs.len();
         state
@@ -191,6 +233,7 @@ impl VaultDrWriter {
             tenant_id=%self.tenant_id,
             is_live,
             blob_count,
+            concurrency_limit,
             "Wrote batch of records to S3"
         );
 
@@ -198,13 +241,14 @@ impl VaultDrWriter {
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_and_write_record", skip_all, fields(
-            tenant_id=%self.tenant_id,
-            is_live=%self.is_live,
-            fp_id=%fp_id,
-            dl.id=%dl.id,
-            dl.created_seqno=%dl.created_seqno,
-            dl.kind=%dl.kind,
-            dl.scoped_vault_id=%dl.scoped_vault_id,
+        config_id=%self.config_id,
+        tenant_id=%self.tenant_id,
+        is_live=%self.is_live,
+        fp_id=%fp_id,
+        dl.id=%dl.id,
+        dl.created_seqno=%dl.created_seqno,
+        dl.kind=%dl.kind,
+        dl.scoped_vault_id=%dl.scoped_vault_id,
     ))]
     async fn encrypt_and_write_record_to_s3(
         &self,
@@ -213,10 +257,14 @@ impl VaultDrWriter {
         pii: Pii,
     ) -> FpResult<NewVaultDrBlob> {
         tracing::info!(
-            sv_id=%dl.scoped_vault_id,
-            %fp_id,
-            di=%&dl.kind,
-            seqno=%&dl.created_seqno,
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live=%self.is_live,
+            fp_id=%fp_id,
+            dl.id=%dl.id,
+            dl.created_seqno=%dl.created_seqno,
+            dl.kind=%dl.kind,
+            dl.scoped_vault_id=%dl.scoped_vault_id,
             "Encrypting and writing record",
         );
 
@@ -291,6 +339,14 @@ impl VaultDrWriter {
         })?;
 
         tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live=%self.is_live,
+            fp_id=%fp_id,
+            dl.id=%dl.id,
+            dl.created_seqno=%dl.created_seqno,
+            dl.kind=%dl.kind,
+            dl.scoped_vault_id=%dl.scoped_vault_id,
             key,
             blob.checksum = checksum_b64_sha256,
             blob.response_checksum = result.checksum_sha256,
