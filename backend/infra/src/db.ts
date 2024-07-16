@@ -78,6 +78,7 @@ export type DatabaseOutput = {
   databaseUrl: pulumi.Output<string>;
   readOnlyDatabaseUrl: pulumi.Output<string>;
   databaseUrlSecretParam: aws.ssm.Parameter;
+  databaseUrlRoSecretParam: aws.ssm.Parameter;
   databaseUrlSecretName: string;
   db: aws.rds.Cluster | undefined;
   instances: aws.rds.ClusterInstance[];
@@ -264,6 +265,7 @@ export async function CreateDB(
   const {
     rw: rwDatabaseUrl,
     ro: readOnlyDatabaseUrl,
+    // TODO add a separate jumpbox ro user for the jumpbox to use instead of the prod RO user?
     jbRw: jbRwDatabaseUrl,
   } = pulumi
     .all([
@@ -286,6 +288,14 @@ export async function CreateDB(
     {
       type: 'SecureString',
       value: rwDatabaseUrl,
+      name: dbSecretName,
+    },
+  );
+  const databaseUrlRoSecretParam = new aws.ssm.Parameter(
+    `ssm-param-database-conn-ro-${clusterIdentifier}`,
+    {
+      type: 'SecureString',
+      value: readOnlyDatabaseUrl,
       name: dbSecretName,
     },
   );
@@ -343,6 +353,7 @@ export async function CreateDB(
     readOnlyDatabaseUrl,
     db,
     databaseUrlSecretParam,
+    databaseUrlRoSecretParam,
     databaseUrlSecretName: dbSecretName,
     instances: [_dbInstance, _dbInstance2],
   };
