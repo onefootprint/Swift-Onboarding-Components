@@ -748,6 +748,7 @@ dependencies = [
  "serde_with",
  "strum",
  "thiserror",
+ "tokio",
  "tracing",
  "url",
  "webauthn-rs-core",
@@ -9850,6 +9851,7 @@ dependencies = [
  "crypto",
  "db",
  "derive_more",
+ "futures",
  "itertools",
  "newtypes",
  "p256 0.11.1",
@@ -9857,6 +9859,7 @@ dependencies = [
  "sha2",
  "tempfile",
  "thiserror",
+ "tokio",
  "tracing",
 ]
 

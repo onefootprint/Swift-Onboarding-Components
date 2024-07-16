@@ -20,6 +20,7 @@ itertools = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
+tokio = { workspace = true }
 base64 = { workspace = true }
 strum = { workspace = true }
 http = { workspace = true }

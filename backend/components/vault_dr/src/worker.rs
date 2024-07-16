@@ -18,8 +18,8 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
         } = config;
 
         tracing::info!(
-            ?config_id,
-            ?tenant_id,
+            %config_id,
+            %tenant_id,
             is_live,
             batch_size,
             "Starting batch for config"
@@ -28,8 +28,8 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
         match result {
             Ok(_) => {
                 tracing::info!(
-                    ?config_id,
-                    ?tenant_id,
+                    %config_id,
+                    %tenant_id,
                     is_live,
                     batch_size,
                     "Batch completed for config"
@@ -37,8 +37,8 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
             }
             Err(error) => {
                 tracing::error!(
-                    ?config_id,
-                    ?tenant_id,
+                    %config_id,
+                    %tenant_id,
                     is_live,
                     batch_size,
                     ?error,

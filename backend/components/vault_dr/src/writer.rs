@@ -22,6 +22,7 @@ use db::models::vault_dr::NewVaultDrBlob;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
+use futures::StreamExt;
 use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::TenantId;
@@ -147,7 +148,17 @@ impl VaultDrWriter {
         let mut dls_by_id = dls.into_iter().map(|dl| (dl.id.clone(), dl)).collect();
         let pii_by_dl = bulk_decrypt_dls_unchecked(state, &self.tenant_id, self.is_live, &dls_by_id).await?;
 
-        let mut new_blobs = vec![];
+        // Encrypt and write records to S3 in parallel tasks.
+        let concurrency_limit = state.config.vault_dr_config.record_task_concurrency;
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            concurrency_limit,
+            "Encrypting and writing records to S3 in parallel"
+        );
+
+        let mut blob_futs = vec![];
         for (dl_id, pii) in pii_by_dl {
             let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
                 "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
@@ -155,17 +166,33 @@ impl VaultDrWriter {
 
             let fp_id = sv_id_to_fp_id
                 .get(&dl.scoped_vault_id)
-                .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?;
+                .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
+                .clone();
 
-            let new_blob = self.encrypt_and_write_record_to_s3(fp_id, &dl, pii).await?;
-            new_blobs.push(new_blob);
+            let fut = self.encrypt_and_write_record_to_s3(fp_id, dl, pii);
+            blob_futs.push(fut);
         }
+
+        let new_blobs = futures::stream::iter(blob_futs)
+            .buffer_unordered(concurrency_limit)
+            .collect::<Vec<FpResult<_>>>()
+            .await
+            .into_iter()
+            .collect::<FpResult<Vec<_>>>()?;
 
         let blob_count = new_blobs.len();
         state
             .db_pool
             .db_transaction(move |conn| VaultDrBlob::bulk_create(conn, new_blobs))
             .await?;
+
+        tracing::info!(
+            config_id=%self.config_id,
+            tenant_id=%self.tenant_id,
+            is_live,
+            blob_count,
+            "Wrote batch of records to S3"
+        );
 
         Ok(blob_count as u32)
     }
@@ -181,53 +208,59 @@ impl VaultDrWriter {
     ))]
     async fn encrypt_and_write_record_to_s3(
         &self,
-        fp_id: &FpId,
-        dl: &DataLifetime,
+        fp_id: FpId,
+        dl: DataLifetime,
         pii: Pii,
     ) -> FpResult<NewVaultDrBlob> {
         tracing::info!(
-            sv_id=?dl.scoped_vault_id,
-            ?fp_id,
-            di=?&dl.kind,
-            seqno=?&dl.created_seqno,
+            sv_id=%dl.scoped_vault_id,
+            %fp_id,
+            di=%&dl.kind,
+            seqno=%&dl.created_seqno,
             "Encrypting and writing record",
         );
 
-        let e_record = self.encrypt_record(pii)?;
+        let e_record = self.encrypt_record(pii).await?;
         let new_blob = self.write_blob_to_s3(fp_id, dl, e_record).await?;
 
         Ok(new_blob)
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_record", skip_all)]
-    fn encrypt_record(&self, pii: Pii) -> FpResult<EncryptedRecord> {
-        let record_private_key = age::x25519::Identity::generate();
-        let record_public_key = PublicKey::X15519Recipient(record_private_key.to_public());
+    async fn encrypt_record(&self, pii: Pii) -> FpResult<EncryptedRecord> {
+        let org_public_keys = self.org_public_keys.clone();
+        let recovery_public_key = self.recovery_public_key.clone();
 
-        let wrapped_record_key = self.org_public_keys.wrap_key(record_private_key)?;
+        // This can be relatively slow depending on data size (10s of ms).
+        tokio::task::spawn_blocking(move || {
+            let record_private_key = age::x25519::Identity::generate();
+            let record_public_key = PublicKey::X15519Recipient(record_private_key.to_public());
 
-        let record_public_key_set =
-            PublicKeySet::new(vec![record_public_key, self.recovery_public_key.clone()])?;
+            let wrapped_record_key = org_public_keys.wrap_key(record_private_key)?;
 
-        let mut plaintext_record = match pii {
-            Pii::Value(v) => v.to_piistring()?.leak_to_string().into_bytes(),
-            Pii::Bytes(b) => b.into_leak(),
-        };
+            let record_public_key_set = PublicKeySet::new(vec![record_public_key, recovery_public_key])?;
 
-        let e_record = record_public_key_set.encrypt(&plaintext_record)?;
-        plaintext_record.zeroize();
+            let mut plaintext_record = match pii {
+                Pii::Value(v) => v.to_piistring()?.leak_to_string().into_bytes(),
+                Pii::Bytes(b) => b.into_leak(),
+            };
 
-        Ok(EncryptedRecord {
-            e_record,
-            wrapped_record_key,
+            let e_record = record_public_key_set.encrypt(&plaintext_record)?;
+            plaintext_record.zeroize();
+
+            Ok(EncryptedRecord {
+                e_record,
+                wrapped_record_key,
+            })
         })
+        .await?
     }
 
     #[tracing::instrument("VaultDrWriter::write_blob_to_s3", skip_all)]
     async fn write_blob_to_s3(
         &self,
-        fp_id: &FpId,
-        dl: &DataLifetime,
+        fp_id: FpId,
+        dl: DataLifetime,
         e_record: EncryptedRecord,
     ) -> FpResult<NewVaultDrBlob> {
         let EncryptedRecord {
@@ -240,7 +273,7 @@ impl VaultDrWriter {
         let checksum_b64_sha256 = base64::encode(digest_bytes);
         let content_length = e_record.len();
 
-        let key = blob_key(&self.bucket_path_namespace, fp_id, dl, &digest_bytes)?;
+        let key = blob_key(&self.bucket_path_namespace, &fp_id, &dl, &digest_bytes)?;
 
         let body = ByteStream::new(SdkBody::from(e_record));
         let req = self
@@ -258,11 +291,11 @@ impl VaultDrWriter {
         })?;
 
         tracing::info!(
-            key=?key,
-            blob.checksum=?checksum_b64_sha256,
-            blob.response_checksum=?result.checksum_sha256,
-            blob.content_length=?content_length,
-            blob.etag=?result.e_tag.as_deref().unwrap_or(""),
+            key,
+            blob.checksum = checksum_b64_sha256,
+            blob.response_checksum = result.checksum_sha256,
+            blob.content_length = content_length,
+            blob.etag = result.e_tag.as_deref().unwrap_or(""),
             "Wrote blob to S3",
         );
 
@@ -284,7 +317,7 @@ impl VaultDrWriter {
         let new_blob = NewVaultDrBlob {
             created_at: Utc::now(),
             config_id: self.config_id.clone(),
-            data_lifetime_id: dl.id.clone(),
+            data_lifetime_id: dl.id,
             dl_created_seqno: dl.created_seqno,
             bucket_path: key,
             content_etag,

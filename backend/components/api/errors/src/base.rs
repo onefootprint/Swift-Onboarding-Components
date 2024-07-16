@@ -116,6 +116,7 @@ fp_error_trait_impl!(
     >,
     INTERNAL_SERVER_ERROR
 );
+fp_error_trait_impl!(tokio::task::JoinError, INTERNAL_SERVER_ERROR);
 
 fp_error_trait_impl!(base64::DecodeError, BAD_REQUEST);
 fp_error_trait_impl!(url::ParseError, BAD_REQUEST);
