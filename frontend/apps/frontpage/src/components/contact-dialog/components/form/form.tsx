@@ -1,4 +1,4 @@
-import { Grid, Text, TextArea, TextInput } from '@onefootprint/ui';
+import { Grid, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,15 @@ const Form = ({ onSubmit }: FormProps) => {
   const formId = 'support-dialog-id';
 
   return (
-    <Grid.Container gap={7} id={formId} tag="form" onSubmit={handleSubmit(onSubmit)}>
+    <Stack
+      flexDirection="column"
+      gap={7}
+      id={formId}
+      tag="form"
+      height="100%"
+      flex={1}
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <Text variant="body-2">{t('description')}</Text>
       <TextInput
         hasError={!!errors[FormField.name]}
@@ -78,7 +86,7 @@ const Form = ({ onSubmit }: FormProps) => {
           },
         })}
       />
-    </Grid.Container>
+    </Stack>
   );
 };
 

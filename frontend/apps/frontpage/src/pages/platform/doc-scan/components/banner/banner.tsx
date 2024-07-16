@@ -4,7 +4,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { useTranslation } from 'react-i18next';
-import ContactButtons from './components/contact-buttons';
+import Ctas from 'src/components/ctas';
 
 type BannerProps = {
   imgSrc?: string;
@@ -19,7 +19,7 @@ const Banner = ({ imgSrc = '/home/banner/penguin-complete.svg' }: BannerProps) =
       <Illustration src={imgSrc} height={600} width={900} alt={t('title')} />
       <TextContainer>
         <Title>{t('title')}</Title>
-        <ContactButtons primaryButton={t('get-started')} secondaryButton={t('book-a-demo')} justify="left" />
+        <Ctas />
       </TextContainer>
     </BannerContainer>
   );

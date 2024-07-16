@@ -1,8 +1,8 @@
 import { Button, Stack, Text, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import ContactDialog from 'src/components/contact-dialog';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
+
+import ContactDialog from 'src/components/contact-dialog';
 
 type ContactUsBannerProps = {
   title: string;

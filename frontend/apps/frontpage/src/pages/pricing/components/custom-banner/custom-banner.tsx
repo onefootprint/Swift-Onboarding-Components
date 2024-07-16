@@ -1,10 +1,8 @@
-import { Button, Stack, Text, media } from '@onefootprint/ui';
-import React, { useMemo, useState } from 'react';
+import { Stack, Text, media } from '@onefootprint/ui';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { sendGTMEvent } from '@next/third-parties/google';
-import ContactDialog from 'src/components/contact-dialog';
-import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
+import Ctas from 'src/components/ctas';
 import Illustration from './components/illustration';
 
 type CustomBannerProps = {
@@ -22,20 +20,6 @@ const CustomBanner = ({
   primaryButton = 'Get Started',
   secondaryButton = 'Learn More',
 }: CustomBannerProps) => {
-  const [showDialog, setShowDialog] = useState(false);
-
-  const handleSignUpClick = () => {
-    window.open(SIGN_UP_URL, '_blank');
-  };
-
-  const handleScheduleCall = () => {
-    setShowDialog(true);
-  };
-
-  const handleClose = () => {
-    setShowDialog(false);
-  };
-
   return (
     <Container direction="column" align="center" gap={2} paddingTop={11} paddingBottom={12} width="100%">
       <Illustration />
@@ -49,15 +33,9 @@ const CustomBanner = ({
           </Text>
         </Stack>
         <ResponsiveStack gap={4}>
-          <Button variant="primary" onClick={handleScheduleCall} size="large">
-            {primaryButton}
-          </Button>
-          <Button variant="secondary" onClick={handleSignUpClick} size="large">
-            {secondaryButton}
-          </Button>
+          <Ctas labels={{ primary: primaryButton, secondary: secondaryButton }} />
         </ResponsiveStack>
       </Stack>
-      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </Container>
   );
 };

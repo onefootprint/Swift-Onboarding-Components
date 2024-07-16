@@ -1,22 +1,11 @@
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { Container, Stack, createFontStyles, media } from '@onefootprint/ui';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-/* eslint-disable import/no-extraneous-dependencies */
-import ContactDialog from 'src/components/contact-dialog';
+import Ctas from 'src/components/ctas';
 import styled, { css } from 'styled-components';
-
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 const Hero = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.kyb.hero' });
-  const [showDialog, setShowDialog] = useState(false);
-  const handleClickTrigger = () => {
-    setShowDialog(true);
-  };
-  const handleClose = () => {
-    setShowDialog(false);
-  };
   return (
     <Container align="center" justify="center">
       <SectionContainer>
@@ -24,15 +13,7 @@ const Hero = () => {
           <Title>{t('title')}</Title>
           <Subtitle>{t('subtitle')}</Subtitle>
         </TitleContainer>
-        <Stack gap={4}>
-          <Button size="large" variant="primary" onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}>
-            {t('get-started')}
-          </Button>
-          <Button variant="secondary" size="large" onClick={handleClickTrigger}>
-            {t('book-a-demo')}
-          </Button>
-        </Stack>
-        <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
+        <Ctas />
       </SectionContainer>
     </Container>
   );

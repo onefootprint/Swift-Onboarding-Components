@@ -1,6 +1,7 @@
 import { Container, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Ctas from 'src/components/ctas';
 import styled, { css, keyframes } from 'styled-components';
 
 const Title = () => {
@@ -17,6 +18,7 @@ const Title = () => {
       <Text variant="display-4" color="tertiary" maxWidth="600px" textAlign="center">
         {t('subtitle')}
       </Text>
+      <Ctas />
     </StyledContainer>
   );
 };

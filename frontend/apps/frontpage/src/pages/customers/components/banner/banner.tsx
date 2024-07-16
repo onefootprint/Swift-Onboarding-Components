@@ -1,12 +1,12 @@
 import { IcoSparkles16 } from '@onefootprint/icons';
 import { Button, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
+
 import styled, { css } from 'styled-components';
 
-import ContactDialog from '../../../../components/contact-dialog';
+import ContactDialog from 'src/components/contact-dialog';
+import { GET_FORM_URL } from 'src/config/constants';
 import Penguin from './components/penguin/penguin';
-
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 type BannerProps = {
   children: React.ReactNode;

@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import ContactButtons from './components/contact-buttons';
+import Ctas from 'src/components/ctas';
 
 type PenguinBannerProps = {
   imgSrc?: string;
@@ -21,7 +21,12 @@ const PenguinBanner = ({ imgSrc = '/home/banner/penguin-complete.svg' }: Penguin
         <Illustration src={imgSrc} height={600} width={600} alt={t('alt-img')} />
         <TextContainer>
           <Title>{t('title')}</Title>
-          <ContactButtons primaryButton={t('primary-button')} secondaryButton={t('secondary-button')} justify="left" />
+          <Ctas
+            labels={{
+              primary: t('primary-button'),
+              secondary: t('secondary-button'),
+            }}
+          />
         </TextContainer>
       </BannerContainer>
     </Background>

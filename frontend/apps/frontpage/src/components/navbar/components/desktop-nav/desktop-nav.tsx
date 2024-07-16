@@ -83,7 +83,7 @@ const NavContainer = styled(Container)`
       top: ${theme.spacing[3]};
       left: 50%;
       transform: translateX(-50%);
-      z-index: 100;
+      z-index: ${theme.zIndex.sticky};
       background: rgba(${theme.backgroundColor.primary}, 0.9);
       backdrop-filter: blur(20px);
       @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {

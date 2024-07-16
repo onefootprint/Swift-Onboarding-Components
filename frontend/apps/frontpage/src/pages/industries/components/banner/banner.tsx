@@ -3,7 +3,7 @@ import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import ContactButtons from './components/contact-buttons';
+import Ctas from 'src/components/ctas';
 
 type PenguinBannerProps = {
   imgSrc?: string;
@@ -23,7 +23,7 @@ const PenguinBanner = ({
       <Illustration src={imgSrc} height={600} width={900} alt={title} />
       <TextContainer>
         <Title>{title}</Title>
-        <ContactButtons primaryButton={primaryButton} secondaryButton={secondaryButton} justify="left" />
+        <Ctas align="left" labels={{ primary: primaryButton, secondary: secondaryButton }} />
       </TextContainer>
     </BannerContainer>
   </Background>
@@ -86,9 +86,9 @@ const Illustration = styled(Image)`
 const TextContainer = styled(Box)`
   ${({ theme }) => css`
     width: 100%;
-    gap: ${theme.spacing[9]};
     display: flex;
     flex-direction: column;
+    gap: ${theme.spacing[5]};
     align-items: flex-start;
     justify-content: flex-start;
 

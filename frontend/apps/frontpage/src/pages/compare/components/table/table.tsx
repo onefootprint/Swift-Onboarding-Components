@@ -34,7 +34,7 @@ const Table = () => {
   }, []);
 
   return (
-    <Container>
+    <Container marginTop={5}>
       <TableWrapper
         ref={tableWrapperRef}
         onScroll={handleScroll}
@@ -70,7 +70,10 @@ const Table = () => {
   );
 };
 
-const TableWrapper = styled.div<{ $isOverflowingLeft: boolean; $isOverflowingRight: boolean }>`
+const TableWrapper = styled.div<{
+  $isOverflowingLeft: boolean;
+  $isOverflowingRight: boolean;
+}>`
   ${({ theme, $isOverflowingLeft, $isOverflowingRight }) => css`
     overflow-x: auto;
     white-space: nowrap;
