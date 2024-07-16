@@ -183,6 +183,7 @@ IP_DATA = {
     "investor_profile.senior_executive_symbols": ["AAPL", "HOOOD", "SPY"],
     "investor_profile.family_member_names": ["Hayes Valley", "Piip Penguin"],
     "investor_profile.political_organization": "Enclave Party",
+    "investor_profile.funding_sources": ["inheritance", "employment_income"],
 }
 
 CREDIT_CARD_DATA = {
@@ -245,6 +246,7 @@ CDO_TO_DIS = {
         "investor_profile.senior_executive_symbols",
         "investor_profile.family_member_names",
         "investor_profile.political_organization",
+        "investor_profile.funding_sources",
     ],
     "us_tax_id": ["id.us_tax_id"],
 }
