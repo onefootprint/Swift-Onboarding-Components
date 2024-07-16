@@ -25,13 +25,6 @@ const Preview = () => {
 
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
-          <Text variant="body-4" color="primary">
-            {t('names')}
-          </Text>
-        </Topic>
-
-        <Topic>
-          <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
             <Text variant="body-4" color="primary">
               {t('email')}

@@ -203,7 +203,6 @@
         "email-validation-method": "We'll validate it sending a one-time password to users email address.",
         "email": "Email address",
         "enabled": "Enabled",
-        "names": "Name and last name",
         "passkeys-availability": "Available for users who have onboarded onto Footprint using a KYC or KYB playbook in the past.",
         "passkeys": "Passkeys",
         "phone-number": "Phone number",
