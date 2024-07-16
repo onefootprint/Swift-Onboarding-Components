@@ -77,7 +77,10 @@ impl DbPool {
     {
         let start = Instant::now();
         let conn: deadpool::managed::Object<ManagedPgConn> = self.0.get().await.map_err(DbError::from)?;
-        tracing::info!(wait_time_s=%start.elapsed().as_secs_f64(), "Fetched DB conn from pool");
+        let duration = start.elapsed().as_secs_f64();
+        if duration >= 1f64 {
+            tracing::warn!(wait_time_s=%duration, "Long wait to fetch db conn from pool");
+        }
 
         let result = conn.interact(move |conn| f(conn)).await;
         let result: Result<R, E> = (move || result.map_err(DbError::from)?)();
