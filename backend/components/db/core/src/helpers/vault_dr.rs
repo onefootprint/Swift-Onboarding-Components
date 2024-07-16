@@ -31,7 +31,7 @@ pub fn load_vault_dr_data_lifetime_batch(
         .filter(scoped_vault::is_live.eq(is_live))
         .filter(diesel::dsl::not(diesel::dsl::exists(
             vault_dr_blob::table
-                .filter(vault_dr_blob::dl_created_seqno.eq(data_lifetime::created_seqno))
+                .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
                 .filter(vault_dr_blob::config_id.eq(config_id)),
         )))
         .into_boxed();
