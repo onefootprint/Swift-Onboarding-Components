@@ -1,12 +1,17 @@
 import type { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 
+export enum DataKind {
+  documentData = 'document_data',
+  vaultData = 'vault_data',
+}
+
 export type VaultEncryptedData = null;
 
 export type VaultEmptyData = undefined;
 
 export type VaultTextData = string;
 
-export type VaultObjectData<T = unknown> = T;
+export type VaultObjectData<T = Object> = T;
 
 export type VaultArrayData<T = unknown> = Array<T>;
 
@@ -42,7 +47,7 @@ export const isVaultDataDecrypted = (data: unknown): data is VaultEncryptedData 
 
 export const isVaultDataText = (data: unknown): data is VaultTextData => typeof data === 'string';
 
-export const isVaultDataDocument = (data: unknown): data is VaultDocumentData => {
+export const isVaultDataDocument = (data: Record<string, unknown>): data is VaultDocumentData => {
   if (typeof data !== 'object') return false;
   if (typeof data?.name !== 'string' || typeof data?.content !== 'object') {
     return false;
@@ -50,7 +55,7 @@ export const isVaultDataDocument = (data: unknown): data is VaultDocumentData =>
   return true;
 };
 
-export const isVaultDataImage = (data: unknown): data is VaultImageData => {
+export const isVaultDataImage = (data: Record<string, unknown>): data is VaultImageData => {
   if (typeof data !== 'object') return false;
   if (typeof data?.name !== 'string' || typeof data?.src !== 'string') {
     return false;
