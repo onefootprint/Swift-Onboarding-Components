@@ -9,6 +9,7 @@ use db_schema::schema::scoped_vault;
 use db_schema::schema::vault_dr_blob;
 use diesel::prelude::*;
 use diesel::QueryDsl;
+use newtypes::DataLifetimeSeqno;
 use newtypes::FpId;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
@@ -24,11 +25,26 @@ pub fn load_vault_dr_data_lifetime_batch(
     batch_size: u32,
     fp_id_filter: Option<Vec<FpId>>,
 ) -> DbResult<Vec<DataLifetime>> {
-    // n.b. This query has been tuned for performance.
+    // Query performance optimization:
+    //
+    // We know that we process records in order of ascending created_seqno and transactionally
+    // commit entire successfully-processed batches of DLs as vault_dr_blob rows, so we can bound
+    // the search space for the next batch of DLs by the maximum processed seqno.
+    //
+    // With the Read Committed isolation level, this seqno may be a bit stale (e.g. if more records
+    // are processed after finding this seqno and before the following batch query). However, the
+    // DL batch query will still return the correct records. The seqno search bound will just be low.
+    let max_processed_seqno = vault_dr_blob::table
+        .filter(vault_dr_blob::config_id.eq(config_id))
+        .select(diesel::dsl::max(vault_dr_blob::dl_created_seqno))
+        .first::<Option<DataLifetimeSeqno>>(conn)?
+        .unwrap_or(DataLifetimeSeqno::from(0));
+
     let mut query = data_lifetime::table
         .inner_join(scoped_vault::table)
         .filter(scoped_vault::tenant_id.eq(tenant_id))
         .filter(scoped_vault::is_live.eq(is_live))
+        .filter(data_lifetime::created_seqno.gt(max_processed_seqno))
         .filter(diesel::dsl::not(diesel::dsl::exists(
             vault_dr_blob::table
                 .filter(vault_dr_blob::data_lifetime_id.eq(data_lifetime::id))
