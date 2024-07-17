@@ -126,7 +126,8 @@ pub async fn post(
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
-    let verification_checks = verification_checks.unwrap_or_default();
+    let verification_checks =
+        create_verification_checks_from_request(verification_checks.unwrap_or_default(), skip_kyc);
 
     let skip_kyb = match kind {
         ObConfigurationKind::Kyb => !verification_checks
@@ -210,4 +211,16 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
     } else {
         None
     }
+}
+
+fn create_verification_checks_from_request(
+    mut checks: Vec<VerificationCheck>,
+    skip_kyc: bool,
+) -> Vec<VerificationCheck> {
+    if !skip_kyc {
+        checks.push(VerificationCheck::Kyc {});
+    }
+
+
+    checks
 }
