@@ -104,6 +104,7 @@ def test_config_create(sandbox_tenant):
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
         can_access_data=["ssn4", "phone_number", "email", "name", "full_address"],
         kind="kyc",
+        verification_checks=[{"data": {}, "kind": "kyc"}],
     )
     body = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
     ob_config = body
@@ -130,6 +131,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             None,
         ),
@@ -147,6 +149,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Cannot provide both ssn4 and ssn9",
         ),
@@ -157,6 +160,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=["ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
@@ -167,6 +171,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=["name", "ssn9"],
                 allow_international_residents=False,
                 international_country_restrictions=None,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             None,
         ),  # data in optional_data should be allowed in can_access
@@ -177,6 +182,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=None,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: [Dob] cannot be optional",
         ),  # for now only let ssn4/ssn9 be optional, not any arbitary CDO
@@ -193,6 +199,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=False,
                 international_country_restrictions=["MX"],
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Cannot specify international_country_restrictions without allow_international_residents",
         ),
@@ -209,6 +216,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=True,
                 international_country_restrictions=[],
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Must specify 1 or more countries in international_country_restrictions",
         ),
@@ -225,6 +233,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=True,
                 international_country_restrictions=["MX"],
+                verification_checks=[],
             ),
             None,
         ),
@@ -241,6 +250,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=["ssn9"],
                 can_access_data=[],
                 doc_scan_for_optional_ssn="document.passport.none.none",
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Cannot specify doc_scan_for_optional_ssn if already collecting a document",
         ),
@@ -256,6 +266,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 can_access_data=[],
                 doc_scan_for_optional_ssn="document.passport.none.none",
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Cannot specify doc_scan_for_optional_ssn if Ssn4 or Ssn9 is not optional",
         ),
@@ -271,6 +282,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=["ssn9"],
                 can_access_data=[],
                 doc_scan_for_optional_ssn="full_address",
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: doc_scan_for_optional_ssn must be a Document collected data option",
         ),
@@ -287,6 +299,7 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 allow_international_residents=False,
                 allow_us_residents=False,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Must set one of allow_us_residents or allow_international_residents to true",
         ),
@@ -304,6 +317,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=True,
                 allow_us_territories=True,
                 allow_us_residents=True,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Specifying allow_us_territories with allow_international_residents is redundant",
         ),
@@ -337,6 +351,18 @@ def test_config_create(sandbox_tenant):
                 kind="document",
                 skip_kyc=False,
                 skip_confirm=True,
+            ),
+            "Playbook of kind document must skip KYC",
+        ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=["document.drivers_license.none.none"],
+                optional_data=[],
+                can_access_data=[],
+                kind="document",
+                skip_confirm=True,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Playbook of kind document must skip KYC",
         ),
@@ -394,6 +420,33 @@ def test_config_create(sandbox_tenant):
             ),
             "Missing required data options: ssn9 for cip: alpaca",
         ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind="alpaca",
+                skip_confirm=True,
+                enhanced_aml=dict(
+                    enhanced_aml=True,
+                    ofac=True,
+                    pep=True,
+                    adverse_media=True,
+                ),
+                allow_us_residents=True,
+                allow_us_territories=True,
+                verification_checks=[{"kind": "kyc", "data": {}}],
+            ),
+            "Missing required data options: ssn9 for cip: alpaca",
+        ),
         (
             dict(
                 must_collect_data=[
@@ -422,6 +475,7 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Cannot specify documents in Playbook and be using an Alpaca CIP",
         ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
         (
             dict(
                 must_collect_data=[
@@ -436,7 +490,6 @@ def test_config_create(sandbox_tenant):
                 can_access_data=[],
                 kind="kyc",
                 cip_kind="alpaca",
-                skip_kyc=False,
                 skip_confirm=True,
                 enhanced_aml=dict(
                     enhanced_aml=True,
@@ -446,6 +499,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=False,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true",
         ),
@@ -476,6 +530,34 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
         ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind="alpaca",
+                skip_confirm=True,
+                enhanced_aml=dict(
+                    enhanced_aml=True,
+                    ofac=True,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=True,
+                allow_us_territories=True,
+                verification_checks=[{"kind": "kyc", "data": {}}],
+            ),
+            "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
+        ),
         (
             dict(
                 must_collect_data=[
@@ -500,6 +582,34 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+            ),
+            "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
+        ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "ssn9",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind="alpaca",
+                skip_confirm=True,
+                enhanced_aml=dict(
+                    enhanced_aml=False,
+                    ofac=False,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=True,
+                allow_us_territories=True,
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
         ),
@@ -532,6 +642,36 @@ def test_config_create(sandbox_tenant):
             ),
             "Must use identifier starting with document.custom. for custom documents",
         ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind=None,
+                skip_confirm=False,
+                enhanced_aml=dict(
+                    enhanced_aml=False,
+                    ofac=False,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=False,
+                allow_us_territories=False,
+                documents_to_collect=[
+                    dict(
+                        kind="custom",
+                        data=dict(
+                            identifier="id.first_name",
+                            name="Custom document",
+                        ),
+                    )
+                ],
+                verification_checks=[{"kind": "kyc", "data": {}}],
+            ),
+            "Must use identifier starting with document.custom. for custom documents",
+        ),
         (
             dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
@@ -558,6 +698,36 @@ def test_config_create(sandbox_tenant):
                         ),
                     )
                 ],
+            ),
+            "Cannot collect business documents in non-KYB playbook",
+        ),
+        # VERIFICATION_CHECK_MIGRATION: same as above test, but with VC
+        (
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind=None,
+                skip_confirm=False,
+                enhanced_aml=dict(
+                    enhanced_aml=False,
+                    ofac=False,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=True,
+                allow_us_territories=False,
+                business_documents_to_collect=[
+                    dict(
+                        kind="custom",
+                        data=dict(
+                            identifier="id.first_name",
+                            name="Custom document",
+                        ),
+                    )
+                ],
+                verification_checks=[{"kind": "kyc", "data": {}}],
             ),
             "Cannot collect business documents in non-KYB playbook",
         ),
@@ -588,6 +758,7 @@ def test_no_phone_obc(sandbox_tenant):
         can_access_data=collect_data,
         is_no_phone_flow=True,
         kind="kyc",
+        verification_checks=[{"kind": "kyc", "data": {}}],
     )
     res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
 
@@ -828,6 +999,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         can_access_data=must_collect_data,
         enhanced_aml=enhanced_aml,
         kind="kyc",
+        verification_checks=[{"kind": "kyc", "data": {}}],
     )
     res = post(
         "org/onboarding_configs",
@@ -912,6 +1084,7 @@ def test_default_rules(sandbox_tenant):
             must_collect_data=collect_data,
             can_access_data=collect_data,
             kind="kyc",
+            verification_checks=[{"kind": "kyc", "data": {}}],
         ),
         *sandbox_tenant.db_auths,
     )

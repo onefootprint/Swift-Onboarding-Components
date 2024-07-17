@@ -44,8 +44,7 @@ pub struct CreateOnboardingConfigurationRequest {
     #[serde(default)]
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
-    #[serde(default)]
-    pub skip_kyc: bool,
+    pub skip_kyc: Option<bool>,
     #[serde(default)]
     pub doc_scan_for_optional_ssn: Option<CDO>,
     #[serde(default)]
@@ -151,7 +150,6 @@ pub async fn post(
         allow_international_residents,
         international_country_restrictions,
         author: actor,
-        skip_kyc,
         doc_scan_for_optional_ssn,
         enhanced_aml,
         // TODO: remove these once frontend is merged

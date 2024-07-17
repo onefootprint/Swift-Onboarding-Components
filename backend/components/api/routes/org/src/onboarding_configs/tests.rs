@@ -14,6 +14,7 @@ use newtypes::EnhancedAmlOption;
 use newtypes::ObConfigurationKind;
 use newtypes::Selfie;
 use newtypes::TenantId;
+use newtypes::VerificationCheck;
 use std::str::FromStr;
 use test_case::test_case;
 
@@ -50,7 +51,6 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        skip_kyc: false,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
@@ -62,8 +62,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test when migrated over
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -90,7 +89,6 @@ fn test_is_no_phone_flow(
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        skip_kyc: false,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
@@ -102,8 +100,7 @@ fn test_is_no_phone_flow(
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test when migrated over
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -129,7 +126,6 @@ fn test_is_doc_first(
         is_doc_first: true,
         allow_international_residents: allow_international,
         international_country_restrictions: None,
-        skip_kyc: false,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
@@ -141,8 +137,7 @@ fn test_is_doc_first(
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test when migrated over
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -164,7 +159,6 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         is_doc_first: false,
         allow_international_residents: allow_international,
         international_country_restrictions: None,
-        skip_kyc: true,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
@@ -176,7 +170,6 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test once migrated over to checks
         verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
@@ -204,7 +197,6 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        skip_kyc: false,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
@@ -216,8 +208,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         documents_to_collect,
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test when migrated over
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -241,7 +232,6 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        skip_kyc: false,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::Yes {
@@ -259,8 +249,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        // TODO: fix this test when migrated over
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

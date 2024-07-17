@@ -287,16 +287,23 @@ impl ObConfiguration {
     }
 
     pub fn get_verification_check(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
-        self.verification_checks.clone().and_then(|vc| {
-            vc.into_iter()
-                .find(|c| VerificationCheckKind::from(c.clone()) == kind)
-        })
+        get_verification_check(self.verification_checks.clone().unwrap_or_default(), kind)
     }
 
     pub fn skip_kyc(&self) -> bool {
         self.get_verification_check(VerificationCheckKind::Kyc).is_none()
     }
 }
+
+fn get_verification_check(
+    checks: Vec<VerificationCheck>,
+    kind: VerificationCheckKind,
+) -> Option<VerificationCheck> {
+    checks
+        .into_iter()
+        .find(|c| VerificationCheckKind::from(c) == kind)
+}
+
 
 trait SupportedCountriesForDocType {
     fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode>;
@@ -399,7 +406,6 @@ pub struct NewObConfigurationArgs {
     pub name: String,
     pub tenant_id: TenantId,
     pub is_live: bool,
-
     pub must_collect_data: Vec<CDO>,
     pub can_access_data: Vec<CDO>,
     pub cip_kind: Option<CipKind>,
@@ -409,7 +415,6 @@ pub struct NewObConfigurationArgs {
     pub allow_international_residents: bool,
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: DbActor,
-    pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
@@ -422,6 +427,17 @@ pub struct NewObConfigurationArgs {
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub verification_checks: VerificationChecksForObc,
+}
+
+impl NewObConfigurationArgs {
+    fn get_verification_check(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
+        get_verification_check(self.verification_checks.clone().into_inner(), kind)
+    }
+
+    // TODO: code duplication
+    pub fn skip_kyc(&self) -> bool {
+        self.get_verification_check(VerificationCheckKind::Kyc).is_none()
+    }
 }
 
 #[derive(Debug, derive_more::From)]
@@ -614,6 +630,7 @@ impl ObConfiguration {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
+        let skip_kyc = args.skip_kyc();
         let NewObConfigurationArgs {
             name,
             tenant_id,
@@ -627,7 +644,6 @@ impl ObConfiguration {
             allow_international_residents,
             international_country_restrictions,
             author,
-            skip_kyc,
             doc_scan_for_optional_ssn,
             enhanced_aml,
             allow_us_residents,
@@ -778,10 +794,14 @@ impl ObConfiguration {
 #[derive(Default, Clone)]
 pub struct VerificationChecksForObc(Vec<VerificationCheck>);
 impl VerificationChecksForObc {
-    pub fn new(checks_from_request: Option<Vec<VerificationCheck>>, skip_kyc: bool) -> Self {
+    pub fn new(checks_from_request: Option<Vec<VerificationCheck>>, skip_kyc: Option<bool>) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
         Self(create_verification_checks_from_obc_request(vc, skip_kyc))
+    }
+
+    pub fn new_for_test(checks: Vec<VerificationCheck>) -> Self {
+        Self(checks)
     }
 
     pub fn into_inner(self) -> Vec<VerificationCheck> {
@@ -799,12 +819,13 @@ impl VerificationChecksForObc {
 
 fn create_verification_checks_from_obc_request(
     mut checks: Vec<VerificationCheck>,
-    skip_kyc: bool,
+    skip_kyc: Option<bool>,
 ) -> Vec<VerificationCheck> {
-    if !skip_kyc {
-        checks.push(VerificationCheck::Kyc {});
+    if let Some(skip) = skip_kyc {
+        if !skip {
+            checks.push(VerificationCheck::Kyc {});
+        }
     }
-
 
     checks
 }

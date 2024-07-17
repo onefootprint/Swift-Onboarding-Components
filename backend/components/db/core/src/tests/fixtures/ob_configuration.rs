@@ -26,7 +26,6 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         allow_international_residents: false,
         international_country_restrictions: None,
         author: DbActor::Footprint,
-        skip_kyc: false,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
@@ -104,6 +103,7 @@ pub fn create_with_opts(
         allow_international_residents,
         international_country_restrictions,
         author,
+        // TODO: we still use this to create verification checks, should stop to be consistent
         skip_kyc,
         doc_scan_for_optional_ssn,
         enhanced_aml,
@@ -114,7 +114,7 @@ pub fn create_with_opts(
     let documents_to_collect = vec![];
     let skip_kyb = false;
     let curp_validation_enabled = false;
-    let verification_checks = VerificationChecksForObc::new(verification_checks, skip_kyc);
+    let verification_checks = VerificationChecksForObc::new(verification_checks, Some(skip_kyc));
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),
@@ -128,7 +128,6 @@ pub fn create_with_opts(
         allow_international_residents,
         international_country_restrictions,
         author,
-        skip_kyc,
         doc_scan_for_optional_ssn,
         enhanced_aml,
         allow_us_residents: true,
