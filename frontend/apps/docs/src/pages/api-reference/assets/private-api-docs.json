@@ -107,6 +107,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -595,6 +596,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -2308,6 +2310,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -2757,6 +2760,7 @@
                                     "investor_profile.senior_executive_symbols",
                                     "investor_profile.family_member_names",
                                     "investor_profile.political_organization",
+                                    "investor_profile.funding_sources",
                                     "document.id_card.front.image",
                                     "document.id_card.front.mime_type",
                                     "document.id_card.back.image",
@@ -7127,6 +7131,16 @@
                 ]
             }
         },
+        "/ro_status": {
+            "get": {
+                "tags": [
+                    "Private"
+                ],
+                "description": "Performs health check to the RO database",
+                "responses": {},
+                "security": []
+            }
+        },
         "/status": {
             "get": {
                 "tags": [
@@ -8474,6 +8488,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -9740,6 +9755,7 @@
                                                 "investor_profile.senior_executive_symbols",
                                                 "investor_profile.family_member_names",
                                                 "investor_profile.political_organization",
+                                                "investor_profile.funding_sources",
                                                 "document.id_card.front.image",
                                                 "document.id_card.front.mime_type",
                                                 "document.id_card.back.image",
@@ -10283,6 +10299,7 @@
                                             "investor_profile.senior_executive_symbols",
                                             "investor_profile.family_member_names",
                                             "investor_profile.political_organization",
+                                            "investor_profile.funding_sources",
                                             "document.id_card.front.image",
                                             "document.id_card.front.mime_type",
                                             "document.id_card.back.image",
@@ -10735,6 +10752,7 @@
                                             "investor_profile.senior_executive_symbols",
                                             "investor_profile.family_member_names",
                                             "investor_profile.political_organization",
+                                            "investor_profile.funding_sources",
                                             "document.id_card.front.image",
                                             "document.id_card.front.mime_type",
                                             "document.id_card.back.image",
@@ -10980,6 +10998,7 @@
                                                     "investor_profile.senior_executive_symbols",
                                                     "investor_profile.family_member_names",
                                                     "investor_profile.political_organization",
+                                                    "investor_profile.funding_sources",
                                                     "document.id_card.front.image",
                                                     "document.id_card.front.mime_type",
                                                     "document.id_card.back.image",
@@ -11249,6 +11268,7 @@
                                             "investor_profile.senior_executive_symbols",
                                             "investor_profile.family_member_names",
                                             "investor_profile.political_organization",
+                                            "investor_profile.funding_sources",
                                             "document.id_card.front.image",
                                             "document.id_card.front.mime_type",
                                             "document.id_card.back.image",
@@ -12223,6 +12243,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -12493,6 +12514,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -12744,6 +12766,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -12988,6 +13011,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -13352,6 +13376,7 @@
                                         "investor_profile.senior_executive_symbols",
                                         "investor_profile.family_member_names",
                                         "investor_profile.political_organization",
+                                        "investor_profile.funding_sources",
                                         "document.id_card.front.image",
                                         "document.id_card.front.mime_type",
                                         "document.id_card.back.image",
@@ -13661,6 +13686,7 @@
                                                     "investor_profile.senior_executive_symbols",
                                                     "investor_profile.family_member_names",
                                                     "investor_profile.political_organization",
+                                                    "investor_profile.funding_sources",
                                                     "document.id_card.front.image",
                                                     "document.id_card.front.mime_type",
                                                     "document.id_card.back.image",
@@ -14005,6 +14031,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -14250,6 +14277,7 @@
                                         "investor_profile.senior_executive_symbols",
                                         "investor_profile.family_member_names",
                                         "investor_profile.political_organization",
+                                        "investor_profile.funding_sources",
                                         "document.id_card.front.image",
                                         "document.id_card.front.mime_type",
                                         "document.id_card.back.image",
@@ -14519,6 +14547,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -15350,6 +15379,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -15718,6 +15748,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -21198,6 +21229,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -21445,6 +21477,7 @@
                                 "investor_profile.senior_executive_symbols",
                                 "investor_profile.family_member_names",
                                 "investor_profile.political_organization",
+                                "investor_profile.funding_sources",
                                 "document.id_card.front.image",
                                 "document.id_card.front.mime_type",
                                 "document.id_card.back.image",
@@ -21696,6 +21729,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -24902,6 +24936,7 @@
                                                 "investor_profile.senior_executive_symbols",
                                                 "investor_profile.family_member_names",
                                                 "investor_profile.political_organization",
+                                                "investor_profile.funding_sources",
                                                 "document.id_card.front.image",
                                                 "document.id_card.front.mime_type",
                                                 "document.id_card.back.image",
@@ -25344,6 +25379,7 @@
                                         "investor_profile.senior_executive_symbols",
                                         "investor_profile.family_member_names",
                                         "investor_profile.political_organization",
+                                        "investor_profile.funding_sources",
                                         "document.id_card.front.image",
                                         "document.id_card.front.mime_type",
                                         "document.id_card.back.image",
@@ -25655,6 +25691,7 @@
                             "investor_profile.senior_executive_symbols",
                             "investor_profile.family_member_names",
                             "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
                             "document.id_card.front.image",
                             "document.id_card.front.mime_type",
                             "document.id_card.back.image",
@@ -27564,15 +27601,15 @@
                             "aws_role_name": {
                                 "type": "string"
                             },
+                            "backup_lag_seconds": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
                             "enrolled_at": {
                                 "type": "string",
                                 "format": "date-time"
                             },
                             "latest_backup_record_timestamp": {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            "latest_online_record_timestamp": {
                                 "type": "string",
                                 "format": "date-time"
                             },
@@ -27589,6 +27626,7 @@
                         "required": [
                             "aws_account_id",
                             "aws_role_name",
+                            "backup_lag_seconds",
                             "enrolled_at",
                             "org_public_keys",
                             "s3_bucket_name"
