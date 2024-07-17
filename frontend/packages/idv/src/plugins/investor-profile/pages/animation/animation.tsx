@@ -13,11 +13,14 @@ const Animation = ({ onAnimationEnd }: AnimationProps) => {
   return (
     <AnimationContainer>
       <GenericTransition
-        firstIcon={IcoUser40}
-        secondIcon={IcoDollar40}
-        firstText={t('investor-profile.components.transition-animation.source')}
-        secondText={t('investor-profile.components.transition-animation.destination')}
-        timeout={4000}
+        firstMessage={{
+          icon: IcoUser40,
+          text: t('investor-profile.components.transition-animation.source'),
+        }}
+        secondMessage={{
+          icon: IcoDollar40,
+          text: t('investor-profile.components.transition-animation.destination'),
+        }}
         onAnimationEnd={onAnimationEnd}
       />
     </AnimationContainer>
@@ -29,6 +32,7 @@ const AnimationContainer = styled.div`
   flex-grow: 1;
   justify-content: center;
   align-items: center;
+  min-height: 180px;
 `;
 
 export default Animation;

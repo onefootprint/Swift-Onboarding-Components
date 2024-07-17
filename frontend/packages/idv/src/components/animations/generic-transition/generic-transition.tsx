@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -13,125 +13,143 @@ import {
 } from './transitions';
 
 type GenericTransitionProps = {
-  firstText: string;
-  secondText: string;
-  firstIcon: Icon;
-  secondIcon: Icon;
-  timeout: number;
+  firstMessage: {
+    icon: Icon;
+    text: string;
+  };
+  secondMessage: {
+    icon: Icon;
+    text: string;
+  };
   onAnimationEnd: () => void;
   isSecondaryBackground?: boolean;
 };
 
-const FIRST_ICON_DELAY = 2000;
-const SECOND_ICON_DELAY = 3500;
+const FIRST_MESSAGE_TIME = 2000;
+const SECOND_MESSAGE_TIME = 4500;
 
 const GenericTransition = ({
-  firstText,
-  secondText,
-  firstIcon: IconFirst,
-  secondIcon: IconSecond,
-  timeout,
+  firstMessage,
+  secondMessage,
   onAnimationEnd,
   isSecondaryBackground,
 }: GenericTransitionProps) => {
-  useTimeout(onAnimationEnd, timeout);
-
-  const [renderFirstIcon, setRenderFirstIcon] = useState(true);
-  const [renderSecondIcon, setRenderSecondIcon] = useState(false);
+  const [animateFirstMessage, setAnimateFirstMessage] = useState(true);
+  const [animateSecondMessage, setAnimateSecondMessage] = useState(false);
 
   useEffect(() => {
-    const firstIconTimeout = setTimeout(() => {
-      setRenderFirstIcon(false);
-      setRenderSecondIcon(true);
-    }, FIRST_ICON_DELAY);
+    const firstMessageTimeout = setTimeout(() => {
+      setAnimateFirstMessage(false);
+      setAnimateSecondMessage(true);
+    }, FIRST_MESSAGE_TIME);
 
-    const secondIconTimeout = setTimeout(() => {
-      setRenderSecondIcon(false);
-      onAnimationEnd();
-    }, FIRST_ICON_DELAY + SECOND_ICON_DELAY);
+    const secondMessageTimeout = setTimeout(() => {
+      setAnimateSecondMessage(false);
+      setTimeout(() => {
+        onAnimationEnd();
+      }, 500);
+    }, SECOND_MESSAGE_TIME);
 
     return () => {
-      clearTimeout(firstIconTimeout);
-      clearTimeout(secondIconTimeout);
+      clearTimeout(firstMessageTimeout);
+      clearTimeout(secondMessageTimeout);
     };
   }, [onAnimationEnd]);
 
   return (
-    <AnimationWrapper
-      gap={3}
-      direction="column"
-      align="center"
-      justify="center"
-      isSecondaryBackground={isSecondaryBackground}
-      height="100%"
-    >
-      <Stack height="60px" width="60px" display="column">
-        <AnimatePresence>
-          {renderFirstIcon ? (
+    <AnimationWrapper $isSecondaryBackground={isSecondaryBackground}>
+      <AnimatePresence>
+        {animateFirstMessage && (
+          <>
             <FeedbackIconContainer
               key="first-icon-container"
               variants={firstIconVariantTransition}
               initial="initial"
               animate="animate"
               exit="exit"
-              isSecondaryBackground={isSecondaryBackground}
+              $isSecondaryBackground={isSecondaryBackground}
             >
-              <IconFirst />
+              <firstMessage.icon />
             </FeedbackIconContainer>
-          ) : null}
-          {renderSecondIcon ? (
+            <TextContainer
+              variants={firstTextVariantTransition}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              key="first-text-container"
+            >
+              {firstMessage.text}
+            </TextContainer>
+          </>
+        )}
+        {animateSecondMessage && (
+          <>
             <FeedbackIconContainer
               key="second-icon-container"
               variants={secondIconVariantTransition}
               initial="initial"
               animate="animate"
               exit="exit"
-              isSecondaryBackground={isSecondaryBackground}
+              $isSecondaryBackground={isSecondaryBackground}
             >
-              <IconSecond />
+              <secondMessage.icon />
             </FeedbackIconContainer>
-          ) : null}
-        </AnimatePresence>
-      </Stack>
-      <Stack minHeight="60px" width="100%" textAlign="center" direction="column">
-        {renderFirstIcon ? (
-          <MotionStack variants={firstTextVariantTransition}>
-            <Text variant="label-1">{firstText}</Text>
-          </MotionStack>
-        ) : null}
-        {renderSecondIcon ? (
-          <MotionStack variants={secondTextVariantTransition}>
-            <Text variant="label-1">{secondText}</Text>
-          </MotionStack>
-        ) : null}
-      </Stack>
+            <TextContainer
+              variants={secondTextVariantTransition}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              key="second-text-container"
+            >
+              {secondMessage.text}
+            </TextContainer>
+          </>
+        )}
+      </AnimatePresence>
     </AnimationWrapper>
   );
 };
 
 const AnimationWrapper = styled(Stack)<{
-  isSecondaryBackground?: boolean;
+  $isSecondaryBackground?: boolean;
 }>`
-  ${({ theme, isSecondaryBackground }) => css`
+  ${({ theme, $isSecondaryBackground }) => css`
     overflow: hidden;
-    padding: ${theme.spacing[11]} ${theme.spacing[3]} ${theme.spacing[3]}
-      ${theme.spacing[3]};
-    background-color: ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+    display: grid;
+    grid-template-rows: 2fr 1fr;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'icon'
+      'text';
+    align-items: center;
+    justify-content: center;
+    background-color: ${$isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
   `}
 `;
 
-const MotionStack = styled(motion(Stack))`
-  display: flex;
-`;
-
-const FeedbackIconContainer = styled(motion.div)<{
-  isSecondaryBackground?: boolean;
+const FeedbackIconContainer = styled(motion(Stack))<{
+  $isSecondaryBackground?: boolean;
 }>`
-  ${({ theme, isSecondaryBackground }) => css`
-    background-color: ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+  ${({ theme, $isSecondaryBackground }) => css`
+    background-color: ${$isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+    padding: ${theme.spacing[7]} ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]};
+    align-items: center;
+    justify-content: center;
     border-radius: ${theme.borderRadius.full};
     border: 4px solid
-      ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+      ${$isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+  `}
+`;
+
+const TextContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    ${createFontStyles('label-1')};
+    padding-top: ${theme.spacing[3]};
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
   `}
 `;
 
