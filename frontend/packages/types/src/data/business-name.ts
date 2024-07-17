@@ -11,10 +11,10 @@ export type RawBusinessName = {
 export type BusinessName = {
   kind: BusinessNameKind | null;
   name: string;
-  sources: string;
+  sources: string | null;
   subStatus: string;
-  submitted: boolean | null;
-  verified: boolean | null;
+  submitted: boolean;
+  verified: boolean;
   notes?: string;
 };
 

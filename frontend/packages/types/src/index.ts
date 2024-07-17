@@ -357,6 +357,8 @@ export type {
   BusinessDetailPhoneNumber,
   BusinessDetailTin,
   BusinessDetailWebsite,
+  BusinessPerson,
+  RawBusinessPerson,
   RiskSignalRuleField,
   Role,
   Rolebinding,

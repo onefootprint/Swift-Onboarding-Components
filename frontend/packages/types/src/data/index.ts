@@ -195,6 +195,7 @@ export type {
   BusinessDetailTin,
   BusinessDetailWebsite,
 } from './business-details';
+export type { BusinessPerson, RawBusinessPerson } from './business-person';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export type {
   BasicRoleScope,

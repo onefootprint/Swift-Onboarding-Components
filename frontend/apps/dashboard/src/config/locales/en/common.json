@@ -1751,7 +1751,15 @@
           "website": "Website"
         },
         "people": {
-          "title": "People"
+          "title": "People",
+          "table": {
+            "aria-label": "Business people",
+            "empty-state": "No associated people",
+            "header": {
+              "name": "Name",
+              "role": "Role"
+            }
+          }
         },
         "sos-filings": {
           "title": "Secretary of State filings"

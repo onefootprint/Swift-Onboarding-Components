@@ -6,10 +6,13 @@ import {
   BusinessDetails,
   BusinessName,
   BusinessNameKind,
+  BusinessPerson,
   GetBusinessInsightsResponse,
   RawBusinessName,
+  RawBusinessPerson,
 } from '@onefootprint/types';
 import capitalize from 'lodash/capitalize';
+import upperFirst from 'lodash/upperFirst';
 import { BusinessDetail } from '../../types';
 
 type RawBusinesDetailValue = string | BusinessDetailPhoneNumber[] | BusinessDetailTin | BusinessDetailWebsite | null;
@@ -60,6 +63,36 @@ const getBusinessInsights = () => {
         verified: true,
       },
     },
+    people: [
+      {
+        associationVerified: false,
+        name: 'Bobby Bobierto',
+        role: 'Chief executive officer',
+        sources: '',
+        submitted: true,
+      },
+      {
+        associationVerified: false,
+        name: 'Bingo Maman',
+        role: 'secretary',
+        sources: '',
+        submitted: true,
+      },
+      {
+        associationVerified: null,
+        name: 'LEGALINC CORPORATE SERVICES INC.',
+        role: 'REGISTERED AGENT',
+        sources: 'DE - SOS',
+        submitted: false,
+      },
+      {
+        associationVerified: null,
+        name: 'Test null person',
+        role: null,
+        sources: null,
+        submitted: null,
+      },
+    ],
   };
   return mockResponse;
 };
@@ -70,10 +103,10 @@ const useBusinessInsights = () => {
   const formatName = (name: RawBusinessName): BusinessName => ({
     kind: name.kind,
     name: name.name || EMPTY_VALUE,
-    sources: name.sources || EMPTY_VALUE,
+    sources: name.sources,
     subStatus: name.subStatus || EMPTY_VALUE,
-    submitted: name.submitted,
-    verified: name.verified,
+    submitted: !!name.submitted,
+    verified: !!name.verified,
     notes: name.notes || EMPTY_VALUE,
   });
 
@@ -123,6 +156,14 @@ const useBusinessInsights = () => {
     return EMPTY_VALUE;
   };
 
+  const formatPerson = (person: RawBusinessPerson): BusinessPerson => ({
+    name: person.name ? upperFirst(person.name) : EMPTY_VALUE,
+    role: person.role ? upperFirst(person.role) : EMPTY_VALUE,
+    submitted: !!person.submitted,
+    associationVerified: !!person.associationVerified,
+    sources: person.sources,
+  });
+
   const formattedDetails: Partial<Record<BusinessDetail, Exclude<RawBusinesDetailValue, null>>> = {};
   Object.entries(rawData.details).forEach(([label, value]) => {
     formattedDetails[label as BusinessDetail] = formatDetail(label as BusinessDetail, value);
@@ -130,6 +171,7 @@ const useBusinessInsights = () => {
   const data = {
     names: rawData.names.map(name => formatName(name)),
     details: formattedDetails as BusinessDetails,
+    people: rawData.people.map(person => formatPerson(person)),
   };
 
   return {
