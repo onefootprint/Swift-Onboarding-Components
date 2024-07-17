@@ -2,6 +2,7 @@ import type { InvestorProfileDI } from './di';
 import type {
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,
+  InvestorProfileFundingSources,
   InvestorProfileInvestmentGoal,
   InvestorProfileNetWorth,
   InvestorProfileRiskTolerance,
@@ -13,6 +14,7 @@ export type InvestorProfileData = Partial<{
   [InvestorProfileDI.employer]: string;
   [InvestorProfileDI.annualIncome]: InvestorProfileAnnualIncome;
   [InvestorProfileDI.netWorth]: InvestorProfileNetWorth;
+  [InvestorProfileDI.fundingSources]: InvestorProfileFundingSources[];
   [InvestorProfileDI.investmentGoals]: InvestorProfileInvestmentGoal[];
   [InvestorProfileDI.riskTolerance]: InvestorProfileRiskTolerance;
   [InvestorProfileDI.declarations]: InvestorProfileDeclaration[];

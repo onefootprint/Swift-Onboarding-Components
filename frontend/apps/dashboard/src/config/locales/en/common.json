@@ -88,6 +88,7 @@
       "employer": "Employer",
       "annual_income": "Annual income",
       "net_worth": "Net worth",
+      "funding_sources": "Funding sources",
       "investment_goals": "Investment goals",
       "risk_tolerance": "Risk tolerance",
       "declarations": "Declaration(s)",
@@ -2011,6 +2012,17 @@
               "gt500k_le1m": "$500,001 - $1,000,000",
               "gt1m_le5m": "$1,000,001 - $5,000,000",
               "gt5m": "$5,000,001+"
+            }
+          },
+          "funding-sources": {
+            "title": "What is the source of your account fundings",
+            "options": {
+              "employment_income": "Employement Income",
+              "investments": "Investments",
+              "inheritance": "Inheritance",
+              "business_income": "Business Income",
+              "savings": "Savings",
+              "family": "Family"
             }
           },
           "investment-goals": {

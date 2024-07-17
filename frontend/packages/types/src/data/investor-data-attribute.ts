@@ -39,3 +39,12 @@ export enum InvestorProfileDeclaration {
   seniorExecutive = 'senior_executive',
   seniorPoliticalFigure = 'senior_political_figure',
 }
+
+export enum InvestorProfileFundingSources {
+  employmentIncome = 'employment_income',
+  investments = 'investments',
+  inheritance = 'inheritance',
+  businessIncome = 'business_income',
+  savings = 'savings',
+  family = 'family',
+}

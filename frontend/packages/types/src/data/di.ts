@@ -30,6 +30,7 @@ export enum InvestorProfileDI {
   familyMemberNames = 'investor_profile.family_member_names',
   politicalOrganization = 'investor_profile.political_organization',
   brokerageFirmEmployer = 'investor_profile.brokerage_firm_employer',
+  fundingSources = 'investor_profile.funding_sources',
 }
 
 export enum IdDI {

@@ -27,7 +27,10 @@ const Declarations = ({ onSuccess, renderFooter }: DeclarationsProps) => {
       data: declarationData,
       speculative: true, // First send the declarations data speculatively to check for any errors
       onSuccess: () => {
-        send({ type: 'declarationsSubmitted', payload: { data: declarationData, files } });
+        send({
+          type: 'declarationsSubmitted',
+          payload: { data: declarationData, files },
+        });
         onSuccess?.();
       },
       onError: (error: unknown) => {

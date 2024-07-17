@@ -111,6 +111,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
         { di: DocumentDI.finraComplianceLetter },
         { di: InvestorProfileDI.declarations },
         { di: InvestorProfileDI.brokerageFirmEmployer },
+        { di: InvestorProfileDI.fundingSources },
         { di: InvestorProfileDI.seniorExecutiveSymbols },
         { di: InvestorProfileDI.familyMemberNames },
         { di: InvestorProfileDI.politicalOrganization },

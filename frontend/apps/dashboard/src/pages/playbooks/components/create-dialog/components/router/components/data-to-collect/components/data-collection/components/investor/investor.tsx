@@ -8,7 +8,9 @@ import styled, { css } from 'styled-components';
 import Panel from '../panel';
 
 const InvestorProfile = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.investor-profile' });
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'create.data-to-collect.investor-profile',
+  });
   const { register, setValue, watch } = useFormContext();
   const value = watch(CollectedInvestorProfileDataOption.investorProfile);
 
@@ -39,6 +41,9 @@ const InvestorProfile = () => {
           </Text>
           <Text variant="body-3" tag="li">
             {t('questions.net-worth')}
+          </Text>
+          <Text variant="body-3" tag="li">
+            {t('questions.funding-sources')}
           </Text>
           <Text variant="body-3" tag="li">
             {t('questions.investment-goals')}

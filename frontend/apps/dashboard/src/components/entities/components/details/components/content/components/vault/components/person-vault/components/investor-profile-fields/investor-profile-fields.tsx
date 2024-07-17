@@ -67,6 +67,21 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             }
           />
         </FieldSection>
+        {isVaultDataEmpty(vaultData?.[InvestorProfileDI.fundingSources]) ? null : (
+          <FieldSection title={t('funding-sources.title')}>
+            <Field
+              di={InvestorProfileDI.fundingSources}
+              entity={entity}
+              renderValue={(value, isValueDecrypted) =>
+                !isValueDecrypted ? (
+                  <FieldOrPlaceholder data={value} />
+                ) : (
+                  <FieldOrPlaceholder data={t(`funding-sources.options.${value}` as ParseKeys<'common'>)} />
+                )
+              }
+            />
+          </FieldSection>
+        )}
       </Column>
       <Separator />
       <Column>
