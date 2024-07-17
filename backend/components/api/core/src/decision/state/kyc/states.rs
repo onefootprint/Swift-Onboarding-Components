@@ -171,7 +171,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was
         // collected. Also need to clairfy tenant's understanding of this
-        let (kyc_vendor_result, user_input_reason_codes) = if !obc.skip_kyc {
+        let (kyc_vendor_result, user_input_reason_codes) = if !obc.skip_kyc() {
             let kyc_vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
             let user_input_reason_codes = features::user_input::generate_user_input_risk_signals(
                 &state.enclave_client,

@@ -164,7 +164,7 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
             .unwrap_or(false)
     });
 
-    let should_run_kyb = obc.skip_kyc || all_bo_kyc_complete;
+    let should_run_kyb = obc.skip_kyc() || all_bo_kyc_complete;
     Ok(should_run_kyb)
 }
 

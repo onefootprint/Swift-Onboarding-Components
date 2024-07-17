@@ -524,6 +524,7 @@ impl ObConfigurationArgsToValidate {
         let duplicates: Vec<VerificationCheckKind> = self
             .verification_checks
             .clone()
+            .into_inner()
             .into_iter()
             .fold(HashMap::new(), |mut acc: HashMap<_, _>, check| {
                 *acc.entry(VerificationCheckKind::from(check)).or_insert(0) += 1;
@@ -546,6 +547,7 @@ impl ObConfigurationArgsToValidate {
 
         // validate against kind
         self.verification_checks
+            .inner()
             .iter()
             .try_for_each(|c| -> FpResult<()> {
                 match c {
@@ -569,6 +571,7 @@ impl ObConfigurationArgsToValidate {
                 if !self.skip_kyb
                     && !self
                         .verification_checks
+                        .inner()
                         .iter()
                         .any(|c| matches!(c.into(), VerificationCheckKind::Kyb))
                 {
@@ -587,6 +590,7 @@ impl ObConfigurationArgsToValidate {
 
         // validate against collected data
         self.verification_checks
+            .inner()
             .iter()
             .try_for_each(|c| -> FpResult<()> {
                 self.validate_verification_check_collected_data(c.clone())?;

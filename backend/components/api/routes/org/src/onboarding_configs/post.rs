@@ -10,6 +10,7 @@ use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::ob_configuration::VerificationChecksForObc;
 use db::models::rule_set_version::RuleSetVersion;
 use newtypes::AdverseMediaListKind;
 use newtypes::CipKind;
@@ -126,11 +127,11 @@ pub async fn post(
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
-    let verification_checks =
-        create_verification_checks_from_request(verification_checks.unwrap_or_default(), skip_kyc);
+    let verification_checks = VerificationChecksForObc::new(verification_checks, skip_kyc);
 
     let skip_kyb = match kind {
         ObConfigurationKind::Kyb => !verification_checks
+            .inner()
             .iter()
             .any(|c| matches!(c.into(), VerificationCheckKind::Kyb)),
         _ => false,
@@ -211,16 +212,4 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
     } else {
         None
     }
-}
-
-fn create_verification_checks_from_request(
-    mut checks: Vec<VerificationCheck>,
-    skip_kyc: bool,
-) -> Vec<VerificationCheck> {
-    if !skip_kyc {
-        checks.push(VerificationCheck::Kyc {});
-    }
-
-
-    checks
 }

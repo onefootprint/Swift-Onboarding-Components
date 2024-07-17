@@ -17,6 +17,7 @@ use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::ob_configuration::VerificationChecksForObc;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_version::RuleSetVersion;
@@ -154,6 +155,7 @@ fn copy_playbook(
     target_is_live: bool,
     name: String,
 ) -> NewObConfigurationArgs {
+    let verification_checks = VerificationChecksForObc::from_existing(&pb);
     let ObConfiguration {
         must_collect_data,
         can_access_data,
@@ -191,7 +193,7 @@ fn copy_playbook(
 
         // Maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
-        verification_checks,
+        verification_checks: _,
     } = pb;
 
     NewObConfigurationArgs {
@@ -220,6 +222,6 @@ fn copy_playbook(
         curp_validation_enabled,
         documents_to_collect: documents_to_collect.unwrap_or_default(),
         business_documents_to_collect,
-        verification_checks: verification_checks.unwrap_or_default(),
+        verification_checks,
     }
 }

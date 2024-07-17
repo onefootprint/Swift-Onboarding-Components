@@ -1,5 +1,6 @@
 use super::validation::ObConfigurationArgsToValidate;
 use db::models::ob_configuration::NewObConfigurationArgs;
+use db::models::ob_configuration::VerificationChecksForObc;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::CountryRestriction;
@@ -62,7 +63,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -102,7 +103,7 @@ fn test_is_no_phone_flow(
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -141,7 +142,7 @@ fn test_is_doc_first(
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -176,7 +177,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test once migrated over to checks
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -216,7 +217,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -259,7 +260,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
-        verification_checks: vec![],
+        verification_checks: VerificationChecksForObc::default(),
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

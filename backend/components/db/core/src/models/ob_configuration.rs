@@ -76,6 +76,7 @@ pub struct ObConfiguration {
     #[diesel(deserialize_as = OptionalNonNullVec<Iso3166TwoDigitCountryCode>)]
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
+    /// DEPRECATED: use verification_checks instead
     pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
@@ -291,6 +292,10 @@ impl ObConfiguration {
                 .find(|c| VerificationCheckKind::from(c.clone()) == kind)
         })
     }
+
+    pub fn skip_kyc(&self) -> bool {
+        self.get_verification_check(VerificationCheckKind::Kyc).is_none()
+    }
 }
 
 trait SupportedCountriesForDocType {
@@ -416,7 +421,7 @@ pub struct NewObConfigurationArgs {
     pub curp_validation_enabled: bool,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
-    pub verification_checks: Vec<VerificationCheck>,
+    pub verification_checks: VerificationChecksForObc,
 }
 
 #[derive(Debug, derive_more::From)]
@@ -664,7 +669,7 @@ impl ObConfiguration {
             curp_validation_enabled,
             documents_to_collect,
             business_documents_to_collect,
-            verification_checks,
+            verification_checks: verification_checks.into_inner(),
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -767,4 +772,39 @@ impl ObConfiguration {
             }),
         }
     }
+}
+
+// 2024-07-16 temporary while we're migrating to verification checks
+#[derive(Default, Clone)]
+pub struct VerificationChecksForObc(Vec<VerificationCheck>);
+impl VerificationChecksForObc {
+    pub fn new(checks_from_request: Option<Vec<VerificationCheck>>, skip_kyc: bool) -> Self {
+        let vc = checks_from_request.unwrap_or_default();
+
+        Self(create_verification_checks_from_obc_request(vc, skip_kyc))
+    }
+
+    pub fn into_inner(self) -> Vec<VerificationCheck> {
+        self.0
+    }
+
+    pub fn inner(&self) -> &Vec<VerificationCheck> {
+        &self.0
+    }
+
+    pub fn from_existing(existing: &ObConfiguration) -> Self {
+        Self(existing.verification_checks.clone().unwrap_or_default())
+    }
+}
+
+fn create_verification_checks_from_obc_request(
+    mut checks: Vec<VerificationCheck>,
+    skip_kyc: bool,
+) -> Vec<VerificationCheck> {
+    if !skip_kyc {
+        checks.push(VerificationCheck::Kyc {});
+    }
+
+
+    checks
 }

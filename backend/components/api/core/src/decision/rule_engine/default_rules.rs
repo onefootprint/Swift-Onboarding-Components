@@ -157,7 +157,7 @@ pub fn default_rules_for_obc(
 
     // KYC
     let has_kyc =
-        (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb) && !obc.skip_kyc;
+        (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb) && !obc.skip_kyc();
     let must_collect_ssn =
         obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
     let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
