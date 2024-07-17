@@ -129,10 +129,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         );
 
         let InsightHeaders {
-            ip_address,
-            country,
-            user_agent,
-            ..
+            ip_address, country, ..
         } = InsightHeaders::parse_from_request(request.request());
 
         let TelemetryHeaders {
@@ -172,7 +169,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             route,
             ip_address,
             country,
-            user_agent,
             // This is already logged by the macro, but we want to overshadow it with a field that
             // excludes the HTTP path
             http.target = %request.uri().path(),
@@ -355,6 +351,7 @@ where
                 | "is_live"
                 | "auth_method"
                 | "auth_token_hash"
+                | "meta"
                 | "client_version"
                 | "session_id"
                 | "fp_session_id"
@@ -362,10 +359,15 @@ where
                 | "route"
                 | "ip_address"
                 | "country"
-                | "user_agent"
                 | "support_id"
+                | "request_id"
+                | "server_git_hash"
                 | "exception.message"
                 | "exception.details"
+                | "http.client_ip"
+                | "http.host"
+                | "http.user_agent"
+                | "http.method"
                 | "http.status_code"
                 | "http.route"
                 | "http.target" => match v {
