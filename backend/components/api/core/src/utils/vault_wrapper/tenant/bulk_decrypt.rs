@@ -201,7 +201,11 @@ pub async fn bulk_decrypt_dls_unchecked(
     let tenant_id = tenant_id.clone();
 
     let dl_ids = dls.iter().map(|(_, dl)| dl.id.clone()).collect_vec();
-    let sv_ids = dls.iter().map(|(_, dl)| dl.scoped_vault_id.clone()).collect_vec();
+    let sv_ids = dls
+        .iter()
+        .map(|(_, dl)| dl.scoped_vault_id.clone())
+        .unique()
+        .collect_vec();
 
     let (sv_vaults, vault_data_by_dl, document_data_by_dl) = state
         .db_pool

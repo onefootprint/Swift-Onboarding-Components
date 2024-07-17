@@ -32,6 +32,11 @@ def test_footprint_dr_backup(tenant):
         "id.phone_number": "+1234232345",
     }, tenant.sk.key)
 
+    # Updating the same data should create another blob.
+    body = patch(f"users/{fp_id_2}/vault", {
+        "id.phone_number": "+2222222222",
+    }, tenant.sk.key)
+
     # Run the VDR batch.
     resp = post("private/vault_dr/run_batch", {
         "tenant_id": tenant.id,
@@ -40,7 +45,7 @@ def test_footprint_dr_backup(tenant):
         "fp_ids": [fp_id_1, fp_id_2],
     }, CUSTODIAN_AUTH)
 
-    assert resp["num_blobs"] == 6
+    assert resp["num_blobs"] == 7
 
     with footprint_dr("status", "--live") as cmd:
         cmd.expect(r"Latest backup record timestamp: ([0-9:\.\- ]+ UTC)")
