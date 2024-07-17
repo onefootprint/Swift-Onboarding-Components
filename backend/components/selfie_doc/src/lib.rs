@@ -236,7 +236,7 @@ mod tests {
 
     async fn run_test(doc: PiiBytes, selfie: PiiBytes) {
         let _dotenv = dotenv::dotenv().unwrap();
-        let conf = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+        let conf = aws_config::defaults(aws_config::BehaviorVersion::latest())
             .load()
             .await;
         let client = AwsSelfieDocClient::new(&conf);
@@ -290,7 +290,7 @@ mod tests {
     #[tokio::test]
     async fn test_doc_extract() {
         let _dotenv = dotenv::dotenv().unwrap();
-        let conf = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+        let conf = aws_config::defaults(aws_config::BehaviorVersion::latest())
             .load()
             .await;
         let client = AwsSelfieDocClient::new(&conf);

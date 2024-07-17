@@ -188,7 +188,7 @@ impl State {
 
         let enclave_client = EnclaveClient::new(config.clone()).await;
 
-        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::latest())
             .load()
             .await;
         let s3_client = s3::AwsS3Client {
