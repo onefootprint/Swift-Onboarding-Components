@@ -443,6 +443,7 @@ export {
   InvestorProfileDeclaration,
   InvestorProfileDI,
   InvestorProfileInvestmentGoal,
+  InvestorProfileFundingSources,
   InvestorProfileNetWorth,
   InvestorProfileRiskTolerance,
   isCountryCode,

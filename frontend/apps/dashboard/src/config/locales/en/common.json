@@ -2015,7 +2015,7 @@
             }
           },
           "funding-sources": {
-            "title": "What is the source of your account fundings",
+            "title": "What's the source of your account fundings",
             "options": {
               "employment_income": "Employement Income",
               "investments": "Investments",

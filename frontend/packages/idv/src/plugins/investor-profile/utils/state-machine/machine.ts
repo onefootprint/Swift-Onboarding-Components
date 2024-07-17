@@ -27,6 +27,10 @@ export const isMissingNetWorthData = ({ data }: MachineContext): boolean => {
   return !data?.[InvestorProfileDI.netWorth];
 };
 
+export const isMissingFundingSources = ({ data }: MachineContext): boolean => {
+  return !data?.[InvestorProfileDI.fundingSources];
+};
+
 export const isMissingInvestmentGoalsData = ({ data }: MachineContext): boolean => {
   const goals = data?.[InvestorProfileDI.investmentGoals];
   if (!goals || !Array.isArray(goals)) return true;
@@ -71,6 +75,7 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
             { target: 'employment', cond: isMissingEmploymentData },
             { target: 'income', cond: isMissingIncomeData },
             { target: 'netWorth', cond: isMissingNetWorthData },
+            { target: 'fundingSources', cond: isMissingFundingSources },
             { target: 'investmentGoals', cond: isMissingInvestmentGoalsData },
             { target: 'riskTolerance', cond: isMissingRiskToleranceData },
             { target: 'declarations', cond: isMissingDeclarationsData },
@@ -97,19 +102,37 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
         },
         netWorth: {
           on: {
-            netWorthSubmitted: { target: 'investmentGoals', actions: 'assignData' },
+            netWorthSubmitted: {
+              target: 'fundingSources',
+              actions: 'assignData',
+            },
             navigatedToPrevPage: { target: 'income' },
+          },
+        },
+        fundingSources: {
+          on: {
+            fundingSourcesSubmitted: {
+              target: 'investmentGoals',
+              actions: 'assignData',
+            },
+            navigatedToPrevPage: { target: 'netWorth' },
           },
         },
         investmentGoals: {
           on: {
-            investmentGoalsSubmitted: { target: 'riskTolerance', actions: 'assignData' },
-            navigatedToPrevPage: { target: 'netWorth' },
+            investmentGoalsSubmitted: {
+              target: 'riskTolerance',
+              actions: 'assignData',
+            },
+            navigatedToPrevPage: { target: 'fundingSources' },
           },
         },
         riskTolerance: {
           on: {
-            riskToleranceSubmitted: { target: 'declarations', actions: 'assignData' },
+            riskToleranceSubmitted: {
+              target: 'declarations',
+              actions: 'assignData',
+            },
             navigatedToPrevPage: { target: 'investmentGoals' },
           },
         },
@@ -124,6 +147,7 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
             navigatedToPrevPage: { target: 'declarations' },
             incomeSubmitted: { actions: 'assignData' },
             netWorthSubmitted: { actions: 'assignData' },
+            fundingSourcesSubmitted: { actions: 'assignData' },
             investmentGoalsSubmitted: { actions: 'assignData' },
             riskToleranceSubmitted: { actions: 'assignData' },
             declarationsSubmitted: { actions: 'assignData' },

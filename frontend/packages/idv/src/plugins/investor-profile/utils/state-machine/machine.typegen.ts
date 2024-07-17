@@ -16,6 +16,7 @@ export interface Typegen0 {
     assignData:
       | 'declarationsSubmitted'
       | 'employmentSubmitted'
+      | 'fundingSourcesSubmitted'
       | 'incomeSubmitted'
       | 'initDone'
       | 'investmentGoalsSubmitted'
@@ -30,6 +31,7 @@ export interface Typegen0 {
     | 'confirm'
     | 'declarations'
     | 'employment'
+    | 'fundingSources'
     | 'income'
     | 'init'
     | 'investmentGoals'

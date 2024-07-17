@@ -24,7 +24,10 @@ describe('<InvestorProfile />', () => {
 
   beforeEach(() => {
     queryCache.clear();
-    useRouterSpy({ pathname: '/', query: { public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY' } });
+    useRouterSpy({
+      pathname: '/',
+      query: { public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY' },
+    });
     withOnboardingConfig();
     withUserVaultValidate();
     withUserVault();
@@ -61,68 +64,96 @@ describe('<InvestorProfile />', () => {
 
     renderPlugin({ onDone });
 
+    // Occupation
     await waitFor(() => {
-      expect(screen.getByText("What's your employment status and occupation?")).toBeInTheDocument();
-    });
-    expect(screen.getByText('Employed')).toBeInTheDocument();
-
-    const occupation = screen.getByLabelText('Occupation');
-    await userEvent.type(occupation, 'Doctor');
-
-    const employer = screen.getByLabelText('Employer');
-    await userEvent.type(employer, 'Hospital');
-
-    let ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("What's your annual income?")).toBeInTheDocument();
+      const occupation = screen.getByText("What's your employment status and occupation?");
+      expect(occupation).toBeInTheDocument;
     });
 
-    ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
+    const occupationField = screen.getByLabelText('Occupation');
+    await userEvent.type(occupationField, 'Doctor');
 
+    const employerField = screen.getByLabelText('Employer');
+    await userEvent.type(employerField, 'Hospital');
+
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Annual income
     await waitFor(() => {
-      expect(screen.getByText("What's your net worth?")).toBeInTheDocument();
+      const annualIncome = screen.getByText("What's your annual income?");
+      expect(annualIncome).toBeInTheDocument();
     });
 
-    ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
+    const option100to200 = screen.getByRole('radio', {
+      name: '$100,001 - $200,000',
+    });
+    await userEvent.click(option100to200);
 
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Net worth
     await waitFor(() => {
-      expect(screen.getByText('What are your investment goals?')).toBeInTheDocument();
+      const netWorth = screen.getByText("What's your net worth?");
+      expect(netWorth).toBeInTheDocument();
     });
 
-    const longTerm = screen.getByLabelText('Preserve capital') as HTMLInputElement;
-    expect(longTerm.checked).toBe(false);
-    await userEvent.click(longTerm);
-    expect(longTerm.checked).toBe(true);
+    const option500to1kk = screen.getByRole('radio', {
+      name: '$500,000 - $1,000,000',
+    });
+    await userEvent.click(option500to1kk);
 
-    ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
+    await userEvent.click(screen.getByText('Continue'));
 
+    // Funding sources
     await waitFor(() => {
-      expect(screen.getByText('How would you describe your risk tolerance?')).toBeInTheDocument();
+      const fundingSources = screen.getByText("What's the source of your account fundings?");
+      expect(fundingSources).toBeInTheDocument();
     });
 
-    ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
+    const familyOption = screen.getByLabelText('Family') as HTMLInputElement;
+    await userEvent.click(familyOption);
 
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Investment goals
     await waitFor(() => {
-      expect(
-        screen.getByText('Do any of the following apply to you or a member of your immediate family?'),
-      ).toBeInTheDocument();
+      const goals = screen.getByText('What are your investment goals?');
+      expect(goals).toBeInTheDocument();
     });
 
-    ctaButton = screen.getByText('Continue');
-    await userEvent.click(ctaButton);
+    const preserveOption = screen.getByLabelText('Preserve capital') as HTMLInputElement;
+    await userEvent.click(preserveOption);
 
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Risk tolerance
     await waitFor(() => {
-      expect(screen.getByText('Confirm your profile')).toBeInTheDocument();
+      const riskTolerance = screen.getByText('How would you describe your risk tolerance?');
+      expect(riskTolerance).toBeInTheDocument();
     });
 
-    ctaButton = screen.getByText('Confirm & Continue');
-    await userEvent.click(ctaButton);
+    const moderateOption = screen.getByRole('radio', { name: 'Moderate' });
+    await userEvent.click(moderateOption);
+
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Declarations
+    await waitFor(() => {
+      const declarations = screen.getByText(
+        'Do any of the following apply to you or a member of your immediate family?',
+      );
+      expect(declarations).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByText('Continue'));
+
+    // Confirm
+    await waitFor(() => {
+      const confirm = screen.getByText('Confirm your profile');
+      expect(confirm).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByText('Confirm & Continue'));
 
     await waitFor(() => {
       expect(onDone).toHaveBeenCalled();

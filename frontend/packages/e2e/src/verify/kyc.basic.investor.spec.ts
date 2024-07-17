@@ -83,30 +83,42 @@ test('Verify KYC as an investor #ci', async ({ page, isMobile }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Occupation
   await frame.getByLabel('Occupation').first().fill('Occupation');
   await frame.getByLabel('Employer').first().fill('Employer');
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Annual income
   await frame.getByLabel('$100,001 - $200,000').first().check();
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Net worth
   await frame.getByLabel('$200,001 - $500,000').first().check();
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Funding sources
+  await frame.getByLabel('Family').first().check();
+  await clickOnContinue(frame);
+  await page.waitForLoadState();
+
+  // Investment goals
   await frame.getByLabel('Growth').first().click();
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Risk tolerance
   await frame.getByLabel('Moderate').first().click();
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Declarations
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
+  // Confirm
   await expect(frame.getByText('$100,001 - $200,000')).toBeAttached();
   await expect(frame.getByText('$200,001 - $500,000')).toBeAttached();
   await expect(frame.getByText('Growth')).toBeAttached();

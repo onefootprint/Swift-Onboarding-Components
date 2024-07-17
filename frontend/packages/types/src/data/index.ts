@@ -28,7 +28,10 @@ export type {
   KycBootstrapData,
 } from './bootstrap-data';
 export type { BusinessBoKycData } from './business-bo-kyc-data';
-export type { BusinessDIData, ValueTypeForBusinessDI } from './business-di-data';
+export type {
+  BusinessDIData,
+  ValueTypeForBusinessDI,
+} from './business-di-data';
 export type { BusinessOwner } from './business-owner';
 export type { CardBrands } from './card-brands';
 export { default as CdoToAllDisMap } from './cdo-to-di-map';
@@ -117,6 +120,7 @@ export type { InsightEvent } from './insight-event';
 export {
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,
+  InvestorProfileFundingSources,
   InvestorProfileInvestmentGoal,
   InvestorProfileNetWorth,
   InvestorProfileRiskTolerance,

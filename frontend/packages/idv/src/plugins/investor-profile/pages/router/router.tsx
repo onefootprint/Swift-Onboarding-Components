@@ -11,6 +11,7 @@ import Animation from '../animation';
 import Confirm from '../confirm/confirm';
 import Declarations from '../declarations';
 import Employment from '../employment';
+import FundingSources from '../funding-sources';
 import Income from '../income';
 import Init from '../init';
 import InvestmentGoals from '../investment-goals';
@@ -84,6 +85,15 @@ const Router = ({ onDone }: RouterProps) => {
         <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
         <HeaderTitle title={t('net-worth.title')} subtitle={t('net-worth.subtitle')} marginBottom={7} />
         <NetWorth />
+      </>
+    );
+  }
+  if (matches('fundingSources')) {
+    return (
+      <>
+        <NavigationHeader leftButton={{ onBack: handleOnBack, variant: 'back' }} />
+        <HeaderTitle title={t('funding-sources.title')} subtitle={t('funding-sources.subtitle')} marginBottom={7} />
+        <FundingSources />
       </>
     );
   }

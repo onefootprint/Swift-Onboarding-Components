@@ -30,7 +30,7 @@ const Container = styled(Grid.Container)`
 const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[6]};
+    row-gap: ${theme.spacing[7]};
   `};
 `;
 

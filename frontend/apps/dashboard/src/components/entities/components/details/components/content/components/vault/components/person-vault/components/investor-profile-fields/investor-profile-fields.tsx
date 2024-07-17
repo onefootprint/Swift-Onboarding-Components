@@ -67,24 +67,29 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             }
           />
         </FieldSection>
+      </Column>
+      <Separator />
+      <Column>
         {isVaultDataEmpty(vaultData?.[InvestorProfileDI.fundingSources]) ? null : (
           <FieldSection title={t('funding-sources.title')}>
             <Field
               di={InvestorProfileDI.fundingSources}
               entity={entity}
-              renderValue={(value, isValueDecrypted) =>
-                !isValueDecrypted ? (
-                  <FieldOrPlaceholder data={value} />
-                ) : (
-                  <FieldOrPlaceholder data={t(`funding-sources.options.${value}` as ParseKeys<'common'>)} />
-                )
-              }
+              renderValue={value => {
+                if (Array.isArray(value)) {
+                  return (
+                    <FieldOrPlaceholder
+                      data={createCapitalStringList(
+                        value.map(option => t(`funding-sources.options.${option}` as ParseKeys<'common'>)),
+                      )}
+                    />
+                  );
+                }
+                return <FieldOrPlaceholder data={value} />;
+              }}
             />
           </FieldSection>
         )}
-      </Column>
-      <Separator />
-      <Column>
         <FieldSection title={t('investment-goals.title')}>
           <Field
             di={InvestorProfileDI.investmentGoals}

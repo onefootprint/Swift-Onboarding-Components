@@ -845,6 +845,17 @@
         "gt1m_le5m": "$1,000,001 - $5,000,000",
         "gt5m": "Más de $5,000,000"
       },
+      "funding-sources": {
+        "title": "¿Cuál es la fuente de los fondos de su cuenta?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "employment_income": "Ingresos por Empleo",
+        "investments": "Inversiones",
+        "inheritance": "Herencia",
+        "business_income": "Ingresos Empresariales",
+        "savings": "Ahorros",
+        "family": "Familia",
+        "empty-selection": "Por favor, seleccione al menos una fuente de financiamiento"
+      },
       "investment-goals": {
         "title": "¿Cuáles son tus objetivos de inversión?",
         "subtitle": "Estamos legalmente obligados a requerir esta información.",

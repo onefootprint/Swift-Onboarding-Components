@@ -11,6 +11,8 @@ export type IncomeData = Required<Pick<InvestorProfileData, InvestorProfileDI.an
 
 export type NetWorthData = Required<Pick<InvestorProfileData, InvestorProfileDI.netWorth>>;
 
+export type FundingSourcesData = Required<Pick<InvestorProfileData, InvestorProfileDI.fundingSources>>;
+
 export type InvestmentGoalsData = Required<Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>>;
 
 export type RiskToleranceData = Required<Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>>;
@@ -47,5 +49,6 @@ export type MachineEvents =
   | { type: 'investmentGoalsSubmitted'; payload: InvestmentGoalsData }
   | { type: 'navigatedToPrevPage' }
   | { type: 'netWorthSubmitted'; payload: NetWorthData }
+  | { type: 'fundingSourcesSubmitted'; payload: FundingSourcesData }
   | { type: 'receivedContext'; payload: { authToken: string; device: DeviceInfo; showTransition?: boolean } }
   | { type: 'riskToleranceSubmitted'; payload: RiskToleranceData };

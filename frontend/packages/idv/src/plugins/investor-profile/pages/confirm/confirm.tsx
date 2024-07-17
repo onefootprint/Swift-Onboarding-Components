@@ -10,6 +10,7 @@ import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import Declarations from '../declarations';
+import FundingSources from '../funding-sources';
 import Income from '../income';
 import InvestmentGoals from '../investment-goals';
 import NetWorth from '../net-worth';
@@ -24,6 +25,7 @@ const Confirm = () => {
 
   const [isAnnualIncomeOpen, setIsAnnualIncomeOpen] = useState(false);
   const [isNetWorthOpen, setIsNetWorthOpen] = useState(false);
+  const [isFundingSourcesOpen, setIsFundingSourcesOpen] = useState(false);
   const [isInvestmentGoalsOpen, setIsInvestmentGoals] = useState(false);
   const [isRiskToleranceOpen, setIsRiskToleranceOpen] = useState(false);
   const [isDeclarationsOpen, setIsDeclarationsOpen] = useState(false);
@@ -34,6 +36,7 @@ const Confirm = () => {
 
   const valueAnnualIncome = data?.[InvestorProfileDI.annualIncome];
   const valueNetWorth = data?.[InvestorProfileDI.netWorth];
+  const listFundingSources = data?.[InvestorProfileDI.fundingSources];
   const listInvestmentGoals = data?.[InvestorProfileDI.investmentGoals];
   const valueRiskTolerance = data?.[InvestorProfileDI.riskTolerance];
   const listDeclarations = data?.[InvestorProfileDI.declarations];
@@ -146,6 +149,56 @@ const Confirm = () => {
             ) : (
               <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`net-worth.${valueNetWorth}`)}
+              </Text>
+            )}
+            <Divider marginTop={7} marginBottom={7} />
+          </>
+        ) : null}
+        {listFundingSources ? (
+          <>
+            <Stack direction="row" justify="space-between" alignItems="flex-start" marginBottom={6}>
+              <Text variant="label-2" isPrivate>
+                {t('funding-sources.title')}
+              </Text>
+              <LinkButton
+                type="button"
+                onClick={() => setIsFundingSourcesOpen(!isFundingSourcesOpen)}
+                data-dd-action-name="investor-profile:edit-funding-sources"
+              >
+                {t('edit')}
+              </LinkButton>
+            </Stack>
+            {isFundingSourcesOpen ? (
+              <FundingSources
+                onSuccess={() => setIsFundingSourcesOpen(false)}
+                renderFooter={loading => (
+                  <Stack direction="row" justifyContent="end" gap={3}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setIsFundingSourcesOpen(!isFundingSourcesOpen)}
+                    >
+                      {t('cancel')}
+                    </Button>
+                    <Button type="submit" loading={loading} disabled={loading} loadingAriaLabel={t('loading')}>
+                      {t('save')}
+                    </Button>
+                  </Stack>
+                )}
+              />
+            ) : listFundingSources.length > 1 ? (
+              listFundingSources.map(source => (
+                <Text key={source} tag="div" variant="body-3" color="primary" data-dd-privacy="mask">
+                  &#8226; {t(`funding-sources.${source}`)}
+                </Text>
+              ))
+            ) : listFundingSources.length === 1 ? (
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
+                {t(`funding-sources.${listFundingSources[0]}`)}
+              </Text>
+            ) : (
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
+                {t('none')}
               </Text>
             )}
             <Divider marginTop={7} marginBottom={7} />
