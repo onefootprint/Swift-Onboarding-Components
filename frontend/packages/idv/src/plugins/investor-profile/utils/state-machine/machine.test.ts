@@ -1,6 +1,7 @@
-import { InvestorProfileDI } from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileFundingSources } from '@onefootprint/types';
 import {
   isMissingEmploymentData,
+  isMissingFundingSources,
   isMissingIncomeData,
   isMissingInvestmentGoalsData,
   isMissingNetWorthData,
@@ -9,12 +10,16 @@ import {
 
 describe('isMissingEmploymentData', () => {
   it('should return true if employment status is undefined', () => {
-    const result = isMissingEmploymentData({ data: { [InvestorProfileDI.employmentStatus]: undefined } });
+    const result = isMissingEmploymentData({
+      data: { [InvestorProfileDI.employmentStatus]: undefined },
+    });
     expect(result).toBe(true);
   });
 
   it('should return true if employment status is empty', () => {
-    const result = isMissingEmploymentData({ data: { [InvestorProfileDI.employmentStatus]: '' } });
+    const result = isMissingEmploymentData({
+      data: { [InvestorProfileDI.employmentStatus]: '' },
+    });
     expect(result).toBe(true);
   });
 
@@ -57,8 +62,10 @@ describe('isMissingIncomeData', () => {
   });
 
   it('should return false if annual income is present', () => {
-    /** @ts-expect-error enum vs string */
-    const result = isMissingIncomeData({ data: { [InvestorProfileDI.annualIncome]: 'le25k' } });
+    const result = isMissingIncomeData({
+      /** @ts-expect-error enum vs string */
+      data: { [InvestorProfileDI.annualIncome]: 'le25k' },
+    });
     expect(result).toBe(false);
   });
 });
@@ -69,8 +76,12 @@ describe('isMissingNetWorthData', () => {
   });
 
   it('should return false if net worth data is present', () => {
-    /** @ts-expect-error enum vs string */
-    expect(isMissingNetWorthData({ data: { [InvestorProfileDI.netWorth]: 'le50k' } })).toBe(false);
+    expect(
+      isMissingNetWorthData({
+        /** @ts-expect-error enum vs string */
+        data: { [InvestorProfileDI.netWorth]: 'le50k' },
+      }),
+    ).toBe(false);
   });
 });
 
@@ -80,17 +91,54 @@ describe('isMissingInvestmentGoalsData', () => {
   });
 
   it('should return true if investment goals is not an array', () => {
-    /** @ts-expect-error enum vs string */
-    expect(isMissingInvestmentGoalsData({ data: { [InvestorProfileDI.investmentGoals]: 'foo' } })).toBe(true);
+    expect(
+      isMissingInvestmentGoalsData({
+        /** @ts-expect-error enum vs string */
+        data: { [InvestorProfileDI.investmentGoals]: 'foo' },
+      }),
+    ).toBe(true);
   });
 
   it('should return true if investment goals is an empty array', () => {
-    expect(isMissingInvestmentGoalsData({ data: { [InvestorProfileDI.investmentGoals]: [] } })).toBe(true);
+    expect(
+      isMissingInvestmentGoalsData({
+        data: { [InvestorProfileDI.investmentGoals]: [] },
+      }),
+    ).toBe(true);
   });
 
   it('should return false if investment goals is a non-empty array', () => {
-    /** @ts-expect-error enum vs string */
-    expect(isMissingInvestmentGoalsData({ data: { [InvestorProfileDI.investmentGoals]: ['foo'] } })).toBe(false);
+    expect(
+      isMissingInvestmentGoalsData({
+        /** @ts-expect-error enum vs string */
+        data: { [InvestorProfileDI.investmentGoals]: ['foo'] },
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('isMissingFundingSources', () => {
+  it('should return true for missing data object', () => {
+    const result = isMissingFundingSources({ data: {} });
+    expect(result).toBe(true);
+  });
+
+  it('should return true for data object with missing funding sources', () => {
+    const result = isMissingFundingSources({
+      data: {
+        [InvestorProfileDI.fundingSources]: [],
+      },
+    });
+    expect(result).toBe(true);
+  });
+
+  it('should return false for data object with funding sources', () => {
+    const result = isMissingFundingSources({
+      data: {
+        [InvestorProfileDI.fundingSources]: [InvestorProfileFundingSources.businessIncome],
+      },
+    });
+    expect(result).toBe(false);
   });
 });
 
@@ -101,14 +149,18 @@ describe('isMissingRiskToleranceData', () => {
   });
 
   it('should return true for data object with missing risk tolerance value', () => {
-    /** @ts-expect-error enum vs string */
-    const result = isMissingRiskToleranceData({ data: { [InvestorProfileDI.riskTolerance]: '' } });
+    const result = isMissingRiskToleranceData({
+      /** @ts-expect-error enum vs string */
+      data: { [InvestorProfileDI.riskTolerance]: '' },
+    });
     expect(result).toBe(true);
   });
 
   it('should return false for data object with risk tolerance value present', () => {
-    /** @ts-expect-error enum vs string */
-    const result = isMissingRiskToleranceData({ data: { [InvestorProfileDI.riskTolerance]: 'aggressive' } });
+    const result = isMissingRiskToleranceData({
+      /** @ts-expect-error enum vs string */
+      data: { [InvestorProfileDI.riskTolerance]: 'aggressive' },
+    });
     expect(result).toBe(false);
   });
 });

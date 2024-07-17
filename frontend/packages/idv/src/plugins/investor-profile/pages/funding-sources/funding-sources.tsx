@@ -14,7 +14,9 @@ type FundingSourcesProps = {
 };
 
 const fundingSources = InvestorProfileDI.fundingSources;
-const { logError } = getLogger({ location: 'investor-profile-founding-sources' });
+const { logError } = getLogger({
+  location: 'investor-profile-funding-sources',
+});
 
 const FundingSources = ({ onSuccess, renderFooter }: FundingSourcesProps) => {
   const [state, send] = useInvestorProfileMachine();

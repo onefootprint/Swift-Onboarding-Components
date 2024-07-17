@@ -19,6 +19,7 @@ const investorProfileFields: `${InvestorProfileDI}`[] = [
   'investor_profile.family_member_names',
   'investor_profile.investment_goals',
   'investor_profile.net_worth',
+  'investor_profile.funding_sources',
   'investor_profile.occupation',
   'investor_profile.political_organization',
   'investor_profile.risk_tolerance',
@@ -30,7 +31,10 @@ const Init = ({ authToken, children, onError, onSuccess }: InitProps) => {
 
   const fetchInvestorProfileData = (authToken: string) => {
     mutDecryptUser.mutate(
-      { authToken, fields: investorProfileFields } /** @ts-expect-error: string | string[] | undefined vs string */,
+      {
+        authToken,
+        fields: investorProfileFields,
+      } /** @ts-expect-error: string | string[] | undefined vs string */,
       { onError, onSuccess },
     );
   };

@@ -28,7 +28,9 @@ export const isMissingNetWorthData = ({ data }: MachineContext): boolean => {
 };
 
 export const isMissingFundingSources = ({ data }: MachineContext): boolean => {
-  return !data?.[InvestorProfileDI.fundingSources];
+  const sources = data?.[InvestorProfileDI.fundingSources];
+  if (!sources || !Array.isArray(sources)) return true;
+  return sources.length === 0;
 };
 
 export const isMissingInvestmentGoalsData = ({ data }: MachineContext): boolean => {
