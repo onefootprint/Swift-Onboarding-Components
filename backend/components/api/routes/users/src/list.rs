@@ -23,7 +23,7 @@ use paperclip::actix::post;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `GET /users/search` API.",
+    description = "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `POST /users/search` API.",
     tags(Users, Preview)
 )]
 #[get("/users")]

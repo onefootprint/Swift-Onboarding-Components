@@ -399,7 +399,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `GET /users/search` API.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `POST /users/search` API.",
                 "parameters": [
                     {
                         "in": "query",
