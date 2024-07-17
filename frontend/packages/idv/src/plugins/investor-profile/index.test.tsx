@@ -106,7 +106,7 @@ describe('<InvestorProfile />', () => {
 
     // Funding sources
     await waitFor(() => {
-      const fundingSources = screen.getByText("What's the source of your account fundings?");
+      const fundingSources = screen.getByText("What's the source of your account funding?");
       expect(fundingSources).toBeInTheDocument();
     });
 

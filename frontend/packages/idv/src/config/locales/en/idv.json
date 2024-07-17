@@ -846,7 +846,7 @@
         "gt5m": "$5,000,000+"
       },
       "funding-sources": {
-        "title": "What's the source of your account fundings?",
+        "title": "What's the source of your account funding?",
         "subtitle": "We're legally required to collect this information.",
         "employment_income": "Employement Income",
         "investments": "Investments",
