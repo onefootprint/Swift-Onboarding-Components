@@ -155,6 +155,7 @@ export type {
 } from './get-risk-signal-details';
 export type { GetRolesRequest, GetRolesResponse } from './get-roles';
 export type { GetRulesResponse } from './get-rules';
+export type { GetBusinessInsightsResponse } from './get-business-insights';
 export type {
   GetTenantsRequest,
   GetTenantsResponse,

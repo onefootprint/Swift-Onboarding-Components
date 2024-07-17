@@ -186,7 +186,15 @@ export { default as ReviewStatus } from './review-status';
 export type { RiskSignal } from './risk-signal';
 export { RiskSignalSeverity } from './risk-signal';
 export { BusinessNameKind } from './business-name';
-export type { BusinessName } from './business-name';
+export type { RawBusinessName, BusinessName } from './business-name';
+export type { BusinessInsights } from './business-insights';
+export type {
+  BusinessDetails,
+  BusinessDetailValue,
+  BusinessDetailPhoneNumber,
+  BusinessDetailTin,
+  BusinessDetailWebsite,
+} from './business-details';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export type {
   BasicRoleScope,

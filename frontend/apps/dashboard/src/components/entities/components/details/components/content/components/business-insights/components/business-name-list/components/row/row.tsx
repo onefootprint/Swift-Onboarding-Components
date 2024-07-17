@@ -18,7 +18,7 @@ const Row = ({ businessName }: RowProps) => {
   return (
     <>
       <td>
-        <Stack gap={3} align="center">
+        <Stack gap={3} align="center" overflow="scroll">
           {sources ? (
             <Tooltip
               text={t('name.table.source', {
@@ -46,7 +46,7 @@ const Row = ({ businessName }: RowProps) => {
       <td>{kind ? t(`name.table.${kind}` as ParseKeys<'common'>) : '-'}</td>
       <td>
         <Text variant="body-3" maxWidth="90%" truncate>
-          {notes ? notes : '-'}
+          {notes}
         </Text>
       </td>
     </>
