@@ -198,6 +198,7 @@ export type {
 export type { BusinessPerson, RawBusinessPerson } from './business-person';
 export type { RawSOSFiling, SOSFiling } from './sos-filing';
 export { FilingStatus } from './sos-filing';
+export type { BusinessWatchlist, RawBusinessWatchlist, EntityWatchlist, WatchlistHit } from './business-watchlist';
 export { default as RiskSignalAttribute } from './risk-signal-attribute';
 export type {
   BasicRoleScope,

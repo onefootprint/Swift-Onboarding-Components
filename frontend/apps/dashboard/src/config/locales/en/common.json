@@ -1819,7 +1819,23 @@
           }
         },
         "watchlist": {
-          "title": "Watchlist"
+          "title": "Watchlist",
+          "select-label": "Hits for {{entity}}",
+          "tags": {
+            "business": "Business",
+            "person": "Person"
+          },
+          "table": {
+            "aria-label": "Watchlist",
+            "empty-state": "No hits found for {{entity}} in KYB response",
+            "empty-state-no-entity": "No hits found in KYB response",
+            "header": {
+              "hits": "Hits",
+              "agency": "Agency",
+              "list": "List",
+              "country": "Country"
+            }
+          }
         }
       },
       "risk-signals": {

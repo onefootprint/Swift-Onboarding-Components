@@ -7,12 +7,16 @@ import {
   BusinessName,
   BusinessNameKind,
   BusinessPerson,
+  BusinessWatchlist,
+  EntityKind,
   FilingStatus,
   GetBusinessInsightsResponse,
   RawBusinessName,
   RawBusinessPerson,
+  RawBusinessWatchlist,
   RawSOSFiling,
   SOSFiling,
+  WatchlistHit,
 } from '@onefootprint/types';
 import capitalize from 'lodash/capitalize';
 import upperFirst from 'lodash/upperFirst';
@@ -157,6 +161,72 @@ const getBusinessInsights = () => {
         fileNumber: '12345',
       },
     ],
+    watchlist: {
+      hitCount: 2,
+      business: [
+        {
+          hits: [
+            {
+              agency: 'Office of Foreign Assets Control',
+              agencyAbbr: 'OFAC',
+              agencyInformationUrl:
+                'https://home.treasury.gov/policy-issues/financial-sanctions/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists',
+              agencyListUrl: 'https://www.treasury.gov/resource-center/sanctions/SDN-List/Pages/default.aspx',
+              entityAliases: [
+                'AL-MULATHAMUN BRIGADE',
+                "AL-MUWAQQI'UN BIL-DIMA",
+                'THOSE SIGNED IN BLOOD BATTALION',
+                'SIGNATORIES IN BLOOD',
+                'THOSE WHO SIGN IN BLOOD',
+                'WITNESSES IN BLOOD',
+                'SIGNED-IN-BLOOD BATTALION',
+                'MASKED MEN BRIGADE',
+                'KHALED ABU AL-ABBAS BRIGADE',
+                'AL-MULATHAMUN MASKED ONES BRIGADE',
+                'AL-MURABITOUN',
+                'THE SENTINELS',
+              ],
+              entityName: 'AL-MULATHAMUN BATTALION',
+              listName: 'Specially Designated Nationals',
+              url: 'https://sanctionssearch.ofac.treas.gov/Details.aspx?id=16446',
+              listCountry: 'United States',
+            },
+            {
+              agency: 'Bureau of Industry and Security',
+              agencyAbbr: 'BIS',
+              agencyInformationUrl:
+                'https://www.bis.doc.gov/index.php/policy-guidance/lists-of-parties-of-concern/entity-list',
+              agencyListUrl:
+                'https://www.bis.doc.gov/index.php/policy-guidance/lists-of-parties-of-concern/entity-list',
+              entityAliases: [],
+              entityName: 'Academy of Military Medical Sciences, Field Blood Transfusion Institution',
+              listName: 'Entity List',
+              url: null,
+              listCountry: 'United States',
+            },
+          ],
+          screenedEntityName: 'BobCo',
+        },
+        {
+          hits: [],
+          screenedEntityName: 'BobCo Labs, Inc.',
+        },
+      ],
+      people: [
+        {
+          hits: [],
+          screenedEntityName: 'Bobby Bobierto',
+        },
+        {
+          hits: [],
+          screenedEntityName: 'Bingo Maman',
+        },
+        {
+          hits: [],
+          screenedEntityName: 'LEGALINC CORPORATE SERVICES INC.',
+        },
+      ],
+    },
   };
   return mockResponse;
 };
@@ -175,8 +245,8 @@ const useBusinessInsights = () => {
     notes: name.notes || EMPTY_VALUE,
   });
 
-  const formatDetail = (label: BusinessDetail, value: RawBusinesDetailValue): Exclude<RawBusinesDetailValue, null> => {
-    if (!value) return LONG_EMPTY_VALUE;
+  const formatDetail = (label: string, value: RawBusinesDetailValue): Exclude<RawBusinesDetailValue, null> => {
+    if (!value) return EMPTY_VALUE;
     if (label === BusinessDetail.formationDate) {
       return formatUtcDate(new Date(value as string));
     }
@@ -259,15 +329,60 @@ const useBusinessInsights = () => {
     };
   };
 
+  const formatWatchlist = (watchlist: RawBusinessWatchlist): BusinessWatchlist => {
+    const formatHit = (hit: WatchlistHit) => {
+      const {
+        entityName,
+        entityAliases,
+        agencyListUrl,
+        agencyInformationUrl,
+        url,
+        agency,
+        agencyAbbr,
+        listName,
+        listCountry,
+      } = hit;
+      return {
+        entityName: entityName || EMPTY_VALUE,
+        entityAliases: entityAliases.filter(alias => !!alias),
+        agencyListUrl,
+        agencyInformationUrl,
+        url,
+        agency: agency || EMPTY_VALUE,
+        agencyAbbr,
+        listName: listName || EMPTY_VALUE,
+        listCountry: listCountry || EMPTY_VALUE,
+      };
+    };
+
+    const flattedWatchlist = {} as BusinessWatchlist;
+    watchlist.business.forEach(({ screenedEntityName, hits }) => {
+      const entityName = screenedEntityName || EMPTY_VALUE;
+      flattedWatchlist[entityName] = {
+        kind: EntityKind.business,
+        hits: hits.map(hit => formatHit(hit)),
+      };
+    });
+    watchlist.people.forEach(({ screenedEntityName, hits }) => {
+      const entityName = screenedEntityName || EMPTY_VALUE;
+      flattedWatchlist[entityName] = {
+        kind: EntityKind.person,
+        hits: hits.map(hit => formatHit(hit)),
+      };
+    });
+    return flattedWatchlist;
+  };
+
   const formattedDetails: Partial<Record<BusinessDetail, Exclude<RawBusinesDetailValue, null>>> = {};
   Object.entries(rawData.details).forEach(([label, value]) => {
-    formattedDetails[label as BusinessDetail] = formatDetail(label as BusinessDetail, value);
+    formattedDetails[label as BusinessDetail] = formatDetail(label, value);
   });
   const data = {
     names: rawData.names.map(name => formatName(name)),
     details: formattedDetails as BusinessDetails,
     people: rawData.people.map(person => formatPerson(person)),
     registrations: rawData.registrations.map(filing => formatFiling(filing)),
+    watchlist: formatWatchlist(rawData.watchlist),
   };
 
   return {

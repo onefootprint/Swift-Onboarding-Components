@@ -9,6 +9,7 @@ import OtherBusinessDetails from './components/other-business-details';
 import PeopleList from './components/people-list';
 import SOSFilings from './components/sos-filings';
 import Subsection from './components/subsection';
+import Watchlist from './components/watchlist';
 import useBusinessInsights from './hooks/use-business-insights';
 
 const BusinessInsights = () => {
@@ -54,6 +55,9 @@ const BusinessInsights = () => {
         </Subsection>
         <Subsection icon={subsections.sosFilings.iconComponent} title={subsections.sosFilings.title}>
           <SOSFilings data={mockResponse.registrations} />
+        </Subsection>
+        <Subsection icon={subsections.watchlist.iconComponent} title={subsections.watchlist.title}>
+          <Watchlist data={mockResponse.watchlist} />
         </Subsection>
       </Stack>
     </Section>
