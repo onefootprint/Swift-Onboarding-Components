@@ -306,6 +306,7 @@ export { default as IcoWww24 } from './ico-www-24';
 export { default as IcoX24 } from './ico-x-24';
 export { default as IcoApple40 } from './ico-apple-40';
 export { default as IcoBankCheck40 } from './ico-bank-check-40';
+export { default as IcoCamera40 } from './ico-camera-40';
 export { default as IcoChartUp40 } from './ico-chart-up-40';
 export { default as IcoCheckCircle40 } from './ico-check-circle-40';
 export { default as IcoClock40 } from './ico-clock-40';
