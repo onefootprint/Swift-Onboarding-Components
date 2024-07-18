@@ -28,6 +28,9 @@ runs:
         # Match the file patterns to .github/workflows/backend_ci.yml
         expectedServerVersion="$(git log -n 1 --format="%H" ./backend ./.github/workflows/backend* ./.github/actions/backend*)"
 
+        echo "api last changed in ${expectedServerVersion}, but we will use ${{ inputs.commitHash }}"
+        expectedServerVersion=${{ inputs.commitHash }}
+
         apiVersion="${imageTagPrefix}${expectedServerVersion}"
         enclaveVersion="${imageTagPrefix}$(git log -n 1 --format="%H" ./backend/components/enclave ./backend/infra ./backend/images/enclave ./backend/images/enclave-proxy)"
 
