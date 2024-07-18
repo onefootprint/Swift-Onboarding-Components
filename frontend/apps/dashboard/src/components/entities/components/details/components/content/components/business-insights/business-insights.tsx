@@ -7,6 +7,7 @@ import Section from '../section';
 import BusinessNameList from './components/business-name-list';
 import OtherBusinessDetails from './components/other-business-details';
 import PeopleList from './components/people-list';
+import SOSFilings from './components/sos-filings';
 import Subsection from './components/subsection';
 import useBusinessInsights from './hooks/use-business-insights';
 
@@ -29,7 +30,7 @@ const BusinessInsights = () => {
       title: t('people.title'),
       iconComponent: IcoUsers16,
     },
-    secretaryOfState: {
+    sosFilings: {
       title: t('sos-filings.title'),
       iconComponent: IcoFileText16,
     },
@@ -50,6 +51,9 @@ const BusinessInsights = () => {
         </Subsection>
         <Subsection icon={subsections.people.iconComponent} title={subsections.people.title}>
           <PeopleList data={mockResponse.people} />
+        </Subsection>
+        <Subsection icon={subsections.sosFilings.iconComponent} title={subsections.sosFilings.title}>
+          <SOSFilings data={mockResponse.registrations} />
         </Subsection>
       </Stack>
     </Section>

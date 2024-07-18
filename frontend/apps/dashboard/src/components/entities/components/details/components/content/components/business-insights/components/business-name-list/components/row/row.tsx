@@ -1,9 +1,9 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { BusinessName } from '@onefootprint/types';
 import { Badge, Stack, Tag, Text, Tooltip } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useBusinessNameKindText from '../../../../hooks/use-business-name-kind-text';
 
 type RowProps = {
   businessName: BusinessName;
@@ -13,6 +13,7 @@ const Row = ({ businessName }: RowProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights',
   });
+  const kindT = useBusinessNameKindText();
   const { name, sources, submitted, verified, kind, notes } = businessName;
 
   return (
@@ -43,7 +44,7 @@ const Row = ({ businessName }: RowProps) => {
           </Stack>
         </Stack>
       </td>
-      <td>{kind ? t(`name.table.${kind}` as ParseKeys<'common'>) : '-'}</td>
+      <td>{kindT(kind)}</td>
       <td>
         <Text variant="body-3" maxWidth="90%" truncate>
           {notes}

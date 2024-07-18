@@ -1767,7 +1767,56 @@
           }
         },
         "sos-filings": {
-          "title": "Secretary of State filings"
+          "title": "Secretary of State filings",
+          "status": {
+            "unknown": "Unknown",
+            "active": "Active",
+            "inactive": "Inactive"
+          },
+          "filters": {
+            "trigger": "Filter by state",
+            "title": "Apply filters",
+            "states": {
+              "label": "States"
+            },
+            "reset": "Clear filters",
+            "cta": "Apply"
+          },
+          "table": {
+            "aria-label": "Secretary of State filings",
+            "empty-state": "No filings",
+            "header": {
+              "state": "State",
+              "file-date": "File date",
+              "status": "Status"
+            }
+          },
+          "dialog": {
+            "title": "Secretary of State filing",
+            "status-details": {
+              "title": "Status details",
+              "jurisdiction": "Jurisdiction",
+              "sub-status": "Sub-status"
+            },
+            "entity-details": {
+              "title": "Entity details",
+              "name": "Business name",
+              "entity-type": "Entity type"
+            },
+            "addresses": {
+              "title": "Addresses"
+            },
+            "people": {
+              "title": "People",
+              "agent": "Registered agent"
+            },
+            "filing-details": {
+              "title": "Filing details",
+              "date": "Filed date",
+              "file-number": "File number",
+              "source": "SOS website"
+            }
+          }
         },
         "watchlist": {
           "title": "Watchlist"

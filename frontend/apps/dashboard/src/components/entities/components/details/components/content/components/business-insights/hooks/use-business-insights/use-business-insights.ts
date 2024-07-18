@@ -1,4 +1,4 @@
-import { STATES } from '@onefootprint/global-constants';
+import { useIntl } from '@onefootprint/hooks';
 import {
   BusinessDetailPhoneNumber,
   BusinessDetailTin,
@@ -7,16 +7,22 @@ import {
   BusinessName,
   BusinessNameKind,
   BusinessPerson,
+  FilingStatus,
   GetBusinessInsightsResponse,
   RawBusinessName,
   RawBusinessPerson,
+  RawSOSFiling,
+  SOSFiling,
 } from '@onefootprint/types';
 import capitalize from 'lodash/capitalize';
 import upperFirst from 'lodash/upperFirst';
 import { BusinessDetail } from '../../types';
+import formatState from '../../utils/format-state/format-state';
 
 type RawBusinesDetailValue = string | BusinessDetailPhoneNumber[] | BusinessDetailTin | BusinessDetailWebsite | null;
+
 const EMPTY_VALUE = '-';
+const LONG_EMPTY_VALUE = '--';
 
 const getBusinessInsights = () => {
   const mockResponse: GetBusinessInsightsResponse = {
@@ -93,15 +99,74 @@ const getBusinessInsights = () => {
         submitted: null,
       },
     ],
+    registrations: [
+      {
+        addresses: ['1 N BROAD ST STE 206, MIDDLETOWN, DE 19709-6402'],
+        entityType: 'CORPORATION',
+        name: 'Bobby Corp LABS, INC.',
+        officers: [],
+        registeredAgent: '"LEGALINC CORPORATE SERVICES INC."',
+        registrationDate: '2020-09-03',
+        source: 'https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx',
+        state: 'DE',
+        status: 'unknown',
+        subStatus: null,
+        jurisdiction: 'domestic',
+        fileNumber: '12345',
+      },
+      {
+        addresses: ['test addy'],
+        entityType: 'b corp',
+        name: 'a random name',
+        officers: [],
+        registeredAgent: 'a random agent',
+        registrationDate: '2001-01-01',
+        source: 'https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx',
+        state: 'FL',
+        status: 'unknown',
+        subStatus: null,
+        jurisdiction: 'domestic',
+        fileNumber: '12345',
+      },
+      {
+        addresses: ['test addy'],
+        entityType: 'b corp',
+        name: 'a random name',
+        officers: [],
+        registeredAgent: 'a random agent',
+        registrationDate: '2002-02-02',
+        source: 'https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx',
+        state: 'FL',
+        status: 'active',
+        subStatus: null,
+        jurisdiction: 'domestic',
+        fileNumber: '12345',
+      },
+      {
+        addresses: ['test addy'],
+        entityType: 'b corp',
+        name: 'a random name',
+        officers: [],
+        registeredAgent: 'a random agent',
+        registrationDate: '2003-03-03',
+        source: 'https://icis.corp.delaware.gov/Ecorp/EntitySearch/NameSearch.aspx',
+        state: null,
+        status: 'inactive',
+        subStatus: null,
+        jurisdiction: 'domestic',
+        fileNumber: '12345',
+      },
+    ],
   };
   return mockResponse;
 };
 
 const useBusinessInsights = () => {
   const rawData = getBusinessInsights();
+  const { formatUtcDate } = useIntl();
 
   const formatName = (name: RawBusinessName): BusinessName => ({
-    kind: name.kind,
+    kind: name.kind as BusinessNameKind,
     name: name.name || EMPTY_VALUE,
     sources: name.sources,
     subStatus: name.subStatus || EMPTY_VALUE,
@@ -111,22 +176,18 @@ const useBusinessInsights = () => {
   });
 
   const formatDetail = (label: BusinessDetail, value: RawBusinesDetailValue): Exclude<RawBusinesDetailValue, null> => {
-    if (!value) return EMPTY_VALUE;
+    if (!value) return LONG_EMPTY_VALUE;
     if (label === BusinessDetail.formationDate) {
-      const detailValue = value as string;
-      const [year, month, day] = detailValue.split('-');
-      return `${month}/${day}/${year}`;
+      return formatUtcDate(new Date(value as string));
     }
     if (label === BusinessDetail.formationState) {
-      const detailValue = value as string;
-      const possibleState = STATES.find(s => s.value === detailValue);
-      return possibleState?.label || detailValue;
+      return formatState(value as string, LONG_EMPTY_VALUE);
     }
     if (label === BusinessDetail.tin) {
       const detailValue = value
         ? value
         : {
-            tin: EMPTY_VALUE,
+            tin: LONG_EMPTY_VALUE,
             verified: null,
           };
       return detailValue as BusinessDetailTin;
@@ -138,7 +199,7 @@ const useBusinessInsights = () => {
     if (label === BusinessDetail.phoneNumbers) {
       const detailValue = value as BusinessDetailPhoneNumber[];
       const emptyPhoneNumber = {
-        phone: EMPTY_VALUE,
+        phone: LONG_EMPTY_VALUE,
         submitted: null,
         verified: null,
       } as BusinessDetailPhoneNumber;
@@ -148,21 +209,55 @@ const useBusinessInsights = () => {
       const detailValue = value
         ? value
         : {
-            url: EMPTY_VALUE,
+            url: LONG_EMPTY_VALUE,
             verified: null,
           };
       return detailValue as BusinessDetailWebsite;
     }
-    return EMPTY_VALUE;
+    return LONG_EMPTY_VALUE;
   };
 
-  const formatPerson = (person: RawBusinessPerson): BusinessPerson => ({
-    name: person.name ? upperFirst(person.name) : EMPTY_VALUE,
-    role: person.role ? upperFirst(person.role) : EMPTY_VALUE,
-    submitted: !!person.submitted,
-    associationVerified: !!person.associationVerified,
-    sources: person.sources,
-  });
+  const formatPerson = (person: RawBusinessPerson): BusinessPerson => {
+    const { name, role, submitted, associationVerified, sources } = person;
+    return {
+      name: name ? upperFirst(name) : EMPTY_VALUE,
+      role: role ? upperFirst(role) : EMPTY_VALUE,
+      submitted: !!submitted,
+      associationVerified: !!associationVerified,
+      sources,
+    };
+  };
+
+  const formatFiling = (filing: RawSOSFiling): SOSFiling => {
+    const {
+      state,
+      registrationDate,
+      registeredAgent,
+      officers,
+      addresses,
+      entityType,
+      status,
+      subStatus,
+      source,
+      name,
+      jurisdiction,
+      fileNumber,
+    } = filing;
+    return {
+      state: state ? formatState(state, EMPTY_VALUE) : EMPTY_VALUE,
+      registrationDate: registrationDate ? formatUtcDate(new Date(registrationDate as string)) : LONG_EMPTY_VALUE,
+      registeredAgent: registeredAgent || LONG_EMPTY_VALUE,
+      officers,
+      addresses: addresses && addresses.length ? addresses : [LONG_EMPTY_VALUE],
+      entityType: entityType ? capitalize(entityType) : LONG_EMPTY_VALUE,
+      status: (status as FilingStatus) ?? status,
+      subStatus: subStatus ? capitalize(subStatus) : LONG_EMPTY_VALUE,
+      source: source || LONG_EMPTY_VALUE,
+      name: name || LONG_EMPTY_VALUE,
+      jurisdiction: jurisdiction ? capitalize(jurisdiction) : LONG_EMPTY_VALUE,
+      fileNumber: fileNumber || LONG_EMPTY_VALUE,
+    };
+  };
 
   const formattedDetails: Partial<Record<BusinessDetail, Exclude<RawBusinesDetailValue, null>>> = {};
   Object.entries(rawData.details).forEach(([label, value]) => {
@@ -172,6 +267,7 @@ const useBusinessInsights = () => {
     names: rawData.names.map(name => formatName(name)),
     details: formattedDetails as BusinessDetails,
     people: rawData.people.map(person => formatPerson(person)),
+    registrations: rawData.registrations.map(filing => formatFiling(filing)),
   };
 
   return {
