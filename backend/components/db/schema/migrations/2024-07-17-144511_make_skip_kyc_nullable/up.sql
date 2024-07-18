@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ALTER COLUMN skip_kyc DROP NOT NULL;
