@@ -92,12 +92,7 @@ const nextConfig = {
     ];
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.onefp.net',
-      },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: '*.onefp.net' }],
   },
   transpilePackages: [
     '@onefootprint/idv-elements',

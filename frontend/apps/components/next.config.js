@@ -67,6 +67,9 @@ const nextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: '*.onefp.net' }],
+  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/design-tokens',

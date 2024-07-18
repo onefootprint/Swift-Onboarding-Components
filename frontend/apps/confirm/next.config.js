@@ -60,6 +60,9 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: '*.onefp.net' }],
+  },
   transpilePackages: [
     '@onefootprint/ui',
     '@onefootprint/design-tokens',
