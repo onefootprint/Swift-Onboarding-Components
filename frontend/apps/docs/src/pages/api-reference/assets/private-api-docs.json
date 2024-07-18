@@ -27926,6 +27926,9 @@
                                 "type": "integer",
                                 "format": "int64"
                             },
+                            "bucket_path_namespace": {
+                                "type": "string"
+                            },
                             "enrolled_at": {
                                 "type": "string",
                                 "format": "date-time"
@@ -27948,6 +27951,7 @@
                             "aws_account_id",
                             "aws_role_name",
                             "backup_lag_seconds",
+                            "bucket_path_namespace",
                             "enrolled_at",
                             "org_public_keys",
                             "s3_bucket_name"

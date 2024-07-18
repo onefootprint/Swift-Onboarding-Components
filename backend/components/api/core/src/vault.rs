@@ -92,6 +92,8 @@ pub async fn create_non_portable_vault(
         return Err(TenantError::CannotProvideBodyAndIdempotencyId.into());
     }
 
+    tracing::info!(idempotency_id_provided=%idempotency_id.is_some(), external_id_provided=%external_id.is_some(), "Creating new vault");
+
     let actor = auth.actor();
     let source = auth.dl_source();
     let (scoped_user, vault) = state

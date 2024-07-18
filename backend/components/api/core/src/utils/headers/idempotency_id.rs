@@ -9,7 +9,6 @@ use lazy_static::lazy_static;
 use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::Parameter;
 use paperclip::v2::schema::Apiv2Schema;
-use paperclip::v2::schema::TypedData;
 use regex::Regex;
 use serde::Deserialize;
 use serde::Serialize;
@@ -37,17 +36,7 @@ impl Apiv2Schema for IdempotencyId {
     }
 
     fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
-        vec![
-            paperclip::v2::models::Parameter::<DefaultSchemaRaw>{
-                name: "x-idempotency-id".to_owned(),
-                in_: paperclip::v2::models::ParameterIn::Header,
-                description: Some("To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
-                data_type: Some(newtypes::IdempotencyId::data_type()),
-                format: newtypes::IdempotencyId::format(),
-                required: Self::required(),
-                ..Default::default()
-            }
-        ]
+        vec![]
     }
 }
 impl paperclip::actix::OperationModifier for IdempotencyId {}

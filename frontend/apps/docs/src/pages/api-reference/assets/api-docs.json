@@ -20,15 +20,6 @@
                 "parameters": [
                     {
                         "in": "header",
-                        "name": "x-idempotency-id",
-                        "description": "To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "header",
                         "name": "x-sandbox-id",
                         "description": "When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.\n            ",
                         "schema": {
@@ -393,15 +384,6 @@
                 ],
                 "description": "Creates a new user, optionally initializing with the provided data",
                 "parameters": [
-                    {
-                        "in": "header",
-                        "name": "x-idempotency-id",
-                        "description": "To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
                     {
                         "in": "header",
                         "name": "x-sandbox-id",
