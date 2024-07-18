@@ -1,6 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode, IdDocRequirement, SupportedIdDocTypes } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Box, Button, CountrySelect, Divider, RadioSelect, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -25,6 +25,7 @@ export type DocSelectionProps = {
   defaultType?: SupportedIdDocTypes;
   onConsentCompleted: () => void;
   onSubmit: (countryCode: CountryCode, docType: SupportedIdDocTypes, docId: string) => void;
+  requirement: IdDocRequirement;
   shouldCollectConsent: boolean;
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   supportedCountryAndDocTypes: any;
@@ -36,6 +37,7 @@ const DocSelection = ({
   defaultType,
   onConsentCompleted,
   onSubmit,
+  requirement,
   shouldCollectConsent,
   supportedCountryAndDocTypes,
 }: DocSelectionProps) => {
@@ -78,6 +80,7 @@ const DocSelection = ({
           documentType: docType,
           countryCode: country.value,
           fixtureResult: app?.sandboxIdDocOutcome ?? undefined,
+          requestId: requirement.documentRequestId,
         },
         {
           onSuccess(response) {

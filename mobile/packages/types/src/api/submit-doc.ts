@@ -5,6 +5,7 @@ export type SubmitDocTypeRequest = {
   countryCode: CountryCode | CountryCode3;
   documentType: SupportedIdDocTypes;
   fixtureResult?: IdDocOutcome;
+  requestId: string;
 };
 
 export type SubmitDocTypeResponse = {

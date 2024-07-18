@@ -12,6 +12,7 @@ const submitDocType = async ({ authToken, documentType, countryCode, fixtureResu
       documentType,
       countryCode,
       fixtureResult,
+      requestId,
     },
     headers: {
       [AUTH_HEADER]: authToken,

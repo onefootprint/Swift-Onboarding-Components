@@ -38,6 +38,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
         authToken={authToken}
         defaultCountry={country}
         defaultType={collectingDocumentMeta?.type}
+        requirement={requirement}
         onConsentCompleted={() => {
           analytics.track(Events.DocConsentAccepted);
           send('consentCompleted');
