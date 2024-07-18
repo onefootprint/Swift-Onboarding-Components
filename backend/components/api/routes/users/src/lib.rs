@@ -8,12 +8,12 @@ mod detail;
 mod documents;
 mod kyc;
 mod label;
-mod list;
 mod liveness;
 mod match_signals;
 mod onboardings;
 mod post;
 mod risk_signals;
+mod search;
 mod tags;
 mod token;
 
@@ -22,8 +22,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
     decisions::routes(config);
     config
         .service(post::post)
-        .service(list::get)
-        .service(list::post_search)
+        .service(search::get)
+        .service(search::post_search)
         .service(delete::delete)
         .service(documents::get)
         .service(risk_signals::get)

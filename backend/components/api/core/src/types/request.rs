@@ -17,8 +17,9 @@ pub struct EmptyRequest {}
 // But, results stay consistent as new results are added to earlier pages.
 // Can be used alongside another actix web::Query extractor
 pub struct CursorPaginationRequest<C> {
-    #[openapi(example = "12345")]
+    #[openapi(example = "null")]
     pub cursor: Option<C>,
+    #[openapi(example = "10")]
     pub page_size: Option<usize>,
 }
 

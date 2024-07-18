@@ -57,7 +57,7 @@ impl ScopedVaultTag {
             .filter(scoped_vault_tag::scoped_vault_id.eq(sv_id))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
             .set(update)
-            .execute(conn)?;
+            .get_result::<Self>(conn)?;
 
         Ok(())
     }
