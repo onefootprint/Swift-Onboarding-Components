@@ -21,7 +21,7 @@ pub struct VaultDrEnrolledStatus {
     pub aws_account_id: String,
     pub aws_role_name: String,
     pub s3_bucket_name: String,
-
+    pub bucket_path_namespace: String,
     pub org_public_keys: Vec<String>,
 
     pub latest_backup_record_timestamp: Option<DateTime<Utc>>,

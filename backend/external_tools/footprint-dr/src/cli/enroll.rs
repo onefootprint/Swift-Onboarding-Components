@@ -7,14 +7,14 @@ use anyhow::bail;
 use anyhow::Result;
 use reqwest::Url;
 
-pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
-    let client = get_cli_client(&api_root, is_live)?;
+pub async fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
+    let client = get_cli_client(&api_root, is_live).await?;
 
-    if client.get_aws_pre_enrollment()?.is_none() {
+    if client.get_aws_pre_enrollment().await?.is_none() {
         bail!("Your AWS external ID has not been generated. Run `footprint get-external-id {}` and create an IAM role according to the Vault Disaster Recovery documentation.", client.is_live.fmt_flag());
     }
 
-    let status = client.get_status()?;
+    let status = client.get_status().await?;
 
     let needs_re_enroll = status.enrolled_status.is_some();
     if needs_re_enroll {
@@ -68,13 +68,15 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
 
     println!();
     print!("Verifying configuration...");
-    let resp = client.enroll(VaultDrEnrollRequest {
-        aws_account_id,
-        aws_role_name,
-        s3_bucket_name,
-        org_public_keys,
-        re_enroll: Some(needs_re_enroll),
-    });
+    let resp = client
+        .enroll(VaultDrEnrollRequest {
+            aws_account_id,
+            aws_role_name,
+            s3_bucket_name,
+            org_public_keys,
+            re_enroll: Some(needs_re_enroll),
+        })
+        .await;
 
     match resp {
         Ok(_) => println!(" OK"),

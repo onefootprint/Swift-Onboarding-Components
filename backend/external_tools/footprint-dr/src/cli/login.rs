@@ -15,14 +15,14 @@ use termcolor::ColorSpec;
 use termcolor::StandardStream;
 use termcolor::WriteColor;
 
-pub fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
+pub async fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     let prompt = format!("Enter Footprint {} API key: ", is_live);
     let api_key = ApiKey::new(
         rpassword::prompt_password(prompt).with_context(|| "failed to read password from stdin")?,
     );
 
     let client = VaultDrApiClient::new(api_root, is_live, api_key)?;
-    let status = client.get_status().map_err(|err| {
+    let status = client.get_status().await.map_err(|err| {
         debug!("{:?}, ", err);
 
         anyhow!("Failed to log in. Please check your API key and try again.")
@@ -38,8 +38,8 @@ pub fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
 
     // Check and warn if the sandbox and live login slots have mismatching org IDs.
     let other_login_slot = !is_live;
-    if let Ok(client) = VaultDrApiClient::try_from_keyring(&client.api_root, other_login_slot) {
-        let other_status = client.get_status()?;
+    if let Ok(client) = VaultDrApiClient::try_from_keyring(&client.api_root, other_login_slot).await {
+        let other_status = client.get_status().await?;
 
         if status.org_id != other_status.org_id {
             let mut stdout = StandardStream::stdout(ColorChoice::Auto);

@@ -16,7 +16,9 @@ use std::path::PathBuf;
 mod api_client;
 mod enroll;
 mod get_external_id;
+mod list_vaults;
 mod login;
+mod s3_client;
 mod status;
 mod wire_types;
 
@@ -88,10 +90,6 @@ enum Subcommand {
         #[clap(flatten)]
         sandbox: SandboxFlags,
 
-        /// List all vaults
-        #[arg(long, group = VAULT_SELECTOR_GROUP, group = NUMBER_OF_VAULTS_GROUP)]
-        all: bool,
-
         #[clap(flatten)]
         vault_filter: VaultSelector,
     },
@@ -99,10 +97,6 @@ enum Subcommand {
     ListRecords {
         #[clap(flatten)]
         sandbox: SandboxFlags,
-
-        /// List all vault records
-        #[arg(long, group = VAULT_SELECTOR_GROUP, group = NUMBER_OF_VAULTS_GROUP)]
-        all: bool,
 
         #[clap(flatten)]
         vault_filter: VaultSelector,
@@ -149,18 +143,19 @@ enum Subcommand {
 }
 
 #[derive(Args, Debug)]
+#[command(group = ArgGroup::new(PAGINATION_OR_SAMPLE_GROUP).requires("limit"))]
 struct VaultSelector {
     /// Begin paginating over vaults after this FP ID.
     #[arg(
         long,
-        group = "vault selector",
+        group = VAULT_SELECTOR_GROUP,
         group = PAGINATION_OR_SAMPLE_GROUP,
         value_name = "FP ID"
     )]
-    vault_gt: Option<String>,
+    fp_id_gt: Option<String>,
 
     /// Randomly sample vaults.
-    #[arg(long, group = "vault selector", group = PAGINATION_OR_SAMPLE_GROUP)]
+    #[arg(long, group = VAULT_SELECTOR_GROUP, group = PAGINATION_OR_SAMPLE_GROUP)]
     sample: bool,
 
     /// The maximum number of vaults to list.
@@ -169,12 +164,12 @@ struct VaultSelector {
         long,
         group = NUMBER_OF_VAULTS_GROUP,
         value_name = "count",
-        default_value = "100"
     )]
-    limit: Option<usize>,
+    // We use a rather small u16 instead of a usize because S3 API sizes are i32.
+    limit: Option<u16>,
 }
 
-pub fn run() -> Result<()> {
+pub async fn run() -> Result<()> {
     env_logger::Builder::from_env("LOG_LEVEL").init();
 
     let cmd = Command::parse();
@@ -188,15 +183,17 @@ pub fn run() -> Result<()> {
     };
 
     match subcommand {
-        Subcommand::Login { sandbox } => login::login_cmd(api_root, sandbox.live.into()),
-        Subcommand::Status { sandbox } => status::status_cmd(api_root, sandbox.live.into()),
+        Subcommand::Login { sandbox } => login::login_cmd(api_root, sandbox.live.into()).await,
+        Subcommand::Status { sandbox } => status::status_cmd(api_root, sandbox.live.into()).await,
         Subcommand::GetExternalId { sandbox } => {
-            get_external_id::get_external_id_cmd(api_root, sandbox.live.into())
+            get_external_id::get_external_id_cmd(api_root, sandbox.live.into()).await
         }
-        Subcommand::Enroll { sandbox } => enroll::enroll_cmd(api_root, sandbox.live.into()),
-        _ => {
-            unimplemented!()
-        }
+        Subcommand::Enroll { sandbox } => enroll::enroll_cmd(api_root, sandbox.live.into()).await,
+        Subcommand::ListVaults {
+            sandbox,
+            vault_filter,
+        } => list_vaults::list_vaults_cmd(api_root, sandbox.live.into(), vault_filter).await,
+        _ => unimplemented!(),
     }
 }
 

@@ -164,6 +164,7 @@ services:
       ENVIRONMENT: ${ENVIRONMENT:-local}
       # Used by diesel migration tests.
       DATABASE_URL: "postgresql://postgres:postgres@localhost:9432/postgres"
+      AWS_PROFILE: localstack
     volumes:
       - .:/backend
     profiles:

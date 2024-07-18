@@ -69,6 +69,7 @@ base64 = "0.13"
 hex = { version = "0.4", features = ["serde"] }
 either = "1.6"
 tokio = { version = "1.0", features = ["full"] }
+tokio-stream = "0.1.15"
 dotenv = "0.15"
 openssl = "0.10.55"
 strum_macros = { version = "0.24" }
@@ -173,6 +174,8 @@ aws-credential-types = { version = "1.2.0", features = [
 ] }
 aws-sdk-rekognition = "1.38.0"
 aws-sdk-textract = "1.35.0"
+aws-smithy-async = { version = "1.2.1" }
+aws-smithy-runtime-api = { version = "1.7.1" }
 
 x509-parser = "0.14"
 test-case = "3.0.0"

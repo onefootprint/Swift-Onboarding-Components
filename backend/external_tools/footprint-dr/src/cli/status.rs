@@ -4,10 +4,10 @@ use anyhow::Result;
 use chrono::Duration;
 use reqwest::Url;
 
-pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
-    let client = get_cli_client(&api_root, is_live)?;
+pub async fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
+    let client = get_cli_client(&api_root, is_live).await?;
 
-    let status = client.get_status()?;
+    let status = client.get_status().await?;
 
     println!(
         "Logged in to {} ({})",

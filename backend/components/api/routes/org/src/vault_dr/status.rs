@@ -86,6 +86,7 @@ pub async fn get(
                 aws_account_id: config.aws_account_id,
                 aws_role_name: config.aws_role_name,
                 s3_bucket_name: config.s3_bucket_name,
+                bucket_path_namespace: config.bucket_path_namespace,
                 org_public_keys: config.org_public_keys,
                 latest_backup_record_timestamp,
                 backup_lag_seconds,
@@ -93,7 +94,6 @@ pub async fn get(
             Ok(Some(enrolled_status))
         })
         .await?;
-
 
     Ok(api_wire_types::VaultDrStatus {
         org_id: tenant.id.clone(),

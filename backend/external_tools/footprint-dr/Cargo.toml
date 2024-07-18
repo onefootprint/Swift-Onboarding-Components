@@ -7,18 +7,28 @@ description = "CLI for interacting with the Footprint Vault Disaster Recovery sy
 edition.workspace = true
 
 [dependencies]
+vault_dr_client = { path = "../../components/vault_dr_client" }
+
 anyhow =  { workspace = true }
 age =  { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-smithy-async = { workspace = true }
+aws-smithy-runtime-api = { workspace = true }
 clap = { workspace = true }
 chrono = { workspace = true }
 env_logger = { workspace = true }
+futures= { workspace = true }
 log = { workspace = true }
 rpassword = { workspace = true }
 keyring = { workspace = true }
+rand = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 test-case = { workspace = true }
 termcolor = { workspace = true }
-vault_dr_client = { path = "../../components/vault_dr_client" }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+
 

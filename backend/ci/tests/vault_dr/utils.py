@@ -17,11 +17,12 @@ def footprint_dr(*args):
     return pexpect.spawn(
         "footprint-dr",
         list(args),
-        timeout=5,
+        timeout=10,
         logfile=sys.stdout.buffer,
         env=os.environ | {
             "LOG_LEVEL": "debug",
             "FOOTPRINT_API_ROOT": os.environ["TEST_URL"],
+            "AWS_PROFILE": "localstack",
         },
     )
 

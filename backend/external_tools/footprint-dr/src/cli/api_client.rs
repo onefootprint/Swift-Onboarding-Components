@@ -10,12 +10,12 @@ use anyhow::Ok;
 use anyhow::Result;
 use keyring::Entry;
 use log::debug;
-use reqwest::blocking::Client;
-use reqwest::blocking::RequestBuilder;
-use reqwest::blocking::Response;
 use reqwest::header::HeaderMap;
 use reqwest::header::HeaderValue;
+use reqwest::Client;
 use reqwest::Method;
+use reqwest::RequestBuilder;
+use reqwest::Response;
 use reqwest::StatusCode;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
@@ -101,9 +101,7 @@ impl VaultDrApiClient {
             HeaderValue::from_str(api_key.leak_ref())?,
         );
 
-        let client = reqwest::blocking::Client::builder()
-            .default_headers(headers)
-            .build()?;
+        let client = reqwest::Client::builder().default_headers(headers).build()?;
 
         Ok(Self {
             api_root,
@@ -121,16 +119,20 @@ impl VaultDrApiClient {
         Entry::new(&service_name, "api_key").with_context(|| "Failed to create keyring entry")
     }
 
-    pub(crate) fn try_from_keyring(api_root: &Url, is_live: IsLive) -> Result<Self> {
+    pub(crate) async fn try_from_keyring(api_root: &Url, is_live: IsLive) -> Result<Self> {
         let entry = Self::keyring_entry(api_root, is_live)?;
-        let secret_key = entry
-            .get_password()
-            .with_context(|| "Failed to retrieve API key from keyring")?;
+        let secret_key = tokio::task::spawn_blocking(move || -> Result<String> {
+            let secret_key = entry
+                .get_password()
+                .with_context(|| "Failed to retrieve API key from keyring")?;
+            Ok(secret_key)
+        })
+        .await??;
 
         let client = Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))?;
 
         // Check that the credentials in the keyring are valid.
-        let status = client.get_status()?;
+        let status = client.get_status().await?;
         if IsLive::from(status.is_live) != is_live {
             bail!(
                 "Keyring has been corrupted. Run `footprint login {}` to log in again.",
@@ -152,12 +154,12 @@ impl VaultDrApiClient {
         Ok(self.client.request(method, self.api_root.join(path)?))
     }
 
-    fn handle_response<T>(resp: Response) -> Result<T>
+    async fn handle_response<T>(resp: Response) -> Result<T>
     where
         T: DeserializeOwned,
     {
         if let Err(err) = resp.error_for_status_ref() {
-            let body = resp.text()?;
+            let body = resp.text().await?;
             let message: String = serde_json::from_str(&body)
                 .map(|e: ApiError| e.message)
                 .unwrap_or(body.clone());
@@ -165,54 +167,59 @@ impl VaultDrApiClient {
             bail!(message);
         };
 
-        Ok(resp.json()?)
+        Ok(resp.json().await?)
     }
 
-    pub(crate) fn get_status(&self) -> Result<VaultDrStatus> {
-        let resp = self.request(Method::GET, "org/vault_dr/status")?.send()?;
+    pub(crate) async fn get_status(&self) -> Result<VaultDrStatus> {
+        let resp = self.request(Method::GET, "org/vault_dr/status")?.send().await?;
 
-        Self::handle_response(resp)
+        Self::handle_response(resp).await
     }
 
-    pub(crate) fn get_aws_pre_enrollment(&self) -> Result<Option<VaultDrAwsPreEnrollResponse>> {
+    pub(crate) async fn get_aws_pre_enrollment(&self) -> Result<Option<VaultDrAwsPreEnrollResponse>> {
         let resp = self
             .request(Method::GET, "org/vault_dr/aws_pre_enrollment")?
-            .send()?;
+            .send()
+            .await?;
 
         if resp.status() == StatusCode::NOT_FOUND {
             return Ok(None);
         }
 
-        Ok(Some(Self::handle_response(resp)?))
+        Ok(Some(Self::handle_response(resp).await?))
     }
 
-    pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
+    pub(crate) async fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
         let resp = self
             .request(Method::POST, "org/vault_dr/aws_pre_enrollment")?
-            .send()?;
+            .send()
+            .await?;
 
-        Self::handle_response(resp)
+        Self::handle_response(resp).await
     }
 
-    pub(crate) fn enroll(&self, req: VaultDrEnrollRequest) -> Result<VaultDrEnrollResponse> {
+    pub(crate) async fn enroll(&self, req: VaultDrEnrollRequest) -> Result<VaultDrEnrollResponse> {
         let resp = self
             .request(Method::POST, "org/vault_dr/enroll")?
             .json(&req)
-            .send()?;
+            .send()
+            .await?;
 
-        Self::handle_response(resp)
+        Self::handle_response(resp).await
     }
 }
 
-pub(crate) fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<VaultDrApiClient> {
-    let client = VaultDrApiClient::try_from_keyring(api_root, is_live).map_err(|err| {
-        debug!("{:?}, ", err);
+pub(crate) async fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<VaultDrApiClient> {
+    let client = VaultDrApiClient::try_from_keyring(api_root, is_live)
+        .await
+        .map_err(|err| {
+            debug!("{:?}, ", err);
 
-        anyhow!(
-            "Not logged in. Run `footprint login {}` to log in.",
-            is_live.fmt_flag()
-        )
-    })?;
+            anyhow!(
+                "Not logged in. Run `footprint login {}` to log in.",
+                is_live.fmt_flag()
+            )
+        })?;
 
     Ok(client)
 }

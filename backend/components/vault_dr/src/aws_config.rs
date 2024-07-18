@@ -10,6 +10,8 @@ use std::fmt::Debug;
 use tracing::info;
 use tracing::warn;
 
+// footprint-dr also uses this key to test s3:GetObject access.
+// Update in footprint-dr if this key is changed.
 const S3_ACCESS_PROBE_KEY: &str = "footprint/.vdr-access-probe";
 
 #[derive(Debug, Clone)]

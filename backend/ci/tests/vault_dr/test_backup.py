@@ -56,3 +56,80 @@ def test_footprint_dr_backup(tenant):
 
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
+
+    # Test listing fp_ids.
+
+    # --limit arg is required for sampling or paginating.
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--sample",
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 2
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--fp-id-gt", fp_id_1
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 2
+
+    # Sampling doesn't work with --fp-id-gt.
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--sample",
+        "--fp-id-gt", fp_id_1,
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 2
+
+    # List all fp_ids.
+    with footprint_dr("list-vaults", "--live") as cmd:
+        cmd.expect_exact(min(fp_id_1, fp_id_2))
+        cmd.expect_exact(max(fp_id_1, fp_id_2))
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+
+    # List just 10.
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--limit", "10",
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    assert 2 <= cmd.before.count(b"\nfp_") <= 10
+
+    # Check that each fp_id is present in the backup.
+    for fp_id in [fp_id_1, fp_id_2]:
+        with footprint_dr(
+            "list-vaults", "--live",
+            # Highly unlikely to be flaky unless there are multiple fp_ids that
+            # match except for the lasst character
+            "--fp-id-gt", fp_id[:-1],
+            "--limit", "1",
+        ) as cmd:
+            cmd.expect_exact(fp_id)
+            cmd.expect(pexpect.EOF)
+        assert cmd.exitstatus == 0
+
+    # Try sampling fp_ids.
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--sample",
+        "--limit", "10",
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    assert 2 <= cmd.before.count(b"\nfp_") <= 10
+
+    # Ensure that --fp-id-gt works.
+    # Test on the min so there is guaranteed to be at least one greater fp_id
+    fp_id = min(fp_id_1, fp_id_2)
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--fp-id-gt", fp_id,
+        "--limit", "10",
+    ) as cmd:
+        cmd.expect(r"fp_[A-Za-z0-9_]+")
+        assert cmd.match.group(0).decode() > fp_id
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
