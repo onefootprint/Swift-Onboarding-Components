@@ -126,10 +126,13 @@ pub struct CreateTokenResponse {
     /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the
     /// flow. This is useful when you'd like to open a native interface inside your app for the user
     /// to complete the flow.
+    #[openapi(example = "utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt")]
     pub token: SessionAuthToken,
     /// A Footprint link embedding the `token` that can be sent to this user to allow them to
     /// complete the flow. This is useful to send in an automated message to the end user.
-    #[openapi(example = "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt")]
+    #[openapi(
+        example = "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt"
+    )]
     pub link: PiiString,
     /// The time at which the token (and link) expire
     pub expires_at: DateTime<Utc>,

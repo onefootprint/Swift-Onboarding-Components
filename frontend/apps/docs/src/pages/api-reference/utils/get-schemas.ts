@@ -48,9 +48,6 @@ export const getSchemaFromComponent = (component?: Content) => {
 // backend provide data types for each of these fields instead of inferring based on the name
 // https://swagger.io/docs/specification/data-models/data-types/#string
 const DefaultFieldValues: Record<string, string> = {
-  token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
-  session_token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
-  validation_token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
   onboarding_config_key: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
   key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
   playbook_key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',

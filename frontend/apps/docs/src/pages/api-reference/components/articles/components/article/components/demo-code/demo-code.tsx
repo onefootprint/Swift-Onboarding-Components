@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Article } from '@/api-reference/api-reference.types';
+import type { Article, SecurityTypes } from '@/api-reference/api-reference.types';
 import type { ContentSchema } from '@/api-reference/api-reference.types';
 import { getExample, getSchemaFromComponent, maybeEvaluateSchemaRef } from '@/api-reference/utils/get-schemas';
 
@@ -18,7 +18,16 @@ const computeCurlRequest = (article: Article) => {
 
   const lines = [];
 
-  if (article.security?.flatMap(s => Object.keys(s)).includes('Secret API Key')) {
+  const security = article.security?.flatMap(s => Object.keys(s));
+  security?.forEach(s => {
+    const ExampleHeaderForSecurity: Record<SecurityTypes, string> = {
+      'Secret API Key': '-u sk_test_xxxxx:',
+      'Client Token': "-H 'X-Fp-Authorization: cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
+    };
+    lines.push(ExampleHeaderForSecurity[s as SecurityTypes]);
+  });
+
+  if (article.security?.flatMap(s => Object.keys(s)).includes('')) {
     lines.push(`-u sk_test_xxxxx:`);
   }
 
@@ -37,19 +46,15 @@ const computeCurlRequest = (article: Article) => {
       httpMethodArgs = '-G';
     }
     querystringParms?.forEach(p => lines.push(`-d ${p.name}=${p.example}`));
-  } else if (article.requestBody) {
+  } else {
     // Add data fields to curl request
     httpMethodArgs = `-X ${article.method.toUpperCase()}`;
     if (referencedSchema?.type === 'object' || referencedSchema?.type === 'array') {
       const exampleRequestJson = JSON.stringify(exampleRequest, null, 2);
       lines.push(`-d '${exampleRequestJson}'`);
-    } else {
+    } else if (article.requestBody) {
       lines.push(`-d '${exampleRequest}'`);
     }
-  }
-
-  if (article.path === '/users/{fp_id}/vault/{identifier}/upload') {
-    console.log(article);
   }
 
   // Construct the first curl line

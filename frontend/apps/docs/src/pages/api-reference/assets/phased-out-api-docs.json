@@ -6121,6 +6121,7 @@
                 "type": "object",
                 "properties": {
                     "session_token": {
+                        "example": "tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "description": "a one-time use session token for onboarding a new user",
                         "type": "string"
                     }

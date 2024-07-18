@@ -2471,6 +2471,10 @@
                         "format": "date-time"
                     },
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "The fields that this token has permissions to operate on, according to the requested scope.",
                         "type": "array",
                         "items": {
@@ -2708,6 +2712,7 @@
                         }
                     },
                     "token": {
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "description": "The short-lived token that gives temporary access to perform operations for this user",
                         "type": "string"
                     }
@@ -2774,11 +2779,12 @@
                         "format": "date-time"
                     },
                     "link": {
-                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "example": "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
                         "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
                         "type": "string"
                     },
                     "token": {
+                        "example": "utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
                         "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
                         "type": "string"
                     }
@@ -4710,7 +4716,8 @@
                 "type": "object",
                 "properties": {
                     "validation_token": {
-                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "example": "vtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "description": "The validation token given from either the `onComplete` or `onAuth` callback of the\n Footprint SDK.",
                         "type": "string"
                     }
                 },
@@ -4723,7 +4730,7 @@
                 "properties": {
                     "business": {
                         "example": null,
-                        "description": "Information on the business and its onboarding session. Provided for KYB playbook sessions",
+                        "description": "Information on the business and its onboarding session. Provided after onboarding onto a KYB\n playbook.",
                         "type": "object",
                         "properties": {
                             "fp_id": {
@@ -4754,7 +4761,7 @@
                         ]
                     },
                     "user": {
-                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook\n sessions",
+                        "description": "Information on the user and their onboarding session. Provided after onboarding onto a KYC\n or KYB playbook.",
                         "type": "object",
                         "properties": {
                             "fp_id": {
@@ -4785,7 +4792,7 @@
                         ]
                     },
                     "user_auth": {
-                        "description": "Information on the authenticated user and the auth method they used",
+                        "description": "Information on the authenticated user and the auth method they used.",
                         "type": "object",
                         "properties": {
                             "auth_events": {

@@ -59,10 +59,12 @@ pub struct CreateClientTokenRequest {
 #[serde(rename_all = "snake_case")]
 pub struct CreateClientTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
+    #[openapi(example = "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub token: SessionAuthToken,
     /// The time at which the token expires
     pub expires_at: DateTime<Utc>,
     /// The fields that this token has permissions to operate on, according to the requested scope.
+    #[openapi(example = r#"["id.first_name","id.last_name"]"#)]
     pub fields: Vec<DataIdentifier>,
 }
 

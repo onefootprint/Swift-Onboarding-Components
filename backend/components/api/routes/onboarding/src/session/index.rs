@@ -26,6 +26,7 @@ pub struct CreateOnboardingSessionRequest {
 #[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct ObConfigSessionToken {
     /// a one-time use session token for onboarding a new user
+    #[openapi(example = "tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub session_token: SessionAuthToken,
 }
 
