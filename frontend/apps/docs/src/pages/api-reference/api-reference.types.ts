@@ -15,20 +15,14 @@ export type PathProps = {
 
 export type SecurityTypes = 'Secret API Key' | 'Client Token';
 
-export type SecurityProps = {
-  type: SecurityTypes;
-};
-
 export type ParameterProps = {
   description?: string;
-  in: string;
+  in: 'query' | 'header' | 'path' | 'cookie';
   name: string;
   required?: boolean;
-  schema: {
-    type: 'string' | 'number' | 'boolean' | 'array' | 'object';
-    items: ContentSchema;
-    enum?: string[];
-  };
+  schema: ContentSchema;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  example?: any;
   style: string;
 };
 
@@ -37,11 +31,11 @@ export type Article = {
   parameters?: ParameterProps[];
   responses?: Record<string, Content>;
   requestBody?: Content;
-  security?: SecurityTypes[];
+  security?: Record<SecurityTypes, string[]>[];
   tags?: string[];
   // These are added on top of the open API spec
   id: string;
-  method: string;
+  method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
   path: string;
   section: string;
 };

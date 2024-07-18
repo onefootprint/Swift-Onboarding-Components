@@ -4,8 +4,8 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
+import Box from '../box';
 import CopyButton from '../copy-button';
-import Text from '../text';
 
 export type CodeBlockProps = {
   ariaLabel?: string;
@@ -14,7 +14,7 @@ export type CodeBlockProps = {
   highlightedLines?: number[];
   language: string;
   showLineNumbers?: boolean;
-  title?: string;
+  title?: string | React.ReactNode;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
 };
@@ -36,9 +36,10 @@ const CodeBlock = ({
   return (
     <Container>
       <Header>
-        <Text variant="label-3">{title || language}</Text>
+        <Title tag="h5">{title || language}</Title>
         {!disableCopy && (
           <CopyButton
+            size="small"
             contentToCopy={children}
             tooltipText={tooltipText ?? t('components.code-block.tooltip-text-default')}
             tooltipTextConfirmation={
@@ -103,10 +104,22 @@ const Header = styled.header`
   `}
 `;
 
+const Title = styled(Box)`
+  ${({ theme }) => css`
+    ${createFontStyles('caption-1')};
+    color: ${theme.color.secondary};
+    gap: ${theme.spacing[3]};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `}
+
+`;
+
 const Content = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2', 'code')};
-    background: transparent;
+    background: ${theme.backgroundColor.primary};
     position: relative;
     width: 100%;
 
@@ -124,7 +137,7 @@ const Content = styled.div`
       width: ${theme.spacing[5]};
       background: linear-gradient(
         -90deg,
-        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0), 
         ${theme.backgroundColor.primary}
       );
     }
@@ -141,8 +154,8 @@ const Content = styled.div`
 
     pre {
       text-align: left;
-      padding: ${theme.spacing[5]} !important;
-      background: none !important;
+      padding: ${theme.spacing[4]} !important;
+      background-color: ${theme.backgroundColor.primary} !important;
     }
   `}
 `;

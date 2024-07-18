@@ -5,6 +5,13 @@ import hostedApiData from '../assets/hosted-api-docs.json';
 import phasedOutApiData from '../assets/phased-out-api-docs.json';
 import privateApiData from '../assets/private-api-docs.json';
 
+export const maybeEvaluateSchemaRef = (schema: ContentSchema | undefined) => {
+  if (schema?.$ref) {
+    return evaluateSchemaRef(schema.$ref);
+  }
+  return schema;
+};
+
 export const evaluateSchemaRef = (ref: string) => {
   const parts = ref?.split('/');
   const key = parts[parts.length - 1];
@@ -46,7 +53,9 @@ const DefaultFieldValues: Record<string, string> = {
   validation_token: 'tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH',
   onboarding_config_key: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
   key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
+  playbook_key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
   fp_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
+  fp_bid: 'fp_bid_xIMR8HSsaGvKtiwosEsvV0',
   fp_user_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
   ip_address: '192.168.1.1',
 };
@@ -61,8 +70,8 @@ export const getExample = (schema?: ContentSchema, name?: string, index = 0): un
     const referencedSchema = evaluateSchemaRef(schema.$ref);
     return getExample(referencedSchema);
   }
-  if (schema.example) {
-    // Some schemas have a hardcoded example
+  if (schema.example !== undefined) {
+    // Some schemas have a hardcoded example. `null` is a valid hardcoded example
     return schema.example;
   }
   if (schema.type === 'string') {
@@ -99,10 +108,13 @@ export const getExample = (schema?: ContentSchema, name?: string, index = 0): un
   if (schema.type === 'object') {
     // Recursively show each property and its schema
     if (schema.properties) {
-      const properties = Object.keys(schema.properties!).map(k => {
-        const propSchema = schema.properties![k];
-        return [k, getExample(propSchema, k)];
-      });
+      const properties = Object.keys(schema.properties!)
+        .map(k => {
+          const propSchema = schema.properties![k];
+          return [k, getExample(propSchema, k)];
+        })
+        // Omit fields that have a null or undefined example
+        .filter(([_, v]) => v !== null && v !== undefined);
       return Object.fromEntries(properties);
     }
 

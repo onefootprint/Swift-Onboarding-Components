@@ -4,8 +4,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { SecurityProps } from '@/api-reference/api-reference.types';
 import staticData from '@/api-reference/assets/api-docs.json';
+import { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
+
+export type SecurityProps = {
+  type: SecurityTypes;
+};
 
 const securityComponentContent = staticData?.components?.securitySchemes;
 

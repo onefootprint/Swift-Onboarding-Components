@@ -52,9 +52,7 @@ const Article = ({ article }: ArticleProps) => {
               <Text variant="label-1" marginTop={3}>
                 {t('request')}
               </Text>
-              {security?.map((element: SecurityTypes) =>
-                Object.keys(element).map(type => <Security key={type} type={type as SecurityTypes} />),
-              )}
+              {security.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
               <Box marginTop={2} marginBottom={2} />
               <Schema>
                 {parameters && <Parameters parameters={parameters} />}
@@ -65,7 +63,7 @@ const Article = ({ article }: ArticleProps) => {
           )}
         </ContentWidth>
       </ContentColumn>
-      <CodeColumn>{responses && <DemoCode requestBody={requestBody} responses={responses} />}</CodeColumn>
+      <CodeColumn>{responses && <DemoCode article={article} />}</CodeColumn>
     </ArticleContainer>
   );
 };
