@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN skip_kyc BOOLEAN NOT NULL DEFAULT FALSE;
