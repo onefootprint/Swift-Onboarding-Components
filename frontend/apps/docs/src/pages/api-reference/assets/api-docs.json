@@ -1596,8 +1596,10 @@
                         "description": "Target proxy destination URL.",
                         "required": true,
                         "schema": {
+                            "example": "https://acmebankprocessor.com/api/process_transaction",
                             "type": "string"
                         },
+                        "example": "https://acmebankprocessor.com/api/process_transaction",
                         "style": "simple"
                     },
                     {

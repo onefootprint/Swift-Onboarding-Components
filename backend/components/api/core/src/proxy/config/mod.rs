@@ -31,6 +31,7 @@ api_headers_schema! {
     pub struct JitProxyHeaderParams {
         required: {
             /// Target proxy destination URL.
+            #[example="https://acmebankprocessor.com/api/process_transaction"]
             egress_url: url::Url = "x-fp-proxy-target-url";
         }
         optional: {}

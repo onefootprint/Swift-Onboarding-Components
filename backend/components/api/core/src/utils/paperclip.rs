@@ -6,8 +6,9 @@ macro_rules! api_headers_schema {
             required: {
                 $(
 
-                    $(#[doc = $r_doc:expr])*
+                    $(#[doc = $r_doc:expr])+
                     $(#[alias = $r_alias:literal])*
+                    #[example = $example:literal]
                     $r_name:ident: $r_typ:ty = $r_header:literal;
                 )*
             }
@@ -15,8 +16,9 @@ macro_rules! api_headers_schema {
             optional: {
                 $(
 
-                    $(#[doc = $o_doc:expr])*
+                    $(#[doc = $o_doc:expr])+
                     $(#[alias = $o_alias:literal])*
+                    $(#[example = $o_example:literal])?
                     $o_name:ident: $o_typ:ty = $o_header:literal;
                 )*
             }
@@ -105,6 +107,12 @@ macro_rules! api_headers_schema {
                                         $r_doc.trim(),
                                     )*].join(" ")
                                 ),
+                                schema: Some(paperclip::v2::models::DefaultSchemaRaw{
+                                    name: Some($r_header.to_owned()),
+                                    data_type: Some(paperclip::v2::models::DataType::String),
+                                    example: Some(serde_json::Value::String($example.to_owned())),
+                                    ..Default::default()
+                                }),
                                 data_type: {
                                     use paperclip::v2::schema::TypedData;
                                     Some(String::data_type())
@@ -127,6 +135,14 @@ macro_rules! api_headers_schema {
                                         $o_doc.trim(),
                                     )*].join(" ")
                                 ),
+                                $(
+                                    schema: Some(paperclip::v2::models::DefaultSchemaRaw{
+                                        name: Some($o_header.to_owned()),
+                                        data_type: Some(paperclip::v2::models::DataType::String),
+                                        example: Some(serde_json::Value::String($o_example.to_owned())),
+                                        ..Default::default()
+                                    }),
+                                )*
                                 data_type: {
                                     use paperclip::v2::schema::TypedData;
                                     Some(String::data_type())
@@ -148,7 +164,8 @@ macro_rules! api_headers_schema {
                     $group::schema()
                 }
             }
-            impl paperclip::actix::OperationModifier for $group {}
+
+            impl paperclip::actix::OperationModifier for $group { }
 
             impl actix_web::FromRequest for $group {
                 type Error = $crate::ApiError;
@@ -197,15 +214,18 @@ macro_rules! api_headers_schema {
 #[cfg(test)]
 mod tests {
     use actix_web::FromRequest;
+    use serde_json::json;
 
     api_headers_schema! {
         /// Test headers
         pub struct TestGroupParams {
             required: {
                 /// test description
+                #[example = "foo"]
                 test_header: String = "x-fp-test";
 
                 /// test description
+                #[example = "bar"]
                 test_header2: String = "x-fp-test-2";
             }
             optional: {
@@ -225,22 +245,19 @@ mod tests {
         assert_eq!(TestGroupParams::TEST_HEADER3_HEADER_NAME, "x-fp-test-3");
         assert_eq!(TestGroupParams::TEST_HEADER4_HEADER_NAME, "x-fp-test-4");
 
+        let test_header = TestGroupParams::schema().first().unwrap().clone();
         assert_eq!(
-            TestGroupParams::schema()
-                .first()
-                .unwrap()
-                .description
-                .clone()
-                .unwrap(),
+            test_header.description.clone().unwrap(),
             "test description".to_string()
         );
+        assert_eq!(test_header.schema.unwrap().example.unwrap(), json!("foo"));
+
+        let test_header2 = TestGroupParams::schema().into_iter().nth(1).unwrap();
+        assert_eq!(test_header2.schema.unwrap().example.unwrap(), json!("bar"));
+
+        let test_header3 = TestGroupParams::schema().into_iter().nth(2).unwrap();
         assert_eq!(
-            TestGroupParams::schema()
-                .into_iter()
-                .nth(2)
-                .unwrap()
-                .description
-                .unwrap(),
+            test_header3.description.unwrap(),
             "test description 3 multline 3".to_string()
         );
     }
