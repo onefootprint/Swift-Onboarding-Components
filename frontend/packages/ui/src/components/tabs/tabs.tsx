@@ -55,6 +55,7 @@ const Container = styled(motion(TabsList))`
   ${({ theme }) => css`
     display: flex;
     border-bottom: 1px solid ${theme.borderColor.tertiary};
+    gap: ${theme.spacing[5]};
     &[data-is-disabled='true'] {
       opacity: 0.5;
       pointer-events: none;
@@ -76,24 +77,11 @@ const Tab = styled(TabsTrigger)`
     color: ${theme.color.tertiary};
     margin: 0;
     height: fit-content;
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    padding: ${theme.spacing[2]} 0;
     transition: color 0.1s ease-in-out;
 
     &:not([data-state='active']):hover {
       color: ${theme.color.primary};
-
-      &::after {
-        content: '';
-        position: absolute;
-        border-radius: ${theme.borderRadius.default};
-        height: calc(100% - ${theme.spacing[1]} * 2);
-        width: 100%;
-        background: ${theme.color.primary};
-        top: ${theme.spacing[1]};
-        left: ${theme.spacing[1]};
-        background: ${theme.backgroundColor.secondary};
-        z-index: -1;
-      }
     }
 
     &[data-state='active'] {
