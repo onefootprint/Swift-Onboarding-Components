@@ -1562,6 +1562,14 @@
         "description": " | Updates, announcements, knowledge sharing",
         "twitter": "Footprint on Twitter"
       },
+      "tags": {
+        "product": "Product",
+        "knowledge-base": "Knowledge Base",
+        "news": "Company News",
+        "engineering": "Engineering",
+        "design": "Design",
+        "all": "All"
+      },
       "post": {
         "reading-time": "{{readingTime}} min. read"
       }

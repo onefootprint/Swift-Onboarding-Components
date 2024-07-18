@@ -65,17 +65,17 @@ const StyledLink = styled(Link)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    box-shadow: ${theme.elevation[1]};
+    box-shadow: ${theme.elevation[0]};
     display: flex;
     flex-direction: column;
     height: 100%;
     text-decoration: none;
-    transition: background-color 0.4s ease-in-out;
+    transition: border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 
     @media (hover: hover) {
       &:hover {
-        box-shadow: ${theme.elevation[0]};
-        background-color: ${theme.backgroundColor.secondary};
+        box-shadow: ${theme.elevation[1]};
+        border-color: ${theme.borderColor.primary};
       }
     }
   `}
