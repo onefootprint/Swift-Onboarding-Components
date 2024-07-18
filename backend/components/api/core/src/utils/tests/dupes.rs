@@ -12,7 +12,6 @@ use db::tests::fixtures;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawDataRequest;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DupeKind as DK;
@@ -238,12 +237,11 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
 async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>) {
     let request: HashMap<DataIdentifier, PiiJsonValue> =
         HashMap::from_iter(data.into_iter().map(|(i, s)| (i.into(), json!(s).into())));
-    let request = RawDataRequest(request);
     let args = ValidateArgs::for_non_portable(true);
     let PatchDataRequest {
         updates,
         deletions: _,
-    } = request.clean_and_validate(args).unwrap();
+    } = PatchDataRequest::clean_and_validate(request, args).unwrap();
     let data_req = FingerprintedDataRequest::build_for_new_user(state, updates, &sv.tenant_id)
         .await
         .unwrap();

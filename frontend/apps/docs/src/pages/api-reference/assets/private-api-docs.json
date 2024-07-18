@@ -407,7 +407,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -508,7 +508,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -2136,7 +2136,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -2292,7 +2292,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -9893,8 +9893,7 @@
                     "is_doc_first_flow",
                     "kind",
                     "must_collect_data",
-                    "name",
-                    "skip_kyc"
+                    "name"
                 ]
             },
             "CreateOrgFrequentNoteRequest": {
@@ -13236,7 +13235,6 @@
             },
             "DeleteVaultResponse": {
                 "example": {
-                    "id.last_name": true,
                     "id.ssn9": true,
                     "custom.credit_card": true,
                     "id.dob": false
@@ -25916,11 +25914,11 @@
                     "url"
                 ]
             },
-            "RawDataRequest": {
+            "RawUserDataRequest": {
                 "example": {
                     "id.first_name": "Jane",
-                    "custom.ach_account_number": "1234567890",
-                    "custom.cc_last_4": "4242"
+                    "id.last_name": "Doe",
+                    "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58"
                 },
                 "type": "object",
                 "properties": {

@@ -16,7 +16,9 @@ use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::FpId;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
@@ -26,18 +28,11 @@ use paperclip::actix::{
     self,
 };
 
-#[route_alias(
-    actix::post(
-        "/users/{fp_id}/vault/validate",
-        tags(Users, Vault, PublicApi),
-        description = "Checks if provided data is valid before adding it to the vault."
-    ),
-    actix::post(
-        "/businesses/{fp_bid}/vault/validate",
-        tags(Businesses, Vault, PublicApi),
-        description = "Checks if provided data is valid before adding it to the vault."
-    )
-)]
+#[route_alias(actix::post(
+    "/users/{fp_id}/vault/validate",
+    tags(Users, Vault, PublicApi),
+    description = "Checks if provided data is valid before adding it to the vault."
+))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
     tags(Vault, Entities, Private)
@@ -46,12 +41,30 @@ use paperclip::actix::{
 pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
-    let result = post_inner(&state, path.into_inner(), request.into_inner(), auth).await?;
+    let result = post_inner(&state, path.into_inner(), request.into_inner().into(), auth).await?;
+    Ok(result)
+}
+
+
+#[api_v2_operation(
+    tags(Businesses, Vault, PublicApi),
+    description = "Checks if provided data is valid before adding it to the vault."
+)]
+#[actix::post("/businesses/{fp_bid}/vault/validate")]
+pub async fn post_business(
+    state: web::Data<State>,
+    path: FpIdPath,
+    request: Json<RawBusinessDataRequest>,
+    auth: SecretTenantAuthContext,
+) -> ApiResponse<api_wire_types::Empty> {
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+
+    let result = post_inner(&state, path.into_inner(), request.into_inner().into(), auth).await?;
     Ok(result)
 }
 
@@ -67,7 +80,7 @@ pub async fn post(
 #[actix::post("/entities/vault/validate")]
 pub async fn post_client(
     state: web::Data<State>,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     auth: ClientTenantAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     // This is a little different - we actually require a permission to update the data in the
@@ -76,7 +89,7 @@ pub async fn post_client(
     let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
 
-    let result = post_inner(&state, fp_id, request, Box::new(auth)).await?;
+    let result = post_inner(&state, fp_id, request.into(), Box::new(auth)).await?;
     Ok(result)
 }
 
@@ -91,7 +104,7 @@ async fn post_inner(
     let actor = auth.actor();
 
     let PatchDataRequest { updates, .. } =
-        request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
+        PatchDataRequest::clean_and_validate(request, ValidateArgs::for_non_portable(is_live))?;
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     let source = auth.dl_source();

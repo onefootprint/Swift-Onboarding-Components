@@ -8,7 +8,7 @@ use api_core::utils::headers::ExternalId;
 use api_core::utils::headers::IdempotencyId;
 use api_core::utils::headers::SandboxId;
 use api_core::vault::create_non_portable_vault;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -22,7 +22,7 @@ use paperclip::actix::web;
 #[post("/users")]
 pub async fn post(
     state: web::Data<State>,
-    request: OptionalJson<RawDataRequest>,
+    request: OptionalJson<RawUserDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
@@ -32,7 +32,7 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::LiteUser> {
     let result = create_non_portable_vault(
         state,
-        request,
+        request.0.unwrap_or_default().into(),
         auth,
         insight,
         idempotency_id,

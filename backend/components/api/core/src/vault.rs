@@ -5,7 +5,6 @@ use crate::errors::tenant::TenantError;
 use crate::errors::ValidationError;
 use crate::telemetry::RootSpan;
 use crate::types::ApiResponse;
-use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
 use crate::utils::headers::ExternalId;
 use crate::utils::headers::IdempotencyId;
@@ -24,22 +23,24 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
+use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::PiiJsonValue;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
 use newtypes::VaultKind;
 use paperclip::actix::web;
+use std::collections::HashMap;
 
 #[allow(clippy::unwrap_or_default)]
 #[allow(clippy::too_many_arguments)]
 pub async fn create_non_portable_vault(
     state: web::Data<State>,
-    request: OptionalJson<RawDataRequest>,
+    request: HashMap<DataIdentifier, PiiJsonValue>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
@@ -77,16 +78,12 @@ pub async fn create_non_portable_vault(
     };
 
     // Parse optional request
-    let request_info = if let Some(request) = request.into_inner() {
-        let targets = request.keys().cloned().collect_vec();
-        if !targets.is_empty() {
-            let PatchDataRequest { updates, .. } =
-                request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-            let updates = FingerprintedDataRequest::build_for_new_user(&state, updates, &tenant_id).await?;
-            Some((targets, updates))
-        } else {
-            None
-        }
+    let targets = request.keys().cloned().collect_vec();
+    let request_info = if !targets.is_empty() {
+        let PatchDataRequest { updates, .. } =
+            PatchDataRequest::clean_and_validate(request, ValidateArgs::for_non_portable(is_live))?;
+        let updates = FingerprintedDataRequest::build_for_new_user(&state, updates, &tenant_id).await?;
+        Some((targets, updates))
     } else {
         None
     };

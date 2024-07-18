@@ -11,7 +11,7 @@ use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::ValidateArgs;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -29,15 +29,16 @@ use paperclip::actix::{
 pub async fn post_validate(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
-    request: Json<RawDataRequest>,
+    request: Json<RawBusinessDataRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 
-    let PatchDataRequest { updates, .. } = request
-        .into_inner()
-        .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
+        request.into_inner(),
+        ValidateArgs::for_bifrost(user_auth.scoped_user.is_live),
+    )?;
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
 
@@ -62,16 +63,17 @@ pub async fn post_validate(
 #[actix::patch("/hosted/business/vault")]
 pub async fn patch(
     state: web::Data<State>,
-    request: Json<RawDataRequest>,
+    request: Json<RawBusinessDataRequest>,
     user_auth: UserWfAuthContext,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 
-    let PatchDataRequest { updates, .. } = request
-        .into_inner()
-        .clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
+        request.into_inner(),
+        ValidateArgs::for_bifrost(user_auth.scoped_user.is_live),
+    )?;
     let updates = FingerprintedDataRequest::build(&state, updates, &sb_id).await?;
 
     let source = user_auth.user_session.dl_source();

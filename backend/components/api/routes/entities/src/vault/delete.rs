@@ -49,7 +49,7 @@ pub struct DeleteVaultResponse(HashMap<DataIdentifier, bool>);
 impl_map_apiv2_schema!(
     DeleteVaultResponse<DataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
-    {"id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false}
+    {"id.ssn9": true, "custom.credit_card": true, "id.dob": false}
 );
 impl_response_type!(DeleteVaultResponse);
 

@@ -47,11 +47,11 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawBusinessDataRequest"
                             }
                         }
                     }
@@ -227,7 +227,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawBusinessDataRequest"
                             }
                         }
                     },
@@ -323,7 +323,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawBusinessDataRequest"
                             }
                         }
                     },
@@ -422,11 +422,11 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     }
@@ -499,7 +499,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -600,7 +600,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -1157,7 +1157,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -1253,7 +1253,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RawDataRequest"
+                                "$ref": "#/components/schemas/RawUserDataRequest"
                             }
                         }
                     },
@@ -3582,7 +3582,6 @@
             },
             "DeleteVaultResponse": {
                 "example": {
-                    "id.last_name": true,
                     "id.ssn9": true,
                     "custom.credit_card": true,
                     "id.dob": false
@@ -4104,11 +4103,260 @@
                     "id"
                 ]
             },
-            "RawDataRequest": {
+            "RawBusinessDataRequest": {
+                "example": {
+                    "business.name": "Acme Bank",
+                    "business.website": "acmebank.org",
+                    "custom.account_id": "d0af81fc-41c2-46ca-8a8d-797b8e4d3146"
+                },
+                "type": "object",
+                "properties": {
+                    "<key>": {
+                        "type": "string",
+                        "enum": [
+                            "id.first_name",
+                            "id.middle_name",
+                            "id.last_name",
+                            "id.dob",
+                            "id.ssn4",
+                            "id.ssn9",
+                            "id.address_line1",
+                            "id.address_line2",
+                            "id.city",
+                            "id.state",
+                            "id.zip",
+                            "id.country",
+                            "id.email",
+                            "id.phone_number",
+                            "id.us_legal_status",
+                            "id.visa_kind",
+                            "id.visa_expiration_date",
+                            "id.nationality",
+                            "id.citizenships",
+                            "id.drivers_license_number",
+                            "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
+                            "custom.*",
+                            "business.name",
+                            "business.dba",
+                            "business.website",
+                            "business.phone_number",
+                            "business.tin",
+                            "business.address_line1",
+                            "business.address_line2",
+                            "business.city",
+                            "business.state",
+                            "business.zip",
+                            "business.country",
+                            "business.beneficial_owners",
+                            "business.kyced_beneficial_owners",
+                            "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
+                            "investor_profile.employment_status",
+                            "investor_profile.occupation",
+                            "investor_profile.employer",
+                            "investor_profile.annual_income",
+                            "investor_profile.net_worth",
+                            "investor_profile.investment_goals",
+                            "investor_profile.risk_tolerance",
+                            "investor_profile.declarations",
+                            "investor_profile.brokerage_firm_employer",
+                            "investor_profile.senior_executive_symbols",
+                            "investor_profile.family_member_names",
+                            "investor_profile.political_organization",
+                            "investor_profile.funding_sources",
+                            "document.id_card.front.image",
+                            "document.id_card.front.mime_type",
+                            "document.id_card.back.image",
+                            "document.id_card.back.mime_type",
+                            "document.id_card.selfie.image",
+                            "document.id_card.selfie.mime_type",
+                            "document.id_card.full_name",
+                            "document.id_card.dob",
+                            "document.id_card.gender",
+                            "document.id_card.full_address",
+                            "document.id_card.document_number",
+                            "document.id_card.expires_at",
+                            "document.id_card.issued_at",
+                            "document.id_card.issuing_state",
+                            "document.id_card.issuing_country",
+                            "document.id_card.ref_number",
+                            "document.id_card.nationality",
+                            "document.id_card.curp",
+                            "document.id_card.classified_document_type",
+                            "document.id_card.curp_validation_response",
+                            "document.drivers_license.front.image",
+                            "document.drivers_license.front.mime_type",
+                            "document.drivers_license.back.image",
+                            "document.drivers_license.back.mime_type",
+                            "document.drivers_license.selfie.image",
+                            "document.drivers_license.selfie.mime_type",
+                            "document.drivers_license.full_name",
+                            "document.drivers_license.dob",
+                            "document.drivers_license.gender",
+                            "document.drivers_license.full_address",
+                            "document.drivers_license.document_number",
+                            "document.drivers_license.expires_at",
+                            "document.drivers_license.issued_at",
+                            "document.drivers_license.issuing_state",
+                            "document.drivers_license.issuing_country",
+                            "document.drivers_license.ref_number",
+                            "document.drivers_license.nationality",
+                            "document.drivers_license.curp",
+                            "document.drivers_license.classified_document_type",
+                            "document.drivers_license.curp_validation_response",
+                            "document.passport.front.image",
+                            "document.passport.front.mime_type",
+                            "document.passport.back.image",
+                            "document.passport.back.mime_type",
+                            "document.passport.selfie.image",
+                            "document.passport.selfie.mime_type",
+                            "document.passport.full_name",
+                            "document.passport.dob",
+                            "document.passport.gender",
+                            "document.passport.full_address",
+                            "document.passport.document_number",
+                            "document.passport.expires_at",
+                            "document.passport.issued_at",
+                            "document.passport.issuing_state",
+                            "document.passport.issuing_country",
+                            "document.passport.ref_number",
+                            "document.passport.nationality",
+                            "document.passport.curp",
+                            "document.passport.classified_document_type",
+                            "document.passport.curp_validation_response",
+                            "document.passport_card.front.image",
+                            "document.passport_card.front.mime_type",
+                            "document.passport_card.back.image",
+                            "document.passport_card.back.mime_type",
+                            "document.passport_card.selfie.image",
+                            "document.passport_card.selfie.mime_type",
+                            "document.passport_card.full_name",
+                            "document.passport_card.dob",
+                            "document.passport_card.gender",
+                            "document.passport_card.full_address",
+                            "document.passport_card.document_number",
+                            "document.passport_card.expires_at",
+                            "document.passport_card.issued_at",
+                            "document.passport_card.issuing_state",
+                            "document.passport_card.issuing_country",
+                            "document.passport_card.ref_number",
+                            "document.passport_card.nationality",
+                            "document.passport_card.curp",
+                            "document.passport_card.classified_document_type",
+                            "document.passport_card.curp_validation_response",
+                            "document.permit.front.image",
+                            "document.permit.front.mime_type",
+                            "document.permit.back.image",
+                            "document.permit.back.mime_type",
+                            "document.permit.selfie.image",
+                            "document.permit.selfie.mime_type",
+                            "document.permit.full_name",
+                            "document.permit.dob",
+                            "document.permit.gender",
+                            "document.permit.full_address",
+                            "document.permit.document_number",
+                            "document.permit.expires_at",
+                            "document.permit.issued_at",
+                            "document.permit.issuing_state",
+                            "document.permit.issuing_country",
+                            "document.permit.ref_number",
+                            "document.permit.nationality",
+                            "document.permit.curp",
+                            "document.permit.classified_document_type",
+                            "document.permit.curp_validation_response",
+                            "document.visa.front.image",
+                            "document.visa.front.mime_type",
+                            "document.visa.back.image",
+                            "document.visa.back.mime_type",
+                            "document.visa.selfie.image",
+                            "document.visa.selfie.mime_type",
+                            "document.visa.full_name",
+                            "document.visa.dob",
+                            "document.visa.gender",
+                            "document.visa.full_address",
+                            "document.visa.document_number",
+                            "document.visa.expires_at",
+                            "document.visa.issued_at",
+                            "document.visa.issuing_state",
+                            "document.visa.issuing_country",
+                            "document.visa.ref_number",
+                            "document.visa.nationality",
+                            "document.visa.curp",
+                            "document.visa.classified_document_type",
+                            "document.visa.curp_validation_response",
+                            "document.residence_document.front.image",
+                            "document.residence_document.front.mime_type",
+                            "document.residence_document.back.image",
+                            "document.residence_document.back.mime_type",
+                            "document.residence_document.selfie.image",
+                            "document.residence_document.selfie.mime_type",
+                            "document.residence_document.full_name",
+                            "document.residence_document.dob",
+                            "document.residence_document.gender",
+                            "document.residence_document.full_address",
+                            "document.residence_document.document_number",
+                            "document.residence_document.expires_at",
+                            "document.residence_document.issued_at",
+                            "document.residence_document.issuing_state",
+                            "document.residence_document.issuing_country",
+                            "document.residence_document.ref_number",
+                            "document.residence_document.nationality",
+                            "document.residence_document.curp",
+                            "document.residence_document.classified_document_type",
+                            "document.residence_document.curp_validation_response",
+                            "document.voter_identification.front.image",
+                            "document.voter_identification.front.mime_type",
+                            "document.voter_identification.back.image",
+                            "document.voter_identification.back.mime_type",
+                            "document.voter_identification.selfie.image",
+                            "document.voter_identification.selfie.mime_type",
+                            "document.voter_identification.full_name",
+                            "document.voter_identification.dob",
+                            "document.voter_identification.gender",
+                            "document.voter_identification.full_address",
+                            "document.voter_identification.document_number",
+                            "document.voter_identification.expires_at",
+                            "document.voter_identification.issued_at",
+                            "document.voter_identification.issuing_state",
+                            "document.voter_identification.issuing_country",
+                            "document.voter_identification.ref_number",
+                            "document.voter_identification.nationality",
+                            "document.voter_identification.curp",
+                            "document.voter_identification.classified_document_type",
+                            "document.voter_identification.curp_validation_response",
+                            "document.finra_compliance_letter",
+                            "document.proof_of_address.image",
+                            "document.ssn_card.image",
+                            "document.custom.*",
+                            "card.*.number",
+                            "card.*.expiration",
+                            "card.*.cvc",
+                            "card.*.name",
+                            "card.*.billing_address.zip",
+                            "card.*.billing_address.country",
+                            "card.*.expiration_month",
+                            "card.*.expiration_year",
+                            "card.*.number_last4",
+                            "card.*.issuer"
+                        ]
+                    },
+                    "<value>": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "<key>",
+                    "<value>"
+                ]
+            },
+            "RawUserDataRequest": {
                 "example": {
                     "id.first_name": "Jane",
-                    "custom.ach_account_number": "1234567890",
-                    "custom.cc_last_4": "4242"
+                    "id.last_name": "Doe",
+                    "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58"
                 },
                 "type": "object",
                 "properties": {

@@ -24,7 +24,9 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
@@ -39,18 +41,11 @@ use paperclip::actix::{
     self,
 };
 
-#[route_alias(
-    actix::patch(
-        "/users/{fp_id}/vault",
-        description = "Updates data in a user vault.",
-        tags(Users, Vault, PublicApi)
-    ),
-    actix::patch(
-        "/businesses/{fp_bid}/vault",
-        description = "Updates data in a business vault.",
-        tags(Businesses, Vault, PublicApi)
-    )
-)]
+#[route_alias(actix::patch(
+    "/users/{fp_id}/vault",
+    description = "Updates data in a user vault.",
+    tags(Users, Vault, PublicApi)
+))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault.",
     tags(Vault, Entities, Vault, Private)
@@ -59,7 +54,7 @@ use paperclip::actix::{
 pub async fn patch(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
@@ -67,7 +62,28 @@ pub async fn patch(
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let path = path.into_inner();
-    let request = request.into_inner();
+    let request = request.into_inner().into();
+    let result = patch_inner(&state, path, request, auth, insight, *ignore_luhn_validation).await?;
+    Ok(result)
+}
+
+#[api_v2_operation(
+    description = "Updates data in a business vault.",
+    tags(Businesses, Vault, PublicApi)
+)]
+#[actix::patch("/businesses/{fp_bid}/vault")]
+pub async fn patch_business(
+    state: web::Data<State>,
+    path: FpIdPath,
+    request: Json<RawBusinessDataRequest>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    insight: InsightHeaders,
+    ignore_luhn_validation: IgnoreLuhnValidation,
+) -> ApiResponse<api_wire_types::Empty> {
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+
+    let path = path.into_inner();
+    let request = request.into_inner().into();
     let result = patch_inner(&state, path, request, auth, insight, *ignore_luhn_validation).await?;
     Ok(result)
 }
@@ -84,7 +100,7 @@ pub async fn patch(
 #[actix::patch("/entities/vault")]
 pub async fn patch_client(
     state: web::Data<State>,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     auth: ClientTenantAuthContext,
     insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
@@ -94,7 +110,7 @@ pub async fn patch_client(
     let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
 
-    let result = patch_inner(&state, fp_id, request, Box::new(auth), insight, false).await?;
+    let result = patch_inner(&state, fp_id, request.into(), Box::new(auth), insight, false).await?;
     Ok(result)
 }
 
@@ -154,7 +170,7 @@ async fn patch_inner(
 
     let mut args = ValidateArgs::for_non_portable(is_live);
     args.ignore_luhn_validation = ignore_luhn_validation;
-    let PatchDataRequest { updates, deletions } = request.clean_and_validate(args)?;
+    let PatchDataRequest { updates, deletions } = PatchDataRequest::clean_and_validate(request, args)?;
     let updates = FingerprintedDataRequest::build(state, updates, &sv.id).await?;
 
     let source = auth.dl_source();

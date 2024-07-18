@@ -10,7 +10,8 @@ use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ValidateArgs;
@@ -27,7 +28,7 @@ use paperclip::actix::{
 )]
 #[actix::post("/hosted/identify/kba")]
 pub async fn post(
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> ApiResponse<KbaResponse> {
@@ -36,7 +37,7 @@ pub async fn post(
     // We reuse the same request structure that is used for adding data to the vault. This lets us
     // easily reuse validation and data cleaning.
     let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
-    let data = request.into_inner().clean_and_validate(args)?.updates;
+    let data = PatchDataRequest::clean_and_validate(request.into_inner(), args)?.updates;
 
     // Limit which fields can be used for KBA
     let allowable_kba_dis = [DataIdentifier::Id(IDK::PhoneNumber)];

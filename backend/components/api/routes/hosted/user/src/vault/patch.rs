@@ -18,7 +18,7 @@ use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::email::Email;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentRequestConfig;
@@ -43,7 +43,7 @@ use std::str::FromStr;
 #[actix::post("/hosted/user/vault/validate")]
 pub async fn post_validate(
     state: web::Data<State>,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
@@ -56,7 +56,7 @@ pub async fn post_validate(
         allow_dangling_keys: *allow_extra_fields,
         is_live: user_auth.user().is_live,
     };
-    let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
+    let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(request.into_inner(), opts)?;
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
     let su_id = user_auth.scoped_user.id.clone();
@@ -78,7 +78,7 @@ pub async fn post_validate(
 #[actix::patch("/hosted/user/vault")]
 pub async fn patch(
     state: web::Data<State>,
-    request: Json<RawDataRequest>,
+    request: Json<RawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
     bootstrap_fields: BootstrapFieldsHeader,
 ) -> ApiResponse<api_wire_types::Empty> {
@@ -86,9 +86,10 @@ pub async fn patch(
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let t_id = &user_auth.tenant().id;
 
-    let PatchDataRequest { updates, .. } = request
-        .into_inner()
-        .clean_and_validate(ValidateArgs::for_bifrost(user_auth.user().is_live))?;
+    let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
+        request.into_inner(),
+        ValidateArgs::for_bifrost(user_auth.user().is_live),
+    )?;
 
     let email = updates
         .get(&IDK::Email.into())

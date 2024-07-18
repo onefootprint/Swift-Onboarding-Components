@@ -14,29 +14,45 @@ use either::Either;
 use itertools::Itertools;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, serde::Deserialize, derive_more::Deref, derive_more::DerefMut)]
-pub struct RawDataRequest(pub HashMap<DataIdentifier, PiiJsonValue>);
+pub type RawDataRequest = HashMap<DataIdentifier, PiiJsonValue>;
+
+#[derive(
+    Debug, Clone, Default, serde::Deserialize, derive_more::Deref, derive_more::DerefMut, derive_more::Into,
+)]
+pub struct RawUserDataRequest(RawDataRequest);
 
 impl_map_apiv2_schema!(
-    RawDataRequest<DataIdentifier, PiiJsonValue>,
-    "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
-    { "id.first_name": "Jane", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }
+    RawUserDataRequest<DataIdentifier, PiiJsonValue>,
+    "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+    { "id.first_name": "Jane", "id.last_name": "Doe", "custom.user_id": "7c50e2bc-c31f-42e3-b2b0-9852010cfd58" }
 );
-impl_request_type!(RawDataRequest);
+impl_request_type!(RawUserDataRequest);
 
-// TODO separate struct for business data, more realistic examples
+#[derive(
+    Debug, Clone, Default, serde::Deserialize, derive_more::Deref, derive_more::DerefMut, derive_more::Into,
+)]
+pub struct RawBusinessDataRequest(RawDataRequest);
+
+impl_map_apiv2_schema!(
+    RawBusinessDataRequest<DataIdentifier, PiiJsonValue>,
+    "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+    { "business.name": "Acme Bank", "business.website": "acmebank.org", "custom.account_id": "d0af81fc-41c2-46ca-8a8d-797b8e4d3146" }
+);
+impl_request_type!(RawBusinessDataRequest);
+
 
 pub struct PatchDataRequest {
     pub updates: DataRequest,
     pub deletions: Vec<DataIdentifier>,
 }
 
-impl RawDataRequest {
-    /// Shorthand to parse into a DataRequest
-    pub fn clean_and_validate(self, opts: ValidateArgs) -> NtResult<PatchDataRequest> {
+impl PatchDataRequest {
+    /// Shorthand to parse into a PatchDataRequest
+    pub fn clean_and_validate<T: Into<RawDataRequest>>(map: T, opts: ValidateArgs) -> NtResult<Self> {
+        let map = map.into();
         // All write paths via API go through this struct, so we can filter out any DIs that we
         // don't want to be written via API here
-        let unallowed_dis: HashMap<_, _> = self
+        let unallowed_dis: HashMap<_, _> = map
             .keys()
             .filter_map(|di| {
                 let err = match di {
@@ -61,7 +77,7 @@ impl RawDataRequest {
             return Err(DataValidationError::FieldValidationError(unallowed_dis).into());
         }
 
-        let (map, deletions) = self.0.into_iter().partition_map(|(k, v)| {
+        let (map, deletions) = map.into_iter().partition_map(|(k, v)| {
             if PiiValueKind::from(&v) == PiiValueKind::Null {
                 Either::Right(k)
             } else {
