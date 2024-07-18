@@ -60,6 +60,7 @@ struct SandboxFlags {
     #[arg(long, global = true, group = SANDBOX_GROUP)]
     live: bool,
 
+    /// Use the sandbox environment for the authenticated organization.
     #[arg(long, global = true, group = SANDBOX_GROUP)]
     sandbox: bool,
 }
