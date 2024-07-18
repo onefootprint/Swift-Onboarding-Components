@@ -10,10 +10,10 @@ export type MissingPermissionsSheetProviderProps = {
   children: React.ReactNode;
 };
 
-const [Provider, useContext] = constate(useLocalSheet);
+const [LocalSheetProvider, useLocalSheetContext] = constate(useLocalSheet);
 
 const SheetManager = ({ device }: { device: DeviceInfo }) => {
-  const { sheet, hide } = useContext();
+  const { sheet, hide } = useLocalSheetContext();
 
   const handleClose = (onClose?: () => void) => () => {
     hide();
@@ -26,14 +26,14 @@ const SheetManager = ({ device }: { device: DeviceInfo }) => {
 };
 
 const MissingPermissionsSheetProvider = ({ device, children }: MissingPermissionsSheetProviderProps) => (
-  <Provider>
+  <LocalSheetProvider>
     <SheetManager device={device} />
     {children}
-  </Provider>
+  </LocalSheetProvider>
 );
 
 export const useMissingPermissionsSheet = () => {
-  const sheet = useContext();
+  const sheet = useLocalSheetContext();
   return { hide: sheet.hide, show: sheet.show };
 };
 

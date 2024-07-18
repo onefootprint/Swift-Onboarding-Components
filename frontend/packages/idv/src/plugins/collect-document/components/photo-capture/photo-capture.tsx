@@ -14,7 +14,7 @@ import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
 import AutoCaptureFace from '../camera/auto-capture-face';
 import type { AutocaptureKind, CaptureStatus, DeviceKind } from '../camera/types';
-import type { CameraKind } from '../camera/utils/get-camera-options';
+import type { CameraSide } from '../camera/utils/get-camera-options';
 import Loading from '../loading';
 import Instructions from './components/instructions';
 import Preview from './components/preview';
@@ -24,7 +24,7 @@ type OnComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind
 
 type PhotoCaptureProps = {
   autocaptureKind: AutocaptureKind;
-  cameraKind: CameraKind;
+  cameraKind: CameraSide;
   deviceKind: DeviceKind;
   sideName?: string;
   docName?: string;
@@ -134,7 +134,7 @@ const PhotoCapture = ({
     onComplete(file, extraCompressed, captureKind);
   };
 
-  const handleError = () => {
+  const handleError = (_err?: unknown) => {
     onCameraErrored?.();
   };
 
@@ -199,7 +199,7 @@ const PhotoCapture = ({
       <Camera
         autocaptureFeedback={autocaptureFeedback}
         autocaptureKind={autocaptureKind}
-        cameraKind={cameraKind}
+        cameraSide={cameraKind}
         deviceKind={deviceKind}
         docName={docName}
         sideName={sideName}

@@ -13,10 +13,9 @@ import MobileRetry from '../mobile-retry';
 type RouterProps = {
   onDone: () => void;
 };
-
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useNonIdDocMachine();
-  const isDone = state.matches('complete') || state.matches('failure');
+  const isDone = state.matches('complete') || state.matches('failure'); // TODO: investigate if we should consider failure as done
   useLogStateMachine('non-id-doc', state);
 
   useEffect(() => {
@@ -45,11 +44,11 @@ const Router = ({ onDone }: RouterProps) => {
     return <DesktopRetry />;
   }
 
-  if (state.matches('processingMobile')) {
+  if (state.matches('mobileProcessing')) {
     return <MobileProcessing />;
   }
 
-  if (state.matches('processingDesktop')) {
+  if (state.matches('desktopProcessing')) {
     return <DesktopProcessing />;
   }
   return <div>{`Router Non id doc flow. State name: ${state.value}`}</div>;

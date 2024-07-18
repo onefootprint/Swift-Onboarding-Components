@@ -15,7 +15,7 @@ export const initialContextDL: MachineContext = {
   documentRequestId: 'id',
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   idDoc: {
     country: 'US',

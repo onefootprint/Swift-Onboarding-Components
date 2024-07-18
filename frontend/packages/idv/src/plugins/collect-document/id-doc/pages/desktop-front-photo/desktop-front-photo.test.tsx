@@ -16,7 +16,7 @@ import {
 } from './desktop-front-photo.test.config';
 
 const renderDesktopFrontPhoto = (context: MachineContext) =>
-  renderPage(context, <DesktopFrontPhoto />, 'frontImageDesktop');
+  renderPage(context, <DesktopFrontPhoto />, 'desktopFrontImage');
 
 describe('<DesktopFrontPhoto />', () => {
   describe('Contains all the UI elements', () => {

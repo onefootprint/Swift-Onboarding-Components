@@ -6,7 +6,7 @@ import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
 import contextDesktopConsent from './desktop-consent.test.config';
 
-const renderDesktopConsent = (context: MachineContext) => renderPage(context, <DesktopConsent />, 'consentDesktop');
+const renderDesktopConsent = (context: MachineContext) => renderPage(context, <DesktopConsent />, 'desktopConsent');
 
 describe('<DesktopConsent />', () => {
   beforeEach(() => {

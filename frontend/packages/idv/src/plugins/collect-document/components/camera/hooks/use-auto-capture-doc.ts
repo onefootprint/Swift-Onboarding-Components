@@ -3,7 +3,7 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { CaptureStatus, DocSrcDimensions, VideoRef, VideoSize } from '../types';
+import type { CaptureStatus, DocSrcDimensions, Resolution, VideoRef } from '../types';
 import computeSrcDimensions, { docDrawer } from '../utils/auto-capture';
 import { CardCaptureStatus, getCardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
 import type { ParamsType } from '../utils/graphics-utils/params';
@@ -22,7 +22,7 @@ type AutoCaptureProps = {
   outlineOffsetY?: number;
   outlineWidth: number;
   videoRef: VideoRef;
-  videoSize: VideoSize | undefined;
+  videoSize: Resolution | undefined;
 };
 
 // const SELFIE_CHECK_INTERVAL = 200; // We send a new capture from video every 200 milliseconds for selfie capture
@@ -39,7 +39,7 @@ const CountDownProps = {
 };
 
 const isCardOk = (x: unknown) => x === CardCaptureStatus.OK;
-const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize => Boolean(v) && v?.width !== 0 && v?.height !== 0;
+const isNonZeroVideoSize = (v?: Resolution): v is Resolution => Boolean(v) && v?.width !== 0 && v?.height !== 0;
 
 // Bring the selected param to the front
 const moveParamToStart = (selectedParamIndex: number, oldParams: ParamsType[]) => {

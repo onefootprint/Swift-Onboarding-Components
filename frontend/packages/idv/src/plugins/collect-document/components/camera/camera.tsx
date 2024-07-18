@@ -35,8 +35,8 @@ import UploadButton from './components/upload-button';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
-import type { AutocaptureKind, CaptureStatus, DeviceKind, VideoRef, VideoSize } from './types';
-import type { CameraKind } from './utils/get-camera-options';
+import type { AutocaptureKind, CaptureStatus, DeviceKind, Resolution, VideoRef } from './types';
+import type { CameraSide } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
 type ChildrenProps = {
@@ -48,13 +48,13 @@ type ChildrenProps = {
   outlineHeight: number;
   outlineWidth: number;
   videoRef: VideoRef;
-  videoSize: VideoSize | undefined;
+  videoSize: Resolution | undefined;
 };
 
 type CameraProps = {
   autocaptureFeedback?: CaptureStatus;
   autocaptureKind: AutocaptureKind;
-  cameraKind: CameraKind;
+  cameraSide: CameraSide;
   children: (props: ChildrenProps) => JSX.Element | null;
   deviceKind: DeviceKind;
   docName?: string;
@@ -62,7 +62,7 @@ type CameraProps = {
   onCapture: (image: string, captureKind: CaptureKind) => void;
   onUpload: (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
   hasBadConnectivity?: boolean;
-  onError?: () => void;
+  onError?: (err?: unknown) => void;
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineWidthRatio: number; // with respect to the video width
   setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
@@ -118,13 +118,13 @@ const videoElementStateListener =
 const getPositionFromBottom = (kind: DeviceKind): 150 | 50 =>
   kind === 'mobile' ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
 
-const getPositionFromTop = (kind: DeviceKind, size?: VideoSize): number =>
+const getPositionFromTop = (kind: DeviceKind, size?: Resolution): number =>
   kind === 'mobile'
     ? (size?.height ?? 0) - FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
     : (size?.height ?? 0) - FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
 
 const getDesiredSize = (
-  videoSize: VideoSize,
+  videoSize: Resolution,
   autocaptureKind: AutocaptureKind,
   positionFromBottom: number,
   outlineHeightRatio: number,
@@ -148,7 +148,7 @@ const getDesiredSize = (
 const Camera = ({
   autocaptureFeedback,
   autocaptureKind,
-  cameraKind,
+  cameraSide,
   children,
   deviceKind,
   docName,
@@ -175,7 +175,7 @@ const Camera = ({
   const [isImageProcessing, setIsImageProcessing] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
+  const [isDetecting, setIsDetecting] = useState(false);
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
   const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
@@ -195,7 +195,7 @@ const Camera = ({
 
   const getImageStringFromVideo = useGetImageString();
 
-  const { mediaStream } = useUserMedia(cameraKind, onError);
+  const { mediaStream } = useUserMedia(cameraSide, onError);
   const isCameraVisible = Boolean(mediaStream?.active) && isVideoPlaying;
   const { outlineWidth, outlineHeight } = getOutlineDimensions({
     videoSize,
@@ -349,19 +349,19 @@ const Camera = ({
 
   const onImageUpload = () => {
     setIsImageProcessing(true);
-    setShouldDetect(false);
+    setIsDetecting(false);
   };
 
   const onUploadComplete = () => {
     setIsImageProcessing(false);
-    setShouldDetect(true);
+    setIsDetecting(true);
   };
 
   const onMobileCaptureClick = () => {
     if (isTimerRunning) {
       handleResetDetectionTimer();
-      setShouldDetect(false); // We can cancel the countdown
-      const restartTimeout = setTimeout(() => setShouldDetect(true), AUTOCAPTURE_RESTART_DELAY); // We wait 1s before re-detecting and starting the countdown again
+      setIsDetecting(false); // We can cancel the countdown
+      const restartTimeout = setTimeout(() => setIsDetecting(true), AUTOCAPTURE_RESTART_DELAY); // We wait 1s before re-detecting and starting the countdown again
       autocaptureRestartTimeoutRef.current = restartTimeout;
     } else {
       handleClick('manual');
@@ -379,7 +379,7 @@ const Camera = ({
   };
 
   // We don't detect for 3 seconds so the camera has time to focus
-  useTimeout(() => setShouldDetect(true), isCameraVisible ? AUTOCAPTURE_START_DELAY : null);
+  useTimeout(() => setIsDetecting(true), isCameraVisible ? AUTOCAPTURE_START_DELAY : null);
 
   useEffect(() => {
     if (autoCaptureTimerVal <= 0) {
@@ -439,7 +439,7 @@ const Camera = ({
         <VideoContainer data-device-kind={deviceKind}>
           <Video
             autoPlay
-            data-camera-kind={cameraKind}
+            data-camera-kind={cameraSide}
             data-device-kind={deviceKind}
             hidden={!isVideoPlaying}
             muted
@@ -447,7 +447,7 @@ const Camera = ({
             playsInline
             ref={videoRef}
           />
-          {isVideoPlaying && shouldDetect
+          {isVideoPlaying && isDetecting
             ? children({
                 canvasAutoCaptureRef,
                 feedbackPositionFromBottom: positionFromBottom,

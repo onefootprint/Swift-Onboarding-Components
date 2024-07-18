@@ -29,7 +29,7 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useIdDocMachine();
-  const isDone = state.matches('complete') || state.matches('failure');
+  const isDone = state.matches('complete') || state.matches('failure'); // TODO: investigate if we should consider failure as done
   useLogStateMachine('id-doc', state);
 
   useEffect(() => {
@@ -42,11 +42,11 @@ const Router = ({ onDone }: RouterProps) => {
     return <IdDocCountryAndType />;
   }
 
-  if (state.matches('consentDesktop')) {
+  if (state.matches('desktopConsent')) {
     return <DesktopConsent />;
   }
 
-  if (state.matches('frontImageCaptureMobile')) {
+  if (state.matches('mobileFrontImageCapture')) {
     return <FrontPhotoCapture />;
   }
 
@@ -54,19 +54,19 @@ const Router = ({ onDone }: RouterProps) => {
     return <MobileFrontPhotoFallbackUpload />;
   }
 
-  if (state.matches('frontImageRetryMobile')) {
+  if (state.matches('mobileFrontImageRetry')) {
     return <IdDocFrontPhotoRetry />;
   }
 
-  if (state.matches('frontImageDesktop')) {
+  if (state.matches('desktopFrontImage')) {
     return <DesktopFrontPhoto />;
   }
 
-  if (state.matches('frontImageRetryDesktop')) {
+  if (state.matches('desktopFrontImageRetry')) {
     return <DesktopFrontPhotoRetry />;
   }
 
-  if (state.matches('backImageCaptureMobile')) {
+  if (state.matches('mobileBackImageCapture')) {
     return <BackPhotoCapture />;
   }
 
@@ -74,19 +74,19 @@ const Router = ({ onDone }: RouterProps) => {
     return <MobileBackPhotoFallbackUpload />;
   }
 
-  if (state.matches('backImageRetryMobile')) {
+  if (state.matches('mobileBackImageRetry')) {
     return <IdDocBackPhotoRetry />;
   }
 
-  if (state.matches('backImageDesktop')) {
+  if (state.matches('desktopBackImage')) {
     return <DesktopBackPhoto />;
   }
 
-  if (state.matches('backImageRetryDesktop')) {
+  if (state.matches('desktopBackImageRetry')) {
     return <DesktopBackPhotoRetry />;
   }
 
-  if (state.matches('selfieImageMobile')) {
+  if (state.matches('mobileSelfieImage')) {
     return <SelfiePhoto />;
   }
 
@@ -94,11 +94,11 @@ const Router = ({ onDone }: RouterProps) => {
     return <MobileSelfieFallbackUpload />;
   }
 
-  if (state.matches('selfieImageRetryMobile')) {
+  if (state.matches('mobileSelfieImageRetry')) {
     return <SelfieRetryPrompt />;
   }
 
-  if (state.matches('selfieImageDesktop')) {
+  if (state.matches('desktopSelfieImage')) {
     return <DesktopSelfie />;
   }
 
@@ -106,15 +106,15 @@ const Router = ({ onDone }: RouterProps) => {
     return <DesktopSelfieFallbackUpload />;
   }
 
-  if (state.matches('selfieImageRetryDesktop')) {
+  if (state.matches('desktopSelfieImageRetry')) {
     return <DesktopSelfieRetry />;
   }
 
-  if (state.matches('processingMobile')) {
+  if (state.matches('mobileProcessing')) {
     return <Processing />;
   }
 
-  if (state.matches('processingDesktop')) {
+  if (state.matches('desktopProcessing')) {
     return <DesktopProcessing />;
   }
 

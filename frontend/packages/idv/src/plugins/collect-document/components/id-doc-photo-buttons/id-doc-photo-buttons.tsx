@@ -119,7 +119,7 @@ const IdDocPhotoButtons = ({
           {t('upload-photo.title')}
         </Button>
       )}
-      <StyledInput
+      <HiddenInput
         ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
         type="file"
         accept={acceptedFileFormats}
@@ -130,7 +130,7 @@ const IdDocPhotoButtons = ({
   );
 };
 
-const StyledInput = styled.input`
+const HiddenInput = styled.input`
   display: none;
 `;
 

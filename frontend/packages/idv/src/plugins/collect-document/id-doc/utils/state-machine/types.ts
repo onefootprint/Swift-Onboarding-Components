@@ -17,7 +17,7 @@ export type MachineContext = {
   orgId: string;
   documentRequestId: string;
   shouldCollectSelfie: boolean;
-  shouldCollectConsent: boolean;
+  isConsentMissing: boolean;
   supportedCountryAndDocTypes: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
   uploadMode: DocumentUploadMode;
   image?: {

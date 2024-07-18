@@ -13,7 +13,7 @@ const contextWithSelfieErrors: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   documentRequestId: 'id',
   errors: [{ errorType: IdDocImageProcessingError.selfieGlare }],

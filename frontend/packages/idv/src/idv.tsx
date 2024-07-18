@@ -14,7 +14,7 @@ import type { IdvMachineArgs } from './utils/state-machine';
 type RouterProps = ComponentProps<typeof Router>;
 type AppProps = IdvProps & RouterProps;
 
-const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
+const Idv = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
   const newIsInIframe = isInIframe === undefined ? checkIsInIframe() : isInIframe;
   const args: IdvMachineArgs = { ...props, isInIframe: newIsInIframe };
   return (
@@ -41,4 +41,4 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export default App;
+export default Idv;

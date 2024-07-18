@@ -1,8 +1,8 @@
-export type CameraKind = 'front' | 'back';
+export type CameraSide = 'front' | 'back';
 
-const getCameraOptions = (cameraKind: CameraKind) => {
+const getCameraOptions = (side: CameraSide) => {
   // We ignore the deviceId for the front camera
-  if (cameraKind === 'front') {
+  if (side === 'front') {
     return {
       audio: false,
       video: { facingMode: 'user' },

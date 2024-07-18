@@ -19,7 +19,7 @@ const contextWithErrors: MachineContext = {
   orgId: 'orgId',
   documentRequestId: 'id',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   errors: [
     { errorType: IdDocImageProcessingError.countryCodeMismatch },

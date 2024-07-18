@@ -24,12 +24,12 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'complete'
+    | 'desktopProcessing'
     | 'documentPrompt'
     | 'failure'
     | 'imageCaptureMobile'
     | 'init'
-    | 'processingDesktop'
-    | 'processingMobile'
+    | 'mobileProcessing'
     | 'retryDesktop'
     | 'retryMobile';
   tags: never;

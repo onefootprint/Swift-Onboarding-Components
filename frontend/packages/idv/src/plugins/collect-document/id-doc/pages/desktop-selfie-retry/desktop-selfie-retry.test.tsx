@@ -7,7 +7,7 @@ import type { MachineContext } from '../../utils/state-machine';
 import initialContextWithErrors from './desktop-selfie-retry.test.config';
 
 const renderDesktopSelfieRetry = (context: MachineContext) =>
-  renderPage(context, <DesktopSelfieRetry />, 'selfieImageRetryDesktop');
+  renderPage(context, <DesktopSelfieRetry />, 'desktopSelfieImageRetry');
 
 describe('<DesktopSelfieRetry />', () => {
   describe('Contains all the UI elements', () => {

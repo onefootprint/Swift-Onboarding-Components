@@ -16,7 +16,7 @@ import {
 } from './desktop-front-photo-retry.test.config';
 
 const renderDesktopFrontPhotoRetry = (context: MachineContext) =>
-  renderPage(context, <DesktopFrontPhotoRetry />, 'frontImageRetryDesktop');
+  renderPage(context, <DesktopFrontPhotoRetry />, 'desktopFrontImageRetry');
 
 describe('<DesktopFrontPhotoRetry />', () => {
   describe('Contains all the UI elements', () => {

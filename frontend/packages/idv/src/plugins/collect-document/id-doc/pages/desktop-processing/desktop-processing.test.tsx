@@ -20,7 +20,7 @@ import {
 } from './desktop-processing.test.config';
 
 const renderDesktopProcessing = (context: MachineContext) =>
-  renderPage(context, <DesktopProcessing />, 'processingDesktop');
+  renderPage(context, <DesktopProcessing />, 'desktopProcessing');
 
 describe('<DesktopProcessing />', () => {
   describe('Contains all the UI elements', () => {

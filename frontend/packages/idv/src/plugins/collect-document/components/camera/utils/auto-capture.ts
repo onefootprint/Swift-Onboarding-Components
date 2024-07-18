@@ -1,13 +1,13 @@
 import type { MutableRefObject } from 'react';
 
-import type { DocSrcDimensions, VideoRef, VideoSize } from '../types';
+import type { DocSrcDimensions, Resolution, VideoRef } from '../types';
 import getSourceDimensions from './get-source-dimensions';
 
 const HEIGHT_ERROR_OFFSET = 30; // We allow 30 pixels offset outside the card outline (10 pixels each side) along the height
 const WIDTH_ERROR_OFFSET = 40; // We allow 40 pixels offset outside the card outline (20 pixels each side) along the width
 
 const getDesiredImgSize = (
-  videoSize: VideoSize,
+  videoSize: Resolution,
   outlineWidth: number,
   outlineHeight: number,
   outlineOffsetY: number | undefined,
@@ -17,7 +17,7 @@ const getDesiredImgSize = (
 });
 
 const computeSrcDimensions = (
-  videoSize: VideoSize,
+  videoSize: Resolution,
   outlineWidth: number,
   outlineHeight: number,
   outlineOffsetY: number | undefined,

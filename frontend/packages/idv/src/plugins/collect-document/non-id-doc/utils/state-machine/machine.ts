@@ -32,12 +32,12 @@ const createNonIdDocMachine = (args: MachineContext) =>
           on: {
             receivedDocument: [
               {
-                target: 'processingMobile',
+                target: 'mobileProcessing',
                 actions: 'assignDocument',
                 cond: context => context.device.type === 'mobile',
               },
               {
-                target: 'processingDesktop',
+                target: 'desktopProcessing',
                 actions: 'assignDocument',
                 cond: context => context.device.type !== 'mobile',
               },
@@ -59,7 +59,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
               target: 'documentPrompt',
             },
             receivedDocument: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignDocument',
             },
           },
@@ -67,7 +67,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
         retryMobile: {
           on: {
             receivedDocument: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: ['assignDocument', 'clearErrors'],
             },
             navigatedToPrompt: {
@@ -83,7 +83,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
         retryDesktop: {
           on: {
             receivedDocument: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: ['assignDocument', 'clearErrors'],
             },
             navigatedToPrompt: {
@@ -96,7 +96,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
             },
           },
         },
-        processingMobile: {
+        mobileProcessing: {
           on: {
             processingSucceeded: {
               target: 'complete',
@@ -110,7 +110,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
             },
           },
         },
-        processingDesktop: {
+        desktopProcessing: {
           on: {
             processingSucceeded: {
               target: 'complete',

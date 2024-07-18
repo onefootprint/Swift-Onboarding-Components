@@ -20,34 +20,34 @@ export interface Typegen0 {
     assignId: 'receivedCountryAndType';
     assignIdDocImageErrors: 'processingErrored' | 'uploadErrored';
     assignImage: 'receivedImage';
+    assignSide: 'receivedCountryAndType';
     clearImageAndErrors: 'navigatedToCountryDoc';
-    resetSide: 'receivedCountryAndType';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'backImageCaptureMobile'
-    | 'backImageDesktop'
-    | 'backImageRetryDesktop'
-    | 'backImageRetryMobile'
     | 'complete'
-    | 'consentDesktop'
     | 'countryAndType'
+    | 'desktopBackImage'
+    | 'desktopBackImageRetry'
+    | 'desktopConsent'
+    | 'desktopFrontImage'
+    | 'desktopFrontImageRetry'
+    | 'desktopProcessing'
     | 'desktopSelfieFallback'
+    | 'desktopSelfieImage'
+    | 'desktopSelfieImageRetry'
     | 'failure'
-    | 'frontImageCaptureMobile'
-    | 'frontImageDesktop'
-    | 'frontImageRetryDesktop'
-    | 'frontImageRetryMobile'
+    | 'mobileBackImageCapture'
+    | 'mobileBackImageRetry'
     | 'mobileBackPhotoFallback'
+    | 'mobileFrontImageCapture'
+    | 'mobileFrontImageRetry'
     | 'mobileFrontPhotoFallback'
+    | 'mobileProcessing'
     | 'mobileSelfieFallback'
-    | 'processingDesktop'
-    | 'processingMobile'
-    | 'selfieImageDesktop'
-    | 'selfieImageMobile'
-    | 'selfieImageRetryDesktop'
-    | 'selfieImageRetryMobile';
+    | 'mobileSelfieImage'
+    | 'mobileSelfieImageRetry';
   tags: never;
 }

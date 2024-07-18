@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { getLogger } from '../../../../../utils';
 import { isUndefined } from '../../../../../utils/type-guards';
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
-import type { CameraKind } from '../utils/get-camera-options';
+import type { CameraSide } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
 
 const { logInfo } = getLogger({
   location: 'useUserMedia',
 });
 
-const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
+const useUserMedia = (cameraSide: CameraSide, onError?: () => void) => {
   const onCameraError = useHandleCameraError();
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
 
@@ -18,7 +18,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
     const enableVideoStream = async () => {
       if (isUndefined(navigator)) return;
 
-      const cameraOptions = getCameraOptions(cameraKind);
+      const cameraOptions = getCameraOptions(cameraSide);
       try {
         const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
         setMediaStream(stream);
@@ -42,7 +42,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
     }
 
     return cleanup;
-  }, [cameraKind, mediaStream, mediaStream?.active]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cameraSide, mediaStream, mediaStream?.active]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     mediaStream,

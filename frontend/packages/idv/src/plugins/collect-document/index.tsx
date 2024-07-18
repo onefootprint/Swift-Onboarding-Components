@@ -6,7 +6,7 @@ import IdDoc from './id-doc';
 import NonIdDoc from './non-id-doc';
 import type { IdDocProps } from './types';
 
-const App = ({ idvContext, context, onDone }: IdDocProps) => {
+const CollectDocument = ({ idvContext, context, onDone }: IdDocProps) => {
   const { authToken, device } = idvContext;
   const { sandboxOutcome, obConfigSupportedCountries } = context;
   const { uploadMode, documentRequestId, config } = context.requirement;
@@ -50,4 +50,4 @@ const App = ({ idvContext, context, onDone }: IdDocProps) => {
   return <NonIdDoc initialContext={{ ...nonIdDocInitialContext }} onDone={handleFlowCompletion} />;
 };
 
-export default App;
+export default CollectDocument;

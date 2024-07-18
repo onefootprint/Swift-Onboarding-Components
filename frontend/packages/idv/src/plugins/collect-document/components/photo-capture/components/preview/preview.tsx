@@ -5,14 +5,14 @@ import styled, { css } from 'styled-components';
 
 import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box';
 import type { DeviceKind } from '../../../camera/types';
-import type { CameraKind } from '../../../camera/utils/get-camera-options';
+import type { CameraSide } from '../../../camera/utils/get-camera-options';
 
 type PreviewProps = {
   imageSrc: string;
   onRetake: () => void;
   onConfirm: () => void;
   isLoading: boolean;
-  cameraKind: CameraKind;
+  cameraKind: CameraSide;
   deviceKind: DeviceKind;
 };
 

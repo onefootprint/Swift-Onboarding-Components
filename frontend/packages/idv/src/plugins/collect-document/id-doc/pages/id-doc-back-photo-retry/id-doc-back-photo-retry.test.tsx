@@ -7,7 +7,7 @@ import type { MachineContext } from '../../utils/state-machine';
 import contextWithErrors from './id-doc-back-photo-retry.test.config';
 
 const renderBackPhotoRetry = (context: MachineContext) =>
-  renderPage(context, <IdDocBackPhotoRetry />, 'backImageRetryMobile');
+  renderPage(context, <IdDocBackPhotoRetry />, 'mobileBackImageRetry');
 
 describe('<IdDocBackPhotoRetry />', () => {
   it('Contains the correct error messages', () => {

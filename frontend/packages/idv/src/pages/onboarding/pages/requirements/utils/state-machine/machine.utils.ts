@@ -27,8 +27,8 @@ const shouldShowAuthorize = (ctx: MachineContext) => !isTransfer(ctx) && isAutho
 const shouldShowProcess = (ctx: MachineContext) => !isTransfer(ctx) && isProcess(getFirstKind(ctx));
 
 const shouldRunIdDoc = (ctx: MachineContext): boolean => {
-  const isMobile = isDeviceMobile(ctx) || isDeviceTablet(ctx);
-  if (isTransfer(ctx) && !isMobile) {
+  const isTabletOrMobile = isDeviceMobile(ctx) || isDeviceTablet(ctx);
+  if (isTransfer(ctx) && !isTabletOrMobile) {
     // If we're running the transfer app on desktop, we want to keep the transfer as small as
     // possible. So, only register the passkey, don't allow also uploading id doc in desktop transfer
     return false;

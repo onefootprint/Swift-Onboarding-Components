@@ -1,7 +1,7 @@
 import React from 'react';
 
 import useAutoCaptureFace from './hooks/use-auto-capture-face';
-import type { CaptureStatus, VideoRef, VideoSize } from './types';
+import type { CaptureStatus, Resolution, VideoRef } from './types';
 
 type AutoCaptureFaceProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
@@ -12,7 +12,7 @@ type AutoCaptureFaceProps = {
   outlineWidth: number;
   setAutocaptureFeedback: (x?: CaptureStatus) => void;
   videoRef: VideoRef;
-  videoSize: VideoSize | undefined;
+  videoSize: Resolution | undefined;
 };
 
 const AutoCaptureFace = ({

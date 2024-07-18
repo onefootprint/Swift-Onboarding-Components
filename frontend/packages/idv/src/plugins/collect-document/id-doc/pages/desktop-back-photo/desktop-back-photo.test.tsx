@@ -13,7 +13,7 @@ import {
 } from './desktop-back-photo.test.config';
 
 const renderDesktopBackPhoto = (context: MachineContext) =>
-  renderPage(context, <DesktopBackPhoto />, 'backImageDesktop');
+  renderPage(context, <DesktopBackPhoto />, 'desktopBackImage');
 
 describe('<DesktopBackPhoto />', () => {
   describe('Contains all the UI elements', () => {

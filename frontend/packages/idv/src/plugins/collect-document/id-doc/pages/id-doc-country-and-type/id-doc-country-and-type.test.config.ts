@@ -14,7 +14,7 @@ export const initialContextAllDocTypes: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   supportedCountryAndDocTypes: {
     US: [
@@ -46,7 +46,7 @@ export const initialContextSomeDocTypes: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   documentRequestId: 'id',
   idDoc: {
@@ -70,7 +70,7 @@ export const initialContextOnlyUS: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   documentRequestId: 'id',
   idDoc: {
@@ -93,7 +93,7 @@ export const initialContextBD: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   documentRequestId: 'id',
   idDoc: {
@@ -116,7 +116,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
   shouldCollectSelfie: true,
-  shouldCollectConsent: true,
+  isConsentMissing: true,
   uploadMode: 'default',
   documentRequestId: 'id',
   idDoc: {

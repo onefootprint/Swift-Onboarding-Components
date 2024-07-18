@@ -2,7 +2,7 @@ import { useCountdownCustom } from '@onefootprint/hooks';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { CaptureStatus, VideoRef, VideoSize } from '../types';
+import type { CaptureStatus, Resolution, VideoRef } from '../types';
 import type { CardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
 import useFaceDetection, { FaceStatus } from './use-face-detection';
 
@@ -16,7 +16,7 @@ type AutoCaptureFaceProps = {
   outlineOffsetY?: number;
   outlineWidth: number;
   videoRef: VideoRef;
-  videoSize: VideoSize | undefined;
+  videoSize: Resolution | undefined;
 };
 
 const SELFIE_CHECK_INTERVAL = 200; // We send a new capture from video every 200 milliseconds for selfie capture
@@ -28,7 +28,7 @@ const CountDownProps = {
 };
 
 const isFaceOk = (x: unknown) => x === FaceStatus.OK;
-const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize => Boolean(v) && v?.width !== 0 && v?.height !== 0;
+const isNonZeroVideoSize = (v?: Resolution): v is Resolution => Boolean(v) && v?.width !== 0 && v?.height !== 0;
 
 const useAutoCaptureFace = ({
   canvasRef,

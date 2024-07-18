@@ -57,7 +57,7 @@ const IdDocCountryAndTypeContainer = ({
     sandboxOutcome,
     device,
     supportedCountryAndDocTypes,
-    shouldCollectConsent: consentRequired,
+    isConsentMissing,
     documentRequestId,
   } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
@@ -107,7 +107,7 @@ const IdDocCountryAndTypeContainer = ({
       },
       {
         onSuccess: data => {
-          if (consentRequired && device.type === 'mobile') {
+          if (isConsentMissing && device.type === 'mobile') {
             setConsentVisible(true);
           }
           onSubmitDocTypeSuccess(data, country, docType);

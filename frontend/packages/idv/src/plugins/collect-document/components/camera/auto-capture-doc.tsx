@@ -1,7 +1,7 @@
 import React from 'react';
 
 import useAutoCaptureDoc from './hooks/use-auto-capture-doc';
-import type { CaptureStatus, VideoRef, VideoSize } from './types';
+import type { CaptureStatus, Resolution, VideoRef } from './types';
 
 type AutoCaptureDocProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
@@ -14,7 +14,7 @@ type AutoCaptureDocProps = {
   outlineWidth: number;
   setAutocaptureFeedback: (x?: CaptureStatus) => void;
   videoRef: VideoRef;
-  videoSize: VideoSize | undefined;
+  videoSize: Resolution | undefined;
 };
 
 const AutoCaptureDoc = ({

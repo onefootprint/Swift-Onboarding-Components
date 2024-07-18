@@ -12,11 +12,10 @@ import Router from './pages/router';
 import type { IdDocProps } from './types';
 import type { MachineContext } from './utils/state-machine';
 
-const App = ({ initialContext, onDone }: IdDocProps) => {
+const IdDoc = ({ initialContext, onDone }: IdDocProps) => {
   const l10n = useL10nContext();
-  const { authToken, device, sandboxOutcome, config, orgId, documentRequestId, uploadMode } = initialContext;
-
-  const { shouldCollectSelfie, shouldCollectConsent, supportedCountryAndDocTypes } = config;
+  const { authToken, config, device, documentRequestId, orgId, sandboxOutcome, uploadMode } = initialContext;
+  const { shouldCollectConsent, shouldCollectSelfie, supportedCountryAndDocTypes } = config;
 
   const context: MachineContext = {
     authToken,
@@ -24,7 +23,7 @@ const App = ({ initialContext, onDone }: IdDocProps) => {
     orgId,
     documentRequestId,
     shouldCollectSelfie,
-    shouldCollectConsent,
+    isConsentMissing: shouldCollectConsent,
     uploadMode,
     currSide: IdDocImageTypes.front,
     idDoc: {
@@ -40,7 +39,7 @@ const App = ({ initialContext, onDone }: IdDocProps) => {
   return (
     <MachineProvider args={context}>
       <MissingPermissionsSheetProvider device={device}>
-        <FaceModelProvider selfieRequired={shouldCollectSelfie}>
+        <FaceModelProvider isSelfieRequired={shouldCollectSelfie}>
           <OpenCvProvider>
             <ImgProcessorsContextProvider>
               <Router onDone={onDone} />
@@ -52,4 +51,4 @@ const App = ({ initialContext, onDone }: IdDocProps) => {
   );
 };
 
-export default App;
+export default IdDoc;

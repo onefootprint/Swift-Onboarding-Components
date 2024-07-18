@@ -20,8 +20,8 @@ export const NextSideTargetsMobile: MachineTarget[] = [
     actions: assignCurrSide,
   },
   {
-    target: 'frontImageCaptureMobile',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'front',
+    target: 'mobileFrontImageCapture',
+    cond: (_, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
@@ -30,8 +30,8 @@ export const NextSideTargetsMobile: MachineTarget[] = [
     actions: assignCurrSide,
   },
   {
-    target: 'backImageCaptureMobile',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'back',
+    target: 'mobileBackImageCapture',
+    cond: (_, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
@@ -40,8 +40,8 @@ export const NextSideTargetsMobile: MachineTarget[] = [
     actions: assignCurrSide,
   },
   {
-    target: 'selfieImageMobile',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'selfie',
+    target: 'mobileSelfieImage',
+    cond: (_, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },
   {
@@ -51,13 +51,13 @@ export const NextSideTargetsMobile: MachineTarget[] = [
 
 export const NextSideTargetsDesktop: MachineTarget[] = [
   {
-    target: 'frontImageDesktop',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'front',
+    target: 'desktopFrontImage',
+    cond: (_, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
-    target: 'backImageDesktop',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'back',
+    target: 'desktopBackImage',
+    cond: (_, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
@@ -66,8 +66,8 @@ export const NextSideTargetsDesktop: MachineTarget[] = [
     actions: assignCurrSide,
   },
   {
-    target: 'selfieImageDesktop',
-    cond: (_context, event) => event.payload.nextSideToCollect === 'selfie',
+    target: 'desktopSelfieImage',
+    cond: (_, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },
   {

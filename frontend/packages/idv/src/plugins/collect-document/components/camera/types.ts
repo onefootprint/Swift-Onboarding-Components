@@ -3,7 +3,7 @@ import type { CardCaptureStatus } from './utils/graphics-utils/graphics-processi
 
 export type DeviceKind = 'mobile' | 'desktop';
 export type AutocaptureKind = 'idDoc' | 'face' | 'nonIdDoc';
-export type VideoSize = { width: number; height: number };
+export type Resolution = { width: number; height: number };
 export type CaptureStatus = `${FaceStatus}` | `${CardCaptureStatus}`;
 export type VideoRef = React.RefObject<HTMLVideoElement>;
 

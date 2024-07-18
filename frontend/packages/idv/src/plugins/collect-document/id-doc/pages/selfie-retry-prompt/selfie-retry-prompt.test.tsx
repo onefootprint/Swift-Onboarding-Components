@@ -7,7 +7,7 @@ import type { MachineContext } from '../../utils/state-machine';
 import contextWithSelfieErrors from './selfie-retry-prompt.test.config';
 
 const renderSelfieRetryPrompt = (context: MachineContext) =>
-  renderPage(context, <SelfieRetryPrompt />, 'selfieImageRetryMobile');
+  renderPage(context, <SelfieRetryPrompt />, 'mobileSelfieImageRetry');
 
 describe('<SelfieRetryPrompt />', () => {
   it('Contains the correct error messages', () => {

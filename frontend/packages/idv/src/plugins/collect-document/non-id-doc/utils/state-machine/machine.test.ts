@@ -31,7 +31,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingMobile');
+      expect(state.value).toEqual('mobileProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -63,7 +63,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingMobile');
+      expect(state.value).toEqual('mobileProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -91,7 +91,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -121,7 +121,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingMobile');
+      expect(state.value).toEqual('mobileProcessing');
       state = machine.send({
         type: 'processingErrored',
         payload: {
@@ -138,7 +138,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingMobile');
+      expect(state.value).toEqual('mobileProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -166,7 +166,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'processingErrored',
         payload: {
@@ -183,7 +183,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -211,7 +211,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'processingErrored',
         payload: {
@@ -236,7 +236,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'processingSucceeded',
       });
@@ -373,7 +373,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingMobile');
+      expect(state.value).toEqual('mobileProcessing');
       state = machine.send({
         type: 'retryLimitExceeded',
       });
@@ -401,7 +401,7 @@ describe('Non Id Doc Machine Tests', () => {
           captureKind: 'manual',
         },
       });
-      expect(state.value).toEqual('processingDesktop');
+      expect(state.value).toEqual('desktopProcessing');
       state = machine.send({
         type: 'retryLimitExceeded',
       });

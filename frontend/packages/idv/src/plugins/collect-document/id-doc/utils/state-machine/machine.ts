@@ -1,9 +1,11 @@
 import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
+
+const { logInfo } = getLogger({ location: 'machine-idDoc' });
 
 const createIdDocMachine = (args: MachineContext, initState?: string) =>
   createMachine(
@@ -24,32 +26,31 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             receivedCountryAndType: [
               {
                 target: 'mobileFrontPhotoFallback',
-                cond: context =>
-                  context.device.type === 'mobile' && !context.shouldCollectConsent && !!context.forceUpload,
-                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+                cond: context => context.device.type === 'mobile' && !context.isConsentMissing && !!context.forceUpload,
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
-                target: 'frontImageCaptureMobile',
-                cond: context => context.device.type === 'mobile' && !context.shouldCollectConsent,
-                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+                target: 'mobileFrontImageCapture',
+                cond: context => context.device.type === 'mobile' && !context.isConsentMissing,
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
-                target: 'frontImageDesktop',
-                cond: context => context.device.type !== 'mobile' && !context.shouldCollectConsent,
-                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+                target: 'desktopFrontImage',
+                cond: context => context.device.type !== 'mobile' && !context.isConsentMissing,
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
-                target: 'consentDesktop',
+                target: 'desktopConsent',
                 cond: context => context.device.type !== 'mobile',
-                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
-                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
             ],
             consentReceived: [
               {
-                target: 'frontImageCaptureMobile',
+                target: 'mobileFrontImageCapture',
                 cond: context => !!context.id,
                 actions: 'assignConsent',
               },
@@ -59,25 +60,25 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             ],
           },
         },
-        consentDesktop: {
+        desktopConsent: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
             },
             consentReceived: {
-              target: 'frontImageDesktop',
+              target: 'desktopFrontImage',
               actions: 'assignConsent',
             },
           },
         },
-        frontImageDesktop: {
+        desktopFrontImage: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
             uploadErrored: {
-              target: 'frontImageRetryDesktop',
+              target: 'desktopFrontImageRetry',
               actions: 'assignIdDocImageErrors',
             },
             navigatedToCountryDoc: {
@@ -87,7 +88,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           },
         },
 
-        frontImageCaptureMobile: {
+        mobileFrontImageCapture: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
@@ -102,7 +103,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
 
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
@@ -114,19 +115,19 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
         },
-        frontImageRetryMobile: {
+        mobileFrontImageRetry: {
           on: {
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'frontImageCaptureMobile',
+              target: 'mobileFrontImageCapture',
             },
             navigatedToCountryDoc: {
               target: 'countryAndType',
@@ -134,14 +135,14 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        frontImageRetryDesktop: {
+        desktopFrontImageRetry: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
             uploadErrored: {
-              target: 'frontImageRetryDesktop',
+              target: 'desktopFrontImageRetry',
               actions: 'assignIdDocImageErrors',
             },
             navigatedToCountryDoc: {
@@ -150,25 +151,25 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        backImageDesktop: {
+        desktopBackImage: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
             uploadErrored: {
-              target: 'backImageRetryDesktop',
+              target: 'desktopBackImageRetry',
               actions: 'assignIdDocImageErrors',
             },
           },
         },
-        backImageCaptureMobile: {
+        mobileBackImageCapture: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
@@ -180,19 +181,19 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
         },
-        backImageRetryDesktop: {
+        desktopBackImageRetry: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
             uploadErrored: {
-              target: 'backImageRetryDesktop',
+              target: 'desktopBackImageRetry',
               actions: 'assignIdDocImageErrors',
             },
             navigatedToCountryDoc: {
@@ -201,14 +202,14 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        backImageRetryMobile: {
+        mobileBackImageRetry: {
           on: {
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
             startImageCapture: {
-              target: 'backImageCaptureMobile',
+              target: 'mobileBackImageCapture',
             },
             navigatedToCountryDoc: {
               target: 'countryAndType',
@@ -216,13 +217,13 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        selfieImageMobile: {
+        mobileSelfieImage: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
@@ -234,15 +235,15 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               target: 'countryAndType',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
         },
-        selfieImageDesktop: {
+        desktopSelfieImage: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
             cameraStuck: {
@@ -254,49 +255,49 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         desktopSelfieFallback: {
           on: {
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
           },
         },
-        selfieImageRetryMobile: {
+        mobileSelfieImageRetry: {
           on: {
             startImageCapture: {
-              target: 'selfieImageMobile',
+              target: 'mobileSelfieImage',
             },
             receivedImage: {
-              target: 'processingMobile',
+              target: 'mobileProcessing',
               actions: 'assignImage',
             },
           },
         },
-        selfieImageRetryDesktop: {
+        desktopSelfieImageRetry: {
           on: {
             startImageCapture: {
-              target: 'selfieImageDesktop',
+              target: 'desktopSelfieImage',
             },
             receivedImage: {
-              target: 'processingDesktop',
+              target: 'desktopProcessing',
               actions: 'assignImage',
             },
           },
         },
-        processingMobile: {
+        mobileProcessing: {
           on: {
             processingSucceeded: NextSideTargetsMobile,
             processingErrored: [
               {
-                target: 'frontImageRetryMobile',
+                target: 'mobileFrontImageRetry',
                 cond: context => context.currSide === 'front',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
-                target: 'backImageRetryMobile',
+                target: 'mobileBackImageRetry',
                 cond: context => context.currSide === 'back',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
-                target: 'selfieImageRetryMobile',
+                target: 'mobileSelfieImageRetry',
                 cond: context => context.currSide === 'selfie',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
@@ -306,22 +307,22 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        processingDesktop: {
+        desktopProcessing: {
           on: {
             processingSucceeded: NextSideTargetsDesktop,
             processingErrored: [
               {
-                target: 'frontImageRetryDesktop',
+                target: 'desktopFrontImageRetry',
                 cond: context => context.currSide === 'front',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
-                target: 'backImageRetryDesktop',
+                target: 'desktopBackImageRetry',
                 cond: context => context.currSide === 'back',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
               {
-                target: 'selfieImageRetryDesktop',
+                target: 'desktopSelfieImageRetry',
                 cond: context => context.currSide === 'selfie',
                 actions: ['assignIdDocImageErrors', 'assignHasBadConnectivity'],
               },
@@ -352,7 +353,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           context.id = event.payload.id;
           return context;
         }),
-        resetSide: assign(context => {
+        assignSide: assign(context => {
           context.currSide = IdDocImageTypes.front;
           return context;
         }),
@@ -362,7 +363,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             captureKind: event.payload.captureKind,
             extraCompressed: event.payload.extraCompressed,
           };
-          Logger.info(
+          logInfo(
             `IdDocMachine (func assignImage): size of the image file assigned to machine context is ${context.image?.imageFile?.size}, file type ${context.image?.imageFile?.type}`,
           );
           return context;
@@ -379,7 +380,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           return context;
         }),
         assignConsent: assign(context => {
-          context.shouldCollectConsent = false;
+          context.isConsentMissing = false;
           return context;
         }),
         clearImageAndErrors: assign(context => {
