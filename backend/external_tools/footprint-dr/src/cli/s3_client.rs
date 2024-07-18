@@ -8,6 +8,7 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
 use std::collections::HashSet;
+use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 
@@ -37,6 +38,12 @@ pub struct FpId {
 pub struct FpIdPartition {
     pub path: String,
     pub fp_id_prefix: String,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub struct FpIdFields {
+    pub fp_id: FpId,
+    pub fields: Vec<String>,
 }
 
 impl S3Client {
@@ -172,6 +179,40 @@ impl S3Client {
                 path: cp.path,
                 fp_id_prefix: cp.partition,
             })
+    }
+
+    pub async fn fp_ids_from_strings(&self, fp_ids: Vec<String>) -> Result<Vec<FpId>> {
+        let partitions = self
+            .list_fp_id_partitions()
+            .await
+            .collect::<Vec<Result<_>>>()
+            .await
+            .into_iter()
+            .collect::<Result<Vec<_>>>()?;
+
+        let bucket_prefix = self.bucket_prefix();
+
+        let ret = fp_ids
+            .into_iter()
+            .flat_map(|fp_id| {
+                // Nested loop is fine if the input list is small.
+                //
+                // Doing it this inefficient way since the partition key calculation is somewhat
+                // compicated and it's in the server crate.
+                for partition in partitions.iter() {
+                    if fp_id.starts_with(&partition.fp_id_prefix) {
+                        return Some(FpId {
+                            path: format!("{}{}/{}/", bucket_prefix, partition.fp_id_prefix, fp_id),
+                            fp_id,
+                        });
+                    }
+                }
+
+                // If there's no live partition for the fp_id, then it must not be in the bucket.
+                None
+            })
+            .collect();
+        Ok(ret)
     }
 
     pub async fn list_fp_ids(
@@ -377,5 +418,63 @@ impl S3Client {
         }
 
         Ok(sample.into_iter().collect())
+    }
+
+    pub async fn list_records(
+        &self,
+        mut fp_ids: Pin<Box<dyn Stream<Item = Result<FpId>> + Send>>,
+    ) -> impl Stream<Item = Result<FpIdFields>> {
+        let (tx, rx) = mpsc::channel::<Result<FpIdFields>>(CHANNEL_BUFFER_SIZE);
+
+        let client = self.client.clone();
+        let bucket_name = self.bucket_name.clone();
+
+        tokio::task::spawn(async move {
+            while let Some(fp_id) = fp_ids.next().await {
+                if tx.is_closed() {
+                    return;
+                }
+
+                let fp_id = match fp_id {
+                    Ok(fp_id) => fp_id,
+                    Err(e) => {
+                        let _ = tx.send(Err(e)).await;
+                        return;
+                    }
+                };
+
+                // fp_id.path already has a trailing slash.
+                let fp_id_prefix = format!("{}data/", fp_id.path);
+
+                let field_prefixes =
+                    Self::list_common_prefixes(&client, &bucket_name, &fp_id_prefix, None, None)
+                        .await
+                        .collect::<Vec<Result<_>>>()
+                        .await
+                        .into_iter()
+                        .collect::<Result<Vec<_>>>();
+
+                let field_prefixes = match field_prefixes {
+                    Ok(field_prefixes) => field_prefixes,
+                    Err(e) => {
+                        let _ = tx.send(Err(e)).await;
+                        return;
+                    }
+                };
+
+                let fields: Vec<_> = field_prefixes
+                    .into_iter()
+                    .map(|field_prefix| field_prefix.partition)
+                    .collect();
+
+                let fp_id_fields = FpIdFields { fp_id, fields };
+                if tx.send(Ok(fp_id_fields)).await.is_err() {
+                    // Receiver closed.
+                    return;
+                }
+            }
+        });
+
+        ReceiverStream::new(rx)
     }
 }

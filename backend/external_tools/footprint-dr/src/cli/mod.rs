@@ -16,6 +16,7 @@ use std::path::PathBuf;
 mod api_client;
 mod enroll;
 mod get_external_id;
+mod list_records;
 mod list_vaults;
 mod login;
 mod s3_client;
@@ -193,6 +194,11 @@ pub async fn run() -> Result<()> {
             sandbox,
             vault_filter,
         } => list_vaults::list_vaults_cmd(api_root, sandbox.live.into(), vault_filter).await,
+        Subcommand::ListRecords {
+            sandbox,
+            vault_filter,
+            fp_ids,
+        } => list_records::list_records_cmd(api_root, sandbox.live.into(), vault_filter, fp_ids).await,
         _ => unimplemented!(),
     }
 }
