@@ -46,18 +46,20 @@ pub async fn post(
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<CreateTokenResponse> {
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
+    let tenant = auth.tenant().clone();
     let CreateTokenRequest {
         kind,
         key,
         fp_bid,
-        third_party_auth,
+        use_third_party_auth,
+        use_implicit_auth,
         limit_auth_methods,
         ttl_min,
     } = request.0.unwrap_or_default();
-    let third_party_auth = third_party_auth.unwrap_or(false);
+
     let kind = if let Some(kind) = kind {
         kind
-    } else if auth.tenant().id.is_apiture() || auth.tenant().id.is_coast() {
+    } else if tenant.id.is_apiture() {
         // Apiture is the only real tenant that has started using the old serialization that doesn't
         // provide a kind. They were just in pilot, so don't want to make a bad impression by
         // breaking their proof of concept app or asking them to update now.
@@ -71,7 +73,18 @@ pub async fn post(
     } else {
         return Err(ValidationError("Missing field kind").into());
     };
-    let tenant = auth.tenant().clone();
+
+    let use_implicit_auth = use_implicit_auth.unwrap_or_else(|| {
+        // These tenants were using implicit auth before we required them to explicitly request it. Will
+        // keep doing this until they pass in the flag.
+        let is_legacy_tenant = tenant.id.is_fractional() || tenant.id.is_coba() || tenant.id.is_grid();
+        if is_legacy_tenant {
+            tracing::info!(tenant_id=%tenant.id, "Implicitly enabling use_implicit_auth");
+        };
+        is_legacy_tenant
+    });
+
+
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
@@ -81,8 +94,11 @@ pub async fn post(
         || state
             .ff_client
             .flag(BoolFlag::CanProvideThirdPartyAuth(&tenant.id));
-    if third_party_auth && !can_provide_3p_auth {
-        return Err(ValidationError("You are not able to provide third-party authentication.").into());
+    if use_third_party_auth && !can_provide_3p_auth {
+        return Err(ValidationError("You are not provisioned to provide third-party authentication.").into());
+    }
+    if use_implicit_auth {
+        auth.check_preview_guard(PreviewApi::ImplicitAuth)?;
     }
 
     let (token, session) = state
@@ -91,7 +107,7 @@ pub async fn post(
             let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
 
-            if third_party_auth {
+            let third_party_auth_event = if use_third_party_auth {
                 // Trust that the tenant has authenticated this user already. Only certain tenants
                 // are permissioned to provide us with third-party auth.
                 // We'll still portablize users with third-part auth (TODO if there's not already
@@ -106,8 +122,11 @@ pub async fn post(
                     scope: IdentifyScope::Onboarding,
                     new_auth_method_action: None,
                 };
-                AuthEvent::save(args, conn)?;
-            }
+                let ae = AuthEvent::save(args, conn)?;
+                Some(ae)
+            } else {
+                None
+            };
 
             // As customers start to use us for auth, there will be situations in which:
             // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
@@ -126,7 +145,7 @@ pub async fn post(
             // who only have an account at this tenant.
             // Maybe we can open this up when we have a better distinction around (1) vaulting PII and (2)
             // creating a login method.
-            let can_use_implied_auth = if tenant.can_access_preview(&PreviewApi::ImplicitAuth) {
+            let can_use_implicit_auth = if use_implicit_auth {
                 let only_sv = ScopedVault::list(conn, &su.vault_id)?
                     .iter()
                     .all(|sv| sv.tenant_id == tenant.id);
@@ -135,15 +154,16 @@ pub async fn post(
             } else {
                 false
             };
-            let implied_auth_events = if can_use_implied_auth {
+            let implicit_auth_events = if can_use_implicit_auth {
                 AuthEvent::list_recent(conn, &su.id)?
             } else {
-                vec![]
+                // Regardless of whether implicit auth is enabled, if 3p auth was used, we should inherit the event
+                third_party_auth_event.into_iter().collect()
             };
-            tracing::info!(num_events=%implied_auth_events.len(), tenant_id=%tenant.id, %is_live, "Creating token with implied auth events");
-            let kinds = implied_auth_events.iter().map(|e| e.kind).collect();
+            tracing::info!(num_events=%implicit_auth_events.len(), tenant_id=%tenant.id, %is_live, "Creating token with implied auth events");
+            let kinds = implicit_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
-            let auth_events = implied_auth_events
+            let auth_events = implicit_auth_events
                 .into_iter()
                 .map(|e| AssociatedAuthEvent::implicit(e.id))
                 .collect_vec();

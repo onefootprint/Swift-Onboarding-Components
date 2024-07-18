@@ -46,9 +46,9 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
     """
     Test running a user through a KYC playbook after they onboard to an auth playbook
     """
-    body = post(
-        f"users/{authed_user.fp_id}/token", dict(kind="user"), sandbox_tenant.sk.key
-    )
+
+    data = dict(kind="user", use_implicit_auth=True)
+    body = post(f"users/{authed_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied

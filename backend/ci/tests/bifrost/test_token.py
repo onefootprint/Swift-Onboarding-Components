@@ -33,7 +33,7 @@ def test_reonboard_kyc(ob_config, sandbox_tenant):
 
     # Go through onboarding with a token made from a user that already onboarded
     obc = sandbox_tenant.default_ob_config
-    data = dict(kind="onboard", key=obc.key.value)
+    data = dict(kind="onboard", key=obc.key.value, use_implicit_auth=True)
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -235,7 +235,7 @@ def test_3p_auth(sandbox_tenant, ob_config):
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
-    data = dict(kind="onboard", key=ob_config.key.value, third_party_auth=True)
+    data = dict(kind="onboard", key=ob_config.key.value, use_third_party_auth=True)
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -274,7 +274,7 @@ def test_reonboard(ob_config, sandbox_tenant, operation_kind):
     user = bifrost1.run()
 
     # Onboard this user onto the same ob config twice. This should make two workflows and two decisions
-    data = dict(kind=operation_kind)
+    data = dict(kind=operation_kind, use_implicit_auth=True)
     if operation_kind == "onboard":
         data["key"] = ob_config.key.value
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
@@ -310,15 +310,14 @@ def test_provide_publishable_key_on_client(sandbox_tenant, ob_config):
     user = bifrost1.run()
 
     # Create a token not linked to an OBC
-    data = dict(kind="user")
+    data = dict(kind="user", use_implicit_auth=False)
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    # Should immediately have onboarding scopes because auth was implied
-    # TODO we should probably update this test to not inherit auth and instead require going through
-    # the verify flow to make sure the logic there works
-    body = get("hosted/user/token", None, auth_token)
-    assert set(body["scopes"]) >= {"sign_up"}
+    # Should have to go through identify again because auth not implied
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
 
     # Should require passing obc key
     body = post("hosted/onboarding", None, auth_token, status_code=400)
@@ -430,7 +429,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     # Create a token and make sure it does not have implied auth
     fp_id = user["id"]
     obc = sandbox_tenant.default_ob_config
-    data = dict(dict(kind="onboard", key=obc.key.value))
+    data = dict(dict(kind="onboard", key=obc.key.value, use_implicit_auth=True))
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 

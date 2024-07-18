@@ -39,6 +39,10 @@ impl TenantId {
     pub fn is_basic_capital(&self) -> bool {
         self.0 == *"org_hfT6m85IKbPHDFVOcybEmF"
     }
+
+    pub fn is_grid(&self) -> bool {
+        self.0 == *"org_AiK8peOw9mrqsb6yeHWEG8"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]

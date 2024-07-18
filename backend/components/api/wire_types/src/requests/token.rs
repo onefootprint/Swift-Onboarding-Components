@@ -49,8 +49,23 @@ pub struct CreateTokenRequest {
     #[openapi(example = "null")]
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 
+    /// When true, will not require physical authentication from the user if they have logged into
+    /// your organization recently.
+    /// This may be useful if a user is running through multiple playbooks and has already recently
+    /// logged in.
+    #[serde(default)]
     #[openapi(skip)]
-    pub third_party_auth: Option<bool>,
+    #[openapi(required)]
+    pub use_implicit_auth: Option<bool>,
+
+    /// When true, you attest that this user has already authenticated to your platform. Footprint
+    /// will then not require re-authentication from the user.
+    /// You must have already authenticated the user before creating a token with
+    /// `use_third_party_auth`. Be very careful using this feature as these tokens will give the
+    /// user logged-in access to the provided `fp_id`.
+    #[openapi(skip)]
+    #[serde(default)]
+    pub use_third_party_auth: bool,
 
     /// Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be
     /// at least 1 minute, at most 1 day
