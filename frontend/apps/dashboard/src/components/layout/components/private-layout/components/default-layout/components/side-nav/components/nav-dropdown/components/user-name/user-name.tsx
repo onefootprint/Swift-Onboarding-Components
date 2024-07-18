@@ -1,4 +1,5 @@
 import { Stack, Text } from '@onefootprint/ui';
+import { Dropdown } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -25,15 +26,16 @@ const UserName = ({ name, lastName, email }: UserNameProps) => {
   );
 };
 
-const UserDropdownItem = styled(Stack)`
+const UserDropdownItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
-    pointer-events: none;
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    display: flex;
-    flex-direction: column;
     align-items: flex-start;
-    width: 100%;
+    flex-direction: column;
+    height: 64px;
     overflow: hidden;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    pointer-events: none;
+    width: 100%;
+    user-select: none;
 
     & > * {
       max-width: 100%;

@@ -12,7 +12,7 @@ import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
 import EditForm from './components/edit-form';
 import PersonVault from './components/person-vault';
-import VaultActionControls, { useDecryptControls, useEditControls } from './components/vault-actions';
+import VaultActions, { useDecryptControls, useEditControls } from './components/vault-actions';
 import EMPTY_SELECT_VALUE from './constants';
 import type { DecryptFormData, EditFormData, EditSubmitData } from './vault.types';
 
@@ -99,7 +99,7 @@ const Vault = ({ entity }: VaultProps) => {
 
   return (
     <>
-      <VaultActionControls entity={entity} />
+      <VaultActions entity={entity} />
       {showEditForm ? (
         <EditForm onSubmit={handleBeforeEditSubmit}>
           <PersonVault />

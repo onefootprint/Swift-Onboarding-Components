@@ -477,7 +477,7 @@
       "no-results": "No results found"
     },
     "pgp-helper-tool": {
-      "title": "PGP Upload Tool",
+      "title": "PGP upload tool",
       "select-file-button-title": "Select data file",
       "description": "When sending sensitive data to Footprint for support cases or migration requests, please use PGP to secure data in transit. If you need help migrating data please reach out to us at support@onefootprint.com with the details of your request.",
       "manual-pgp-instructions-link-title": "Manual PGP instructions",
@@ -1314,6 +1314,11 @@
       },
       "actions": {
         "cta": "Open actions",
+        "groups": {
+          "user-management": "User Management",
+          "user-requests": "User Requests",
+          "internal": "Internal"
+        },
         "edit-user": {
           "label": "Edit user information",
           "not-allowed": "You're not allowed to edit user information"

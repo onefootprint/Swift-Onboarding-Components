@@ -15,7 +15,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
         align-items: center;
         background-color: ${button.variant.secondary.bg};
         border-color: ${button.variant.secondary.borderColor};
-        border-radius: ${button.borderRadius};
+        border-radius: ${theme.borderRadius.sm};
         border-style: solid;
         border-width: ${button.borderWidth};
         cursor: pointer;
@@ -52,7 +52,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
     return css`
       align-items: center;
       background: none;
-      border-radius: ${theme.borderRadius.full};
+      border-radius: ${theme.borderRadius.sm};
       border: none;
       cursor: pointer;
       display: flex;
@@ -80,15 +80,16 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
 
 const StyledDropdownContent = styled(RadixDropdown.Content)<{
   $minWidth?: string;
+  $noPadding?: boolean;
 }>`
-  ${({ theme, $minWidth }) => css`
+  ${({ theme, $minWidth, $noPadding }) => css`
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     min-width: ${$minWidth || '200px'};
-    padding: ${theme.spacing[2]};
     z-index: ${theme.zIndex.dropdown};
+    padding: ${$noPadding ? 0 : theme.spacing[2]};
   `}
 `;
 
@@ -98,14 +99,15 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
 }>`
   ${({ theme, variant, size }) => css`
     ${createFontStyles('body-3')};
-    cursor: pointer;
-    color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
-    padding: ${theme.spacing[2]} ${theme.spacing[5]};
-    outline: none;
-    border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[2]});
-    display: flex;
     align-items: center;
+    border-radius: ${theme.borderRadius.default};
+    color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
+    cursor: pointer;
+    display: flex;
     justify-content: left;
+    outline: none;
+    padding: ${theme.spacing[2]} ${theme.spacing[4]};
+    height: 36px;
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
@@ -211,17 +213,42 @@ const StyledSubTrigger = styled(RadixDropdown.SubTrigger)<{
   `}
 `;
 
+const StyledSeparator = styled(RadixDropdown.Separator)`
+  ${({ theme }) => css`
+    background: ${theme.borderColor.tertiary};
+    height: 0.5px;
+  `}
+`;
+
+const StyledGroup = styled(RadixDropdown.Group)`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[2]};
+  `}
+`;
+
+const GroupTitle = styled.div`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')};
+    color: ${theme.color.tertiary};
+    display: flex;
+    padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[2]};
+  `};
+`;
+
 const Dropdown = {
   Content: StyledDropdownContent,
-  Trigger: StyledDropdownTrigger,
-  Root: RadixDropdown.Root,
-  Portal: RadixDropdown.Portal,
-  Item: StyledDropdownItem,
   Divider: StyledDivider,
-  Sub: RadixDropdown.Sub,
-  SubTrigger: StyledSubTrigger,
-  SubContent: StyledSubContent,
+  Group: StyledGroup,
+  GroupTitle,
   Indicator: RadixDropdown.ItemIndicator,
+  Item: StyledDropdownItem,
+  Portal: RadixDropdown.Portal,
+  Root: RadixDropdown.Root,
+  Separator: StyledSeparator,
+  Sub: RadixDropdown.Sub,
+  SubContent: StyledSubContent,
+  SubTrigger: StyledSubTrigger,
+  Trigger: StyledDropdownTrigger,
 };
 
 export default Dropdown;

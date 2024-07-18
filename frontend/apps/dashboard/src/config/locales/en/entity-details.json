@@ -2,7 +2,7 @@
   "header": {
     "actions": {
       "upload-doc": {
-        "label": "Upload document manually",
+        "label": "Upload document",
         "not-allowed": "You're not allowed to upload documents",
         "form": {
           "identifier": {

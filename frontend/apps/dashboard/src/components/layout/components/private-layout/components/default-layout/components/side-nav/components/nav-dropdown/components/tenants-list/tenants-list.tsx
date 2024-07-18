@@ -1,10 +1,8 @@
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import { LinkButton } from '@onefootprint/ui';
+import { Dropdown, LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import SectionContainer from '../section-container';
-import SectionTitle from '../section-title';
 import TenantItem from './components/tenant-item';
 
 type TenantsListProps = {
@@ -28,13 +26,13 @@ const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
     onSelect?.(tenantId);
   };
 
-  const toggleShowAll = () => {
+  const handleToggleAll = () => {
     setShouldShowAllTenants(!shouldShowAllTenants);
   };
 
   return (
-    <SectionContainer>
-      <SectionTitle>{t('tenants-list.title')}</SectionTitle>
+    <>
+      <Dropdown.GroupTitle>{t('tenants-list.title')}</Dropdown.GroupTitle>
       {displayList.map(tenant => (
         <TenantItem
           key={tenant.id}
@@ -44,11 +42,11 @@ const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
         />
       ))}
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
-        <LinkButton $paddingLeft={5} $paddingBottom={3} $paddingTop={3} onClick={toggleShowAll}>
+        <LinkButton $paddingLeft={5} $paddingBottom={3} $paddingTop={3} onClick={handleToggleAll}>
           {t(shouldShowAllTenants ? 'tenants-list.show-less' : 'tenants-list.show-all')}
         </LinkButton>
       )}
-    </SectionContainer>
+    </>
   );
 };
 
