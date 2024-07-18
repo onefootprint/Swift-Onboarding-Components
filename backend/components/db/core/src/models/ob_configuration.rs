@@ -76,8 +76,6 @@ pub struct ObConfiguration {
     #[diesel(deserialize_as = OptionalNonNullVec<Iso3166TwoDigitCountryCode>)]
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
-    /// DEPRECATED: use verification_checks instead
-    pub skip_kyc: bool,
     pub doc_scan_for_optional_ssn: Option<CDO>,
     pub enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
@@ -387,7 +385,6 @@ struct NewObConfiguration {
     allow_international_residents: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     author: DbActor,
-    skip_kyc: bool,
     doc_scan_for_optional_ssn: Option<CDO>,
     enhanced_aml: EnhancedAmlOption,
     allow_us_residents: bool,
@@ -630,7 +627,6 @@ impl ObConfiguration {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
-        let skip_kyc = args.skip_kyc();
         let NewObConfigurationArgs {
             name,
             tenant_id,
@@ -673,7 +669,6 @@ impl ObConfiguration {
             allow_international_residents,
             international_country_restrictions,
             author,
-            skip_kyc,
             doc_scan_for_optional_ssn,
             enhanced_aml,
             allow_us_residents,

@@ -116,6 +116,9 @@ impl
             Arc<dyn FeatureFlagClient>,
         ),
     ) -> Self {
+        let skip_kyc = ob_config
+            .get_verification_check(VerificationCheckKind::Kyc)
+            .is_none();
         let ObConfiguration {
             id,
             key,
@@ -130,7 +133,6 @@ impl
             allow_international_residents,
             international_country_restrictions,
             is_doc_first,
-            skip_kyc,
             skip_kyb,
             skip_confirm,
             enhanced_aml,

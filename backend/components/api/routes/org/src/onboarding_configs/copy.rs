@@ -165,7 +165,6 @@ fn copy_playbook(
         is_doc_first,
         allow_international_residents,
         international_country_restrictions,
-        skip_kyc: _,
         doc_scan_for_optional_ssn,
         enhanced_aml,
         allow_us_residents,

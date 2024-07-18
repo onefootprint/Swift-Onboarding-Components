@@ -34,6 +34,7 @@ pub struct OnboardingConfiguration {
     pub is_no_phone_flow: bool,
     pub is_doc_first_flow: bool,
     pub author: Option<Actor>,
+    // TODO: remove this since migrated to verification checks
     pub skip_kyc: bool,
     pub skip_kyb: bool,
     pub skip_confirm: bool,
