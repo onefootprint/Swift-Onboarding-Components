@@ -146,8 +146,7 @@ export const useRequestError = () => {
     if (!error || !isFootprintError(error)) {
       return undefined;
     }
-    const data = error?.response?.data;
-    const statusCode = data?.statusCode;
+    const statusCode = error?.response?.status;
     if (statusCode) {
       return statusCode;
     }
