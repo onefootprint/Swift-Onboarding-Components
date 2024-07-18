@@ -7,7 +7,7 @@ use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
-use newtypes::flat_api_object_map_type;
+use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::FilterFunction;
 use newtypes::HmacSha256Args;
@@ -25,6 +25,7 @@ use paperclip::actix::{
 };
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::HashMap;
 use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
@@ -36,10 +37,13 @@ pub struct IntegrityRequest {
     signing_key: IntegritySigningKey,
 }
 
-flat_api_object_map_type!(
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct IntegrityResponse(HashMap<VersionedDataIdentifier, Option<PiiJsonValue>>);
+
+impl_map_apiv2_schema!(
     IntegrityResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
-    description="A key-value map with the corresponding hex-encoded hash values",
-    example=r#"{ "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }"#
+    "A key-value map with the corresponding hex-encoded hash values",
+    { "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }
 );
 impl_response_type!(IntegrityResponse);
 
@@ -81,6 +85,6 @@ pub async fn post(
     let fp_id = path.into_inner();
 
     let response = super::decrypt::post_inner(&state, fp_id, req, auth, insights, root_span).await?;
-    let response = IntegrityResponse::from(response.map);
+    let response = IntegrityResponse(response.0);
     Ok(response)
 }

@@ -1,4 +1,4 @@
-use crate::flat_api_object_map_type;
+use crate::impl_map_apiv2_schema;
 use crate::impl_request_type;
 use crate::CardDataKind;
 use crate::DataIdentifier;
@@ -14,12 +14,17 @@ use either::Either;
 use itertools::Itertools;
 use std::collections::HashMap;
 
-flat_api_object_map_type!(
+#[derive(Debug, Clone, serde::Deserialize, derive_more::Deref, derive_more::DerefMut)]
+pub struct RawDataRequest(pub HashMap<DataIdentifier, PiiJsonValue>);
+
+impl_map_apiv2_schema!(
     RawDataRequest<DataIdentifier, PiiJsonValue>,
-    description="Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
-    example=r#"{ "id.first_name": "Jane", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
+    "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+    { "id.first_name": "Jane", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }
 );
 impl_request_type!(RawDataRequest);
+
+// TODO separate struct for business data, more realistic examples
 
 pub struct PatchDataRequest {
     pub updates: DataRequest,
@@ -32,7 +37,6 @@ impl RawDataRequest {
         // All write paths via API go through this struct, so we can filter out any DIs that we
         // don't want to be written via API here
         let unallowed_dis: HashMap<_, _> = self
-            .map
             .keys()
             .filter_map(|di| {
                 let err = match di {
@@ -57,7 +61,7 @@ impl RawDataRequest {
             return Err(DataValidationError::FieldValidationError(unallowed_dis).into());
         }
 
-        let (map, deletions) = self.map.into_iter().partition_map(|(k, v)| {
+        let (map, deletions) = self.0.into_iter().partition_map(|(k, v)| {
             if PiiValueKind::from(&v) == PiiValueKind::Null {
                 Either::Right(k)
             } else {

@@ -12,7 +12,7 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::flat_api_object_map_type;
+use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::input::Csv;
 use newtypes::DataIdentifier;
@@ -33,10 +33,13 @@ pub struct FieldsParams {
     fields: Option<Csv<DataIdentifier>>,
 }
 
-flat_api_object_map_type!(
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct GetVaultResponse(HashMap<DataIdentifier, bool>);
+
+impl_map_apiv2_schema!(
     GetVaultResponse<DataIdentifier, bool>,
-    description="A key-value map of identifier to whether the identifier exists in the vault",
-    example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
+    "A key-value map of identifier to whether the identifier exists in the vault",
+    { "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }
 );
 impl_response_type!(GetVaultResponse);
 
@@ -86,7 +89,7 @@ pub async fn get(
         populated.clone()
     };
     let results = HashMap::from_iter(keys.into_iter().map(|di| (di.clone(), populated.contains(&di))));
-    let out = GetVaultResponse { map: results };
+    let out = GetVaultResponse(results);
 
     Ok(out)
 }

@@ -223,7 +223,7 @@ pub(super) async fn post_inner(
             results.insert(id, result);
         }
     }
-    let out = DecryptResponse::from(results);
+    let out = DecryptResponse(results);
 
     Ok(out)
 }

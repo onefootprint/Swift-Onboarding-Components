@@ -15,7 +15,7 @@ use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::flat_api_object_map_type;
+use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
@@ -43,10 +43,13 @@ pub struct DeleteRequest {
     delete_all: Option<bool>,
 }
 
-flat_api_object_map_type!(
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct DeleteVaultResponse(HashMap<DataIdentifier, bool>);
+
+impl_map_apiv2_schema!(
     DeleteVaultResponse<DataIdentifier, bool>,
-    description="A key-value map of identifier to whether the identifier was successfully deleted in the vault",
-    example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
+    "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
+    {"id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false}
 );
 impl_response_type!(DeleteVaultResponse);
 
@@ -136,7 +139,7 @@ pub async fn delete(
             .into_iter()
             .map(|di| (di.clone(), deleted_dis.contains(&di))),
     );
-    let out = DeleteVaultResponse { map: results };
+    let out = DeleteVaultResponse(results);
 
     Ok(out)
 }

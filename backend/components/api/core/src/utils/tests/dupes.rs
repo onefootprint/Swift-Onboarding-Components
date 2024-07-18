@@ -238,7 +238,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
 async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>) {
     let request: HashMap<DataIdentifier, PiiJsonValue> =
         HashMap::from_iter(data.into_iter().map(|(i, s)| (i.into(), json!(s).into())));
-    let request = RawDataRequest::from(request);
+    let request = RawDataRequest(request);
     let args = ValidateArgs::for_non_portable(true);
     let PatchDataRequest {
         updates,
