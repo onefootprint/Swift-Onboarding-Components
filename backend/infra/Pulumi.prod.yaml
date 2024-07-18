@@ -201,6 +201,13 @@ config:
       cpuUnits: 1024
       memoryMB: 2048
       name: execute-tasks
+    - args:
+      - vault-dr-worker
+      - --batch-size=1000
+      - --poll-period-ms=5000
+      cpuUnits: 2048
+      memoryMB: 2048
+      name: vault-dr
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
