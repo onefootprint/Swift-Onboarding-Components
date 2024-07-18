@@ -157,7 +157,7 @@ const OuterContainer = styled(Box)<{ $isOpen: boolean }>`
     ${
       $isOpen &&
       css`
-        height: calc(100vh - 2 * ${theme.spacing[3]});
+        height: calc(100dvh - 2 * ${theme.spacing[3]});
         background: ${theme.backgroundColor.primary};
       `
     }
