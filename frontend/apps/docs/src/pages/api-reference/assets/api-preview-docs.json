@@ -385,9 +385,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1051,12 +1048,6 @@
     },
     "components": {
         "securitySchemes": {
-            "Dashboard Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Dashboard-Authorization",
-                "description": "Short-lived token for an authenticated dashboard user."
-            },
             "Secret API Key": {
                 "type": "apiKey",
                 "in": "header",

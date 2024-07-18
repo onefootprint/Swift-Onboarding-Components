@@ -155,9 +155,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -250,9 +247,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -300,9 +294,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Secret API Key": []
                     }
@@ -1094,9 +1085,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1189,9 +1177,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1239,9 +1224,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Secret API Key": []
                     }
@@ -1583,9 +1565,6 @@
                 },
                 "security": [
                     {
-                        "Dashboard Token": []
-                    },
-                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1888,12 +1867,6 @@
                 "in": "header",
                 "name": "X-Fp-Authorization",
                 "description": "Short-lived client token to perform actions for a given user."
-            },
-            "Dashboard Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Dashboard-Authorization",
-                "description": "Short-lived token for an authenticated dashboard user."
             },
             "Secret API Key": {
                 "type": "apiKey",

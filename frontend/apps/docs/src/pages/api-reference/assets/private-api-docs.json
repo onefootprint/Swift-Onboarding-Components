@@ -320,6 +320,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -384,6 +387,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -847,6 +853,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -886,6 +895,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -937,6 +949,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -975,6 +990,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1024,6 +1042,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -1070,6 +1091,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1127,6 +1151,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1170,6 +1197,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1211,6 +1241,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1251,6 +1284,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1301,6 +1337,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1348,6 +1387,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1399,6 +1441,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1437,6 +1482,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     },
                     {
                         "Secret API Key": []
@@ -1483,6 +1531,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1522,6 +1573,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     },
                     {
                         "Secret API Key": []
@@ -1644,6 +1698,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -1692,6 +1749,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1731,6 +1791,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1779,6 +1842,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1848,6 +1914,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1895,6 +1964,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1936,6 +2008,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1983,6 +2058,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     },
                     {
                         "Secret API Key": []
@@ -2081,6 +2159,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -2130,6 +2211,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     },
                     {
                         "Secret API Key": []
@@ -2523,6 +2607,9 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Secret API Key": []
                     }
                 ]
@@ -2631,6 +2718,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -2666,6 +2756,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -2992,6 +3085,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3067,6 +3163,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3102,6 +3201,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3150,6 +3252,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3188,6 +3293,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3228,6 +3336,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3258,6 +3369,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3293,6 +3407,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3331,6 +3448,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3377,6 +3497,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3416,6 +3539,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3446,6 +3572,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3481,6 +3610,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3519,6 +3651,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3565,6 +3700,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3604,6 +3742,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3699,6 +3840,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3738,6 +3882,9 @@
                     },
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3821,6 +3968,9 @@
                     },
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3885,6 +4035,9 @@
                     },
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3912,6 +4065,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -3947,6 +4103,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3993,6 +4152,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4028,6 +4190,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4066,6 +4231,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4113,6 +4281,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4148,6 +4319,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4203,6 +4377,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4241,6 +4418,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4277,6 +4457,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4323,6 +4506,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4364,6 +4550,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4413,6 +4602,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4460,6 +4652,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4487,6 +4682,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4514,6 +4712,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4620,6 +4821,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4655,6 +4859,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4703,6 +4910,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4741,6 +4951,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4795,6 +5008,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4870,6 +5086,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4905,6 +5124,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -4943,6 +5165,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -4989,6 +5214,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5039,7 +5267,13 @@
                         "Dashboard Token": []
                     },
                     {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5082,6 +5316,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -5132,6 +5369,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5181,6 +5421,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5237,6 +5480,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5293,6 +5539,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5339,6 +5588,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5383,6 +5635,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -5418,6 +5673,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5456,6 +5714,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -5502,6 +5763,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5540,6 +5804,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5608,6 +5875,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -5643,6 +5913,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5691,6 +5964,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5729,6 +6005,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -5903,6 +6182,9 @@
                 "security": [
                     {
                         "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -7235,6 +7517,12 @@
                 "in": "header",
                 "name": "X-Fp-Dashboard-Authorization",
                 "description": "Short-lived token for an authenticated dashboard user."
+            },
+            "Firm Employee Assume Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Dashboard-Authorization",
+                "description": "Short-lived auth token for a firm-employee dashboard user assuming a tenant."
             },
             "Secret API Key": {
                 "type": "apiKey",

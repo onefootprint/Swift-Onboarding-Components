@@ -16,7 +16,7 @@ IDENTIFYING_TAG_VALUES = [
 ]
 
 # APIs with these identifying tags are shown in our docs site - we should apply more scrutiny to them
-PUBLIC_TAG_VALUES = ["PublicApi", "Preview", "PhasedOut"]
+TENANT_VISIBLE_TAG_VALUES = ["PublicApi", "Preview", "PhasedOut"]
 
 # Only APIs that take one of these auth methods should ever be publicly documented - otherwise,
 # the API isn't usable
@@ -56,7 +56,7 @@ class Endpoint:
 
     @property
     def is_public(self):
-        return self.identifying_tag in PUBLIC_TAG_VALUES
+        return self.identifying_tag in TENANT_VISIBLE_TAG_VALUES
 
     @property
     def schemas(self):
@@ -67,16 +67,25 @@ class Endpoint:
     @property
     def security_schemes(self):
         """Computes the security schemes that are used for the endpoint"""
-        # Read specifically from path_info and not _path_info to get the mutated security
-        security_schemes = [k for i in self.path_info.get("security") for k in i.keys()]
-        has_public_security_scheme = set(security_schemes) & set(VISIBLE_API_SECURITY)
+        security_schemes = self._path_info.get("security") or []
+        if not self.is_public:
+            # No processing needed for APIs that aren't documented for tenants
+            return security_schemes
+
+        public_security_schemes = [
+            i
+            for i in security_schemes
+            if any(k in VISIBLE_API_SECURITY for k in i.keys())
+        ]
         assert (
-            not self.is_public
-            or has_public_security_scheme
+            public_security_schemes
             # This one is weird
             or self.url == "/users/vault/decrypt/{token}"
         ), f"API auth not found in schemes for {self.method.upper()} {self.url}. No reason to document if the API is not accesible via an accessible auth method"
-        return security_schemes
+        assert not any(
+            "firm" in k.lower() for s in public_security_schemes for k in s
+        ), "Couldn't scrub out firm employee auth from security - maybe you changed the name of the security?"
+        return public_security_schemes
 
     @property
     def path_info(self):
@@ -106,16 +115,11 @@ class Endpoint:
                 len(responses) <= 1
             ), f"{self.method} {self.url} has too many response bodies. Our docs site does not support APIs with multiple responses"
 
-        # Update the security to filter out Firm Employee Token
-        security = [
-            security
-            for security in self._path_info.get("security") or []
-            if not any(k == "Firm Employee Assume Token" for k in security)
-        ]
-        assert not any(
-            "firm" in k.lower() for s in security for k in s
-        ), "Couldn't scrub out firm employee auth from security - maybe you changed the name of the security?"
-        return {**self._path_info, "description": description, "security": security}
+        return {
+            **self._path_info,
+            "description": description,
+            "security": self.security_schemes,
+        }
 
 
 def find_keys(node, key):
@@ -152,7 +156,9 @@ def get_apis(open_api_spec, tag):
         if endpoint.identifying_tag == tag:
             paths_dict[endpoint.url][endpoint.method] = endpoint.path_info
             used_entity_refs |= set(endpoint.schemas)
-            used_security_schemes |= set(endpoint.security_schemes)
+            used_security_schemes |= set(
+                k for i in endpoint.security_schemes for k in i.keys()
+            )
     # Create the final list of all schemas used by the matching endpoints
     used_entity_names = [schema_ref.split("/")[-1] for schema_ref in used_entity_refs]
     used_schemas = {
