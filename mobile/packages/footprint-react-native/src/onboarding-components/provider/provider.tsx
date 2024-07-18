@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { type Appearance, OnboardingStep } from '../../types';
-import getOnboardingConfigReq from '../queries/get-onboarding-config-req';
+import getOnboardingConfigReq from '../queries/get-onboarding-config';
 
 export type ContextData = {
   appearance?: Appearance;

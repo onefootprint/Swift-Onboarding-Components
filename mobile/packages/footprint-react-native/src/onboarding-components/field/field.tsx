@@ -4,16 +4,16 @@ import type { FieldError, FieldErrorsImpl, Merge } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 
 import type { FormValues } from '../../types';
+import type { ChidrenOrFunction } from '../types/children';
 import FieldContext from '../field-context';
 
 type FieldOptions = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
+  error: FieldError | Merge<FieldError, FieldErrorsImpl<FormValues>> | undefined;
 };
 
 export type FieldProps = {
   name: keyof FormValues;
-  children?: (options: FieldOptions) => React.ReactNode;
+  children?: ChidrenOrFunction<FieldOptions>;
 };
 
 const Field = ({ name, children }: FieldProps) => {
@@ -24,7 +24,14 @@ const Field = ({ name, children }: FieldProps) => {
   } = useFormContext();
   const error = get(errors, name);
 
-  return <FieldContext.Provider value={contextValues}>{children?.({ error })}</FieldContext.Provider>;
+  const renderChildren = () => {
+    if (typeof children === 'function') {
+      return children({ error });
+    }
+    return children;
+  };
+
+  return <FieldContext.Provider value={contextValues}>{renderChildren()}</FieldContext.Provider>;
 };
 
 export default Field;
