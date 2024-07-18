@@ -22,6 +22,7 @@ pub struct ValidateResponse {
     pub user: Option<EntityValidateResponse>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Information on the business and its onboarding session. Provided for KYB playbook sessions
+    #[openapi(example = "null")]
     pub business: Option<EntityValidateResponse>,
 
     #[serde(skip_serializing_if = "Option::is_none")]

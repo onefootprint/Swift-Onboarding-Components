@@ -18,13 +18,17 @@ pub struct RiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
 }
 
-/// RiskSignal information, including severity, impacted scopes, and more.
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicRiskSignal {
+    #[openapi(example = "address_does_not_match")]
     pub reason_code: FootprintReasonCode,
+    #[openapi(example = "Address does not match")]
     pub note: String,
+    #[openapi(example = "Address located does not match address input.")]
     pub description: String,
+    #[openapi(example = "high")]
     pub severity: SignalSeverity,
+    #[openapi(example = r#"["address"]"#)]
     pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,
 }

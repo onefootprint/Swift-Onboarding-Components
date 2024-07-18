@@ -40,11 +40,13 @@ pub struct CreateTokenRequest {
     /// onboarding onto a KYB playbook.
     /// If no `fp_bid` is provided here when onboarding onto a KYB playbook, the user will be asked
     /// to enter their business information and create a new business.
+    #[openapi(example = "null")]
     pub fp_bid: Option<FpId>,
 
     /// Can only be provided when the kind is `update_auth_methods`. The set of auth methods that
     /// you would like to be allowed to be updated. When not provided, the token allows updating any
     /// auth method.
+    #[openapi(example = "null")]
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 
     #[openapi(skip)]

@@ -46,17 +46,17 @@ impl_response_type!(GetVaultResponse);
 #[route_alias(
     actix::get(
         "/users/{fp_id}/vault",
-        description = "Returns the list of fields present on the vault.",
+        description = "Returns information on which fields are present in the vault.",
         tags(Users, Vault, PublicApi)
     ),
     actix::get(
         "/businesses/{fp_bid}/vault",
-        description = "Returns the list of fields present on the vault.",
+        description = "Returns information on which fields are present in the vault.",
         tags(Businesses, Vault, PublicApi)
     )
 )]
 #[api_v2_operation(
-    description = "Works for either person or business entities. Returns the list of fields present on the vault.",
+    description = "Returns information on which fields are present in the vault.",
     tags(Vault, Entities, Private)
 )]
 #[actix::get("/entities/{fp_id}/vault")]

@@ -4,6 +4,7 @@ use actix_web::FromRequest;
 use actix_web::HttpRequest;
 use futures::Future;
 use paperclip::actix::web;
+use paperclip::v2::models::DataType;
 use paperclip::v2::models::DataTypeFormat;
 use paperclip::v2::schema::Apiv2Schema;
 use std::pin::Pin;
@@ -177,8 +178,16 @@ impl<const L: usize> Apiv2Schema for BodyBytes<L> {
         Some(format!("Body ({}MB limit)", L / 1024))
     }
 
+    fn description() -> &'static str {
+        "Raw body"
+    }
+
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        Bytes::raw_schema()
+        let mut schema = Bytes::raw_schema();
+        schema.data_type = Some(DataType::String);
+        schema.example = Some(serde_json::Value::String("raw data".to_string()));
+        schema.description = Some("Raw body".to_owned());
+        schema
     }
 }
 
@@ -189,6 +198,7 @@ impl<const L: usize> paperclip::actix::OperationModifier for BodyBytes<L> {
                 description: Some("Raw body".to_owned()),
                 in_: paperclip::v2::models::ParameterIn::Body,
                 name: "body".into(),
+                schema: Some(Self::raw_schema()),
                 required: true,
                 max_length: Some(L as u32),
                 format: Some(DataTypeFormat::Other),

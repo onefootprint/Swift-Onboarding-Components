@@ -90,6 +90,7 @@ pub async fn get(
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct SearchUsersRequestBody {
+    #[openapi(example = "sandbox@onefootprint.com")]
     pub search: PiiString,
     pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
 }

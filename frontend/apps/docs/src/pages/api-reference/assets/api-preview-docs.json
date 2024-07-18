@@ -1096,7 +1096,8 @@
                         "type": "object"
                     },
                     "status_code": {
-                        "description": "Alpaca response HTTP status code",
+                        "example": 200,
+                        "description": "HTTP status code from Alpaca response",
                         "type": "integer",
                         "format": "int32"
                     }
@@ -1328,11 +1329,12 @@
                 "type": "object",
                 "properties": {
                     "alpaca_response": {
-                        "description": "response from alpaca",
+                        "description": "Response body from Alpaca",
                         "type": "object"
                     },
                     "status_code": {
-                        "description": "alpaca response HTTP status code",
+                        "example": 200,
+                        "description": "HTTP status code from Alpaca response",
                         "type": "integer",
                         "format": "int32"
                     }
@@ -1346,6 +1348,7 @@
                 "type": "object",
                 "properties": {
                     "default_approver": {
+                        "example": "janedoe@acmebank.org",
                         "description": "The default approver name/email to use for automatically approved users. This will be\n overwritten if done by a manual reviewer",
                         "type": "string"
                     }
@@ -1624,7 +1627,8 @@
                 "type": "object",
                 "properties": {
                     "tag": {
-                        "description": "any string to tag a user with",
+                        "example": "transaction_chargeback",
+                        "description": "Any string to tag the user",
                         "type": "string"
                     }
                 },
@@ -1740,6 +1744,7 @@
                         "type": "string"
                     },
                     "ownership_stake": {
+                        "example": 20,
                         "description": "The percentage of the business that this user owns, between 0 and 100 (inclusive).",
                         "type": "integer",
                         "format": "int32"
@@ -1895,16 +1900,18 @@
                 ]
             },
             "PublicRiskSignal": {
-                "description": "RiskSignal information, including severity, impacted scopes, and more.",
                 "type": "object",
                 "properties": {
                     "description": {
+                        "example": "Address located does not match address input.",
                         "type": "string"
                     },
                     "note": {
+                        "example": "Address does not match",
                         "type": "string"
                     },
                     "reason_code": {
+                        "example": "address_does_not_match",
                         "type": "string",
                         "enum": [
                             "watchlist_hit_ofac",
@@ -2249,6 +2256,9 @@
                         ]
                     },
                     "scopes": {
+                        "example": [
+                            "address"
+                        ],
                         "type": "array",
                         "items": {
                             "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see\n `DataAttribute` for that",
@@ -2284,6 +2294,7 @@
                         }
                     },
                     "severity": {
+                        "example": "high",
                         "type": "string",
                         "enum": [
                             "info",
@@ -2720,6 +2731,7 @@
                 "type": "object",
                 "properties": {
                     "fixture_result": {
+                        "example": null,
                         "description": "(only valid for sandbox businesses) choose the desired KYB outcome",
                         "type": "string",
                         "enum": [
@@ -2741,6 +2753,7 @@
                 "type": "object",
                 "properties": {
                     "fixture_result": {
+                        "example": null,
                         "description": "(only valid for sandbox users) choose the desired KYC outcome.",
                         "type": "string",
                         "enum": [
@@ -2787,9 +2800,11 @@
                         "format": "date-time"
                     },
                     "id": {
+                        "example": "tag_2ZwAl6LyHB6l7Ap2Ksdw8X",
                         "type": "string"
                     },
                     "tag": {
+                        "example": "transaction_chargeback",
                         "type": "string"
                     }
                 },

@@ -51,9 +51,10 @@ pub struct DeprecatedAlpacaCreateAccountRequest {
 
 #[derive(Debug, Clone, Apiv2Response, Serialize, macros::JsonResponder)]
 pub struct AlpacaCreateAccountResponse {
-    /// alpaca response HTTP status code
+    /// HTTP status code from Alpaca response
+    #[openapi(example = "200")]
     pub status_code: u16,
 
-    /// response from alpaca
+    /// Response body from Alpaca
     pub alpaca_response: PiiJsonValue,
 }

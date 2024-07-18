@@ -43,13 +43,17 @@ use std::collections::HashSet;
 pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
+    // TODO different examples for business / person
+    #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
+    #[openapi(example = "Lorem ipsum dolor")]
     pub(super) reason: String,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms.
     /// Can find more information on allowed transform functions on our docs
+    #[openapi(example = "null")]
     pub(super) transforms: Option<Vec<FilterFunction>>,
 }
 
@@ -57,15 +61,18 @@ pub struct DecryptRequest {
 pub struct ClientDecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
+    #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
     fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged.
     /// The reason must be provided either here or in the client token
+    #[openapi(example = "Lorem ipsum dolor")]
     reason: Option<String>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms
     /// Can find more information on allowed transform functions on our docs
     #[serde(default)]
+    #[openapi(example = "null")]
     transforms: Option<Vec<FilterFunction>>,
 }
 

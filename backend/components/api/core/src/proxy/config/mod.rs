@@ -30,8 +30,7 @@ pub mod ingress_rule;
 api_headers_schema! {
     pub struct JitProxyHeaderParams {
         required: {
-            /// Target proxy destination URL
-            /// Required if "just-in-time" OR ignored if using proxy configuration
+            /// Target proxy destination URL.
             egress_url: url::Url = "x-fp-proxy-target-url";
         }
         optional: {}
@@ -42,44 +41,44 @@ api_headers_schema! {
         required: {}
 
         optional: {
-            /// HTTP Method VERB for the proxy destination request (defaults to POST)
+            /// HTTP Method VERB for the proxy destination request (defaults to POST).
             egress_method: Method = "x-fp-proxy-method";
 
-            /// Egress destination URL path and query string to append
+            /// Egress destination URL path and query string to append.
             egress_path_and_query: PiiString = "x-fp-path-and-query";
 
-            /// Content-type for the proxy ingress
+            /// Content-type for the proxy ingress.
             ingress_content_type: IngressContentType = "x-fp-proxy-ingress-content-type";
 
-            /// Access reason for any egress decryption operations during the proxy request
+            /// Access reason for any egress decryption operations during the proxy request.
             access_reason: String = "x-fp-proxy-access-reason";
 
-            /// When proxy requests are on behalf of a single footprint vault, you can
+            /// When proxy requests are on behalf of a single footprint vault, you
             /// can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead
             /// of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.
             ///
             /// Similarly, if specifying proxy configuration ingress rules from a stored configuration
-            /// the corresponding token must be assigned just-in-time via a headers
+            /// the corresponding token must be assigned just-in-time via a headers.
             ///
             /// i.e: `x-fp-id: fp_id_abc`
             #[alias = "x-fp-proxy-footprint-token"]
             user_token_assignment: FpId = "x-fp-id";
 
-            /// Configure one more ingress rules
+            /// Configure one more ingress rules.
             ///
             /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
             /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
             /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
             ingress_rule: String = "x-fp-proxy-ingress-rule";
 
-            /// Prefixes custom headers to forward along egress
-            /// For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination
+            /// Headers with this `x-fp-proxy-fwd-*` prefix are forwarded to the proxy egress, with the prefix stripped.
+            /// For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination.
             forward_header_prefix: PiiString = "x-fp-proxy-fwd-";
 
-            /// Base64 encoded PEM client certificate to use (required if using key)
+            /// Base64 encoded PEM client certificate to use (required if using key).
             client_cert: String = "x-fp-proxy-client-cert";
 
-            /// Base64 encoded PEM client key to use (required if using cert)
+            /// Base64 encoded PEM client key to use (required if using cert).
             client_key: PiiString = "x-fp-proxy-client-key";
 
             /// Configure one or more base64 encoded PEM server certificates to validate and pin

@@ -12,6 +12,7 @@ pub struct TriggerKycRequest {
     /// playbook will specify required information and the rules by which to make a KYC decision.
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox users) choose the desired KYC outcome.
+    #[openapi(example = "null")]
     pub fixture_result: Option<SimpleFixtureResult>,
     /// Run the user through KYC on the provided playbook even if they have already onboarded onto
     /// this playbook. Defaults to true.
@@ -47,5 +48,6 @@ pub struct TriggerKybRequest {
     /// decision.
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox businesses) choose the desired KYB outcome
+    #[openapi(example = "null")]
     pub fixture_result: Option<SimpleFixtureResult>,
 }

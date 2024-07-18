@@ -3095,9 +3095,8 @@
             },
             "DecryptResponse": {
                 "example": {
-                    "id.last_name": "doe",
-                    "id.ssn9": "121121212",
-                    "custom.credit_card": "4242424242424242"
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe"
                 },
                 "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",

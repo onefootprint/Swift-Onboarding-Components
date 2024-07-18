@@ -120,7 +120,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Returns the list of fields present on the vault.",
+                "description": "Returns information on which fields are present in the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -165,7 +165,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Deletes data in a business vault.",
+                "description": "Deletes the provided fields from the provided business vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -307,7 +307,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Checks if provided data is valid before adding it to the vault.",
+                "description": "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "parameters": [
                     {
                         "in": "path",
@@ -595,7 +595,7 @@
                     "Users",
                     "PublicApi"
                 ],
-                "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token",
+                "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -886,7 +886,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -1050,7 +1056,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Returns the list of fields present on the vault.",
+                "description": "Returns information on which fields are present in the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1095,7 +1101,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Deletes data in a user vault.",
+                "description": "Deletes the provided fields from the provided user vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1237,7 +1243,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Checks if provided data is valid before adding it to the vault.",
+                "description": "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1285,7 +1291,7 @@
                     "Vault",
                     "PublicApi"
                 ],
-                "description": "Updates data in a user vault.",
+                "description": "Sets the contents of the provided identifier for the provided user vault to the HTTP request body. Useful for uploading large objects",
                 "parameters": [
                     {
                         "in": "path",
@@ -1547,7 +1553,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -1581,7 +1593,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-target-url",
-                        "description": "Target proxy destination URL Required if \"just-in-time\" OR ignored if using proxy configuration",
+                        "description": "Target proxy destination URL.",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1591,7 +1603,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-method",
-                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST)",
+                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST).",
                         "schema": {
                             "type": "string"
                         },
@@ -1600,7 +1612,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-path-and-query",
-                        "description": "Egress destination URL path and query string to append",
+                        "description": "Egress destination URL path and query string to append.",
                         "schema": {
                             "type": "string"
                         },
@@ -1609,7 +1621,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-content-type",
-                        "description": "Content-type for the proxy ingress",
+                        "description": "Content-type for the proxy ingress.",
                         "schema": {
                             "type": "string"
                         },
@@ -1618,7 +1630,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-access-reason",
-                        "description": "Access reason for any egress decryption operations during the proxy request",
+                        "description": "Access reason for any egress decryption operations during the proxy request.",
                         "schema": {
                             "type": "string"
                         },
@@ -1627,7 +1639,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-id",
-                        "description": "When proxy requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers  i.e: `x-fp-id: fp_id_abc`",
+                        "description": "When proxy requests are on behalf of a single footprint vault, you can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers.  i.e: `x-fp-id: fp_id_abc`",
                         "schema": {
                             "type": "string"
                         },
@@ -1636,7 +1648,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-rule",
-                        "description": "Configure one more ingress rules  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "description": "Configure one more ingress rules.  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
                         "schema": {
                             "type": "string"
                         },
@@ -1645,7 +1657,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-fwd-",
-                        "description": "Prefixes custom headers to forward along egress For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination",
+                        "description": "Headers with this `x-fp-proxy-fwd-*` prefix are forwarded to the proxy egress, with the prefix stripped. For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination.",
                         "schema": {
                             "type": "string"
                         },
@@ -1654,7 +1666,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-client-cert",
-                        "description": "Base64 encoded PEM client certificate to use (required if using key)",
+                        "description": "Base64 encoded PEM client certificate to use (required if using key).",
                         "schema": {
                             "type": "string"
                         },
@@ -1663,7 +1675,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-client-key",
-                        "description": "Base64 encoded PEM client key to use (required if using cert)",
+                        "description": "Base64 encoded PEM client key to use (required if using cert).",
                         "schema": {
                             "type": "string"
                         },
@@ -1682,7 +1694,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -1724,7 +1742,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -1756,7 +1780,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-method",
-                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST)",
+                        "description": "HTTP Method VERB for the proxy destination request (defaults to POST).",
                         "schema": {
                             "type": "string"
                         },
@@ -1765,7 +1789,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-path-and-query",
-                        "description": "Egress destination URL path and query string to append",
+                        "description": "Egress destination URL path and query string to append.",
                         "schema": {
                             "type": "string"
                         },
@@ -1774,7 +1798,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-content-type",
-                        "description": "Content-type for the proxy ingress",
+                        "description": "Content-type for the proxy ingress.",
                         "schema": {
                             "type": "string"
                         },
@@ -1783,7 +1807,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-access-reason",
-                        "description": "Access reason for any egress decryption operations during the proxy request",
+                        "description": "Access reason for any egress decryption operations during the proxy request.",
                         "schema": {
                             "type": "string"
                         },
@@ -1792,7 +1816,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-id",
-                        "description": "When proxy requests are on behalf of a single footprint vault, you can can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers  i.e: `x-fp-id: fp_id_abc`",
+                        "description": "When proxy requests are on behalf of a single footprint vault, you can omit the `fp_id_` prefix on token identifiers, and just use `id.x` or `custom.y` instead of `fp_id_xyz.id.x` or `fp_id_xyz.custom.y`.  Similarly, if specifying proxy configuration ingress rules from a stored configuration the corresponding token must be assigned just-in-time via a headers.  i.e: `x-fp-id: fp_id_abc`",
                         "schema": {
                             "type": "string"
                         },
@@ -1801,7 +1825,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-rule",
-                        "description": "Configure one more ingress rules  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "description": "Configure one more ingress rules.  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
                         "schema": {
                             "type": "string"
                         },
@@ -1810,7 +1834,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-fwd-",
-                        "description": "Prefixes custom headers to forward along egress For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination",
+                        "description": "Headers with this `x-fp-proxy-fwd-*` prefix are forwarded to the proxy egress, with the prefix stripped. For example `x-fp-proxy-fwd-MYHEADER: hello world` sends `MYHEADER: hello world` to the destination.",
                         "schema": {
                             "type": "string"
                         },
@@ -1819,7 +1843,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-client-cert",
-                        "description": "Base64 encoded PEM client certificate to use (required if using key)",
+                        "description": "Base64 encoded PEM client certificate to use (required if using key).",
                         "schema": {
                             "type": "string"
                         },
@@ -1828,7 +1852,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-client-key",
-                        "description": "Base64 encoded PEM client key to use (required if using cert)",
+                        "description": "Base64 encoded PEM client key to use (required if using cert).",
                         "schema": {
                             "type": "string"
                         },
@@ -1847,7 +1871,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -1911,6 +1941,10 @@
                 "type": "object",
                 "properties": {
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -2148,10 +2182,12 @@
                         }
                     },
                     "reason": {
+                        "example": "Lorem ipsum dolor",
                         "description": "Reason for the data decryption. This will be logged.\n The reason must be provided either here or in the client token",
                         "type": "string"
                     },
                     "transforms": {
+                        "example": null,
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
@@ -2702,6 +2738,7 @@
                 "type": "object",
                 "properties": {
                     "fp_bid": {
+                        "example": null,
                         "description": "The existing business to be linked to this user's onboarding session. Only takes effect when\n onboarding onto a KYB playbook.\n If no `fp_bid` is provided here when onboarding onto a KYB playbook, the user will be asked\n to enter their business information and create a new business.",
                         "type": "string"
                     },
@@ -2721,6 +2758,7 @@
                         ]
                     },
                     "limit_auth_methods": {
+                        "example": null,
                         "description": "Can only be provided when the kind is `update_auth_methods`. The set of auth methods that\n you would like to be allowed to be updated. When not provided, the token allows updating any\n auth method.",
                         "type": "array",
                         "items": {
@@ -2819,6 +2857,10 @@
                 "type": "object",
                 "properties": {
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -3056,10 +3098,12 @@
                         }
                     },
                     "reason": {
+                        "example": "Lorem ipsum dolor",
                         "description": "Reason for the data decryption. This will be logged",
                         "type": "string"
                     },
                     "transforms": {
+                        "example": null,
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms.\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
@@ -3086,9 +3130,8 @@
             },
             "DecryptResponse": {
                 "example": {
-                    "id.last_name": "doe",
-                    "id.ssn9": "121121212",
-                    "custom.credit_card": "4242424242424242"
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe"
                 },
                 "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",
@@ -3338,10 +3381,15 @@
                 "type": "object",
                 "properties": {
                     "delete_all": {
+                        "example": null,
                         "description": "When true, deletes all data in the vault.",
                         "type": "boolean"
                     },
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -3582,9 +3630,8 @@
             },
             "DeleteVaultResponse": {
                 "example": {
-                    "id.ssn9": true,
-                    "custom.credit_card": true,
-                    "id.dob": false
+                    "id.first_name": true,
+                    "id.last_name": false
                 },
                 "description": "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
                 "type": "object",
@@ -4618,6 +4665,7 @@
                         }
                     },
                     "search": {
+                        "example": "sandbox@onefootprint.com",
                         "type": "string"
                     }
                 },
@@ -4690,6 +4738,7 @@
                 "type": "object",
                 "properties": {
                     "business": {
+                        "example": null,
                         "description": "Information on the business and its onboarding session. Provided for KYB playbook sessions",
                         "type": "object",
                         "properties": {

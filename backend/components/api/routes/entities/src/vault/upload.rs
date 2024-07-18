@@ -59,12 +59,12 @@ const TEN_MB: usize = 10 * 1024 * 1024;
 #[route_alias(
     actix::post(
         "/users/{fp_id}/vault/{identifier}/upload",
-        description = "Updates data in a user vault.",
+        description = "Sets the contents of the provided identifier for the provided user vault to the HTTP request body. Useful for uploading large objects",
         tags(Users, Vault, PublicApi)
     ),
     actix::post(
         "/businesses/{fp_bid}/vault/{identifier}/upload",
-        description = "Updates data in a business vault.",
+        description = "Sets the contents of the provided identifier for the provided business vault to the HTTP request body. Useful for uploading large objects",
         tags(Businesses, Vault, Private)
     )
 )]

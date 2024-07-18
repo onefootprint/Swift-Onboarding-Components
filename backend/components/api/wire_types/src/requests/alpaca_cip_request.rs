@@ -48,7 +48,8 @@ pub struct DeprecatedAlpacaCipRequest {
 
 #[derive(Debug, Clone, Apiv2Response, Serialize, macros::JsonResponder)]
 pub struct AlpacaCipResponse {
-    /// Alpaca response HTTP status code
+    /// HTTP status code from Alpaca response
+    #[openapi(example = "200")]
     pub status_code: u16,
 
     /// Response body from Alpaca

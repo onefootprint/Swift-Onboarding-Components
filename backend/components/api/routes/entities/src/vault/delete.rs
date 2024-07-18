@@ -38,8 +38,11 @@ use std::collections::HashSet;
 pub struct DeleteRequest {
     /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
+    // TODO different examples for business / person
+    #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
     fields: Option<Vec<DataIdentifier>>,
     /// When true, deletes all data in the vault.
+    #[openapi(example = "null")]
     delete_all: Option<bool>,
 }
 
@@ -49,24 +52,24 @@ pub struct DeleteVaultResponse(HashMap<DataIdentifier, bool>);
 impl_map_apiv2_schema!(
     DeleteVaultResponse<DataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
-    {"id.ssn9": true, "custom.credit_card": true, "id.dob": false}
+    {"id.first_name": true, "id.last_name": false}
 );
 impl_response_type!(DeleteVaultResponse);
 
 #[route_alias(
     actix::delete(
         "/users/{fp_id}/vault",
-        description = "Deletes data in a user vault.",
+        description = "Deletes the provided fields from the provided user vault.",
         tags(Users, Vault, PublicApi)
     ),
     actix::delete(
         "/businesses/{fp_bid}/vault",
-        description = "Deletes data in a business vault.",
+        description = "Deletes the provided fields from the provided business vault.",
         tags(Businesses, Vault, PublicApi)
     )
 )]
 #[api_v2_operation(
-    description = "Works for either person or business entities. Deletes data in a vault.",
+    description = "Works for either person or business entities. Deletes the provided fields from the provide vault.",
     tags(Vault, Entities, Private)
 )]
 #[actix::delete("/entities/{fp_id}/vault")]

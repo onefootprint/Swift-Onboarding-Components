@@ -8,6 +8,7 @@ use newtypes::Vendor;
 pub struct ApexCipReportRequest {
     /// The default approver name/email to use for automatically approved users. This will be
     /// overwritten if done by a manual reviewer
+    #[openapi(example = "janedoe@acmebank.org")]
     pub default_approver: PiiString,
 }
 

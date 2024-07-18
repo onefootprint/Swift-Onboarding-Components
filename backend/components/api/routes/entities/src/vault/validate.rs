@@ -31,10 +31,10 @@ use paperclip::actix::{
 #[route_alias(actix::post(
     "/users/{fp_id}/vault/validate",
     tags(Users, Vault, PublicApi),
-    description = "Checks if provided data is valid before adding it to the vault."
+    description = "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any."
 ))]
 #[api_v2_operation(
-    description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
+    description = "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
     tags(Vault, Entities, Private)
 )]
 #[actix::post("/entities/{fp_id}/vault/validate")]
@@ -53,7 +53,7 @@ pub async fn post(
 
 #[api_v2_operation(
     tags(Businesses, Vault, PublicApi),
-    description = "Checks if provided data is valid before adding it to the vault."
+    description = "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any."
 )]
 #[actix::post("/businesses/{fp_bid}/vault/validate")]
 pub async fn post_business(
@@ -71,10 +71,10 @@ pub async fn post_business(
 #[route_alias(actix::post(
     "/users/vault/validate",
     tags(Client, Vault, Users, PublicApi),
-    description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token"
+    description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any."
 ))]
 #[api_v2_operation(
-    description = "Works for either person or business entities. Checks if provided data is valid before adding it to the vault given a short-lived, entity-scoped client token.",
+    description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
     tags(Client, Vault, Entities, Private)
 )]
 #[actix::post("/entities/vault/validate")]

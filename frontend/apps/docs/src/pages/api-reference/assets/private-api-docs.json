@@ -37,7 +37,7 @@
                     "Vault",
                     "Private"
                 ],
-                "description": "Updates data in a business vault.",
+                "description": "Sets the contents of the provided identifier for the provided business vault to the HTTP request body. Useful for uploading large objects",
                 "parameters": [
                     {
                         "in": "path",
@@ -299,7 +299,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -503,7 +509,7 @@
                     "Entities",
                     "Private"
                 ],
-                "description": "Works for either person or business entities. Checks if provided data is valid before adding it to the vault given a short-lived, entity-scoped client token.",
+                "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -794,7 +800,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -2022,7 +2034,7 @@
                     "Entities",
                     "Private"
                 ],
-                "description": "Works for either person or business entities. Returns the list of fields present on the vault.",
+                "description": "Returns information on which fields are present in the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2073,7 +2085,7 @@
                     "Entities",
                     "Private"
                 ],
-                "description": "Works for either person or business entities. Deletes data in a vault.",
+                "description": "Works for either person or business entities. Deletes the provided fields from the provide vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2276,7 +2288,7 @@
                     "Entities",
                     "Private"
                 ],
-                "description": "Works for either person or business entities. Checks if provided data is valid before adding it to the vault.",
+                "description": "Checks if provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2586,7 +2598,13 @@
                 "requestBody": {
                     "description": "Raw body",
                     "content": {
-                        "application/json": {}
+                        "application/json": {
+                            "schema": {
+                                "example": "raw data",
+                                "description": "Raw body",
+                                "type": "string"
+                            }
+                        }
                     },
                     "required": true
                 },
@@ -8718,6 +8736,10 @@
                 "type": "object",
                 "properties": {
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -8955,10 +8977,12 @@
                         }
                     },
                     "reason": {
+                        "example": "Lorem ipsum dolor",
                         "description": "Reason for the data decryption. This will be logged.\n The reason must be provided either here or in the client token",
                         "type": "string"
                     },
                     "transforms": {
+                        "example": null,
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
@@ -11820,6 +11844,7 @@
                                                 "format": "date-time"
                                             },
                                             "tag": {
+                                                "example": "transaction_chargeback",
                                                 "type": "string"
                                             }
                                         },
@@ -12472,6 +12497,10 @@
                 "type": "object",
                 "properties": {
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -12709,10 +12738,12 @@
                         }
                     },
                     "reason": {
+                        "example": "Lorem ipsum dolor",
                         "description": "Reason for the data decryption. This will be logged",
                         "type": "string"
                     },
                     "transforms": {
+                        "example": null,
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms.\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
@@ -12739,9 +12770,8 @@
             },
             "DecryptResponse": {
                 "example": {
-                    "id.last_name": "doe",
-                    "id.ssn9": "121121212",
-                    "custom.credit_card": "4242424242424242"
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe"
                 },
                 "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",
@@ -12991,10 +13021,15 @@
                 "type": "object",
                 "properties": {
                     "delete_all": {
+                        "example": null,
                         "description": "When true, deletes all data in the vault.",
                         "type": "boolean"
                     },
                     "fields": {
+                        "example": [
+                            "id.first_name",
+                            "id.last_name"
+                        ],
                         "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
@@ -13235,9 +13270,8 @@
             },
             "DeleteVaultResponse": {
                 "example": {
-                    "id.ssn9": true,
-                    "custom.credit_card": true,
-                    "id.dob": false
+                    "id.first_name": true,
+                    "id.last_name": false
                 },
                 "description": "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
                 "type": "object",
@@ -15098,6 +15132,7 @@
                                     "format": "date-time"
                                 },
                                 "tag": {
+                                    "example": "transaction_chargeback",
                                     "type": "string"
                                 }
                             },
