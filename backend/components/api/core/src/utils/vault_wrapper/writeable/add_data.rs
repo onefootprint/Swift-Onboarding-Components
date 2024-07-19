@@ -15,6 +15,8 @@ use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::TxnPgConn;
@@ -79,6 +81,16 @@ impl<Type> WriteableVw<Type> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
         let SavedData { vd, ci, seqno } = request.save(conn, self, actor.clone())?;
+
+        if keys.iter().any(|di| !di.is_vault_storage_free()) && !self.sv.is_billable_for_vault_storage {
+            // If we just added the first billable DI, set the vault as billable
+            let update = ScopedVaultUpdate {
+                is_billable_for_vault_storage: Some(true),
+                ..Default::default()
+            };
+            ScopedVault::update(conn, &self.sv.id, update)?;
+        }
+
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys, actor, is_prefill)?;
 

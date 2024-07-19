@@ -313,7 +313,6 @@ impl FromStr for DataIdentifier {
 }
 
 impl DataIdentifier {
-    /// collect fingerprintable DIs
     pub fn searchable() -> Vec<Self> {
         vec![
             IdentityDataKind::searchable()
@@ -332,6 +331,20 @@ impl DataIdentifier {
         .into_iter()
         .flatten()
         .collect()
+    }
+
+    /// Returns true if storage of the given DI does not trigger the vault to be eligible for
+    /// general vault storage fees.
+    pub fn is_vault_storage_free(&self) -> bool {
+        #[allow(clippy::match_like_matches_macro)]
+        match self {
+            Self::Business(BusinessDataKind::Name)
+            | Self::Id(IdentityDataKind::FirstName)
+            | Self::Id(IdentityDataKind::LastName)
+            | Self::Id(IdentityDataKind::Email)
+            | Self::Id(IdentityDataKind::PhoneNumber) => true,
+            _ => false,
+        }
     }
 }
 

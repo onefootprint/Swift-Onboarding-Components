@@ -1100,6 +1100,7 @@ diesel::table! {
         deactivated_at -> Nullable<Timestamptz>,
         kind -> Text,
         is_active -> Bool,
+        is_billable_for_vault_storage -> Bool,
     }
 }
 

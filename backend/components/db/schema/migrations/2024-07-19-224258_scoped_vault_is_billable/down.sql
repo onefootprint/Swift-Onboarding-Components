@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault DROP COLUMN is_billable_for_vault_storage;

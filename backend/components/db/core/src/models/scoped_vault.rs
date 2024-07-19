@@ -90,6 +90,11 @@ pub struct ScopedVault {
     /// - The old DELETE /users/{fp_id} API could deactivate a user.
     /// - When an unverified vault is made via bifrost, it is inactive until it is OTP verified
     pub is_active: bool,
+    /// True if the vault has reached the threshold of being considered "billable" for vault data
+    /// storage. Vaults cross this threshold when the first piece of data is vaulted other than
+    /// name, email, phone. Effectively, we won't charge for vaults that only have name, email,
+    /// and / or phone
+    pub is_billable_for_vault_storage: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -108,12 +113,14 @@ struct NewScopedVault {
     kind: VaultKind,
     is_active: bool,
     status: OnboardingStatus,
+    is_billable_for_vault_storage: bool,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset, Eq, PartialEq)]
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVaultUpdate {
     pub is_active: Option<bool>,
+    pub is_billable_for_vault_storage: Option<bool>,
     pub last_activity_at: Option<DateTime<Utc>>,
 }
 
@@ -244,6 +251,7 @@ impl ScopedVault {
             external_id: None,
             kind: uv.kind,
             status: args.status,
+            is_billable_for_vault_storage: false,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -308,6 +316,7 @@ impl ScopedVault {
                 external_id,
                 kind: uv.kind,
                 status: OnboardingStatus::None,
+                is_billable_for_vault_storage: false,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
