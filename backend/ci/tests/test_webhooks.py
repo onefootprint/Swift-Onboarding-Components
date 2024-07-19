@@ -72,7 +72,7 @@ def test_webhook_e2e(sandbox_tenant, run_id):
     # Retrieve the webhook message and make sure it's correct
     # we expect 3 webhooks, 1 OnboardingStatusChanged from incomplete -> pending. Then an OnboardingCompleted and another OnboardingStatusChanged from pending -> pass
     # TODO but we stopped testing ^
-    p.join(60)
+    p.join(5)
     p.terminate()
     assert (
         user.fp_id in webhook_fpids
