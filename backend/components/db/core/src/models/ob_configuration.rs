@@ -387,7 +387,6 @@ pub struct NewObConfigurationArgs {
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: DbActor,
     pub doc_scan_for_optional_ssn: Option<CDO>,
-    pub enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
@@ -591,6 +590,7 @@ impl ObConfiguration {
     #[allow(clippy::too_many_arguments)]
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
+        let enhanced_aml = args.verification_checks.enhanced_aml();
         let NewObConfigurationArgs {
             name,
             tenant_id,
@@ -605,7 +605,6 @@ impl ObConfiguration {
             international_country_restrictions,
             author,
             doc_scan_for_optional_ssn,
-            enhanced_aml,
             allow_us_residents,
             allow_us_territory_residents,
             kind,

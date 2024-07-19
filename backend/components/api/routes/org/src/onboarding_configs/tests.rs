@@ -10,7 +10,6 @@ use newtypes::DbActor;
 use newtypes::DocTypeRestriction;
 use newtypes::DocumentCdoInfo;
 use newtypes::DocumentRequestConfig;
-use newtypes::EnhancedAmlOption;
 use newtypes::ObConfigurationKind;
 use newtypes::Selfie;
 use newtypes::TenantId;
@@ -53,7 +52,6 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -91,7 +89,6 @@ fn test_is_no_phone_flow(
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -128,7 +125,6 @@ fn test_is_doc_first(
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -161,7 +157,6 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -199,7 +194,6 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
@@ -234,13 +228,6 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         international_country_restrictions: None,
         skip_kyb: false,
         doc_scan_for_optional_ssn: None,
-        enhanced_aml: EnhancedAmlOption::Yes {
-            ofac: true,
-            pep: true,
-            adverse_media: true,
-            continuous_monitoring: true,
-            adverse_media_lists: None,
-        },
         allow_us_residents: true,
         allow_us_territory_residents: true,
         kind: ObConfigurationKind::Kyc,
@@ -249,7 +236,16 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![
+            VerificationCheck::Kyc {},
+            VerificationCheck::Aml {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+            },
+        ]),
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

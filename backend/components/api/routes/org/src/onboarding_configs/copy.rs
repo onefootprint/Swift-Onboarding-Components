@@ -156,7 +156,6 @@ fn copy_playbook(
     name: String,
 ) -> NewObConfigurationArgs {
     let verification_checks = VerificationChecks::from_existing(&pb);
-    let enhanced_aml = pb.verification_checks().enhanced_aml();
     let ObConfiguration {
         must_collect_data,
         can_access_data,
@@ -212,7 +211,6 @@ fn copy_playbook(
         allow_international_residents,
         international_country_restrictions,
         doc_scan_for_optional_ssn,
-        enhanced_aml,
         allow_us_residents,
         allow_us_territory_residents,
         kind,

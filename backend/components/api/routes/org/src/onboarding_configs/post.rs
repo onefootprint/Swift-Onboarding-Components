@@ -141,7 +141,6 @@ pub async fn post(
         international_country_restrictions,
         author: actor,
         doc_scan_for_optional_ssn,
-        enhanced_aml: db_enhanced_aml,
         // TODO: remove these once frontend is merged
         allow_us_residents: allow_us_residents.unwrap_or(true),
         allow_us_territory_residents: allow_us_territories.unwrap_or(false),

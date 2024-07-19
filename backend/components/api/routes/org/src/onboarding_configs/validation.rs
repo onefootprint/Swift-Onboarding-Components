@@ -424,7 +424,7 @@ impl ObConfigurationArgsToValidate {
             ));
         }
         // AML
-        match self.enhanced_aml {
+        match self.verification_checks.enhanced_aml() {
             EnhancedAmlOption::No => Err(TenantError::ValidationError(
                 "Must choose EnhancedAmlOption Alpaca playbook".to_owned(),
             )),
@@ -462,7 +462,10 @@ impl ObConfigurationArgsToValidate {
                 ),
                 (self.verification_checks.skip_kyc(), "skip_kyc"),
                 (
-                    matches!(self.enhanced_aml, EnhancedAmlOption::Yes { .. }),
+                    matches!(
+                        self.verification_checks.enhanced_aml(),
+                        EnhancedAmlOption::Yes { .. }
+                    ),
                     "enhanced_aml",
                 ),
                 (self.skip_confirm, "skip_confirm"),
