@@ -1,15 +1,13 @@
-import isPlainObject from 'lodash/isPlainObject';
 import React from 'react';
 import type { FieldErrors } from 'react-hook-form';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, type UseFormSetValue } from 'react-hook-form';
 
 import type { FormValues } from '../../types';
-
-type DiKey = keyof FormValues;
+import flattenObject from '../utils/flatten-object';
 
 type FormOptions = {
   handleSubmit: () => void;
-  setValue: (name: DiKey, value: FormValues[DiKey]) => void;
+  setValue: UseFormSetValue<FormValues>;
   errors: FieldErrors<FormValues>;
 };
 
@@ -35,33 +33,11 @@ const Form = ({ children, defaultValues, onSubmit }: FormProps) => {
     <FormProvider {...methods}>
       {children({
         handleSubmit: handleSubmit(handleBeforeSubmit),
-        setValue: (name, value) => setValue(name, value as never), // TODO: Fix this type casting - issue with react-form-hook
-        errors,
+        setValue, // TODO: Fix this type casting - issue with react-form-hook
+        errors: flattenObject(errors, { level: 1 }) as FieldErrors<FormValues>,
       })}
     </FormProvider>
   );
-};
-
-const flattenObject = (
-  obj: Record<string, unknown>,
-  parentKey: string = '',
-  sep: string = '.',
-): Record<string, unknown> => {
-  const toReturn: Record<string, unknown> = {};
-
-  Object.keys(obj).forEach(key => {
-    const newKey = parentKey ? `${parentKey}${sep}${key}` : key;
-    if (isPlainObject(obj[key])) {
-      const flatObject = flattenObject(obj[key] as Record<string, unknown>, newKey, sep);
-      Object.keys(flatObject).forEach(x => {
-        toReturn[x] = flatObject[x] as FormValues;
-      });
-    } else {
-      toReturn[newKey] = obj[key] as FormValues;
-    }
-  });
-
-  return toReturn;
 };
 
 export default Form;

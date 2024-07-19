@@ -60,3 +60,5 @@ type BusinessProps = {
 export type BootstrapData = Partial<IDProps> & Partial<BusinessProps> & Partial<CustomProps>;
 
 export type FormValues = BootstrapData;
+
+export type FormValuesKeys = keyof FormValues;

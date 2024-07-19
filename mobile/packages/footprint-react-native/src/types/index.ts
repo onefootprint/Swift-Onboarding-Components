@@ -3,7 +3,7 @@ export type {
   AppearanceRules,
   AppearanceVariables,
 } from './appearance';
-export type { BootstrapData, FormValues } from './bootstrap-data';
+export type { BootstrapData, FormValues, FormValuesKeys } from './bootstrap-data';
 export type {
   ComponentKind,
   ComponentProps,

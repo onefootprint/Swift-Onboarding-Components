@@ -1,4 +1,3 @@
-import { dateToIso8601 } from '@onefootprint/core';
 import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 
 import { AUTH_HEADER } from '../../../constants';
