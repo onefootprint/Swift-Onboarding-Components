@@ -2594,7 +2594,7 @@
           "error": "Couldn't load invoice. Please try again later.",
           "no-results": "An invoice hasn't yet been generated.",
           "subtotal": "Subtotal",
-          "info": "Last updated at {{lastUpdatedAt}}. This is a preliminary invoice intended to provide an estimate of your usage for the month and may not include all charges for the month. The final invoice, which will reflect the actual usage and charges, will be issued and sent out at the end of the month."
+          "info": "Last updated {{lastUpdatedAt}}. This is a preliminary invoice intended to provide an estimate of your usage for the month and may not include all charges for the month. The final invoice, which will reflect the actual usage and charges, will be issued and sent out at the end of the month."
         }
       }
     },

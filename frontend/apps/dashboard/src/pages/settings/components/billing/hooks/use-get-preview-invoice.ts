@@ -1,3 +1,4 @@
+import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -28,19 +29,12 @@ const getPreviewInvoice = async (authHeaders: AuthHeaders) => {
 
 const useGetPreviewInvoice = () => {
   const { authHeaders } = useSession();
+  const { formatRelativeDate } = useIntl();
 
   return useQuery(['invoice-preview', authHeaders], () => getPreviewInvoice(authHeaders), {
     select: data => ({
-      lastUpdatedAt: data?.lastUpdatedAt
-        ? new Date(data.lastUpdatedAt).toLocaleString('en-us', {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-            hour: 'numeric',
-            minute: 'numeric',
-          })
-        : undefined,
       ...data,
+      lastUpdatedAt: data?.lastUpdatedAt ? formatRelativeDate(new Date(data.lastUpdatedAt)) : null,
     }),
   });
 };
