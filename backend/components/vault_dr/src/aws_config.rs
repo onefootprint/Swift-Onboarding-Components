@@ -183,8 +183,8 @@ impl VaultDrAwsConfig {
 
             warn!(error=?svc_error, "S3 PutObject failed");
 
-            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
-                Error::RoleValidationFailed(format!("S3 PutObject failed: {}", svc_error.meta()))
+            if let Some(code) = aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
+                Error::RoleValidationFailed(format!("S3 PutObject failed: {}", code))
             } else {
                 Box::new(svc_error).into()
             }
@@ -201,8 +201,8 @@ impl VaultDrAwsConfig {
 
             warn!(error = ?svc_error, "S3 ListObjectsV2 failed");
 
-            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
-                Error::RoleValidationFailed(format!("S3 ListObjectsV2 failed: {}", svc_error.meta()))
+            if let Some(code) = aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
+                Error::RoleValidationFailed(format!("S3 ListObjectsV2 failed: {}", code))
             } else {
                 Box::new(svc_error).into()
             }
@@ -216,8 +216,8 @@ impl VaultDrAwsConfig {
 
             warn!(error = ?svc_error, "S3 GetBucketLocation failed");
 
-            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
-                Error::RoleValidationFailed(format!("S3 GetBucketLocation failed: {}", svc_error.meta()))
+            if let Some(code) = aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
+                Error::RoleValidationFailed(format!("S3 GetBucketLocation failed: {}", code))
             } else {
                 Box::new(svc_error).into()
             }
@@ -269,7 +269,7 @@ impl VaultDrAwsConfig {
                 let svc_error = e.into_service_error();
 
                 info!(error = ?svc_error, "S3 GetObject failed as expected. Expected code is AccessDenied");
-                if !aws_error_has_code(&svc_error, &["AccessDenied"]) {
+                if aws_error_has_code(&svc_error, &["AccessDenied"]).is_none() {
                     return Err(Box::new(svc_error).into());
                 }
             }
@@ -293,11 +293,11 @@ macro_rules! register_known_aws_errors {
             impl KnownAwsError for $x {}
         )*
 
-        fn _known_error_has_code(err: &(dyn std::error::Error + 'static), codes: &[&str]) -> bool {
+        fn _known_error_has_code(err: &(dyn std::error::Error + 'static), codes: &[&str]) -> Option<String> {
             // Recursively check the error sources.
             if let Some(source_err) = err.source() {
-                if _known_error_has_code(source_err, codes) {
-                    return true;
+                if let Some(code) = _known_error_has_code(source_err, codes) {
+                    return Some(code);
                 }
             }
 
@@ -306,13 +306,13 @@ macro_rules! register_known_aws_errors {
                 if let Some(aws_err) = (&err).downcast_ref::<$x>() {
                     for code in codes {
                         if aws_err.code() == Some(*code) {
-                            return true;
+                            return Some(code.to_string());
                         }
                     }
                 }
             )*
 
-            false
+                None
         }
     };
 }
@@ -324,6 +324,6 @@ register_known_aws_errors!(
     ListObjectsV2Error
 );
 
-fn aws_error_has_code(err: &impl KnownAwsError, codes: &[&str]) -> bool {
+fn aws_error_has_code(err: &impl KnownAwsError, codes: &[&str]) -> Option<String> {
     _known_error_has_code(err, codes)
 }
