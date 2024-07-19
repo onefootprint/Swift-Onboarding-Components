@@ -77,7 +77,7 @@ pub struct ObConfiguration {
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
     pub doc_scan_for_optional_ssn: Option<CDO>,
-    pub enhanced_aml: EnhancedAmlOption,
+    enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
@@ -261,11 +261,6 @@ impl ObConfiguration {
         self.document_cdo_for_optional_ssn().is_some()
     }
 
-    // TODO: will remove in upstack
-    pub fn enhanced_aml(&self) -> EnhancedAmlOption {
-        self.enhanced_aml.clone()
-    }
-
     pub fn is_stepup_enabled(&self) -> bool {
         // TODO this is kind of incorrect now - should check for rules with a stepup outcome
         matches!(self.cip_kind, Some(CipKind::Alpaca))
@@ -277,6 +272,29 @@ impl ObConfiguration {
 
     pub fn skip_kyc(&self) -> bool {
         self.get_verification_check(VerificationCheckKind::Kyc).is_none()
+    }
+
+    pub fn aml_verification_check(&self) -> EnhancedAmlOption {
+        match self.get_verification_check(VerificationCheckKind::Aml) {
+            Some(VerificationCheck::Aml {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            }) => EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            },
+            _ => EnhancedAmlOption::No,
+        }
+    }
+
+    pub fn enhanced_aml_for_test(&self) -> EnhancedAmlOption {
+        self.enhanced_aml.clone()
     }
 }
 
@@ -716,7 +734,7 @@ impl ObConfiguration {
             .filter(|(wf, _)| wf.completed_at.is_some())
             .sorted_by_key(|(wf, _)| wf.completed_at)
             .flat_map(|(_, obc)| obc)
-            .find(|obc| matches!(&obc.enhanced_aml, EnhancedAmlOption::Yes { .. }))
+            .find(|obc| matches!(&obc.aml_verification_check(), EnhancedAmlOption::Yes { .. }))
         {
             Some(obc.clone())
         } else {

@@ -72,7 +72,7 @@ async fn test(
     let svid = wf.scoped_vault_id.clone();
 
     let aml_vc = obc.get_verification_check(VerificationCheckKind::Aml);
-    match (obc.enhanced_aml, aml_vc) {
+    match (obc.enhanced_aml_for_test(), aml_vc) {
         (EnhancedAmlOption::No, None) => (),
         (
             EnhancedAmlOption::Yes {

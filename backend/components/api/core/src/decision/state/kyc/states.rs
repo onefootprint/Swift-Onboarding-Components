@@ -226,7 +226,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let aml_vendor_result = match obc.enhanced_aml {
+        let aml_vendor_result = match obc.aml_verification_check() {
             EnhancedAmlOption::No => None,
             EnhancedAmlOption::Yes { .. } => {
                 Some(common::run_aml_call(state, &self.wf_id, &self.t_id).await?)

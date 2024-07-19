@@ -119,6 +119,7 @@ impl
         let skip_kyc = ob_config
             .get_verification_check(VerificationCheckKind::Kyc)
             .is_none();
+        let enhanced_aml = ob_config.aml_verification_check();
         let ObConfiguration {
             id,
             key,
@@ -135,7 +136,6 @@ impl
             is_doc_first,
             skip_kyb,
             skip_confirm,
-            enhanced_aml,
             allow_us_residents,
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
@@ -153,6 +153,8 @@ impl
             _updated_at: _,
             appearance_id: _,
             author: _,
+            // TODO: only thing hidden here is enhanced_aml which will be removed shortly
+            ..
         } = ob_config;
 
         Self {

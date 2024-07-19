@@ -76,8 +76,10 @@ pub async fn complete_vendor_call(
         decision::vendor::incode::incode_watchlist::run_watchlist_check(state, &di, &obc.key, kind.clone())
             .await?;
 
-    let reason_codes =
-        decision::features::incode_watchlist::reason_codes_from_watchlist_result(&res, &obc.enhanced_aml);
+    let reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
+        &res,
+        &obc.aml_verification_check(),
+    );
 
     // TODO: vendor_api here should be either IncodeWatchlistCheck or IncodeUpdatedWatchlistResult
     Ok(reason_codes

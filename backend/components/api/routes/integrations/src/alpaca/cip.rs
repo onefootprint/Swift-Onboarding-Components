@@ -674,10 +674,12 @@ fn watchlist(
     // hits, so we pull them from the Vres on the fly here
 
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
-    let leaked_hits =
-        decision::features::incode_watchlist::get_hits(&watchlist_result_response, &obc.enhanced_aml())
-            .into_iter()
-            .map(|h| h.leak());
+    let leaked_hits = decision::features::incode_watchlist::get_hits(
+        &watchlist_result_response,
+        &obc.aml_verification_check(),
+    )
+    .into_iter()
+    .map(|h| h.leak());
     let records_json: Vec<PiiJsonValue> = leaked_hits
         .map(|h| serde_json::to_value(&h).map(PiiJsonValue::new))
         .collect::<Result<Vec<_>, _>>()?;

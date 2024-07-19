@@ -189,7 +189,7 @@ pub fn default_rules_for_obc(
     }
 
     // AML
-    let aml_risk_signals = match obc.enhanced_aml() {
+    let aml_risk_signals = match obc.aml_verification_check() {
         // We do get some watchlist risk signals from normal KYC
         EnhancedAmlOption::No if has_kyc => vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn],
         // But if we're not running KYC at all, there will be no risk signals

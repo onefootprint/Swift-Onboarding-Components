@@ -572,11 +572,13 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     );
 }
 
+
+// TODO: update this test for verification checks
 #[db_test]
 pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut TestPgConn) {
     let t = fixtures::tenant::create(conn);
     let obc = fixtures::ob_configuration::create(conn, &t.id, true);
-    assert_eq!(obc.enhanced_aml, EnhancedAmlOption::No);
+    assert_eq!(obc.enhanced_aml_for_test(), EnhancedAmlOption::No);
     diesel::sql_query(format!(
             "update ob_configuration set enhanced_aml={} where id = '{}';",
             r#"'{"data": {"pep": false, "ofac": true, "adverse_media": true, "continuous_monitoring": true}, "kind": "yes"}'"#, obc.id
@@ -592,7 +594,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
             continuous_monitoring: true,
             adverse_media_lists: None
         },
-        obc.enhanced_aml
+        obc.enhanced_aml_for_test()
     );
 
     let enhanced_aml = EnhancedAmlOption::Yes {
@@ -613,7 +615,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
             ..Default::default()
         },
     );
-    assert_eq!(enhanced_aml, obc.enhanced_aml);
+    assert_eq!(enhanced_aml, obc.enhanced_aml_for_test());
 
     // since im gunna manually set this in PG for Composer, nice to explicitly test here too
     diesel::sql_query(format!(
@@ -634,7 +636,7 @@ pub fn test_enhanced_aml_addition_of_am_lists_is_backwards_compatible(conn: &mut
                 AdverseMediaListKind::Fraud,
             ]),
         },
-        obc.enhanced_aml
+        obc.enhanced_aml_for_test()
     );
 }
 

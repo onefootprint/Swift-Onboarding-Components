@@ -130,7 +130,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             "Expected watchlist_check.decision_intent_id to be non-null",
         )))?;
 
-        let watchlist_result = match (&obc, obc.as_ref().map(|o| o.enhanced_aml.clone())) {
+        let watchlist_result = match (&obc, obc.as_ref().map(|o| o.aml_verification_check())) {
             // Idology
             (None, _) | (Some(_), None) | (_, Some(EnhancedAmlOption::No)) => {
                 // logic that enqeues this Task should prevent this, but extra precaution
