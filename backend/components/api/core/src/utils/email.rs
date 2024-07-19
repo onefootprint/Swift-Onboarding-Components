@@ -269,7 +269,11 @@ impl SendgridClient {
     }
 }
 
-pub async fn send_email_challenge(
+#[allow(unused)]
+/// Sends an email with a link to asynchronously "verify" the email.
+/// This is different from the synchronous OTP verification. We never used the information on
+/// asynchronous verification for anything, so we've since removed the verification.
+pub async fn send_async_email_challenge(
     state: &web::Data<State>,
     tenant_id: &TenantId,
     email_id: ContactInfoId,

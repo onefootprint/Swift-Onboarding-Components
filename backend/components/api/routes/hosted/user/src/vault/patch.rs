@@ -1,5 +1,4 @@
 use crate::types::ApiResponse;
-use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -16,10 +15,8 @@ use api_core::utils::vault_wrapper::VwArgs;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::email::Email;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::put_data_request::RawUserDataRequest;
-use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentRequestConfig;
 use newtypes::IdentityDataKind as IDK;
@@ -84,18 +81,11 @@ pub async fn patch(
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
-    let t_id = &user_auth.tenant().id;
 
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(
         request.into_inner(),
         ValidateArgs::for_bifrost(user_auth.user().is_live),
     )?;
-
-    let email = updates
-        .get(&IDK::Email.into())
-        .map(|p| Email::from_str(p.leak()))
-        .transpose()?;
-
     let residential_address = updates
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
@@ -105,7 +95,7 @@ pub async fn patch(
 
     let su_id = user_auth.scoped_user.id.clone();
     let source = user_auth.user_session.dl_source();
-    let new_ci = state
+    state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
@@ -118,25 +108,10 @@ pub async fn patch(
             let sources = DataLifetimeSources::overrides(source, overrides);
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let new_contact_info = uvw.patch_data(conn, updates, sources, None)?.new_ci;
-            Ok(new_contact_info)
+            uvw.patch_data(conn, updates, sources, None)?;
+            Ok(())
         })
         .await?;
-
-    // If we just added a new email address to the vault, send a verification email
-    if let Some(email) = email {
-        if let Some((_, ci)) = new_ci
-            .into_iter()
-            .find(|(di, _)| di == &DataIdentifier::from(IDK::Email))
-        {
-            if let Err(err) = send_email_challenge(&state, t_id, ci.id, &email.email).await {
-                // For now, we don't want to block vault updates on these async email verifications.
-                // We don't do anything with them today. But maybe we'll want to be more strict
-                // about this in the future
-                tracing::error!(?err, "Unable to send async email verification email");
-            }
-        }
-    }
 
     // TODO these need to be atomic with the patch
     if let Some(address) = residential_address {

@@ -42,6 +42,8 @@ pub enum AuthSessionData {
     User(user::UserSession),
 
     /// Used for validating email challenges
+    /// NOTE this is no longer used.
+    /// Check the context in https://github.com/onefootprint/monorepo/pull/10698
     EmailVerify(user::EmailVerifySession),
 
     /// Used to prove to a tenant that a user is authed with footprint
