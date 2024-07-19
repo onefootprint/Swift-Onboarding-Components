@@ -49,6 +49,7 @@ use crate::NtResult;
 use crate::PiiJsonValue;
 use crate::PiiString;
 use crate::ValidateArgs;
+use crate::VaultKind;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -249,6 +250,23 @@ impl std::fmt::Display for DataIdentifier {
             Self::Card(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
+    }
+}
+
+impl DataIdentifierDiscriminant {
+    /// Returns true if the provided VaultKind is allowed to store a data identifier with this
+    /// discriminant
+    pub fn is_allowed_for(&self, vault_kind: VaultKind) -> bool {
+        match vault_kind {
+            VaultKind::Person => match self {
+                Self::Id | Self::Custom | Self::InvestorProfile | Self::Document | Self::Card => true,
+                Self::Business => false,
+            },
+            VaultKind::Business => match self {
+                Self::Business | Self::Custom => true,
+                Self::Id | Self::InvestorProfile | Self::Document | Self::Card => false,
+            },
+        }
     }
 }
 

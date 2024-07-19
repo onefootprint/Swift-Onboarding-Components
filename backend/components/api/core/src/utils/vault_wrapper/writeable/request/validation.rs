@@ -15,6 +15,7 @@ use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerSource;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
+use newtypes::DataIdentifierDiscriminant;
 use newtypes::DataLifetimeSource;
 use newtypes::DataValidationError;
 use newtypes::DiValidationError;
@@ -269,25 +270,8 @@ impl<Type> VaultWrapper<Type> {
 fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind) -> NtResult<()> {
     // Keep full match statements here so we have to implement this any time there's a new
     // VaultKind or DataIdentifierDiscriminant
-    let is_allowed = move |di: &DataIdentifier| -> bool {
-        match kind {
-            VaultKind::Person => match di {
-                DataIdentifier::Id(_)
-                | DataIdentifier::Custom(_)
-                | DataIdentifier::InvestorProfile(_)
-                | DataIdentifier::Document(_)
-                | DataIdentifier::Card(_) => true,
-                DataIdentifier::Business(_) => false,
-            },
-            VaultKind::Business => match di {
-                DataIdentifier::Business(_) | DataIdentifier::Custom(_) => true,
-                DataIdentifier::Id(_)
-                | DataIdentifier::InvestorProfile(_)
-                | DataIdentifier::Document(_)
-                | DataIdentifier::Card(_) => false,
-            },
-        }
-    };
+    let is_allowed =
+        move |di: &DataIdentifier| -> bool { DataIdentifierDiscriminant::from(di).is_allowed_for(kind) };
 
     let disallowed_keys = request.keys().filter(|di| !is_allowed(di)).collect_vec();
     if !disallowed_keys.is_empty() {
