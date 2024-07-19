@@ -82,8 +82,10 @@ pub struct ObConfiguration {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
+    // DEPRECATED: use verification checks
     /// When true on a KYB playbook, just collect business info without sending to vendors
-    pub skip_kyb: bool,
+    #[allow(unused)]
+    skip_kyb: bool,
     /// When true on a KYC or KYB playbook, allows skipping confirm screen.
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
@@ -864,6 +866,10 @@ impl VerificationChecks {
 
     pub fn skip_kyc(&self) -> bool {
         self.get(VerificationCheckKind::Kyc).is_none()
+    }
+
+    pub fn skip_kyb(&self) -> bool {
+        self.get(VerificationCheckKind::Kyb).is_none()
     }
 
     pub fn enhanced_aml(&self) -> EnhancedAmlOption {

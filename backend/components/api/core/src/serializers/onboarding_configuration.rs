@@ -120,6 +120,7 @@ impl
         let vc = ob_config.verification_checks();
         let skip_kyc = vc.skip_kyc();
         let enhanced_aml = vc.enhanced_aml();
+        let skip_kyb = vc.skip_kyc();
         let ObConfiguration {
             id,
             key,
@@ -134,7 +135,6 @@ impl
             allow_international_residents,
             international_country_restrictions,
             is_doc_first,
-            skip_kyb,
             skip_confirm,
             allow_us_residents,
             allow_us_territory_residents,
@@ -153,7 +153,7 @@ impl
             _updated_at: _,
             appearance_id: _,
             author: _,
-            // TODO: only thing hidden here is enhanced_aml which will be removed shortly
+            // TODO: only thing hidden here is enhanced_aml and skip_kyb which will be removed shortly
             ..
         } = ob_config;
 

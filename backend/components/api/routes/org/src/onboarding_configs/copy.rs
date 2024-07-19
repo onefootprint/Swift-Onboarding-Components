@@ -156,6 +156,7 @@ fn copy_playbook(
     name: String,
 ) -> NewObConfigurationArgs {
     let verification_checks = VerificationChecks::from_existing(&pb);
+    let skip_kyb = verification_checks.skip_kyb();
     let ObConfiguration {
         must_collect_data,
         can_access_data,
@@ -169,7 +170,6 @@ fn copy_playbook(
         allow_us_residents,
         allow_us_territory_residents,
         kind,
-        skip_kyb,
         skip_confirm,
         document_types_and_countries,
         curp_validation_enabled,
@@ -192,7 +192,7 @@ fn copy_playbook(
         // Maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
         verification_checks: _,
-        // TODO: only thing here is enhanced_aml which will be removed shortly
+        // TODO: only thing here is enhanced_aml and skip_kyb which will be removed shortly
         ..
     } = pb;
 

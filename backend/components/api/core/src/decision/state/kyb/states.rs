@@ -181,7 +181,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             };
         }
 
-        if obc.skip_kyb {
+        if obc.verification_checks().skip_kyb() {
             // Skip past KYB vendor calls and go straight to decisioning
             Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {

@@ -68,7 +68,8 @@ pub async fn multi_update_rules(
                 return Err(ValidationError("Proceeding would remove all rules on your playbook").into());
             }
 
-            let should_pb_have_no_rules = obc.kind == ObConfigurationKind::Kyb && obc.skip_kyb;
+            let should_pb_have_no_rules =
+                obc.kind == ObConfigurationKind::Kyb && obc.verification_checks().skip_kyb();
             if should_pb_have_no_rules && rules.iter().any(|r| matches!(r.kind, RuleInstanceKind::Business)) {
                 return Err(ValidationError(
                     "Cannot add Business related rules to a playbook that is skipping running KYB",

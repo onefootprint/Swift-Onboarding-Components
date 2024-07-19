@@ -234,9 +234,6 @@ pub fn default_rules_for_obc(
         obc.verification_checks().get(VerificationCheckKind::Kyb)
     {
         base_kyb_rules(ein_only)
-    } else if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {
-        // legacy, shouldn't hit this case
-        base_kyb_rules(false)
     } else {
         vec![]
     }

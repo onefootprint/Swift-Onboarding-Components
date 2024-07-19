@@ -245,8 +245,9 @@ pub fn evaluate_rules(
             // docs_to_collect.all(is_custom)
             ObConfigurationKind::Kyc => false, // We could support this some day for skip_kyc
             ObConfigurationKind::Kyb => {
-                (obc.verification_checks().skip_kyc() && v.kind == VaultKind::Person)
-                    || (obc.skip_kyb && v.kind == VaultKind::Business)
+                let vc = obc.verification_checks();
+                (vc.skip_kyc() && v.kind == VaultKind::Person)
+                    || (vc.skip_kyb() && v.kind == VaultKind::Business)
             }
             ObConfigurationKind::Auth => true,
         };
