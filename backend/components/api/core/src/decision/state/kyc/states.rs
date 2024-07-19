@@ -171,7 +171,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was
         // collected. Also need to clairfy tenant's understanding of this
-        let (kyc_vendor_result, user_input_reason_codes) = if !obc.skip_kyc() {
+        let (kyc_vendor_result, user_input_reason_codes) = if !obc.verification_checks().skip_kyc() {
             let kyc_vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
             let user_input_reason_codes = features::user_input::generate_user_input_risk_signals(
                 &state.enclave_client,
@@ -203,7 +203,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         };
 
         let is_neuro_enabled_obc = obc
-            .get_verification_check(VerificationCheckKind::NeuroId)
+            .verification_checks()
+            .get(VerificationCheckKind::NeuroId)
             .is_some();
         let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
         let neuro_result = if is_neuro_enabled_obc && is_neuro_enabled_for_workflow {
@@ -226,7 +227,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let aml_vendor_result = match obc.aml_verification_check() {
+        let aml_vendor_result = match obc.verification_checks().enhanced_aml() {
             EnhancedAmlOption::No => None,
             EnhancedAmlOption::Yes { .. } => {
                 Some(common::run_aml_call(state, &self.wf_id, &self.t_id).await?)

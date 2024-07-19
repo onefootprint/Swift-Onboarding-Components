@@ -156,8 +156,8 @@ pub fn default_rules_for_obc(
     let mut person_rules = vec![];
 
     // KYC
-    let has_kyc =
-        (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb) && !obc.skip_kyc();
+    let has_kyc = (obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb)
+        && !obc.verification_checks().skip_kyc();
     let must_collect_ssn =
         obc.must_collect_data.contains(&CDO::Ssn9) || obc.must_collect_data.contains(&CDO::Ssn4);
     let optional_ssn = obc.optional_data.contains(&CDO::Ssn9) || obc.optional_data.contains(&CDO::Ssn4);
@@ -189,7 +189,7 @@ pub fn default_rules_for_obc(
     }
 
     // AML
-    let aml_risk_signals = match obc.aml_verification_check() {
+    let aml_risk_signals = match obc.verification_checks().enhanced_aml() {
         // We do get some watchlist risk signals from normal KYC
         EnhancedAmlOption::No if has_kyc => vec![FRC::WatchlistHitOfac, FRC::WatchlistHitNonSdn],
         // But if we're not running KYC at all, there will be no risk signals
@@ -231,7 +231,7 @@ pub fn default_rules_for_obc(
 
     // KYB
     let business_rules = if let Some(VerificationCheck::Kyb { ein_only }) =
-        obc.get_verification_check(VerificationCheckKind::Kyb)
+        obc.verification_checks().get(VerificationCheckKind::Kyb)
     {
         base_kyb_rules(ein_only)
     } else if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {

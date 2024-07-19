@@ -311,9 +311,14 @@ async fn get_risk_signal_and_maybe_aml_detail(
         .await?;
 
     let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
-        get_aml_hits(state, &obc.aml_verification_check(), vreq_vres.clone(), key)
-            .await?
-            .map(|a| (a, vreq_vres.0))
+        get_aml_hits(
+            state,
+            &obc.verification_checks().enhanced_aml(),
+            vreq_vres.clone(),
+            key,
+        )
+        .await?
+        .map(|a| (a, vreq_vres.0))
     } else {
         None
     };

@@ -23,7 +23,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Vec<
         })
         .await?;
 
-    if obc.skip_kyc() {
+    if obc.verification_checks().skip_kyc() {
         return Ok(vec![]);
     }
 

@@ -234,7 +234,7 @@ pub async fn run_watchlist_check(
             let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
 
             // Create a BillingEvent once per year for this user
-            let adverse_media = match obc.aml_verification_check() {
+            let adverse_media = match obc.verification_checks().enhanced_aml() {
                 EnhancedAmlOption::Yes { adverse_media, .. } => adverse_media,
                 EnhancedAmlOption::No => false,
             };

@@ -1,6 +1,6 @@
 use super::validation::ObConfigurationArgsToValidate;
 use db::models::ob_configuration::NewObConfigurationArgs;
-use db::models::ob_configuration::VerificationChecksForObc;
+use db::models::ob_configuration::VerificationChecks;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::CountryRestriction;
@@ -62,7 +62,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -100,7 +100,7 @@ fn test_is_no_phone_flow(
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -137,7 +137,7 @@ fn test_is_doc_first(
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -170,7 +170,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -208,7 +208,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         documents_to_collect,
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -249,7 +249,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

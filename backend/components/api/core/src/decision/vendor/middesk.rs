@@ -276,7 +276,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         .await?;
 
         let Some(VerificationCheck::Kyb { ein_only }) =
-            obc.get_verification_check(VerificationCheckKind::Kyb)
+            obc.verification_checks().get(VerificationCheckKind::Kyb)
         else {
             // todo make this into a proper variant
             return Err(AssertionError("no kyb check configured").into());
@@ -595,7 +595,7 @@ impl MiddeskState<Complete> {
             .db_transaction(move |conn| -> FpResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let billing_event_kind = if let Some(VerificationCheck::Kyb { ein_only }) =
-                    obc.get_verification_check(VerificationCheckKind::Kyb)
+                    obc.verification_checks().get(VerificationCheckKind::Kyb)
                 {
                     if ein_only {
                         Ok(BillingEventKind::KybEinOnly)

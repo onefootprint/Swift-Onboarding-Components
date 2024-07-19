@@ -266,45 +266,14 @@ impl ObConfiguration {
         matches!(self.cip_kind, Some(CipKind::Alpaca))
     }
 
-    pub fn get_verification_check(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
-        get_verification_check(self.verification_checks.clone().unwrap_or_default(), kind)
-    }
-
-    pub fn skip_kyc(&self) -> bool {
-        self.get_verification_check(VerificationCheckKind::Kyc).is_none()
-    }
-
-    pub fn aml_verification_check(&self) -> EnhancedAmlOption {
-        match self.get_verification_check(VerificationCheckKind::Aml) {
-            Some(VerificationCheck::Aml {
-                ofac,
-                pep,
-                adverse_media,
-                continuous_monitoring,
-                adverse_media_lists,
-            }) => EnhancedAmlOption::Yes {
-                ofac,
-                pep,
-                adverse_media,
-                continuous_monitoring,
-                adverse_media_lists,
-            },
-            _ => EnhancedAmlOption::No,
-        }
-    }
-
     pub fn enhanced_aml_for_test(&self) -> EnhancedAmlOption {
         self.enhanced_aml.clone()
     }
-}
 
-fn get_verification_check(
-    checks: Vec<VerificationCheck>,
-    kind: VerificationCheckKind,
-) -> Option<VerificationCheck> {
-    checks
-        .into_iter()
-        .find(|c| VerificationCheckKind::from(c) == kind)
+    // More useful public interface for working with VerificationChecks
+    pub fn verification_checks(&self) -> VerificationChecks {
+        VerificationChecks::from_existing(self)
+    }
 }
 
 
@@ -428,19 +397,9 @@ pub struct NewObConfigurationArgs {
     pub curp_validation_enabled: bool,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
-    pub verification_checks: VerificationChecksForObc,
+    pub verification_checks: VerificationChecks,
 }
 
-impl NewObConfigurationArgs {
-    fn get_verification_check(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
-        get_verification_check(self.verification_checks.clone().into_inner(), kind)
-    }
-
-    // TODO: code duplication
-    pub fn skip_kyc(&self) -> bool {
-        self.get_verification_check(VerificationCheckKind::Kyc).is_none()
-    }
-}
 
 #[derive(Debug, derive_more::From)]
 pub enum ObConfigIdentifier<'a> {
@@ -734,8 +693,12 @@ impl ObConfiguration {
             .filter(|(wf, _)| wf.completed_at.is_some())
             .sorted_by_key(|(wf, _)| wf.completed_at)
             .flat_map(|(_, obc)| obc)
-            .find(|obc| matches!(&obc.aml_verification_check(), EnhancedAmlOption::Yes { .. }))
-        {
+            .find(|obc| {
+                matches!(
+                    &obc.verification_checks().enhanced_aml(),
+                    EnhancedAmlOption::Yes { .. }
+                )
+            }) {
             Some(obc.clone())
         } else {
             wfs.first().and_then(|(_, obc)| obc.clone())
@@ -790,10 +753,10 @@ impl ObConfiguration {
     }
 }
 
-// 2024-07-16 temporary while we're migrating to verification checks
+// Helper to more easily interact with verification checks
 #[derive(Default, Clone)]
-pub struct VerificationChecksForObc(Vec<VerificationCheck>);
-impl VerificationChecksForObc {
+pub struct VerificationChecks(Vec<VerificationCheck>);
+impl VerificationChecks {
     pub fn new(
         checks_from_request: Option<Vec<VerificationCheck>>,
         skip_kyc: Option<bool>,
@@ -801,11 +764,47 @@ impl VerificationChecksForObc {
     ) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
-        Self(create_verification_checks_from_obc_request(
+        VerificationChecks(Self::create_verification_checks_from_obc_request(
             vc,
             skip_kyc,
             enhanced_aml,
         ))
+    }
+
+    // 2024-07-16 temporary while we're migrating to verification checks
+    // Eventually this will just be a passthrough
+    fn create_verification_checks_from_obc_request(
+        mut checks: Vec<VerificationCheck>,
+        skip_kyc: Option<bool>,
+        enhanced_aml: EnhancedAmlOption,
+    ) -> Vec<VerificationCheck> {
+        if let Some(skip) = skip_kyc {
+            if !skip {
+                checks.push(VerificationCheck::Kyc {});
+            }
+        }
+
+        match enhanced_aml {
+            EnhancedAmlOption::No => (),
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            } => {
+                let aml_check = VerificationCheck::Aml {
+                    ofac,
+                    pep,
+                    adverse_media,
+                    continuous_monitoring,
+                    adverse_media_lists,
+                };
+                checks.push(aml_check);
+            }
+        }
+
+        checks
     }
 
     pub fn new_for_test(checks: Vec<VerificationCheck>) -> Self {
@@ -825,37 +824,34 @@ impl VerificationChecksForObc {
     }
 }
 
-fn create_verification_checks_from_obc_request(
-    mut checks: Vec<VerificationCheck>,
-    skip_kyc: Option<bool>,
-    enhanced_aml: EnhancedAmlOption,
-) -> Vec<VerificationCheck> {
-    if let Some(skip) = skip_kyc {
-        if !skip {
-            checks.push(VerificationCheck::Kyc {});
-        }
+impl VerificationChecks {
+    pub fn get(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
+        self.0
+            .clone()
+            .into_iter()
+            .find(|c| VerificationCheckKind::from(c) == kind)
     }
 
-    // TODO: remove serde default in POST ob_configs
-    match enhanced_aml {
-        EnhancedAmlOption::No => (),
-        EnhancedAmlOption::Yes {
-            ofac,
-            pep,
-            adverse_media,
-            continuous_monitoring,
-            adverse_media_lists,
-        } => {
-            let aml_check = VerificationCheck::Aml {
+    pub fn skip_kyc(&self) -> bool {
+        self.get(VerificationCheckKind::Kyc).is_none()
+    }
+
+    pub fn enhanced_aml(&self) -> EnhancedAmlOption {
+        match self.get(VerificationCheckKind::Aml) {
+            Some(VerificationCheck::Aml {
                 ofac,
                 pep,
                 adverse_media,
                 continuous_monitoring,
                 adverse_media_lists,
-            };
-            checks.push(aml_check);
+            }) => EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            },
+            _ => EnhancedAmlOption::No,
         }
     }
-
-    checks
 }

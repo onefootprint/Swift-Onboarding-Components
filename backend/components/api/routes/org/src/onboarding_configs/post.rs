@@ -9,7 +9,7 @@ use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::ob_configuration::VerificationChecksForObc;
+use db::models::ob_configuration::VerificationChecks;
 use db::models::rule_set_version::RuleSetVersion;
 use newtypes::AdverseMediaListKind;
 use newtypes::CipKind;
@@ -115,8 +115,7 @@ pub async fn post(
         .unwrap_or(EnhancedAmlOption::No);
 
     // VERIFICATION CHECK MIGRATION: construct verification checks
-    let verification_checks =
-        VerificationChecksForObc::new(verification_checks, skip_kyc, db_enhanced_aml.clone());
+    let verification_checks = VerificationChecks::new(verification_checks, skip_kyc, db_enhanced_aml.clone());
 
     // TODO: remove this
     let skip_kyb = match kind {

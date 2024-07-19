@@ -239,7 +239,7 @@ pub fn create_user_and_populate_vault(
 }
 
 pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId, obc: &ObConfiguration) {
-    let Some(VerificationCheck::Kyb { ein_only }) = obc.get_verification_check(VerificationCheckKind::Kyb)
+    let Some(VerificationCheck::Kyb { ein_only }) = obc.verification_checks().get(VerificationCheckKind::Kyb)
     else {
         panic!("missing kyb check in configured obc")
     };

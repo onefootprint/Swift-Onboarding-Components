@@ -104,7 +104,7 @@ pub async fn post(
             if obc.kind != ObConfigurationKind::Kyb {
                 return ValidationError("Must use playbook of kind KYB").into();
             }
-            if !obc.skip_kyc() {
+            if !obc.verification_checks().skip_kyc() {
                 return ValidationError("Cannot manually trigger KYB on a playbook that requires KYC").into();
             }
 

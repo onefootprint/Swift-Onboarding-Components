@@ -27,7 +27,8 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let required_auth_methods = ob_config.required_auth_methods();
         // just hide neuro id as much as possible. total overkill
         let nid_enabled = ob_config
-            .get_verification_check(VerificationCheckKind::NeuroId)
+            .verification_checks()
+            .get(VerificationCheckKind::NeuroId)
             .map(|_| true);
 
         let ObConfiguration {
@@ -116,10 +117,9 @@ impl
             Arc<dyn FeatureFlagClient>,
         ),
     ) -> Self {
-        let skip_kyc = ob_config
-            .get_verification_check(VerificationCheckKind::Kyc)
-            .is_none();
-        let enhanced_aml = ob_config.aml_verification_check();
+        let vc = ob_config.verification_checks();
+        let skip_kyc = vc.skip_kyc();
+        let enhanced_aml = vc.enhanced_aml();
         let ObConfiguration {
             id,
             key,

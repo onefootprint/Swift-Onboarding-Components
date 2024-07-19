@@ -676,7 +676,7 @@ fn watchlist(
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
     let leaked_hits = decision::features::incode_watchlist::get_hits(
         &watchlist_result_response,
-        &obc.aml_verification_check(),
+        &obc.verification_checks().enhanced_aml(),
     )
     .into_iter()
     .map(|h| h.leak());

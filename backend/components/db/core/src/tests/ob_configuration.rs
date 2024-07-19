@@ -1,7 +1,7 @@
 use crate::diesel::RunQueryDsl;
 use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
-use crate::models::ob_configuration::VerificationChecksForObc;
+use crate::models::ob_configuration::VerificationChecks;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -90,7 +90,7 @@ fn test_ob_config_international_countries(
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -132,7 +132,7 @@ fn obc_with_doc_cdo(
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     }
 }
 
@@ -388,7 +388,7 @@ fn test_doc_scan_for_optional_ssn(conn: &mut TestPgConn, cdo: Option<String>) ->
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -431,7 +431,7 @@ fn test_cip_kind_documents(
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -507,7 +507,7 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -556,7 +556,7 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
         curp_validation_enabled: false,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 

@@ -17,7 +17,7 @@ use api_wire_types::MultiUpdateRuleRequest;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::ob_configuration::VerificationChecksForObc;
+use db::models::ob_configuration::VerificationChecks;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_version::RuleSetVersion;
@@ -155,8 +155,8 @@ fn copy_playbook(
     target_is_live: bool,
     name: String,
 ) -> NewObConfigurationArgs {
-    let verification_checks = VerificationChecksForObc::from_existing(&pb);
-    let enhanced_aml = pb.aml_verification_check();
+    let verification_checks = VerificationChecks::from_existing(&pb);
+    let enhanced_aml = pb.verification_checks().enhanced_aml();
     let ObConfiguration {
         must_collect_data,
         can_access_data,

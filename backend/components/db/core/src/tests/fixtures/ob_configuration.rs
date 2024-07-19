@@ -1,6 +1,6 @@
 use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
-use crate::models::ob_configuration::VerificationChecksForObc;
+use crate::models::ob_configuration::VerificationChecks;
 use crate::PgConn;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
@@ -37,7 +37,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
-        verification_checks: VerificationChecksForObc::default(),
+        verification_checks: VerificationChecks::default(),
     };
     ObConfiguration::create(conn, args).expect("Could not create ob config")
 }
@@ -115,7 +115,7 @@ pub fn create_with_opts(
     let skip_kyb = false;
     let curp_validation_enabled = false;
     let verification_checks =
-        VerificationChecksForObc::new(verification_checks, Some(skip_kyc), enhanced_aml.clone());
+        VerificationChecks::new(verification_checks, Some(skip_kyc), enhanced_aml.clone());
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),

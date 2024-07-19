@@ -120,7 +120,7 @@ impl ObConfigurationArgsToValidate {
             .into());
         }
 
-        if self.skip_kyc()
+        if self.verification_checks.skip_kyc()
             && !self.allow_international_residents
             && !is_collecting_doc
             && self.kind != ObConfigurationKind::Kyb
@@ -313,7 +313,7 @@ impl ObConfigurationArgsToValidate {
 
         // Document playbooks must not run KYC
         if self.kind == ObConfigurationKind::Document {
-            if !self.skip_kyc() {
+            if !self.verification_checks.skip_kyc() {
                 return Err(ValidationError("Playbook of kind document must skip KYC").into());
             }
             if !self.skip_confirm {
@@ -335,7 +335,7 @@ impl ObConfigurationArgsToValidate {
                 return ValidationError("Must collect identity data if and only if collecting BOs").into();
             }
 
-            if !has_bo_cdo && !self.skip_kyc() {
+            if !has_bo_cdo && !self.verification_checks.skip_kyc() {
                 return ValidationError("Must skip KYC if not collecting BOs").into();
             }
         }
@@ -460,7 +460,7 @@ impl ObConfigurationArgsToValidate {
                     self.international_country_restrictions.is_some(),
                     "international_country_restrictions",
                 ),
-                (self.skip_kyc(), "skip_kyc"),
+                (self.verification_checks.skip_kyc(), "skip_kyc"),
                 (
                     matches!(self.enhanced_aml, EnhancedAmlOption::Yes { .. }),
                     "enhanced_aml",

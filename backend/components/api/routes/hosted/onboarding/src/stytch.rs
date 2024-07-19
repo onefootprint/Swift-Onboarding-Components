@@ -73,7 +73,11 @@ pub async fn post(
     // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing
     let should_hide_risk_signals = user_auth
         .ob_config()
-        .map(|o| o.get_verification_check(VerificationCheckKind::NeuroId).is_some())
+        .map(|o| {
+            o.verification_checks()
+                .get(VerificationCheckKind::NeuroId)
+                .is_some()
+        })
         .unwrap_or(false);
 
     state

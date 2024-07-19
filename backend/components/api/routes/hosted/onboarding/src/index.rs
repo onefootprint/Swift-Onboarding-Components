@@ -91,7 +91,8 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
     let is_neuro_enabled = obc
-        .get_verification_check(VerificationCheckKind::NeuroId)
+        .verification_checks()
+        .get(VerificationCheckKind::NeuroId)
         .is_some();
     state
         .db_pool
