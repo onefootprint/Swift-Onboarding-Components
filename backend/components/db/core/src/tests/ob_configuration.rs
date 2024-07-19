@@ -1,29 +1,29 @@
 use crate::diesel::RunQueryDsl;
+use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
+use crate::models::ob_configuration::VerificationChecksForObc;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use crate::tests::prelude::*;
-use chrono::Utc;
 use macros::db_test;
+use macros::db_test_case;
 use newtypes::AdverseMediaListKind;
 use newtypes::ApiKeyStatus;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption;
 use newtypes::CountrySpecificDocumentMapping;
+use newtypes::DbActor;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentCdoInfo;
 use newtypes::EnhancedAmlOption;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use newtypes::ObConfigurationKind;
 use newtypes::TenantId;
 use std::collections::HashMap;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
-use test_case::test_case;
 
 #[db_test]
 fn test_ob_config(conn: &mut TestPgConn) {
@@ -52,39 +52,33 @@ fn test_ob_config(conn: &mut TestPgConn) {
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");
 }
 
-#[test_case(true, true, false, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
-#[test_case(false, false, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
-#[test_case(true, true, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX, Iso3166TwoDigitCountryCode::US]; "obc has restrictions and allow us")]
-#[test_case(false, true, false,  None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
-#[test_case(false, true, true,  None, Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories(); "obc is for territories + US")]
-#[test_case(true, false, false,  None, Iso3166TwoDigitCountryCode::all_international(); "obc is international without US")]
+#[db_test_case(true, true, false, None, Iso3166TwoDigitCountryCode::iter().collect(); "allow international, any country acceptable")]
+#[db_test_case(false, false, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX]; "obc has restrictions")]
+#[db_test_case(true, true, false, Some(vec![Iso3166TwoDigitCountryCode::MX]), vec![Iso3166TwoDigitCountryCode::MX, Iso3166TwoDigitCountryCode::US]; "obc has restrictions and allow us")]
+#[db_test_case(false, true, false,  None, vec![Iso3166TwoDigitCountryCode::US]; "obc doesn't allow international, only US")]
+#[db_test_case(false, true, true,  None, Iso3166TwoDigitCountryCode::all_codes_for_us_including_territories(); "obc is for territories + US")]
+#[db_test_case(true, false, false,  None, Iso3166TwoDigitCountryCode::all_international(); "obc is international without US")]
 fn test_ob_config_international_countries(
+    conn: &mut TestPgConn,
     allow_international: bool,
     allow_us_residents: bool,
     allow_us_territory_residents: bool,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     expected_countries: Vec<Iso3166TwoDigitCountryCode>,
 ) {
-    let obc = ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str("t_1234").unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![],
         can_access_data: vec![],
-        appearance_id: None,
         cip_kind: None,
         optional_data: vec![],
         is_no_phone_flow: false,
         is_doc_first: false,
         allow_international_residents: allow_international,
         international_country_restrictions,
-        author: None,
+        author: DbActor::Footprint,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents,
@@ -94,10 +88,11 @@ fn test_ob_config_international_countries(
         skip_confirm: false,
         document_types_and_countries: None,
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     };
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     assert_have_same_elements(
         obc.supported_countries_for_residential_address(),
@@ -110,29 +105,22 @@ fn obc_with_doc_cdo(
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     doc_cdo: &str,
     tenant_id: Option<&str>,
-) -> ObConfiguration {
-    ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+) -> NewObConfigurationArgs {
+    NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![CollectedDataOption::Document(
             DocumentCdoInfo::from_str(doc_cdo).unwrap(),
         )],
         can_access_data: vec![],
-        appearance_id: None,
         cip_kind: None,
         optional_data: vec![],
         is_no_phone_flow: false,
         is_doc_first: false,
         allow_international_residents: allow_international,
         international_country_restrictions,
-        author: None,
+        author: DbActor::Footprint,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
@@ -142,25 +130,29 @@ fn obc_with_doc_cdo(
         skip_confirm: false,
         document_types_and_countries: None,
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     }
 }
 
-#[test_case(None)]
-#[test_case(Some(Iso3166TwoDigitCountryCode::US))]
-fn test_supported_country_mapping_us_only(residential_country: Option<Iso3166TwoDigitCountryCode>) {
+#[db_test_case(None)]
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::US))]
+fn test_supported_country_mapping_us_only(
+    conn: &mut TestPgConn,
+    residential_country: Option<Iso3166TwoDigitCountryCode>,
+) {
     // We don't allow international
     //
     // We expect by default to return US with the indicated doc types
     //  every other country with just passport
-    let obc = obc_with_doc_cdo(
+    let args = obc_with_doc_cdo(
         false,
         None,
         "document.drivers_license,passport,id_card.none.require_selfie",
         None,
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country);
 
@@ -175,14 +167,15 @@ fn test_supported_country_mapping_us_only(residential_country: Option<Iso3166Two
         .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
 }
 
-#[test]
-fn test_supported_country_mapping_override_for_coba() {
-    let obc = obc_with_doc_cdo(
+#[db_test]
+fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
+    let args = obc_with_doc_cdo(
         false,
         None,
         "document.drivers_license,passport,voter_identification.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     Iso3166TwoDigitCountryCode::iter()
         .filter(|c| *c != Iso3166TwoDigitCountryCode::MX)
@@ -201,12 +194,13 @@ fn test_supported_country_mapping_override_for_coba() {
         ],
     );
     // Second form of ID: Mexican Resident Card
-    let obc = obc_with_doc_cdo(
+    let args = obc_with_doc_cdo(
         false,
         None,
         "document.residence_document.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -225,12 +219,13 @@ fn test_supported_country_mapping_override_for_coba() {
     );
 
     // Second form of ID: Any additional document (voters ID, drivers license, etc)
-    let obc = obc_with_doc_cdo(
+    let args = obc_with_doc_cdo(
         false,
         None,
         "document.drivers_license,voter_identification,visa,id_card,residence_document.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -261,12 +256,13 @@ fn test_supported_country_mapping_override_for_coba() {
     );
 
     // Second form of ID: Driver's license
-    let obc = obc_with_doc_cdo(
+    let args = obc_with_doc_cdo(
         false,
         None,
         "document.drivers_license.none.require_selfie",
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let all_supported = obc.supported_country_mapping_for_document(None);
     assert_eq!(all_supported.keys().len(), 1);
@@ -285,31 +281,32 @@ fn test_supported_country_mapping_override_for_coba() {
     )
 }
 
-#[test_case(None, None)]
-#[test_case(Some(Iso3166TwoDigitCountryCode::US), None)]
-#[test_case(Some(Iso3166TwoDigitCountryCode::MX), None)]
-#[test_case(Some(Iso3166TwoDigitCountryCode::NO), None)]
-#[test_case(None, Some(vec![
+#[db_test_case(None, None)]
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::US), None)]
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::MX), None)]
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::NO), None)]
+#[db_test_case(None, Some(vec![
         Iso3166TwoDigitCountryCode::US,
         Iso3166TwoDigitCountryCode::MX,
         Iso3166TwoDigitCountryCode::NO,
     ]))]
-#[test_case(Some(Iso3166TwoDigitCountryCode::US), Some(vec![
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::US), Some(vec![
         Iso3166TwoDigitCountryCode::US,
         Iso3166TwoDigitCountryCode::MX,
         Iso3166TwoDigitCountryCode::NO,
     ]))]
-#[test_case(Some(Iso3166TwoDigitCountryCode::MX), Some(vec![
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::MX), Some(vec![
         Iso3166TwoDigitCountryCode::US,
         Iso3166TwoDigitCountryCode::MX,
         Iso3166TwoDigitCountryCode::NO,
     ]))]
-#[test_case(Some(Iso3166TwoDigitCountryCode::NO), Some(vec![
+#[db_test_case(Some(Iso3166TwoDigitCountryCode::NO), Some(vec![
         Iso3166TwoDigitCountryCode::US,
         Iso3166TwoDigitCountryCode::MX,
         Iso3166TwoDigitCountryCode::NO,
     ]))]
 fn test_supported_country_mapping_allow_international(
+    conn: &mut TestPgConn,
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
 ) {
@@ -320,12 +317,13 @@ fn test_supported_country_mapping_allow_international(
     //
     // Note: international country restrictions do not affect the countries you can submit a passport
     // for, this just controls residential address - there are integration tests testing this part
-    let obc = obc_with_doc_cdo(
+    let args = obc_with_doc_cdo(
         true,
         international_country_restrictions,
         "document.drivers_license,passport.none.require_selfie",
         None,
     );
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country);
 
@@ -361,32 +359,25 @@ fn test_supported_country_mapping_allow_international(
         .for_each(|c| assert_eq!(mapping.get(&c).cloned().unwrap(), vec![IdDocKind::Passport]))
 }
 
-#[test_case(Some("document.passport.none.none") => Some(vec![IdDocKind::Passport]))]
-#[test_case(Some("document.passport,drivers_license.none.none") => Some(vec![IdDocKind::Passport, IdDocKind::DriversLicense]))]
-#[test_case(None => None)]
-#[test_case(Some("full_address") => None)] // obc will fail when getting created anyways
-fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
-    let obc = ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+#[db_test_case(Some("document.passport.none.none".to_string()) => Some(vec![IdDocKind::Passport]))]
+#[db_test_case(Some("document.passport,drivers_license.none.none".to_string()) => Some(vec![IdDocKind::Passport, IdDocKind::DriversLicense]))]
+#[db_test_case(None => None)]
+#[db_test_case(Some("full_address".to_string()) => None)] // obc will fail when getting created anyways
+fn test_doc_scan_for_optional_ssn(conn: &mut TestPgConn, cdo: Option<String>) -> Option<Vec<IdDocKind>> {
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str("t_1234").unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![],
         can_access_data: vec![],
-        appearance_id: None,
         cip_kind: None,
         optional_data: vec![],
         is_no_phone_flow: false,
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        author: None,
-        doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c).unwrap())),
+        author: DbActor::Footprint,
+        doc_scan_for_optional_ssn: cdo.map(|c| (CollectedDataOption::from_str(c.as_str()).unwrap())),
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
         allow_us_territory_residents: false,
@@ -395,34 +386,32 @@ fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
         skip_confirm: false,
         document_types_and_countries: None,
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     };
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     obc.optional_ssn_restricted_id_doc_kinds()
 }
 
-#[test_case(None, None)]
-#[test_case(None, Some(Iso3166TwoDigitCountryCode::US))]
-#[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::US))]
-#[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::PR))]
-#[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::GU))]
-#[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::CA))]
-fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso3166TwoDigitCountryCode>) {
-    let obc = ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+#[db_test_case(None, None)]
+#[db_test_case(None, Some(Iso3166TwoDigitCountryCode::US))]
+#[db_test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::US))]
+#[db_test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::PR))]
+#[db_test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::GU))]
+#[db_test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::CA))]
+fn test_cip_kind_documents(
+    conn: &mut TestPgConn,
+    cip: Option<CipKind>,
+    residential_country: Option<Iso3166TwoDigitCountryCode>,
+) {
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str("t_1234").unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![],
         can_access_data: vec![],
-        appearance_id: None,
         // Testing this!!!
         cip_kind: cip,
         optional_data: vec![],
@@ -430,7 +419,7 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        author: None,
+        author: DbActor::Footprint,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
@@ -440,10 +429,11 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
         skip_confirm: false,
         document_types_and_countries: None,
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     };
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     let mapping = obc.supported_country_mapping_for_document(residential_country).0;
     if let Some(c) = cip {
@@ -482,8 +472,8 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
     }
 }
 
-#[test]
-fn test_document_types_and_countries() {
+#[db_test]
+fn test_document_types_and_countries(conn: &mut TestPgConn) {
     let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
         Iso3166TwoDigitCountryCode::CA,
         vec![IdDocKind::DriversLicense],
@@ -492,26 +482,19 @@ fn test_document_types_and_countries() {
         global: vec![],
         country_specific: supported,
     };
-    let obc_with_supported_countries_set = ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str("t_1234").unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![],
         can_access_data: vec![],
-        appearance_id: None,
         cip_kind: None,
         optional_data: vec![],
         is_no_phone_flow: false,
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        author: None,
+        author: DbActor::Footprint,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
@@ -522,14 +505,14 @@ fn test_document_types_and_countries() {
         // TESTING THIS
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     };
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
-    let mapping = obc_with_supported_countries_set
-        .supported_country_mapping_for_document(None)
-        .0;
+
+    let mapping = obc.supported_country_mapping_for_document(None).0;
     assert_eq!(mapping.keys().len(), 1);
     assert_eq!(
         mapping.get(&Iso3166TwoDigitCountryCode::CA).unwrap().clone(),
@@ -537,8 +520,8 @@ fn test_document_types_and_countries() {
     );
 }
 
-#[test]
-fn test_document_and_countries_field_with_cip_kind() {
+#[db_test]
+fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     let supported = CountrySpecificDocumentMapping(HashMap::from_iter(vec![(
         Iso3166TwoDigitCountryCode::PR,
         vec![IdDocKind::Visa],
@@ -547,19 +530,12 @@ fn test_document_and_countries_field_with_cip_kind() {
         global: vec![],
         country_specific: supported,
     };
-    let obc_with_supported_countries_and_cip_kind = ObConfiguration {
-        id: ObConfigurationId::from_str("1234").unwrap(),
-        key: ObConfigurationKey::from_str("obk1").unwrap(),
+    let args = NewObConfigurationArgs {
         name: "obc".into(),
         tenant_id: TenantId::from_str("t_1234").unwrap(),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
         is_live: true,
-        status: ApiKeyStatus::Enabled,
-        created_at: Utc::now(),
         must_collect_data: vec![],
         can_access_data: vec![],
-        appearance_id: None,
         // TESTING THIS
         cip_kind: Some(CipKind::Alpaca),
         optional_data: vec![],
@@ -567,7 +543,7 @@ fn test_document_and_countries_field_with_cip_kind() {
         is_doc_first: false,
         allow_international_residents: false,
         international_country_restrictions: None,
-        author: None,
+        author: DbActor::Footprint,
         doc_scan_for_optional_ssn: None,
         enhanced_aml: EnhancedAmlOption::No,
         allow_us_residents: true,
@@ -578,13 +554,14 @@ fn test_document_and_countries_field_with_cip_kind() {
         // TESTING THIS
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
-        documents_to_collect: None,
+        documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: None,
+        verification_checks: VerificationChecksForObc::default(),
     };
+    let obc = ObConfiguration::create(conn, args).unwrap();
 
     // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
-    let mapping = obc_with_supported_countries_and_cip_kind
+    let mapping = obc
         .supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::PR))
         .0;
     assert_eq!(mapping.keys().len(), 2);

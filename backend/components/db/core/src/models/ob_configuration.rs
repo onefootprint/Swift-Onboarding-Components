@@ -261,22 +261,9 @@ impl ObConfiguration {
         self.document_cdo_for_optional_ssn().is_some()
     }
 
-    // Dumb temporary hack since we use Alpaca Cipkind in some pytets but aren't stricly enforcing that
-    // 'if alpaca then enhanced aml'
+    // TODO: will remove in upstack
     pub fn enhanced_aml(&self) -> EnhancedAmlOption {
-        if matches!(self.cip_kind, Some(CipKind::Alpaca))
-            && matches!(self.enhanced_aml, EnhancedAmlOption::No)
-        {
-            EnhancedAmlOption::Yes {
-                ofac: true,
-                pep: true,
-                adverse_media: true,
-                continuous_monitoring: true,
-                adverse_media_lists: None,
-            }
-        } else {
-            self.enhanced_aml.clone()
-        }
+        self.enhanced_aml.clone()
     }
 
     pub fn is_stepup_enabled(&self) -> bool {

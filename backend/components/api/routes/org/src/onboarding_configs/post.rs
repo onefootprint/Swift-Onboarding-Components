@@ -3,7 +3,6 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
-use api_core::errors::tenant::TenantError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
@@ -82,6 +81,8 @@ pub async fn post(
     let tenant_id = &tenant.id;
     let actor = auth.actor().into();
 
+    let pb_request = request.into_inner().validate()?;
+
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data,
@@ -101,37 +102,23 @@ pub async fn post(
         documents_to_collect,
         business_documents_to_collect,
         curp_validation_enabled,
-        enhanced_aml,
+        enhanced_aml: api_enhanced_aml,
         kind,
         verification_checks,
-    } = request.into_inner();
+    } = pb_request;
 
-    // First, map some of the API format to the format we write to the DB
-    if let Some(r) = &enhanced_aml {
-        if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
-            return Err(TenantError::ValidationError(
-                "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
-            )
-            .into());
-        }
-        if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
-            return Err(TenantError::ValidationError(
-                "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true".to_owned(),
-            )
-            .into());
-        }
-    }
 
-    // TODO: clean this up
-    // TODO: surface AM lists in FE
-    let enhanced_aml = enhanced_aml
+    // TODO: clean this up by surfacing AM lists in FE
+    let db_enhanced_aml = api_enhanced_aml
         .map(|r| r.into())
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
+    // VERIFICATION CHECK MIGRATION: construct verification checks
     let verification_checks =
-        VerificationChecksForObc::new(verification_checks, skip_kyc, enhanced_aml.clone());
+        VerificationChecksForObc::new(verification_checks, skip_kyc, db_enhanced_aml.clone());
 
+    // TODO: remove this
     let skip_kyb = match kind {
         ObConfigurationKind::Kyb => !verification_checks
             .inner()
@@ -155,7 +142,7 @@ pub async fn post(
         international_country_restrictions,
         author: actor,
         doc_scan_for_optional_ssn,
-        enhanced_aml,
+        enhanced_aml: db_enhanced_aml,
         // TODO: remove these once frontend is merged
         allow_us_residents: allow_us_residents.unwrap_or(true),
         allow_us_territory_residents: allow_us_territories.unwrap_or(false),
@@ -191,19 +178,9 @@ pub async fn post(
     )))
 }
 
+// TODO: add lists to FE and stop this hacking
 fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
-    // TODO: remove this for coba
-    if tenant_id.is_coba() {
-        Some(EnhancedAmlOption::Yes {
-            ofac: true,
-            pep: true,
-            adverse_media: false,
-            continuous_monitoring: true,
-            adverse_media_lists: None,
-        })
-
-    // Need adverse media list kind
-    } else if tenant_id.is_composer() {
+    if tenant_id.is_composer() {
         Some(EnhancedAmlOption::Yes {
             ofac: true,
             pep: true,

@@ -1,3 +1,4 @@
+use super::post::CreateOnboardingConfigurationRequest;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
@@ -631,5 +632,28 @@ impl ObConfigurationArgsToValidate {
             // TODO
             _ => Ok(()),
         }
+    }
+}
+
+
+impl CreateOnboardingConfigurationRequest {
+    pub fn validate(self) -> FpResult<Self> {
+        // First, map some of the API format to the format we write to the DB
+        if let Some(r) = &self.enhanced_aml {
+            if !r.enhanced_aml && (r.adverse_media || r.ofac || r.pep) {
+                return Err(TenantError::ValidationError(
+                    "cannot set adverse_media, ofac, or pep if enhanced_aml = false".to_owned(),
+                )
+                .into());
+            }
+            if r.enhanced_aml && !(r.adverse_media || r.ofac || r.pep) {
+                return Err(TenantError::ValidationError(
+                    "at least one of adverse_media, ofac, or pep must be set if enhanced_aml = true"
+                        .to_owned(),
+                )
+                .into());
+            }
+        }
+        Ok(self)
     }
 }
