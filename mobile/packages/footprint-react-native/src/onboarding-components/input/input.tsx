@@ -1,7 +1,8 @@
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import type { TextInputProps, TextInput } from 'react-native';
-import MaskInput from 'react-native-mask-input';
+import { TextInput as RNTextInput } from 'react-native';
+import { formatWithMask } from 'react-native-mask-input';
 import useFieldProps from '../hooks/use-field-props';
 
 export type InputProps = TextInputProps & {
@@ -9,9 +10,9 @@ export type InputProps = TextInputProps & {
   hasError?: boolean;
 };
 
-const Input = ({ as: Component = MaskInputWrapper, hasError, ...props }: InputProps) => {
+const Input = ({ as: Component = RNTextInput, hasError, ...props }: InputProps) => {
   const { control } = useFormContext();
-  const { name, validations = {}, transformValue, ...allProps } = useFieldProps();
+  const { name, validations = {}, transformValue, mask, ...allProps } = useFieldProps();
 
   return (
     <Controller
@@ -25,14 +26,19 @@ const Input = ({ as: Component = MaskInputWrapper, hasError, ...props }: InputPr
               props.onBlur?.(event);
             }}
             onChangeText={(val: string) => {
+              let formattedValue = val;
+              if (mask) {
+                const { masked } = formatWithMask({ text: val, mask });
+                formattedValue = masked;
+              }
               if (transformValue) {
-                const transformedValue = transformValue(val);
+                const transformedValue = transformValue(formattedValue);
                 onChange(transformedValue);
                 props.onChangeText?.(transformedValue.toString());
                 return;
               }
-              onChange(val);
-              props.onChangeText?.(val);
+              onChange(formattedValue);
+              props.onChangeText?.(formattedValue);
             }}
             value={value}
             hasError={hasError || !!fieldState.error}
@@ -45,21 +51,5 @@ const Input = ({ as: Component = MaskInputWrapper, hasError, ...props }: InputPr
     />
   );
 };
-
-const MaskInputWrapper = React.forwardRef<TextInput, TextInputProps & { hasError?: boolean }>((props, ref) => {
-  const { onChangeText, hasError, ...rest } = props;
-
-  return (
-    <MaskInput
-      ref={ref}
-      {...rest}
-      onChangeText={masked => {
-        if (onChangeText) {
-          onChangeText(masked);
-        }
-      }}
-    />
-  );
-});
 
 export default Input;
