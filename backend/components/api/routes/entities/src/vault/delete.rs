@@ -37,8 +37,7 @@ use std::collections::HashSet;
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct DeleteRequest {
     /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,
-    /// `custom.bank_account`
-    // TODO different examples for business / person
+    /// `custom.account_id`
     #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
     fields: Option<Vec<DataIdentifier>>,
     /// When true, deletes all data in the vault.
@@ -46,28 +45,43 @@ pub struct DeleteRequest {
     delete_all: Option<bool>,
 }
 
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct BusinessDeleteRequest {
+    /// List of data identifiers to delete. For example, `business.name`, `business.website`,
+    /// `custom.account_id`
+    #[openapi(example = r#"["business.name", "business.website"]"#)]
+    fields: Option<Vec<DataIdentifier>>,
+    /// When true, deletes all data in the vault.
+    #[openapi(example = "null")]
+    delete_all: Option<bool>,
+}
+
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
-pub struct DeleteVaultResponse(HashMap<DataIdentifier, bool>);
+pub struct BusinessDeleteResponse(HashMap<DataIdentifier, bool>);
 
 impl_map_apiv2_schema!(
-    DeleteVaultResponse<DataIdentifier, bool>,
+    BusinessDeleteResponse<DataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
     {"id.first_name": true, "id.last_name": false}
 );
-impl_response_type!(DeleteVaultResponse);
+impl_response_type!(BusinessDeleteResponse);
 
-#[route_alias(
-    actix::delete(
-        "/users/{fp_id}/vault",
-        description = "Deletes the provided fields from the provided user vault.",
-        tags(Users, Vault, PublicApi)
-    ),
-    actix::delete(
-        "/businesses/{fp_bid}/vault",
-        description = "Deletes the provided fields from the provided business vault.",
-        tags(Businesses, Vault, PublicApi)
-    )
-)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+pub struct DeleteBusinessVaultResponse(HashMap<DataIdentifier, bool>);
+
+impl_map_apiv2_schema!(
+    DeleteBusinessVaultResponse<DataIdentifier, bool>,
+    "A key-value map of identifier to whether the identifier was successfully deleted in the business vault",
+    {"business.name": true, "custom.account_id": false}
+);
+impl_response_type!(DeleteBusinessVaultResponse);
+
+#[route_alias(actix::delete(
+    "/users/{fp_id}/vault",
+    description = "Deletes the provided fields from the provided user vault.",
+    tags(Users, Vault, PublicApi)
+))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Deletes the provided fields from the provide vault.",
     tags(Vault, Entities, Private)
@@ -79,9 +93,38 @@ pub async fn delete(
     request: Json<DeleteRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> ApiResponse<DeleteVaultResponse> {
+) -> ApiResponse<BusinessDeleteResponse> {
+    let DeleteRequest { delete_all, fields } = request.into_inner();
+    let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
+    Ok(BusinessDeleteResponse(result))
+}
+
+#[api_v2_operation(
+    description = "Deletes the provided fields from the provided business vault.",
+    tags(Businesses, Vault, PublicApi)
+)]
+#[actix::delete("/businesses/{fp_bid}/vault")]
+pub async fn delete_business(
+    state: web::Data<State>,
+    path: FpIdPath,
+    request: Json<BusinessDeleteRequest>,
+    auth: SecretTenantAuthContext,
+    insight: InsightHeaders,
+) -> ApiResponse<DeleteBusinessVaultResponse> {
+    let BusinessDeleteRequest { delete_all, fields } = request.into_inner();
+    let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
+    Ok(DeleteBusinessVaultResponse(result))
+}
+
+async fn delete_inner(
+    state: web::Data<State>,
+    path: FpIdPath,
+    delete_all: Option<bool>,
+    fields: Option<Vec<DataIdentifier>>,
+    auth: SecretTenantAuthContext,
+    insight: InsightHeaders,
+) -> ApiResponse<HashMap<DataIdentifier, bool>> {
     let fp_id = path.into_inner();
-    let DeleteRequest { fields, delete_all } = request.into_inner();
     let delete_all = delete_all.unwrap_or_default();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
@@ -142,7 +185,5 @@ pub async fn delete(
             .into_iter()
             .map(|di| (di.clone(), deleted_dis.contains(&di))),
     );
-    let out = DeleteVaultResponse(results);
-
-    Ok(out)
+    Ok(results)
 }

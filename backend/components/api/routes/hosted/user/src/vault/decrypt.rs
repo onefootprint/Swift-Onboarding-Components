@@ -6,9 +6,10 @@ use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
-use api_wire_types::DecryptResponse;
+use api_wire_types::UserDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::VersionedDataIdentifier as VDI;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -33,7 +34,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
     user_auth: UserAuthContext,
-) -> ApiResponse<DecryptResponse> {
+) -> ApiResponse<UserDecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
 
@@ -53,9 +54,8 @@ pub async fn post(
     // Is this step necessary? Every key is present in the response if it was in the request?
     let results: HashMap<_, _> = fields
         .into_iter()
-        .map(|di| (di.clone(), results.remove(&di.into())))
+        .map(|di| (VDI::new(di.clone()), results.remove(&di.into())))
         .collect();
-    let out = DecryptResponse::from(results);
-
+    let out = UserDecryptResponse(results);
     Ok(out)
 }

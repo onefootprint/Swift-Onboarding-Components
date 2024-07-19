@@ -5,9 +5,10 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
 use api_core::errors::ValidationError;
-use api_wire_types::DecryptResponse;
+use api_wire_types::BusinessDecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::VersionedDataIdentifier as VDI;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -32,7 +33,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
     user_auth: UserAuthContext,
-) -> ApiResponse<DecryptResponse> {
+) -> ApiResponse<BusinessDecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
     let sb_id = user_auth
@@ -50,9 +51,8 @@ pub async fn post(
 
     let results: HashMap<_, _> = fields
         .into_iter()
-        .map(|di| (di.clone(), results.remove(&di.into())))
+        .map(|di| (VDI::new(di.clone()), results.remove(&di.into())))
         .collect();
-    let out = DecryptResponse::from(results);
-
+    let out = BusinessDecryptResponse(results);
     Ok(out)
 }

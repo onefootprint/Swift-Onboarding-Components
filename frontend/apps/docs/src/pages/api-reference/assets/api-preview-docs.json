@@ -321,7 +321,7 @@
                 ]
             }
         },
-        "/businesses/{fp_id}/risk_signals": {
+        "/businesses/{fp_bid}/risk_signals": {
             "get": {
                 "tags": [
                     "Businesses",
@@ -331,7 +331,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "fp_id",
+                        "name": "fp_bid",
                         "required": true,
                         "schema": {
                             "type": "string"

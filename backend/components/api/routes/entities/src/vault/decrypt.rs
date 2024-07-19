@@ -19,7 +19,9 @@ use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
+use api_wire_types::BusinessDecryptResponse;
 use api_wire_types::DecryptResponse;
+use api_wire_types::UserDecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -43,8 +45,23 @@ use std::collections::HashSet;
 pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
-    // TODO different examples for business / person
     #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
+    pub(super) fields: HashSet<VersionedDataIdentifier>,
+    /// Reason for the data decryption. This will be logged
+    #[openapi(example = "Lorem ipsum dolor")]
+    pub(super) reason: String,
+
+    /// A list of filter and transform functions to apply to each decrypted datum.
+    /// Omit or leave empty to apply no transforms.
+    /// Can find more information on allowed transform functions on our docs
+    #[openapi(example = "null")]
+    pub(super) transforms: Option<Vec<FilterFunction>>,
+}
+
+#[derive(Debug, Deserialize, Apiv2Schema)]
+pub struct BusinessDecryptRequest {
+    /// List of data identifiers to decrypt. For example, `business.name`, `business.website`,
+    #[openapi(example = r#"["business.name", "business.website"]"#)]
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     #[openapi(example = "Lorem ipsum dolor")]
@@ -76,18 +93,11 @@ pub struct ClientDecryptRequest {
     transforms: Option<Vec<FilterFunction>>,
 }
 
-#[route_alias(
-    post(
-        "/users/{fp_id}/vault/decrypt",
-        tags(Users, Vault, PublicApi),
-        description = "Decrypts the specified list of fields from the provided vault."
-    ),
-    post(
-        "/businesses/{fp_bid}/vault/decrypt",
-        tags(Businesses, Vault, PublicApi),
-        description = "Decrypts the specified list of fields from the provided vault."
-    )
-)]
+#[route_alias(post(
+    "/users/{fp_id}/vault/decrypt",
+    tags(Users, Vault, PublicApi),
+    description = "Decrypts the specified list of fields from the provided user vault."
+))]
 #[api_v2_operation(
     tags(Vault, Entities, Private),
     description = "Works for either person or business entities. Decrypts the specified list of fields from the provided vault."
@@ -100,13 +110,44 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<DecryptResponse> {
+) -> ApiResponse<UserDecryptResponse> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    Ok(result)
+    Ok(UserDecryptResponse(result))
+}
+
+#[api_v2_operation(
+    tags(Businesses, Vault, PublicApi),
+    description = "Decrypts the specified list of fields from the provided business vault."
+)]
+#[post("/businesses/{fp_bid}/vault/decrypt")]
+pub async fn post_business(
+    state: web::Data<State>,
+    path: FpIdPath,
+    request: Json<BusinessDecryptRequest>,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    insights: InsightHeaders,
+    root_span: RootSpan,
+) -> ApiResponse<BusinessDecryptResponse> {
+    let dis = request.fields.iter().map(|id| id.di.clone()).collect();
+    let auth = auth.check_guard(CanDecrypt::new(dis))?;
+
+    let BusinessDecryptRequest {
+        fields,
+        reason,
+        transforms,
+    } = request.into_inner();
+    let request = DecryptRequest {
+        reason,
+        fields,
+        transforms,
+    };
+
+    let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
+    Ok(BusinessDecryptResponse(result))
 }
 
 #[route_alias(post(
@@ -125,7 +166,7 @@ pub async fn post_client(
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<DecryptResponse> {
+) -> ApiResponse<UserDecryptResponse> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
@@ -146,7 +187,7 @@ pub async fn post_client(
     };
 
     let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
-    Ok(result)
+    Ok(UserDecryptResponse(result))
 }
 
 pub(super) async fn post_inner(
@@ -230,7 +271,5 @@ pub(super) async fn post_inner(
             results.insert(id, result);
         }
     }
-    let out = DecryptResponse(results);
-
-    Ok(out)
+    Ok(results)
 }

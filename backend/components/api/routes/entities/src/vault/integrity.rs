@@ -85,6 +85,6 @@ pub async fn post(
     let fp_id = path.into_inner();
 
     let response = super::decrypt::post_inner(&state, fp_id, req, auth, insights, root_span).await?;
-    let response = IntegrityResponse(response.0);
+    let response = IntegrityResponse(response);
     Ok(response)
 }

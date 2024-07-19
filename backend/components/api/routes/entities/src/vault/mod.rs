@@ -12,7 +12,9 @@ mod validate;
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(get::get)
+        .service(get::get_business)
         .service(decrypt::post)
+        .service(decrypt::post_business)
         .service(decrypt::post_client)
         .service(validate::post)
         .service(validate::post_client)
@@ -21,6 +23,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(patch::patch_client)
         .service(patch::patch_business)
         .service(delete::delete)
+        .service(delete::delete_business)
         .service(integrity::post)
         .service(download::get)
         .service(upload::post)

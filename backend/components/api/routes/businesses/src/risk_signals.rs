@@ -21,7 +21,7 @@ use paperclip::actix::web;
     // TODO don't take out of preview unless we paginate this API
     tags(Businesses, Preview)
 )]
-#[get("/businesses/{fp_id}/risk_signals")]
+#[get("/businesses/{fp_bid}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
