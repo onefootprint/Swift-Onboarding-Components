@@ -4,7 +4,6 @@ mod decrypt;
 mod default_rules;
 mod incode;
 mod org;
-mod risk;
 mod samba;
 mod sandbox_tenant;
 mod task;
@@ -20,10 +19,6 @@ pub use api_core::State;
 pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(check)
-        .service(risk::make_vendor_calls)
-        .service(risk::make_decision)
-        .service(risk::shadow_run)
-        .service(risk::save_risk_signals_for_vres)
         .service(task::create_task)
         .service(incode::rerun_machine)
         .service(incode::adhoc_create_document_and_workflow)
