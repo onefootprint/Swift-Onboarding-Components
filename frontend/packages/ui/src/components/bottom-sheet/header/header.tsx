@@ -17,7 +17,7 @@ type HeaderProps = {
 };
 
 const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
-  <Container hasBorder={!!title} flexGrow={0}>
+  <Container $hasBorder={!!title} flexGrow={0}>
     <DialogPrimitive.Close asChild>
       <IconButton aria-label={closeAriaLabel} onClick={onClose}>
         <IcoClose24 />
@@ -32,8 +32,8 @@ const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
   </Container>
 );
 
-const Container = styled(Stack)<{ hasBorder: boolean }>`
-  ${({ theme, hasBorder }) => css`
+const Container = styled(Stack)<{ $hasBorder: boolean }>`
+  ${({ theme, $hasBorder }) => css`
     height: 52px;
     display: flex;
     align-items: center;
@@ -42,7 +42,7 @@ const Container = styled(Stack)<{ hasBorder: boolean }>`
     width: 100%;
 
     ${
-      hasBorder &&
+      $hasBorder &&
       css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
     `
