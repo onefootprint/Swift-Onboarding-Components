@@ -54,7 +54,7 @@ const Billing = () => {
         {invoice?.lineItems.length ? (
           <Stack gap={5} padding={5} direction="column">
             <Stack gap={11} justifyContent="right">
-              <Text variant="label-3">{t('table.amount-due')}</Text>
+              <Text variant="label-3">{t('table.subtotal')}</Text>
               <Text variant="label-3">{totalAmountDue ? dollarAmountFromCents(totalAmountDue) : '-'}</Text>
             </Stack>
             <InfoContainer padding={5} gap={3}>

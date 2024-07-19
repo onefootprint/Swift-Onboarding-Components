@@ -3,6 +3,7 @@ import { useTheme } from 'next-themes';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import usePermissions from 'src/hooks/use-permissions';
 import styled, { css } from 'styled-components';
 
 import useSession from 'src/hooks/use-session';
@@ -14,13 +15,16 @@ const Settings = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings' });
   const { theme, setTheme } = useTheme();
   const {
-    data: { user },
+    data: { user, org },
   } = useSession();
+  const { isAdmin } = usePermissions();
 
   const handleToggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
   };
+
+  const shouldShowBilling = (org?.id === 'org_AiK8peOw9mrqsb6yeHWEG8' && isAdmin) || user?.isFirmEmployee;
 
   return (
     <>
@@ -36,8 +40,7 @@ const Settings = () => {
       <Stack gap={10} direction="column">
         <BusinessProfile />
         <TeamRoles />
-        {/* TODO eventually show for Grid admins once we've verified in prod */}
-        {user?.isFirmEmployee && <Billing />}
+        {shouldShowBilling ? <Billing /> : null}
       </Stack>
     </>
   );
