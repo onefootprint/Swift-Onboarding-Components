@@ -22,6 +22,7 @@ struct InvoicePreview {
 
 #[derive(Debug, Clone, Serialize, Apiv2Response)]
 struct LineItem {
+    id: String,
     description: Option<String>,
     quantity: u64,
     unit_price_cents: Option<String>,
@@ -50,6 +51,7 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<In
     let line_items = line_items
         .into_iter()
         .map(|li| LineItem {
+            id: li.id.to_string(),
             description: li.description,
             quantity: li.quantity.unwrap_or_default(),
             unit_price_cents: li.unit_amount_decimal,
