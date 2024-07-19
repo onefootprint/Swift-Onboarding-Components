@@ -11,6 +11,7 @@ mod logo;
 mod member;
 mod members;
 // Weird module name, but there's a metrics module inside api_core too...
+mod invoice_preview;
 mod metrics_api;
 mod onboarding_configs;
 mod partners;
@@ -29,6 +30,7 @@ pub fn routes(config: &mut ServiceConfig) {
     config
         .service(index::get)
         .service(index::patch)
+        .service(invoice_preview::get)
         .service(members::get)
         .service(members::post)
         .service(members::patch)

@@ -29,6 +29,7 @@ use stripe::InvoiceItem;
 use stripe::InvoicePendingInvoiceItemsBehavior;
 use stripe::InvoiceStatus;
 use stripe::ListCustomers;
+use stripe::ListInvoiceItems;
 use stripe::ListInvoices;
 
 pub type BResult<T> = Result<T, Error>;
@@ -175,18 +176,7 @@ impl BillingClient {
     #[tracing::instrument(skip(self))]
     pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
         let customer_id = stripe::CustomerId::from_str(&info.customer_id)?;
-        // See if there's an existing draft invoice for the tenant and cancel
-        // TODO use search API rather than filtering in RAM
-        let list_invoice = ListInvoices {
-            customer: Some(customer_id.clone()),
-            limit: Some(10),
-            status: Some(InvoiceStatus::Draft),
-            ..Default::default()
-        };
-        let existing_invoices = Invoice::list(&self.client, &list_invoice).await?;
-        let existing_invoice = existing_invoices.data.into_iter().find(|i| {
-            is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&info.interval.label())
-        });
+        let existing_invoice = self.get_draft_invoice(&customer_id, info.interval).await?;
         if let Some(i) = existing_invoice {
             // Delete the existing draft invoice that was created from a previous run.
             // This may fail if the invoice is no longer a draft
@@ -267,6 +257,46 @@ impl BillingClient {
         }
 
         Ok(())
+    }
+
+    async fn get_draft_invoice(
+        &self,
+        customer_id: &stripe::CustomerId,
+        interval: BillingInterval,
+    ) -> BResult<Option<Invoice>> {
+        let list_invoice = ListInvoices {
+            customer: Some(customer_id.clone()),
+            limit: Some(10),
+            status: Some(InvoiceStatus::Draft),
+            ..Default::default()
+        };
+        let existing_invoices = Invoice::list(&self.client, &list_invoice).await?;
+        let existing_invoice = existing_invoices.data.into_iter().find(|i| {
+            is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&interval.label())
+        });
+        Ok(existing_invoice)
+    }
+
+    pub async fn get_draft_line_items(
+        &self,
+        customer_id: &StripeCustomerId,
+        interval: BillingInterval,
+    ) -> BResult<Vec<InvoiceItem>> {
+        let customer_id = stripe::CustomerId::from_str(customer_id)?;
+        let Some(invoice) = self.get_draft_invoice(&customer_id, interval).await? else {
+            return Ok(vec![]);
+        };
+
+        let params = ListInvoiceItems {
+            invoice: Some(invoice.id.clone()),
+            limit: Some(100),
+            ..Default::default()
+        };
+        let items = InvoiceItem::list(&self.client, &params).await?;
+        if items.has_more {
+            tracing::error!(invoice_id=%invoice.id, customer_id=%customer_id, "Need to implement pagination in get_draft_line_items");
+        }
+        Ok(items.data)
     }
 }
 

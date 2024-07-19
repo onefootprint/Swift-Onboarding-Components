@@ -1278,6 +1278,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-kms",
  "aws-sdk-s3",
+ "billing",
  "byteorder",
  "bytes 1.6.0",
  "chrono",
