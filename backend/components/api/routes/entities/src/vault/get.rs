@@ -15,7 +15,9 @@ use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::input::Csv;
+use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
+use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
@@ -26,27 +28,36 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
-pub struct FieldsParams {
+pub struct UserFieldsParam {
     /// Optionally, a comma-separated list of fields whose existence to check. For example,
     /// `id.first_name,id.ssn4,custom.account_id`
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
+    fields: Option<Csv<DataIdentifier>>,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct BusinessFieldsParam {
+    /// Optionally, a comma-separated list of fields whose existence to check. For example,
+    /// `business.name,business.website,custom.account_id`
+    #[openapi(serialize_as = "Option<Vec<BusinessDataIdentifier>>")]
     fields: Option<Csv<DataIdentifier>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
-pub struct GetVaultResponse(HashMap<DataIdentifier, bool>);
+pub struct GetUserVaultResponse(HashMap<DataIdentifier, bool>);
 
 impl_map_apiv2_schema!(
-    GetVaultResponse<DataIdentifier, bool>,
+    GetUserVaultResponse<UserDataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier exists in the vault",
     { "id.first_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }
 );
-impl_response_type!(GetVaultResponse);
+impl_response_type!(GetUserVaultResponse);
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct GetBusinessVaultResponse(HashMap<DataIdentifier, bool>);
 
 impl_map_apiv2_schema!(
-    GetBusinessVaultResponse<DataIdentifier, bool>,
+    GetBusinessVaultResponse<BusinessDataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier exists in the business vault",
     { "business.name": true, "business.website": true, "custom.account_id": true }
 );
@@ -65,11 +76,12 @@ impl_response_type!(GetBusinessVaultResponse);
 pub async fn get(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Query<FieldsParams>,
+    request: Query<UserFieldsParam>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> ApiResponse<GetVaultResponse> {
-    let result = get_inner(state, path, request, auth).await?;
-    Ok(GetVaultResponse(result))
+) -> ApiResponse<GetUserVaultResponse> {
+    let UserFieldsParam { fields } = request.into_inner();
+    let result = get_inner(state, path, fields, auth).await?;
+    Ok(GetUserVaultResponse(result))
 }
 
 #[api_v2_operation(
@@ -80,21 +92,21 @@ pub async fn get(
 pub async fn get_business(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Query<FieldsParams>,
+    request: Query<BusinessFieldsParam>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResponse<GetBusinessVaultResponse> {
-    let result = get_inner(state, path, request, auth).await?;
+    let BusinessFieldsParam { fields } = request.into_inner();
+    let result = get_inner(state, path, fields, auth).await?;
     Ok(GetBusinessVaultResponse(result))
 }
 
 async fn get_inner(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Query<FieldsParams>,
+    fields: Option<Csv<DataIdentifier>>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> ApiResponse<HashMap<DataIdentifier, bool>> {
     let fp_id = path.into_inner();
-    let FieldsParams { fields } = request.into_inner();
 
     let auth = auth.check_guard(TenantGuard::Read)?;
     let is_live = auth.is_live()?;

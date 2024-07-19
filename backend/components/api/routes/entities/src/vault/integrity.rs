@@ -15,6 +15,7 @@ use newtypes::IntegritySigningKey;
 use newtypes::PiiBytes;
 use newtypes::PiiJsonValue;
 use newtypes::PreviewApi;
+use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -24,14 +25,14 @@ use paperclip::actix::{
     self,
 };
 use serde::Deserialize;
-use serde::Serialize;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-#[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct IntegrityRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     fields: HashSet<VersionedDataIdentifier>,
     /// A hex-encoded key for computing `hmac-sha256` signatures
     signing_key: IntegritySigningKey,
@@ -41,7 +42,7 @@ pub struct IntegrityRequest {
 pub struct IntegrityResponse(HashMap<VersionedDataIdentifier, Option<PiiJsonValue>>);
 
 impl_map_apiv2_schema!(
-    IntegrityResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,
+    IntegrityResponse<UserDataIdentifier, Option<PiiJsonValue>>,
     "A key-value map with the corresponding hex-encoded hash values",
     { "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }
 );
@@ -76,7 +77,7 @@ pub async fn post(
     let transform = FilterFunction::HmacSha256(HmacSha256Args {
         key: PiiBytes::new(signing_key.leak()),
     });
-    let req = super::decrypt::DecryptRequest {
+    let req = super::decrypt::UserDecryptRequest {
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         fields,
         transforms: Some(vec![transform]),

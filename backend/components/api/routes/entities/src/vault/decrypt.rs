@@ -28,9 +28,11 @@ use itertools::Itertools;
 use macros::route_alias;
 use newtypes::output::Csv;
 use newtypes::AccessEventPurpose;
+use newtypes::BusinessDataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::FilterFunction;
 use newtypes::FpId;
+use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -42,10 +44,12 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
-pub struct DecryptRequest {
+pub struct UserDecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
     #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
+    // NOTE: We are not serializing that this request can include versioned DIs
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     #[openapi(example = "Lorem ipsum dolor")]
@@ -62,6 +66,7 @@ pub struct DecryptRequest {
 pub struct BusinessDecryptRequest {
     /// List of data identifiers to decrypt. For example, `business.name`, `business.website`,
     #[openapi(example = r#"["business.name", "business.website"]"#)]
+    #[openapi(serialize_as = "Option<Vec<BusinessDataIdentifier>>")]
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     #[openapi(example = "Lorem ipsum dolor")]
@@ -79,6 +84,7 @@ pub struct ClientDecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
     /// `custom.bank_account`
     #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged.
     /// The reason must be provided either here or in the client token
@@ -106,7 +112,7 @@ pub struct ClientDecryptRequest {
 pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
-    request: Json<DecryptRequest>,
+    request: Json<UserDecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
     root_span: RootSpan,
@@ -140,7 +146,7 @@ pub async fn post_business(
         reason,
         transforms,
     } = request.into_inner();
-    let request = DecryptRequest {
+    let request = UserDecryptRequest {
         reason,
         fields,
         transforms,
@@ -171,7 +177,7 @@ pub async fn post_client(
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
 
-    // Compose the DecryptRequest
+    // Compose the UserDecryptRequest
     let ClientDecryptRequest {
         fields,
         reason,
@@ -180,7 +186,7 @@ pub async fn post_client(
     let reason = reason
         .or(auth.data.decrypt_reason.clone())
         .ok_or(TenantError::NoDecryptionReasonProvided)?;
-    let request = DecryptRequest {
+    let request = UserDecryptRequest {
         reason,
         fields,
         transforms,
@@ -193,12 +199,12 @@ pub async fn post_client(
 pub(super) async fn post_inner(
     state: &State,
     fp_id: FpId,
-    request: DecryptRequest,
+    request: UserDecryptRequest,
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<DecryptResponse> {
-    let DecryptRequest {
+    let UserDecryptRequest {
         fields,
         reason,
         transforms,

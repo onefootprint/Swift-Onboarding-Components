@@ -1,6 +1,7 @@
 use crate::*;
 use newtypes::DataIdentifier;
 use newtypes::SessionAuthToken;
+use newtypes::UserDataIdentifier;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
@@ -31,9 +32,10 @@ pub enum ModernClientTokenScopeKind {
 #[serde(rename_all = "snake_case")]
 pub struct CreateClientTokenRequest {
     /// List of data identifiers to which this token will have access. For example, `id.first_name`,
-    /// `id.ssn4`, `custom.bank_account`.. Should not be specified when using the `vault_card`
+    /// `id.ssn4`, `custom.bank_account`. Should not be specified when using the `vault_card`
     /// scope.
     #[serde(default)]
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     pub fields: HashSet<DataIdentifier>,
     /// Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be
     /// at least 60 seconds, at most 1 day
@@ -65,6 +67,7 @@ pub struct CreateClientTokenResponse {
     pub expires_at: DateTime<Utc>,
     /// The fields that this token has permissions to operate on, according to the requested scope.
     #[openapi(example = r#"["id.first_name","id.last_name"]"#)]
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     pub fields: Vec<DataIdentifier>,
 }
 

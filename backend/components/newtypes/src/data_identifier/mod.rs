@@ -26,6 +26,7 @@ mod decryptable_identifier;
 mod derived;
 mod doc_kind;
 mod document_di_kind;
+mod documentation;
 mod identity_data_kind;
 mod investor_profile_kind;
 mod kv_data_key;
@@ -39,6 +40,7 @@ pub use self::decryptable_identifier::*;
 pub use self::derived::*;
 pub use self::doc_kind::*;
 pub use self::document_di_kind::*;
+pub use self::documentation::*;
 pub use self::identity_data_kind::*;
 pub use self::investor_profile_kind::*;
 pub use self::validation::Error as DiValidationError;
@@ -54,13 +56,11 @@ use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use itertools::Itertools;
-use paperclip::v2::models::DataType;
 use regex::Regex;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use std::hash::Hash;
 use std::str::FromStr;
-use strum::IntoEnumIterator;
 use strum_macros::EnumDiscriminants;
 
 lazy_static! {
@@ -93,8 +93,8 @@ lazy_static! {
 /// decrypted items.
 pub enum DataIdentifier {
     Id(IdentityDataKind),
-    Custom(KvDataKey),
     Business(BusinessDataKind),
+    Custom(KvDataKey),
     InvestorProfile(InvestorProfileKind),
     Document(DocumentDiKind),
     Card(CardInfo),
@@ -270,58 +270,6 @@ impl DataIdentifierDiscriminant {
     }
 }
 
-impl DataIdentifier {
-    /// List of permissible DataIdentifiers to be rendered in documentation
-    fn api_examples() -> Vec<serde_json::Value> {
-        DataIdentifierDiscriminant::iter()
-            .flat_map(|kind| match kind {
-                DataIdentifierDiscriminant::Custom => {
-                    vec![DataIdentifier::Custom(KvDataKey::from("*".to_string()))]
-                }
-                DataIdentifierDiscriminant::Id => {
-                    IdentityDataKind::iter().map(DataIdentifier::from).collect_vec()
-                }
-                DataIdentifierDiscriminant::Business => {
-                    BusinessDataKind::iter().map(DataIdentifier::from).collect_vec()
-                }
-                DataIdentifierDiscriminant::InvestorProfile => InvestorProfileKind::iter()
-                    .map(DataIdentifier::from)
-                    .collect_vec(),
-                DataIdentifierDiscriminant::Document => DocumentDiKind::api_examples()
-                    .into_iter()
-                    .map(DataIdentifier::from)
-                    .collect_vec(),
-                DataIdentifierDiscriminant::Card => CardInfo::api_examples()
-                    .into_iter()
-                    .map(DataIdentifier::from)
-                    .collect_vec(),
-            })
-            .map(|id| serde_json::Value::String(id.to_string()))
-            .collect_vec()
-    }
-}
-
-impl paperclip::v2::schema::Apiv2Schema for DataIdentifier {
-    fn name() -> Option<String> {
-        Some("DataIdentifier".to_string())
-    }
-
-    fn description() -> &'static str {
-        "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items."
-    }
-
-    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        use paperclip::v2::models::DefaultSchemaRaw;
-        DefaultSchemaRaw {
-            name: Some("DataIdentifier".into()),
-            data_type: Some(DataType::String),
-            enum_: Self::api_examples(),
-            ..Default::default()
-        }
-    }
-}
-impl paperclip::actix::OperationModifier for DataIdentifier {}
-
 /// A custom implementation to make the appearance of serialized DataIdentifiers much more
 /// reasonable. We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
@@ -437,6 +385,7 @@ mod tests {
     use crate::DocumentSide;
     use crate::IdDocKind;
     use itertools::Itertools;
+    use strum::IntoEnumIterator;
     use test_case::test_case;
 
     #[test_case(DataIdentifier::Id(IdentityDataKind::PhoneNumber) => "id.phone_number")]

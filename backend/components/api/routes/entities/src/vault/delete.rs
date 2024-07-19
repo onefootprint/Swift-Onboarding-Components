@@ -21,8 +21,10 @@ use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
+use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -39,6 +41,7 @@ pub struct DeleteRequest {
     /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,
     /// `custom.account_id`
     #[openapi(example = r#"["id.first_name", "id.last_name"]"#)]
+    #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     fields: Option<Vec<DataIdentifier>>,
     /// When true, deletes all data in the vault.
     #[openapi(example = "null")]
@@ -51,6 +54,7 @@ pub struct BusinessDeleteRequest {
     /// List of data identifiers to delete. For example, `business.name`, `business.website`,
     /// `custom.account_id`
     #[openapi(example = r#"["business.name", "business.website"]"#)]
+    #[openapi(serialize_as = "Option<Vec<BusinessDataIdentifier>>")]
     fields: Option<Vec<DataIdentifier>>,
     /// When true, deletes all data in the vault.
     #[openapi(example = "null")]
@@ -58,24 +62,22 @@ pub struct BusinessDeleteRequest {
 }
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
-pub struct BusinessDeleteResponse(HashMap<DataIdentifier, bool>);
-
+pub struct UserDeleteResponse(HashMap<DataIdentifier, bool>);
 impl_map_apiv2_schema!(
-    BusinessDeleteResponse<DataIdentifier, bool>,
+    UserDeleteResponse<UserDataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
     {"id.first_name": true, "id.last_name": false}
 );
-impl_response_type!(BusinessDeleteResponse);
+impl_response_type!(UserDeleteResponse);
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
-pub struct DeleteBusinessVaultResponse(HashMap<DataIdentifier, bool>);
-
+pub struct BusinessDeleteResponse(HashMap<DataIdentifier, bool>);
 impl_map_apiv2_schema!(
-    DeleteBusinessVaultResponse<DataIdentifier, bool>,
+    BusinessDeleteResponse<BusinessDataIdentifier, bool>,
     "A key-value map of identifier to whether the identifier was successfully deleted in the business vault",
     {"business.name": true, "custom.account_id": false}
 );
-impl_response_type!(DeleteBusinessVaultResponse);
+impl_response_type!(BusinessDeleteResponse);
 
 #[route_alias(actix::delete(
     "/users/{fp_id}/vault",
@@ -93,10 +95,10 @@ pub async fn delete(
     request: Json<DeleteRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> ApiResponse<BusinessDeleteResponse> {
+) -> ApiResponse<UserDeleteResponse> {
     let DeleteRequest { delete_all, fields } = request.into_inner();
     let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
-    Ok(BusinessDeleteResponse(result))
+    Ok(UserDeleteResponse(result))
 }
 
 #[api_v2_operation(
@@ -110,10 +112,10 @@ pub async fn delete_business(
     request: Json<BusinessDeleteRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> ApiResponse<DeleteBusinessVaultResponse> {
+) -> ApiResponse<BusinessDeleteResponse> {
     let BusinessDeleteRequest { delete_all, fields } = request.into_inner();
     let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
-    Ok(DeleteBusinessVaultResponse(result))
+    Ok(BusinessDeleteResponse(result))
 }
 
 async fn delete_inner(
