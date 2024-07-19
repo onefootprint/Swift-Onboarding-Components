@@ -384,7 +384,7 @@ impl<Type> WriteableVw<Type> {
         data: Vec<(DataIdentifier, PiiString)>,
         create_fingerprints: bool,
     ) -> FpResult<Vec<(DataIdentifier, ContactInfo)>> {
-        let sv = ScopedVault::get(conn, &self.scoped_vault_id)?;
+        let sv = ScopedVault::get(conn, &self.sv.id)?;
         let data = HashMap::from_iter(data);
         let request =
             DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(self.vault.is_live))?;

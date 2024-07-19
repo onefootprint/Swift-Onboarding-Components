@@ -75,7 +75,7 @@ impl WriteableVw<Person> {
         // TODO only portablize data collected by the ob config rather than all data
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
-        let Self { uvw, scoped_vault_id } = self;
+        let Self { uvw, sv } = self;
         // Use the same seqno to deactivate old data and portablize new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
@@ -112,7 +112,7 @@ impl WriteableVw<Person> {
             .filter_map(|di| speculative.remove(&di))
             .collect();
 
-        DataLifetime::bulk_portablize_for_tenant(conn, to_portablize_ids, &scoped_vault_id, seqno)?;
+        DataLifetime::bulk_portablize_for_tenant(conn, to_portablize_ids, &sv.id, seqno)?;
 
         Ok(seqno)
     }
@@ -128,7 +128,7 @@ impl WriteableVw<Person> {
             .get_lifetime(&di)
             .ok_or(AssertionError("No lifetime for CI"))?;
         let ci = ContactInfo::get(conn, &lifetime.id)?;
-        let is_first_time_verifying_ci = on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;
+        let is_first_time_verifying_ci = on_otp_verified(conn, ci, &self.sv.id, &self.vault.id)?;
         Ok(is_first_time_verifying_ci)
     }
 }

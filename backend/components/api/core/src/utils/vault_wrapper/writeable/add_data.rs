@@ -130,7 +130,7 @@ impl<Type> WriteableVw<Type> {
                 actor: actor.map(|a| a.into()),
                 is_prefill,
             };
-            UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_vault_id.clone())?;
+            UserTimeline::create(conn, info, self.vault.id.clone(), self.sv.id.clone())?;
         }
         Ok(())
     }
@@ -182,7 +182,7 @@ impl WriteableVw<Person> {
         make_timeline_event: bool,
     ) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
-        let su_id = self.scoped_vault_id.clone();
+        let su_id = self.sv.id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();

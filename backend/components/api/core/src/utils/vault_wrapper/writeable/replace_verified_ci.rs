@@ -37,7 +37,7 @@ impl<Type> WriteableVw<Type> {
             .into_iter()
             .next()
             .ok_or(AssertionError("Didn't make CI"))?;
-        on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;
+        on_otp_verified(conn, ci, &self.sv.id, &self.vault.id)?;
         Ok(())
     }
 }

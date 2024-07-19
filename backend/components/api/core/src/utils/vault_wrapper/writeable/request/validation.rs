@@ -103,7 +103,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id), None, false)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.sv.id), None, false)?;
         let request = ValidatedDataRequest {
             data,
             old_ci,

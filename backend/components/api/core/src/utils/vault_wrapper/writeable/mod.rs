@@ -1,7 +1,7 @@
 use super::VaultWrapper;
+use db::models::scoped_vault::ScopedVault;
 use derive_more::Deref;
 use newtypes::Locked;
-use newtypes::ScopedVaultId;
 
 mod add_data;
 mod build;
@@ -40,5 +40,5 @@ pub use add_data::PatchDataResult;
 pub struct WriteableVw<Type> {
     #[deref]
     uvw: Locked<VaultWrapper<Type>>,
-    scoped_vault_id: ScopedVaultId,
+    sv: ScopedVault,
 }

@@ -75,7 +75,7 @@ impl ValidatedDataRequest {
         }
 
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Saving DIs");
-        let sv_id = &vw.scoped_vault_id;
+        let sv_id = &vw.sv.id;
         let v_id = &vw.vault.id;
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data

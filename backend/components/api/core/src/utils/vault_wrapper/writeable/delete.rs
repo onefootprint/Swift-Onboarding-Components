@@ -11,10 +11,10 @@ impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::soft_delete_vault", skip_all)]
     pub fn soft_delete_vault(self, conn: &mut TxnPgConn) -> FpResult<()> {
         tracing::info!(
-            scoped_vault_id = ?self.scoped_vault_id,
+            scoped_vault_id = ?self.sv.id,
             "Deactivating entire scoped vault"
         );
-        let _ = ScopedVault::deactivate(conn, &self.scoped_vault_id)?;
+        let _ = ScopedVault::deactivate(conn, &self.sv.id)?;
 
         Ok(())
     }
@@ -35,7 +35,7 @@ impl<Type> WriteableVw<Type> {
             .into_iter()
             .flat_map(|di| self.data(&di).map(|d| (di, d)))
             // To be extra safe, make sure this tenant added the data
-            .filter(|(_, d)| d.lifetime.scoped_vault_id == self.scoped_vault_id)
+            .filter(|(_, d)| d.lifetime.scoped_vault_id == self.sv.id)
             .map(|(di, d)| (di, d.lifetime.id.clone()))
             .unzip();
 

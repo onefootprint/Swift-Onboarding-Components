@@ -2,7 +2,7 @@ use super::WriteableVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
-use db::models::vault::Vault;
+use db::models::scoped_vault::ScopedVault;
 use db::TxnPgConn;
 use newtypes::Locked;
 use newtypes::ScopedVaultId;
@@ -13,14 +13,14 @@ impl<Type> VaultWrapper<Type> {
     /// speculative data that has been added by previous operations
     pub fn lock_for_onboarding(
         conn: &mut TxnPgConn,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault_id: &ScopedVaultId,
     ) -> FpResult<WriteableVw<Type>> {
         // Lock the UserVault in this transaction, then build the UVW
-        Vault::lock_by_scoped_user(conn, scoped_user_id)?;
-        let uvw = Self::build(conn, VwArgs::Tenant(scoped_user_id))?;
+        let sv = ScopedVault::lock(conn, scoped_vault_id)?;
+        let uvw = Self::build(conn, VwArgs::Tenant(scoped_vault_id))?;
         let ob_uvw = WriteableVw::<Type> {
             uvw: Locked::new(uvw),
-            scoped_vault_id: scoped_user_id.clone(),
+            sv: sv.into_inner(),
         };
         Ok(ob_uvw)
     }

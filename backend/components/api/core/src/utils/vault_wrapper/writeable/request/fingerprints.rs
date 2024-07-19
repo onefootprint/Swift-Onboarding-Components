@@ -5,7 +5,6 @@ use crate::FpResult;
 use db::models::fingerprint::Fingerprint as DbFingerprint;
 use db::models::fingerprint::FingerprintDataValue;
 use db::models::fingerprint::NewFingerprintArgs;
-use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::chain;
@@ -49,8 +48,6 @@ impl Fingerprints {
         new_vd: &[VaultData],
     ) -> FpResult<()> {
         let Self { fps, salt_to_dl_id } = self;
-        let sv = ScopedVault::get(conn, &vw.scoped_vault_id)?;
-
         struct FingerprintData<'a> {
             kind: FingerprintKind,
             data: FingerprintDataValue,
@@ -104,7 +101,7 @@ impl Fingerprints {
         let fps: HashMap<_, _> = fps.into_iter().collect();
         let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
         let vd_kinds = new_vd.keys().cloned().collect_vec();
-        let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id)
+        let composite_fingerprints = CompositeFingerprint::list(&vw.sv.tenant_id)
             .into_iter()
             .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
             .map(|cfp| -> FpResult<_> {
@@ -182,10 +179,10 @@ impl Fingerprints {
                     scope,
                     version: newtypes::FingerprintVersion::current(),
                     // Denormalized fields
-                    scoped_vault_id: &sv.id,
-                    vault_id: &sv.vault_id,
-                    tenant_id: &sv.tenant_id,
-                    is_live: sv.is_live,
+                    scoped_vault_id: &vw.sv.id,
+                    vault_id: &vw.sv.vault_id,
+                    tenant_id: &vw.sv.tenant_id,
+                    is_live: vw.sv.is_live,
                 }
             })
             .collect();
