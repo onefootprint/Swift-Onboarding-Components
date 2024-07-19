@@ -45,6 +45,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::user_timeline;
     use db_schema::schema::vault;
     use db_schema::schema::vault_data;
+    use db_schema::schema::vault_dr_blob;
     use db_schema::schema::verification_request;
     use db_schema::schema::verification_result;
     use db_schema::schema::watchlist_check;
@@ -102,6 +103,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         let dl_ids = data_lifetime::table
             .filter(data_lifetime::vault_id.eq_any(&v_ids))
             .select(data_lifetime::id);
+
+        deleted_rows += diesel::delete(vault_dr_blob::table)
+            .filter(vault_dr_blob::data_lifetime_id.eq_any(dl_ids.clone()))
+            .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(vault_data::table)
             .filter(vault_data::lifetime_id.eq_any(dl_ids.clone()))
