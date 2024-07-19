@@ -565,6 +565,22 @@ impl ObConfigurationArgsToValidate {
                             Ok(())
                         }
                     }
+                    newtypes::VerificationCheck::Aml {
+                        ofac,
+                        pep,
+                        adverse_media,
+                        continuous_monitoring: _,
+                        adverse_media_lists: _,
+                    } => {
+                        if !(*adverse_media || *ofac || *pep) {
+                            Err(TenantError::ValidationError(
+                                "at least one of adverse_media, ofac, or pep must be set for AML verification check".to_owned(),
+                            )
+                            .into())
+                        } else {
+                            Ok(())
+                        }
+                    }
                     _ => Ok(()),
                 }
             })?;

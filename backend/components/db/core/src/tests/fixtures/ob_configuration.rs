@@ -113,8 +113,12 @@ pub fn create_with_opts(
     let documents_to_collect = vec![];
     let skip_kyb = false;
     let curp_validation_enabled = false;
-    let verification_checks =
-        VerificationChecks::new(verification_checks, Some(skip_kyc), enhanced_aml.clone());
+    let verification_checks = VerificationChecks::new(
+        tenant_id,
+        verification_checks,
+        Some(skip_kyc),
+        Some(enhanced_aml.clone()),
+    );
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),

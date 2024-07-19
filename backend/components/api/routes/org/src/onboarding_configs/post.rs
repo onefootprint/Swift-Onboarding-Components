@@ -11,16 +11,13 @@ use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
 use db::models::rule_set_version::RuleSetVersion;
-use newtypes::AdverseMediaListKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAml;
-use newtypes::EnhancedAmlOption;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
-use newtypes::TenantId;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use paperclip::actix::api_v2_operation;
@@ -109,13 +106,11 @@ pub async fn post(
 
 
     // TODO: clean this up by surfacing AM lists in FE
-    let db_enhanced_aml = api_enhanced_aml
-        .map(|r| r.into())
-        .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
-        .unwrap_or(EnhancedAmlOption::No);
+    let db_enhanced_aml = api_enhanced_aml.map(|r| r.into());
 
     // VERIFICATION CHECK MIGRATION: construct verification checks
-    let verification_checks = VerificationChecks::new(verification_checks, skip_kyc, db_enhanced_aml.clone());
+    let verification_checks =
+        VerificationChecks::new(tenant_id, verification_checks, skip_kyc, db_enhanced_aml.clone());
 
     // TODO: remove this
     let skip_kyb = match kind {
@@ -174,22 +169,4 @@ pub async fn post(
         rs,
         state.ff_client.clone(),
     )))
-}
-
-// TODO: add lists to FE and stop this hacking
-fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
-    if tenant_id.is_composer() {
-        Some(EnhancedAmlOption::Yes {
-            ofac: true,
-            pep: true,
-            adverse_media: true,
-            continuous_monitoring: false,
-            adverse_media_lists: Some(vec![
-                AdverseMediaListKind::FinancialCrime,
-                AdverseMediaListKind::Fraud,
-            ]),
-        })
-    } else {
-        None
-    }
 }

@@ -435,15 +435,20 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_confirm=True,
-                enhanced_aml=dict(
-                    enhanced_aml=True,
-                    ofac=True,
-                    pep=True,
-                    adverse_media=True,
-                ),
                 allow_us_residents=True,
                 allow_us_territories=True,
-                verification_checks=[{"kind": "kyc", "data": {}}],
+                verification_checks=[
+                    dict(kind="kyc", data=dict()),
+                    dict(
+                        kind="aml",
+                        data=dict(
+                            ofac=True,
+                            pep=True,
+                            adverse_media=True,
+                            continuous_monitoring=True,
+                        ),
+                    ),
+                ],
             ),
             "Missing required data options: ssn9 for cip: alpaca",
         ),
@@ -491,15 +496,20 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_confirm=True,
-                enhanced_aml=dict(
-                    enhanced_aml=True,
-                    ofac=True,
-                    pep=True,
-                    adverse_media=True,
-                ),
                 allow_us_residents=True,
                 allow_us_territories=False,
-                verification_checks=[{"kind": "kyc", "data": {}}],
+                verification_checks=[
+                    dict(kind="kyc", data=dict()),
+                    dict(
+                        kind="aml",
+                        data=dict(
+                            ofac=True,
+                            pep=True,
+                            adverse_media=True,
+                            continuous_monitoring=True,
+                        ),
+                    ),
+                ],
             ),
             "Validation error: Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true",
         ),
@@ -554,7 +564,18 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
-                verification_checks=[{"kind": "kyc", "data": {}}],
+                verification_checks=[
+                    dict(kind="kyc", data=dict()),
+                    dict(
+                        kind="aml",
+                        data=dict(
+                            ofac=True,
+                            pep=False,
+                            adverse_media=False,
+                            continuous_monitoring=False,
+                        ),
+                    ),
+                ],
             ),
             "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
         ),
@@ -601,15 +622,9 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind="alpaca",
                 skip_confirm=True,
-                enhanced_aml=dict(
-                    enhanced_aml=False,
-                    ofac=False,
-                    pep=False,
-                    adverse_media=False,
-                ),
                 allow_us_residents=True,
                 allow_us_territories=True,
-                verification_checks=[{"kind": "kyc", "data": {}}],
+                verification_checks=[{"kind": "kyc", "data": {}}],  # no AML check
             ),
             "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
         ),
@@ -651,12 +666,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind=None,
                 skip_confirm=False,
-                enhanced_aml=dict(
-                    enhanced_aml=False,
-                    ofac=False,
-                    pep=False,
-                    adverse_media=False,
-                ),
                 allow_us_residents=False,
                 allow_us_territories=False,
                 documents_to_collect=[
@@ -710,12 +719,6 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 cip_kind=None,
                 skip_confirm=False,
-                enhanced_aml=dict(
-                    enhanced_aml=False,
-                    ofac=False,
-                    pep=False,
-                    adverse_media=False,
-                ),
                 allow_us_residents=True,
                 allow_us_territories=False,
                 business_documents_to_collect=[
@@ -1012,6 +1015,65 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         assert res["message"] == expected_error
     else:
         assert res["enhanced_aml"] == enhanced_aml
+
+
+@pytest.mark.parametrize(
+    "enhanced_aml,expected_error",
+    [
+        (
+            dict(
+                ofac=True,
+                pep=True,
+                adverse_media=False,
+            ),
+            None,
+        ),
+        (
+            dict(
+                ofac=False,
+                pep=False,
+                adverse_media=False,
+            ),
+            "Validation error: at least one of adverse_media, ofac, or pep must be set for AML verification check",
+        ),
+    ],
+)
+def test_enhanced_aml_with_verification_checks(
+    sandbox_tenant, must_collect_data, enhanced_aml, expected_error
+):
+
+    # with verification checks
+    aml_check = dict(
+        kind="aml",
+        data=dict(
+            ofac=enhanced_aml["ofac"],
+            pep=enhanced_aml["pep"],
+            adverse_media=enhanced_aml["adverse_media"],
+            continuous_monitoring=True,
+            adverse_media_lists=None,
+        ),
+    )
+    verification_checks = [dict(kind="kyc", data=dict()), aml_check]
+
+    data = dict(
+        name="Yo",
+        must_collect_data=must_collect_data,
+        optional_data=[],
+        can_access_data=must_collect_data,
+        kind="kyc",
+        verification_checks=verification_checks,
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200 if expected_error is None else 400,
+    )
+
+    if expected_error:
+        assert res["message"] == expected_error
+    else:
+        assert aml_check in res["verification_checks"]
 
 
 def test_config_update(sandbox_tenant, ob_configuration):

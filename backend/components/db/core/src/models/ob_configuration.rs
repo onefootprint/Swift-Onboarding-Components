@@ -21,6 +21,7 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use itertools::Itertools;
+use newtypes::AdverseMediaListKind;
 use newtypes::ApiKeyStatus;
 use newtypes::AppearanceId;
 use newtypes::AuthMethodKind;
@@ -752,18 +753,21 @@ impl ObConfiguration {
     }
 }
 
+
 // Helper to more easily interact with verification checks
 #[derive(Default, Clone)]
 pub struct VerificationChecks(Vec<VerificationCheck>);
 impl VerificationChecks {
     pub fn new(
+        tenant_id: &TenantId,
         checks_from_request: Option<Vec<VerificationCheck>>,
         skip_kyc: Option<bool>,
-        enhanced_aml: EnhancedAmlOption,
+        enhanced_aml: Option<EnhancedAmlOption>,
     ) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
         VerificationChecks(Self::create_verification_checks_from_obc_request(
+            tenant_id,
             vc,
             skip_kyc,
             enhanced_aml,
@@ -773,35 +777,58 @@ impl VerificationChecks {
     // 2024-07-16 temporary while we're migrating to verification checks
     // Eventually this will just be a passthrough
     fn create_verification_checks_from_obc_request(
+        tenant_id: &TenantId,
         mut checks: Vec<VerificationCheck>,
         skip_kyc: Option<bool>,
-        enhanced_aml: EnhancedAmlOption,
+        enhanced_aml: Option<EnhancedAmlOption>,
     ) -> Vec<VerificationCheck> {
-        if let Some(skip) = skip_kyc {
+        let skip_kyc_migrated = if let Some(skip) = skip_kyc {
             if !skip {
                 checks.push(VerificationCheck::Kyc {});
             }
-        }
 
-        match enhanced_aml {
-            EnhancedAmlOption::No => (),
-            EnhancedAmlOption::Yes {
-                ofac,
-                pep,
-                adverse_media,
-                continuous_monitoring,
-                adverse_media_lists,
-            } => {
-                let aml_check = VerificationCheck::Aml {
+            false
+        } else {
+            true
+        };
+        Self::log_for_migration("skip_kyc", skip_kyc_migrated);
+
+
+        let enhanced_aml_migrated = if let Some(enhanced) = enhanced_aml {
+            match enhanced {
+                EnhancedAmlOption::No => (),
+                EnhancedAmlOption::Yes {
                     ofac,
                     pep,
                     adverse_media,
                     continuous_monitoring,
                     adverse_media_lists,
-                };
-                checks.push(aml_check);
+                } => {
+                    let am_lists = if tenant_id.is_composer() {
+                        Some(vec![
+                            AdverseMediaListKind::FinancialCrime,
+                            AdverseMediaListKind::Fraud,
+                        ])
+                    } else {
+                        adverse_media_lists
+                    };
+                    let aml_check = VerificationCheck::Aml {
+                        ofac,
+                        pep,
+                        adverse_media,
+                        continuous_monitoring,
+                        adverse_media_lists: am_lists,
+                    };
+                    checks.push(aml_check);
+                }
             }
-        }
+
+            false
+        } else {
+            true
+        };
+
+        Self::log_for_migration("enhanced_aml", enhanced_aml_migrated);
 
         checks
     }
@@ -820,6 +847,10 @@ impl VerificationChecks {
 
     pub fn from_existing(existing: &ObConfiguration) -> Self {
         Self(existing.verification_checks.clone().unwrap_or_default())
+    }
+
+    fn log_for_migration(field: &str, fe_migrated: bool) {
+        tracing::info!(?field, ?fe_migrated, "VerificationCheck migration");
     }
 }
 
