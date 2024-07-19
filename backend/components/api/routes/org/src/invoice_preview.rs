@@ -7,6 +7,7 @@ use billing::interval::get_billing_interval;
 use chrono::DateTime;
 use chrono::TimeZone;
 use chrono::Utc;
+use itertools::Itertools;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -50,6 +51,7 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<In
     let last_updated_at = last_updated_at.and_then(|d| Utc.timestamp_opt(d, 0).single());
     let line_items = line_items
         .into_iter()
+        .sorted_by_key(|li| li.date)
         .map(|li| LineItem {
             id: li.id.to_string(),
             description: li.description,
