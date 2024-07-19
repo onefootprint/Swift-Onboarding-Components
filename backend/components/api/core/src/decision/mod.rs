@@ -7,7 +7,6 @@ use newtypes::VerificationResultId;
 pub mod biz_risk;
 pub mod business_insights;
 pub mod document;
-pub mod engine;
 pub mod features;
 pub mod field_validations;
 pub mod onboarding;

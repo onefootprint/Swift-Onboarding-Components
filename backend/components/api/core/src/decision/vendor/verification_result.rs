@@ -1,6 +1,5 @@
 use super::make_request::VerificationRequestWithVendorResponse;
 use super::VendorAPIError;
-use crate::decision::engine::VendorResults;
 use crate::enclave_client::EnclaveClient;
 use crate::FpResult;
 use api_errors::FpError;
@@ -171,9 +170,23 @@ pub fn save_vres(
     match vendor_result {
         Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr.clone()), public_key),
         Err(e) => {
-            let json = VendorResults::vendor_api_error_to_json(e);
+            let json = vendor_api_error_to_json(e);
             save_error_verification_result(conn, &(vreq.clone(), json), public_key)
         }
+    }
+}
+
+// TODO: extend this to more vendors?
+fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJsonValue> {
+    match &vendor_api_error.error {
+        idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
+            Some(e.response.clone())
+        }
+        idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
+            Some(e.response.clone())
+        }
+        idv::Error::StytchError(idv::stytch::error::Error::ErrorWithResponse(e)) => Some(e.response.clone()),
+        _ => None,
     }
 }
 
