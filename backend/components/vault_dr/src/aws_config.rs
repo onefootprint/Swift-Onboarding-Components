@@ -4,6 +4,10 @@ use aws_config::default_provider::credentials::DefaultCredentialsChain;
 use aws_config::Region;
 use aws_sdk_s3::config::SharedCredentialsProvider;
 use aws_sdk_s3::error::ProvideErrorMetadata;
+use aws_sdk_s3::operation::get_bucket_location::GetBucketLocationError;
+use aws_sdk_s3::operation::get_object::GetObjectError;
+use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Error;
+use aws_sdk_s3::operation::put_object::PutObjectError;
 use aws_types::SdkConfig;
 use newtypes::PiiString;
 use std::fmt::Debug;
@@ -179,7 +183,7 @@ impl VaultDrAwsConfig {
 
             warn!(error=?svc_error, "S3 PutObject failed");
 
-            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
                 Error::RoleValidationFailed(format!("S3 PutObject failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
@@ -197,7 +201,7 @@ impl VaultDrAwsConfig {
 
             warn!(error = ?svc_error, "S3 ListObjectsV2 failed");
 
-            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
                 Error::RoleValidationFailed(format!("S3 ListObjectsV2 failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
@@ -212,7 +216,7 @@ impl VaultDrAwsConfig {
 
             warn!(error = ?svc_error, "S3 GetBucketLocation failed");
 
-            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+            if aws_error_has_code(&svc_error, &["AccessDenied", "NoSuchBucket"]) {
                 Error::RoleValidationFailed(format!("S3 GetBucketLocation failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
@@ -265,7 +269,7 @@ impl VaultDrAwsConfig {
                 let svc_error = e.into_service_error();
 
                 info!(error = ?svc_error, "S3 GetObject failed as expected. Expected code is AccessDenied");
-                if svc_error.code() != Some("AccessDenied") {
+                if aws_error_has_code(&svc_error, &["AccessDenied"]) {
                     return Err(Box::new(svc_error).into());
                 }
             }
@@ -273,4 +277,53 @@ impl VaultDrAwsConfig {
 
         Ok(())
     }
+}
+
+// The AWS SDK doesn't make it easy to check for specific error codes. The real error code of
+// interest may be nested in an Error source(). The problem is that an Error source() is a boxed
+// Error, but the error code is retrieved using the ProvideErrorMetadata trait. We can't downcast
+// an Error into a different trait object, only known types. So we have to manually try the
+// downcast on each known concrete type. To wrap this up in a misuse-resistant API, we define a
+// trait KnownAwsError implemented by known error types.
+trait KnownAwsError: std::error::Error + ProvideErrorMetadata + 'static {}
+
+macro_rules! register_known_aws_errors {
+    ( $( $x:ident ),* ) => {
+        $(
+            impl KnownAwsError for $x {}
+        )*
+
+        fn _known_error_has_code(err: &(dyn std::error::Error + 'static), codes: &[&str]) -> bool {
+            // Recursively check the error sources.
+            if let Some(source_err) = err.source() {
+                if _known_error_has_code(source_err, codes) {
+                    return true;
+                }
+            }
+
+            // Try downcasting into each known error type.
+            $(
+                if let Some(aws_err) = (&err).downcast_ref::<$x>() {
+                    for code in codes {
+                        if aws_err.code() == Some(*code) {
+                            return true;
+                        }
+                    }
+                }
+            )*
+
+            false
+        }
+    };
+}
+
+register_known_aws_errors!(
+    GetObjectError,
+    PutObjectError,
+    GetBucketLocationError,
+    ListObjectsV2Error
+);
+
+fn aws_error_has_code(err: &impl KnownAwsError, codes: &[&str]) -> bool {
+    _known_error_has_code(err, codes)
 }
