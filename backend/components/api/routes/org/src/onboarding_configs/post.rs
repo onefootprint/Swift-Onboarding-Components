@@ -19,7 +19,6 @@ use newtypes::EnhancedAml;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
 use newtypes::VerificationCheck;
-use newtypes::VerificationCheckKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -112,14 +111,6 @@ pub async fn post(
     let verification_checks =
         VerificationChecks::new(tenant_id, verification_checks, skip_kyc, db_enhanced_aml.clone());
 
-    // TODO: remove this
-    let skip_kyb = match kind {
-        ObConfigurationKind::Kyb => !verification_checks
-            .inner()
-            .iter()
-            .any(|c| matches!(c.into(), VerificationCheckKind::Kyb)),
-        _ => false,
-    };
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
 
     let args = NewObConfigurationArgs {
@@ -140,7 +131,6 @@ pub async fn post(
         allow_us_residents: allow_us_residents.unwrap_or(true),
         allow_us_territory_residents: allow_us_territories.unwrap_or(false),
         kind,
-        skip_kyb,
         skip_confirm: skip_confirm.unwrap_or(false),
         document_types_and_countries,
         documents_to_collect,

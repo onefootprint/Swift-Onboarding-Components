@@ -30,7 +30,6 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind: ObConfigurationKind::Kyc,
-        skip_kyb: false,
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
@@ -111,7 +110,6 @@ pub fn create_with_opts(
         verification_checks,
     } = opts;
     let documents_to_collect = vec![];
-    let skip_kyb = false;
     let curp_validation_enabled = false;
     let verification_checks = VerificationChecks::new(
         tenant_id,
@@ -136,7 +134,6 @@ pub fn create_with_opts(
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind,
-        skip_kyb,
         skip_confirm: false,
         document_types_and_countries,
         documents_to_collect,

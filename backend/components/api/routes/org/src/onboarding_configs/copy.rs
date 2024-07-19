@@ -156,7 +156,6 @@ fn copy_playbook(
     name: String,
 ) -> NewObConfigurationArgs {
     let verification_checks = VerificationChecks::from_existing(&pb);
-    let skip_kyb = verification_checks.skip_kyb();
     let ObConfiguration {
         must_collect_data,
         can_access_data,
@@ -214,7 +213,6 @@ fn copy_playbook(
         allow_us_residents,
         allow_us_territory_residents,
         kind,
-        skip_kyb,
         skip_confirm,
         document_types_and_countries,
         curp_validation_enabled,

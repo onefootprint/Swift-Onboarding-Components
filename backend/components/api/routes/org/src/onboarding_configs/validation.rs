@@ -556,9 +556,9 @@ impl ObConfigurationArgsToValidate {
             .try_for_each(|c| -> FpResult<()> {
                 match c {
                     newtypes::VerificationCheck::Kyb { .. } => {
-                        if !matches!(&self.kind, &ObConfigurationKind::Kyb) || self.skip_kyb {
+                        if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
                             Err(TenantError::ValidationError(
-                                "Cannot run KYB for non-KYB or skip_kyb Playbooks".to_owned(),
+                                "Cannot run KYB for non-KYB Playbooks".to_owned(),
                             )
                             .into())
                         } else {
@@ -584,29 +584,6 @@ impl ObConfigurationArgsToValidate {
                     _ => Ok(()),
                 }
             })?;
-
-        // validate we are sending the checks appropriately during the migration
-        match self.kind {
-            ObConfigurationKind::Kyb => {
-                if !self.skip_kyb
-                    && !self
-                        .verification_checks
-                        .inner()
-                        .iter()
-                        .any(|c| matches!(c.into(), VerificationCheckKind::Kyb))
-                {
-                    Err(FpError::from(TenantError::ValidationError(
-                        "Must provide a kyb verification_check if skip_kyb=false".to_owned(),
-                    )))
-                } else {
-                    Ok(())
-                }
-            }
-            // TODO: finish these
-            ObConfigurationKind::Kyc => Ok(()),
-            ObConfigurationKind::Auth => Ok(()),
-            ObConfigurationKind::Document => Ok(()),
-        }?;
 
         // validate against collected data
         self.verification_checks

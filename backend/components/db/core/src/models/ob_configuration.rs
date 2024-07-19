@@ -393,7 +393,6 @@ pub struct NewObConfigurationArgs {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
-    pub skip_kyb: bool,
     pub skip_confirm: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     pub curp_validation_enabled: bool,
@@ -594,6 +593,7 @@ impl ObConfiguration {
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
         let enhanced_aml = args.verification_checks.enhanced_aml();
+        let skip_kyb = args.verification_checks.skip_kyb();
         let NewObConfigurationArgs {
             name,
             tenant_id,
@@ -611,7 +611,6 @@ impl ObConfiguration {
             allow_us_residents,
             allow_us_territory_residents,
             kind,
-            skip_kyb,
             skip_confirm,
             document_types_and_countries,
             documents_to_collect,

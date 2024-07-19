@@ -913,7 +913,7 @@ def test_skip_kyc(
             ],
             "kyc",
             [{"kind": "kyb", "data": {"ein_only": False}}],
-            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks",
+            "Validation error: Cannot run KYB for non-KYB Playbooks",
         ),
         (
             [
@@ -925,7 +925,7 @@ def test_skip_kyc(
             ],
             "kyc",
             [{"kind": "kyb", "data": {"ein_only": True}}],
-            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks",
+            "Validation error: Cannot run KYB for non-KYB Playbooks",
         ),
     ],
 )
