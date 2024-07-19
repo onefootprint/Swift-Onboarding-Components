@@ -1,9 +1,9 @@
+use super::make_request;
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::eval::RuleEvalConfig;
 use crate::decision::vendor::get_vendor_apis_for_verification_requests;
 use crate::decision::vendor::kyc::waterfall_rules::WaterfallRuleAction;
-use crate::decision::vendor::make_request;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_result::HydratedVerificationResult;
 use crate::decision::vendor::vendor_result::RequestAndMaybeHydratedResult;
@@ -100,7 +100,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     for waterfall_vendor_api in ordered_apis {
         let eid = waterfall_execution.id.clone();
         let eid2 = eid.clone();
-        let v_api = waterfall_vendor_api.clone().into();
+        let v_api = waterfall_vendor_api.into();
         let step = state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
@@ -117,7 +117,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
             &di.scoped_vault_id,
             &di.id,
             ob_configuration_key.clone(),
-            waterfall_vendor_api.into(),
+            waterfall_vendor_api,
         )
         .await?;
         let vres_id = vres.id.clone();

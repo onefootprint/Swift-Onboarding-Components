@@ -1,14 +1,19 @@
 #![allow(clippy::too_many_arguments)]
-use super::tenant_vendor_control::TenantVendorControl;
-use super::vendor_trait::VendorAPIResponse;
-use super::*;
+use super::waterfall_vendor_api::WaterfallVendorAPI;
+use crate::decision::vendor::build_request;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_trait::VendorAPIResponse;
+use crate::decision::vendor::verification_result;
+use crate::decision::vendor::VendorAPIError;
 use crate::vendor_clients::VendorClient;
+use crate::FpResult;
 use crate::State;
-use db::models::ob_configuration::ObConfiguration;
+use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
-use db::DbError;
+use db::models::verification_result::VerificationResult;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
+use idv::experian::error::Error as ExperianError;
 use idv::experian::ExperianCrossCoreRequest;
 use idv::experian::ExperianCrossCoreResponse;
 use idv::idology::expectid::response::ExpectIDResponse;
@@ -16,35 +21,104 @@ use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::lexis::client::LexisFlexIdRequest;
 use idv::lexis::client::LexisFlexIdResponse;
-use idv::socure::SocureIDPlusAPIResponse;
-use idv::socure::SocureIDPlusRequest;
-use idv::twilio::TwilioLookupV2APIResponse;
-use idv::twilio::TwilioLookupV2Request;
 use idv::ParsedResponse;
 use idv::VendorResponse;
+use newtypes::DecisionIntentId;
 use newtypes::IdvData;
 use newtypes::ObConfigurationKey;
-use newtypes::PiiString;
-use newtypes::VendorAPI;
-use newtypes::WorkflowId;
+use newtypes::ScopedVaultId;
 use std::sync::Arc;
 
-/// /////
-/// DEPRECATED THIS WHOLE FILE WILL BE DELETED DO NOT USE
-/// ////
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
+// and returns the success or error response
+#[tracing::instrument(skip(state, tvc))]
+pub async fn make_idv_vendor_call_save_vreq_vres(
+    state: &State,
+    tvc: &TenantVendorControl,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    ob_configuration_key: ObConfigurationKey,
+    vendor_api: WaterfallVendorAPI,
+) -> FpResult<(
+    VerificationRequest,
+    VerificationResult,
+    Result<VendorResponse, VendorAPIError>,
+)> {
+    let (vreq, vendor_result) =
+        make_idv_vendor_call_save_vreq(state, tvc, sv_id, di_id, ob_configuration_key, vendor_api).await?;
+
+    if let Err(err) = vendor_result.as_ref() {
+        let VendorAPIError { vendor_api: _, error } = err;
+        let log_msg = "Error making vendor call";
+        match error {
+            idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => match e.is_known_error() {
+                true => {
+                    tracing::warn!(?err, log_msg);
+                }
+                false => tracing::error!(?err, log_msg),
+            },
+            _ => {
+                tracing::error!(?err, log_msg);
+            }
+        };
+    }
+
+    let sv_id = sv_id.clone();
+    let v_req: VerificationRequest = vreq.clone();
+    let (vres, vendor_result) = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            let uv = Vault::get(conn, &sv_id)?;
+            let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
+            Ok((vres, vendor_result))
+        })
+        .await?;
+
+    Ok((vreq, vres, vendor_result))
+}
+
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
+// and returns the success or error response
+#[tracing::instrument(skip(state, tvc))]
+pub async fn make_idv_vendor_call_save_vreq(
+    state: &State,
+    tvc: &TenantVendorControl,
+    sv_id: &ScopedVaultId,
+    di_id: &DecisionIntentId,
+    ob_configuration_key: ObConfigurationKey,
+    vendor_api: WaterfallVendorAPI,
+) -> FpResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
+    let sv_id = sv_id.clone();
+    let di_id = di_id.clone();
+    let vreq = state
+        .db_pool
+        .db_query(move |conn| VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api.into()).into()))
+        .await?;
+
+    let idv_data = build_request::build_idv_data_from_verification_request(
+        &state.db_pool,
+        &state.enclave_client,
+        vreq.clone(),
+    )
+    .await?;
+
+    Ok((
+        vreq,
+        send_idv_request(state, tvc, vendor_api, idv_data, ob_configuration_key).await,
+    ))
+}
 
 #[tracing::instrument(skip(state, tvc, idv_data))]
 pub async fn send_idv_request(
     state: &State,
     tvc: &TenantVendorControl,
-    vendor_api: VendorAPI,
+    vendor_api: WaterfallVendorAPI,
     idv_data: IdvData,
     ob_configuration_key: ObConfigurationKey,
 ) -> Result<VendorResponse, VendorAPIError> {
     let is_production = state.config.service_config.is_production();
-    // still TODO: traitfy the ff logic shared by these requests
     match vendor_api {
-        VendorAPI::IdologyExpectId => {
+        WaterfallVendorAPI::Idology => {
             let request = tvc.build_idology_request(idv_data);
             send_idology_idv_request(
                 request,
@@ -55,27 +129,7 @@ pub async fn send_idv_request(
             )
             .await
         }
-        VendorAPI::TwilioLookupV2 => {
-            send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await
-        }
-        VendorAPI::SocureIdPlus => {
-            tracing::error!("Socure called in `make_request`");
-            // if we ever add this back, we need to fetch device_id and ip_address
-            let socure_data = SocureData {
-                device_session_id: None,
-                ip_address: None,
-            };
-            send_socure_idv_request(
-                idv_data,
-                socure_data,
-                ob_configuration_key,
-                is_production,
-                state.vendor_clients.socure_id_plus.clone(),
-                state.ff_client.clone(),
-            )
-            .await
-        }
-        VendorAPI::ExperianPreciseId => {
+        WaterfallVendorAPI::Experian => {
             let request = tvc.build_experian_request(idv_data);
             send_experian_idv_request(
                 request,
@@ -86,7 +140,7 @@ pub async fn send_idv_request(
             )
             .await
         }
-        VendorAPI::LexisFlexId => {
+        WaterfallVendorAPI::Lexis => {
             let credentials = tvc.lexis_credentials();
             if let Some(tbi) = tvc.tenant_business_info() {
                 send_lexis_flex_id_request(
@@ -110,33 +164,13 @@ pub async fn send_idv_request(
                 ))
             }
         }
-        api => {
-            let err = format!("send_idv_request not implemented for {}", api);
-            Err(idv::Error::AssertionError(err))
-        }
     }
-    .map_err(|e| VendorAPIError { vendor_api, error: e })
+    .map_err(|e| VendorAPIError {
+        vendor_api: vendor_api.into(),
+        error: e,
+    })
 }
 
-#[tracing::instrument(skip_all)]
-pub async fn send_twilio_lookupv2_request(
-    idv_data: IdvData,
-    twilio_api_call: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> Result<VendorResponse, idv::Error> {
-    twilio_api_call
-        .make_request(TwilioLookupV2Request { idv_data })
-        .await
-        .map(|r| {
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            // TODO put this into a INto
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
-}
 
 #[tracing::instrument(skip_all)]
 pub async fn send_idology_idv_request(
@@ -176,52 +210,6 @@ pub async fn send_idology_idv_request(
     }
 }
 
-#[derive(Clone)]
-pub struct SocureData {
-    pub device_session_id: Option<String>,
-    pub ip_address: Option<PiiString>,
-}
-#[tracing::instrument(skip_all)]
-pub async fn send_socure_idv_request(
-    data: IdvData,
-    socure_data: SocureData,
-    ob_configuration_key: ObConfigurationKey,
-    is_production: bool,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<VendorResponse, idv::Error> {
-    if ff_client.flag(BoolFlag::DisableAllSocure) {
-        Err(idv::Error::VendorCallsDisabledError)
-    } else if is_production || ff_client.flag(BoolFlag::EnableSocureInNonProd(&ob_configuration_key)) {
-        let res = socure_client
-            .make_request(SocureIDPlusRequest {
-                idv_data: data,
-                socure_device_session_id: socure_data.device_session_id,
-                ip_address: socure_data.ip_address,
-            })
-            .await;
-
-        res.map(|r| {
-            // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
-    } else {
-        let response = idv::test_fixtures::socure_idplus_fake_passing_response();
-
-        let parsed_response = idv::socure::parse_response(response.clone())?;
-
-        Ok(VendorResponse {
-            response: ParsedResponse::SocureIDPlus(parsed_response),
-            raw_response: response.into(),
-        })
-    }
-}
 
 #[tracing::instrument(skip_all)]
 pub async fn send_experian_idv_request(
@@ -291,87 +279,6 @@ pub async fn send_lexis_flex_id_request(
     }
 }
 
-/// Make our requests to a vendor, building data from the cached VerificationRequest
-#[tracing::instrument(skip_all)]
-pub async fn make_idv_request(
-    // TODO: really no need to have this and send_idv_request
-    state: &State,
-    tvc: &TenantVendorControl,
-    vendor_api: VendorAPI,
-    idv_data: IdvData,
-    ob_configuration_key: ObConfigurationKey,
-    wf_id: &WorkflowId, // TODO: remove, only used in this random log here
-) -> Result<VendorResponse, VendorAPIError> {
-    tracing::info!(
-        vendor_api = vendor_api.clone().to_string(),
-        workflow_id = %wf_id,
-        "Sending verification request"
-    );
-
-    let vendor_response = send_idv_request(state, tvc, vendor_api, idv_data, ob_configuration_key).await?;
-
-    Ok(vendor_response)
-}
-
-pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
-pub type VerificationRequestWithVendorError = (VerificationRequest, VendorAPIError);
-
-#[tracing::instrument(skip_all,
-    fields(vreqs = ?requests.iter().map(|r| r.id.clone()).collect::<Vec<_>>(),
-    vendors = ?requests.iter().map(|r| r.vendor).collect::<Vec<_>>()))
-]
-pub async fn make_vendor_requests(
-    state: &State,
-    tvc: TenantVendorControl,
-    requests: Vec<VerificationRequest>,
-    wf_id: &WorkflowId, // TODO: remove?
-) -> FpResult<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>> {
-    let requests_with_data =
-        build_request::bulk_build_data_from_requests(&state.db_pool, &state.enclave_client, requests).await?;
-
-    let wfid = wf_id.clone();
-
-    let obc_key = state
-        .db_pool
-        .db_query(move |conn| -> Result<ObConfigurationKey, DbError> {
-            let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
-
-            Ok(obc_key)
-        })
-        .await?;
-
-    let raw_futures_with_vendors = requests_with_data.into_iter().map(|(r, data)| {
-        (
-            r.clone(),
-            make_idv_request(state, &tvc, r.vendor_api, data, obc_key.clone(), wf_id),
-        )
-    });
-
-    let (reqs, raw_futures): (Vec<_>, Vec<_>) = raw_futures_with_vendors.into_iter().unzip();
-    let raw_results = futures::future::join_all(raw_futures).await;
-    let results = raw_results
-        .into_iter()
-        .enumerate()
-        .map(|(idx, res)| {
-            let log_msg = "VerificationRequest failed";
-
-            match res {
-                Ok(vr) => Ok((reqs[idx].clone(), vr)),
-                Err(err) => {
-                    tracing::error!(
-                        ?err,
-                        vendor_api = %err.vendor_api,
-                        log_msg
-                    );
-
-                    Err((reqs[idx].clone(), err))
-                }
-            }
-        })
-        .collect();
-
-    Ok(results)
-}
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]

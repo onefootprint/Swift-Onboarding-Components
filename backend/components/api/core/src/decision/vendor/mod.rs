@@ -7,7 +7,6 @@ use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use itertools::Itertools;
-use newtypes::DecisionIntentId;
 use newtypes::DocumentFixtureResult;
 use newtypes::DocumentRequestKind;
 use newtypes::IdentityDataKind;

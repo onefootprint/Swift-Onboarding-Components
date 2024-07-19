@@ -11,7 +11,7 @@ use newtypes::VendorAPI;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter, Copy)]
 // For now, we just have 1 singular KYC waterfall ordering for all vendors.
 // we only make vendor calls that are available to the tenant as dictated by enabled vendors on
 // TenantVendorControl (with no TVC, we default to Ido)
@@ -54,8 +54,8 @@ impl WaterfallVendorAPI {
         id: VReqIdentifier,
         user_vault_private_key: &EncryptedVaultPrivateKey,
     ) -> FpResult<Vec<VendorResult>> {
-        let futs = Self::iter()
-            .map(|v| Self::get_vendor_result(v.clone(), state, id.clone(), user_vault_private_key));
+        let futs =
+            Self::iter().map(|v| Self::get_vendor_result(v, state, id.clone(), user_vault_private_key));
 
         let res = futures::future::join_all(futs)
             .await
@@ -73,7 +73,7 @@ impl WaterfallVendorAPI {
     pub fn ordered_apis(available_apis: Vec<VendorAPI>) -> Vec<Self> {
         Self::iter()
             .filter(|v| {
-                let vendor_api = v.clone().into();
+                let vendor_api = (*v).into();
                 available_apis.contains(&vendor_api)
             })
             .collect()
