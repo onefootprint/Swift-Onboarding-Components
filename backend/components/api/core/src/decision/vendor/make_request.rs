@@ -16,15 +16,10 @@ use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::lexis::client::LexisFlexIdRequest;
 use idv::lexis::client::LexisFlexIdResponse;
-use idv::socure::SocureIDPlusAPIResponse;
-use idv::socure::SocureIDPlusRequest;
-use idv::twilio::TwilioLookupV2APIResponse;
-use idv::twilio::TwilioLookupV2Request;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::IdvData;
 use newtypes::ObConfigurationKey;
-use newtypes::PiiString;
 use newtypes::VendorAPI;
 use newtypes::WorkflowId;
 use std::sync::Arc;
@@ -51,26 +46,6 @@ pub async fn send_idv_request(
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.idology_expect_id.clone(),
-                state.ff_client.clone(),
-            )
-            .await
-        }
-        VendorAPI::TwilioLookupV2 => {
-            send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await
-        }
-        VendorAPI::SocureIdPlus => {
-            tracing::error!("Socure called in `make_request`");
-            // if we ever add this back, we need to fetch device_id and ip_address
-            let socure_data = SocureData {
-                device_session_id: None,
-                ip_address: None,
-            };
-            send_socure_idv_request(
-                idv_data,
-                socure_data,
-                ob_configuration_key,
-                is_production,
-                state.vendor_clients.socure_id_plus.clone(),
                 state.ff_client.clone(),
             )
             .await
@@ -118,25 +93,6 @@ pub async fn send_idv_request(
     .map_err(|e| VendorAPIError { vendor_api, error: e })
 }
 
-#[tracing::instrument(skip_all)]
-pub async fn send_twilio_lookupv2_request(
-    idv_data: IdvData,
-    twilio_api_call: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-) -> Result<VendorResponse, idv::Error> {
-    twilio_api_call
-        .make_request(TwilioLookupV2Request { idv_data })
-        .await
-        .map(|r| {
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            // TODO put this into a INto
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
-}
 
 #[tracing::instrument(skip_all)]
 pub async fn send_idology_idv_request(
@@ -176,52 +132,6 @@ pub async fn send_idology_idv_request(
     }
 }
 
-#[derive(Clone)]
-pub struct SocureData {
-    pub device_session_id: Option<String>,
-    pub ip_address: Option<PiiString>,
-}
-#[tracing::instrument(skip_all)]
-pub async fn send_socure_idv_request(
-    data: IdvData,
-    socure_data: SocureData,
-    ob_configuration_key: ObConfigurationKey,
-    is_production: bool,
-    socure_client: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<VendorResponse, idv::Error> {
-    if ff_client.flag(BoolFlag::DisableAllSocure) {
-        Err(idv::Error::VendorCallsDisabledError)
-    } else if is_production || ff_client.flag(BoolFlag::EnableSocureInNonProd(&ob_configuration_key)) {
-        let res = socure_client
-            .make_request(SocureIDPlusRequest {
-                idv_data: data,
-                socure_device_session_id: socure_data.device_session_id,
-                ip_address: socure_data.ip_address,
-            })
-            .await;
-
-        res.map(|r| {
-            // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
-    } else {
-        let response = idv::test_fixtures::socure_idplus_fake_passing_response();
-
-        let parsed_response = idv::socure::parse_response(response.clone())?;
-
-        Ok(VendorResponse {
-            response: ParsedResponse::SocureIDPlus(parsed_response),
-            raw_response: response.into(),
-        })
-    }
-}
 
 #[tracing::instrument(skip_all)]
 pub async fn send_experian_idv_request(
