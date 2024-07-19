@@ -4,6 +4,7 @@ import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import type * as CSS from 'csstype';
 import { createFontStyles } from '../../utils';
 import type { LabelTooltipProps } from '../label';
 import Shimmer from '../shimmer';
@@ -23,6 +24,7 @@ export type TableProps<T> = {
     text: string;
     width?: Property.Width;
     tooltip?: LabelTooltipProps;
+    justifyContent?: CSS.Property.JustifyContent;
   }[];
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
@@ -79,7 +81,7 @@ const Table = <T,>({
             <tr>
               {columns.map(column => (
                 <th key={column.id || column.text}>
-                  <TooltipContainer>
+                  <TooltipContainer justifyContent={column.justifyContent}>
                     {column.text}
                     {column?.tooltip && (
                       <Tooltip text={column.tooltip.text} alignment="end" position="bottom">
@@ -244,12 +246,12 @@ const EmptyTr = styled.tr`
   }
 `;
 
-const TooltipContainer = styled.div`
-  ${({ theme }) => css`
+const TooltipContainer = styled.div<{ justifyContent?: CSS.Property.JustifyContent }>`
+  ${({ theme, justifyContent = 'flex-start' }) => css`
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: ${justifyContent};
     white-space: nowrap;
     gap: ${theme.spacing[3]};
   `}

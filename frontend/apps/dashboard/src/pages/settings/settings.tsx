@@ -1,16 +1,21 @@
-import { Box, Text, ThemeToggle } from '@onefootprint/ui';
+import { Box, Stack, Text, ThemeToggle } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import useSession from 'src/hooks/use-session';
+import Billing from './components/billing';
 import BusinessProfile from './components/business-profile';
 import TeamRoles from './components/team-roles';
 
 const Settings = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings' });
   const { theme, setTheme } = useTheme();
+  const {
+    data: { user },
+  } = useSession();
 
   const handleToggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
@@ -28,12 +33,12 @@ const Settings = () => {
         </Text>
         <ThemeToggle label={t('header.theme')} onChange={handleToggleTheme} checked={theme === 'dark'} />
       </Header>
-      <Box marginBottom={10}>
+      <Stack gap={10} direction="column">
         <BusinessProfile />
-      </Box>
-      <Box>
         <TeamRoles />
-      </Box>
+        {/* TODO eventually show for Grid admins once we've verified in prod */}
+        {user?.isFirmEmployee && <Billing />}
+      </Stack>
     </>
   );
 };
