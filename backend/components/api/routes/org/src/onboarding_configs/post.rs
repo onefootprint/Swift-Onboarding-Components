@@ -121,12 +121,16 @@ pub async fn post(
             .into());
         }
     }
+
+    // TODO: clean this up
+    // TODO: surface AM lists in FE
     let enhanced_aml = enhanced_aml
         .map(|r| r.into())
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
-    let verification_checks = VerificationChecksForObc::new(verification_checks, skip_kyc);
+    let verification_checks =
+        VerificationChecksForObc::new(verification_checks, skip_kyc, enhanced_aml.clone());
 
     let skip_kyb = match kind {
         ObConfigurationKind::Kyb => !verification_checks
@@ -188,6 +192,7 @@ pub async fn post(
 }
 
 fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<EnhancedAmlOption> {
+    // TODO: remove this for coba
     if tenant_id.is_coba() {
         Some(EnhancedAmlOption::Yes {
             ofac: true,
@@ -196,6 +201,8 @@ fn hardcoded_tenant_enhanced_aml_option(tenant_id: &TenantId) -> Option<Enhanced
             continuous_monitoring: true,
             adverse_media_lists: None,
         })
+
+    // Need adverse media list kind
     } else if tenant_id.is_composer() {
         Some(EnhancedAmlOption::Yes {
             ofac: true,

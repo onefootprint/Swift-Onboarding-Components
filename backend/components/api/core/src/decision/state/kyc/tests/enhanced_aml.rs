@@ -22,6 +22,8 @@ use newtypes::OnboardingStatus;
 use newtypes::VendorAPI;
 use newtypes::VendorAPI::IdologyExpectId;
 use newtypes::VendorAPI::IncodeWatchlistCheck;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
 use newtypes::WorkflowState;
 use strum::IntoEnumIterator;
 
@@ -55,7 +57,7 @@ async fn test(
     let (expected_status, expected_rs) = expected;
     let user_kind = UserKind::Live;
     // DATA SETUP
-    let (wf, _t, _obc, _tu) = setup_data(
+    let (wf, _t, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
@@ -68,6 +70,34 @@ async fn test(
 
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
+
+    let aml_vc = obc.get_verification_check(VerificationCheckKind::Aml);
+    match (obc.enhanced_aml, aml_vc) {
+        (EnhancedAmlOption::No, None) => (),
+        (
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            },
+            Some(VerificationCheck::Aml {
+                ofac: ofac_vc,
+                pep: pep_vc,
+                adverse_media: adverse_media_vc,
+                continuous_monitoring: continuous_monitoring_vc,
+                adverse_media_lists: adverse_media_lists_vc,
+            }),
+        ) => {
+            assert_eq!(ofac, ofac_vc);
+            assert_eq!(pep, pep_vc);
+            assert_eq!(adverse_media, adverse_media_vc);
+            assert_eq!(continuous_monitoring, continuous_monitoring_vc);
+            assert_eq!(adverse_media_lists, adverse_media_lists_vc);
+        }
+        _ => panic!("incorrect verification check for obc"),
+    };
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 

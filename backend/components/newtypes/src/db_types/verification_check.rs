@@ -34,7 +34,7 @@ pub enum VerificationCheck {
     },
     // Run KYC
     Kyc {},
-    EnhancedAml {
+    Aml {
         ofac: bool,
         pep: bool,
         adverse_media: bool,

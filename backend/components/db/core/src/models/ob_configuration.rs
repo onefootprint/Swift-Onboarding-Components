@@ -789,10 +789,18 @@ impl ObConfiguration {
 #[derive(Default, Clone)]
 pub struct VerificationChecksForObc(Vec<VerificationCheck>);
 impl VerificationChecksForObc {
-    pub fn new(checks_from_request: Option<Vec<VerificationCheck>>, skip_kyc: Option<bool>) -> Self {
+    pub fn new(
+        checks_from_request: Option<Vec<VerificationCheck>>,
+        skip_kyc: Option<bool>,
+        enhanced_aml: EnhancedAmlOption,
+    ) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
-        Self(create_verification_checks_from_obc_request(vc, skip_kyc))
+        Self(create_verification_checks_from_obc_request(
+            vc,
+            skip_kyc,
+            enhanced_aml,
+        ))
     }
 
     pub fn new_for_test(checks: Vec<VerificationCheck>) -> Self {
@@ -815,10 +823,32 @@ impl VerificationChecksForObc {
 fn create_verification_checks_from_obc_request(
     mut checks: Vec<VerificationCheck>,
     skip_kyc: Option<bool>,
+    enhanced_aml: EnhancedAmlOption,
 ) -> Vec<VerificationCheck> {
     if let Some(skip) = skip_kyc {
         if !skip {
             checks.push(VerificationCheck::Kyc {});
+        }
+    }
+
+    // TODO: remove serde default in POST ob_configs
+    match enhanced_aml {
+        EnhancedAmlOption::No => (),
+        EnhancedAmlOption::Yes {
+            ofac,
+            pep,
+            adverse_media,
+            continuous_monitoring,
+            adverse_media_lists,
+        } => {
+            let aml_check = VerificationCheck::Aml {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring,
+                adverse_media_lists,
+            };
+            checks.push(aml_check);
         }
     }
 
