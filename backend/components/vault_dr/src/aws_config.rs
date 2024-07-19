@@ -269,7 +269,7 @@ impl VaultDrAwsConfig {
                 let svc_error = e.into_service_error();
 
                 info!(error = ?svc_error, "S3 GetObject failed as expected. Expected code is AccessDenied");
-                if aws_error_has_code(&svc_error, &["AccessDenied"]) {
+                if !aws_error_has_code(&svc_error, &["AccessDenied"]) {
                     return Err(Box::new(svc_error).into());
                 }
             }
