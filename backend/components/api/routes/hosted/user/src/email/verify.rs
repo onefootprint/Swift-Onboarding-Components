@@ -31,7 +31,7 @@ pub async fn post(
     request: Json<EmailVerifyRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     // NOTE this is no longer used.
-    /// Check the context in https://github.com/onefootprint/monorepo/pull/10698
+    // Check the context in https://github.com/onefootprint/monorepo/pull/10698
     let session = AuthSession::get(&state, &request.data).await?;
 
     let AuthSessionData::EmailVerify(data) = session.data else {
