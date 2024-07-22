@@ -6,6 +6,7 @@ use crate::VaultDrAwsConfig;
 use crate::WrappedKey;
 use age::secrecy::Zeroize;
 use api_core::utils::vault_wrapper::bulk_decrypt_dls_unchecked;
+use api_core::utils::vault_wrapper::MimeTypedPii;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::FpResult;
 use api_core::State;
@@ -25,10 +26,17 @@ use db::models::vault_dr::VaultDrConfig;
 use futures::StreamExt;
 use itertools::Itertools;
 use newtypes::FpId;
+use newtypes::PiiString;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
 use std::collections::HashMap;
 use std::fmt::Debug;
+
+// https://www.iana.org/assignments/media-types/application/vnd.age
+const AGE_CONTENT_TYPE: &str = "application/vnd.age";
+
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html?icmpid=docs_amazons3_console#UserMetadata
+const X_AMZ_META_FP_DOC_MIME_TYPE: &str = "x-amz-meta-fp-doc-mime-type";
 
 #[derive(Debug, Clone)]
 pub struct VaultDrWriter {
@@ -47,6 +55,7 @@ pub struct VaultDrWriter {
 pub struct EncryptedRecord {
     pub e_record: Vec<u8>,
     pub wrapped_record_key: WrappedKey,
+    pub document_mime_type: Option<PiiString>,
 }
 
 impl VaultDrWriter {
@@ -212,7 +221,7 @@ impl VaultDrWriter {
         &self,
         fp_id: FpId,
         dl: DataLifetime,
-        pii: Pii,
+        pii: MimeTypedPii,
     ) -> FpResult<NewVaultDrBlob> {
         tracing::info!(
             config_id=%self.config_id,
@@ -233,7 +242,12 @@ impl VaultDrWriter {
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_record", skip_all)]
-    async fn encrypt_record(&self, pii: Pii) -> FpResult<EncryptedRecord> {
+    async fn encrypt_record(&self, pii: MimeTypedPii) -> FpResult<EncryptedRecord> {
+        let MimeTypedPii {
+            pii,
+            document_mime_type,
+        } = pii;
+
         let org_public_keys = self.org_public_keys.clone();
         let recovery_public_key = self.recovery_public_key.clone();
 
@@ -257,6 +271,7 @@ impl VaultDrWriter {
             Ok(EncryptedRecord {
                 e_record,
                 wrapped_record_key,
+                document_mime_type,
             })
         })
         .await?
@@ -272,6 +287,7 @@ impl VaultDrWriter {
         let EncryptedRecord {
             e_record,
             wrapped_record_key,
+            document_mime_type,
         } = e_record;
 
 
@@ -281,12 +297,21 @@ impl VaultDrWriter {
 
         let key = blob_key(&self.bucket_path_namespace, &fp_id, &dl, &digest_bytes)?;
 
+        let obj_metadata = document_mime_type.map(|mime_type| {
+            let mut metadata = HashMap::new();
+            metadata.insert(X_AMZ_META_FP_DOC_MIME_TYPE.to_owned(), mime_type.leak_to_string());
+            metadata
+        });
+
         let body = ByteStream::new(SdkBody::from(e_record));
         let req = self
             .s3_client
             .put_object()
             .bucket(&self.aws_config.s3_bucket_name)
             .checksum_sha256(&checksum_b64_sha256)
+            .content_type(AGE_CONTENT_TYPE)
+            .set_metadata(obj_metadata)
+            .content_length(content_length.try_into().map_err(|_| Error::S3ObjectTooLarge)?)
             .key(&key)
             .body(body);
 

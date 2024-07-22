@@ -29,6 +29,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DbActor;
 use newtypes::PiiJsonValue;
+use newtypes::PiiString;
 use newtypes::TenantId;
 use std::collections::HashMap;
 
@@ -190,6 +191,12 @@ where
     Ok(decrypted_results)
 }
 
+pub struct MimeTypedPii {
+    pub pii: Pii,
+    // None if the PII is not a document.
+    pub document_mime_type: Option<PiiString>,
+}
+
 /// Decrypt DLs for a tenant without checking permissions or creating audit logs.
 #[tracing::instrument(skip_all)]
 pub async fn bulk_decrypt_dls_unchecked(
@@ -197,7 +204,7 @@ pub async fn bulk_decrypt_dls_unchecked(
     tenant_id: &TenantId,
     is_live: IsLive,
     dls: &HashMap<DataLifetimeId, DataLifetime>,
-) -> FpResult<HashMap<DataLifetimeId, Pii>> {
+) -> FpResult<HashMap<DataLifetimeId, MimeTypedPii>> {
     let tenant_id = tenant_id.clone();
 
     let dl_ids = dls.iter().map(|(_, dl)| dl.id.clone()).collect_vec();
@@ -232,6 +239,7 @@ pub async fn bulk_decrypt_dls_unchecked(
 
 
     let mut requests = vec![];
+    let mut doc_mime_types_by_dl_id = HashMap::new();
     for (dl_id, dl) in dls.iter() {
         let (_, vault) = sv_vault_by_sv_id
             .get(&dl.scoped_vault_id)
@@ -261,6 +269,8 @@ pub async fn bulk_decrypt_dls_unchecked(
                 dd.data(),
             );
             requests.push((dl_id.clone(), req));
+
+            doc_mime_types_by_dl_id.insert(dl_id.clone(), dd.mime_type.clone());
         }
     }
 
@@ -271,6 +281,10 @@ pub async fn bulk_decrypt_dls_unchecked(
         let mut decrypt_ops = decrypt_result.results.into_iter();
 
         if let Some((_, pii)) = decrypt_ops.next() {
+            let pii = MimeTypedPii {
+                pii,
+                document_mime_type: doc_mime_types_by_dl_id.get(&dl_id).cloned(),
+            };
             pii_by_dl.insert(dl_id, pii);
         } else {
             return AssertionError("Expected at least one decryption result per DL").into();

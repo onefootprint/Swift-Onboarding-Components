@@ -78,6 +78,9 @@ pub enum Error {
 
     #[error("Can not test decryption for more than {0} records at once")]
     TooManyWrappedRecordKeyRequests(usize),
+
+    #[error("S3 object too large")]
+    S3ObjectTooLarge,
 }
 
 impl api_errors::FpErrorTrait for Error {
@@ -91,7 +94,8 @@ impl api_errors::FpErrorTrait for Error {
             | Self::InvalidAgeRecipient(_)
             | Self::ValidationError(_)
             | Self::BlobDoesNotExist
-            | Self::TooManyWrappedRecordKeyRequests(_) => StatusCode::BAD_REQUEST,
+            | Self::TooManyWrappedRecordKeyRequests(_)
+            | Self::S3ObjectTooLarge => StatusCode::BAD_REQUEST,
             Self::IamAssertionFailed(_)
             | Self::AwsClientMissingRegion
             | Self::StsGetCallerIdentity(_)
