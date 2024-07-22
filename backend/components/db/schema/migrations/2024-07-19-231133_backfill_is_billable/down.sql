@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ALTER COLUMN is_billable_for_vault_storage SET DEFAULT 't';
