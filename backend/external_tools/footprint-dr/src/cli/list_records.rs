@@ -39,17 +39,12 @@ pub async fn list_records_cmd(
         let fp_ids = s3_client.sample_fp_ids(limit).await?;
         let fp_id_results = fp_ids.into_iter().map(Ok);
         futures::stream::iter(fp_id_results).boxed()
-    } else if let (Some(fp_id_gt), Some(limit)) = (fp_id_gt, limit) {
-        s3_client.list_fp_ids(Some(fp_id_gt), Some(limit)).await.boxed()
-    } else {
-        // Explicit fp_ids passed by arguments.
-        if fp_ids.is_empty() {
-            bail!("No FP IDs provided");
-        }
-
+    } else if !fp_ids.is_empty() {
         let fp_ids = s3_client.fp_ids_from_strings(fp_ids).await?.into_iter().unique();
         let fp_id_results = fp_ids.map(Ok);
         futures::stream::iter(fp_id_results).boxed()
+    } else {
+        s3_client.list_fp_ids(fp_id_gt, limit).await.boxed()
     };
 
     let mut records = s3_client.list_records(fp_ids).await;
