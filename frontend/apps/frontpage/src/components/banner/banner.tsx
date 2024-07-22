@@ -60,7 +60,7 @@ const BannerContainer = styled(Container)`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: ${theme.spacing[10]};
+    gap: ${theme.spacing[9]};
     max-width: 100%;
     padding: ${theme.spacing[11]} 0 ${theme.spacing[12]} 0;
   `}
@@ -70,7 +70,7 @@ const TextContainer = styled(Stack)`
   ${({ theme }) => css`
     position: relative;
     flex-direction: column;
-    gap: ${theme.spacing[8]};
+    gap: ${theme.spacing[9]};
     text-align: center;
     max-width: 600px;
 

@@ -18,10 +18,10 @@ export const FishingPenguin = () => (
 
 const IllustrationContainer = styled(Box)`
   position: relative;
-  filter: scale(0.8);
+  transform: scale(0.8);
 
   ${media.greaterThan('md')`
-    filter: scale(1);
+    transform: scale(1);
   `}
 `;
 

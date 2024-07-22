@@ -49,20 +49,6 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
 
   useLockedBody(isOpen);
 
-  const menuVariants = {
-    initial: { opacity: 0, y: -10 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.1, ease: 'easeOut' },
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-      transition: { duration: 0.1, ease: 'easeOut' },
-    },
-  };
-
   const iconVariant = {
     initial: { rotate: 0 },
     animate: {
@@ -72,6 +58,20 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
     exit: {
       rotate: isOpen ? -90 : 0,
       transition: { duration: 0.2, ease: 'easeOut' },
+    },
+  };
+
+  const menuVariants = {
+    initial: { opacity: 0, y: -5 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.1, ease: 'easeOut' },
+    },
+    exit: {
+      opacity: 0,
+      y: 0,
+      transition: { duration: 0.05, ease: 'easeOut' },
     },
   };
 
@@ -129,7 +129,6 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
           )}
         </AnimatePresence>
       </OuterContainer>
-      <Overlay isVisible={isOpen} />
     </>
   );
 };
@@ -138,6 +137,7 @@ const OuterContainer = styled(Box)<{ $isOpen: boolean }>`
   ${({ theme, $isOpen }) => css`
     position: fixed;
     top: ${theme.spacing[3]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -148,11 +148,11 @@ const OuterContainer = styled(Box)<{ $isOpen: boolean }>`
     border-radius: ${theme.borderRadius.lg};
     overflow: hidden;
     z-index: ${theme.zIndex.dialog};
-    background: rgba(${theme.backgroundColor.primary}, 0.9);
+    background: rgba(${theme.backgroundColor.primary}, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    transition: height 0.2s ease-out;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    transition: height 0.1s ease-out;
+    height: 'auto';
 
     ${
       $isOpen &&

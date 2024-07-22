@@ -276,6 +276,7 @@ const MobileMockup = styled(motion(Image))`
 
 const Container = styled(motion.div)`
   position: relative;
+  z-index: 0;
 `;
 
 const Wire03 = styled(motion(Image))`

@@ -1,4 +1,4 @@
-import { Stack, Text } from '@onefootprint/ui';
+import { Box, Container, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,10 +19,10 @@ const Hero = () => {
         <Text variant="display-4" color="tertiary" tag="h2">
           {t('subtitle')}
         </Text>
+        <Box paddingTop={3} width="100%">
+          <Ctas />
+        </Box>
       </TitleContainer>
-      <Stack gap={4} align="center">
-        <Ctas />
-      </Stack>
     </HeroContainer>
   );
 };
@@ -37,7 +37,7 @@ const HeroContainer = styled(motion.div)`
   `}
 `;
 
-const TitleContainer = styled.div`
+const TitleContainer = styled(Container)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

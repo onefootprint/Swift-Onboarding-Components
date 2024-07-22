@@ -95,6 +95,7 @@ const TextContainer = styled(Stack)`
     align-items: center;
     justify-content: center;
     gap: ${theme.spacing[5]};
+    z-index: 1;
   `}
 `;
 
