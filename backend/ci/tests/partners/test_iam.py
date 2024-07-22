@@ -34,31 +34,36 @@ def test_partner_tenant_iam(tenant, partner_tenant):
 def test_partner_tenant_iam_roles(partner_tenant):
     # Create a role.
     name = "test " + _gen_random_str(16)
-    post("partner/roles", {
-      "kind": "compliance_partner_dashboard_user",
-      "name": name,
-      "scopes": [
+    post(
+        "partner/roles",
         {
-          "kind": "compliance_partner_read"
-        }
-      ]
-    }, *partner_tenant.db_auths)
+            "kind": "compliance_partner_dashboard_user",
+            "name": name,
+            "scopes": [{"kind": "compliance_partner_read"}],
+        },
+        *partner_tenant.db_auths,
+    )
 
     # Can't create with read-only auth.
-    post("partner/roles", {
-      "kind": "compliance_partner_dashboard_user",
-      "name": name,
-      "scopes": [
+    post(
+        "partner/roles",
         {
-          "kind": "compliance_partner_read"
-        }
-      ]
-    }, *partner_tenant.ro_db_auths, status_code=401)
+            "kind": "compliance_partner_dashboard_user",
+            "name": name,
+            "scopes": [{"kind": "compliance_partner_read"}],
+        },
+        *partner_tenant.ro_db_auths,
+        status_code=403,
+    )
 
     # Check that it was created.
-    resp = get("partner/roles", {
-        "search": name,
-    }, *partner_tenant.db_auths)
+    resp = get(
+        "partner/roles",
+        {
+            "search": name,
+        },
+        *partner_tenant.db_auths,
+    )
     assert len(resp["data"]) == 1
     role = resp["data"][0]
     role_id = role["id"]
@@ -68,19 +73,32 @@ def test_partner_tenant_iam_roles(partner_tenant):
 
     # Update the role.
     name += _gen_random_str(16)
-    patch(f"partner/roles/{role_id}", {
-        "name": name,
-    }, *partner_tenant.db_auths)
+    patch(
+        f"partner/roles/{role_id}",
+        {
+            "name": name,
+        },
+        *partner_tenant.db_auths,
+    )
 
     # Can't update with read-only auth.
-    patch(f"partner/roles/{role_id}", {
-        "name": name + _gen_random_str(16),
-    }, *partner_tenant.ro_db_auths, status_code=401)
+    patch(
+        f"partner/roles/{role_id}",
+        {
+            "name": name + _gen_random_str(16),
+        },
+        *partner_tenant.ro_db_auths,
+        status_code=403,
+    )
 
     # Check that it was updated.
-    resp = get("partner/roles", {
-        "search": name,
-    }, *partner_tenant.db_auths)
+    resp = get(
+        "partner/roles",
+        {
+            "search": name,
+        },
+        *partner_tenant.db_auths,
+    )
     assert len(resp["data"]) == 1
     role = resp["data"][0]
     assert role["id"] == role_id
@@ -89,13 +107,22 @@ def test_partner_tenant_iam_roles(partner_tenant):
     assert role["scopes"] == [{"kind": "compliance_partner_read"}]
 
     # Can't deactivate with read-only auth.
-    post(f"partner/roles/{role_id}/deactivate", {}, *partner_tenant.ro_db_auths, status_code=401)
+    post(
+        f"partner/roles/{role_id}/deactivate",
+        {},
+        *partner_tenant.ro_db_auths,
+        status_code=403,
+    )
 
     # Deactivate the role.
     post(f"partner/roles/{role_id}/deactivate", {}, *partner_tenant.db_auths)
 
     # Check that it was deactivated
-    resp = get("partner/roles", {
-        "search": name,
-    }, *partner_tenant.db_auths)
+    resp = get(
+        "partner/roles",
+        {
+            "search": name,
+        },
+        *partner_tenant.db_auths,
+    )
     assert len(resp["data"]) == 0

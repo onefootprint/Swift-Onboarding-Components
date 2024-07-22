@@ -156,7 +156,7 @@ def test_insufficient_permissions(sandbox_user):
             fields=["id.ssn9"],
             reason="Hayes valley",
         )
-        post(f"entities/vault/decrypt", data, auth_token, status_code=401)
+        post(f"entities/vault/decrypt", data, auth_token, status_code=403)
 
     auth_tokens = [
         # Token with incorrect vault perms
@@ -170,8 +170,8 @@ def test_insufficient_permissions(sandbox_user):
         data = {
             "id.ssn9": "123-12-1234",
         }
-        post(f"entities/vault/validate", data, auth_token, status_code=401)
-        patch(f"entities/vault", data, auth_token, status_code=401)
+        post(f"entities/vault/validate", data, auth_token, status_code=403)
+        patch(f"entities/vault", data, auth_token, status_code=403)
 
 
 def test_vault_legacy(sandbox_user, sandbox_tenant):

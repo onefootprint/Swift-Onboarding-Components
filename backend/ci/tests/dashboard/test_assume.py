@@ -73,19 +73,22 @@ def test_read_allowed_post_entities_search(assumed_token):
     post("entities/search", None, assumed_token)
 
 
+def test_cannot_patch_org_member(assumed_token):
+    patch("org/member", dict(), assumed_token, status_code=401)
+
+
 @pytest.mark.parametrize(
     "path",
     [
         "org",
         # "org/api_keys/some_id",
-        "org/member",  # this one is weird
         "org/members/some_id",
         "org/roles/some_id",
         # "org/onboarding_configs/some_id",
     ],
 )
 def test_cannot_patch(assumed_token, path):
-    patch(path, dict(), assumed_token, status_code=401)
+    patch(path, dict(), assumed_token, status_code=403)
 
 
 @pytest.mark.parametrize(
@@ -118,4 +121,4 @@ def test_cannot_patch(assumed_token, path):
     ],
 )
 def test_cannot_post(assumed_token, path, body):
-    post(path, body, assumed_token, status_code=401)
+    post(path, body, assumed_token, status_code=403)

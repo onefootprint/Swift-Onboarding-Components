@@ -115,7 +115,7 @@ def test_api_key_limited_role(sandbox_tenant, admin_role, sandbox_user, limited_
     # Cannot do other actions, like decrypt, with limited role
     decrypt_data = dict(fields=["id.first_name"], reason="HI")
     fp_id = sandbox_user.fp_id
-    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=401)
+    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=403)
 
     # Now, change the key's role
     data = dict(role_id=admin_role["id"])
@@ -137,7 +137,7 @@ def test_client_token_perms(limited_role, sandbox_tenant, sandbox_user, admin_ro
         dict(scopes=["decrypt_download"], fields=["id.ssn9"], decrypt_reason="Flerp"),
     ]
     for data in decrypt_datas:
-        post(f"users/{fp_id}/client_token", data, key.key, status_code=401)
+        post(f"users/{fp_id}/client_token", data, key.key, status_code=403)
 
     # Can make client token with vault permissions since limited_role allows write_entities
     data = dict(scopes=["vault"], fields=["id.first_name"])

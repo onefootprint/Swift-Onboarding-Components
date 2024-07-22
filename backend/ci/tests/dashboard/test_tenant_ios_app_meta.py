@@ -47,7 +47,7 @@ def test_tenant_ios_app_meta(sandbox_tenant):
                 "device_check_private_key": device_check_private_key,
             },
             *sandbox_tenant.ro_db_auths,
-            status_code=401,
+            status_code=403,
         )
 
         # Make sure we can create using correctly permissioned creds
@@ -113,7 +113,7 @@ def test_tenant_ios_app_meta(sandbox_tenant):
             f"/org/app_meta/ios/{meta_id}",
             None,
             *sandbox_tenant.ro_db_auths,
-            status_code=401,
+            status_code=403,
         )
 
     # Delete the tenant app meta entries we created.

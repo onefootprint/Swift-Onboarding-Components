@@ -55,7 +55,7 @@ def test_create_no_permissions(sandbox_tenant):
             kind="email_domain",
         ),
         *sandbox_tenant.ro_db_auths,
-        status_code=401,
+        status_code=403,
     )
 
 
@@ -376,7 +376,7 @@ def test_update_no_permissions(sandbox_tenant):
         f"/org/lists/{list['id']}",
         dict(name=f"Super Duper Baddies {nonce}", alias=f"super_duper_baddies_{nonce}"),
         *sandbox_tenant.ro_db_auths,
-        status_code=401,
+        status_code=403,
     )
 
     list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
@@ -461,7 +461,7 @@ def test_delete_no_permissions(sandbox_tenant):
     )
 
     delete(
-        f"/org/lists/{list['id']}", None, *sandbox_tenant.ro_db_auths, status_code=401
+        f"/org/lists/{list['id']}", None, *sandbox_tenant.ro_db_auths, status_code=403
     )
 
     list = get(f"/org/lists/{list['id']}", None, *sandbox_tenant.db_auths)
@@ -616,7 +616,7 @@ def test_create_list_entry_no_permissions(sandbox_tenant):
         f"/org/lists/{list['id']}/entries",
         dict(entries=["protonmail.com"]),
         *sandbox_tenant.ro_db_auths,
-        status_code=401,
+        status_code=403,
     )
 
 
@@ -788,7 +788,7 @@ def test_delete_list_entries_no_permissions(sandbox_tenant):
         f"/org/lists/{list['id']}/entries/{entry1[0]['id']}",
         None,
         *sandbox_tenant.ro_db_auths,
-        status_code=401,
+        status_code=403,
     )
 
     entries = get(f"/org/lists/{list['id']}/entries", None, *sandbox_tenant.db_auths)

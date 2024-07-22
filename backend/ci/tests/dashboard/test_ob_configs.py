@@ -1289,7 +1289,7 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
         f"org/onboarding_configs/{obc.id}/copy",
         data,
         *sandbox_tenant.ro_db_auths,
-        status_code=401,
+        status_code=403,
     )
     assert (
         body["message"]
@@ -1302,7 +1302,7 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
         data,
         *sandbox_tenant.db_auths,
         SecondaryDashboardAuth(foo_sandbox_tenant.ro_auth_token.value),
-        status_code=401,
+        status_code=403,
     )
     assert (
         body["message"]

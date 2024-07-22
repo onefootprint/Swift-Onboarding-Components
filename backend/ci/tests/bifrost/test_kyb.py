@@ -147,7 +147,7 @@ def test_put_business_vault_not_authorized(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     auth_token = bifrost.auth_token
     # Can't hit PATCH /hosted/business/vault without a business vault
-    patch("hosted/business/vault", {}, auth_token, status_code=401)
+    patch("hosted/business/vault", {}, auth_token, status_code=403)
 
 
 def test_one_click_kyb(kyb_sandbox_ob_config):
