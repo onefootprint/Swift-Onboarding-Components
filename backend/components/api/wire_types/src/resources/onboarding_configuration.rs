@@ -54,6 +54,7 @@ pub struct OnboardingConfiguration {
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub curp_validation_enabled: bool,
     pub verification_checks: Vec<VerificationCheck>,
+    pub required_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
 /// The public onboarding configuration

@@ -101,6 +101,11 @@ pub struct ObConfiguration {
     pub verification_checks: Option<Vec<VerificationCheck>>,
     #[diesel(deserialize_as = NonNullVec<DocumentRequestConfig>)]
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
+    /// The list of auth methods that are required to satisfy this playbook, if any.
+    /// NOTE: we have limited client support for this field, so it is not entirely operational.
+    /// When null, no specific auth methods are required and any auth method is acceptable.
+    #[diesel(deserialize_as = OptionalNonNullVec<AuthMethodKind>)]
+    pub required_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
 impl ObConfiguration {
@@ -374,6 +379,7 @@ struct NewObConfiguration {
     documents_to_collect: Vec<DocumentRequestConfig>,
     business_documents_to_collect: Vec<DocumentRequestConfig>,
     verification_checks: Vec<VerificationCheck>,
+    required_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
 pub struct NewObConfigurationArgs {
@@ -399,6 +405,7 @@ pub struct NewObConfigurationArgs {
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub verification_checks: VerificationChecks,
+    pub required_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
 
@@ -617,6 +624,7 @@ impl ObConfiguration {
             business_documents_to_collect,
             curp_validation_enabled,
             verification_checks,
+            required_auth_methods,
         } = args;
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -646,6 +654,7 @@ impl ObConfiguration {
             documents_to_collect,
             business_documents_to_collect,
             verification_checks: verification_checks.into_inner(),
+            required_auth_methods,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -742,15 +751,22 @@ impl ObConfiguration {
 
     /// Returns the list of auth methods that are required to be registered by this playbook, if any
     pub fn required_auth_methods(&self) -> Option<Vec<AuthMethodKind>> {
-        match self.kind {
-            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
-            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
-            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if self.is_no_phone_flow {
-                vec![AuthMethodKind::Email]
-            } else {
-                vec![AuthMethodKind::Phone]
-            }),
-        }
+        required_auth_methods_for(self.kind, self.is_no_phone_flow)
+    }
+}
+
+pub fn required_auth_methods_for(
+    kind: ObConfigurationKind,
+    is_no_phone_flow: bool,
+) -> Option<Vec<AuthMethodKind>> {
+    match kind {
+        // Auth and Document playbooks don't (yet) have an opinion on which login method is used
+        ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
+        ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
+            vec![AuthMethodKind::Email]
+        } else {
+            vec![AuthMethodKind::Phone]
+        }),
     }
 }
 

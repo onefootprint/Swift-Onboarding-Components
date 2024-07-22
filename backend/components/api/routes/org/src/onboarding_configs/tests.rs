@@ -60,6 +60,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -96,6 +97,7 @@ fn test_is_no_phone_flow(
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -131,6 +133,7 @@ fn test_is_doc_first(
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -162,6 +165,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         verification_checks: VerificationChecks::default(),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -198,6 +202,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -240,6 +245,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
                 adverse_media_lists: None,
             },
         ]),
+        required_auth_methods: None,
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

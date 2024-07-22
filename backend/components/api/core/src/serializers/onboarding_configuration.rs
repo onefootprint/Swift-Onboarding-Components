@@ -146,6 +146,7 @@ impl
             cip_kind,
             curp_validation_enabled,
             verification_checks,
+            required_auth_methods,
 
             // explicitly enumerating unused fields here so we don't forget to expose
             tenant_id: _,
@@ -188,6 +189,7 @@ impl
             business_documents_to_collect,
             curp_validation_enabled,
             verification_checks: verification_checks.unwrap_or_default(),
+            required_auth_methods,
         }
     }
 }

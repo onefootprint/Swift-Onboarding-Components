@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
+use db::models::ob_configuration::required_auth_methods_for;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
@@ -112,6 +113,7 @@ pub async fn post(
         VerificationChecks::new(tenant_id, verification_checks, skip_kyc, db_enhanced_aml.clone());
 
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
+    let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
 
     let args = NewObConfigurationArgs {
         name,
@@ -121,7 +123,7 @@ pub async fn post(
         can_access_data,
         is_live,
         cip_kind,
-        is_no_phone_flow: is_no_phone_flow.unwrap_or(false),
+        is_no_phone_flow,
         is_doc_first: is_doc_first_flow,
         allow_international_residents,
         international_country_restrictions,
@@ -137,6 +139,7 @@ pub async fn post(
         business_documents_to_collect,
         curp_validation_enabled,
         verification_checks,
+        required_auth_methods: required_auth_methods_for(kind, is_no_phone_flow),
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;

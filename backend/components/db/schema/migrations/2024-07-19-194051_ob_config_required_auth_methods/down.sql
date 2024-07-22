@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration DROP COLUMN required_auth_methods;

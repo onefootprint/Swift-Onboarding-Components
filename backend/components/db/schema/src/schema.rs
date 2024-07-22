@@ -773,6 +773,7 @@ diesel::table! {
         documents_to_collect -> Nullable<Array<Nullable<Jsonb>>>,
         verification_checks -> Nullable<Array<Nullable<Jsonb>>>,
         business_documents_to_collect -> Array<Nullable<Jsonb>>,
+        required_auth_methods -> Nullable<Array<Nullable<Text>>>,
     }
 }
 

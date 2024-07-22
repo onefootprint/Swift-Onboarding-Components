@@ -174,6 +174,7 @@ fn copy_playbook(
         curp_validation_enabled,
         documents_to_collect,
         business_documents_to_collect,
+        required_auth_methods,
 
         // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
         // field is added
@@ -219,5 +220,6 @@ fn copy_playbook(
         documents_to_collect: documents_to_collect.unwrap_or_default(),
         business_documents_to_collect,
         verification_checks,
+        required_auth_methods,
     }
 }

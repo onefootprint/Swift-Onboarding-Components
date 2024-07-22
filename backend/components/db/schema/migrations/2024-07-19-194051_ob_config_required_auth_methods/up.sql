@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN required_auth_methods TEXT[];

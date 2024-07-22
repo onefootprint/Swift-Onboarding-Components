@@ -1,8 +1,12 @@
+use crate::util::impl_enum_string_diesel;
 use crate::AuthEventKind;
 use crate::ChallengeKind;
 use crate::DataIdentifier;
 use crate::Error;
 use crate::IdentityDataKind;
+use diesel::sql_types::Text;
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 
@@ -19,14 +23,19 @@ use strum_macros::Display;
     strum_macros::Display,
     strum_macros::EnumString,
     macros::SerdeAttr,
+    AsExpression,
+    FromSqlRow,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
+#[diesel(sql_type = Text)]
 pub enum AuthMethodKind {
     Phone,
     Passkey,
     Email,
 }
+
+impl_enum_string_diesel!(AuthMethodKind);
 
 impl TryFrom<AuthEventKind> for AuthMethodKind {
     type Error = Error;
