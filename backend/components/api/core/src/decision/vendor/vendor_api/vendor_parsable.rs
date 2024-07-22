@@ -3,6 +3,7 @@ use super::vendor_api_struct::*;
 use idv::experian::cross_core::response::CrossCoreAPIResponse;
 use idv::idology::expectid::response::ExpectIDResponse;
 use idv::idology::pa::response::PaResponse;
+use idv::incode::curp_validation::response::CurpValidationResponse;
 use idv::incode::doc::response::AddCustomerResponse;
 use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
@@ -11,6 +12,7 @@ use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::lexis::response::FlexIdResponse;
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::samba::response::license_validation::CreateLVOrderResponse;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;
@@ -145,4 +147,24 @@ impl AsParsedResponse for MiddeskBusinessUpdateWebhookResponse {
 // we don't need a vendor result for this one
 impl VendorParsable for SambaLicenseValidationCreate {
     type ParsedType = CreateLVOrderResponse;
+}
+
+// Neuro
+impl VendorParsable for NeuroIdAnalytics {
+    type ParsedType = NeuroIdAnalyticsResponse;
+}
+impl AsParsedResponse for NeuroIdAnalyticsResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::NeuroIdAnalytics(self)
+    }
+}
+
+// Incode Curp
+impl VendorParsable for IncodeCurpValidation {
+    type ParsedType = CurpValidationResponse;
+}
+impl AsParsedResponse for CurpValidationResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::IncodeCurpValidation(self)
+    }
 }

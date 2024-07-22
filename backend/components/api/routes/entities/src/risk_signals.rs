@@ -9,7 +9,9 @@ use crate::State;
 use api_core::auth::CanDecrypt;
 use api_core::decision;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
-use api_core::decision::vendor::vendor_result::VendorResult;
+use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeUpdatedWatchlistResult;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiListResponse;
@@ -31,11 +33,10 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
-use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
-use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
@@ -332,75 +333,87 @@ async fn get_aml_hits(
     vreq_vres: RequestAndResult,
     private_key: EncryptedVaultPrivateKey,
 ) -> FpResult<Option<api_wire_types::AmlDetail>> {
-    let vreq_vres =
-        VendorResult::hydrate_vendor_result(vreq_vres, &state.enclave_client, &private_key).await?;
+    let decrypted_response = match vreq_vres.0.vendor_api {
+        VendorAPI::IncodeWatchlistCheck => load_response_for_vendor_api(
+            state,
+            VReqIdentifier::Id(vreq_vres.0.id),
+            &private_key,
+            IncodeWatchlistCheck,
+        )
+        .await?
+        .ok()
+        .map(|(res, _)| res),
+        VendorAPI::IncodeUpdatedWatchlistResult => load_response_for_vendor_api(
+            state,
+            VReqIdentifier::Id(vreq_vres.0.id),
+            &private_key,
+            IncodeUpdatedWatchlistResult,
+        )
+        .await?
+        .ok()
+        .map(|(res, _)| res.0),
+        _ => None,
+    };
 
-    if let Some(vres) = vreq_vres.vres {
-        if let Some(res) = vres.response {
-            if let ParsedResponse::IncodeWatchlistCheck(wc)
-            | ParsedResponse::IncodeUpdatedWatchlistResult(UpdatedWatchlistResultResponse(wc)) =
-                res.response
-            {
-                let share_url = wc
-                    .content
+    if let Some(wc) = decrypted_response {
+        let share_url = wc
+            .content
+            .as_ref()
+            .and_then(|c| c.data.as_ref())
+            .and_then(|d| d.share_url.clone());
+
+        let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml)
+            .into_iter()
+            .map(|h| h.leak());
+
+        let aml_hits = leaked_hits
+            .map(|h| {
+                let fields_json = h
+                    .doc
                     .as_ref()
-                    .and_then(|c| c.data.as_ref())
-                    .and_then(|d| d.share_url.clone());
-
-                let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml)
-                    .into_iter()
-                    .map(|h| h.leak());
-
-                let aml_hits = leaked_hits
-                    .map(|h| {
-                        let fields_json = h
-                            .doc
-                            .as_ref()
-                            .and_then(|d| d.fields.as_ref())
-                            .map(|f| {
-                                serde_json::to_value(
-                                    f.iter()
-                                        .flat_map(|e| {
-                                            e.name.clone().and_then(|name| {
-                                                e.value.clone().map(|value| (name, value.leak_to_string()))
-                                            })
-                                        })
-                                        .collect::<HashMap<_, _>>(),
-                                )
-                            })
-                            .transpose()
-                            .ok()
-                            .flatten()
-                            .map(PiiJsonValue::from);
-
-                        let media = h.doc.as_ref().and_then(|d| d.media.as_ref()).map(|m| {
-                            m.iter()
-                                .map(|e| AmlHitMedia {
-                                    date: e.date,
-                                    pdf_url: e.pdf_url.clone(),
-                                    snippet: e.snippet.clone(),
-                                    title: e.title.clone(),
-                                    url: e.url.clone(),
+                    .and_then(|d| d.fields.as_ref())
+                    .map(|f| {
+                        serde_json::to_value(
+                            f.iter()
+                                .flat_map(|e| {
+                                    e.name.clone().and_then(|name| {
+                                        e.value.clone().map(|value| (name, value.leak_to_string()))
+                                    })
                                 })
-                                .collect::<Vec<_>>()
-                        });
-
-                        AmlHit {
-                            name: h.doc.as_ref().and_then(|d| d.name.clone()),
-                            fields: fields_json,
-                            match_types: h.match_types,
-                            media,
-                        }
+                                .collect::<HashMap<_, _>>(),
+                        )
                     })
-                    .collect::<Vec<_>>();
+                    .transpose()
+                    .ok()
+                    .flatten()
+                    .map(PiiJsonValue::from);
 
-                return Ok(Some(api_wire_types::AmlDetail {
-                    share_url,
-                    hits: aml_hits,
-                }));
-            }
-        }
+                let media = h.doc.as_ref().and_then(|d| d.media.as_ref()).map(|m| {
+                    m.iter()
+                        .map(|e| AmlHitMedia {
+                            date: e.date,
+                            pdf_url: e.pdf_url.clone(),
+                            snippet: e.snippet.clone(),
+                            title: e.title.clone(),
+                            url: e.url.clone(),
+                        })
+                        .collect::<Vec<_>>()
+                });
+
+                AmlHit {
+                    name: h.doc.as_ref().and_then(|d| d.name.clone()),
+                    fields: fields_json,
+                    match_types: h.match_types,
+                    media,
+                }
+            })
+            .collect::<Vec<_>>();
+
+        Ok(Some(api_wire_types::AmlDetail {
+            share_url,
+            hits: aml_hits,
+        }))
+    } else {
+        Ok(None)
     }
-
-    Ok(None)
 }

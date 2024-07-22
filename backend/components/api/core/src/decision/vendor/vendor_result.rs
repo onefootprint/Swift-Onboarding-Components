@@ -1,13 +1,9 @@
 use super::verification_result::decrypt_verification_result_response;
 use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
-use crate::State;
 use db::models::verification_request::RequestAndMaybeResult;
-use db::models::verification_request::RequestAndResult;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::DbError;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::EncryptedVaultPrivateKey;
@@ -15,7 +11,6 @@ use newtypes::SealedVaultBytes;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
 use newtypes::VerificationResultId;
-use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct VendorResult {
@@ -54,69 +49,6 @@ impl RequestAndMaybeHydratedResult {
 }
 
 impl VendorResult {
-    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present and
-    // non-error) into VendorResponse. Similar to from_verification_results_for_onboarding, but this
-    // method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only
-    // non-None vres's
-    #[tracing::instrument(skip_all)]
-    pub async fn hydrate_vendor_results(
-        requests_and_results: Vec<RequestAndMaybeResult>,
-        enclave_client: &EnclaveClient,
-        user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> FpResult<Vec<RequestAndMaybeHydratedResult>> {
-        // TODO: our saving/derser of vendor "Errors" is pretty sketch and
-        // from_verification_results_for_onboarding decrypting and deser'ing Vres's that are
-        // is_error = true seems a bit scary to me. Need to overhaul our approach to vendor errors
-
-        let vendor_results = Self::from_verification_results_for_onboarding(
-            requests_and_results.clone(),
-            enclave_client,
-            user_vault_private_key,
-        )
-        .await?;
-
-        let result_map: HashMap<VerificationRequestId, VendorResponse> = vendor_results
-            .into_iter()
-            .map(|vr| (vr.verification_request_id, vr.response))
-            .collect();
-
-        let res: Vec<_> = requests_and_results
-            .into_iter()
-            .map(|(vreq, vres)| {
-                let response = result_map.get(&vreq.id);
-                if let Some(vres) = vres {
-                    RequestAndMaybeHydratedResult {
-                        vreq,
-                        vres: (!vres.is_error).then_some(HydratedVerificationResult {
-                            vres,
-                            response: response.cloned(),
-                        }),
-                    }
-                } else {
-                    RequestAndMaybeHydratedResult { vreq, vres: None }
-                }
-            })
-            .collect();
-
-        Ok(res)
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn hydrate_vendor_result(
-        request_and_result: RequestAndResult,
-        enclave_client: &EnclaveClient,
-        user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> FpResult<RequestAndMaybeHydratedResult> {
-        Self::hydrate_vendor_results(
-            vec![(request_and_result.0, Some(request_and_result.1))],
-            enclave_client,
-            user_vault_private_key,
-        )
-        .await?
-        .pop()
-        .ok_or(DbError::ObjectNotFound.into())
-    }
-
     #[tracing::instrument(skip_all)]
     pub async fn from_verification_results_for_onboarding(
         requests_and_results: Vec<RequestAndMaybeResult>,
@@ -180,29 +112,6 @@ impl VendorResult {
         let parsed = &self.response.response;
 
         parsed.into()
-    }
-
-    #[tracing::instrument(skip_all)]
-    pub async fn get_successful_response(
-        state: &State,
-        latest_results: Vec<RequestAndMaybeResult>,
-        vw: &VaultWrapper,
-        vendor_api_to_check: VendorAPI,
-    ) -> FpResult<Option<VendorResult>> {
-        let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> =
-            VendorResult::hydrate_vendor_results(
-                latest_results,
-                &state.enclave_client,
-                &vw.vault.e_private_key,
-            )
-            .await?
-            .into_iter()
-            .map(|r| (r.vreq.vendor_api, r))
-            .collect();
-
-        Ok(vendor_api_to_latest_result
-            .get(&vendor_api_to_check)
-            .and_then(|r| r.clone().into_vendor_result()))
     }
 }
 

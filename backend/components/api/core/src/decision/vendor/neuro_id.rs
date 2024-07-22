@@ -1,5 +1,7 @@
 use super::map_to_api_error;
 use super::tenant_vendor_control::TenantVendorControl;
+use super::vendor_api::loaders::load_response_for_vendor_api;
+use super::vendor_api::vendor_api_struct::NeuroIdAnalytics;
 use super::vendor_result::VendorResult;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
@@ -13,7 +15,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::neuro_id_analytics_event::NewNeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::VerificationRequest;
+use db::models::verification_request::VReqIdentifier;
 use feature_flag::BoolFlag;
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
@@ -84,24 +86,27 @@ pub async fn run_neuro_call(
     wf_id: &WorkflowId,
     t_id: &TenantId,
 ) -> FpResult<Option<VendorResult>> {
-    let di_id = di.id.clone();
     let svid = di.scoped_vault_id.clone();
-    let (vw, latest_results, scoped_vault) = state
+    let (vw, scoped_vault) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
-            let latest_results =
-                VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
+
             let scoped_vault = ScopedVault::get(conn, &svid)?;
 
-            Ok((vw, latest_results, scoped_vault))
+            Ok((vw, scoped_vault))
         })
         .await?;
 
     // If we already have a successful neuro validation for this DI, we return early
-    let existing_vendor_result =
-        VendorResult::get_successful_response(state, latest_results, &vw, VendorAPI::NeuroIdAnalytics)
-            .await?;
+    let existing_vendor_result = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::WfId(wf_id.clone()),
+        &vw.vault.e_private_key,
+        NeuroIdAnalytics,
+    )
+    .await?
+    .into_vendor_result();
 
     if existing_vendor_result.is_some() {
         return Ok(existing_vendor_result);

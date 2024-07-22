@@ -1,6 +1,8 @@
 use super::common::call_start_onboarding;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeCurpValidation;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
@@ -31,7 +33,7 @@ use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::VerificationRequest;
+use db::models::verification_request::VReqIdentifier;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use idv::incode::curp_validation::response::CurpValidationResponse;
@@ -79,25 +81,28 @@ pub async fn run_curp_validation_check(
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
-    let di_id = di.id.clone();
-    let (vw, tenant_id, id_documents, latest_results, sv) = state
+    let (vw, tenant_id, id_documents, sv) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             let id_documents = Document::list_completed_sent_to_incode(conn, &wf_id2)?;
-            let latest_results =
-                VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
 
-            Ok((vw, tenant_id, id_documents, latest_results, sv))
+            Ok((vw, tenant_id, id_documents, sv))
         })
         .await?;
 
     // If we already have a successful curp validation for this DI, we return early
-    let existing_vendor_result =
-        VendorResult::get_successful_response(state, latest_results, &vw, VendorAPI::IncodeCurpValidation)
-            .await?;
+    // If we already have a successful neuro validation for this DI, we return early
+    let existing_vendor_result = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::WfId(wf_id.clone()),
+        &vw.vault.e_private_key,
+        IncodeCurpValidation,
+    )
+    .await?
+    .into_vendor_result();
     if existing_vendor_result.is_some() {
         return Ok(existing_vendor_result);
     }

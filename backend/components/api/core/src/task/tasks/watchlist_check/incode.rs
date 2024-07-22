@@ -1,5 +1,6 @@
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
-use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use crate::decision::{
     self,
 };
@@ -14,10 +15,10 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
-use idv::ParsedResponse;
 use newtypes::DataIdentifier as DI;
 use newtypes::DecisionIntentId;
 use newtypes::EncryptedVaultPrivateKey;
@@ -93,35 +94,31 @@ async fn watchlist_check_ref_from_latest_vres(
     user_vault_private_key: &EncryptedVaultPrivateKey,
     latest_watchlist_check_vres: Option<RequestAndResult>,
 ) -> FpResult<Option<(VerificationRequest, VerificationResult, IncodeWatchlistResultRef)>> {
-    let watchlist_ref = if let Some(latest_watchlist_check_vres) = latest_watchlist_check_vres {
-        let vreq_vres = VendorResult::hydrate_vendor_result(
-            latest_watchlist_check_vres,
-            &state.enclave_client,
-            user_vault_private_key,
-        )
-        .await?;
-        if let Some(vres) = vreq_vres.vres {
-            if let Some(res) = vres.response {
-                if let ParsedResponse::IncodeWatchlistCheck(wc) = res.response {
-                    wc.content.as_ref().and_then(|c| {
-                        c.data.as_ref().and_then(|d| {
-                            d.ref_
-                                .clone()
-                                .map(|r| (vreq_vres.vreq.clone(), vres.vres.clone(), r))
-                        })
-                    })
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+    let Some(vreq_vres) = latest_watchlist_check_vres else {
+        return Ok(None);
+    };
+
+    let decrypted_response = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::Id(vreq_vres.0.id.clone()),
+        user_vault_private_key,
+        IncodeWatchlistCheck,
+    )
+    .await?
+    .ok()
+    .map(|(res, _)| res);
+    let watchlist_ref = if let Some(wc) = decrypted_response {
+        wc.content.as_ref().and_then(|c| {
+            c.data.as_ref().and_then(|d| {
+                d.ref_
+                    .clone()
+                    .map(|r| (vreq_vres.0.clone(), vreq_vres.1.clone(), r))
+            })
+        })
     } else {
         None
     };
+
     Ok(watchlist_ref)
 }
 
