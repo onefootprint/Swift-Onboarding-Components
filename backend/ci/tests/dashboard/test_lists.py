@@ -4,7 +4,7 @@ from tests.dashboard.utils import update_rules
 
 
 def test_create(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -46,7 +46,7 @@ def test_create(sandbox_tenant):
 
 
 def test_create_no_permissions(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     post(
         f"/org/lists",
         dict(
@@ -60,7 +60,7 @@ def test_create_no_permissions(sandbox_tenant):
 
 
 def test_list(sandbox_tenant, must_collect_data, can_access_data):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     post(
         f"/org/lists",
         dict(
@@ -190,7 +190,7 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
     # that matches the list type.
 
     # Create some lists.
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     ssn9_list = post(
         f"/org/lists",
         dict(
@@ -319,7 +319,7 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
 
 
 def test_update(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -361,7 +361,7 @@ def test_update(sandbox_tenant):
 
 
 def test_update_no_permissions(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -384,7 +384,7 @@ def test_update_no_permissions(sandbox_tenant):
 
 
 def test_delete_list(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list1 = post(
         f"/org/lists",
         dict(
@@ -449,7 +449,7 @@ def test_delete_list(sandbox_tenant):
 
 
 def test_delete_no_permissions(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -469,7 +469,7 @@ def test_delete_no_permissions(sandbox_tenant):
 
 
 def test_create_list_entry(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     resp = post(
         f"/org/lists",
         dict(
@@ -540,7 +540,7 @@ def test_create_list_entry(sandbox_tenant):
 
 
 def test_create_list_entry_format_canonicalization(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
 
     # Invalid SSN yields HTTP 400
     resp = post(
@@ -601,7 +601,7 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
 
 
 def test_create_list_entry_no_permissions(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -621,7 +621,7 @@ def test_create_list_entry_no_permissions(sandbox_tenant):
 
 
 def test_list_list_entries(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -678,7 +678,7 @@ def test_list_list_entries(sandbox_tenant):
 
 
 def test_delete_list_entries(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -767,7 +767,7 @@ def test_delete_list_entries(sandbox_tenant):
 
 
 def test_delete_list_entries_no_permissions(sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     list = post(
         f"/org/lists",
         dict(
@@ -801,7 +801,7 @@ def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_d
         sandbox_tenant, "Test OB Config", must_collect_data, can_access_data
     )
 
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(15)
     ssn9_list = post(
         f"/org/lists",
         dict(
