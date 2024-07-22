@@ -296,7 +296,7 @@ task_enum! {
     #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosNotFoundTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosFilingNotFound)]
-        #[strum(serialize = "Not Registered	")]
+        #[strum(serialize = "Not Registered")]
         NotRegistered,
     }
 }
