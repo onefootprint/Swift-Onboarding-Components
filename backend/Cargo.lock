@@ -4468,7 +4468,6 @@ dependencies = [
  "test-case",
  "tokio",
  "tokio-stream",
- "vault_dr_client",
 ]
 
 [[package]]
@@ -9894,14 +9893,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "vault_dr_client"
-version = "0.1.0"
-dependencies = [
- "age",
- "thiserror",
 ]
 
 [[package]]

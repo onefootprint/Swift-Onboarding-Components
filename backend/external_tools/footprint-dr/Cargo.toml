@@ -7,8 +7,6 @@ description = "CLI for interacting with the Footprint Vault Disaster Recovery sy
 edition.workspace = true
 
 [dependencies]
-vault_dr_client = { path = "../../components/vault_dr_client" }
-
 anyhow =  { workspace = true }
 age =  { workspace = true }
 aws-config = { workspace = true }
