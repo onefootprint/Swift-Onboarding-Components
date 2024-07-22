@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import { type FormValues, OnboardingStep } from '../../types';
-import { Context } from '../provider';
+import { Context } from '../components/provider';
 import save from '../queries/save';
 import fp from '../utils/browser';
 import { formatBeforeSave } from '../utils/save-utils';
@@ -54,39 +54,22 @@ const useFootprint = () => {
     component.render();
   };
 
-  const vaultData = async (
-    formValues: FormValues,
-    {
-      onSuccess,
-      onError,
-    }: {
-      onSuccess?: () => void;
-      onError?: (error: unknown) => void;
-    } = {},
-  ) => {
+  const vaultData = async (formValues: FormValues) => {
     const { vaultingToken, onboardingConfig } = context;
     if (!vaultingToken) {
-      onError?.(new Error('No authToken found. Please authenticate first'));
-      return;
+      throw new Error('No authToken found. Please authenticate first');
     }
     if (!onboardingConfig) {
-      onError?.(new Error('No onboardingConfig found. Please make sure that the publicKey is correct'));
-      return;
+      throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
     }
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
-      onError?.(new Error('Unsupported onboardingConfig kind'));
-      return;
+      throw new Error('Unsupported onboardingConfig kind');
     }
-    try {
-      await save({
-        data: formatBeforeSave(formValues, context.locale ?? 'en-US'),
-        bootstrapDis: [],
-        authToken: vaultingToken,
-      });
-      onSuccess?.();
-    } catch (error: unknown) {
-      onError?.(error);
-    }
+    await save({
+      data: formatBeforeSave(formValues, context.locale ?? 'en-US'),
+      bootstrapDis: [],
+      authToken: vaultingToken,
+    });
   };
 
   const handoff = ({

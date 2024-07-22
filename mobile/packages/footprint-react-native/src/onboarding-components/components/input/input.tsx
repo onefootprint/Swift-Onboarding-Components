@@ -1,9 +1,9 @@
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import type { TextInputProps, TextInput } from 'react-native';
+import type { TextInputProps } from 'react-native';
 import { TextInput as RNTextInput } from 'react-native';
 import { formatWithMask } from 'react-native-mask-input';
-import useFieldProps from '../hooks/use-field-props';
+import useFieldProps from '../../hooks/use-field-props';
 
 export type InputProps = TextInputProps & {
   as?: React.ComponentType<TextInputProps & { hasError?: boolean }>;

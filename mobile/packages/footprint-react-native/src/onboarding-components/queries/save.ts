@@ -1,5 +1,5 @@
 import { AUTH_HEADER } from '@onefootprint/types';
-import { API_BASE_URL } from 'src/utils/constants';
+import request from 'src/utils/request';
 
 import type { SaveDataRequest, SaveDataResponse } from '../types/save-request-data';
 
@@ -22,18 +22,16 @@ const save = async (payload: SaveDataRequest) => {
   }
 
   const url = hasBusiness ? '/hosted/business/vault' : '/hosted/user/vault';
-
-  const response = await fetch(`${API_BASE_URL}${url}`, {
+  const response = await request<SaveDataResponse>({
+    url,
     method: 'PATCH',
-    body: JSON.stringify(data),
+    data,
     headers: {
       [AUTH_HEADER]: payload.authToken,
     },
+    disableCaseConverter: true,
   });
-
-  if (!response.ok) throw new Error('Failed to save data');
-
-  return response.json() as Promise<SaveDataRequest>;
+  return response;
 };
 
 export default save;

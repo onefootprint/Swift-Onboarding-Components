@@ -2,10 +2,10 @@ import get from 'lodash/get';
 import React, { useId, useMemo } from 'react';
 import type { FieldError, FieldErrorsImpl, Merge } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
-import { View, StyleSheet, type ViewProps, ViewStyle } from 'react-native';
+import { StyleSheet, View, type ViewProps, ViewStyle } from 'react-native';
 
-import type { FormValues } from '../../types';
-import type { ChidrenOrFunction } from '../types/children';
+import type { FormValues } from '../../../types';
+import type { ChidrenOrFunction } from '../../types/children';
 import FieldContext from '../field-context';
 
 type FieldOptions = {

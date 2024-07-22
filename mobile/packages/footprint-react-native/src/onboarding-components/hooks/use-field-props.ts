@@ -7,8 +7,8 @@ import type { MaskInputProps } from 'react-native-mask-input';
 import { Masks, createNumberMask } from 'react-native-mask-input';
 import { isEmail, isMobilePhone } from 'validator';
 
-import fieldContext from '../field-context';
-import { Context } from '../provider';
+import fieldContext from '../components/field-context';
+import { Context } from '../components/provider';
 import validateDob from '../utils/dob-validator';
 import isName from '../utils/name-validator';
 import { isSSN4, isSSN9 } from '../utils/ssn-validator';

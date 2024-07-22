@@ -1,9 +1,10 @@
-import { CORPORATION_TYPES, COUNTRY_CODES } from './constants';
-import Field from './field';
-import FieldErrors from './field-errors';
-import Form from './form';
-import Input from './input';
-import Provider from './provider';
+import Field from './components/field';
+import FieldErrors from './components/field-errors';
+import Form from './components/form';
+import Input from './components/input';
+import Otp from './components/otp';
+import Provider from './components/provider';
+import { CORPORATION_TYPES, COUNTRY_CODES } from './config/constants';
 
 const Fp = {
   Provider,
@@ -11,6 +12,7 @@ const Fp = {
   Input,
   Field,
   FieldErrors,
+  Otp,
   COUNTRY_CODES,
   CORPORATION_TYPES,
 };

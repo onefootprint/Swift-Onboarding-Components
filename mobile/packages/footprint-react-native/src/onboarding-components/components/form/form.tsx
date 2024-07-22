@@ -1,14 +1,15 @@
 import React from 'react';
 import type { FieldErrors } from 'react-hook-form';
-import { FormProvider, useForm, type UseFormSetValue } from 'react-hook-form';
-import { View, StyleSheet, type ViewProps, ViewStyle } from 'react-native';
+import { FormProvider, type UseFormSetFocus, type UseFormSetValue, useForm } from 'react-hook-form';
+import { StyleSheet, View, type ViewProps, ViewStyle } from 'react-native';
 
-import type { FormValues } from '../../types';
-import flattenObject from '../utils/flatten-object';
+import type { FormValues } from '../../../types';
+import flattenObject from '../../utils/flatten-object';
 
 type FormOptions = {
   handleSubmit: () => void;
   setValue: UseFormSetValue<FormValues>;
+  setFocus: UseFormSetFocus<FormValues>;
   errors: FieldErrors<FormValues>;
 };
 
@@ -24,6 +25,7 @@ const Form = ({ children, defaultValues, onSubmit, style, ...props }: FormProps)
   const {
     handleSubmit,
     setValue,
+    setFocus,
     formState: { errors },
   } = methods;
 
@@ -37,6 +39,7 @@ const Form = ({ children, defaultValues, onSubmit, style, ...props }: FormProps)
         {children({
           handleSubmit: handleSubmit(handleBeforeSubmit),
           setValue,
+          setFocus,
           errors: flattenObject(errors, { level: 1 }) as FieldErrors<FormValues>,
         })}
       </View>

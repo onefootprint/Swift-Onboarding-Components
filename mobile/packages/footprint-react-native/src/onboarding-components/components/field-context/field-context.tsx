@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import type { FormValues } from '../../types';
+import type { FormValues } from '../../../types';
 
 export default createContext<{
   name: keyof FormValues;

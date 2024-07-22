@@ -1,18 +1,15 @@
 import type { GetPublicOnboardingConfigResponse } from '@onefootprint/types';
-import { API_BASE_URL } from 'src/utils/constants';
+import request from 'src/utils/request';
 
 const getOnboardingConfig = async (obConfig: string): Promise<GetPublicOnboardingConfigResponse> => {
-  const response = await fetch(`${API_BASE_URL}/hosted/onboarding/config`, {
+  const response = await request<GetPublicOnboardingConfigResponse>({
+    url: '/hosted/onboarding/config',
     method: 'GET',
     headers: {
       'X-Onboarding-Config-Key': obConfig,
     },
   });
-  if (!response.ok) {
-    throw new Error('Failed to fetch onboarding config');
-  }
-  const config = await response.json();
-  return config as GetPublicOnboardingConfigResponse;
+  return response;
 };
 
 export default getOnboardingConfig;
