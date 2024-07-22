@@ -619,7 +619,7 @@ impl ScopedVault {
 
     /// Count the number of scoped vaults that are billable for PII storage
     #[tracing::instrument("ScopedVault::count_billable", skip_all)]
-    pub fn count_billable(
+    pub fn count_billable_for_vault_storage(
         conn: &mut PgConn,
         t_id: &TenantId,
         end_date: DateTime<Utc>,
@@ -653,6 +653,7 @@ impl ScopedVault {
             .filter(scoped_vault::is_live.eq(true))
             // Only allow billing for active users
             .filter(scoped_vault::is_active.eq(true))
+            .filter(scoped_vault::is_billable_for_vault_storage.eq(true))
             // Only bill for users that have data in them
             .filter(scoped_vault::id.eq_any(sv_with_data))
             // Only bill for vaults that existed by the end of the billng period

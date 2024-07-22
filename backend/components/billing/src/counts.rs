@@ -120,7 +120,8 @@ impl BillingCounts {
         // Fetch counts for most products regardless of whether the tenant is set up with
         // billing for them. We will error if any of these products have use when they haven't
         // been contracted
-        let pii = ScopedVault::count_billable(conn, t_id, i.end, ScopedVaultPiiFilters::None)?;
+        let pii =
+            ScopedVault::count_billable_for_vault_storage(conn, t_id, i.end, ScopedVaultPiiFilters::None)?;
         let watchlist_checks = WatchlistCheck::get_billable_count(conn, t_id, i.start, i.end)?;
 
         // These billing schemes are only used by some tenants, so only count them conditionally
@@ -141,13 +142,17 @@ impl BillingCounts {
             .is_some()
         {
             let filter = ScopedVaultPiiFilters::NonPci;
-            Some(ScopedVault::count_billable(conn, t_id, i.end, filter)?)
+            Some(ScopedVault::count_billable_for_vault_storage(
+                conn, t_id, i.end, filter,
+            )?)
         } else {
             None
         };
         let vaults_with_pci = if bp.and_then(|p| p.prices.get(&Product::VaultsWithPci)).is_some() {
             let filter = ScopedVaultPiiFilters::PciOrCustom;
-            Some(ScopedVault::count_billable(conn, t_id, i.end, filter)?)
+            Some(ScopedVault::count_billable_for_vault_storage(
+                conn, t_id, i.end, filter,
+            )?)
         } else {
             None
         };

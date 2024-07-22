@@ -4,6 +4,7 @@ use crate::PgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::access_event;
+use db_schema::schema::scoped_vault;
 use diesel::dsl::count_distinct;
 use diesel::prelude::*;
 use diesel::Insertable;
@@ -92,6 +93,11 @@ impl AccessEvent {
             .filter(access_event::timestamp.ge(start_date))
             .filter(access_event::timestamp.lt(end_date))
             .filter(access_event::purpose.eq_any(purposes))
+            .filter(diesel::dsl::exists(
+                scoped_vault::table
+                    .filter(scoped_vault::id.eq(access_event::scoped_vault_id))
+                    .filter(scoped_vault::is_billable_for_vault_storage.eq(true))
+            ))
             .select(count_distinct(access_event::scoped_vault_id))
             .get_result(conn)?;
         Ok(count)
