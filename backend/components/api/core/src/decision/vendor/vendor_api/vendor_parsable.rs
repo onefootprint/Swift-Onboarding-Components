@@ -1,6 +1,7 @@
 use super::vendor_api_struct::WrappedVendorAPI;
 use super::vendor_api_struct::*;
 use idv::experian::cross_core::response::CrossCoreAPIResponse;
+use idv::footprint::FootprintDeviceAttestationData;
 use idv::idology::expectid::response::ExpectIDResponse;
 use idv::idology::pa::response::PaResponse;
 use idv::incode::curp_validation::response::CurpValidationResponse;
@@ -167,4 +168,9 @@ impl AsParsedResponse for CurpValidationResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::IncodeCurpValidation(self)
     }
+}
+
+// FootprintDeviceAttestationData
+impl VendorParsable for FootprintDeviceAttestation {
+    type ParsedType = FootprintDeviceAttestationData;
 }

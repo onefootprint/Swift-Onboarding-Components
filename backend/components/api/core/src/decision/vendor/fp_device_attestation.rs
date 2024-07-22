@@ -98,16 +98,18 @@ pub fn save_vendor_result_and_risk_signals(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::decision::vendor::vendor_result::VendorResult;
     use crate::FpResult;
     use crate::State;
+    use db::models::verification_request::VReqIdentifier;
     use db::tests::fixtures;
     use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
+    use vendor::vendor_api::loaders::load_response_for_vendor_api;
+    use vendor::vendor_api::vendor_api_struct::FootprintDeviceAttestation;
 
     #[test_state]
     async fn test_deser(state: &mut State) {
-        let (vreq, vres, private_key) = state
+        let (vreq, private_key) = state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let uv = fixtures::vault::create_person(conn, true);
@@ -117,7 +119,7 @@ mod tests {
 
                 let attest = fixtures::apple_device_attestation::create(conn, &uv.id);
 
-                let (vreq, vres, _rs) = save_vendor_result_and_risk_signals(
+                let (vreq, _, _rs) = save_vendor_result_and_risk_signals(
                     conn,
                     &AttestationResult::Apple(&attest),
                     &uv.public_key,
@@ -127,19 +129,21 @@ mod tests {
                 )
                 .unwrap();
 
-                Ok((vreq, vres, uv.e_private_key.clone()))
+                Ok((vreq, uv.e_private_key.clone()))
             })
             .await
             .unwrap();
 
         // We can properly deserialize the saved vendor response
-        let vr = VendorResult::from_verification_results_for_onboarding(
-            vec![(vreq, Some(vres))],
-            &state.enclave_client,
+        let _ = load_response_for_vendor_api(
+            state,
+            VReqIdentifier::Id(vreq.id),
             &private_key,
+            FootprintDeviceAttestation,
         )
         .await
+        .unwrap()
+        .ok()
         .unwrap();
-        assert_eq!(1, vr.len());
     }
 }
