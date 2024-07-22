@@ -109,6 +109,8 @@ const Title = styled(Box)`
     ${createFontStyles('caption-1')};
     color: ${theme.color.secondary};
     gap: ${theme.spacing[3]};
+    max-width: 100%;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;

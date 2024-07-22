@@ -1,4 +1,4 @@
-import { Box, CodeBlock, media } from '@onefootprint/ui';
+import { Box, CodeBlock, Text, media } from '@onefootprint/ui';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -84,7 +84,9 @@ const DemoCode = ({ article }: DemoCodeProps) => {
       <Box tag="span" color={getColorFromMethod(method)}>
         {method.toUpperCase()}
       </Box>
-      {path}
+      <Text tag="span" color="neutral" variant="caption-1" truncate maxWidth="100%">
+        {path}
+      </Text>
     </>
   );
 
