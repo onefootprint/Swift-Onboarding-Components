@@ -85,7 +85,7 @@ pub struct ObConfiguration {
     // DEPRECATED: use verification checks
     /// When true on a KYB playbook, just collect business info without sending to vendors
     #[allow(unused)]
-    skip_kyb: bool,
+    skip_kyb: Option<bool>,
     /// When true on a KYC or KYB playbook, allows skipping confirm screen.
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
@@ -367,7 +367,7 @@ struct NewObConfiguration {
     allow_us_residents: bool,
     allow_us_territory_residents: bool,
     kind: ObConfigurationKind,
-    skip_kyb: bool,
+    skip_kyb: Option<bool>,
     skip_confirm: bool,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     curp_validation_enabled: bool,
@@ -639,7 +639,7 @@ impl ObConfiguration {
             allow_us_residents,
             allow_us_territory_residents,
             kind,
-            skip_kyb,
+            skip_kyb: Some(skip_kyb),
             skip_confirm,
             document_types_and_countries,
             curp_validation_enabled,
