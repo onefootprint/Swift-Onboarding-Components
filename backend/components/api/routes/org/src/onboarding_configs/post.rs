@@ -7,11 +7,12 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
-use db::models::ob_configuration::required_auth_methods_for;
+use api_wire_types::Patch;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::VerificationChecks;
 use db::models::rule_set_version::RuleSetVersion;
+use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::DocumentAndCountryConfiguration;
@@ -26,7 +27,7 @@ use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::Apiv2Schema;
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateOnboardingConfigurationRequest {
     pub name: String,
@@ -60,6 +61,8 @@ pub struct CreateOnboardingConfigurationRequest {
     pub curp_validation_enabled: Option<bool>,
     #[serde(default)]
     pub verification_checks: Option<Vec<VerificationCheck>>,
+    #[serde(default)]
+    pub required_auth_methods: Patch<Vec<AuthMethodKind>>,
 }
 
 #[api_v2_operation(
@@ -102,6 +105,7 @@ pub async fn post(
         enhanced_aml: api_enhanced_aml,
         kind,
         verification_checks,
+        required_auth_methods,
     } = pb_request;
 
 
@@ -114,6 +118,21 @@ pub async fn post(
 
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
     let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
+
+    // TODO remove once client start providing this
+    let required_auth_methods = match required_auth_methods {
+        Patch::Null => None,
+        Patch::Value(v) => Some(v),
+        Patch::Missing => match kind {
+            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
+            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
+            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
+                vec![AuthMethodKind::Email]
+            } else {
+                vec![AuthMethodKind::Phone]
+            }),
+        },
+    };
 
     let args = NewObConfigurationArgs {
         name,
@@ -139,7 +158,7 @@ pub async fn post(
         business_documents_to_collect,
         curp_validation_enabled,
         verification_checks,
-        required_auth_methods: required_auth_methods_for(kind, is_no_phone_flow),
+        required_auth_methods,
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;

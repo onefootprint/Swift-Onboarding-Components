@@ -76,7 +76,7 @@ pub async fn post(
         if let Some(obc) = obc {
             // There won't be an obc associated with auth tokens that were generated via API
             // without a playbook key.
-            if let Some(required_auth_methods) = obc.required_auth_methods() {
+            if let Some(required_auth_methods) = obc.required_auth_methods.as_ref() {
                 let id = UserIdentifier::ScopedVault(sv_id.clone());
                 let ctx = get_user_challenge_context(&state, id, None).await?;
                 let verified_auth_methods = ctx

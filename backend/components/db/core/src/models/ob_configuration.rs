@@ -748,30 +748,10 @@ impl ObConfiguration {
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == di_kind)
     }
-
-    /// Returns the list of auth methods that are required to be registered by this playbook, if any
-    pub fn required_auth_methods(&self) -> Option<Vec<AuthMethodKind>> {
-        required_auth_methods_for(self.kind, self.is_no_phone_flow)
-    }
-}
-
-pub fn required_auth_methods_for(
-    kind: ObConfigurationKind,
-    is_no_phone_flow: bool,
-) -> Option<Vec<AuthMethodKind>> {
-    match kind {
-        // Auth and Document playbooks don't (yet) have an opinion on which login method is used
-        ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
-        ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
-            vec![AuthMethodKind::Email]
-        } else {
-            vec![AuthMethodKind::Phone]
-        }),
-    }
 }
 
 
-// Helper to more easily interact with verification checks
+/// Helper to more easily interact with verification checks
 #[derive(Default, Clone)]
 pub struct VerificationChecks(Vec<VerificationCheck>);
 impl VerificationChecks {

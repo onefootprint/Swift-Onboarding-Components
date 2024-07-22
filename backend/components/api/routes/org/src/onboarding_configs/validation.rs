@@ -10,6 +10,7 @@ use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::output::Csv;
+use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedData as CD;
 use newtypes::CollectedDataOption as CDO;
@@ -42,6 +43,7 @@ impl ObConfigurationArgsToValidate {
         args.validate_flags(state, &tenant.id)?;
         args.validate_tenant_restrictions(tenant)?;
         args.validate_checks()?;
+        args.validate_required_auth_methods()?;
         Ok(args.0)
     }
 
@@ -628,6 +630,25 @@ impl ObConfigurationArgsToValidate {
             // TODO
             _ => Ok(()),
         }
+    }
+
+    fn validate_required_auth_methods(&self) -> FpResult<()> {
+        let Some(reqd_methods) = self.required_auth_methods.as_ref() else {
+            return Ok(());
+        };
+        if reqd_methods.iter().unique().count() != reqd_methods.len() {
+            return ValidationError("Cannot provide duplicates in required auth methods").into();
+        }
+        if reqd_methods.iter().any(|r| r == &AuthMethodKind::Passkey) {
+            return ValidationError("Cannot yet require passkey as an auth method").into();
+        }
+        if reqd_methods.iter().any(|r| r == &AuthMethodKind::Phone) && self.is_no_phone_flow {
+            return ValidationError("Cannot require phone auth method in no phone flow").into();
+        }
+        if reqd_methods.is_empty() {
+            return ValidationError("Must have at least one required auth method if provided").into();
+        }
+        Ok(())
     }
 }
 
