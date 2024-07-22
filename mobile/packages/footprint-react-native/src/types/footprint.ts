@@ -58,3 +58,5 @@ export type Options = {
   showCompletionPage?: boolean;
   showLogo?: boolean;
 };
+
+export type SandboxOutcome = 'fail' | 'pass' | 'manual_review' | 'use_rules_outcome';

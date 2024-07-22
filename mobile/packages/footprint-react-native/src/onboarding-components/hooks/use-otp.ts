@@ -14,29 +14,30 @@ const useOtp = () => {
     timeBeforeRetryS: number;
   } | null>(null);
 
-  const create = async ({ email, phoneNumber }: { email?: string; phoneNumber?: string }) => {
+  const create = async (payload: { email?: string; phoneNumber?: string }) => {
     const { onboardingConfig } = context;
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
     }
     const response = await createChallenge(
-      { email, phoneNumber },
+      payload,
       { onboardingConfig: onboardingConfig.key, sandboxId: context.sandboxId },
     );
     setChallengeData(response.challengeData);
   };
 
-  const verify = async ({ challenge }: { challenge: string }) => {
+  const verify = async (payload: { challenge: string }) => {
     if (!challengeData) {
       throw new Error('No challengeData found. Please make sure that the publicKey is correct');
     }
     const response = await verifyChallenge(
       {
-        challenge,
+        challenge: payload.challenge,
         challengeToken: challengeData?.challengeToken,
       },
       {
         token: challengeData.token,
+        sandboxOutcome: context.sandboxOutcome,
       },
     );
     setContext(prev => ({

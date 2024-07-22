@@ -1,4 +1,5 @@
 import request from 'src/utils/request';
+import type { SandboxOutcome } from 'src/types';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
 
@@ -58,43 +59,43 @@ export const createChallenge = async (payload: EmailAndPassword, options: Reques
 };
 
 const verify = async (
-  { challenge, challengeToken }: { challenge: string; challengeToken: string },
-  { token }: { token: string },
+  payload: { challenge: string; challengeToken: string },
+  options: { token: string },
 ) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/identify/verify',
     method: 'POST',
     data: {
-      challengeResponse: challenge,
-      challengeToken,
+      challengeResponse: payload.challenge,
+      challengeToken: payload.challengeToken,
       scope: 'onboarding',
     },
     headers: {
-      'X-Fp-Authorization': token,
+      'X-Fp-Authorization': options.token,
     },
   });
   return response;
 };
-const getValidationToken = async ({ token }: { token: string }) => {
+const getValidationToken = async (options: { token: string }) => {
   const response = await request<{ validationToken: string }>({
     url: '/hosted/identify/validation_token',
     method: 'POST',
     headers: {
-      'X-Fp-Authorization': token,
+      'X-Fp-Authorization': options.token,
     },
   });
   return response;
 };
 
-const initOnboarding = async ({ token }: { token: string }) => {
+const initOnboarding = async (options: { token: string, sandboxOutcome: SandboxOutcome }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/onboarding',
     method: 'POST',
     data: {
-      fixture_result: 'pass',
+      fixture_result: options.sandboxOutcome,
     },
     headers: {
-      'X-Fp-Authorization': token,
+      'X-Fp-Authorization': options.token,
     },
   });
   return response;
@@ -102,10 +103,10 @@ const initOnboarding = async ({ token }: { token: string }) => {
 
 export const verifyChallenge = async (
   payload: { challenge: string; challengeToken: string },
-  options: { token: string },
+  options: { token: string, sandboxOutcome: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
   await getValidationToken({ token: response.authToken });
-  await initOnboarding({ token: response.authToken });
+  await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
   return response;
 };

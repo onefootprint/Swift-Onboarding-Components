@@ -2,7 +2,7 @@ import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/type
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { type Appearance, OnboardingStep } from '../../../types';
+import { type Appearance, type SandboxOutcome, OnboardingStep } from '../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 
 export type ContextData = {
@@ -12,12 +12,14 @@ export type ContextData = {
   onboardingConfig?: PublicOnboardingConfig;
   publicKey: string;
   sandboxId?: string;
+  sandboxOutcome: SandboxOutcome;
   step: OnboardingStep;
   vaultingToken?: string;
 };
 
 export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxId'> & {
   children?: React.ReactNode;
+  sandboxOutcome?: SandboxOutcome;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -26,17 +28,27 @@ const Context = createContext<[ContextData, UpdateContext]>([
   {
     publicKey: '',
     step: OnboardingStep.Auth,
+    sandboxOutcome: 'pass',
   },
   () => undefined,
 ]);
 
-const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US', sandboxId }: ProviderProps) => {
+const Provider = ({ 
+  appearance,
+  authToken,
+  children,
+  locale = 'en-US',
+  publicKey,
+  sandboxId,
+  sandboxOutcome = 'pass'
+}: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
     locale,
     publicKey,
     sandboxId,
+    sandboxOutcome,
     step: authToken ? OnboardingStep.Onboard : OnboardingStep.Auth,
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);

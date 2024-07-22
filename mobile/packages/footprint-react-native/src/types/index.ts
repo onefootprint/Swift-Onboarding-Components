@@ -12,6 +12,7 @@ export type {
   OnboardingProps,
   Options,
   PublicEvent,
+  SandboxOutcome,
   SupportedLanguage,
   SupportedLocale,
   VerifyProps,
