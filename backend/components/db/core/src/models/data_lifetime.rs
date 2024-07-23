@@ -347,4 +347,27 @@ impl DataLifetime {
 
         Ok(results)
     }
+
+    /// Computes the active seqno at the provided timestamp.
+    pub fn get_seqno_at(conn: &mut PgConn, timestamp: DateTime<Utc>) -> DbResult<DataLifetimeSeqno> {
+        // Grab the DataLifetime that was created most recently before the provided timestamp and return its
+        // seqno. This was the currently active seqno at the time of the provided timestamp.
+
+        // Seqno should only be advanced when a new DataLifetime is created, so the DataLifetime table can
+        // be used to reconstruct the timeline of seqnos.
+        // A given seqno is active from DL that creates it to the DL that next increments seqno.
+
+        // A timestamp will correspond to either exactly one unique DataLifetime seqno, or it will most
+        // likely be sandwiched between two DataLifetime seqnos (which may not be contiguous
+        // integers). If it's sandwiched between two seqnos, we'll take the lower seqno.
+        let seqno = data_lifetime::table
+            .filter(data_lifetime::created_at.le(timestamp))
+            .order_by(data_lifetime::created_at.desc())
+            .limit(1)
+            .select(data_lifetime::created_seqno)
+            .get_result(conn)
+            .optional()?;
+        let seqno = seqno.unwrap_or_default();
+        Ok(seqno)
+    }
 }

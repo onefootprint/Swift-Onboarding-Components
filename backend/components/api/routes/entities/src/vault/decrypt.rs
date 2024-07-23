@@ -11,6 +11,7 @@ use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::bulk_decrypt;
@@ -22,6 +23,9 @@ use api_core::FpResult;
 use api_wire_types::BusinessDecryptResponse;
 use api_wire_types::DecryptResponse;
 use api_wire_types::UserDecryptResponse;
+use chrono::DateTime;
+use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -51,9 +55,15 @@ pub struct UserDecryptRequest {
     // NOTE: We are not serializing that this request can include versioned DIs
     #[openapi(serialize_as = "Option<Vec<UserDataIdentifier>>")]
     pub(super) fields: HashSet<VersionedDataIdentifier>,
+
     /// Reason for the data decryption. This will be logged
     #[openapi(example = "Lorem ipsum dolor")]
     pub(super) reason: String,
+
+    /// When provided, decrypts the user's data as it existed at the provided timestamp.
+    /// Provided as an ISO 8601 timestamp string, like `2024-01-01T12:00:00Z`.
+    #[openapi(example = "null")]
+    pub(super) version_at: Option<DateTime<Utc>>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms.
@@ -150,6 +160,7 @@ pub async fn post_business(
         reason,
         fields,
         transforms,
+        version_at: None,
     };
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
@@ -190,10 +201,19 @@ pub async fn post_client(
         reason,
         fields,
         transforms,
+        version_at: None,
     };
 
     let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
     Ok(UserDecryptResponse(result))
+}
+
+#[derive(derive_more::From, Clone, Copy, Hash, Eq, PartialEq)]
+enum VwVersion {
+    /// Build at the provided seqno
+    Seqno(DataLifetimeSeqno),
+    /// Build at the provided timestamp
+    Timestamp(DateTime<Utc>),
 }
 
 pub(super) async fn post_inner(
@@ -203,11 +223,12 @@ pub(super) async fn post_inner(
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<DecryptResponse> {
+) -> FpResult<DecryptResponse> {
     let UserDecryptRequest {
         fields,
         reason,
         transforms,
+        version_at,
     } = request;
 
     // Record the fields being decrypted
@@ -215,28 +236,58 @@ pub(super) async fn post_inner(
         "meta",
         Csv::from(fields.iter().cloned().collect_vec()).to_string(),
     );
+    let timestamp_version = version_at.map(VwVersion::from);
 
     // Create a VW for each version in fields
     let version_to_targets = fields
         .into_iter()
         .map(|f| {
+            let seqno_version = f.version.map(VwVersion::from);
+            let version = match (timestamp_version, seqno_version) {
+                (Some(_), Some(_)) => {
+                    return ValidationError("Cannot provide both `version_at` and inline per-field versions.")
+                        .into()
+                }
+                (Some(v), None) | (None, Some(v)) => Some(v),
+                (None, None) => None,
+            };
             let target = EnclaveDecryptOperation::new(f.di, transforms.clone().unwrap_or_default());
-            (f.version, target)
+            Ok((version, target))
         })
+        .collect::<FpResult<Vec<_>>>()?
+        .into_iter()
         .into_group_map();
     let versions = version_to_targets.keys().cloned().collect_vec();
+
+    let has_seqno_versions = versions.iter().any(|v| matches!(v, Some(VwVersion::Seqno(_))));
+    let has_timestamp_versions = versions
+        .iter()
+        .any(|v| matches!(v, Some(VwVersion::Timestamp(_))));
+    if has_seqno_versions || has_timestamp_versions {
+        tracing::info!(%has_seqno_versions, %has_timestamp_versions, "Decrypting with version");
+    }
 
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
 
-    let vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
+    let vws: HashMap<Option<VwVersion>, TenantVw> = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Build a VW for every version requested
             let vws = versions
                 .into_iter()
-                .map(|v| VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v).map(|vw| (v, vw)))
+                .map(|v| {
+                    let v_seqno = match v {
+                        None => None,
+                        Some(VwVersion::Seqno(seqno)) => Some(seqno),
+                        Some(VwVersion::Timestamp(t)) => {
+                            let seqno = DataLifetime::get_seqno_at(conn, t)?;
+                            Some(seqno)
+                        }
+                    };
+                    VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v_seqno).map(|vw| (v, vw))
+                })
                 .collect::<FpResult<_>>()?;
             Ok(vws)
         })
@@ -272,8 +323,14 @@ pub(super) async fn post_inner(
             .iter()
             .map(|target| (target.identifier.clone(), v_results.remove(target)))
             .collect();
+        let version = if let Some(VwVersion::Seqno(v_seqno)) = v {
+            Some(v_seqno)
+        } else {
+            // Don't serialize the seqno inline for data that was decrypted by timestamp
+            None
+        };
         for (di, result) in v_results {
-            let id = VersionedDataIdentifier { di, version: v };
+            let id = VersionedDataIdentifier { di, version };
             results.insert(id, result);
         }
     }

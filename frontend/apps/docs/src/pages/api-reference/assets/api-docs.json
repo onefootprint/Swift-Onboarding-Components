@@ -4342,6 +4342,12 @@
                                 "encrypt('<algorithm>','<public_key>')"
                             ]
                         }
+                    },
+                    "version_at": {
+                        "example": null,
+                        "description": "When provided, decrypts the user's data as it existed at the provided timestamp.\n Provided as an ISO 8601 timestamp string, like `2024-01-01T12:00:00Z`.",
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "required": [

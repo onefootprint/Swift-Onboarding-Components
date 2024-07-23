@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS data_lifetime_seqno_timeline;

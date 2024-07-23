@@ -81,6 +81,7 @@ pub async fn post(
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         fields,
         transforms: Some(vec![transform]),
+        version_at: None,
     };
 
     let fp_id = path.into_inner();

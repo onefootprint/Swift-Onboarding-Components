@@ -63,7 +63,6 @@ def test_decisions(sandbox_tenant, must_collect_data):
     # Finally, check all the decisions
     #
     body = get(f"users/{user.fp_id}/decisions", None, sandbox_tenant.s_sk)
-    print(body)
     decisions = body["data"]
     assert len(decisions) == 4
     # Doc playbook decision

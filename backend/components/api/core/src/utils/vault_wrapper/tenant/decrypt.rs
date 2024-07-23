@@ -25,6 +25,8 @@ impl<Type> TenantVw<Type> {
             .into_iter()
             .filter(|x| !self.has_field(&x.identifier) || self.tenant_can_decrypt(x.identifier.clone()))
             .collect_vec();
+        // TODO should this error if you don't have access?
+        // Nobody is really using the can_access_data feature right now, so we don't really have to solve
         Ok(can_access)
     }
 
