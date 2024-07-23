@@ -846,12 +846,12 @@
         "gt5m": "$5,000,000+"
       },
       "funding-sources": {
-        "title": "What's the source of your account funding?",
+        "title": "What’s the source of your account funding?",
         "subtitle": "We're legally required to collect this information.",
-        "employment_income": "Employement Income",
+        "employment_income": "Employment income",
         "investments": "Investments",
         "inheritance": "Inheritance",
-        "business_income": "Business Income",
+        "business_income": "Business income",
         "savings": "Savings",
         "family": "Family",
         "empty-selection": "Please select at least one funding source"

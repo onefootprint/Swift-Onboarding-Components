@@ -2103,12 +2103,12 @@
             }
           },
           "funding-sources": {
-            "title": "What's the source of your account funding?",
+            "title": "What’s the source of your account funding?",
             "options": {
-              "employment_income": "Employement Income",
+              "employment_income": "Employment income",
               "investments": "Investments",
               "inheritance": "Inheritance",
-              "business_income": "Business Income",
+              "business_income": "Business income",
               "savings": "Savings",
               "family": "Family"
             }

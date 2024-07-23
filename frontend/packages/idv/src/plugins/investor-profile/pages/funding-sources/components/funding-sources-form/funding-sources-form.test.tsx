@@ -33,7 +33,7 @@ describe('<FundingSourcesForm />', () => {
         },
       });
 
-      const employement = screen.getByLabelText('Employement Income') as HTMLInputElement;
+      const employement = screen.getByLabelText('Employment income') as HTMLInputElement;
       expect(employement.checked).toBe(false);
 
       const investments = screen.getByLabelText('Investments') as HTMLInputElement;
@@ -42,7 +42,7 @@ describe('<FundingSourcesForm />', () => {
       const inheritance = screen.getByLabelText('Inheritance') as HTMLInputElement;
       expect(inheritance.checked).toBe(false);
 
-      const businessIncome = screen.getByLabelText('Business Income') as HTMLInputElement;
+      const businessIncome = screen.getByLabelText('Business income') as HTMLInputElement;
       expect(businessIncome.checked).toBe(false);
 
       const savings = screen.getByLabelText('Savings') as HTMLInputElement;
@@ -81,7 +81,7 @@ describe('<FundingSourcesForm />', () => {
       const onSubmit = jest.fn();
       renderForm({ onSubmit });
 
-      const employement = screen.getByLabelText('Employement Income') as HTMLInputElement;
+      const employement = screen.getByLabelText('Employment income') as HTMLInputElement;
       await userEvent.click(employement);
 
       const inheritance = screen.getByLabelText('Inheritance') as HTMLInputElement;
