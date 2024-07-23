@@ -1,8 +1,9 @@
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::schema::Apiv2Schema;
 use serde::Deserialize;
 use serde::Deserializer;
 
-#[derive(Debug, Apiv2Schema, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 /// NOTE: if you use this, the field must be annotated with `#[serde(default)]`.
 /// To support PATCH requests with fields that can be cleared out, we make the distinction between
 /// a missing (undefined) value vs an explicit null value.
@@ -14,6 +15,28 @@ pub enum Patch<T> {
     Null,
     /// Explicit non-null value. Set the field's value.
     Value(T),
+}
+
+impl<T: Apiv2Schema> Apiv2Schema for Patch<T> {
+    fn name() -> Option<String> {
+        T::name()
+    }
+
+    fn required() -> bool {
+        false
+    }
+
+    fn raw_schema() -> DefaultSchemaRaw {
+        T::raw_schema()
+    }
+
+    fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
+        T::security_scheme()
+    }
+
+    fn header_parameter_schema() -> Vec<paperclip::v2::models::Parameter<DefaultSchemaRaw>> {
+        T::header_parameter_schema()
+    }
 }
 
 impl<T> From<Option<T>> for Patch<T> {

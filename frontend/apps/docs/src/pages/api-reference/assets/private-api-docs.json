@@ -4472,6 +4472,35 @@
                 ]
             }
         },
+        "/org/invoice_preview": {
+            "get": {
+                "tags": [
+                    "Billing",
+                    "Private"
+                ],
+                "description": "Returns a preview of the in-progress invoice for the month, if exists",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvoicePreview"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/lists": {
             "get": {
                 "tags": [
@@ -10090,6 +10119,17 @@
                                 "InvestorProfile",
                                 "Card",
                                 "UsTaxId"
+                            ]
+                        }
+                    },
+                    "required_auth_methods": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "phone",
+                                "passkey",
+                                "email"
                             ]
                         }
                     },
@@ -21595,6 +21635,48 @@
                     "<value>"
                 ]
             },
+            "InvoicePreview": {
+                "type": "object",
+                "properties": {
+                    "last_updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "line_items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "type": "string"
+                                },
+                                "notional_cents": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "unit_price_cents": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "notional_cents",
+                                "quantity"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "line_items"
+                ]
+            },
             "LinkAuthRequest": {
                 "type": "object",
                 "properties": {
@@ -22663,6 +22745,17 @@
                                         ]
                                     }
                                 },
+                                "required_auth_methods": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "phone",
+                                            "passkey",
+                                            "email"
+                                        ]
+                                    }
+                                },
                                 "rule_set": {
                                     "type": "object",
                                     "properties": {
@@ -23661,6 +23754,17 @@
                                 "InvestorProfile",
                                 "Card",
                                 "UsTaxId"
+                            ]
+                        }
+                    },
+                    "required_auth_methods": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "phone",
+                                "passkey",
+                                "email"
                             ]
                         }
                     },
