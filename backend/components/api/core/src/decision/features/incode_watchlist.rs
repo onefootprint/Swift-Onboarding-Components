@@ -1,11 +1,13 @@
 use super::incode_utils::pii_strings_match_name_normalized;
 use idv::incode::watchlist::response::Hit;
+use idv::incode::watchlist::response::MatchKind;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::vendor_reason_code_enum;
 use newtypes::AdverseMediaListKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode;
+use newtypes::TenantId;
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
@@ -229,7 +231,11 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
     }
 }
 
-pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption) -> Vec<Hit> {
+pub fn get_hits(
+    res: &WatchlistResultResponse,
+    enhanced_aml: &EnhancedAmlOption,
+    tenant_id: &TenantId,
+) -> Vec<Hit> {
     let search_term = res
         .content
         .as_ref()
@@ -244,10 +250,17 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
 
     let watchlist_types = watchlist_types_for_enhanced_aml_opt(enhanced_aml);
 
+    // TODO: bubble this up to configuration somewhere
+    // https://linear.app/footprint/issue/BE-392/enable-configuration-of-other-params
+    let match_kind = if tenant_id.is_wingspan() {
+        MatchKind::ExactNameAndDobYear
+    } else {
+        MatchKind::ExactName
+    };
+
     hits.into_iter()
         .filter(|h| h.score.map(|s| s < SCORE_THRESHOLD_FOR_HIT).unwrap_or(false))
-        // for now, also only consider it a hit if `name_exact`, for a bit more precision
-        .filter(|h| h.match_types.as_ref().map(|t| t.contains(&"name_exact".to_string())).unwrap_or(false))
+        .filter(|h| h.matches_by_criteria(match_kind))
         // CA's logic for determine hits/what it calls "name_exact" matches is still very low precision. In particular, this returns many hits where parts of the names are ordered differently in our search term vs the found hit or the found hit has additional names that the search term does not. Unclear what default settings most tenants would want here or how CA/Incode typically suggest mitigating these sorts of factors but for now as a quick patch we manually confirm here that our searched name exactly matches the found hit's name
         .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n|
             match &search_term {
@@ -266,8 +279,9 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
 pub fn reason_codes_from_watchlist_result(
     res: &WatchlistResultResponse,
     enhanced_aml: &EnhancedAmlOption,
+    tenant_id: &TenantId,
 ) -> Vec<FootprintReasonCode> {
-    let unique_types_for_valid_hits = get_hits(res, enhanced_aml)
+    let unique_types_for_valid_hits = get_hits(res, enhanced_aml, tenant_id)
         .into_iter()
         .flat_map(|h| h.doc.and_then(|d| d.types).unwrap_or_default())
         .unique()
@@ -337,6 +351,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
+        let t_id = TenantId::from_str("12").unwrap();
         reason_codes_from_watchlist_result(
             &res,
             &EnhancedAmlOption::Yes {
@@ -346,6 +361,7 @@ mod test {
                 continuous_monitoring: true,
                 adverse_media_lists: None,
             },
+            &t_id,
         )
     }
 
@@ -373,7 +389,8 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
-        reason_codes_from_watchlist_result(&res, &enhanced_aml)
+        let t_id = TenantId::from_str("12").unwrap();
+        reason_codes_from_watchlist_result(&res, &enhanced_aml, &t_id)
     }
 
     #[test_case("Bob Boberto", vec![("Bob Boberto", "sanction")] => vec![FootprintReasonCode::WatchlistHitOfac])]
@@ -395,6 +412,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res(search_term, hits);
+        let t_id = TenantId::from_str("12").unwrap();
         reason_codes_from_watchlist_result(
             &res,
             &EnhancedAmlOption::Yes {
@@ -404,6 +422,7 @@ mod test {
                 continuous_monitoring: true,
                 adverse_media_lists: None,
             },
+            &t_id,
         )
     }
 

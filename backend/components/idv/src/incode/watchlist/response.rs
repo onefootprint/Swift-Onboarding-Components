@@ -7,7 +7,6 @@ use newtypes::IncodeFailureReason;
 use newtypes::IncodeWatchlistResultRef;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
-use newtypes::ScrubbedPiiJsonValue;
 use newtypes::ScrubbedPiiString;
 
 impl IncodeClientErrorCustomFailureReasons for WatchlistResultResponse {
@@ -67,6 +66,12 @@ pub struct Filters {
     pub types: Option<Vec<String>>,
 }
 
+#[derive(strum::EnumString, Clone, Copy)]
+pub enum MatchKind {
+    ExactNameAndDobYear,
+    ExactName,
+}
+
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct Hit {
     pub score: Option<f32>,
@@ -76,12 +81,41 @@ pub struct Hit {
     pub doc: Option<Doc>,
 }
 
+impl Hit {
+    pub fn matches_by_criteria(&self, match_kind: MatchKind) -> bool {
+        let match_types = self.match_types.clone().unwrap_or_default();
+        let name_matches = match_types.contains(&"name_exact".to_string());
+        match match_kind {
+            MatchKind::ExactNameAndDobYear => {
+                let dob_matches = if match_types.contains(&"year_of_birth".to_string()) {
+                    self.match_type_details
+                        .clone()
+                        .unwrap_or_default()
+                        .into_iter()
+                        .any(|mtd| {
+                            mtd.secondary_matches.unwrap_or_default().into_iter().any(|sm| {
+                                sm.match_types
+                                    .unwrap_or_default()
+                                    .contains(&"exact_birth_year_match".to_string())
+                            })
+                        })
+                } else {
+                    false
+                };
+
+                name_matches && dob_matches
+            }
+            MatchKind::ExactName => name_matches,
+        }
+    }
+}
+
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct MatchTypeDetail {
     pub aml_types: Option<Vec<String>>,
     pub matching_name: Option<ScrubbedPiiString>,
     pub names_matches: Option<Vec<NameMatch>>,
-    pub secondary_matches: Option<ScrubbedPiiJsonValue>, // TODO: dunno schema for this bad boy
+    pub secondary_matches: Option<Vec<NameMatch>>,
     pub sources: Option<Vec<String>>,
 }
 
@@ -166,7 +200,9 @@ impl From<MatchTypeDetail> for LeakedMatchTypeDetail {
             names_matches: value
                 .names_matches
                 .map(|x| x.into_iter().map(|y| y.into()).collect()),
-            secondary_matches: value.secondary_matches.map(PiiJsonValue::from),
+            secondary_matches: serde_json::to_value(value.secondary_matches.clone())
+                .map(PiiJsonValue::from)
+                .ok(),
             sources: value.sources,
         }
     }
@@ -338,5 +374,102 @@ mod tests {
         let json = serde_json::to_value(&leaked_hit).unwrap();
         let s = format!("{}", json);
         assert!(!s.contains("SCRUBBED"));
+    }
+
+
+    #[test]
+    fn test_hit_matches_by_criteria() {
+        let sm1 = NameMatch {
+            match_types: None,
+            query_term: None,
+        };
+        let mtd1 = MatchTypeDetail {
+            aml_types: None,
+            matching_name: None,
+            names_matches: None,
+            secondary_matches: Some(vec![sm1]),
+            sources: None,
+        };
+        let h1 = Hit {
+            score: None,
+            is_whitelisted: None,
+            match_types: Some(vec!["name_exact".to_string()]),
+            match_type_details: Some(vec![mtd1]),
+            doc: None,
+        };
+        assert!(!h1.matches_by_criteria(MatchKind::ExactNameAndDobYear));
+        assert!(h1.matches_by_criteria(MatchKind::ExactName));
+
+
+        // DOB + Name match
+        let sm2 = NameMatch {
+            match_types: Some(vec!["exact_birth_year_match".to_string()]),
+            query_term: None,
+        };
+        let mtd2 = MatchTypeDetail {
+            aml_types: None,
+            matching_name: None,
+            names_matches: None,
+            secondary_matches: Some(vec![sm2]),
+            sources: None,
+        };
+        let h2 = Hit {
+            score: None,
+            is_whitelisted: None,
+            match_types: Some(vec!["name_exact".to_string(), "year_of_birth".to_string()]),
+            match_type_details: Some(vec![mtd2]),
+            doc: None,
+        };
+        assert!(h2.matches_by_criteria(MatchKind::ExactNameAndDobYear));
+        assert!(h2.matches_by_criteria(MatchKind::ExactName));
+
+
+        // Name matches but year is fuzzy
+        let sm3 = NameMatch {
+            match_types: Some(vec!["exact_birth_year_match".to_string()]),
+            query_term: None,
+        };
+        let mtd3 = MatchTypeDetail {
+            aml_types: None,
+            matching_name: None,
+            names_matches: None,
+            secondary_matches: Some(vec![sm3]),
+            sources: None,
+        };
+        let h3 = Hit {
+            score: None,
+            is_whitelisted: None,
+            match_types: Some(vec![
+                "name_exact".to_string(),
+                "fuzzy_birth_year_match".to_string(),
+            ]),
+            match_type_details: Some(vec![mtd3]),
+            doc: None,
+        };
+        assert!(!h3.matches_by_criteria(MatchKind::ExactNameAndDobYear));
+        assert!(h3.matches_by_criteria(MatchKind::ExactName));
+
+        // nothing matches
+        let sm4 = NameMatch {
+            match_types: Some(vec!["exact_birth_year_match".to_string()]),
+            query_term: None,
+        };
+        let mtd4 = MatchTypeDetail {
+            aml_types: None,
+            matching_name: None,
+            names_matches: None,
+            secondary_matches: Some(vec![sm4]),
+            sources: None,
+        };
+        let h4 = Hit {
+            score: None,
+            is_whitelisted: None,
+            match_types: Some(vec!["fuzzy_birth_year_match".to_string()]),
+            match_type_details: Some(vec![mtd4]),
+            doc: None,
+        };
+
+        assert!(!h4.matches_by_criteria(MatchKind::ExactNameAndDobYear));
+        assert!(!h4.matches_by_criteria(MatchKind::ExactName));
     }
 }

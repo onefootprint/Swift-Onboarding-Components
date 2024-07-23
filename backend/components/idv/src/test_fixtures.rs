@@ -5142,8 +5142,14 @@ pub fn incode_watchlist_result_response_large() -> serde_json::Value {
                                         "query_term": "chuol"
                                     }
                                 ],
-                                "secondary_matches":
-                                [],
+                                "secondary_matches": [
+                                    {
+                                        "match_types": [
+                                            "exact_birth_year_match"
+                                        ],
+                                        "query_term": "1966"
+                                    }
+                                ],
                                 "sources":
                                 [
                                     "United Kingdom HM Treasury Office of Financial Sanctions Implementation Consolidated List"
@@ -5179,8 +5185,14 @@ pub fn incode_watchlist_result_response_large() -> serde_json::Value {
                                         "query_term": "chuol"
                                     }
                                 ],
-                                "secondary_matches":
-                                [],
+                                "secondary_matches": [
+                                    {
+                                        "match_types": [
+                                            "exact_birth_year_match"
+                                        ],
+                                        "query_term": "1966"
+                                    }
+                                ],
                                 "sources":
                                 [
                                     "OFAC SDN List"
@@ -5297,8 +5309,14 @@ pub fn incode_watchlist_result_response_large() -> serde_json::Value {
                                         "query_term": "chuol"
                                     }
                                 ],
-                                "secondary_matches":
-                                [],
+                               "secondary_matches": [
+                                    {
+                                        "match_types": [
+                                            "exact_birth_year_match"
+                                        ],
+                                        "query_term": "1966"
+                                    }
+                                ],
                                 "sources":
                                 [
                                     "ComplyAdvantage Adverse Media"
@@ -6611,7 +6629,18 @@ pub fn incode_watchlist_result_response_yes_hits() -> serde_json::Value {
                         [
                             "name_exact"
                         ],
-                        "match_types_details": [],
+                        "match_types_details": [
+                            {
+                                "secondary_matches": [
+                                    {
+                                        "match_types": [
+                                            "fuzzy_birth_year_match"
+                                        ],
+                                        "query_term": "1966"
+                                    }
+                                ]
+                            }
+                        ],
                         "score": 1.7
                     },
                 ]

@@ -45,7 +45,6 @@ use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
 use newtypes::EncryptedVaultPrivateKey;
-use newtypes::EnhancedAmlOption;
 use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::IdentityDataKind as IDK;
@@ -312,14 +311,9 @@ async fn get_risk_signal_and_maybe_aml_detail(
         .await?;
 
     let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
-        get_aml_hits(
-            state,
-            &obc.verification_checks().enhanced_aml(),
-            vreq_vres.clone(),
-            key,
-        )
-        .await?
-        .map(|a| (a, vreq_vres.0))
+        get_aml_hits(state, &obc, vreq_vres.clone(), key)
+            .await?
+            .map(|a| (a, vreq_vres.0))
     } else {
         None
     };
@@ -329,7 +323,7 @@ async fn get_risk_signal_and_maybe_aml_detail(
 
 async fn get_aml_hits(
     state: &State,
-    enhanced_aml: &EnhancedAmlOption,
+    obc: &ObConfiguration,
     vreq_vres: RequestAndResult,
     private_key: EncryptedVaultPrivateKey,
 ) -> FpResult<Option<api_wire_types::AmlDetail>> {
@@ -362,7 +356,8 @@ async fn get_aml_hits(
             .and_then(|c| c.data.as_ref())
             .and_then(|d| d.share_url.clone());
 
-        let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml)
+        let enhanced_aml = &obc.verification_checks().enhanced_aml();
+        let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, enhanced_aml, &obc.tenant_id)
             .into_iter()
             .map(|h| h.leak());
 

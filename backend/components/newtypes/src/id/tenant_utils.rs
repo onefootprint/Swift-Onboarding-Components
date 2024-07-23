@@ -43,6 +43,10 @@ impl TenantId {
     pub fn is_grid(&self) -> bool {
         self.0 == *"org_AiK8peOw9mrqsb6yeHWEG8"
     }
+
+    pub fn is_wingspan(&self) -> bool {
+        self.0 == *"org_HfhfuQan6A6EXIYuFDwyNZ"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
