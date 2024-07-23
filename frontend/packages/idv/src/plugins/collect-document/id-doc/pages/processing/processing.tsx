@@ -219,7 +219,14 @@ const Processing = () => {
   if (!type || !currSide) return null;
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      height="100%"
+      minHeight="130px"
+    >
       <IdDocAnimation
         loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
         successComponent={<Success onComplete={mode === 'success' && !nextSide ? onSuccessComplete : undefined} />}

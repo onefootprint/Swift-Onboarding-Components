@@ -606,6 +606,11 @@ const VideoContainer = styled.div`
     &[data-device-kind='mobile'] {
       width: calc(100% + ${theme.spacing[8]});
       margin: calc(-1 * ${theme.spacing[5]});
+
+      ${media.greaterThan('md')`
+        justify-content: end;
+        height: 530px; // Set the minimum height for the selfie step when using a "tablet" in horizontal orientation
+      `}
     }
   `}
 `;
