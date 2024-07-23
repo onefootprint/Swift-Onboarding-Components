@@ -1,5 +1,5 @@
+import { BusinessDetail } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
-import { BusinessDetail } from '../../types';
 
 const useOtherDetailText = () => {
   const { t } = useTranslation('common', {

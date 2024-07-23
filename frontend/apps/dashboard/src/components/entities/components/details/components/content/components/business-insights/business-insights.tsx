@@ -1,67 +1,60 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { IcoEye16, IcoFileText16, IcoStore16, IcoUsers16 } from '@onefootprint/icons';
-import { Stack } from '@onefootprint/ui';
+import useEntityVault from '@/entities/hooks/use-entity-vault';
+import type { WithEntityProps } from '@/entity/components/with-entity';
+import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
+import useEntityId from '@/entity/hooks/use-entity-id';
+import {
+  DecisionStatus,
+  EntityVault,
+  OnboardingDecisionEvent,
+  TimelineEventKind,
+  WorkflowKind,
+  isVaultDataDecrypted,
+} from '@onefootprint/types';
 import Section from '../section';
-import BusinessNameList from './components/business-name-list';
-import OtherBusinessDetails from './components/other-business-details';
-import PeopleList from './components/people-list';
-import SOSFilings from './components/sos-filings';
-import Subsection from './components/subsection';
-import Watchlist from './components/watchlist';
-import useBusinessInsights from './hooks/use-business-insights';
+import Content from './components/content';
+import Decrypt from './components/decrypt';
 
-const BusinessInsights = () => {
+export type BusinessInsightsProps = WithEntityProps;
+
+const BusinessInsights = ({ entity }: BusinessInsightsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights',
   });
-  const { response: mockResponse } = useBusinessInsights();
+  const entityId = useEntityId();
+  const { data: vaultData } = useEntityVault(entityId, entity);
+  const { data: timelineData } = useCurrentEntityTimeline();
 
-  const subsections = {
-    name: {
-      title: t('name.title'),
-      iconComponent: IcoStore16,
-    },
-    details: {
-      title: t('details.title'),
-      iconComponent: IcoStore16,
-    },
-    people: {
-      title: t('people.title'),
-      iconComponent: IcoUsers16,
-    },
-    sosFilings: {
-      title: t('sos-filings.title'),
-      iconComponent: IcoFileText16,
-    },
-    watchlist: {
-      title: t('watchlist.title'),
-      iconComponent: IcoEye16,
-    },
+  const isKybOnboardingComplete = (event: OnboardingDecisionEvent) => {
+    return (
+      event.data.decision.workflowKind === WorkflowKind.Kyb &&
+      (event.data.decision.status === DecisionStatus.pass || event.data.decision.status === DecisionStatus.fail)
+    );
   };
 
-  return (
-    <Section title={t('title')}>
-      <Stack direction="column" gap={5}>
-        <Subsection icon={subsections.name.iconComponent} title={subsections.name.title}>
-          <BusinessNameList data={mockResponse.names} />
-        </Subsection>
-        <Subsection icon={subsections.details.iconComponent} title={subsections.details.title}>
-          <OtherBusinessDetails data={mockResponse.details} />
-        </Subsection>
-        <Subsection icon={subsections.people.iconComponent} title={subsections.people.title}>
-          <PeopleList data={mockResponse.people} />
-        </Subsection>
-        <Subsection icon={subsections.sosFilings.iconComponent} title={subsections.sosFilings.title}>
-          <SOSFilings data={mockResponse.registrations} />
-        </Subsection>
-        <Subsection icon={subsections.watchlist.iconComponent} title={subsections.watchlist.title}>
-          <Watchlist data={mockResponse.watchlist} />
-        </Subsection>
-      </Stack>
-    </Section>
-  );
+  const hasNoInsights = () => {
+    if (!timelineData) return true;
+    const events = timelineData.filter(({ event }) => {
+      return (
+        event.kind === TimelineEventKind.onboardingDecision && isKybOnboardingComplete(event as OnboardingDecisionEvent)
+      );
+    });
+    return events.length === 0;
+  };
+
+  const hasDecryptedAll = (entityVault: EntityVault | undefined) => {
+    if (!entityVault) return false;
+    return entity.decryptableAttributes.every(di => {
+      const value = entityVault?.[di];
+      return isVaultDataDecrypted(value);
+    });
+  };
+
+  if (hasNoInsights()) return null;
+
+  return <Section title={t('title')}>{hasDecryptedAll(vaultData?.vault) ? <Content /> : <Decrypt />}</Section>;
 };
 
 export default BusinessInsights;

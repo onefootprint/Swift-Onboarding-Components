@@ -14,6 +14,7 @@ export type RawSOSFiling = {
 };
 
 export type SOSFiling = {
+  id: string; // Internally used for filtering on the frontend
   state: string;
   registrationDate: string;
   registeredAgent: string;

@@ -12,10 +12,6 @@ type SOSFilingsProps = {
   data: SOSFiling[];
 };
 
-type SOSFilingWithId = SOSFiling & {
-  id: string;
-};
-
 const SOSFilings = ({ data }: SOSFilingsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights.sos-filings.table',
@@ -31,7 +27,7 @@ const SOSFilings = ({ data }: SOSFilingsProps) => {
     { text: t('header.status'), width: '33%' },
   ];
 
-  const handleOpen = (filing: SOSFilingWithId) => {
+  const handleOpen = (filing: SOSFiling) => {
     setOpenFilingId(filing.id);
   };
 
@@ -40,15 +36,12 @@ const SOSFilings = ({ data }: SOSFilingsProps) => {
   };
 
   const filteredData = () => {
-    const dataWithIds = data.map((filing, index) => {
-      return { ...filing, id: `${index}` };
-    });
     return filters.values.states.length
-      ? dataWithIds.filter(({ state }) => state && filters.values.states.includes(state))
-      : dataWithIds;
+      ? data.filter(({ state }) => state && filters.values.states.includes(state))
+      : data;
   };
 
-  const renderTr = ({ item }: TableRow<SOSFilingWithId>) => {
+  const renderTr = ({ item }: TableRow<SOSFiling>) => {
     const isOpen = item.id === openFilingId;
     return (
       <>
@@ -61,11 +54,11 @@ const SOSFilings = ({ data }: SOSFilingsProps) => {
   return (
     <Stack direction="column" gap={4}>
       {filters.isReady && <DrawerFilter states={stateFilterOptions} />}
-      <Table<SOSFilingWithId>
+      <Table<SOSFiling>
         aria-label={t('aria-label')}
         columns={columns}
         emptyStateText={t('empty-state')}
-        getKeyForRow={(filing: SOSFilingWithId) => `${filing.state} ${filing.registrationDate}`}
+        getKeyForRow={(filing: SOSFiling) => filing.id}
         items={filteredData()}
         onRowClick={handleOpen}
         renderTr={renderTr}

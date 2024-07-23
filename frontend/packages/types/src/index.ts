@@ -487,6 +487,7 @@ export {
   RiskSignalRuleOp,
   RiskSignalSeverity,
   BusinessNameKind,
+  BusinessDetail,
   RoleKind,
   RoleScopeKind,
   RuleAction,

@@ -1,6 +1,7 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { BusinessPerson } from '@onefootprint/types';
 import { Badge, Stack, Tag, Tooltip } from '@onefootprint/ui';
+import isNull from 'lodash/isNull';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,10 +36,12 @@ const Row = ({ person }: RowProps) => {
             name
           )}
           <Stack gap={2} align="center">
-            <Tag>{submitted ? t('tags.submitted') : t('tags.not-submitted')}</Tag>
-            <Badge variant={associationVerified ? 'success' : 'error'}>
-              {associationVerified ? t('tags.verified') : t('tags.not-verified')}
-            </Badge>
+            {!isNull(submitted) && <Tag>{submitted ? t('tags.submitted') : t('tags.not-submitted')}</Tag>}
+            {!isNull(associationVerified) && (
+              <Badge variant={associationVerified ? 'success' : 'error'}>
+                {associationVerified ? t('tags.verified') : t('tags.not-verified')}
+              </Badge>
+            )}
           </Stack>
         </Stack>
       </td>

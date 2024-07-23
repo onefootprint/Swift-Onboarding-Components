@@ -9,7 +9,7 @@ export type RawBusinessPerson = {
 export type BusinessPerson = {
   name: string;
   role: string;
-  submitted: boolean;
-  associationVerified: boolean;
+  submitted: boolean | null;
+  associationVerified: boolean | null;
   sources: string | null;
 };

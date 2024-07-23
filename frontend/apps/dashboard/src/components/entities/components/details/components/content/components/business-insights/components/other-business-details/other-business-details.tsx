@@ -1,9 +1,9 @@
-import { BusinessDetails } from '@onefootprint/types';
+import { BusinessDetail, BusinessDetails } from '@onefootprint/types';
 import { Badge, Stack } from '@onefootprint/ui';
+import isNull from 'lodash/isNull';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useOtherDetailText from '../../hooks/use-other-detail-text';
-import { BusinessDetail } from '../../types';
 import LineItem from '../line-item';
 
 type OtherBusinessDetailsProps = {
@@ -15,8 +15,10 @@ const OtherBusinessDetails = ({ data }: OtherBusinessDetailsProps) => {
     keyPrefix: 'pages.entity.business-insights',
   });
   const detailT = useOtherDetailText();
+  const { formationDate, formationState, tin, entityType, phoneNumbers, website } = data;
 
-  const renderBadge = (isVerified: boolean) => {
+  const renderBadge = (isVerified: boolean | null) => {
+    if (isNull(isVerified)) return null;
     return (
       <Badge variant={isVerified ? 'success' : 'error'}>
         {isVerified ? t('tags.verified') : t('tags.not-verified')}
@@ -26,26 +28,22 @@ const OtherBusinessDetails = ({ data }: OtherBusinessDetailsProps) => {
 
   return (
     <Stack direction="column" gap={4}>
-      <LineItem leftText={detailT(BusinessDetail.formationDate)} rightText={data.formationDate} />
-      <LineItem leftText={detailT(BusinessDetail.formationState)} rightText={data.formationState} />
-      <LineItem
-        leftText={detailT(BusinessDetail.tin)}
-        badge={renderBadge(!!data.tin.verified)}
-        rightText={data.tin.tin}
-      />
-      <LineItem leftText={detailT(BusinessDetail.entityType)} rightText={data.entityType} />
-      {data.phoneNumbers.map(phoneNumber => (
+      <LineItem leftText={detailT(BusinessDetail.formationDate)} rightText={formationDate} />
+      <LineItem leftText={detailT(BusinessDetail.formationState)} rightText={formationState} />
+      <LineItem leftText={detailT(BusinessDetail.tin)} badge={renderBadge(tin.verified)} rightText={tin.tin} />
+      <LineItem leftText={detailT(BusinessDetail.entityType)} rightText={entityType} />
+      {phoneNumbers.map(phoneNumber => (
         <LineItem
           key={phoneNumber.phone}
           leftText={detailT(BusinessDetail.phoneNumber)}
-          badge={renderBadge(!!phoneNumber.verified)}
+          badge={renderBadge(phoneNumber.verified)}
           rightText={phoneNumber.phone}
         />
       ))}
       <LineItem
         leftText={detailT(BusinessDetail.website)}
-        badge={renderBadge(!!data.website.verified)}
-        rightText={data.website.url}
+        badge={renderBadge(website.verified)}
+        rightText={website.url}
       />
     </Stack>
   );

@@ -13,8 +13,8 @@ export type BusinessName = {
   name: string;
   sources: string | null;
   subStatus: string;
-  submitted: boolean;
-  verified: boolean;
+  submitted: boolean | null;
+  verified: boolean | null;
   notes?: string;
 };
 
