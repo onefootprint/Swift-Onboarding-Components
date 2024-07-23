@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignCameraPermissionState: 'cameraAccessDenied' | 'cameraAccessGranted';
     assignConsent: 'consentReceived';
     assignCountryAndType: 'receivedCountryAndType';
     assignForcedUpload: 'cameraStuck';
@@ -42,10 +43,12 @@ export interface Typegen0 {
     | 'mobileBackImageCapture'
     | 'mobileBackImageRetry'
     | 'mobileBackPhotoFallback'
+    | 'mobileCameraAccessDenied'
     | 'mobileFrontImageCapture'
     | 'mobileFrontImageRetry'
     | 'mobileFrontPhotoFallback'
     | 'mobileProcessing'
+    | 'mobileRequestCameraAccess'
     | 'mobileSelfieFallback'
     | 'mobileSelfieImage'
     | 'mobileSelfieImageRetry';

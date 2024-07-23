@@ -1,8 +1,12 @@
 import UAParser from 'ua-parser-js';
 import { useEffectOnce } from 'usehooks-ts';
+import { isFunction, isUndefined } from '../../../utils/type-guards';
 
 export type BasicDeviceInfo = { browser: string; osName: string; type: string };
-export type DeviceInfo = BasicDeviceInfo & { hasSupportForWebauthn: boolean };
+export type DeviceInfo = BasicDeviceInfo & {
+  hasSupportForWebauthn: boolean;
+  initialCameraPermissionState?: PermissionState;
+};
 
 // UAParser device type can have an undefined type, because
 // it could get executed on the server side. We assign a default
@@ -10,6 +14,19 @@ export type DeviceInfo = BasicDeviceInfo & { hasSupportForWebauthn: boolean };
 const DEFAULT_DEVICE_TYPE = 'unknown';
 const DEFAULT_OS_TYPE = 'unknown';
 const DEFAULT_BROWSER_TYPE = 'unknown';
+
+const getCameraPermissionState = async (): Promise<PermissionState> => {
+  if (isUndefined(navigator)) return Promise.resolve('denied');
+  if (isUndefined(navigator.permissions)) return Promise.resolve('denied');
+  if (!isFunction(navigator.permissions.query)) return Promise.resolve('denied');
+
+  try {
+    const res = await navigator.permissions.query({ name: 'camera' as PermissionName });
+    return res.state;
+  } catch (_err) {
+    return 'denied';
+  }
+};
 
 export const getBasicDevice = () => {
   // return device without webauthn status for clients that don't care
@@ -40,7 +57,9 @@ export const checkDeviceInfo = async () => {
 
 const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void, onError?: () => void) => {
   useEffectOnce(() => {
-    checkDeviceInfo().then(onComplete).catch(onError);
+    Promise.all([checkDeviceInfo(), getCameraPermissionState()])
+      .then(([deviceInfo, initialCameraPermissionState]) => onComplete({ ...deviceInfo, initialCameraPermissionState }))
+      .catch(onError);
   });
 };
 

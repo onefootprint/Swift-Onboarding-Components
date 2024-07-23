@@ -39,6 +39,7 @@ export const initialContextDL: MachineContext = {
     }),
     captureKind: 'manual',
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextBD: MachineContext = {

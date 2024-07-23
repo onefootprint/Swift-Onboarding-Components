@@ -22,9 +22,11 @@ export const argsRegularMobile: MachineContext = {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
-export const getArgsRegularMobile = () => JSON.parse(JSON.stringify(argsRegularMobile));
+export const getArgsRegularMobile = (override?: Partial<MachineContext>) =>
+  JSON.parse(JSON.stringify({ ...argsRegularMobile, ...override }));
 
 export const argsRegularDesktop: MachineContext = {
   authToken: 'token',
@@ -45,6 +47,7 @@ export const argsRegularDesktop: MachineContext = {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const getArgsRegularDesktop = () => JSON.parse(JSON.stringify(argsRegularDesktop));

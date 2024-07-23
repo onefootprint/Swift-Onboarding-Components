@@ -36,6 +36,7 @@ export const initialContextDL: MachineContext = {
     ],
     CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextWithErrors: MachineContext = {

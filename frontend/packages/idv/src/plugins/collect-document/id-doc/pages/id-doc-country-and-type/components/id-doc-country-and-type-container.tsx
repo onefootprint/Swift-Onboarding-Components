@@ -14,9 +14,10 @@ import HeaderTitle from '../../../../../../components/layout/components/header-t
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
 import useIdvRequestErrorToast from '../../../../../../hooks/ui/use-idv-request-error-toast';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger } from '../../../../../../utils/logger';
 import useSubmitDocType from '../../../../hooks/use-submit-doc-type';
-import { getCountryFromCode } from '../../../../utils/get-country-from-code';
+import { isMobileKind } from '../../../../utils/capture';
+import { getCountryFromCode, getDefaultCountry } from '../../../../utils/get-country-from-code';
 import { useIdDocMachine } from '../../../components/machine-provider';
 import detectWebcam from '../../../utils/detect-webcam';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';
@@ -27,15 +28,7 @@ type IdDocCountryAndTypeContainerProps = {
   onConsentSubmit: () => void;
 };
 
-const getDefaultCountry = (supportedCountries: Set<CountryCode>, supportedCountryRecords: CountryRecord[]) => {
-  let defaultCountry;
-  if (supportedCountries.has('US')) {
-    defaultCountry = getCountryFromCode('US');
-  }
-
-  if (!defaultCountry) [defaultCountry] = supportedCountryRecords;
-  return defaultCountry;
-};
+const { logError } = getLogger({ location: 'id-doc-country-and-type-container' });
 
 const getRecordKeys = <T extends object>(object: T) => Object.keys(object) as (keyof T)[];
 
@@ -101,23 +94,21 @@ const IdDocCountryAndTypeContainer = ({
         documentType: docType,
         countryCode: selectedCountry,
         fixtureResult: sandboxOutcome,
-        deviceType: deviceType === 'mobile' ? 'mobile' : 'desktop',
+        deviceType: isMobileKind(deviceType) ? 'mobile' : 'desktop',
         skipSelfie: !hasWebcam,
         requestId: documentRequestId,
       },
       {
         onSuccess: data => {
-          if (isConsentMissing && device.type === 'mobile') {
+          if (isConsentMissing && isMobileKind(device.type)) {
             setConsentVisible(true);
           }
           onSubmitDocTypeSuccess(data, country, docType);
         },
         onError: err => {
-          Logger.error(
-            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
-              err,
-            )}`,
-            { location: 'id-doc-country-and-type-container' },
+          logError(
+            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(err)}`,
+            err,
           );
           requestErrorToast(err);
         },
@@ -141,8 +132,10 @@ const IdDocCountryAndTypeContainer = ({
     .filter((option): option is RadioSelectOptionFields => !!option);
 
   return (
-    <Container data-mobile={device.type === 'mobile'}>
-      <NavigationHeader leftButton={device.type !== 'mobile' ? { variant: 'close', confirmClose: true } : undefined} />
+    <Container data-mobile={isMobileKind(device.type)}>
+      <NavigationHeader
+        leftButton={!isMobileKind(device.type) ? { variant: 'close', confirmClose: true } : undefined}
+      />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InputsContainer>
         <CountrySelect

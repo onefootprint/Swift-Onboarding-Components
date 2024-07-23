@@ -2,6 +2,7 @@ import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types'
 import { assign, createMachine } from 'xstate';
 
 import { getLogger } from '../../../../../utils/logger';
+import { isDenied, isGranted, isMobileKind, isPrompt } from '../../../utils/capture';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -26,22 +27,35 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             receivedCountryAndType: [
               {
                 target: 'mobileFrontPhotoFallback',
-                cond: context => context.device.type === 'mobile' && !context.isConsentMissing && !!context.forceUpload,
+                cond: ctx => isMobileKind(ctx.device.type) && !ctx.isConsentMissing && !!ctx.forceUpload,
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
+              },
+              {
+                target: 'mobileRequestCameraAccess',
+                cond: ctx =>
+                  isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isPrompt(ctx.cameraPermissionState),
+                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
+              },
+              {
+                target: 'mobileCameraAccessDenied',
+                cond: ctx =>
+                  isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isDenied(ctx.cameraPermissionState),
                 actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
                 target: 'mobileFrontImageCapture',
-                cond: context => context.device.type === 'mobile' && !context.isConsentMissing,
+                cond: ctx =>
+                  isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isGranted(ctx.cameraPermissionState),
                 actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
                 target: 'desktopFrontImage',
-                cond: context => context.device.type !== 'mobile' && !context.isConsentMissing,
+                cond: ctx => !isMobileKind(ctx.device.type) && !ctx.isConsentMissing,
                 actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
                 target: 'desktopConsent',
-                cond: context => context.device.type !== 'mobile',
+                cond: ctx => !isMobileKind(ctx.device.type),
                 actions: ['assignCountryAndType', 'assignId', 'assignSide'],
               },
               {
@@ -50,14 +64,53 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             ],
             consentReceived: [
               {
+                target: 'mobileRequestCameraAccess',
+                cond: ctx => isMobileKind(ctx.device.type) && isPrompt(ctx.cameraPermissionState),
+                actions: 'assignConsent',
+              },
+              {
+                target: 'mobileCameraAccessDenied',
+                cond: ctx => isMobileKind(ctx.device.type) && isDenied(ctx.cameraPermissionState),
+                actions: 'assignConsent',
+              },
+              {
                 target: 'mobileFrontImageCapture',
-                cond: context => !!context.id,
+                cond: ctx => !!ctx.id,
                 actions: 'assignConsent',
               },
               {
                 actions: 'assignConsent',
               },
             ],
+          },
+        },
+        mobileRequestCameraAccess: {
+          on: {
+            navigatedToPrev: { target: 'countryAndType' },
+            cameraAccessDenied: { target: 'mobileCameraAccessDenied', actions: 'assignCameraPermissionState' },
+            cameraAccessGranted: [
+              {
+                target: 'mobileFrontImageCapture',
+                cond: (ctx, { payload }) =>
+                  isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isGranted(payload.status),
+                actions: ['assignCameraPermissionState'], // TODO: implement 'assignMediaStream' ?
+              },
+              {
+                target: 'desktopFrontImage',
+                cond: ctx => !isMobileKind(ctx.device.type) && !ctx.isConsentMissing,
+                actions: 'assignCameraPermissionState',
+              },
+              {
+                target: 'desktopConsent',
+                cond: ctx => !isMobileKind(ctx.device.type),
+                actions: 'assignCameraPermissionState',
+              },
+            ],
+          },
+        },
+        mobileCameraAccessDenied: {
+          on: {
+            navigatedToPrev: { target: 'mobileRequestCameraAccess' },
           },
         },
         desktopConsent: {
@@ -390,6 +443,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         }),
         assignForcedUpload: assign(context => {
           context.forceUpload = true;
+          return context;
+        }),
+        assignCameraPermissionState: assign((context, event) => {
+          context.cameraPermissionState = event.payload.status;
           return context;
         }),
       },

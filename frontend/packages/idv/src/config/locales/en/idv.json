@@ -1040,6 +1040,18 @@
     }
   },
   "document-flow": {
+    "access-camera": "Allow access to camera",
+    "allow-access": "Allow access",
+    "docs-and-or-selfie": "To take photos of your document and a selfie, if applicable.",
+    "go-to-camera-settings": "Go to the website settings and grant us access to your camera as shown above.",
+    "go-to-chrome-settings": "Go to your device settings > Chrome, and turn \"Camera\" on as shown above.",
+    "go-to-chrome-url": "Tap the \"Camera\" icon in the <bold>URL bar</bold> and grant permission to your camera. Alternatively, go to website settings > Site settings > Camera permissions > and allow access to all onefootprint.com, our identity verification partner, domains.",
+    "go-to-device-settings": "Go to your device settings and please grant \"Footprint\", our identity verification partner, access to your camera.",
+    "how-we-will-use-this": "How <underlined>we</underlined> will use this",
+    "how-you-will-use-this": "How <underlined>you</underlined> will use this",
+    "key-needed-for-verification": "To complete your identity verification by analyzing your photos and selfie.",
+    "no-camera-access": "Without camera access, we can't verify your identity.",
+    "then-refresh-page": "Then refresh the page.",
     "components": {
       "photo-upload-buttons": {
         "take-photo": {

@@ -4,6 +4,7 @@ import type { MachineContext } from '../../utils/state-machine';
 
 const contextWithSelfieErrors: MachineContext = {
   authToken: 'token',
+  cameraPermissionState: 'prompt',
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,

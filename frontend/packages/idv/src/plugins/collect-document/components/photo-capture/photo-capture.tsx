@@ -6,6 +6,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
 import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../components';
+import useHandleCameraError from '../../../../plugins/collect-document/hooks/use-handle-camera-error';
 import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../types';
@@ -69,6 +70,7 @@ const PhotoCapture = ({
   const allowPdf = uploadMode === 'allow_upload';
   const allowUpload = uploadMode !== 'capture_only';
   const { processImageUrl } = useProcessImage({ allowPdf });
+  const onCameraErrorToast = useHandleCameraError();
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
@@ -134,7 +136,8 @@ const PhotoCapture = ({
     onComplete(file, extraCompressed, captureKind);
   };
 
-  const handleError = (_err?: unknown) => {
+  const handleError = (err?: unknown) => {
+    onCameraErrorToast(err);
     onCameraErrored?.();
   };
 

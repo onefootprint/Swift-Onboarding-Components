@@ -195,7 +195,7 @@ const Camera = ({
 
   const getImageStringFromVideo = useGetImageString();
 
-  const { mediaStream } = useUserMedia(cameraSide, onError);
+  const { mediaStream } = useUserMedia({ side: cameraSide, onError });
   const isCameraVisible = Boolean(mediaStream?.active) && isVideoPlaying;
   const { outlineWidth, outlineHeight } = getOutlineDimensions({
     videoSize,

@@ -34,6 +34,7 @@ const IdDoc = ({ initialContext, onDone }: IdDocProps) => {
     supportedCountryAndDocTypes: {
       ...supportedCountryAndDocTypes,
     },
+    cameraPermissionState: device.initialCameraPermissionState || 'prompt',
   };
 
   return (

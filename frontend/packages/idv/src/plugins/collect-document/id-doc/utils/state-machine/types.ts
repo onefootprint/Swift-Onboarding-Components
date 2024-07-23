@@ -13,6 +13,7 @@ import type { CaptureKind, IdDocImageErrorType } from '../../../types';
 
 export type MachineContext = {
   authToken: string;
+  cameraPermissionState: PermissionState;
   device: DeviceInfo;
   orgId: string;
   documentRequestId: string;
@@ -45,65 +46,18 @@ export type ProccessingSucceededEvent = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'receivedCountryAndType';
-      payload: {
-        type?: SupportedIdDocTypes;
-        country?: CountryCode;
-        id: string;
-      };
-    }
-  | {
-      type: 'receivedImage';
-      payload: {
-        imageFile: File | Blob;
-        captureKind: CaptureKind;
-        extraCompressed?: boolean;
-      };
-    }
-  | {
-      type: 'nextSide';
-      payload: {
-        nextSideToCollect: string;
-      };
-    }
-  | {
-      type: 'processingErrored';
-      payload: {
-        errors: {
-          errorType: IdDocImageProcessingError;
-          errorInfo?: string;
-        }[];
-      };
-    }
-  | {
-      type: 'uploadErrored';
-      payload: {
-        errors: {
-          errorType: IdDocImageUploadError;
-          errorInfo?: string;
-        }[];
-      };
-    }
-  | {
-      type: 'consentReceived';
-    }
-  | {
-      type: 'startImageCapture';
-    }
-  | {
-      type: 'cameraErrored';
-    }
-  | {
-      type: 'navigatedToPrev';
-    }
-  | {
-      type: 'retryLimitExceeded';
-    }
-  | {
-      type: 'navigatedToCountryDoc';
-    }
-  | {
-      type: 'cameraStuck';
-    }
+  | { type: 'cameraAccessDenied'; payload: { status: PermissionState } }
+  | { type: 'cameraAccessGranted'; payload: { status: PermissionState; stream: MediaStream } }
+  | { type: 'cameraErrored' }
+  | { type: 'cameraStuck' }
+  | { type: 'consentReceived' }
+  | { type: 'navigatedToCountryDoc' }
+  | { type: 'navigatedToPrev' }
+  | { type: 'nextSide'; payload: { nextSideToCollect: string } }
+  | { type: 'processingErrored'; payload: { errors: { errorType: IdDocImageProcessingError; errorInfo?: string }[] } }
+  | { type: 'receivedCountryAndType'; payload: { type?: SupportedIdDocTypes; country?: CountryCode; id: string } }
+  | { type: 'receivedImage'; payload: { imageFile: File | Blob; captureKind: CaptureKind; extraCompressed?: boolean } }
+  | { type: 'retryLimitExceeded' }
+  | { type: 'startImageCapture' }
+  | { type: 'uploadErrored'; payload: { errors: { errorType: IdDocImageUploadError; errorInfo?: string }[] } }
   | ProccessingSucceededEvent;

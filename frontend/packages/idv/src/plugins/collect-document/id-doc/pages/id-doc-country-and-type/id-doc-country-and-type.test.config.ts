@@ -33,6 +33,7 @@ export const initialContextAllDocTypes: MachineContext = {
     country: undefined,
     type: undefined,
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextSomeDocTypes: MachineContext = {
@@ -57,6 +58,7 @@ export const initialContextSomeDocTypes: MachineContext = {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextOnlyUS: MachineContext = {
@@ -80,6 +82,7 @@ export const initialContextOnlyUS: MachineContext = {
   supportedCountryAndDocTypes: {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextBD: MachineContext = {
@@ -103,6 +106,7 @@ export const initialContextBD: MachineContext = {
   supportedCountryAndDocTypes: {
     BD: [SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const initialContextNoSupportedDoc: MachineContext = {
@@ -126,6 +130,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
   supportedCountryAndDocTypes: {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export const withSubmitDocTypeAndCountry = () => {

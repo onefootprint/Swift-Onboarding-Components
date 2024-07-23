@@ -29,7 +29,7 @@ describe('Id Doc Machine Tests', () => {
   });
 
   describe('Transitions to the correct state after country and doc', () => {
-    it('Should transition mobileFrontImageCapture state for mobile', () => {
+    it('Should transition mobileRequestCameraAccess state for mobile', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
@@ -46,7 +46,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
       ]);
-      expect(state.value).toEqual('mobileFrontImageCapture');
+      expect(state.value).toEqual('mobileRequestCameraAccess');
     });
     it('Should transition to desktopConsent state for desktop', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
@@ -82,13 +82,15 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
       ]);
-      expect(state.value).toEqual('mobileFrontImageCapture');
+      expect(state.value).toEqual('mobileRequestCameraAccess');
       expect(state.context.idDoc.country).toEqual('US');
 
+      state = machine.send([
+        { type: 'cameraAccessGranted', payload: { status: 'granted', stream: {} as MediaStream } },
+      ]);
       expect(state.context.idDoc.type).toEqual(SupportedIdDocTypes.driversLicense);
-      state = machine.send({
-        type: 'navigatedToPrev',
-      });
+
+      state = machine.send({ type: 'navigatedToPrev' });
       expect(state.value).toEqual('countryAndType');
 
       state = machine.send([
@@ -374,7 +376,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can retry image upload when processing fails and update errors on mobile', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       let state = machine.send([
@@ -491,7 +493,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can select a different doc type from retry state mobile', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       let state = machine.send([
@@ -534,7 +536,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Allows uploading any side/selfie based nextSideToCollect out of order on mobile', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([
@@ -600,7 +602,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Can terminate the flow after any side upload on mobile', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([
@@ -666,7 +668,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Goes back to country and doc selection if camera errored', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([
@@ -689,7 +691,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Stays on back image capture if camera errored', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([
@@ -725,7 +727,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Stays on the selfie capture if camera errored', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([
@@ -761,11 +763,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Does not start front image capture if consent was not provided', () => {
-      const machine = interpret(
-        createIdDocMachine({
-          ...getArgsRegularMobile(),
-        }),
-      );
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       let state = machine.send([
@@ -791,7 +789,7 @@ describe('Id Doc Machine Tests', () => {
     });
 
     it('Terminate the flow when retry limit exceeds on mobile', () => {
-      const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile({ cameraPermissionState: 'granted' })));
       machine.start();
 
       const state = machine.send([

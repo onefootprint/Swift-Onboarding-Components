@@ -32,6 +32,7 @@ const initialContextWithErrors: MachineContext = {
     ],
     CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export default initialContextWithErrors;

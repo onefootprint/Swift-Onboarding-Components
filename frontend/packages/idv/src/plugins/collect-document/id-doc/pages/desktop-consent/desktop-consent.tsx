@@ -8,11 +8,13 @@ import NavigationHeader from '../../../../../components/layout/components/naviga
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box';
 import { LAYOUT_CONTAINER_ID } from '../../../../../components/layout/constants';
 import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-error-toast';
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+
+const { logError } = getLogger({ location: 'consent-desktop' });
 
 const DesktopConsent = () => {
   const { t } = useTranslation('idv', {
@@ -25,24 +27,25 @@ const DesktopConsent = () => {
   const consentRef = useRef<ImageConsentHandler>(null);
   const [fullyScrolled, setFullyScrolled] = useState(false);
 
-  const observeBottomIntersection = () => {
+  useEffect(() => {
     const container = document.getElementById(LAYOUT_CONTAINER_ID);
     const bottom = document.getElementById('consent-bottom');
     if (!container || !bottom) return;
+
     const intersectionObserver = new IntersectionObserver(
-      entries =>
-        entries.forEach(entry => {
-          if (entry.isIntersecting) setFullyScrolled(true);
-        }),
-      {
-        root: container,
+      entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          setFullyScrolled(true);
+          intersectionObserver.disconnect();
+        }
       },
+      { root: container },
     );
     intersectionObserver.observe(bottom);
-  };
 
-  useEffect(() => {
-    observeBottomIntersection();
+    return () => {
+      intersectionObserver.unobserve(bottom);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -54,20 +57,15 @@ const DesktopConsent = () => {
     const consentInfo = consentRef.current?.getConsentInfo();
     if (!authToken || consentMutation.isLoading || !consentInfo) {
       if (!authToken) {
-        Logger.error("Could not submit consent - auth token doesn't exist", {
-          location: 'consent-desktop',
-        });
+        logError("Could not submit consent - auth token doesn't exist");
       }
       if (!consentInfo) {
-        Logger.error('Could not submit consent - consent language is empty or undefined', {
-          location: 'consent-desktop',
-        });
+        logError('Could not submit consent - consent language is empty or undefined');
       }
       return;
     }
 
     const { consentLanguageText, mlConsent } = consentInfo;
-
     consentMutation.mutate(
       { consentLanguageText, mlConsent, authToken },
       {
@@ -77,14 +75,11 @@ const DesktopConsent = () => {
           });
         },
         onError: err => {
-          Logger.error(`Could not submit consent language. Error: ${getErrorMessage(err)}`, {
-            location: 'consent-desktop',
-          });
+          logError(`Could not submit consent language. Error: ${getErrorMessage(err)}`, err);
           requestErrorToast(err);
         },
       },
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   };
 
   const handleClickBack = () => {

@@ -1,32 +1,63 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getLogger } from '../../../../../utils';
 import { isUndefined } from '../../../../../utils/type-guards';
-import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 import type { CameraSide } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
 
-const { logInfo } = getLogger({
-  location: 'useUserMedia',
-});
+type UseUserMediaInput = {
+  side?: CameraSide;
+  isLazy?: boolean;
+  onError?: (err?: unknown) => void;
+  onSuccess?: (stream: MediaStream) => void;
+};
 
-const useUserMedia = (cameraSide: CameraSide, onError?: () => void) => {
-  const onCameraError = useHandleCameraError();
+type UseUserMediaOutput = {
+  mediaStream: MediaStream | null;
+  requestMediaStream: (side: CameraSide) => Promise<void>;
+};
+
+const { logInfo } = getLogger({ location: 'useUserMedia' });
+
+const getMediaStream = (options: MediaStreamConstraints): Promise<MediaStream> => {
+  if (isUndefined(navigator)) {
+    return Promise.reject(new Error('navigator is not defined'));
+  }
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    return navigator.mediaDevices.getUserMedia(options);
+  }
+
+  const getUserMedia = // @ts-expect-error: different versions of getUserMedia
+    navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+  if (!getUserMedia) {
+    return Promise.reject(new Error('getUserMedia is not supported in this browser'));
+  }
+
+  return new Promise((resolve, reject) => {
+    getUserMedia.call(navigator, options, resolve, reject);
+  });
+};
+
+const useUserMedia = ({ side = 'back', isLazy = false, onError, onSuccess }: UseUserMediaInput): UseUserMediaOutput => {
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
+  const isRunning = useRef<boolean>(false);
+
+  const requestMediaStream = async (str: CameraSide) => {
+    isRunning.current = true;
+    try {
+      const stream = await getMediaStream(getCameraOptions(str));
+      setMediaStream(stream);
+      onSuccess?.(stream);
+    } catch (err) {
+      onError?.(err);
+    }
+  };
 
   useEffect(() => {
-    const enableVideoStream = async () => {
-      if (isUndefined(navigator)) return;
-
-      const cameraOptions = getCameraOptions(cameraSide);
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
-        setMediaStream(stream);
-      } catch (err) {
-        onCameraError(err);
-        onError?.();
-      }
-    };
+    // When lazy, don't run the effect until requestMediaStream is called
+    if (isLazy && !isRunning.current) return;
 
     const cleanup = () => {
       if (mediaStream) {
@@ -38,15 +69,13 @@ const useUserMedia = (cameraSide: CameraSide, onError?: () => void) => {
     if (!mediaStream || !mediaStream.active) {
       logInfo('use-user-media: media stream not active, enabling video stream');
       cleanup();
-      enableVideoStream();
+      requestMediaStream(side);
     }
 
     return cleanup;
-  }, [cameraSide, mediaStream, mediaStream?.active]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mediaStream, mediaStream?.active, side]);
 
-  return {
-    mediaStream,
-  };
+  return { mediaStream, requestMediaStream };
 };
 
 export default useUserMedia;

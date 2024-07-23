@@ -31,6 +31,7 @@ const contextDesktopConsent: MachineContext = {
     ],
     CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
+  cameraPermissionState: 'prompt',
 };
 
 export default contextDesktopConsent;

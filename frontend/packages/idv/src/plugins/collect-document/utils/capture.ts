@@ -6,33 +6,58 @@ type ForwardVideoRef =
 
 /* https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video */
 export const VideoEvents = [
+  'abort',
   'canplay', // The canplay event is fired when the user agent can play the media, but estimates that not enough data has been loaded to play the media up to its end without having to stop for further buffering of content.
   'canplaythrough', // The canplaythrough event is fired when the user agent can play the media, and estimates that enough data has been loaded to play the media up to its end without having to stop for further buffering of content.
+  'durationchange',
   'emptied', // The emptied event is fired when the media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the load() method is called to reload it.
+  'encrypted',
   'ended', // The ended event is fired when playback or streaming has stopped because the end of the media was reached or because no further data is available.
   'error', // The error event is fired when the resource could not be loaded due to an error (for example, a network connectivity problem).
+  'loadeddata',
+  'loadedmetadata',
+  'loadstart',
   'pause', // The pause event is sent when a request to pause an activity is handled and the activity has entered its paused state, most commonly after the media has been paused through a call to the element's pause() method.
+  'play',
   'playing', // The playing event is fired after playback is first started, and whenever it is restarted. For example it is fired when playback resumes after having been paused or delayed due to lack of data.
+  'progress',
+  'resize',
+  'seeked',
+  'seeking',
   'stalled', // The user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
   'suspend', // The suspend event is fired when media data loading has been suspended.
+  'waiting',
+  'ratechange',
+  'volumechange',
+  // 'timeupdate',
 ];
 const nonPlayingVideoEventTypes = new Set(['ended', 'error', 'pause', 'stalled', 'suspend']);
 
 const isHtmlVideoElement = (x?: unknown): x is HTMLVideoElement => Boolean(x) && x instanceof HTMLVideoElement;
+export const isNonPlayingVideoEvent = (e: Event): boolean => nonPlayingVideoEventTypes.has(e.type);
 
 export const isNotAllowedError = (x?: unknown) => x === 'NotAllowedError';
-export const isDesktop = (x: unknown): x is 'desktop' => x === 'desktop';
-export const isDocument = (x: unknown): x is 'document' => x !== 'face';
-export const isFace = (x: unknown): x is 'face' => x === 'face';
-export const isMobile = (x: unknown): x is 'mobile' => x === 'mobile';
+export const isFunction = (x?: unknown): x is Function => typeof x === 'function';
 export const isString = (x: unknown): x is string => typeof x === 'string';
 export const isBlob = (x: unknown): x is Blob => x instanceof Blob;
 export const isFile = (x: unknown): x is File => x instanceof File;
 export const isFileOrBlob = (x: unknown): x is File | Blob => isFile(x) || isBlob(x);
 
-export const isFunction = (x?: unknown): x is Function => typeof x === 'function';
+export const isPrompt = (x?: string): boolean => x === 'prompt';
+export const isDenied = (x?: string): boolean => x === 'denied';
+export const isGranted = (x?: string): boolean => x === 'granted';
 
-export const isNonPlayingVideoEvent = (e: Event): boolean => nonPlayingVideoEventTypes.has(e.type);
+export const isDesktop = (x: unknown): x is 'desktop' => x === 'desktop';
+export const isDocument = (x: unknown): x is 'document' => x !== 'face';
+export const isFace = (x: unknown): x is 'face' => x === 'face';
+
+export const isIOS = (x?: string): boolean => !!x && /iOS/i.test(x);
+export const isSafari = (x?: string): boolean => !!x && /Safari/i.test(x);
+export const isChrome = (x?: string): boolean => !!x && /Chrome/i.test(x);
+export const isAndroid = (x?: string): boolean => !!x && /Android/i.test(x);
+export const isMobile = (x?: string): boolean => !!x && /mobile/i.test(x);
+export const isTablet = (x?: string): boolean => !!x && /tablet/i.test(x);
+export const isMobileKind = (x?: string): boolean => isMobile(x) || isTablet(x);
 
 export const hasFileReaderSupport = (): boolean => {
   if (typeof window === 'undefined') return false;
