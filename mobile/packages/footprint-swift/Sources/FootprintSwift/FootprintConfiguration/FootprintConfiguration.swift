@@ -1,6 +1,5 @@
 import Foundation
 
-// Exactly one of publicKey or authToken should be provided
 public struct FootprintConfiguration: Encodable {
     public var bootstrapData: FootprintBootstrapData?
     public var publicKey: String?
@@ -12,8 +11,9 @@ public struct FootprintConfiguration: Encodable {
     public var options: FootprintOptions?
     public var l10n: FootprintL10n?
     public var appearance: FootprintAppearance?
-    
-    public init(authToken: String,
+
+    public init(publicKey: String? = nil,
+                authToken: String? = nil,
                 scheme: String,
                 bootstrapData: FootprintBootstrapData? = nil,
                 options: FootprintOptions? = nil,
@@ -23,7 +23,9 @@ public struct FootprintConfiguration: Encodable {
                 onComplete: ((_ validationToken: String) -> Void)? = nil,
                 onError: ((_ errorMessage: String) -> Void)? = nil
     ) {
-        self.publicKey = nil
+        precondition(publicKey != nil || authToken != nil, "Either publicKey or authToken must be provided")
+
+        self.publicKey = publicKey
         self.authToken = authToken
         self.scheme = scheme
         self.bootstrapData = bootstrapData
@@ -34,29 +36,7 @@ public struct FootprintConfiguration: Encodable {
         self.l10n = l10n
         self.appearance = appearance
     }
-    
-    public init(publicKey: String,
-                scheme: String,
-                bootstrapData: FootprintBootstrapData? = nil,
-                options: FootprintOptions? = nil,
-                l10n: FootprintL10n? = nil,
-                appearance: FootprintAppearance? = nil,
-                onCancel: (() -> Void)? = nil,
-                onComplete: ((_ validationToken: String) -> Void)? = nil,
-                onError: ((_ errorMessage: String) -> Void)? = nil
-    ) {
-        self.publicKey = publicKey
-        self.authToken = nil
-        self.scheme = scheme
-        self.bootstrapData = bootstrapData
-        self.onCancel = onCancel
-        self.onComplete = onComplete
-        self.onError = onError
-        self.options = options
-        self.l10n = l10n
-        self.appearance = appearance
-    }
-    
+
     // Callbacks and redirectUrl should not be serialized
     private enum CodingKeys: String, CodingKey {
         case publicKey = "public_key"
@@ -65,7 +45,7 @@ public struct FootprintConfiguration: Encodable {
         case options = "options"
         case l10n = "l10n"
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(self.publicKey, forKey: .publicKey)

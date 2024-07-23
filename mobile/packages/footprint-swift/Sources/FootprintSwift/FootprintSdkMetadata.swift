@@ -5,5 +5,5 @@ internal struct FootprintSdkMetadata {
     static let apiBaseUrl: String = "https://api.onefootprint.com"
     static let name: String = "footprint-swift"
     static let kind: String = "verify_v1"
-    static let version: String = "1.0.5"
+    static let version: String = "1.0.6"
 }
