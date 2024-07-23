@@ -24,7 +24,11 @@ def test_dupes(sandbox_tenant):
 
     # Create a user with the same email who didn't finish the signup challenge. We shouldn't find
     # this user
-    data = dict(email=dict(value=email), phone_number=dict(value=FIXTURE_PHONE_NUMBER))
+    data = dict(
+        email=dict(value=email),
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER),
+        scope="onboarding",
+    )
     obc = sandbox_tenant.default_ob_config
     sandbox_id = _gen_random_sandbox_id()
     post("hosted/identify/signup_challenge", data, obc.key, SandboxId(sandbox_id))

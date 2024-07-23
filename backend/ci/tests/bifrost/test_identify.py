@@ -139,7 +139,7 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     # Token should be unverified because this vault was made via API
-    data = dict(identifierscope="onboarding")
+    data = dict(scope="onboarding")
     body = post("/hosted/identify", data, auth_token)
     assert body["user"]
     assert body["user"]["is_unverified"]

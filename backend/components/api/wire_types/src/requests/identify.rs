@@ -27,7 +27,7 @@ pub struct IdentifyRequest {
     pub phone_number: Option<PhoneNumber>,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for your
     /// use case in order to get the least permissions required
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Apiv2Response, serde::Serialize, Default, macros::JsonResponder)]
@@ -113,7 +113,7 @@ pub struct SignupChallengeData<T> {
 pub struct SignupChallengeRequest {
     pub phone_number: Option<SignupChallengeData<PhoneNumber>>,
     pub email: Option<SignupChallengeData<Email>>,
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]

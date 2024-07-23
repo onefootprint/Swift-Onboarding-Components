@@ -58,17 +58,9 @@ pub async fn post(
         phone_number,
         scope,
     } = request.into_inner();
-    if identifier.is_some() {
-        tracing::info!(tenant_id=?ob_context.as_ref().map(|ob| &ob.ob_config().tenant_id), "Identifier provided");
-    };
-    let scope = if let Some(scope) = scope {
-        tracing::info!("Scope provided");
-        scope
-    } else {
-        // TODO should deprecate this branch when all client SDKs are updated to use /hosted/identify/lite
-        tracing::info!(tenant_id=?ob_context.as_ref().map(|ob| &ob.ob_config().tenant_id), "Scope not provided");
-        IdentifyScope::Onboarding
-    };
+    // TODO remove identifier
+    tracing::info!(tenant_id=?ob_context.as_ref().map(|ob| &ob.ob_config().tenant_id), has_identifier=%identifier.is_some(), "Identifier provided");
+
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
     let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.is_from_api());
 

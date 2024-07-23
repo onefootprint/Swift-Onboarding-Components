@@ -32,7 +32,6 @@ use newtypes::email::Email;
 use newtypes::ChallengeKind;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
-use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PhoneNumber;
 use newtypes::ValidateArgs;
@@ -64,14 +63,6 @@ pub async fn post(
         scope,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
-    let scope = if let Some(scope) = scope {
-        tracing::info!("Scope provided");
-        scope
-    } else {
-        // TODO should deprecate this branch when all client SDKs are updated to use /hosted/identify/lite
-        tracing::info!(tenant_id=%ob_context.ob_config().tenant_id, "Scope not provided");
-        IdentifyScope::Onboarding
-    };
 
     let is_fixture = phone.as_ref().is_some_and(|p| p.value.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.value.is_fixture());
