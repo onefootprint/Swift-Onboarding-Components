@@ -225,7 +225,7 @@ where
     where
         T: IsGuardMet<TenantScope>,
     {
-        let requested_permission_str = format!("{}", guard);
+        let requested_permission_str = guard.error_display(&self.token_scopes());
         if guard.is_met(&self.token_scopes()) {
             Ok(())
         } else {

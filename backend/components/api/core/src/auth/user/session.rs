@@ -222,7 +222,7 @@ impl UserAuthContext {
     where
         T: IsGuardMet<UserAuthScope>,
     {
-        let requested_permission_str = format!("{}", guard);
+        let requested_permission_str = guard.error_display(&self.0.scopes);
         if guard.is_met(&self.0.scopes) {
             Ok(self.map(|d| d.0))
         } else {

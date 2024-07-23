@@ -24,6 +24,7 @@ def limited_role(sandbox_tenant):
         scopes=[
             {"kind": "read"},
             {"kind": "write_entities"},
+            {"kind": "decrypt", "data": "dob"},
         ],
         kind="api_key",
     )
@@ -112,10 +113,16 @@ def test_api_key_limited_role(sandbox_tenant, admin_role, sandbox_user, limited_
     data = {"id.first_name": "Hayes Valley"}
     post("users", data, key.key)
 
-    # Cannot do other actions, like decrypt, with limited role
-    decrypt_data = dict(fields=["id.first_name"], reason="HI")
+    # Cannot do other actions, like decrypt name, with limited role
+    decrypt_data = dict(fields=["id.first_name", "id.dob"], reason="HI")
     fp_id = sandbox_user.fp_id
-    post(f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=403)
+    body = post(
+        f"entities/{fp_id}/vault/decrypt", decrypt_data, key.key, status_code=403
+    )
+    assert (
+        body["message"]
+        == "Not allowed: required permission is missing: CanDecrypt<id.first_name>. Please review the permissions configured for your role in the Footprint dashboard."
+    )
 
     # Now, change the key's role
     data = dict(role_id=admin_role["id"])

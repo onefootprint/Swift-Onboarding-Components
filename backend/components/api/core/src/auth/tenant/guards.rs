@@ -1,9 +1,9 @@
 use super::CanCheckTenantGuard;
 use super::IsGuardMet;
 use crate::auth::CanDecrypt;
+use crate::auth::DisplayGuardError;
 use crate::auth::Either;
-use either::Either::Left;
-use either::Either::Right;
+use crate::auth::ImplDisplayGuardError;
 use itertools::Itertools;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::DataIdentifier;
@@ -11,7 +11,6 @@ use newtypes::DocumentDiKind;
 use newtypes::DocumentSide;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::TenantScope;
-use std::collections::HashSet;
 use strum::Display;
 
 /// Represents a simple permission that is required to execute an HTTP handler.
@@ -62,10 +61,12 @@ impl TenantGuard {
 }
 
 impl IsGuardMet<TenantScope> for TenantGuard {
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+    fn is_met(&self, token_scopes: &[TenantScope]) -> bool {
         token_scopes.contains(&self.granting_scope()) || token_scopes.contains(&TenantScope::Admin)
     }
 }
+
+impl ImplDisplayGuardError for TenantGuard {}
 
 /// Represents a complaince partner permission that is required to execute an HTTP handler.
 #[derive(Display)]
@@ -89,14 +90,16 @@ impl PartnerTenantGuard {
 }
 
 impl IsGuardMet<TenantScope> for PartnerTenantGuard {
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+    fn is_met(&self, token_scopes: &[TenantScope]) -> bool {
         token_scopes.contains(&self.granting_scope())
             || token_scopes.contains(&TenantScope::CompliancePartnerAdmin)
     }
 }
 
+impl ImplDisplayGuardError for PartnerTenantGuard {}
+
 impl IsGuardMet<TenantScope> for InvokeVaultProxyPermission {
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
+    fn is_met(&self, token_scopes: &[TenantScope]) -> bool {
         if token_scopes.contains(&TenantScope::Admin) {
             return true;
         }
@@ -109,74 +112,74 @@ impl IsGuardMet<TenantScope> for InvokeVaultProxyPermission {
             })
             .collect_vec();
         allowed_vault_proxy_permissions.contains(&&InvokeVaultProxyPermission::Any)
-            || allowed_vault_proxy_permissions.contains(&&self)
+            || allowed_vault_proxy_permissions.contains(&self)
+    }
+}
+
+impl ImplDisplayGuardError for InvokeVaultProxyPermission {}
+
+fn can_decrypt(di: &DataIdentifier, token_scopes: &[TenantScope]) -> bool {
+    match di {
+        // Id and Business data permissions are handled with CDOs
+        DataIdentifier::Id(_) | DataIdentifier::Business(_) | DataIdentifier::InvestorProfile(_) => {
+            token_scopes
+                .iter()
+                .filter_map(|p| match p {
+                    TenantScope::Decrypt { data: cdo } => Some(cdo),
+                    _ => None,
+                })
+                .flat_map(|cdo| cdo.data_identifiers())
+                .flatten()
+                .contains(di)
+        }
+        // While Custom + Document permissions are very easy to determine
+        DataIdentifier::Custom(_) => token_scopes.contains(&TenantScope::DecryptCustom),
+        // TODO can we simplify document permissions?
+        DataIdentifier::Document(DocumentDiKind::SsnCard)
+        | DataIdentifier::Document(DocumentDiKind::ProofOfAddress)
+        | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Front))
+        | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Back))
+        | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Front))
+        | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Back))
+        | DataIdentifier::Document(DocumentDiKind::OcrData(_, _))
+        | DataIdentifier::Document(DocumentDiKind::MimeType(_, _))
+        | DataIdentifier::Document(DocumentDiKind::Barcodes(_, _))
+        | DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
+            token_scopes.contains(&TenantScope::DecryptDocument)
+                || token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie)
+        }
+        DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Selfie))
+        | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Selfie)) => {
+            token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie)
+        }
+        DataIdentifier::Document(newtypes::DocumentDiKind::FinraComplianceLetter) => {
+            token_scopes.contains(&TenantScope::Decrypt {
+                data: CDO::InvestorProfile,
+            })
+        }
+        DataIdentifier::Card(_) => token_scopes.contains(&TenantScope::Decrypt { data: CDO::Card }),
     }
 }
 
 impl IsGuardMet<TenantScope> for CanDecrypt {
-    fn is_met(self, token_scopes: &[TenantScope]) -> bool {
-        if token_scopes.contains(&TenantScope::Admin) {
+    fn is_met(&self, token_scopes: &[TenantScope]) -> bool {
+        if token_scopes.contains(&TenantScope::Admin) || token_scopes.contains(&TenantScope::DecryptAll) {
             return true;
         }
-
-        if token_scopes.contains(&TenantScope::DecryptAll) {
-            return true;
-        }
-
         // Otherwise, check fine-grained decryption permissions.
-        // We have these two codepaths below separated with partition_map to support some CDOs that
-        // are difficult to map directly to DIs for now. For the CDOs that do map cleanly to DIs,
-        // the check is very simple
-        let (identifiers, other): (Vec<_>, Vec<_>) = self.0.into_iter().partition_map(|di| match di {
-            // Id and Business data permissions are handled with CDOs
-            DataIdentifier::Id(_) | DataIdentifier::Business(_) | DataIdentifier::InvestorProfile(_) => {
-                Left(di)
-            }
-            // While Custom + Document permissions are very easy to determine
-            DataIdentifier::Custom(_) => Right(token_scopes.contains(&TenantScope::DecryptCustom)),
-            // TODO can we simplify document permissions?
-            DataIdentifier::Document(DocumentDiKind::SsnCard)
-            | DataIdentifier::Document(DocumentDiKind::ProofOfAddress)
-            | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Front))
-            | DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Back))
-            | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Front))
-            | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Back))
-            | DataIdentifier::Document(DocumentDiKind::OcrData(_, _))
-            | DataIdentifier::Document(DocumentDiKind::MimeType(_, _))
-            | DataIdentifier::Document(DocumentDiKind::Barcodes(_, _))
-            | DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
-                let can_decrypt = token_scopes.contains(&TenantScope::DecryptDocument)
-                    || token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie);
-                Right(can_decrypt)
-            }
-            DataIdentifier::Document(DocumentDiKind::Image(_, DocumentSide::Selfie))
-            | DataIdentifier::Document(DocumentDiKind::LatestUpload(_, DocumentSide::Selfie)) => {
-                Right(token_scopes.contains(&TenantScope::DecryptDocumentAndSelfie))
-            }
-            DataIdentifier::Document(newtypes::DocumentDiKind::FinraComplianceLetter) => {
-                Right(token_scopes.contains(&TenantScope::Decrypt {
-                    data: CDO::InvestorProfile,
-                }))
-            }
-            DataIdentifier::Card(_) => {
-                Right(token_scopes.contains(&TenantScope::Decrypt { data: CDO::Card }))
-            }
-        });
-        // Check if we can decrypt all the requested IdentityDataKind attributes - the logic
-        // here is a little different
-        let accessible_data: HashSet<_> = token_scopes
+        self.0.iter().all(|di| can_decrypt(di, token_scopes))
+    }
+}
+
+impl DisplayGuardError<TenantScope> for CanDecrypt {
+    fn error_display(&self, token_scopes: &[TenantScope]) -> String {
+        let cannot_decrypt_dis = self
+            .0
             .iter()
-            .filter_map(|p| match p {
-                TenantScope::Decrypt { data: cdo } => Some(cdo),
-                _ => None,
-            })
-            .flat_map(|cdo| cdo.data_identifiers())
-            .flatten()
+            .filter(|di| !can_decrypt(di, token_scopes))
+            .cloned()
             .collect();
-        let can_access = accessible_data.is_superset(&HashSet::from_iter(identifiers));
-        // Next, check if we can decrypt custom + id documents
-        let can_access_other = other.into_iter().all(|v| v);
-        can_access && can_access_other
+        CanDecrypt(cannot_decrypt_dis).to_string()
     }
 }
 
@@ -308,6 +311,13 @@ mod test {
     #[test_case(Any.or(TG::Admin) => "Or<Any,Admin>")]
     fn test_display<T: IsGuardMet<TS>>(t: T) -> String {
         // Display is used to show an informative error message when permissions aren't met
-        format!("{}", t)
+        t.error_display(&[])
+    }
+
+    #[test_case(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName]).or(TG::ApiKeys) => "Or<CanDecrypt<id.ssn9>,ApiKeys>")]
+    #[test_case(TG::ApiKeys.and(CanDecrypt::new(vec![IDK::Ssn9, IDK::FirstName])) => "And<ApiKeys,CanDecrypt<id.ssn9>>")]
+    fn test_decrypt_display<T: IsGuardMet<TS>>(t: T) -> String {
+        // Display is used to show an informative error message when permissions aren't met
+        t.error_display(&[TS::Decrypt { data: CDO::Name }])
     }
 }

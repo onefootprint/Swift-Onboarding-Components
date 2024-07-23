@@ -75,7 +75,7 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
     assert body["business.address_line1"] == BUSINESS_DATA["business.address_line1"]
 
     # Cannot decrypt tin
-    data = dict(fields=["business.tin"])
+    data = dict(fields=["business.tin", "business.name"])
     body = post("hosted/business/vault/decrypt", data, auth_token, status_code=403)
     assert (
         body["message"]

@@ -2,11 +2,12 @@ use newtypes::output::Csv;
 use newtypes::DataIdentifier;
 use std::fmt::Display;
 
-pub trait IsGuardMet<ScopeT>: Display {
+#[allow(private_bounds)]
+pub trait IsGuardMet<ScopeT>: DisplayGuardError<ScopeT> {
     /// Given the `token_scopes` that exist on the auth token, checks if the required permission
     /// represented by self is met.
     #[allow(clippy::wrong_self_convention)]
-    fn is_met(self, token_scopes: &[ScopeT]) -> bool;
+    fn is_met(&self, token_scopes: &[ScopeT]) -> bool;
 
     fn or<T: IsGuardMet<ScopeT>>(self, other: T) -> Or<Self, T>
     where
@@ -23,31 +24,46 @@ pub trait IsGuardMet<ScopeT>: Display {
     }
 }
 
-/// Represents a guard that is always met, no matter the scopes of the auth token
-pub struct Any;
+pub(super) trait DisplayGuardError<ScopeT> {
+    /// The display of this guard to show when it is not met
+    fn error_display(&self, _token_scopes: &[ScopeT]) -> String;
+}
 
-impl Display for Any {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Any")
+/// Implement this trait to automatically implement DisplayGuardError using T's Display
+/// implementation
+pub(super) trait ImplDisplayGuardError: Display {}
+impl<T: ImplDisplayGuardError, ScopeT> DisplayGuardError<ScopeT> for T {
+    fn error_display(&self, _token_scopes: &[ScopeT]) -> String {
+        self.to_string()
     }
 }
 
+/// Represents a guard that is always met, no matter the scopes of the auth token
+#[derive(derive_more::Display)]
+pub struct Any;
+
 impl<ScopeT> IsGuardMet<ScopeT> for Any {
-    fn is_met(self, _token_scopes: &[ScopeT]) -> bool {
+    fn is_met(&self, _token_scopes: &[ScopeT]) -> bool {
         true
     }
 }
 
+impl ImplDisplayGuardError for Any {}
+
 /// Represents a permission that is met if either its Left or Right permission is met
 pub struct Or<Left, Right>(pub(crate) Left, pub(crate) Right);
 
-impl<Left, Right> Display for Or<Left, Right>
+impl<Left, Right, ScopeT> DisplayGuardError<ScopeT> for Or<Left, Right>
 where
-    Left: Display,
-    Right: Display,
+    Left: DisplayGuardError<ScopeT>,
+    Right: DisplayGuardError<ScopeT>,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Or<{},{}>", self.0, self.1)
+    fn error_display(&self, token_scopes: &[ScopeT]) -> String {
+        format!(
+            "Or<{},{}>",
+            self.0.error_display(token_scopes),
+            self.1.error_display(token_scopes)
+        )
     }
 }
 
@@ -56,7 +72,7 @@ where
     Left: IsGuardMet<ScopeT>,
     Right: IsGuardMet<ScopeT>,
 {
-    fn is_met(self, token_scopes: &[ScopeT]) -> bool {
+    fn is_met(&self, token_scopes: &[ScopeT]) -> bool {
         self.0.is_met(token_scopes) || self.1.is_met(token_scopes)
     }
 }
@@ -64,13 +80,17 @@ where
 /// Represents a permission that is met if both its Left and Right permission are met
 pub struct And<Left, Right>(pub(crate) Left, pub(crate) Right);
 
-impl<Left, Right> Display for And<Left, Right>
+impl<Left, Right, ScopeT> DisplayGuardError<ScopeT> for And<Left, Right>
 where
-    Left: Display,
-    Right: Display,
+    Left: DisplayGuardError<ScopeT>,
+    Right: DisplayGuardError<ScopeT>,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "And<{},{}>", self.0, self.1)
+    fn error_display(&self, token_scopes: &[ScopeT]) -> String {
+        format!(
+            "And<{},{}>",
+            self.0.error_display(token_scopes),
+            self.1.error_display(token_scopes)
+        )
     }
 }
 
@@ -79,7 +99,7 @@ where
     Left: IsGuardMet<ScopeT>,
     Right: IsGuardMet<ScopeT>,
 {
-    fn is_met(self, token_scopes: &[ScopeT]) -> bool {
+    fn is_met(&self, token_scopes: &[ScopeT]) -> bool {
         self.0.is_met(token_scopes) && self.1.is_met(token_scopes)
     }
 }

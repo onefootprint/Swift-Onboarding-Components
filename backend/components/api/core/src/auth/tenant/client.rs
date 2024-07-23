@@ -7,6 +7,7 @@ use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::CanDecrypt;
 use crate::auth::CanVault;
+use crate::auth::DisplayGuardError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
 use crate::FpResult;
@@ -15,7 +16,6 @@ use actix_web::web;
 use db::models::tenant::Tenant;
 use db::PgConn;
 use futures_util::Future;
-use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::FpId;
@@ -176,29 +176,54 @@ pub enum ClientTenantScope {
     DecryptDownload(DataIdentifier),
 }
 
+fn can_decrypt(di: &DataIdentifier, token_scopes: &[ClientTenantScope]) -> bool {
+    token_scopes.iter().any(|s| match s {
+        ClientTenantScope::Decrypt(dis) => dis.contains(di),
+        _ => false,
+    })
+}
+
 impl IsGuardMet<ClientTenantScope> for CanDecrypt {
-    fn is_met(self, token_scopes: &[ClientTenantScope]) -> bool {
-        let decryptable_dis = token_scopes
-            .iter()
-            .flat_map(|s| match s {
-                ClientTenantScope::Decrypt(dis) => dis.clone(),
-                _ => vec![],
-            })
-            .collect_vec();
-        self.0.into_iter().all(|di| decryptable_dis.contains(&di))
+    fn is_met(&self, token_scopes: &[ClientTenantScope]) -> bool {
+        self.0.iter().all(|di| can_decrypt(di, token_scopes))
     }
 }
 
-impl IsGuardMet<ClientTenantScope> for CanVault {
-    fn is_met(self, token_scopes: &[ClientTenantScope]) -> bool {
-        let encryptable_dis = token_scopes
+impl DisplayGuardError<ClientTenantScope> for CanDecrypt {
+    fn error_display(&self, token_scopes: &[ClientTenantScope]) -> String {
+        let cannot_decrypt_dis = self
+            .0
             .iter()
-            .flat_map(|s| match s {
-                ClientTenantScope::Vault(dis) => dis.clone(),
-                _ => vec![],
-            })
-            .collect_vec();
-        self.0.into_iter().all(|di| encryptable_dis.contains(&di))
+            .filter(|di| !can_decrypt(di, token_scopes))
+            .cloned()
+            .collect();
+        CanDecrypt(cannot_decrypt_dis).to_string()
+    }
+}
+
+
+fn can_vault(di: &DataIdentifier, token_scopes: &[ClientTenantScope]) -> bool {
+    token_scopes.iter().any(|s| match s {
+        ClientTenantScope::Vault(dis) => dis.contains(di),
+        _ => false,
+    })
+}
+
+impl IsGuardMet<ClientTenantScope> for CanVault {
+    fn is_met(&self, token_scopes: &[ClientTenantScope]) -> bool {
+        self.0.iter().all(|di| can_vault(di, token_scopes))
+    }
+}
+
+impl DisplayGuardError<ClientTenantScope> for CanVault {
+    fn error_display(&self, token_scopes: &[ClientTenantScope]) -> String {
+        let cannot_decrypt_dis = self
+            .0
+            .iter()
+            .filter(|di| !can_vault(di, token_scopes))
+            .cloned()
+            .collect();
+        CanDecrypt(cannot_decrypt_dis).to_string()
     }
 }
 
@@ -209,7 +234,7 @@ impl ClientTenantAuthContext {
         self,
         guard: T,
     ) -> Result<SessionContext<ClientTenantData>, AuthError> {
-        let requested_permission_str = format!("{}", guard);
+        let requested_permission_str = guard.error_display(&self.0.scopes);
         if guard.is_met(&self.0.scopes) {
             Ok(self.map(|d| d.0))
         } else {
