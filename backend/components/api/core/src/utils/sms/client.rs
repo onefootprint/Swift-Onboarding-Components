@@ -271,7 +271,7 @@ impl SmsClient {
         destination: PhoneNumber,
         vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
-    ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
+    ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -297,7 +297,7 @@ impl SmsClient {
             .await?;
 
         let state = PhoneEmailChallengeState { vault_id, h_code };
-        Ok((rx, state, self.duration_between_challenges))
+        Ok((rx, state))
     }
 }
 

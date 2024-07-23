@@ -85,7 +85,7 @@ pub async fn post(
                 "Phone number required to initiate sign up challenge",
             ))?;
             let e164 = phone_number.e164();
-            let (rx, challenge_data, time_before_retry) = state
+            let (rx, challenge_data) = state
                 .sms_client
                 .send_challenge_non_blocking(&state, tenant, phone_number, uv.id, uv.sandbox_id)
                 .await?;
@@ -94,7 +94,8 @@ pub async fn post(
                 h_code: challenge_data.h_code,
                 phone_number: e164,
             };
-            (Some(rx), challenge_data, time_before_retry.num_seconds(), None)
+            let time_between_challenges = state.config.time_s_between_challenges;
+            (Some(rx), challenge_data, time_between_challenges, None)
         }
         AuthMethodKind::Email => {
             let email = email.ok_or(ValidationError(

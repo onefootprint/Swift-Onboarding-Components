@@ -5,7 +5,6 @@ use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::errors::ValidationError;
@@ -143,23 +142,11 @@ pub async fn post(
                     "Phone number required to initiate sign up challenge",
                 ))?
                 .value;
-            let tenant = ob_context.tenant();
-            let (rx, challenge_state_data, time_before_retry_s) = state
+            let (rx, challenge_data) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, Some(tenant), phone, uv.id, sandbox_id)
+                .send_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, uv.id, sandbox_id)
                 .await?;
-
-            let challenge_data = ChallengeData::Sms(challenge_state_data);
-            let data = ChallengeState { data: challenge_data };
-            let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
-            let data = UserChallengeData {
-                token,
-                challenge_kind: ChallengeKind::Sms,
-                challenge_token,
-                biometric_challenge_json: None,
-                time_before_retry_s: time_before_retry_s.num_seconds(),
-            };
-            (rx, data)
+            (rx, ChallengeData::Sms(challenge_data))
         }
         ChallengeKind::Email => {
             // If obc is no-phone flow, only initiate email challenge
@@ -168,28 +155,9 @@ pub async fn post(
                     "Email must be provided for no-phone signup challenges",
                 ))?
                 .value;
-            let obc = ob_context.ob_config();
-            let tenant = ob_context.tenant();
-
-            if !obc.is_no_phone_flow {
-                return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into());
-            };
-
             let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
-            let challenge_data = ChallengeData::Email(challenge_data);
-
-            let data = ChallengeState { data: challenge_data };
-            let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
-
-            let data = UserChallengeData {
-                token,
-                challenge_kind: ChallengeKind::Email,
-                challenge_token,
-                biometric_challenge_json: None,
-                time_before_retry_s: state.config.time_s_between_challenges,
-            };
-            (rx, data)
+                send_email_challenge_non_blocking(&state, &email, uv.id, ob_context.tenant(), sandbox_id)?;
+            (rx, ChallengeData::Email(challenge_data))
         }
         ChallengeKind::Passkey => {
             return ValidationError("Passkey challenges not yet supported on signup").into();
@@ -201,6 +169,16 @@ pub async fn post(
     match err {
         Some(_) => root_span.record("meta", "error"),
         None => root_span.record("meta", "no_error"),
+    };
+
+    let data = ChallengeState { data: challenge_data };
+    let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
+    let challenge_data = UserChallengeData {
+        token,
+        challenge_kind,
+        challenge_token,
+        biometric_challenge_json: None,
+        time_before_retry_s: state.config.time_s_between_challenges,
     };
 
     let response = SignupChallengeResponse {
