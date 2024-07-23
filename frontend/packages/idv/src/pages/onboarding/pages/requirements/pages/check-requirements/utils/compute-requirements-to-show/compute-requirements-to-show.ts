@@ -25,7 +25,9 @@ const computeRequirementsToShow = (
   }: MachineContext,
   response: OnboardingStatusResponse,
 ) => {
-  const { allRequirements } = response;
+  const { allRequirements: allRequirementsOriginal } = response;
+  // This requirement isn't yet handled by bifrost
+  const allRequirements = allRequirementsOriginal.filter(r => r.kind !== OnboardingRequirementKind.registerAuthMethod);
   const unmetRequirements = allRequirements.filter(r => !r.isMet);
 
   if (!startedDataCollection && !unmetRequirements.length) {

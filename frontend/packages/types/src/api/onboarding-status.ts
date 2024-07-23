@@ -1,4 +1,4 @@
-import type { DocumentRequestKind } from '..';
+import type { AuthMethodKind, DocumentRequestKind } from '..';
 import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -9,6 +9,7 @@ import type { SupportedIdDocTypes } from '../data/id-doc-type';
 import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
+  registerAuthMethod = 'register_auth_method',
   registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate
   idDoc = 'collect_document',
   collectKycData = 'collect_data',
@@ -17,6 +18,12 @@ export enum OnboardingRequirementKind {
   authorize = 'authorize',
   process = 'process',
 }
+
+export type RegisterAuthMethodRequirement = {
+  kind: OnboardingRequirementKind.registerAuthMethod;
+  isMet: boolean;
+  authMethodKind: AuthMethodKind;
+};
 
 export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
@@ -92,6 +99,7 @@ export type ProcessRequirement = {
 };
 
 export type OnboardingRequirement =
+  | RegisterAuthMethodRequirement
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
