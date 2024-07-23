@@ -4,6 +4,7 @@ import type { MachineContext } from './types';
 
 export const argsRegularMobile: MachineContext = {
   authToken: 'token',
+  cameraPermissionState: 'prompt',
   device: {
     hasSupportForWebauthn: true,
     type: 'mobile',
@@ -18,10 +19,12 @@ export const argsRegularMobile: MachineContext = {
   },
 };
 
-export const getArgsRegularMobile = () => JSON.parse(JSON.stringify(argsRegularMobile));
+export const getArgsRegularMobile = (overrides?: Partial<MachineContext>) =>
+  JSON.parse(JSON.stringify({ ...argsRegularMobile, ...overrides }));
 
 export const argsRegularDesktop: MachineContext = {
   authToken: 'token',
+  cameraPermissionState: 'prompt',
   device: {
     hasSupportForWebauthn: true,
     type: 'desktop',

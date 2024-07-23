@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
+import CameraAccessDenied from '../../../components/camera-access-denied';
+import CameraAccessRequest from '../../../components/camera-access-request';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import DesktopProcessing from '../desktop-processing';
 import DesktopRetry from '../desktop-retry';
@@ -14,7 +16,7 @@ type RouterProps = {
   onDone: () => void;
 };
 const Router = ({ onDone }: RouterProps) => {
-  const [state] = useNonIdDocMachine();
+  const [state, send] = useNonIdDocMachine();
   const isDone = state.matches('complete') || state.matches('failure'); // TODO: investigate if we should consider failure as done
   useLogStateMachine('non-id-doc', state);
 
@@ -32,15 +34,29 @@ const Router = ({ onDone }: RouterProps) => {
     return <DocumentPrompt />;
   }
 
-  if (state.matches('imageCaptureMobile')) {
+  if (state.matches('mobileRequestCameraAccess')) {
+    return (
+      <CameraAccessRequest
+        onClose={() => send({ type: 'navigatedToPrev' })}
+        onError={() => send({ type: 'cameraAccessDenied', payload: { status: 'denied' } })}
+        onSuccess={stream => send({ type: 'cameraAccessGranted', payload: { stream, status: 'granted' } })}
+      />
+    );
+  }
+
+  if (state.matches('mobileCameraAccessDenied')) {
+    return <CameraAccessDenied device={state.context.device} onClose={() => send({ type: 'navigatedToPrev' })} />;
+  }
+
+  if (state.matches('mobileImageCapture')) {
     return <MobileImageCapture />;
   }
 
-  if (state.matches('retryMobile')) {
+  if (state.matches('mobileRetry')) {
     return <MobileRetry />;
   }
 
-  if (state.matches('retryDesktop')) {
+  if (state.matches('desktopRetry')) {
     return <DesktopRetry />;
   }
 

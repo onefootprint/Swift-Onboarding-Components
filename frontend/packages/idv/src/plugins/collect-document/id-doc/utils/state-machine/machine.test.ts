@@ -848,4 +848,64 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('failure');
     });
   });
+
+  describe('Considering context.cameraPermissionState', () => {
+    it('should ignore cameraPermissionState screens for desktop ...', () => {
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
+      machine.start();
+
+      expect(machine.getSnapshot().value).toEqual('countryAndType');
+
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: { type: SupportedIdDocTypes.driversLicense, country: 'US', id: 'id' },
+        },
+      ]);
+      expect(state.value).toEqual('desktopConsent');
+
+      state = machine.send([{ type: 'consentReceived' }]);
+      expect(state.value).toEqual('desktopFrontImage');
+    });
+
+    it('should show cameraPermissionState screens for tablet', () => {
+      const machine = interpret(
+        createIdDocMachine(
+          getArgsRegularMobile({
+            device: {
+              browser: 'Mobile Safari',
+              hasSupportForWebauthn: true,
+              osName: 'iOS',
+              type: 'tablet',
+            },
+          }),
+        ),
+      );
+      machine.start();
+
+      expect(machine.getSnapshot().value).toEqual('countryAndType');
+
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: { type: SupportedIdDocTypes.driversLicense, country: 'US', id: 'id' },
+        },
+      ]);
+      expect(state.value).toEqual('countryAndType');
+
+      state = machine.send([{ type: 'consentReceived' }]);
+      expect(state.value).toEqual('mobileRequestCameraAccess');
+
+      state = machine.send([{ type: 'cameraAccessDenied', payload: { status: 'denied' } }]);
+      expect(state.value).toEqual('mobileCameraAccessDenied');
+
+      state = machine.send([{ type: 'navigatedToPrev' }]);
+      expect(state.value).toEqual('mobileRequestCameraAccess');
+
+      state = machine.send([
+        { type: 'cameraAccessGranted', payload: { status: 'granted', stream: {} as MediaStream } },
+      ]);
+      expect(state.value).toEqual('mobileFrontImageCapture');
+    });
+  });
 });

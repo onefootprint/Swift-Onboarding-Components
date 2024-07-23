@@ -40,9 +40,7 @@ export type MachineContext = {
 
 export type ProccessingSucceededEvent = {
   type: 'processingSucceeded';
-  payload: {
-    nextSideToCollect?: string;
-  };
+  payload: { nextSideToCollect?: string };
 };
 
 export type MachineEvents =

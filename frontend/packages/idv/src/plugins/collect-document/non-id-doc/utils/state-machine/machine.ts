@@ -2,6 +2,7 @@ import { IdDocImageProcessingError } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { Logger } from '../../../../../utils/logger';
+import { isDenied, isGranted, isMobileKind, isPrompt } from '../../../utils/capture';
 import type { MachineContext, MachineEvents } from './types';
 
 const createNonIdDocMachine = (args: MachineContext) =>
@@ -16,7 +17,10 @@ const createNonIdDocMachine = (args: MachineContext) =>
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
-      context: { ...args },
+      context: {
+        cameraPermissionState: 'prompt',
+        ...args,
+      },
       states: {
         init: {
           on: {
@@ -34,20 +38,50 @@ const createNonIdDocMachine = (args: MachineContext) =>
               {
                 target: 'mobileProcessing',
                 actions: 'assignDocument',
-                cond: context => context.device.type === 'mobile',
+                cond: ctx => isMobileKind(ctx.device.type),
               },
               {
                 target: 'desktopProcessing',
                 actions: 'assignDocument',
-                cond: context => context.device.type !== 'mobile',
+                cond: ctx => !isMobileKind(ctx.device.type),
               },
             ],
-            startImageCapture: {
-              target: 'imageCaptureMobile',
-            },
+            startImageCapture: [
+              {
+                target: 'mobileRequestCameraAccess',
+                cond: ctx => isMobileKind(ctx.device.type) && isPrompt(ctx.cameraPermissionState),
+              },
+              {
+                target: 'mobileCameraAccessDenied',
+                cond: ctx => isMobileKind(ctx.device.type) && isDenied(ctx.cameraPermissionState),
+              },
+              { target: 'mobileImageCapture' },
+            ],
           },
         },
-        imageCaptureMobile: {
+        mobileRequestCameraAccess: {
+          on: {
+            navigatedToPrev: { target: 'documentPrompt' },
+            cameraAccessDenied: { target: 'mobileCameraAccessDenied', actions: 'assignCameraPermissionState' },
+            cameraAccessGranted: [
+              {
+                target: 'mobileImageCapture',
+                cond: (ctx, { payload }) => isMobileKind(ctx.device.type) && isGranted(payload.status),
+                actions: ['assignCameraPermissionState'], // TODO: implement 'assignMediaStream' ?
+              },
+              {
+                target: 'documentPrompt',
+                actions: 'assignCameraPermissionState',
+              },
+            ],
+          },
+        },
+        mobileCameraAccessDenied: {
+          on: {
+            navigatedToPrev: { target: 'mobileRequestCameraAccess' },
+          },
+        },
+        mobileImageCapture: {
           on: {
             navigatedToPrev: {
               target: 'documentPrompt',
@@ -64,7 +98,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
             },
           },
         },
-        retryMobile: {
+        mobileRetry: {
           on: {
             receivedDocument: {
               target: 'mobileProcessing',
@@ -75,12 +109,12 @@ const createNonIdDocMachine = (args: MachineContext) =>
               actions: 'clearErrors',
             },
             startImageCapture: {
-              target: 'imageCaptureMobile',
+              target: 'mobileImageCapture',
               actions: 'clearErrors',
             },
           },
         },
-        retryDesktop: {
+        desktopRetry: {
           on: {
             receivedDocument: {
               target: 'desktopProcessing',
@@ -91,7 +125,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
               actions: 'clearErrors',
             },
             uploadErrored: {
-              target: 'retryDesktop',
+              target: 'desktopRetry',
               actions: 'assignErrors',
             },
           },
@@ -102,7 +136,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
               target: 'complete',
             },
             processingErrored: {
-              target: 'retryMobile',
+              target: 'mobileRetry',
               actions: ['assignErrors', 'assignHasBadConnectivity'],
             },
             retryLimitExceeded: {
@@ -116,7 +150,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
               target: 'complete',
             },
             processingErrored: {
-              target: 'retryDesktop',
+              target: 'desktopRetry',
               actions: ['assignErrors', 'assignHasBadConnectivity'],
             },
             retryLimitExceeded: {
@@ -162,6 +196,10 @@ const createNonIdDocMachine = (args: MachineContext) =>
         }),
         clearErrors: assign(context => {
           context.errors = undefined;
+          return context;
+        }),
+        assignCameraPermissionState: assign((context, event) => {
+          context.cameraPermissionState = event.payload.status;
           return context;
         }),
       },

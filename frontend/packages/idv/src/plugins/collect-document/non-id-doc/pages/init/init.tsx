@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 
 import { Logger } from '../../../../../utils';
 import useSubmitDocType from '../../../hooks/use-submit-doc-type';
+import { isMobileKind } from '../../../utils/capture';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import type { NonIdDocKinds } from '../../types';
 import requestKindToDocType from '../../utils/request-kind-to-doc-type';
@@ -28,7 +29,7 @@ const Init = () => {
         authToken,
         documentType: requestKindToDocType[config.kind as NonIdDocKinds],
         requestId: documentRequestId,
-        deviceType: device.type === 'mobile' ? 'mobile' : 'desktop',
+        deviceType: isMobileKind(device.type) ? 'mobile' : 'desktop',
       },
       {
         onSuccess: data => {

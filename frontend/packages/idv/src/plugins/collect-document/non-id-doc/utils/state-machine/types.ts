@@ -11,6 +11,7 @@ import type { CaptureKind, IdDocImageErrorType } from '../../../types';
 
 export type MachineContext = {
   authToken: string;
+  cameraPermissionState?: PermissionState;
   device: DeviceInfo;
   orgId: string;
   documentRequestId: string;
@@ -28,63 +29,22 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'contextInitialized';
-      payload: {
-        id: string;
-      };
-    }
-  | {
-      type: 'contextInitializationFailed';
-    }
+  | { type: 'cameraAccessDenied'; payload: { status: PermissionState } }
+  | { type: 'cameraAccessGranted'; payload: { status: PermissionState; stream: MediaStream } }
+  | { type: 'cameraErrored' }
+  | { type: 'cameraStuck' }
+  | { type: 'contextInitializationFailed' }
+  | { type: 'contextInitialized'; payload: { id: string } }
+  | { type: 'navigatedToCountryDoc' }
+  | { type: 'navigatedToPrev' }
+  | { type: 'navigatedToPrev' }
+  | { type: 'navigatedToPrompt' }
+  | { type: 'processingErrored'; payload: { errors: { errorType: IdDocImageProcessingError; errorInfo?: string }[] } }
+  | { type: 'processingSucceeded' }
   | {
       type: 'receivedDocument';
-      payload: {
-        imageFile: File | Blob;
-        captureKind: CaptureKind;
-        extraCompressed?: boolean;
-      };
+      payload: { imageFile: File | Blob; captureKind: CaptureKind; extraCompressed?: boolean };
     }
-  | {
-      type: 'processingErrored';
-      payload: {
-        errors: {
-          errorType: IdDocImageProcessingError;
-          errorInfo?: string;
-        }[];
-      };
-    }
-  | {
-      type: 'uploadErrored';
-      payload: {
-        errors: {
-          errorType: IdDocImageUploadError;
-          errorInfo?: string;
-        }[];
-      };
-    }
-  | {
-      type: 'startImageCapture';
-    }
-  | {
-      type: 'cameraErrored';
-    }
-  | {
-      type: 'navigatedToPrev';
-    }
-  | {
-      type: 'retryLimitExceeded';
-    }
-  | {
-      type: 'navigatedToCountryDoc';
-    }
-  | {
-      type: 'cameraStuck';
-    }
-  | {
-      type: 'processingSucceeded';
-    }
-  | { type: 'navigatedToPrev' }
-  | {
-      type: 'navigatedToPrompt';
-    };
+  | { type: 'retryLimitExceeded' }
+  | { type: 'startImageCapture' }
+  | { type: 'uploadErrored'; payload: { errors: { errorType: IdDocImageUploadError; errorInfo?: string }[] } };

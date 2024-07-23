@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignCameraPermissionState: 'cameraAccessDenied' | 'cameraAccessGranted';
     assignDocument: 'receivedDocument';
     assignErrors: 'processingErrored' | 'uploadErrored';
     assignHasBadConnectivity: 'processingErrored';
@@ -25,12 +26,14 @@ export interface Typegen0 {
   matchesStates:
     | 'complete'
     | 'desktopProcessing'
+    | 'desktopRetry'
     | 'documentPrompt'
     | 'failure'
-    | 'imageCaptureMobile'
     | 'init'
+    | 'mobileCameraAccessDenied'
+    | 'mobileImageCapture'
     | 'mobileProcessing'
-    | 'retryDesktop'
-    | 'retryMobile';
+    | 'mobileRequestCameraAccess'
+    | 'mobileRetry';
   tags: never;
 }
