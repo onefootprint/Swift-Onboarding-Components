@@ -1,5 +1,5 @@
+import { InlineOtpNotSupported, type SandboxOutcome } from 'src/types';
 import request from 'src/utils/request';
-import type { SandboxOutcome } from 'src/types';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
 
@@ -8,7 +8,7 @@ type RequestOptions = {
   sandboxId?: string;
 };
 
-type SignupResponse = {
+type ChallengeResponse = {
   challengeData: {
     token: string;
     challengeKind: string;
@@ -19,8 +19,23 @@ type SignupResponse = {
   error: unknown;
 };
 
+export type IdentifiedAuthMethod = {
+  kind: 'phone' | 'email' | 'passkey';
+  isVerified: boolean;
+};
+
+export type IdentifyResponse = {
+  user: {
+    token: string;
+    authMethods: IdentifiedAuthMethod[];
+    isUnverified: boolean;
+    scrubbedEmail?: string;
+    scrubbedPhone?: string;
+  } | null;
+};
+
 const identify = async (payload: EmailAndPassword, options: RequestOptions) => {
-  const response = await request<{ user: unknown }>({
+  const response = await request<IdentifyResponse>({
     url: '/hosted/identify',
     method: 'POST',
     data: { ...payload, scope: 'onboarding' },
@@ -33,7 +48,7 @@ const identify = async (payload: EmailAndPassword, options: RequestOptions) => {
 };
 
 const signupChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
-  const response = await request<SignupResponse>({
+  const response = await request<ChallengeResponse>({
     url: '/hosted/identify/signup_challenge',
     method: 'POST',
     data: {
@@ -49,19 +64,21 @@ const signupChallenge = async (payload: EmailAndPassword, options: RequestOption
   return response;
 };
 
-export const createChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
-  const identifyResponse = await identify(payload, options);
-  if (identifyResponse.user) {
-    throw new Error('to be implemented');
-  }
-  const signupResponse = await signupChallenge(payload, options);
-  return signupResponse;
+const loginChallenge = async (payload: { kind: 'sms' }, options: { token: string }) => {
+  const response = await request<ChallengeResponse>({
+    url: '/hosted/identify/login_challenge',
+    method: 'POST',
+    data: {
+      preferredChallengeKind: payload.kind,
+    },
+    headers: {
+      'X-Fp-Authorization': options.token,
+    },
+  });
+  return response;
 };
 
-const verify = async (
-  payload: { challenge: string; challengeToken: string },
-  options: { token: string },
-) => {
+const verify = async (payload: { challenge: string; challengeToken: string }, options: { token: string }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/identify/verify',
     method: 'POST',
@@ -87,7 +104,7 @@ const getValidationToken = async (options: { token: string }) => {
   return response;
 };
 
-const initOnboarding = async (options: { token: string, sandboxOutcome: SandboxOutcome }) => {
+const initOnboarding = async (options: { token: string; sandboxOutcome: SandboxOutcome }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/onboarding',
     method: 'POST',
@@ -103,10 +120,31 @@ const initOnboarding = async (options: { token: string, sandboxOutcome: SandboxO
 
 export const verifyChallenge = async (
   payload: { challenge: string; challengeToken: string },
-  options: { token: string, sandboxOutcome: SandboxOutcome },
+  options: { token: string; sandboxOutcome: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
   await getValidationToken({ token: response.authToken });
   await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
   return response;
+};
+
+export const createChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
+  const identifyResponse = await identify(payload, options);
+  if (identifyResponse.user) {
+    if (identifyResponse.user.authMethods) {
+      const hasVerifiedSource = identifyResponse.user.authMethods.some(authMethod => authMethod.isVerified);
+      if (!hasVerifiedSource) {
+        throw new InlineOtpNotSupported('Cannot verify inline');
+      }
+      const hasPhone = identifyResponse.user.authMethods.some(
+        authMethod => authMethod.kind === 'phone' && authMethod.isVerified,
+      );
+      if (hasPhone) {
+        const loginResponse = await loginChallenge({ kind: 'sms' }, { token: identifyResponse.user.token });
+        return loginResponse;
+      }
+    }
+  }
+  const signupResponse = await signupChallenge(payload, options);
+  return signupResponse;
 };

@@ -17,4 +17,4 @@ export type {
   SupportedLocale,
   VerifyProps,
 } from './footprint';
-export { OnboardingStep } from './footprint';
+export { OnboardingStep, InlineOtpNotSupported } from './footprint';

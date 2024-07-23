@@ -60,3 +60,10 @@ export type Options = {
 };
 
 export type SandboxOutcome = 'fail' | 'pass' | 'manual_review' | 'use_rules_outcome';
+
+export class InlineOtpNotSupported extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InlineOtpNotSupported';
+  }
+}

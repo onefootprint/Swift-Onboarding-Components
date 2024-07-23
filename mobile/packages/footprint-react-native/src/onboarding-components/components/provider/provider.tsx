@@ -2,7 +2,7 @@ import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/type
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { type Appearance, type SandboxOutcome, OnboardingStep } from '../../../types';
+import { type Appearance, OnboardingStep, type SandboxOutcome } from '../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 
 export type ContextData = {
@@ -33,14 +33,14 @@ const Context = createContext<[ContextData, UpdateContext]>([
   () => undefined,
 ]);
 
-const Provider = ({ 
+const Provider = ({
   appearance,
   authToken,
   children,
   locale = 'en-US',
   publicKey,
   sandboxId,
-  sandboxOutcome = 'pass'
+  sandboxOutcome = 'pass',
 }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,

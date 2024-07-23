@@ -5,56 +5,13 @@ import { Context } from '../components/provider';
 import save from '../queries/save';
 import fp from '../utils/browser';
 import { formatBeforeSave } from '../utils/save-utils';
+import useOtp from './use-otp';
 
 const useFootprint = () => {
-  const [context, setContext] = useContext(Context);
+  const [context] = useContext(Context);
+  const otp = useOtp();
 
-  const launchIdentify = (
-    { email, phoneNumber }: { email?: string; phoneNumber?: string },
-    {
-      onAuthenticated,
-      onError,
-      onCancel,
-    }: {
-      onAuthenticated?: () => void;
-      onError?: (error: unknown) => void;
-      onCancel?: () => void;
-    } = {},
-  ) => {
-    const component = fp.init({
-      appearance: context.appearance,
-      publicKey: context.publicKey,
-      bootstrapData: {
-        'id.phone_number': phoneNumber,
-        'id.email': email,
-      },
-      onAuthComplete: ({
-        authToken,
-        vaultingToken,
-      }: {
-        authToken: string;
-        vaultingToken: string;
-      }) => {
-        setContext(prev => ({
-          ...prev,
-          authToken,
-          vaultingToken,
-          step: OnboardingStep.Onboard,
-        }));
-        onAuthenticated?.();
-      },
-      onError: (error: unknown) => {
-        onError?.(error);
-      },
-      onCancel: () => {
-        onCancel?.();
-      },
-      step: OnboardingStep.Auth,
-    });
-    component.render();
-  };
-
-  const vaultData = async (formValues: FormValues) => {
+  const vault = async (formValues: FormValues) => {
     const { vaultingToken, onboardingConfig } = context;
     if (!vaultingToken) {
       throw new Error('No authToken found. Please authenticate first');
@@ -104,9 +61,11 @@ const useFootprint = () => {
   };
 
   return {
-    launchIdentify,
-    save: vaultData,
+    save: vault,
     handoff,
+    launchIdentify: otp.launchIdentify,
+    verifyChallenge: otp.verify,
+    createChallenge: otp.create,
   };
 };
 

@@ -19,7 +19,13 @@ export type PinInputProps = InputProps & {
   onComplete?: (value: string) => void;
 };
 
-const PinInput: React.FC<PinInputProps> = ({ as: Component = TextInput, containerStyle, hasError = false, onComplete, ...props }) => {
+const PinInput: React.FC<PinInputProps> = ({
+  as: Component = TextInput,
+  containerStyle,
+  hasError = false,
+  onComplete,
+  ...props
+}) => {
   const { autoFocus, ...inputProps } = props;
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
