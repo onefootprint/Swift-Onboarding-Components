@@ -114,6 +114,9 @@ pub struct SignupChallengeRequest {
     pub phone_number: Option<SignupChallengeData<PhoneNumber>>,
     pub email: Option<SignupChallengeData<Email>>,
     pub scope: IdentifyScope,
+    #[openapi(required)]
+    // TODO make required
+    pub challenge_kind: Option<ChallengeKind>,
 }
 
 #[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]

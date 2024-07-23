@@ -61,8 +61,18 @@ pub async fn post(
         phone_number: phone,
         email,
         scope,
+        challenge_kind,
     } = request.into_inner();
     let sandbox_id = sandbox_id.0;
+    // TODO remove fallback value
+    tracing::info!(has_challenge_kind=%challenge_kind.is_some(), "Challenge kind provided");
+    let challenge_kind = challenge_kind.unwrap_or_else(|| {
+        if ob_context.ob_config().is_no_phone_flow {
+            ChallengeKind::Email
+        } else {
+            ChallengeKind::Sms
+        }
+    });
 
     let is_fixture = phone.as_ref().is_some_and(|p| p.value.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.value.is_fixture());
@@ -125,59 +135,65 @@ pub async fn post(
     let (token, _) =
         create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
 
-    let (rx, challenge_data) = if !ob_context.ob_config().is_no_phone_flow {
-        // Expect a phone number and initiate an SMS challenge
-        let phone = phone
-            .ok_or(ValidationError(
-                "Phone number required to initiate sign up challenge",
-            ))?
-            .value;
-        let tenant = ob_context.tenant();
-        let (rx, challenge_state_data, time_before_retry_s) = state
-            .sms_client
-            .send_challenge_non_blocking(&state, Some(tenant), phone, uv.id, sandbox_id)
-            .await?;
+    let (rx, challenge_data) = match challenge_kind {
+        ChallengeKind::Sms => {
+            // Expect a phone number and initiate an SMS challenge
+            let phone = phone
+                .ok_or(ValidationError(
+                    "Phone number required to initiate sign up challenge",
+                ))?
+                .value;
+            let tenant = ob_context.tenant();
+            let (rx, challenge_state_data, time_before_retry_s) = state
+                .sms_client
+                .send_challenge_non_blocking(&state, Some(tenant), phone, uv.id, sandbox_id)
+                .await?;
 
-        let challenge_data = ChallengeData::Sms(challenge_state_data);
-        let data = ChallengeState { data: challenge_data };
-        let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
-        let data = UserChallengeData {
-            token,
-            challenge_kind: ChallengeKind::Sms,
-            challenge_token,
-            biometric_challenge_json: None,
-            time_before_retry_s: time_before_retry_s.num_seconds(),
-        };
-        (rx, data)
-    } else {
-        // If obc is no-phone flow, only initiate email challenge
-        let email = email
-            .ok_or(ValidationError(
-                "Email must be provided for no-phone signup challenges",
-            ))?
-            .value;
-        let obc = ob_context.ob_config();
-        let tenant = ob_context.tenant();
+            let challenge_data = ChallengeData::Sms(challenge_state_data);
+            let data = ChallengeState { data: challenge_data };
+            let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
+            let data = UserChallengeData {
+                token,
+                challenge_kind: ChallengeKind::Sms,
+                challenge_token,
+                biometric_challenge_json: None,
+                time_before_retry_s: time_before_retry_s.num_seconds(),
+            };
+            (rx, data)
+        }
+        ChallengeKind::Email => {
+            // If obc is no-phone flow, only initiate email challenge
+            let email = email
+                .ok_or(ValidationError(
+                    "Email must be provided for no-phone signup challenges",
+                ))?
+                .value;
+            let obc = ob_context.ob_config();
+            let tenant = ob_context.tenant();
 
-        if !obc.is_no_phone_flow {
-            return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into());
-        };
+            if !obc.is_no_phone_flow {
+                return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into());
+            };
 
-        let (rx, challenge_data) =
-            send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
-        let challenge_data = ChallengeData::Email(challenge_data);
+            let (rx, challenge_data) =
+                send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
+            let challenge_data = ChallengeData::Email(challenge_data);
 
-        let data = ChallengeState { data: challenge_data };
-        let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
+            let data = ChallengeState { data: challenge_data };
+            let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
 
-        let data = UserChallengeData {
-            token,
-            challenge_kind: ChallengeKind::Email,
-            challenge_token,
-            biometric_challenge_json: None,
-            time_before_retry_s: state.config.time_s_between_challenges,
-        };
-        (rx, data)
+            let data = UserChallengeData {
+                token,
+                challenge_kind: ChallengeKind::Email,
+                challenge_token,
+                biometric_challenge_json: None,
+                time_before_retry_s: state.config.time_s_between_challenges,
+            };
+            (rx, data)
+        }
+        ChallengeKind::Passkey => {
+            return ValidationError("Passkey challenges not yet supported on signup").into();
+        }
     };
 
     let err = rx_background_error(rx, 3).await.err();
