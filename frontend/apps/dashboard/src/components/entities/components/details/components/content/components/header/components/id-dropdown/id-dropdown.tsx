@@ -43,8 +43,6 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
     }
   };
 
-  console.log({ hasSingleId, mainId });
-
   return (
     <Container>
       <Main>
