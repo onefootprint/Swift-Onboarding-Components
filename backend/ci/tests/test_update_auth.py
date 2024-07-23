@@ -41,10 +41,9 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
         assert body["message"] == error_message
 
     # Also test that a playbook with the auth scopes can't be used
-    token_for_auth = IdentifyClient.from_user(
-        user,
-        playbook_key=auth_playbook.key,
-    ).inherit(scope="auth")
+    token_for_auth = IdentifyClient.from_user(user, playbook=auth_playbook).inherit(
+        scope="auth"
+    )
 
     assert_cant_use_token(
         token_for_auth, 400, "Can only replace auth methods using auth issued via API"

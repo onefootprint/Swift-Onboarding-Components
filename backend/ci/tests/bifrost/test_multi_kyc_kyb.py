@@ -96,7 +96,9 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     # Should be able to use the BO token in identify flow for same user
     phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
-    IdentifyClient(secondary_bo_token, sandbox_id).inherit()
+    IdentifyClient(
+        kyb_sandbox_ob_config, sandbox_id, override_playbook_auth=secondary_bo_token
+    ).inherit()
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]

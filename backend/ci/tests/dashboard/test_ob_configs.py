@@ -1,5 +1,6 @@
 import pytest
 import json
+from tests.types import ObConfiguration
 from tests.utils import (
     get,
     post,
@@ -107,12 +108,11 @@ def test_config_create(sandbox_tenant):
         verification_checks=[{"data": {}, "kind": "kyc"}],
     )
     body = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
-    ob_config = body
-    ob_config_key = PublishableOnboardingKey(ob_config["key"])
+    obc = ObConfiguration.from_response(body, sandbox_tenant)
 
     sandbox_id = _gen_random_sandbox_id()
-    auth_token = IdentifyClient(ob_config_key, sandbox_id).create_user()
-    post("hosted/onboarding", None, ob_config_key, auth_token)
+    auth_token = IdentifyClient(obc, sandbox_id).create_user()
+    post("hosted/onboarding", None, obc.key, auth_token)
 
 
 @pytest.mark.parametrize(

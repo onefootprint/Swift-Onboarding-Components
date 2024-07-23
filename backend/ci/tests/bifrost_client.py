@@ -43,8 +43,9 @@ class BifrostClient:
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
-        ob_config_auth = override_ob_config_auth or ob_config.key
-        auth = IdentifyClient(ob_config_auth, sandbox_id).inherit()
+        auth = IdentifyClient(
+            ob_config, sandbox_id, override_playbook_auth=override_ob_config_auth
+        ).inherit()
         return BifrostClient(ob_config, auth, sandbox_id, **kwargs)
 
     def new_user(
@@ -53,9 +54,10 @@ class BifrostClient:
         """
         Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
         """
-        ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
-        auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
+        auth_token = IdentifyClient(
+            ob_config, sandbox_id, override_playbook_auth=override_ob_config_auth
+        ).create_user()
         return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
 
     def __init__(

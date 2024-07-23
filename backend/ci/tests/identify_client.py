@@ -15,7 +15,7 @@ class IdentifyClient:
         overrides.
         """
         return IdentifyClient(
-            playbook_key=kwargs.pop("playbook_key", user.client.ob_config.key),
+            playbook=kwargs.pop("playbook", user.client.ob_config),
             sandbox_id=kwargs.pop("sandbox_id", user.client.sandbox_id),
             webauthn=kwargs.pop("webauthn", user.client.webauthn_device),
             phone_number=kwargs.pop(
@@ -27,19 +27,22 @@ class IdentifyClient:
 
     def from_token(auth_token, **kwargs):
         return IdentifyClient(
-            playbook_key=None, sandbox_id=None, auth_token=auth_token, **kwargs
+            playbook=None, sandbox_id=None, auth_token=auth_token, **kwargs
         )
 
     def __init__(
         self,
-        playbook_key,
+        playbook,
         sandbox_id,
         webauthn=None,
         phone_number=FIXTURE_PHONE_NUMBER,
         email=FIXTURE_EMAIL,
         auth_token=None,
+        # Only used for BO auth
+        override_playbook_auth=None,
     ):
-        self.playbook_key = playbook_key
+        self.playbook = playbook
+        self.playbook_auth_h = override_playbook_auth or getattr(playbook, "key", None)
         self.sandbox_id = sandbox_id
 
         self.webauthn = webauthn
@@ -62,8 +65,10 @@ class IdentifyClient:
             data = dict(email=dict(value=self.email))
         data = dict(**data, scope=scope)
 
-        assert self.playbook_key, "Cannot issue signup challenge without playbook key"
-        headers = [*self.headers, self.playbook_key]
+        assert (
+            self.playbook_auth_h
+        ), "Cannot issue signup challenge without playbook auth"
+        headers = [*self.headers, self.playbook_auth_h]
         if self.sandbox_id:
             headers.append(SandboxId(self.sandbox_id))
         body = post("hosted/identify/signup_challenge", data, *headers)
@@ -82,8 +87,8 @@ class IdentifyClient:
         headers = [*self.headers]
         if self.sandbox_id:
             headers.append(SandboxId(self.sandbox_id))
-        if self.playbook_key:
-            headers.append(self.playbook_key)
+        if self.playbook_auth_h:
+            headers.append(self.playbook_auth_h)
         if self.auth_token:
             headers.append(self.auth_token)
         body = post("hosted/identify", data, *headers)

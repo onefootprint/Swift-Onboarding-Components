@@ -35,7 +35,7 @@ def test_dupes(sandbox_tenant):
 
     # Create another user that finished onboarding entirely
     sandbox_id = _gen_random_sandbox_id()
-    auth_token = IdentifyClient(obc.key, sandbox_id, email=email).create_user()
+    auth_token = IdentifyClient(obc, sandbox_id, email=email).create_user()
     bifrost = BifrostClient(obc, auth_token, sandbox_id)
     fp_id3 = bifrost.run().fp_id
 

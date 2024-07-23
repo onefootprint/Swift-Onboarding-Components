@@ -15,7 +15,7 @@ class User(typing.NamedTuple):
 @pytest.fixture(scope="session")
 def authed_user(auth_playbook, sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
-    auth_token = IdentifyClient(auth_playbook.key, sandbox_id).create_user(scope="auth")
+    auth_token = IdentifyClient(auth_playbook, sandbox_id).create_user(scope="auth")
 
     # Enforce we can't start an onboarding with this auth token
     body = post("/hosted/onboarding", None, auth_token, status_code=403)
@@ -91,10 +91,9 @@ def test_auth_onto_onboarded_user(sandbox_user, auth_playbook, sandbox_tenant):
     Test running a user through an auth playbook after they onboard to a KYC playbook.
     Use a passkey to log in
     """
-    auth_token = IdentifyClient.from_user(
-        sandbox_user,
-        playbook_key=auth_playbook.key,
-    ).inherit(kind="biometric", scope="auth")
+    auth_token = IdentifyClient.from_user(sandbox_user, playbook=auth_playbook).inherit(
+        kind="biometric", scope="auth"
+    )
     # Grab a validation token
     body = post("/hosted/onboarding/validate", None, auth_token)
 
@@ -134,10 +133,9 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     # First, onboard the user onto an auth playbook at Foo tenant
     #
 
-    auth_token = IdentifyClient.from_user(
-        sandbox_user,
-        playbook_key=auth_playbook.key,
-    ).inherit(kind="biometric", scope="auth")
+    auth_token = IdentifyClient.from_user(sandbox_user, playbook=auth_playbook).inherit(
+        kind="biometric", scope="auth"
+    )
     body = post("/hosted/onboarding/validate", None, auth_token)
 
     # And validate it via the backend API

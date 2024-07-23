@@ -20,7 +20,7 @@ def create_user_with_components_token(tenant, obc=None):
         obc = tenant.default_ob_config
 
     token = (
-        IdentifyClient(obc.key, sandbox_id)
+        IdentifyClient(obc, sandbox_id)
         .with_headers(IsComponentsSdk("true"))
         .create_user()
     )

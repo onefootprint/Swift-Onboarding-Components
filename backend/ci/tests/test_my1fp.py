@@ -11,7 +11,7 @@ def auth_token(sandbox_user):
     auth_token = IdentifyClient.from_user(
         sandbox_user,
         # Specifically don't provide any ob public key auth
-        playbook_key=None,
+        playbook=None,
     ).inherit(scope="my1fp")
     body = get("/hosted/user/token", None, auth_token)
     assert set(body["scopes"]) == {"basic_profile", "explicit_auth"}

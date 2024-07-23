@@ -35,7 +35,7 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
     assert all(not i["is_verified"] for i in body["user"]["auth_methods"])
 
     # Log into the user with an auth playbook, which will portablize it
-    IdentifyClient(auth_playbook.key, sandbox_id).inherit(scope="auth")
+    IdentifyClient(auth_playbook, sandbox_id).inherit(scope="auth")
 
     # After we mark this API-created vault as verified after logging into it, it should still be
     # visible via identify and should now have a verified auth method.
@@ -160,7 +160,7 @@ def test_portablize_nypid_by_email_then_phone(sandbox_tenant, foo_sandbox_tenant
     post("users", NONPORTABLE_DATA, sandbox_tenant.s_sk, sandbox_id_h)
 
     # Inherit the user via email
-    auth = IdentifyClient(sandbox_tenant.default_ob_config.key, sandbox_id).inherit(
+    auth = IdentifyClient(sandbox_tenant.default_ob_config, sandbox_id).inherit(
         kind="email"
     )
 
