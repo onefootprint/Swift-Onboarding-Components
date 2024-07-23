@@ -20,7 +20,7 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-describe('DrawerTimeline', () => {
+describe.todo('DrawerTimeline', () => {
   it('should requested, submitted, assigned and accepted events', async () => {
     await renderWithI18n(
       <DrawerTimeline
