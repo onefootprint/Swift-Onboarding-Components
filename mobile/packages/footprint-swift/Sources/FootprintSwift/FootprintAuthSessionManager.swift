@@ -85,8 +85,12 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
             }
             
             let urlComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true)
-            let teamIdentifier = Bundle.main.infoDictionary!["AppIdentifierPrefix"] as! String // ends with "."
-            let bundleIdentifier = Bundle.main.bundleIdentifier as! String
+            guard let teamIdentifier = Bundle.main.infoDictionary?["AppIdentifierPrefix"] as? String else {
+                fatalError("AppIdentifierPrefix is missing from Info.plist")
+            }            
+            guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+                fatalError("Bundle identifier is missing")
+            }
             if let queryItems = urlComponents?.queryItems {
                 if let deviceResponseJson = queryItems.first(where: {$0.name == "device_response" })?.value {
                     if let authToken = queryItems.first(where: {$0.name == "auth_token" })?.value {
