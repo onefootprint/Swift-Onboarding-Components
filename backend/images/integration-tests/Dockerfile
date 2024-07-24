@@ -1,6 +1,6 @@
 FROM ubuntu:22.04 AS rust-builder
 
-ARG RUST_TOOLCHAIN="1.77.0"
+ARG RUST_TOOLCHAIN="1.79.0"
 ARG DIESEL_VERSION="2.0.0"
 
 RUN mkdir -p /build

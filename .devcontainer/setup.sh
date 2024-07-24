@@ -43,12 +43,12 @@ service postgresql restart
 createdb footprint_db
 
 ## Install rustup and common components
-curl https://sh.rustup.rs -sSf | sh -s -- -y 
+curl https://sh.rustup.rs -sSf | sh -s -- -y
 source "$HOME/.cargo/env"
 rustup install stable
-rustup default 1.77.0
+rustup default 1.79.0
 rustup component add rustfmt
-rustup component add clippy 
+rustup component add clippy
 
 cargo install cargo-expand
 cargo install cargo-edit

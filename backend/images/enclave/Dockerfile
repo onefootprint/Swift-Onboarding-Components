@@ -12,7 +12,7 @@
 
 FROM alpine:3.17.3 AS nitro_enclave_builder
 
-ARG RUST_TOOLCHAIN="1.77.0"
+ARG RUST_TOOLCHAIN="1.79.0"
 
 # Force Rust dynamic linking against the Alpine-default musl libc.
 ENV RUSTFLAGS="-C target-feature=-crt-static"

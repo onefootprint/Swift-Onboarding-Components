@@ -92,7 +92,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
       - name: Install Rust toolchain for usage by Swatinem/rust-cache
-        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.79.0
 
       # Note that the cargo environment used by Swatinem/rust-cache to
       # construct a cache key is incorrect since we're actually building inside
@@ -173,7 +173,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.79.0
 
       - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
         with:
@@ -224,7 +224,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.79.0
         with:
           components: clippy
 

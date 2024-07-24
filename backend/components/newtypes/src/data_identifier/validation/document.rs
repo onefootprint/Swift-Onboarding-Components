@@ -68,9 +68,11 @@ fn validate_barcodes(doc_kind: DocumentDiKind, value: PiiJsonValue) -> VResult<D
     })
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(serde::Deserialize)]
 pub struct DocumentBarcode {
     /// Kind of barcode, like PDF 417
+    #[allow(dead_code)]
     pub kind: String,
+    #[allow(dead_code)]
     pub content: PiiString,
 }

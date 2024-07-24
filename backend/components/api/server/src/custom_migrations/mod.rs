@@ -16,6 +16,7 @@ use diesel::sql_query;
 use diesel::sql_types::BigInt;
 use diesel::RunQueryDsl;
 
+#[allow(dead_code)]
 trait CustomMigration {
     type MigrationState;
 

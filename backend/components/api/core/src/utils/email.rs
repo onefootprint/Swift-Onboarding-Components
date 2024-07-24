@@ -35,14 +35,6 @@ pub struct SendgridClient {
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-struct SendgridRequest {
-    personalizations: Vec<SendgridPersonalization>,
-    from: SendgridEmail,
-    subject: String,
-    content: Vec<SendgridContent>,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
 struct SendgridTemplateRequest {
     personalizations: Vec<SendgridPersonalization>,
     from: SendgridEmail,
@@ -59,13 +51,6 @@ struct SendgridPersonalization {
 struct SendgridEmail {
     email: String,
     name: Option<String>,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-struct SendgridContent {
-    #[serde(rename(serialize = "type"))]
-    type_: String,
-    value: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

@@ -1,4 +1,4 @@
-ARG RUST_TOOLCHAIN="1.77.0"
+ARG RUST_TOOLCHAIN="1.79.0"
 
 FROM clux/muslrust:${RUST_TOOLCHAIN}-stable AS builder
 
