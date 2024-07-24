@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useRequestError } from '@onefootprint/request';
 import { useL10nContext } from '../../../../components/l10n-provider';
-import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
 import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
+import { useUserData } from '../../../../queries';
 import { getLogger } from '../../../../utils/logger';
 import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';

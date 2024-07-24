@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import { useSkipLiveness } from '../../../../hooks';
+import { useSkipLiveness } from '../../../../queries';
 import { FPCustomEvents, sendCustomEvent } from '../../../../utils/custom-event';
 import { getLogger, trackAction } from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';

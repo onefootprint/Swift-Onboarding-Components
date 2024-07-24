@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
-import { useGetD2PStatus } from '../../../../hooks';
+import { useGetD2PStatus } from '../../../../queries';
 import SmsButtonWithCountdown from '../../components/sms-button-with-countdown';
 import useCreateHandoffUrl from '../../hooks/use-create-handoff-url';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';

@@ -3,7 +3,7 @@ import type { BusinessDIData, BusinessDataResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import { useBusinessData } from '../../../hooks';
+import { useBusinessData } from '../../../queries';
 
 type SyncDataArgs = {
   authToken?: string;

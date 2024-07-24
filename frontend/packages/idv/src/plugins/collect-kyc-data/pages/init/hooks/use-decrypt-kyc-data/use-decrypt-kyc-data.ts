@@ -3,9 +3,8 @@ import { CollectedKycDataOption } from '@onefootprint/types';
 import type { UserTokenResponse } from '@onefootprint/types';
 import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 
-import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
+import { useDecryptUser, useUserToken } from '../../../../../../queries';
 import { Logger } from '../../../../../../utils/logger';
-import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed

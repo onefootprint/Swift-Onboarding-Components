@@ -3,7 +3,7 @@ import type { InvestorProfileData, UserDataResponse } from '@onefootprint/types'
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import { useUserData } from '../../../hooks';
+import { useUserData } from '../../../queries';
 
 type SyncDataArgs = {
   authToken?: string;

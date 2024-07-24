@@ -10,8 +10,8 @@ import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useIdentify, useIdentifyVerify, useLoginChallenge } from '../../../../../../../../components/identify/queries';
-import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
+import { useUserToken } from '../../../../../../../../queries';
 import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
 
 type UseStepUpArgs = {

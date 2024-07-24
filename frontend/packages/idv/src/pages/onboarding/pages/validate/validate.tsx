@@ -3,7 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useOnboardingValidate } from '../../../../hooks';
+import { useOnboardingValidate } from '../../../../queries';
 import Logger from '../../../../utils/logger/logger';
 import nid from '../../../../utils/neuro-id';
 import ErrorComponent from '../../components/error';

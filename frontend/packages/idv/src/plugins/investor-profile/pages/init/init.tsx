@@ -1,7 +1,7 @@
-import { InvestorProfileDI, InvestorProfileData, UserTokenResponse } from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
 import React from 'react';
 import useEffectOnceStrict from '../../../../../src/components/identify/hooks/use-effect-once-strict';
-import useDecryptUser from '../../../collect-kyc-data/hooks/use-decrypt-user';
+import { useDecryptUser } from '../../../../queries';
 
 type InitProps = {
   authToken?: string;

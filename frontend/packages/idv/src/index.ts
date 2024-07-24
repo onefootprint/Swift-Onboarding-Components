@@ -33,14 +33,16 @@ export type { DeviceInfo } from './hooks';
 export {
   getBasicDevice,
   useDeviceInfo,
+  useLogStateMachine,
+  useParseHandoffUrl,
+} from './hooks';
+export {
   useGetD2PStatus,
   useGetOnboardingConfig,
   useGetOnboardingStatus,
-  useLogStateMachine,
   useOnboardingValidate,
-  useParseHandoffUrl,
   useUpdateD2PStatus,
-} from './hooks';
+} from './queries';
 export { default } from './idv';
 export type { IdvCompletePayload, IdvProps } from './types';
 export type { BootstrapProps, DeviceResponseJsonPayload } from './utils';

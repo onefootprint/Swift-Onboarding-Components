@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 
-import { useGetOnboardingStatus } from '../../../../../../hooks/api';
+import { useGetOnboardingStatus } from '../../../../../../queries';
 import { Logger, getLogger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';

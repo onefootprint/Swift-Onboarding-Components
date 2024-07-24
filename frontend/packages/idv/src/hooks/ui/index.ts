@@ -8,4 +8,3 @@ export { default } from './use-idv-container-measurement';
 export { default as useIdvMachine } from './use-idv-machine';
 export { default as useLogStateMachine } from './use-log-state-machine';
 export { default as useParseHandoffUrl } from './use-parse-handoff-url';
-export { default as useValidateSession } from './use-validate-session';

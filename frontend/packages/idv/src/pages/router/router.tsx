@@ -9,7 +9,8 @@ import { AppErrorBoundary, SessionExpired } from '../../components';
 import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import LoadNeuroId from '../../components/load-neuro-id';
-import { useIdvMachine, useLogStateMachine, useValidateSession } from '../../hooks';
+import { useIdvMachine, useLogStateMachine } from '../../hooks';
+import { useValidateSession } from '../../queries';
 import { FPCustomEvents, getLogger, trackAction } from '../../utils';
 import {
   createAuthTokenChangedPayload,

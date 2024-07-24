@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
-import { useSkipLiveness } from '../../../../hooks';
+import { useSkipLiveness } from '../../../../queries';
 import { checkIsSocialMediaBrowser } from '../../../../utils';
 import { trackAction } from '../../../../utils/logger';
 import { Logger } from '../../../../utils/logger';

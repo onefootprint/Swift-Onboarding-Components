@@ -3,7 +3,7 @@ import { FootprintPrivateEvent, type FootprintVariant } from '@onefootprint/foot
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
 import Idv, { AppErrorBoundary, getLogger, Logger, useFootprintProvider, useLogStateMachine } from '@onefootprint/idv';
-import { useIdentifyValidate } from '@onefootprint/idv/src/hooks/api';
+import { useIdentifyValidate } from '@onefootprint/idv/src/queries';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import { type ComponentsSdkContext, ComponentsSdkTypes } from '@onefootprint/idv/src/utils/state-machine/types';

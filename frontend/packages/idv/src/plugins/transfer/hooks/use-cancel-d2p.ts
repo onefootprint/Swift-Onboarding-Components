@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { D2PStatusUpdate } from '@onefootprint/types';
 
-import { useUpdateD2PStatus } from '../../../hooks';
+import { useUpdateD2PStatus } from '../../../queries';
 import { Logger } from '../../../utils/logger';
 
 const useCancelD2P = ({

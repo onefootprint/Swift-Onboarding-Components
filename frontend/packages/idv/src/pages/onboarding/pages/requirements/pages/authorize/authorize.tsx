@@ -13,6 +13,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
+import { useOnboardingAuthorize } from '../../../../../../queries';
 import { getLogger, trackAction } from '../../../../../../utils/logger';
 import { isDocCdo, isInvestorProfileCdo, isKybCdo, isKycCdo } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
@@ -20,7 +21,6 @@ import useOnboardingProcess from '../../hooks/use-onboarding-process';
 import Button from './components/button';
 import KybFields from './components/kyb-fields';
 import KycFields from './components/kyc-fields';
-import useOnboardingAuthorize from './hooks/use-onboarding-authorize';
 
 export type AuthorizeProps = {
   onDone: () => void;

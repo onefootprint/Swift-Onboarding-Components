@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Button, Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
+import { useUploadFile } from '../../../../queries';
 import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

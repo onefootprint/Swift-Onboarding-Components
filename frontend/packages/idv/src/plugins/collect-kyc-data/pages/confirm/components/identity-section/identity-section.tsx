@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
 import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
+import { useDecryptUser } from '../../../../../../queries';
 import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
 import { getLogger } from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';
 import {
   TaxIdDisplay,
