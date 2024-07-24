@@ -3,8 +3,6 @@ use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
-use crate::decision::vendor::vendor_api::vendor_api_struct::SambaLicenseValidationCreate;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
 use crate::errors::AssertionError;
@@ -31,6 +29,8 @@ use idv::samba::response::license_validation::SambaLinkType;
 use idv::samba::response::webhook::SambaWebhook;
 use newtypes::samba::SambaLicenseValidationData;
 use newtypes::samba::SambaOrderKind;
+use newtypes::vendor_api_struct::IncodeFetchOcr;
+use newtypes::vendor_api_struct::SambaLicenseValidationCreate;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentId;
@@ -144,7 +144,7 @@ async fn build_request_from_ocr_response(
         state,
         VReqIdentifier::DocumentId(did),
         &vw.vault.e_private_key,
-        IncodeFetchOCR,
+        IncodeFetchOcr,
     )
     .await?
     .ok() else {

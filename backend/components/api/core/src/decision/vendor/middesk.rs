@@ -1,8 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 
 use self::vendor_api::loaders::load_response_for_vendor_api;
-use self::vendor_api::vendor_api_struct::MiddeskBusinessUpdateWebhook;
-use self::vendor_api::vendor_api_struct::MiddeskGetBusiness;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 use crate::config::Config;
@@ -53,6 +51,8 @@ use idv::middesk::{
 };
 use idv::ParsedResponse;
 use idv::VendorResponse;
+use newtypes::vendor_api_struct::MiddeskBusinessUpdateWebhook;
+use newtypes::vendor_api_struct::MiddeskGetBusiness;
 use newtypes::BillingEventKind;
 use newtypes::BusinessDataForRequest;
 use newtypes::BusinessDataKind;

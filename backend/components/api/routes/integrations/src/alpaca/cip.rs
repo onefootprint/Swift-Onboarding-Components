@@ -13,10 +13,6 @@ use api_core::decision::features::{
 };
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use api_core::decision::vendor::vendor_api::vendor_api_struct::vendor_api_enum_from_struct;
-use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
-use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchScores;
-use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use api_core::decision::{
     self,
 };
@@ -58,6 +54,9 @@ use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::format_pii;
 use newtypes::pii;
+use newtypes::vendor_api_struct::IncodeFetchOcr;
+use newtypes::vendor_api_struct::IncodeFetchScores;
+use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::AlpacaPiiString;
 use newtypes::DataIdentifier;
 use newtypes::DecisionStatus;
@@ -405,13 +404,11 @@ pub(crate) async fn create_cip_request(
                 state,
                 VReqIdentifier::LatestForSv(sv_id.clone()),
                 &uvw.vault.e_private_key,
-                IncodeFetchOCR,
+                IncodeFetchOcr,
             )
             .await?
             .ok()
-            .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-                IncodeFetchOCR,
-            )))?;
+            .ok_or(CipError::VerificationResultNotFound(IncodeFetchOcr.into()))?;
             let (scores_response, _) = load_response_for_vendor_api(
                 state,
                 VReqIdentifier::LatestForSv(sv_id),
@@ -420,9 +417,7 @@ pub(crate) async fn create_cip_request(
             )
             .await?
             .ok()
-            .ok_or(CipError::VerificationResultNotFound(vendor_api_enum_from_struct(
-                IncodeFetchScores,
-            )))?;
+            .ok_or(CipError::VerificationResultNotFound(IncodeFetchScores.into()))?;
             document_and_photo(
                 scoped_vault.clone(),
                 mr.as_ref(),

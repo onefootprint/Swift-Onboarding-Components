@@ -3,8 +3,6 @@ use crate::decision::vendor::incode::common::call_start_onboarding;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeUpdatedWatchlistResult;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::decision::vendor::verification_result::{
@@ -30,6 +28,8 @@ use idv::incode::IncodeClientErrorCustomFailureReasons;
 use idv::incode::IncodeResponse;
 use idv::ParsedResponse;
 use idv::VendorResponse;
+use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
+use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::BillingEventKind as BEK;
 use newtypes::DecisionIntentId;

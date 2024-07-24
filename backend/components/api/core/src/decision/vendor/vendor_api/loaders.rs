@@ -70,7 +70,7 @@ pub async fn load_response_for_vendor_api<T>(
 where
     T: VendorParsable + std::fmt::Debug,
 {
-    let vendor_api = vendor_api_struct.vendor_api();
+    let vendor_api = T::vendor_api();
     let requests_and_result = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
@@ -117,7 +117,6 @@ mod tests {
     use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
     use crate::decision::tests::test_helpers::FixtureData;
     use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-    use crate::decision::vendor::vendor_api::vendor_api_struct::*;
     use crate::decision::vendor::verification_result::encrypt_verification_result_response;
     use crate::State;
     use chrono::Utc;
@@ -133,6 +132,7 @@ mod tests {
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
+    use newtypes::vendor_api_struct::*;
     use newtypes::DecisionIntentId;
     use newtypes::DecisionIntentKind;
     use newtypes::DocumentId;
@@ -261,7 +261,7 @@ mod tests {
                     doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
-                    IdologyExpectID,
+                    IdologyExpectId,
                 )
                 .await
             }
@@ -289,7 +289,7 @@ mod tests {
                     doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
-                    ExperianPreciseID,
+                    ExperianPreciseId,
                 )
                 .await
             }
@@ -349,7 +349,7 @@ mod tests {
                     doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
-                    IncodeFetchOCR,
+                    IncodeFetchOcr,
                 )
                 .await
             }

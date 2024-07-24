@@ -104,8 +104,8 @@ mod tests {
     use db::tests::fixtures;
     use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
+    use newtypes::vendor_api_struct::FootprintDeviceAttestation;
     use vendor::vendor_api::loaders::load_response_for_vendor_api;
-    use vendor::vendor_api::vendor_api_struct::FootprintDeviceAttestation;
 
     #[test_state]
     async fn test_deser(state: &mut State) {

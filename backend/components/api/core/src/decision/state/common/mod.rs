@@ -11,7 +11,6 @@ use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::neuro_id::run_neuro_call;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::{
     self,
@@ -46,6 +45,7 @@ use db::PgConn;
 use db::TxnPgConn;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
+use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
 use newtypes::DecisionIntentKind;
 use newtypes::DeviceInsightOperation;
@@ -280,7 +280,7 @@ pub async fn maybe_generate_ocr_reason_codes(
         state,
         VReqIdentifier::WfId(wfid),
         &vw.vault.e_private_key,
-        IncodeFetchOCR,
+        IncodeFetchOcr,
     )
     .await?
     .ok() else {

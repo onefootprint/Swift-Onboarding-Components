@@ -1,7 +1,6 @@
 use super::idology;
 use super::incode;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
 use crate::errors::AssertionError;
 use crate::task::ExecuteTask;
 use crate::task::{
@@ -27,6 +26,7 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::watchlist_check::WatchlistCheck;
 use db::DbResult;
 use db::TxnPgConn;
+use newtypes::vendor_api_struct::IdologyPa;
 use newtypes::DecisionIntentKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::OnboardingStatus;

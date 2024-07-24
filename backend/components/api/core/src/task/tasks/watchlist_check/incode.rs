@@ -1,6 +1,5 @@
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use crate::decision::{
     self,
 };
@@ -19,6 +18,7 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
+use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::DataIdentifier as DI;
 use newtypes::DecisionIntentId;
 use newtypes::EncryptedVaultPrivateKey;

@@ -1,5 +1,3 @@
-use super::vendor_api_struct::WrappedVendorAPI;
-use super::vendor_api_struct::*;
 use idv::experian::cross_core::response::CrossCoreAPIResponse;
 use idv::footprint::FootprintDeviceAttestationData;
 use idv::idology::expectid::response::ExpectIDResponse;
@@ -16,7 +14,8 @@ use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::samba::response::license_validation::CreateLVOrderResponse;
 use idv::ParsedResponse;
-use newtypes::VendorAPI;
+use newtypes::vendor_api_struct::*;
+use newtypes::VendorAPIMarker;
 use serde::de::DeserializeOwned;
 
 pub trait AsParsedResponse {
@@ -25,7 +24,7 @@ pub trait AsParsedResponse {
 
 pub trait VendorParsable
 where
-    Self: Into<WrappedVendorAPI> + Clone,
+    Self: VendorAPIMarker + Clone,
 {
     type ParsedType: DeserializeOwned;
 
@@ -34,15 +33,10 @@ where
 
         Ok(parsed)
     }
-
-    fn vendor_api(&self) -> VendorAPI {
-        let wrapped: WrappedVendorAPI = self.clone().into();
-        VendorAPI::from(wrapped)
-    }
 }
 
 // Idology KYC
-impl VendorParsable for IdologyExpectID {
+impl VendorParsable for IdologyExpectId {
     type ParsedType = ExpectIDResponse;
 }
 impl AsParsedResponse for ExpectIDResponse {
@@ -51,7 +45,7 @@ impl AsParsedResponse for ExpectIDResponse {
     }
 }
 // Experian KYC
-impl VendorParsable for ExperianPreciseID {
+impl VendorParsable for ExperianPreciseId {
     type ParsedType = CrossCoreAPIResponse;
 }
 impl AsParsedResponse for CrossCoreAPIResponse {
@@ -61,7 +55,7 @@ impl AsParsedResponse for CrossCoreAPIResponse {
 }
 
 // Incode Fetch OCR
-impl VendorParsable for IncodeFetchOCR {
+impl VendorParsable for IncodeFetchOcr {
     type ParsedType = FetchOCRResponse;
 }
 impl AsParsedResponse for FetchOCRResponse {

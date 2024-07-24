@@ -3,6 +3,7 @@ use derive_more::Display;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
+use enum_variant_type::EnumVariantType;
 use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
@@ -63,10 +64,14 @@ impl_enum_str_diesel!(Vendor);
     EnumIter,
     EnumString,
     AsRefStr,
+    EnumVariantType,
 )]
+#[evt(module = "vendor_api_struct")]
+#[evt(derive(Default, Clone, Hash, PartialEq, Eq, Debug))]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+#[evt(implement_marker_traits(VendorAPIMarker))]
 /// Represents the API for the request we'll make
 pub enum VendorAPI {
     IdologyExpectId,
@@ -105,6 +110,7 @@ pub enum VendorAPI {
     SambaLicenseValidationGetReport,
 }
 impl_enum_str_diesel!(VendorAPI);
+pub use vendor_api_struct::*;
 
 impl From<VendorAPI> for Vendor {
     fn from(api: VendorAPI) -> Self {
@@ -169,6 +175,12 @@ impl VendorAPI {
                 | VendorAPI::IncodeGetOnboardingStatus
                 | VendorAPI::IncodeProcessFace
         )
+    }
+}
+
+pub trait VendorAPIMarker: Into<VendorAPI> + Default {
+    fn vendor_api() -> VendorAPI {
+        Self::default().into()
     }
 }
 

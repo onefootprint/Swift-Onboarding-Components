@@ -1,11 +1,11 @@
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::ExperianPreciseID;
-use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyExpectID;
-use crate::decision::vendor::vendor_api::vendor_api_struct::LexisFlexId;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
+use newtypes::vendor_api_struct::ExperianPreciseId;
+use newtypes::vendor_api_struct::IdologyExpectId;
+use newtypes::vendor_api_struct::LexisFlexId;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::VendorAPI;
 use strum::EnumIter;
@@ -30,12 +30,12 @@ impl WaterfallVendorAPI {
     ) -> FpResult<Option<VendorResult>> {
         let res = match order {
             WaterfallVendorAPI::Experian => {
-                load_response_for_vendor_api(state, id, user_vault_private_key, ExperianPreciseID)
+                load_response_for_vendor_api(state, id, user_vault_private_key, ExperianPreciseId)
                     .await?
                     .into_vendor_result()
             }
             WaterfallVendorAPI::Idology => {
-                load_response_for_vendor_api(state, id, user_vault_private_key, IdologyExpectID)
+                load_response_for_vendor_api(state, id, user_vault_private_key, IdologyExpectId)
                     .await?
                     .into_vendor_result()
             }

@@ -1,7 +1,6 @@
 use super::map_to_api_error;
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_api::loaders::load_response_for_vendor_api;
-use super::vendor_api::vendor_api_struct::NeuroIdAnalytics;
 use super::vendor_result::VendorResult;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
@@ -23,6 +22,7 @@ use idv::neuro_id::response::NeuroIdAttributes;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
 use idv::ParsedResponse;
 use idv::VendorResponse;
+use newtypes::vendor_api_struct::NeuroIdAnalytics;
 use newtypes::vendor_credentials::NeuroIdCredentials;
 use newtypes::vendor_credentials::NeuroIdSiteId;
 use newtypes::DecisionIntentId;
