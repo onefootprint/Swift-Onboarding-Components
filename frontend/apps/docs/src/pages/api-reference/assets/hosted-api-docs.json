@@ -3773,7 +3773,10 @@
                             "auth"
                         ]
                     }
-                }
+                },
+                "required": [
+                    "scope"
+                ]
             },
             "IdentifyResponse": {
                 "type": "object",
@@ -5777,6 +5780,14 @@
             "SignupChallengeRequest": {
                 "type": "object",
                 "properties": {
+                    "challenge_kind": {
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "biometric",
+                            "email"
+                        ]
+                    },
                     "email": {
                         "type": "object",
                         "properties": {
@@ -5815,7 +5826,11 @@
                             "auth"
                         ]
                     }
-                }
+                },
+                "required": [
+                    "challenge_kind",
+                    "scope"
+                ]
             },
             "SignupChallengeResponse": {
                 "type": "object",
