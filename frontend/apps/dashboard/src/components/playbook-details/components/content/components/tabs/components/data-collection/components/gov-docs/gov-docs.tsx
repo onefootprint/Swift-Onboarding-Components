@@ -1,9 +1,9 @@
-import { DocumentTypesAndCountries, SupportedIdDocTypes, type CountryCode } from '@onefootprint/types';
+import { getCountryNameFromCode } from '@onefootprint/global-constants';
+import { type CountryCode, DocumentTypesAndCountries, SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
-import { getCountryNameFromCode } from '@onefootprint/global-constants'
 
 type GovDocsProps = {
   countrySpecific?: DocumentTypesAndCountries['countrySpecific'];
@@ -35,7 +35,9 @@ const GovDocs = ({ global = [], countrySpecific = {}, hasSelfie = false }: GovDo
           <Stack gap={3} flexDirection="column">
             {Object.entries(countrySpecific).map(([country, docs]) => {
               const countryName = getCountryNameFromCode(country as CountryCode);
-              return countryName ? <CountryItem label={countryName} docs={docs} key={country} hasSelfie={hasSelfie} /> : null;
+              return countryName ? (
+                <CountryItem label={countryName} docs={docs} key={country} hasSelfie={hasSelfie} />
+              ) : null;
             })}
           </Stack>
         ) : (
