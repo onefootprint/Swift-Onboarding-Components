@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
 
+const IS_DEV = process.env.NODE_ENV === 'development';
+
+const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
+
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live getform.io/f/pbgxoqza; 
+  connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live getform.io/f/pbgxoqza;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

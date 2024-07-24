@@ -12,6 +12,7 @@ import styled, { css } from 'styled-components';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import PgpUploadTool from 'src/components/pgp-upload-tool';
 import type { UserSession } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
 
@@ -27,6 +28,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
+  const {
+    data: { auth },
+  } = useSession();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -37,6 +41,12 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
     onAssumeTenant(tenantId);
     setIsOpen(false);
   };
+
+  let apiReferenceLink = `${DOCS_BASE_URL}/api-reference`;
+  if (user?.isFirmEmployee) {
+    // For in-development logged-in docs site
+    apiReferenceLink = `${DOCS_BASE_URL}/login#${auth}`;
+  }
 
   return (
     <>
@@ -59,7 +69,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
                 {t('help-links.documentation')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
-              <StyledLink as={Link} href={`${DOCS_BASE_URL}/api-reference`} target="_blank">
+              <StyledLink as={Link} href={apiReferenceLink} target="_blank">
                 {t('help-links.api-reference')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
