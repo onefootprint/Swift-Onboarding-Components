@@ -55,7 +55,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             ) : null}
             <Dropdown.Separator />
             <Dropdown.Group>
-              <Dropdown.GroupTitle>Help</Dropdown.GroupTitle>
               <StyledLink as={Link} href={DOCS_BASE_URL} target="_blank">
                 {t('help-links.documentation')}
                 <IcoArrowUpRight16 color="secondary" />
