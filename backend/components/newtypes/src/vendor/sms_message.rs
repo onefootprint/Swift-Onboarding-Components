@@ -1,4 +1,7 @@
 use crate::PiiString;
+use crate::TenantId;
+use itertools::chain;
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(Clone, strum::EnumDiscriminants)]
@@ -23,7 +26,7 @@ pub enum SmsMessage {
 }
 
 impl SmsMessage {
-    pub fn body(&self) -> PiiString {
+    pub fn body(&self, t_id: Option<&TenantId>) -> PiiString {
         // NOTE: some carriers, particularly in Mexico, have a character limit of 140.
         // Be careful with long message bodies
         let body = match self {
@@ -48,7 +51,13 @@ impl SmsMessage {
             ),
             Self::Freeform { content } => content.leak_to_string()
         };
-        PiiString::from(format!("{}\n\nSent via Footprint", body))
+        let show_sent_via_footprint = !t_id.is_some_and(|t| t.is_wingspan());
+        let body = chain!(
+            Some(body),
+            show_sent_via_footprint.then_some("Sent via Footprint".to_string())
+        )
+        .join("\n\n");
+        PiiString::from(body)
     }
 
     pub fn rate_limit_scope(&self) -> &str {

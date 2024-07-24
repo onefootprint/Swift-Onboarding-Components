@@ -125,8 +125,9 @@ pub async fn send_missing_secondary_bo_links(
 
     let futs = bo_sms_info
         .into_iter()
-        .flat_map(|((sms_message, sms_destination), email)| {
-            let sms = state.sms_client.send_message(state, sms_message, sms_destination);
+        .flat_map(|((sms, sms_destination), email)| {
+            let t_id = Some(&tenant.id);
+            let sms = state.sms_client.send_message(state, sms, sms_destination, t_id);
             let email = state.sendgrid_client.send_business_owner_invite(state, email);
             let v: Vec<Pin<Box<dyn futures::Future<Output = FpResult<()>>>>> =
                 vec![Box::pin(sms), Box::pin(email)];

@@ -41,6 +41,7 @@ pub async fn handler(
     state: web::Data<State>,
 ) -> ApiResponse<D2pSmsResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
+    let t_id = user_auth.tenant().map(|t| t.id.clone());
 
     let uvw = state
         .db_pool
@@ -71,7 +72,7 @@ pub async fn handler(
     };
     state
         .sms_client
-        .send_message(&state, message, phone_number)
+        .send_message(&state, message, phone_number, t_id.as_ref())
         .await?;
     let time_before_retry_s = state.sms_client.duration_between_challenges;
 

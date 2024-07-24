@@ -2,6 +2,7 @@ use crate::error::Error;
 use crate::response::message::Status;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
+use newtypes::TenantId;
 use rand::Rng;
 use request::send_message::SendMessage;
 use reqwest::IntoUrl;
@@ -117,7 +118,12 @@ impl Client {
         Ok(twilio_response)
     }
 
-    pub fn compose_sms_message(&self, message: &SmsMessage, destination: &PiiString) -> SendMessage {
+    pub fn compose_sms_message(
+        &self,
+        message: &SmsMessage,
+        destination: &PiiString,
+        t_id: Option<&TenantId>,
+    ) -> SendMessage {
         // temporary workaround to support UK numbers with Alphanumeric Sender ID
         let from = if destination.leak().starts_with("+44") {
             "Footprint".to_string()
@@ -125,7 +131,7 @@ impl Client {
             self.config.from_number.to_string()
         };
         SendMessage {
-            body: Some(message.body().leak_to_string()),
+            body: Some(message.body(t_id).leak_to_string()),
             to: destination.leak_to_string(),
             from,
             validity_period: Self::VALIDITY_PERIOD_SECS as u64,

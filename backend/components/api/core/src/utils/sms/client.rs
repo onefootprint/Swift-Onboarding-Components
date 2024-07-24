@@ -20,6 +20,7 @@ use newtypes::sms_message::SmsMessageKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SandboxId;
+use newtypes::TenantId;
 use newtypes::VaultId;
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -108,6 +109,7 @@ impl SmsClient {
         state: &State,
         message: SmsMessage,
         destination: PhoneNumber,
+        t_id: Option<&TenantId>,
     ) -> FpResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -121,7 +123,7 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
-        self._send_message(message, destination, None).await?;
+        self._send_message(message, destination, t_id, None).await?;
         Ok(())
     }
 
@@ -131,6 +133,7 @@ impl SmsClient {
         state: &State,
         message: SmsMessage,
         destination: PhoneNumber,
+        t_id: Option<TenantId>,
         tx: Sender<FpError>,
     ) -> FpResult<()> {
         if destination.is_fixture_phone_number() {
@@ -146,7 +149,8 @@ impl SmsClient {
         .await?;
         let client = self.clone();
         let fut = async move {
-            let res = client._send_message(message, destination, Some(tx)).await;
+            let t_id = t_id.as_ref();
+            let res = client._send_message(message, destination, t_id, Some(tx)).await;
             if let Err(err) = res {
                 tracing::error!(%err, "Couldn't send SMS asynchronously");
             }
@@ -161,6 +165,7 @@ impl SmsClient {
         &self,
         message: SmsMessage,
         destination: PhoneNumber,
+        t_id: Option<&TenantId>,
         mut tx: Option<Sender<FpError>>,
     ) -> FpResult<()> {
         let e164 = destination.e164();
@@ -216,7 +221,7 @@ impl SmsClient {
 
             // Send the message using this vendor
             let vendor = vendor_kind.vendor();
-            let e = match vendor.send(self, &message, &destination.e164()).await {
+            let e = match vendor.send(self, &message, &destination.e164(), t_id).await {
                 Ok(SmsSendStatus::Sent) => {
                     err = None;
                     break true;
@@ -293,7 +298,8 @@ impl SmsClient {
             tenant_name: tenant.map(|t| t.name.clone()),
             code,
         };
-        self.send_message_non_blocking(state, message, destination, tx)
+        let t_id = tenant.map(|t| t.id.clone());
+        self.send_message_non_blocking(state, message, destination, t_id, tx)
             .await?;
 
         let state = PhoneEmailChallengeState { vault_id, h_code };

@@ -3,6 +3,7 @@ use crate::FpResult;
 use async_trait::async_trait;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
+use newtypes::TenantId;
 
 pub struct TwilioSms;
 
@@ -60,6 +61,7 @@ pub trait SmsVendor: Send + Sync {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
+        t_id: Option<&TenantId>,
     ) -> FpResult<SmsSendStatus>;
 }
 
@@ -71,9 +73,10 @@ impl SmsVendor for TwilioSms {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
+        t_id: Option<&TenantId>,
     ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
-        let message = twilio_client.compose_sms_message(message, destination);
+        let message = twilio_client.compose_sms_message(message, destination, t_id);
         twilio_client.send(message).await?;
         Ok(SmsSendStatus::Sent)
     }
@@ -87,6 +90,7 @@ impl SmsVendor for TwilioWhatsapp {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
+        _t_id: Option<&TenantId>,
     ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_whatsapp_message(message, destination)?;
@@ -118,6 +122,7 @@ impl SmsVendor for Pinpoint {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
+        t_id: Option<&TenantId>,
     ) -> FpResult<SmsSendStatus> {
         client
             .pinpoint_client
@@ -125,7 +130,7 @@ impl SmsVendor for Pinpoint {
             // TODO change number based on environment
             .origination_identity("+17655634600".to_owned())
             .destination_phone_number(destination.leak_to_string())
-            .message_body(message.body().leak_to_string())
+            .message_body(message.body(t_id).leak_to_string())
             .send()
             .await?;
         Ok(SmsSendStatus::Sent)
