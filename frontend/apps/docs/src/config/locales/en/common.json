@@ -25,6 +25,10 @@
         }
       }
     },
+    "nav-dropdown": {
+      "dashboard": "Dashboard",
+      "log-out": "Log out"
+    },
     "cmd": {
       "title": "Global command menu",
       "remove-content": "Remove content",
