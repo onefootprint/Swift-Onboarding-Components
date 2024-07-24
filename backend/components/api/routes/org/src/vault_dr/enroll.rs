@@ -1,7 +1,7 @@
 use actix_web::web;
 use age::secrecy::ExposeSecret;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
@@ -30,7 +30,7 @@ use vault_dr::VaultDrAwsConfig;
 #[actix::post("/org/vault_dr/enroll")]
 pub async fn post(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     request: web::Json<api_wire_types::VaultDrEnrollRequest>,
 ) -> ApiResponse<api_wire_types::VaultDrEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;

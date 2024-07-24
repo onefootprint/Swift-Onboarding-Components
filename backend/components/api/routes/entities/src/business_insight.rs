@@ -1,4 +1,4 @@
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -29,7 +29,7 @@ use paperclip::actix::web;
 pub async fn get_business_insights(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<BusinessInsights> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

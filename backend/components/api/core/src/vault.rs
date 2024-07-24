@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
 use crate::errors::ValidationError;
@@ -41,7 +41,7 @@ use std::collections::HashMap;
 pub async fn create_non_portable_vault(
     state: web::Data<State>,
     request: HashMap<DataIdentifier, PiiJsonValue>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     sandbox_id: SandboxIdHeader,

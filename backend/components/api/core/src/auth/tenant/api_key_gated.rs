@@ -1,5 +1,5 @@
 use super::CanCheckTenantGuard;
-use super::SecretTenantAuthContext;
+use super::TenantApiKey;
 use super::TenantAuth;
 use crate::auth::AuthError;
 use actix_web::FromRequest;
@@ -13,7 +13,7 @@ use tracing::Instrument;
 #[derive(Debug, Clone, derive_more::Deref)]
 /// Auth extractor that requires a tenant API key to be provided for a tenant that has access to the
 /// `PreviewApi` defined by `T`.
-pub struct TenantApiKeyGated<T>(#[deref] SecretTenantAuthContext, PhantomData<T>);
+pub struct TenantApiKeyGated<T>(#[deref] TenantApiKey, PhantomData<T>);
 
 impl<T: PreviewApiMarker> FromRequest for TenantApiKeyGated<T> {
     type Error = crate::ApiError;
@@ -21,7 +21,7 @@ impl<T: PreviewApiMarker> FromRequest for TenantApiKeyGated<T> {
 
     #[tracing::instrument("TenantApiKeyGated::from_request", skip_all)]
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let fut = SecretTenantAuthContext::from_request(req, payload);
+        let fut = TenantApiKey::from_request(req, payload);
         let extractor = async move {
             let auth = fut.await?;
             // Check preview API guard during extraction

@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::CanDecrypt;
 use api_core::types::ApiResponse;
@@ -35,7 +35,7 @@ const RECORD_LIMIT: usize = 50;
 #[actix::post("/org/vault_dr/reveal_wrapped_record_keys")]
 pub async fn post(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     request: web::Json<VaultDrRevealWrappedRecordKeysRequest>,
     insight_headers: InsightHeaders,
 ) -> ApiResponse<VaultDrRevealWrappedRecordKeysResponse> {

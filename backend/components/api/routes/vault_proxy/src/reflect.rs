@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::proxy;
 use crate::proxy::token_parser::ProxyTokenParser;
 use crate::utils::headers::InsightHeaders;
@@ -41,7 +41,7 @@ api_headers_schema! {
 #[post("/vault_proxy/reflect")]
 pub async fn post(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     body_bytes: BodyBytes<5_242_880>,
     insight: InsightHeaders,
     params: ReflectHeaderParams,

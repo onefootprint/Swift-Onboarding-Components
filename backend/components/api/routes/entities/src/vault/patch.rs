@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
@@ -55,7 +55,7 @@ pub async fn patch(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<RawUserDataRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
 ) -> ApiResponse<api_wire_types::Empty> {
@@ -76,7 +76,7 @@ pub async fn patch_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<RawBusinessDataRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
 ) -> ApiResponse<api_wire_types::Empty> {

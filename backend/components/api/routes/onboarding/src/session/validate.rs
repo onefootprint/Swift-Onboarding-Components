@@ -1,5 +1,5 @@
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::errors::onboarding::OnboardingError;
 use crate::utils::session::AuthSession;
 use crate::State;
@@ -37,7 +37,7 @@ use paperclip::actix::web;
 pub async fn post(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     root_span: RootSpan,
 ) -> ApiResponse<ValidateResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;

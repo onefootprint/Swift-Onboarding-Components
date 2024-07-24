@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::types::ApiResponse;
@@ -123,7 +123,7 @@ pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<UserDecryptRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<UserDecryptResponse> {
@@ -144,7 +144,7 @@ pub async fn post_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<BusinessDecryptRequest>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<BusinessDecryptResponse> {

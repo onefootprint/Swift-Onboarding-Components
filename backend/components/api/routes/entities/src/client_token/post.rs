@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
@@ -39,7 +39,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<CreateClientTokenRequest>,
     // For now, only accept tenant API key
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     root_span: RootSpan,
 ) -> ApiResponse<CreateClientTokenResponse> {
     let CreateClientTokenRequest {

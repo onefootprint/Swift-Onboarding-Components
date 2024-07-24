@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
@@ -20,7 +20,7 @@ use paperclip::actix::{
 #[actix::post("/org/vault_dr/aws_pre_enrollment")]
 pub async fn post(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
 ) -> ApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant().clone();
@@ -51,7 +51,7 @@ pub async fn post(
 #[actix::get("/org/vault_dr/aws_pre_enrollment")]
 pub async fn get(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
 ) -> ApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant_id = auth.tenant().id.clone();

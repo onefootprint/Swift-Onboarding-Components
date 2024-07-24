@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
@@ -20,10 +20,7 @@ use paperclip::actix::{
     description = "Returns the status of Vault Disaster Recovery for the authenticated organization"
 )]
 #[actix::get("/org/vault_dr/status")]
-pub async fn get(
-    state: web::Data<State>,
-    auth: SecretTenantAuthContext,
-) -> ApiResponse<api_wire_types::VaultDrStatus> {
+pub async fn get(state: web::Data<State>, auth: TenantApiKey) -> ApiResponse<api_wire_types::VaultDrStatus> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

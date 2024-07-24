@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -32,7 +32,7 @@ use paperclip::actix::{
 pub async fn delete(
     state: web::Data<State>,
     path: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     insight: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let fp_id = path.into_inner();

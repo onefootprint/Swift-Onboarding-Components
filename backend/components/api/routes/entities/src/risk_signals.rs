@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -70,7 +70,7 @@ pub async fn get(
     version: web::Query<api_wire_types::GetHistoricalDataRequest>,
     // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET
     // /users/<>/risk_signals API
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     root_span: RootSpan,
 ) -> ApiListResponse<api_wire_types::RiskSignal> {
     // Some tracing to track when tenants have stopped using this API

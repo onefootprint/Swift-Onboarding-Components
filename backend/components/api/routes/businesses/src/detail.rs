@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::types::ApiResponse;
@@ -21,7 +21,7 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     fp_bid: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
 ) -> ApiResponse<api_wire_types::Business> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

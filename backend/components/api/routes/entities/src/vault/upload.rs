@@ -1,4 +1,4 @@
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
@@ -76,7 +76,7 @@ const TEN_MB: usize = 10 * 1024 * 1024;
 pub async fn post(
     state: web::Data<State>,
     path: Path<(FpId, DataIdentifier)>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,
     headers: UploadHeaderParams,
     body: BodyBytes<TEN_MB>,

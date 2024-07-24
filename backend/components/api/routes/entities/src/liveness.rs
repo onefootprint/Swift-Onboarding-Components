@@ -4,7 +4,7 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use paperclip::actix::api_v2_operation;
@@ -19,7 +19,7 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiListResponse<api_wire_types::LivenessEvent> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

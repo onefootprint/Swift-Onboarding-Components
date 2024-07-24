@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
@@ -51,7 +51,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: web::Json<TriggerKycRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKey,
     root_span: RootSpan,
 ) -> ApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;

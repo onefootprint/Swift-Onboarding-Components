@@ -11,7 +11,7 @@ use actix_web::FromRequest;
 use actix_web_httpauth::headers::authorization::Authorization;
 use actix_web_httpauth::headers::authorization::Basic;
 use db::models::tenant::Tenant;
-use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_api_key::TenantApiKey as DbTenantApiKey;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
 use futures_util::Future;
@@ -24,9 +24,9 @@ use tracing::Instrument;
 use tracing_actix_web::RootSpan;
 
 #[derive(Debug, Clone)]
-pub struct CheckedSecretTenantAuth {
+pub struct CheckedTenantApiKey {
     tenant: Tenant,
-    api_key: TenantApiKey,
+    api_key: DbTenantApiKey,
     role: TenantRole,
 }
 
@@ -40,11 +40,11 @@ pub struct CheckedSecretTenantAuth {
 )]
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Footprint-Secret-Key header
 /// which authenticates the client as a tenant.
-pub struct SecretTenantAuthContext(pub(super) CheckedSecretTenantAuth);
+pub struct TenantApiKey(pub(super) CheckedTenantApiKey);
 
 pub const HEADER_NAME: &str = "X-Footprint-Secret-Key";
 
-impl FromRequest for SecretTenantAuthContext {
+impl FromRequest for TenantApiKey {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -68,7 +68,7 @@ impl FromRequest for SecretTenantAuthContext {
 
             let (api_key, tenant, role) = state
                 .db_pool
-                .db_transaction(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
+                .db_transaction(|conn| DbTenantApiKey::get_enabled(conn, sh_api_key))
                 .await
                 .map_err(|e| -> Self::Error {
                     match e {
@@ -89,7 +89,7 @@ impl FromRequest for SecretTenantAuthContext {
             root_span.record("is_live", api_key.is_live);
             root_span.record("auth_method", "secret_key");
 
-            Ok(SecretTenantAuthContext(CheckedSecretTenantAuth {
+            Ok(TenantApiKey(CheckedTenantApiKey {
                 tenant,
                 api_key,
                 role,
@@ -116,7 +116,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> FpResult<SecretApiKey> {
     Ok(tenant_sk_input)
 }
 
-impl TenantAuth for CheckedSecretTenantAuth {
+impl TenantAuth for CheckedTenantApiKey {
     fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -142,7 +142,7 @@ impl TenantAuth for CheckedSecretTenantAuth {
     }
 }
 
-impl CanCheckTenantGuard for SecretTenantAuthContext {
+impl CanCheckTenantGuard for TenantApiKey {
     type Auth = Box<dyn TenantAuth>;
 
     fn token_scopes(&self) -> Vec<TenantScope> {

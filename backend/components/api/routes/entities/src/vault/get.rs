@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -77,7 +77,7 @@ pub async fn get(
     state: web::Data<State>,
     path: FpIdPath,
     request: Query<UserFieldsParam>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<GetUserVaultResponse> {
     let UserFieldsParam { fields } = request.into_inner();
     let result = get_inner(state, path, fields, auth).await?;
@@ -93,7 +93,7 @@ pub async fn get_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Query<BusinessFieldsParam>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<GetBusinessVaultResponse> {
     let BusinessFieldsParam { fields } = request.into_inner();
     let result = get_inner(state, path, fields, auth).await?;
@@ -104,7 +104,7 @@ async fn get_inner(
     state: web::Data<State>,
     path: FpIdPath,
     fields: Option<Csv<DataIdentifier>>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<HashMap<DataIdentifier, bool>> {
     let fp_id = path.into_inner();
 
