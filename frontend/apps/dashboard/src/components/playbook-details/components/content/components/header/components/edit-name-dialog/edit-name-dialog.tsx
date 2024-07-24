@@ -16,9 +16,7 @@ export type EditNameDialogProps = {
 
 const EditNameDialog = ({ open, playbook, onClose }: EditNameDialogProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.header.edit-name',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.header.edit-name' });
   const mutation = useUpdatePlaybook();
 
   const handleSubmit = (formData: EditNameFormData) => {

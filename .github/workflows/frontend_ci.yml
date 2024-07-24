@@ -33,29 +33,21 @@ jobs:
       filesChanged: ${{ steps.changes.outputs.src }}
 
   install-dependencies:
-    needs: [files-changed]
-    if: needs.files-changed.outputs.filesChanged == 'true'
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node-version: [18.x]
-    runs-on: frontend_runner
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # ratchet:actions/setup-node@v4
-
-      - name: Restore node modules cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        id: cache-dependencies
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install node_modules if not cached
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install node_modules
         working-directory: ./frontend
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
   lint:
@@ -67,17 +59,17 @@ jobs:
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # ratchet:actions/setup-node@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
-      - name: Restore yarn dependencies
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        id: cache-dependencies
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install node_modules
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
+
       - name: Lint
         working-directory: ./frontend
         run: yarn lint:ci
@@ -90,17 +82,16 @@ jobs:
     runs-on: frontend_runner
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # ratchet:actions/setup-node@v4
 
-      - name: Restore yarn dependencies
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        id: cache-dependencies
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install node_modules
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
+
       - name: Tests
         working-directory: ./frontend
         run: yarn test:ci
@@ -113,37 +104,19 @@ jobs:
     runs-on: frontend_runner
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # ratchet:actions/setup-node@v4
 
-      - name: Restore yarn dependencies
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        id: cache-dependencies
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
         with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install node_modules
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
+
       - name: Typecheck
         working-directory: ./frontend
         run: yarn typecheck
-
-  # audit:
-  #   needs: [files-changed]
-  #   if: needs.files-changed.outputs.filesChanged == 'true'
-  #   strategy:
-  #     matrix:
-  #       node-version: [18.x]
-  #       os: [ubuntu-latest]
-  #   name: 'Audit'
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Audit for vulnerabilities
-  #       working-directory: ./frontend
-  #       run: npx audit-ci@^6 --config ./audit-ci.jsonc
 
   bun-unit-tests:
     needs: [files-changed]

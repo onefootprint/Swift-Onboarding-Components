@@ -12,9 +12,7 @@ export type DisplayValueProps = {
 };
 
 const DisplayValue = ({ field, mustCollectData, optionalData = [] }: DisplayValueProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.data-collection',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
 
   if (field === 'document') {
     const documentString = mustCollectData.find(a => a.match('document'));

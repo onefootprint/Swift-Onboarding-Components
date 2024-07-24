@@ -21,8 +21,8 @@ type ListRuleChipProps = {
 };
 
 const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onChange }: ListRuleChipProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'details.rules.action-row.rule-chip',
   });
   const [ruleExpression, setRuleExpression] = useState<ListRuleField>(defaultExpression);
   const [selectedList, setSelectedList] = useState<List | undefined>(

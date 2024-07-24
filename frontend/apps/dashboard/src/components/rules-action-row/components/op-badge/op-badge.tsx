@@ -11,8 +11,8 @@ export type OpBadgeProps = {
 };
 
 const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.rules.action-row',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'details.rules.action-row',
   });
   const [isSelected, setIsSelected] = useState(defaultValue === RiskSignalRuleOp.notEq);
 

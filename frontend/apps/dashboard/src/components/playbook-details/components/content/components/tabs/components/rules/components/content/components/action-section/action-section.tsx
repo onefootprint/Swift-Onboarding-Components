@@ -37,8 +37,8 @@ const ActionSection = ({
   onUndoEdit,
   onDeleteAdd,
 }: ActionSectionProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: `pages.playbooks.details.rules.action-section`,
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: `details.rules.action-section`,
   });
   const [addedRules, setAddedRules] = useState<AddedRuleWithId[]>([]);
 

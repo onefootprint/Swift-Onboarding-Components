@@ -15,9 +15,7 @@ export type HeaderProps = {
 };
 
 const Header = ({ playbook, isDisabled }: HeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.header',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.header' });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const theme = useTheme();
 

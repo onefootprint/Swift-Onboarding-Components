@@ -20,7 +20,7 @@ const DataCollection = ({
     optionalData = [],
   },
 }: DataCollectionProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.details.data-collection' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const documentsAsString = mustCollectData.filter(scopes => scopes.includes('document'))?.[0];

@@ -313,6 +313,222 @@
     }
   },
   "details": {
-    "html-title": "Footprint | Playbook details"
+    "html-title": "Footprint | Playbook details",
+    "title": "Playbook details",
+    "breadcrumb": {
+      "title": "playbook details breadcrumb",
+      "playbooks": "Playbooks",
+      "users": "Users",
+      "user-details": "User details",
+      "playbook-details": "Playbook details"
+    },
+    "header": {
+      "edit-name": {
+        "cta": "Edit playbook name",
+        "cta-not-allowed": "You're not allowed to edit Playbooks",
+        "form": {
+          "label": "Playbook name"
+        }
+      },
+      "type": {
+        "label": "Type",
+        "kyc": "KYC",
+        "kyb": "KYB",
+        "auth": "Auth",
+        "document": "Document"
+      },
+      "name": "Playbook name",
+      "publishable-key": "Publishable key"
+    },
+    "tabs": {
+      "data-collection": "Data collection",
+      "aml-monitoring": "AML monitoring",
+      "rules": "Rules"
+    },
+    "data-collection": {
+      "basic-information": "Basic information",
+      "us-residents": {
+        "title": "U.S. residents",
+        "empty": "U.S. residents aren't allowed to be onboarded."
+      },
+      "non-us-residents": {
+        "title": "Non-U.S. residents",
+        "empty": "Non-U.S. residents aren't allowed to be onboarded."
+      },
+      "us-territories": {
+        "label": "Note:",
+        "content": "Residents from U.S. territories are allowed to be onboarded."
+      },
+      "id-doc-first": "Document scan will be used to autofill basic identity data",
+      "last4": "Last 4",
+      "full": "Full",
+      "full_optional": "Full (Optional)",
+      "last4_optional": "Last 4 (Optional)",
+      "investor_profile": {
+        "title": "Investor profile questions",
+        "subtitle": "Investor profiling questions will be part of the onboarding process."
+      },
+      "kyb": {
+        "business": "Business",
+        "basic_information": "Basic information",
+        "other": "Other",
+        "business_beneficial_owners": "Beneficial owners",
+        "entity-type": "Entity type",
+        "business_website": "Business website",
+        "business_phone": "Business phone"
+      },
+      "id-doc": {
+        "title": "ID document scan"
+      }
+    },
+    "aml-monitoring": {
+      "title": "AML checks",
+      "footer": {
+        "label": "Note:",
+        "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+      }
+    },
+    "rules": {
+      "title": "Rules",
+      "description": "Define the onboarding logic for your playbook.",
+      "empty-rules": "This playbook does not have rules.",
+      "cta-not-allowed": "You're not allowed to edit rules",
+      "alerts": {
+        "kyb-alert": "These rules are only applied when verifying a Business Owner's identity.",
+        "view-only-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access.",
+        "view-only-kyb-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access. Please also note these are only applied when verifying a Business Owner's identity."
+      },
+      "edit-bar": {
+        "editing-rules": "Editing rules",
+        "tooltip": "Changes will only take effect if you click \"Save changes\"",
+        "test-changes": "Test changes"
+      },
+      "success-toast": {
+        "title": "Success!",
+        "description": "Changes saved."
+      },
+      "action-section": {
+        "fail": {
+          "title": "Fail",
+          "subtitle": "User will be marked as failed"
+        },
+        "manual-review": {
+          "title": "Fail + Manual review",
+          "subtitle": "User will be marked as failed and flagged for review"
+        },
+        "step-up": {
+          "title": "Step-up",
+          "subtitle": "User will be asked to scan or upload another document",
+          "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
+          "step-up-proof-of-address": "Proof of Address",
+          "step-up-identity": "Identity document"
+        },
+        "step-up-proof-of-address": {
+          "title": "Step-up: Proof of Address"
+        },
+        "step-up-identity": {
+          "title": "Step-up: Identity document"
+        },
+        "pass-with-manual-review": {
+          "title": "Pass + Manual review",
+          "subtitle": "User will be onboarded, but should be manually reviewed"
+        },
+        "add-rule": "Add rule",
+        "empty-rules": "No rule has been configured."
+      },
+      "action-row": {
+        "if": "if ",
+        "and": " and ",
+        "not": "not",
+        "add-risk-signal": "Add risk signal condition",
+        "add-list": "Add list condition",
+        "add-list-tooltip": "First create a list to add a list condition",
+        "delete": "Delete rule",
+        "empty-aria-label": "Empty rule",
+        "risk-signals-select": {
+          "title": "Risk signals",
+          "aria-label": "Open risk signals select",
+          "placeholder": "risk signal",
+          "delete": "Delete",
+          "search": "Search by name or description"
+        },
+        "rule-chip": {
+          "risk-signal": {
+            "field-placeholder": "risk signal",
+            "value-placeholder": "triggered"
+          },
+          "op": {
+            "trigger-aria-label": "Open ops",
+            "aria-label": "Rule ops",
+            "eq": "is",
+            "not_eq": "is not",
+            "is_in": "is",
+            "is_not_in": "is not"
+          },
+          "list": {
+            "field": {
+              "placeholder": "vault data",
+              "trigger-aria-label": "Open data identifiers",
+              "aria-label": "Rule data identifiers",
+              "search-placeholder": "Search vault data...",
+              "empty": "There is no vault data corresponding to this kind of list",
+              "search-empty": "No results",
+              "validation-note": "Showing options that match the type of list selected: <b>{{type}}</b>"
+            },
+            "in": "in",
+            "value": {
+              "placeholder": "list",
+              "trigger-aria-label": "Open lists",
+              "aria-label": "Rule lists",
+              "search-placeholder": "Search lists...",
+              "empty": "There are no lists corresponding to this kind of vault data",
+              "validation-note": "Showing options that match the type of data selected: <b>{{type}}</b>"
+            },
+            "empty-option": "Clear"
+          }
+        },
+        "pending-change": "Pending change",
+        "pending-deletion": "Pending deletion",
+        "delete-toast": {
+          "title": "Rule is pending deletion",
+          "description": "This will only take effect if you save your changes",
+          "undo": "Undo"
+        }
+      },
+      "backtesting": {
+        "title": "Review rule changes",
+        "save": "Save changes",
+        "affected": {
+          "heading": "{{count}} out of {{total}} total onboardings matched",
+          "description": "If these rules existed in the selected period they would've affected {{count}} onboardings.",
+          "aria-label": "Affected onboardings table",
+          "none-affected": "No onboardings would've been affected.",
+          "none-total": "This playbook did not have any onboardings during this time period. Please try a different date range.",
+          "header": {
+            "id": "Footprint ID",
+            "current-status": "Current onboarding status",
+            "historical-outcome": "Original rule outcome",
+            "backtested-outcome": "Backtested rule outcome",
+            "historical-tooltip": "Rule outcomes based on existing rules at the time of these onboardings",
+            "backtested-tooltip": "If the rules that are being tested existed at the time of these onboardings, rule outcomes may or may not have been different."
+          }
+        },
+        "historical": {
+          "heading": "Original rule outcomes",
+          "description": "Rule outcomes based on existing rules at the time of the onboardings above."
+        },
+        "backtested": {
+          "heading": "Backtested rule outcomes",
+          "description": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:"
+        },
+        "correlation": {
+          "heading": "Original rule outcomes to Backtested rule outcomes",
+          "description": "Correlation between original and backtested rule outcomes.",
+          "action-list": "Rule outcomes that were originally <color>{{action}}</color> would:",
+          "same": "Still evaluate to <color>{{action}}</color>",
+          "changed": "Evaluate to <color>{{action}}</color> instead"
+        }
+      }
+    }
   }
 }

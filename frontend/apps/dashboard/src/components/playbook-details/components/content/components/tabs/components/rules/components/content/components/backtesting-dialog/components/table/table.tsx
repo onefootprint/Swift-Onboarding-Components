@@ -14,8 +14,8 @@ type TableProps = {
 };
 
 const Table = ({ data, isEmpty }: TableProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.rules.backtesting.affected',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'details.rules.backtesting.affected',
   });
   const router = useRouter();
   const session = useSession();

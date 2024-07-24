@@ -15,9 +15,7 @@ const AmlMonitoring = ({
     enhancedAml: { enhancedAml, ofac, pep, adverseMedia },
   },
 }: AmlMonitoringProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.aml-monitoring',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.aml-monitoring' });
 
   const monitorAml = enhancedAml || ofac || pep || adverseMedia;
 

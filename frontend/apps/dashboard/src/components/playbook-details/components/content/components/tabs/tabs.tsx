@@ -15,9 +15,7 @@ export type TabsProps = {
 };
 
 const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details' });
   const options = [
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },

@@ -17,8 +17,8 @@ type ListProps = {
 };
 
 const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip.list',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'details.rules.action-row.rule-chip.list',
   });
   const [isOpen, setIsOpen] = useState(false);
   const [selectedList, setSelectedList] = useState<List | undefined>(defaultList);
@@ -54,7 +54,8 @@ const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
             {di && filteredLists.length > 0 && (
               <Note>
                 <Trans
-                  i18nKey="pages.playbooks.details.rules.action-row.rule-chip.list.value.validation-note"
+                  ns="playbooks"
+                  i18nKey="details.rules.action-row.rule-chip.list.value.validation-note"
                   components={{
                     b: <Bold />,
                   }}
