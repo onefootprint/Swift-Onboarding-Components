@@ -64,6 +64,7 @@ pub struct CreateOnboardingConfigurationRequest {
     pub verification_checks: Option<Vec<VerificationCheck>>,
     #[serde(default)]
     pub required_auth_methods: Patch<Vec<AuthMethodKind>>,
+    pub prompt_for_passkey: Option<bool>,
 }
 
 #[api_v2_operation(
@@ -108,6 +109,7 @@ pub async fn post(
         kind,
         verification_checks,
         required_auth_methods,
+        prompt_for_passkey,
     } = pb_request;
 
 
@@ -142,6 +144,9 @@ pub async fn post(
         },
     };
 
+    let prompt_for_passkey =
+        prompt_for_passkey.unwrap_or(!is_no_phone_flow && kind != ObConfigurationKind::Auth);
+
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),
@@ -167,6 +172,7 @@ pub async fn post(
         curp_validation_enabled,
         verification_checks,
         required_auth_methods,
+        prompt_for_passkey,
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;

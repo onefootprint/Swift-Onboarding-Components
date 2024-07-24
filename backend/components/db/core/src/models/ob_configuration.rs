@@ -106,6 +106,9 @@ pub struct ObConfiguration {
     /// When null, no specific auth methods are required and any auth method is acceptable.
     #[diesel(deserialize_as = OptionalNonNullVec<AuthMethodKind>)]
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
+    /// When true, will prompt for passkey registration during onboarding requirements.
+    /// Passkey registration will always be skippable.
+    pub prompt_for_passkey: bool,
 }
 
 impl ObConfiguration {
@@ -380,6 +383,7 @@ struct NewObConfiguration {
     business_documents_to_collect: Vec<DocumentRequestConfig>,
     verification_checks: Vec<VerificationCheck>,
     required_auth_methods: Option<Vec<AuthMethodKind>>,
+    prompt_for_passkey: bool,
 }
 
 pub struct NewObConfigurationArgs {
@@ -406,6 +410,7 @@ pub struct NewObConfigurationArgs {
     pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub verification_checks: VerificationChecks,
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
+    pub prompt_for_passkey: bool,
 }
 
 
@@ -625,6 +630,7 @@ impl ObConfiguration {
             curp_validation_enabled,
             verification_checks,
             required_auth_methods,
+            prompt_for_passkey,
         } = args;
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -655,6 +661,7 @@ impl ObConfiguration {
             business_documents_to_collect,
             verification_checks: verification_checks.into_inner(),
             required_auth_methods,
+            prompt_for_passkey,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

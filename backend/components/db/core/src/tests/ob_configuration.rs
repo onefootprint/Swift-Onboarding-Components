@@ -90,6 +90,7 @@ fn test_ob_config_international_countries(
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -131,6 +132,7 @@ fn obc_with_doc_cdo(
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     }
 }
 
@@ -386,6 +388,7 @@ fn test_doc_scan_for_optional_ssn(conn: &mut TestPgConn, cdo: Option<String>) ->
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -428,6 +431,7 @@ fn test_cip_kind_documents(
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -503,6 +507,7 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 
@@ -551,6 +556,7 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
         business_documents_to_collect: vec![],
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
+        prompt_for_passkey: true,
     };
     let obc = ObConfiguration::create(conn, args).unwrap();
 

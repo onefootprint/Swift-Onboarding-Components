@@ -648,6 +648,9 @@ impl ObConfigurationArgsToValidate {
         if reqd_methods.is_empty() {
             return ValidationError("Must have at least one required auth method if provided").into();
         }
+        if self.prompt_for_passkey && self.kind == ObConfigurationKind::Auth {
+            return ValidationError("Cannot require passkey on an auth playbook").into();
+        }
         Ok(())
     }
 }
