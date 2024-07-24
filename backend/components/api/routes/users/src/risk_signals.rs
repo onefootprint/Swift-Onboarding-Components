@@ -1,8 +1,8 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -11,8 +11,8 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use itertools::Itertools;
+use newtypes::preview_api;
 use newtypes::FootprintReasonCode;
-use newtypes::PreviewApi;
 use newtypes::VendorAPI;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -27,10 +27,9 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::RiskSignalsList>,
 ) -> ApiListResponse<api_wire_types::PublicRiskSignal> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

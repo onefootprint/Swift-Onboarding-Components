@@ -1,5 +1,5 @@
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
@@ -13,9 +13,9 @@ use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::DbError;
+use newtypes::preview_api;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
-use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -29,11 +29,10 @@ use paperclip::actix::web;
 pub async fn post(
     state: web::Data<State>,
     fp_bid: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::CreateBusinessOwner>,
     request: web::Json<NewBusinessOwnerRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::CreateBusinessOwner)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();

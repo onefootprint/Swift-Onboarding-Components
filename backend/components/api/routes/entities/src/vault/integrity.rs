@@ -1,20 +1,20 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
+use newtypes::preview_api;
 use newtypes::FilterFunction;
 use newtypes::HmacSha256Args;
 use newtypes::IntegritySigningKey;
 use newtypes::PiiBytes;
 use newtypes::PiiJsonValue;
-use newtypes::PreviewApi;
 use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
 use paperclip::actix::api_v2_operation;
@@ -63,14 +63,13 @@ pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<IntegrityRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::VaultIntegrity>,
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<IntegrityResponse> {
     // TODO: should we add a separate guard for checking integrity?
     // This is incorrect - won't change though since we are deprecating this soon
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
-    auth.check_preview_guard(PreviewApi::VaultIntegrity)?;
 
     let IntegrityRequest { fields, signing_key } = request.into_inner();
 

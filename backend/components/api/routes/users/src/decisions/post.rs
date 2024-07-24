@@ -2,7 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::decision;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ValidationError;
@@ -13,8 +13,8 @@ use api_wire_types::CreateUserDecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use newtypes::preview_api;
 use newtypes::CreateAnnotationRequest;
-use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -29,12 +29,11 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: web::Json<CreateUserDecisionRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::CreateUserDecision>,
 ) -> ApiResponse<api_wire_types::Empty> {
     // This is a kind of weird guard to use here. But ManualReview can't currently be added to API key
     // IAM roles
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
-    auth.check_preview_guard(PreviewApi::CreateUserDecision)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor().into();

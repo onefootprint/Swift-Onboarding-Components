@@ -1,15 +1,15 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::types::ApiResponse;
 use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::session::ob_config::OnboardingSession;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use db::models::ob_configuration::ObConfiguration;
+use newtypes::preview_api;
 use newtypes::ObConfigurationKey;
-use newtypes::PreviewApi;
 use newtypes::SessionAuthToken;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -37,11 +37,10 @@ pub struct ObConfigSessionToken {
 #[post("/onboarding/session")]
 pub async fn post(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::OnboardingSessionToken>,
     request: Json<CreateOnboardingSessionRequest>,
 ) -> ApiResponse<ObConfigSessionToken> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
-    auth.check_preview_guard(PreviewApi::OnboardingSessionToken)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
 

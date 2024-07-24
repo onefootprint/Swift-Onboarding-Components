@@ -1,8 +1,8 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::GetFieldValidationResponse;
@@ -10,7 +10,7 @@ use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use newtypes::SignalScope;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -24,10 +24,9 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::MatchSignalsList>,
 ) -> ApiResponse<GetFieldValidationResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::MatchSignalsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

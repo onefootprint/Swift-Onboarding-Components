@@ -2,6 +2,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::telemetry::RootSpan;
 use api_core::types::CursorPaginatedResponse;
@@ -11,8 +12,8 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::search_utils::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use newtypes::preview_api;
 use newtypes::PiiString;
-use newtypes::PreviewApi;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::TimestampCursor;
@@ -31,11 +32,10 @@ pub async fn get(
     state: web::Data<State>,
     pagination: web::Query<CursorPaginationRequest<i64>>,
     request: web::Query<SearchUsersRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::LegacyListUsersBusinesses>,
     root_span: RootSpan,
 ) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::LegacyListUsersBusinesses)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search, external_id } = request.into_inner();
     let has_search = search.is_some();

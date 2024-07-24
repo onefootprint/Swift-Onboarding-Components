@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::types::ApiListResponse;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -14,7 +14,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_tag::NewScopedVaultTag;
 use db::models::scoped_vault_tag::ScopedVaultTag;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use newtypes::TagId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -28,11 +28,10 @@ use paperclip::actix::{
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::Tags>,
     request: Json<CreateTagRequest>,
 ) -> ApiResponse<api_wire_types::UserTag> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -62,10 +61,9 @@ pub async fn post(
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::Tags>,
 ) -> ApiListResponse<api_wire_types::UserTag> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -87,10 +85,9 @@ pub async fn get(
 pub async fn delete(
     state: web::Data<State>,
     path: FpIdPathPlus<TagId>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::Tags>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
-    auth.check_preview_guard(PreviewApi::Tags)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (fp_id, tag_id) = path.into_inner();

@@ -1,15 +1,15 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -22,10 +22,9 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::DocumentsList>,
 ) -> ApiListResponse<api_wire_types::PublicDocument> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::DocumentsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();

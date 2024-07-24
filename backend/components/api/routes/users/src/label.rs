@@ -1,14 +1,14 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -21,11 +21,10 @@ use paperclip::actix::{
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::Labels>,
     request: Json<CreateLabelRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
-    auth.check_preview_guard(PreviewApi::Labels)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -48,10 +47,9 @@ pub async fn post(
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::Labels>,
 ) -> ApiResponse<api_wire_types::UserLabel> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
-    auth.check_preview_guard(PreviewApi::Labels)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();

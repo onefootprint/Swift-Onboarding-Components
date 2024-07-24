@@ -1,5 +1,4 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::proxy;
 use crate::proxy::config::ProxyConfig;
 use crate::proxy::net_client;
@@ -10,6 +9,7 @@ use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
 use crate::ApiResponse;
 use crate::State;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantAuth;
 use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
@@ -17,9 +17,9 @@ use api_core::telemetry::RootSpan;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiCoreError;
 use api_core::FpError;
+use newtypes::preview_api;
 use newtypes::AccessEventPurpose;
 use newtypes::InvokeVaultProxyPermission;
-use newtypes::PreviewApi;
 use newtypes::ProxyConfigId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -39,7 +39,7 @@ const FIVE_MB: usize = 5 * 1024 * 1024;
 #[post("/vault_proxy/jit")]
 pub async fn just_in_time(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::VaultProxyJit>,
     body_bytes: BodyBytes<FIVE_MB>,
     jit_params: JitProxyHeaderParams,
     opt_params: ProxyHeaderParams,
@@ -48,7 +48,6 @@ pub async fn just_in_time(
     root_span: RootSpan,
 ) -> ApiResponse<HttpResponse> {
     let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
-    auth.check_preview_guard(PreviewApi::VaultProxyJit)?;
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
 
     invoke_vault_proxy(
@@ -71,7 +70,7 @@ pub async fn just_in_time(
 #[post("/vault_proxy/{id}")]
 pub async fn id(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::VaultProxy>,
     proxy_config_id: web::Path<ProxyConfigId>,
     body_bytes: BodyBytes<FIVE_MB>,
     insight: InsightHeaders,
@@ -81,7 +80,6 @@ pub async fn id(
 ) -> ApiResponse<HttpResponse> {
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
-    auth.check_preview_guard(PreviewApi::VaultProxy)?;
 
     invoke_vault_proxy(
         state,

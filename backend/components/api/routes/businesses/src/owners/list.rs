@@ -1,5 +1,5 @@
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginatedResponseMetaNoCount;
@@ -13,7 +13,7 @@ use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::BusinessOwnerQuery;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -29,11 +29,10 @@ type BusinessOwnersListResponse =
 pub async fn get(
     state: web::Data<State>,
     fp_bid: FpIdPath,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::ListBusinessOwners>,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResponse<Json<BusinessOwnersListResponse>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::ListBusinessOwners)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();

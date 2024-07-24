@@ -2492,7 +2492,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_integrity"
+                        ]
                     }
                 ]
             }

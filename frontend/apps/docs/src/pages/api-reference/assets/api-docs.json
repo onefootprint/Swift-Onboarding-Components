@@ -1929,7 +1929,9 @@
                 "responses": {},
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_proxy_jit"
+                        ]
                     }
                 ]
             }
@@ -2106,7 +2108,9 @@
                 "responses": {},
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_proxy"
+                        ]
                     }
                 ]
             }

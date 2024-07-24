@@ -40,7 +40,7 @@ pub struct CheckedSecretTenantAuth {
 )]
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Footprint-Secret-Key header
 /// which authenticates the client as a tenant.
-pub struct SecretTenantAuthContext(CheckedSecretTenantAuth);
+pub struct SecretTenantAuthContext(pub(super) CheckedSecretTenantAuth);
 
 pub const HEADER_NAME: &str = "X-Footprint-Secret-Key";
 

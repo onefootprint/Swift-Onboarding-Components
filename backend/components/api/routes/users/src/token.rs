@@ -5,6 +5,7 @@ use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
+use api_core::auth::AuthError;
 use api_core::config::LinkKind;
 use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
@@ -97,8 +98,8 @@ pub async fn post(
     if use_third_party_auth && !can_provide_3p_auth {
         return Err(ValidationError("You are not provisioned to provide third-party authentication.").into());
     }
-    if use_implicit_auth {
-        auth.check_preview_guard(PreviewApi::ImplicitAuth)?;
+    if use_implicit_auth && !auth.tenant().can_access_preview(&PreviewApi::ImplicitAuth) {
+        return Err(AuthError::CannotAccessPreviewApi.into());
     }
 
     let (token, session) = state

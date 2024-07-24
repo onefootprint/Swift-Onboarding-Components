@@ -1,8 +1,8 @@
-use crate::auth::tenant::SecretTenantAuthContext;
 use crate::ApiResponse;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginatedResponseMetaNoCount;
@@ -13,7 +13,7 @@ use api_core::web::Json;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use macros::route_alias;
-use newtypes::PreviewApi;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -35,11 +35,10 @@ type OnboardingsListResponse =
 pub async fn get(
     state: web::Data<State>,
     pagination: web::Query<OffsetPaginationRequest>,
-    auth: SecretTenantAuthContext,
+    auth: TenantApiKeyGated<preview_api::OnboardingsList>,
     fp_id: FpIdPath,
 ) -> ApiResponse<Json<OnboardingsListResponse>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
-    auth.check_preview_guard(PreviewApi::OnboardingsList)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
