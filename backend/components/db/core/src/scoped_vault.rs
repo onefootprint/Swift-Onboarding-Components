@@ -1,4 +1,6 @@
+use crate::errors::FpOptionalExtension;
 use crate::models::scoped_vault::ScopedVault;
+use crate::models::scoped_vault::ScopedVaultIdentifier;
 use crate::models::vault::Vault;
 use crate::DbResult;
 use crate::PgConn;
@@ -50,7 +52,8 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
 
 #[derive(Debug, Clone, Default)]
 pub struct SearchQuery {
-    /// Plaintext search query. Will perform an ilike on plaintext data to try to find matches
+    /// Plaintext search query. Will perform an ilike on plaintext fingerprints, and also an exact
+    /// match on external ID.
     pub search: PiiString,
     /// Fingerprint search queries. Results will match ANY of the FingerprintQueries
     pub fingerprint_queries: Vec<Fingerprint>,
@@ -240,9 +243,9 @@ fn vaults_matching_search(
         search,
         fingerprint_queries,
     } = search;
+
     // Search both plaintext results and fingerprinted results
     let plaintext_results = {
-        tracing::info!(search_len=%search.len(), "Searching for plaintext results");
         let plaintext_search = format!("%{}%", search.leak());
         // Be careful changing this query - it's optimized to use a specific index
         fingerprint::table
@@ -258,8 +261,6 @@ fn vaults_matching_search(
     };
 
     let fingerprint_results = {
-        tracing::info!(sh_datas=%Csv::from(fingerprint_queries.iter().cloned().collect_vec()), "Searching for fingerprint results");
-
         // Be careful changing this query - it's optimized to use a specific index
         fingerprint::table
             .filter(fingerprint::deactivated_at.is_null())
@@ -268,13 +269,37 @@ fn vaults_matching_search(
             .filter(fingerprint::is_hidden.eq(false))
             // Matching filter
             .filter(fingerprint::sh_data.is_not_null())
-            .filter(fingerprint::sh_data.eq_any(fingerprint_queries))
+            .filter(fingerprint::sh_data.eq_any(&fingerprint_queries))
             .select(fingerprint::scoped_vault_id)
             .get_results::<ScopedVaultId>(conn)?
     };
+
+    let external_id_results = {
+        let external_id: ExternalId = search.leak().to_owned().into();
+
+        let id = ScopedVaultIdentifier::ExternalId {
+            e_id: &external_id,
+            t_id: tenant_id,
+            is_live,
+        };
+        let sv = ScopedVault::get(conn, id).optional()?;
+
+        sv.into_iter().map(|sv| sv.id).collect_vec()
+    };
+
+    tracing::info!(
+        search_len = search.len(),
+        sh_datas=%Csv::from(fingerprint_queries),
+        num_plaintext_results = plaintext_results.len(),
+        num_fingerprint_results = fingerprint_results.len(),
+        num_external_id_results = external_id_results.len(),
+        "Scoped vaults matching fingerprint/plaintext search"
+    );
+
     let all_ids = fingerprint_results
         .into_iter()
         .chain(plaintext_results)
+        .chain(external_id_results)
         .unique()
         .collect();
     Ok(all_ids)
