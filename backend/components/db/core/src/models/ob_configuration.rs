@@ -431,12 +431,13 @@ pub enum ObConfigIdentifier<'a> {
     Workflow(&'a WorkflowId),
 }
 
-#[derive(AsChangeset)]
+#[derive(Default, AsChangeset)]
 #[diesel(table_name = ob_configuration)]
-struct ObConfigurationUpdate {
-    name: Option<String>,
-    status: Option<ApiKeyStatus>,
-    verification_checks: Option<Vec<VerificationCheck>>,
+pub struct ObConfigurationUpdate {
+    pub name: Option<String>,
+    pub status: Option<ApiKeyStatus>,
+    pub verification_checks: Option<Vec<VerificationCheck>>,
+    pub prompt_for_passkey: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
@@ -675,15 +676,8 @@ impl ObConfiguration {
         id: &ObConfigurationId,
         tenant_id: &TenantId,
         is_live: bool,
-        name: Option<String>,
-        status: Option<ApiKeyStatus>,
-        verification_checks: Option<Vec<VerificationCheck>>,
+        update: ObConfigurationUpdate,
     ) -> DbResult<Self> {
-        let update = ObConfigurationUpdate {
-            name,
-            status,
-            verification_checks,
-        };
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
             .filter(ob_configuration::tenant_id.eq(tenant_id))

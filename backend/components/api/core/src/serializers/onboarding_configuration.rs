@@ -147,6 +147,7 @@ impl
             curp_validation_enabled,
             verification_checks,
             required_auth_methods,
+            prompt_for_passkey,
 
             // explicitly enumerating unused fields here so we don't forget to expose
             tenant_id: _,
@@ -190,6 +191,7 @@ impl
             curp_validation_enabled,
             verification_checks: verification_checks.unwrap_or_default(),
             required_auth_methods,
+            prompt_for_passkey,
         }
     }
 }

@@ -1,6 +1,7 @@
 use crate::diesel::RunQueryDsl;
 use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
+use crate::models::ob_configuration::ObConfigurationUpdate;
 use crate::models::ob_configuration::VerificationChecks;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
@@ -37,16 +38,11 @@ fn test_ob_config(conn: &mut TestPgConn) {
     assert_eq!(ob_config.name, fetched_ob_config.name);
 
     // Mark as inactive
-    ObConfiguration::update(
-        conn,
-        &ob_config.id,
-        &tenant.id,
-        true,
-        None,
-        Some(ApiKeyStatus::Disabled),
-        None,
-    )
-    .expect("Couldn't update");
+    let update = ObConfigurationUpdate {
+        status: Some(ApiKeyStatus::Disabled),
+        ..Default::default()
+    };
+    ObConfiguration::update(conn, &ob_config.id, &tenant.id, true, update).expect("Couldn't update");
 
     // Enforce it does not exist
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");

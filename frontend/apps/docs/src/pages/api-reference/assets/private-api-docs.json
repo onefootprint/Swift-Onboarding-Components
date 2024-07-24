@@ -10124,6 +10124,9 @@
                             ]
                         }
                     },
+                    "prompt_for_passkey": {
+                        "type": "boolean"
+                    },
                     "required_auth_methods": {
                         "type": "array",
                         "items": {
@@ -22747,6 +22750,9 @@
                                         ]
                                     }
                                 },
+                                "prompt_for_passkey": {
+                                    "type": "boolean"
+                                },
                                 "required_auth_methods": {
                                     "type": "array",
                                     "items": {
@@ -22813,6 +22819,7 @@
                                 "must_collect_data",
                                 "name",
                                 "optional_data",
+                                "prompt_for_passkey",
                                 "skip_confirm",
                                 "skip_kyb",
                                 "skip_kyc",
@@ -23759,6 +23766,9 @@
                             ]
                         }
                     },
+                    "prompt_for_passkey": {
+                        "type": "boolean"
+                    },
                     "required_auth_methods": {
                         "type": "array",
                         "items": {
@@ -23825,6 +23835,7 @@
                     "must_collect_data",
                     "name",
                     "optional_data",
+                    "prompt_for_passkey",
                     "skip_confirm",
                     "skip_kyb",
                     "skip_kyc",
@@ -27032,6 +27043,9 @@
                 "properties": {
                     "name": {
                         "type": "string"
+                    },
+                    "prompt_for_passkey": {
+                        "type": "boolean"
                     },
                     "status": {
                         "type": "string",

@@ -55,6 +55,7 @@ pub struct OnboardingConfiguration {
     pub curp_validation_enabled: bool,
     pub verification_checks: Vec<VerificationCheck>,
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
+    pub prompt_for_passkey: bool,
 }
 
 /// The public onboarding configuration

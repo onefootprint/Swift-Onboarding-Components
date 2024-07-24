@@ -7,6 +7,7 @@ use api_core::web::Json;
 use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::ob_configuration::ObConfigurationUpdate;
 use newtypes::ObConfigurationId;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
@@ -57,15 +58,11 @@ async fn update_verification_checks(
                 new_checks.push(vc)
             }
 
-            let obc = ObConfiguration::update(
-                conn,
-                &obc.id,
-                &obc.tenant_id,
-                obc.is_live,
-                None,
-                None,
-                Some(new_checks),
-            )?;
+            let update = ObConfigurationUpdate {
+                verification_checks: Some(new_checks),
+                ..Default::default()
+            };
+            let obc = ObConfiguration::update(conn, &obc.id, &obc.tenant_id, obc.is_live, update)?;
 
             Ok(obc)
         })
