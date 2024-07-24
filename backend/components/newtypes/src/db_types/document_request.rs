@@ -17,7 +17,18 @@ use strum::EnumIter;
 use strum_macros::Display;
 use strum_macros::EnumString;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, AsJsonb, EnumDiscriminants, Apiv2Schema)]
+#[derive(
+    Debug,
+    Clone,
+    Eq,
+    PartialEq,
+    Serialize,
+    Deserialize,
+    AsJsonb,
+    EnumDiscriminants,
+    Apiv2Schema,
+    derive_more::IsVariant,
+)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 #[strum_discriminants(
@@ -34,6 +45,7 @@ use strum_macros::EnumString;
         macros::SerdeAttr,
         Apiv2Schema,
         EnumIter,
+        derive_more::IsVariant
     ),
     vis(pub),
     strum(serialize_all = "snake_case"),
@@ -73,10 +85,6 @@ fn yes() -> bool {
 }
 
 impl DocumentRequestKind {
-    pub fn is_identity(&self) -> bool {
-        matches!(self, DocumentRequestKind::Identity)
-    }
-
     pub fn should_initiate_incode_requests(&self) -> bool {
         self.is_identity()
     }

@@ -4,6 +4,7 @@ use crate::models::ob_configuration::VerificationChecks;
 use crate::PgConn;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::CollectedDataOptionKind as CDOK;
 use newtypes::DbActor;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::EnhancedAmlOption;
@@ -112,11 +113,13 @@ pub fn create_with_opts(
     } = opts;
     let documents_to_collect = vec![];
     let curp_validation_enabled = false;
+    let collects_identity_doc = must_collect_data.iter().any(|d| CDOK::from(d) == CDOK::Document);
     let verification_checks = VerificationChecks::new(
         tenant_id,
         verification_checks,
         Some(skip_kyc),
         Some(enhanced_aml.clone()),
+        collects_identity_doc,
     );
     let args = NewObConfigurationArgs {
         name,

@@ -760,6 +760,7 @@ impl VerificationChecks {
         checks_from_request: Option<Vec<VerificationCheck>>,
         skip_kyc: Option<bool>,
         enhanced_aml: Option<EnhancedAmlOption>,
+        collects_identity_document: bool,
     ) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
@@ -768,6 +769,7 @@ impl VerificationChecks {
             vc,
             skip_kyc,
             enhanced_aml,
+            collects_identity_document,
         ))
     }
 
@@ -778,6 +780,7 @@ impl VerificationChecks {
         mut checks: Vec<VerificationCheck>,
         skip_kyc: Option<bool>,
         enhanced_aml: Option<EnhancedAmlOption>,
+        collects_identity_document: bool,
     ) -> Vec<VerificationCheck> {
         let skip_kyc_migrated = if let Some(skip) = skip_kyc {
             if !skip {
@@ -788,8 +791,6 @@ impl VerificationChecks {
         } else {
             true
         };
-        Self::log_for_migration("skip_kyc", skip_kyc_migrated);
-
 
         let enhanced_aml_migrated = if let Some(enhanced) = enhanced_aml {
             match enhanced {
@@ -825,7 +826,21 @@ impl VerificationChecks {
             true
         };
 
-        Self::log_for_migration("enhanced_aml", enhanced_aml_migrated);
+        let identity_doc_migrated = if collects_identity_document {
+            let doc_migrated = VerificationChecks::new_for_test(checks.clone())
+                .get(VerificationCheckKind::IdentityDocument)
+                .is_some();
+
+            if !doc_migrated {
+                checks.push(VerificationCheck::IdentityDocument {});
+            };
+
+            Some(doc_migrated)
+        } else {
+            None
+        };
+
+        tracing::info!(?identity_doc_migrated, %enhanced_aml_migrated, %skip_kyc_migrated, "VerificationCheck migration");
 
         checks
     }
@@ -844,10 +859,6 @@ impl VerificationChecks {
 
     pub fn from_existing(existing: &ObConfiguration) -> Self {
         Self(existing.verification_checks.clone().unwrap_or_default())
-    }
-
-    fn log_for_migration(field: &str, fe_migrated: bool) {
-        tracing::info!(?field, ?fe_migrated, "VerificationCheck migration");
     }
 }
 

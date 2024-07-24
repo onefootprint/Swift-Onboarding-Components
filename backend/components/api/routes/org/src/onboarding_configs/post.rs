@@ -15,6 +15,7 @@ use db::models::rule_set_version::RuleSetVersion;
 use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::CollectedDataOptionKind as CDOK;
 use newtypes::DocumentAndCountryConfiguration;
 use newtypes::DocumentRequestConfig;
 use newtypes::EnhancedAml;
@@ -82,6 +83,7 @@ pub async fn post(
     let actor = auth.actor().into();
 
     let pb_request = request.into_inner().validate()?;
+    let collects_identity_document = collects_identity_document(&pb_request);
 
     let CreateOnboardingConfigurationRequest {
         name,
@@ -112,9 +114,15 @@ pub async fn post(
     // TODO: clean this up by surfacing AM lists in FE
     let db_enhanced_aml = api_enhanced_aml.map(|r| r.into());
 
+
     // VERIFICATION CHECK MIGRATION: construct verification checks
-    let verification_checks =
-        VerificationChecks::new(tenant_id, verification_checks, skip_kyc, db_enhanced_aml.clone());
+    let verification_checks = VerificationChecks::new(
+        tenant_id,
+        verification_checks,
+        skip_kyc,
+        db_enhanced_aml.clone(),
+        collects_identity_document,
+    );
 
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
     let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
@@ -181,4 +189,17 @@ pub async fn post(
         rs,
         state.ff_client.clone(),
     )))
+}
+
+
+fn collects_identity_document(create_obc_req: &CreateOnboardingConfigurationRequest) -> bool {
+    let has_document_cdo = create_obc_req
+        .must_collect_data
+        .iter()
+        .any(|d| CDOK::from(d) == CDOK::Document);
+    let has_other_document = create_obc_req
+        .documents_to_collect
+        .iter()
+        .any(|c| c.is_identity());
+    has_document_cdo || has_other_document
 }
