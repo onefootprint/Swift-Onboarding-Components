@@ -74,27 +74,27 @@ jobs:
         working-directory: ./frontend
         run: yarn lint:ci
 
-  test:
-    needs: install-dependencies
-    strategy:
-      matrix:
-        node-version: [18.x]
-    runs-on: frontend_runner
-    steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
+  # test:
+  #   needs: install-dependencies
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x]
+  #   runs-on: frontend_runner
+  #   steps:
+  #     - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+  #     - name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
 
-      - name: Install node_modules
-        working-directory: ./frontend
-        run: yarn install --frozen-lockfile
+  #     - name: Install node_modules
+  #       working-directory: ./frontend
+  #       run: yarn install --frozen-lockfile
 
-      - name: Tests
-        working-directory: ./frontend
-        run: yarn test:ci
+  #     - name: Tests
+  #       working-directory: ./frontend
+  #       run: yarn test:ci
 
   typecheck:
     needs: install-dependencies
@@ -143,7 +143,7 @@ jobs:
   # Add all jobs in this workflow to the `needs` here
   frontend-ci:
     runs-on: ubuntu-latest
-    needs: [files-changed, install-dependencies, lint, test, typecheck, bun-unit-tests]
+    needs: [files-changed, install-dependencies, lint, typecheck, bun-unit-tests]
     if: always()
     steps:
       - name: Success

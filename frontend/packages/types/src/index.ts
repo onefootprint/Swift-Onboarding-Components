@@ -403,6 +403,7 @@ export type {
   WatchlistCheckEventData,
   WorkflowTriggeredEvent,
   WorkflowTriggeredEventData,
+  DocumentTypesAndCountries,
 } from './data';
 export {
   WorkflowKind,

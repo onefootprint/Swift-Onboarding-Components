@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
+import GovDocs from './components/gov-docs';
 
 export type DataCollectionProps = {
   playbook: OnboardingConfig;
@@ -11,6 +12,7 @@ export type DataCollectionProps = {
 
 const DataCollection = ({
   playbook: {
+    kind,
     allowInternationalResidents,
     allowUsResidents,
     allowUsTerritoryResidents,
@@ -23,14 +25,8 @@ const DataCollection = ({
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
-  const documentsAsString = mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
-  const isKYB = mustCollectData.includes(
-    'business_name' || 'business_address' || 'business_tin' || 'business_kyced_beneficial_owners' || 'business_tin',
-  );
-  const showIdDocScan = mustCollectData.some(
-    scope => scope.includes('document'), // to make it backwards compatible; new playbooks will have 'document' or "document_and_selfie"
-  );
+  const isKYB = kind === 'kyb';
 
   return (
     <Stack direction="column">
@@ -105,18 +101,14 @@ const DataCollection = ({
           ) : (
             <CollectedInformation title={t('non-us-residents.title')} subtitle={t('non-us-residents.empty')} />
           )}
-          {showIdDocScan && (
-            <CollectedInformation
-              title={t('id-doc.title')}
-              options={{
-                idDocKind: documentTypesAndCountries?.global,
-                selfie: !!documentsAsString?.includes('selfie'),
-              }}
-            />
-          )}
           {hasInvestorProfile && (
             <CollectedInformation title={t('investor_profile.title')} subtitle={t('investor_profile.subtitle')} />
           )}
+          <GovDocs
+            countrySpecific={documentTypesAndCountries?.countrySpecific || {}}
+            global={documentTypesAndCountries?.global || []}
+            hasSelfie={mustCollectData.includes('document_selfie')}
+          />
         </Stack>
       </Stack>
       {allowUsTerritoryResidents && (

@@ -379,6 +379,16 @@
       },
       "id-doc": {
         "title": "ID document scan"
+      },
+      "gov-docs": {
+        "global": {
+          "title": "Globally accepted government-issued ID",
+          "empty": "No globally accepted document types are available for scanning."
+        },
+        "country-specific": {
+          "title": "Country-based accepted government-issued ID",
+          "empty": "No country-specific document types are available for scanning."
+        }
       }
     },
     "aml-monitoring": {

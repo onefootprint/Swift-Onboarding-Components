@@ -157,6 +157,7 @@ export {
   KYB_BO_SESSION_AUTHORIZATION_HEADER,
 } from './ob-config-auth';
 export type {
+  DocumentTypesAndCountries,
   OnboardingConfig,
   PublicOnboardingConfig,
 } from './onboarding-config';
