@@ -432,7 +432,7 @@
     "business_kyced_beneficial_owners": "Business beneficial owners (Fully-KYCed)",
     "investor_profile": "Investor profile",
     "us_legal_status": "Legal status in the U.S.",
-    "us_tax_id": "ITIN"
+    "us_tax_id": "US Tax ID"
   },
   "vendor": {
     "idology": "Idology",
