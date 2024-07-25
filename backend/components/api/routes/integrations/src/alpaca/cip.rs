@@ -296,14 +296,7 @@ pub(crate) async fn create_cip_request(
                     (mr, Some(obd_manual), annotation)
                 }
             };
-            let latest_identity_document_and_request: Option<(Document, DocumentRequest)> =
-                Document::list_by_wf_id(conn, &wf.id)?
-                .into_iter()
-                .filter(|(i, dr)| i.is_upload_complete() && dr.kind.is_identity())
-                // sort just for safety, we shouldn't have more than 1 completed doc per wf
-                .sorted_by(|(i1, _), (i2, _)| i1.completed_seqno.cmp(&i2.completed_seqno))
-                .collect_vec()
-                .pop();
+            let latest_identity_document_and_request = Document::get_latest_complete_identity(conn, &wf.id)?;
 
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get_for_workflow(conn, &wf.id)?;

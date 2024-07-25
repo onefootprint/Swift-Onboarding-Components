@@ -26,6 +26,7 @@ use newtypes::DocumentId;
 use newtypes::DocumentKind;
 use newtypes::DocumentRequestConfig;
 use newtypes::DocumentRequestId;
+use newtypes::DocumentRequestKind;
 use newtypes::DocumentReviewStatus;
 use newtypes::DocumentSide;
 use newtypes::DocumentStatus;
@@ -319,18 +320,27 @@ impl Document {
         Ok(results)
     }
 
-    #[tracing::instrument("Document::get_latest_complete", skip_all)]
-    pub fn get_latest_complete(
+    #[tracing::instrument("Document::get_latest_complete_identity", skip_all)]
+    pub fn get_latest_complete_identity<'a, T: Into<DocumentIdentifier<'a>>>(
         conn: &mut PgConn,
-        sv_id: ScopedVaultId,
+        id: T,
     ) -> DbResult<Option<(Document, DocumentRequest)>> {
-        let res = identity_document::table
+        let mut query = identity_document::table
             .inner_join(document_request::table)
             .filter(identity_document::status.eq(DocumentStatus::Complete))
-            .filter(document_request::scoped_vault_id.eq(sv_id))
+            .filter(document_request::kind.eq(DocumentRequestKind::Identity))
             .order_by(identity_document::completed_seqno.desc())
-            .first(conn)
-            .optional()?;
+            .into_boxed();
+        match id.into() {
+            DocumentIdentifier::WorkflowId { id } => {
+                query = query.filter(document_request::workflow_id.eq(id));
+            }
+            DocumentIdentifier::SvId { id } => {
+                query = query.filter(document_request::scoped_vault_id.eq(id));
+            }
+        }
+        let res = query.first(conn).optional()?;
+
 
         Ok(res)
     }

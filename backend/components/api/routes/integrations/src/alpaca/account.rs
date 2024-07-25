@@ -135,7 +135,7 @@ async fn create_create_account_request(
         .db_pool
         .db_query(move |conn| -> FpResult<(TenantVw<Person>, _)> {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
-            let doc = Document::get_latest_complete(conn, sv.id.clone())?;
+            let doc = Document::get_latest_complete_identity(conn, &sv.id)?;
             let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((uvw, doc))
         })
