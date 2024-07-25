@@ -112,8 +112,12 @@ diesel-derive-enum = { rev = "e6aa69856245f083645a0087527236a6bff42c18", git = "
 ] }
 diesel_as_jsonb = "1.0.0"
 
-deadpool-diesel = { version = "0.6.1", features = ["serde", "postgres", "tracing"] }
-deadpool = { version = "0.12.1", features = [
+# deadpool versions are patched to fix a bug in the latest release.
+# https://github.com/bikeshedder/deadpool/issues/325
+#
+# Remove the patch once the next release of deadpool-diesel after 0.6.1 is out.
+deadpool-diesel = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118370e93aa5a3bdb6e8acfb2014f581a01d", package = "deadpool-diesel", features = ["serde", "postgres", "tracing"] }
+deadpool = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118370e93aa5a3bdb6e8acfb2014f581a01d", package = "deadpool", features = [
     "managed",
 ], default-features = false }
 

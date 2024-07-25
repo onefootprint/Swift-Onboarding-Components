@@ -3627,8 +3627,7 @@ dependencies = [
 [[package]]
 name = "deadpool"
 version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6541a3916932fe57768d4be0b1ffb5ec7cbf74ca8c903fdfd5c0fe8aa958f0ed"
+source = "git+https://github.com/bikeshedder/deadpool.git?rev=cd3a118370e93aa5a3bdb6e8acfb2014f581a01d#cd3a118370e93aa5a3bdb6e8acfb2014f581a01d"
 dependencies = [
  "deadpool-runtime",
  "num_cpus",
@@ -3639,8 +3638,7 @@ dependencies = [
 [[package]]
 name = "deadpool-diesel"
 version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "590573e9e29c5190a5ff782136f871e6e652e35d598a349888e028693601adf1"
+source = "git+https://github.com/bikeshedder/deadpool.git?rev=cd3a118370e93aa5a3bdb6e8acfb2014f581a01d#cd3a118370e93aa5a3bdb6e8acfb2014f581a01d"
 dependencies = [
  "deadpool",
  "deadpool-sync",
@@ -3649,9 +3647,8 @@ dependencies = [
 
 [[package]]
 name = "deadpool-runtime"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eaa37046cc0f6c3cc6090fbdbf73ef0b8ef4cfcc37f6befc0020f63e8cf121e1"
+version = "0.1.4"
+source = "git+https://github.com/bikeshedder/deadpool.git?rev=cd3a118370e93aa5a3bdb6e8acfb2014f581a01d#cd3a118370e93aa5a3bdb6e8acfb2014f581a01d"
 dependencies = [
  "tokio",
 ]
@@ -3659,8 +3656,7 @@ dependencies = [
 [[package]]
 name = "deadpool-sync"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "524bc3df0d57e98ecd022e21ba31166c2625e7d3e5bcc4510efaeeab4abcab04"
+source = "git+https://github.com/bikeshedder/deadpool.git?rev=cd3a118370e93aa5a3bdb6e8acfb2014f581a01d#cd3a118370e93aa5a3bdb6e8acfb2014f581a01d"
 dependencies = [
  "deadpool-runtime",
  "tracing",
