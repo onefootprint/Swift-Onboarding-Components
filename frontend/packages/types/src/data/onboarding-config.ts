@@ -1,6 +1,7 @@
 import type { AuthMethodKind } from './auth-method';
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';
+import type { DocumentRequestConfig } from './document-request-config';
 import type { FootprintAppearance } from './footprint-appearance';
 import type { SupportedIdDocTypes } from './id-doc-type';
 
@@ -85,6 +86,7 @@ export type OnboardingConfig = {
   isRulesEnabled?: boolean;
   skipConfirm?: boolean;
   documentTypesAndCountries?: DocumentTypesAndCountries;
+  documentsToCollect: DocumentRequestConfig[] | null;
   ruleSet: {
     version: number;
   };

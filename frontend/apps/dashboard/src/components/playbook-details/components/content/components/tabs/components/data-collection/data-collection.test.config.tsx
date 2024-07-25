@@ -53,6 +53,7 @@ const onboardingConfig: OnboardingConfig = {
   ruleSet: {
     version: 1,
   },
+  documentsToCollect: null,
 };
 
 export default onboardingConfig;

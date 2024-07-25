@@ -37,6 +37,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   ruleSet: {
     version: 1,
   },
+  documentsToCollect: null,
 };
 
 export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>

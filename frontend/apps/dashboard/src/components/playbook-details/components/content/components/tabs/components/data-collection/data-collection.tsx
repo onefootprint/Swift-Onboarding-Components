@@ -4,14 +4,16 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
+import AdditionalDocs from './components/additional-docs';
 import GovDocs from './components/gov-docs';
 
 export type DataCollectionProps = {
   playbook: OnboardingConfig;
 };
 
-const DataCollection = ({
-  playbook: {
+const DataCollection = ({ playbook }: DataCollectionProps) => {
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const {
     kind,
     allowInternationalResidents,
     allowUsResidents,
@@ -20,9 +22,8 @@ const DataCollection = ({
     mustCollectData,
     documentTypesAndCountries,
     optionalData = [],
-  },
-}: DataCollectionProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+    documentsToCollect = [],
+  } = playbook;
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
@@ -109,6 +110,7 @@ const DataCollection = ({
             global={documentTypesAndCountries?.global || []}
             hasSelfie={mustCollectData.includes('document_selfie')}
           />
+          <AdditionalDocs docs={documentsToCollect || []} />
         </Stack>
       </Stack>
       {allowUsTerritoryResidents && (

@@ -117,6 +117,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     ruleSet: {
       version: 1,
     },
+    documentsToCollect: null,
   },
 ];
 

@@ -90,6 +90,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     ruleSet: {
       version: 1,
     },
+    documentsToCollect: null,
   },
   {
     id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
@@ -122,6 +123,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     ruleSet: {
       version: 1,
     },
+    documentsToCollect: null,
   },
   {
     id: 'ob_config_id_m35ER0O2UEaAOHyZa0oAKR',
@@ -154,6 +156,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     ruleSet: {
       version: 1,
     },
+    documentsToCollect: null,
   },
 ];
 

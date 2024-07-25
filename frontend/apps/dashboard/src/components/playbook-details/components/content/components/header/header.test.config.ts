@@ -34,6 +34,7 @@ const onboardingConfigFixture: OnboardingConfig = {
   ruleSet: {
     version: 1,
   },
+  documentsToCollect: null,
 };
 
 export default onboardingConfigFixture;

@@ -389,6 +389,19 @@
           "title": "Country-based accepted government-issued ID",
           "empty": "No country-specific document types are available for scanning."
         }
+      },
+      "additional-docs": {
+        "title": "Additional docs",
+        "empty": "No additional docs docs are available for scanning.",
+        "poa": {
+          "title": "Proof of Address",
+          "description": "Official documents displaying the user's address."
+        },
+        "possn": {
+          "title": "Proof of SSN",
+          "description": "Scan of Social Security card or official document displaying your name and Social Security Number."
+        },
+        "requires-manual-review": "After uploading, user will be marked for manual review"
       }
     },
     "aml-monitoring": {
