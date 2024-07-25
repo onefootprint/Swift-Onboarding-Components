@@ -636,6 +636,15 @@ impl ObConfigurationArgsToValidate {
         let Some(reqd_methods) = self.required_auth_methods.as_ref() else {
             return Ok(());
         };
+        if matches!(
+            self.kind,
+            ObConfigurationKind::Document | ObConfigurationKind::Auth
+        ) {
+            // TODO we should support this on auth playbooks one day, but the Auth SDK will need to properly
+            // handle requirements to add additional auth methods
+            return ValidationError("Cannot required auth methods for playbook of kind document or auth")
+                .into();
+        }
         if reqd_methods.iter().unique().count() != reqd_methods.len() {
             return ValidationError("Cannot provide duplicates in required auth methods").into();
         }
