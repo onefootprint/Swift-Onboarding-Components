@@ -5,6 +5,7 @@ use age::secrecy::Zeroize;
 use bech32::FromBase32;
 use itertools::Itertools;
 use newtypes::PiiString;
+use std::fmt::Display;
 use std::io::Write;
 use std::str::FromStr;
 
@@ -92,11 +93,11 @@ impl FromStr for PublicKey {
     }
 }
 
-impl ToString for PublicKey {
-    fn to_string(&self) -> String {
+impl Display for PublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PublicKey::X15519Recipient(r) => r.to_string(),
-            PublicKey::YubiKeyRecipient { recipient_string, .. } => recipient_string.clone(),
+            PublicKey::X15519Recipient(r) => write!(f, "{}", r),
+            PublicKey::YubiKeyRecipient { recipient_string, .. } => write!(f, "{}", recipient_string),
         }
     }
 }

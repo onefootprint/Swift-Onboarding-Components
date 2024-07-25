@@ -55,7 +55,7 @@ macro_rules! define_newtype_id {
             DB: diesel::backend::Backend,
             $type: diesel::deserialize::FromSql<diesel::sql_types::Text, DB>,
         {
-            fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+            fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
                 Ok(Self::from(<$type>::from_sql(bytes)?))
             }
         }
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_id_string() {
-        define_newtype_id!(TestId, String, "");
+        define_newtype_id!(TestId, String, "TestId");
 
         let x = TestId::from_str("some_test_id").unwrap();
         assert_eq!(x.to_string(), "some_test_id".to_string());
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_id_uuid() {
-        define_newtype_id!(TestUuid, Uuid, "");
+        define_newtype_id!(TestUuid, Uuid, "TestUuid");
 
         let x = TestUuid::from_str("a5971b52-1b44-4c3a-a83f-a96796f8774d").unwrap();
         assert_eq!(x.to_string(), "a5971b52-1b44-4c3a-a83f-a96796f8774d".to_string());
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_prefix() {
-        define_newtype_id!(TestId, String, "");
+        define_newtype_id!(TestId, String, "TestId");
         impl_verified_prefix_for_nt_id!(TestId, "abcd_ab_");
 
         let _ = TestId::parse_with_prefix("abcd_ab_asdajsdhj1h313j1jsdsdf").expect("failed to parse id");

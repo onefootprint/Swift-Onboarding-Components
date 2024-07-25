@@ -4,10 +4,10 @@
 use diesel::backend::Backend;
 use diesel::connection::AnsiTransactionManager;
 use diesel::connection::Connection;
-use diesel::connection::ConnectionGatWorkaround;
+use diesel::connection::ConnectionSealed;
 use diesel::connection::DefaultLoadingMode;
+use diesel::connection::Instrumentation;
 use diesel::connection::LoadConnection;
-use diesel::connection::LoadRowIter;
 use diesel::connection::SimpleConnection;
 use diesel::connection::TransactionManager;
 use diesel::deserialize::Queryable;
@@ -32,13 +32,13 @@ use tracing::instrument;
 
 // https://www.postgresql.org/docs/12/functions-info.html
 // db.name
-sql_function!(fn current_database() -> diesel::sql_types::Text);
+define_sql_function!(fn current_database() -> diesel::sql_types::Text);
 // net.peer.ip
-sql_function!(fn inet_server_addr() -> diesel::sql_types::Inet);
+define_sql_function!(fn inet_server_addr() -> diesel::sql_types::Inet);
 // net.peer.port
-sql_function!(fn inet_server_port() -> diesel::sql_types::Integer);
+define_sql_function!(fn inet_server_port() -> diesel::sql_types::Integer);
 // db.version
-sql_function!(fn version() -> diesel::sql_types::Text);
+define_sql_function!(fn version() -> diesel::sql_types::Text);
 
 #[derive(Queryable, Clone, Debug, PartialEq)]
 struct PgConnectionInfo {
@@ -79,20 +79,6 @@ impl SimpleConnection for InstrumentedPgConnection {
     }
 }
 
-impl<'conn, 'query> ConnectionGatWorkaround<'conn, 'query, Pg, DefaultLoadingMode>
-    for InstrumentedPgConnection
-{
-    type Cursor = <PgConnection as ConnectionGatWorkaround<'conn, 'query, Pg, DefaultLoadingMode>>::Cursor;
-    type Row = <PgConnection as ConnectionGatWorkaround<'conn, 'query, Pg, DefaultLoadingMode>>::Row;
-}
-
-impl<'conn, 'query> ConnectionGatWorkaround<'conn, 'query, Pg, PgRowByRowLoadingMode>
-    for InstrumentedPgConnection
-{
-    type Cursor = <PgConnection as ConnectionGatWorkaround<'conn, 'query, Pg, PgRowByRowLoadingMode>>::Cursor;
-    type Row = <PgConnection as ConnectionGatWorkaround<'conn, 'query, Pg, PgRowByRowLoadingMode>>::Row;
-}
-
 impl InstrumentedPgConnection {
     #[instrument(skip_all)]
     fn get_pg_connection_info(conn: &mut PgConnection) -> Result<PgConnectionInfo, ConnectionError> {
@@ -107,6 +93,8 @@ impl InstrumentedPgConnection {
         Ok(info)
     }
 }
+
+impl ConnectionSealed for InstrumentedPgConnection {}
 
 impl Connection for InstrumentedPgConnection {
     type Backend = Pg;
@@ -191,9 +179,21 @@ impl Connection for InstrumentedPgConnection {
     fn transaction_state(&mut self) -> &mut Self::TransactionManager {
         self.inner.transaction_state()
     }
+
+    // Maybe we can use Diesel's built-in instrumentation eventually?
+    fn instrumentation(&mut self) -> &mut dyn Instrumentation {
+        self.inner.instrumentation()
+    }
+
+    fn set_instrumentation(&mut self, instrumentation: impl Instrumentation) {
+        self.inner.set_instrumentation(instrumentation)
+    }
 }
 
 impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
+    type Cursor<'conn, 'query> = <PgConnection as LoadConnection<DefaultLoadingMode>>::Cursor<'conn, 'query>;
+    type Row<'conn, 'query> = <PgConnection as LoadConnection<DefaultLoadingMode>>::Row<'conn, 'query>;
+
     #[instrument(
         fields(
             db.name=%self.info.current_database,
@@ -210,10 +210,7 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
         skip(self, source),
         err,
     )]
-    fn load<'conn, 'query, T>(
-        &'conn mut self,
-        source: T,
-    ) -> QueryResult<LoadRowIter<'conn, 'query, PgConnection, Pg, DefaultLoadingMode>>
+    fn load<'conn, 'query, T>(&'conn mut self, source: T) -> QueryResult<Self::Cursor<'conn, 'query>>
     where
         T: Query + QueryFragment<Pg> + QueryId + 'query,
         Self::Backend: QueryMetadata<T::SqlType>,
@@ -229,6 +226,10 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
 }
 
 impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
+    type Cursor<'conn, 'query> =
+        <PgConnection as LoadConnection<PgRowByRowLoadingMode>>::Cursor<'conn, 'query>;
+    type Row<'conn, 'query> = <PgConnection as LoadConnection<PgRowByRowLoadingMode>>::Row<'conn, 'query>;
+
     #[instrument(
         fields(
             db.name=%self.info.current_database,
@@ -244,10 +245,7 @@ impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
         skip(self, source),
         err,
     )]
-    fn load<'conn, 'query, T>(
-        &'conn mut self,
-        source: T,
-    ) -> QueryResult<LoadRowIter<'conn, 'query, PgConnection, Pg, PgRowByRowLoadingMode>>
+    fn load<'conn, 'query, T>(&'conn mut self, source: T) -> QueryResult<Self::Cursor<'conn, 'query>>
     where
         T: Query + QueryFragment<Pg> + QueryId + 'query,
         Self::Backend: QueryMetadata<T::SqlType>,

@@ -52,7 +52,7 @@ where
     DB: Backend,
     Vec<u8>: FromSql<Binary, DB>,
 {
-    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+    fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
         Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
     }
 }
@@ -104,7 +104,7 @@ where
     DB: Backend,
     Vec<u8>: FromSql<Binary, DB>,
 {
-    fn from_sql(bytes: diesel::backend::RawValue<'_, DB>) -> diesel::deserialize::Result<Self> {
+    fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
         Ok(Self::from(Vec::<u8>::from_sql(bytes)?))
     }
 }

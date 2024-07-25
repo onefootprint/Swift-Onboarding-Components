@@ -59,11 +59,11 @@ impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::C
 
         let partner_tenant_assignee = partner_tenant_assignment
             .and_then(|pta| pta.assigned_to_tenant_user_id.as_ref())
-            .map(|user_id| api_wire_types::LiteOrgMember::try_from_db((summary, &user_id)))
+            .map(|user_id| api_wire_types::LiteOrgMember::try_from_db((summary, user_id)))
             .transpose()?;
         let tenant_assignee = tenant_assignment
             .and_then(|ta| ta.assigned_to_tenant_user_id.as_ref())
-            .map(|user_id| api_wire_types::LiteOrgMember::try_from_db((summary, &user_id)))
+            .map(|user_id| api_wire_types::LiteOrgMember::try_from_db((summary, user_id)))
             .transpose()?;
 
         let last_updated = summary.last_updated(doc_id)?;

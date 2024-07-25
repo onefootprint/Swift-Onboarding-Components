@@ -115,7 +115,7 @@ pub async fn get(
             events.push(ComplianceDocEvent {
                 timestamp: deactivated_at,
                 actor: Some(api_wire_types::LiteUserAndOrg {
-                    user: api_wire_types::LiteOrgMember::try_from_db((&summary, &user_id))?,
+                    user: api_wire_types::LiteOrgMember::try_from_db((&summary, user_id))?,
                     org: summary.partner_tenant.name.clone(),
                 }),
                 event: ComplianceDocEventType::RequestRetracted {},

@@ -237,4 +237,4 @@ pub fn ro_health_check(ro_url: &str) -> DbResult<()> {
     Ok(())
 }
 
-sql_function!(fn nextval(a: diesel::sql_types::VarChar) -> diesel::sql_types::BigInt);
+define_sql_function!(fn nextval(a: diesel::sql_types::VarChar) -> diesel::sql_types::BigInt);

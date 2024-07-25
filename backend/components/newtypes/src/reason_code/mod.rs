@@ -17,6 +17,7 @@ pub use lexis::*;
 pub use reason_code_helpers::*;
 pub use signal_attribute::*;
 pub use socure::*;
+use std::fmt::Display;
 use std::str::FromStr;
 
 // TODO: do these macros and our vendor enums need to be in newtypes? or could we move into decision
@@ -159,11 +160,11 @@ impl TryFrom<&str> for ReasonCode {
     }
 }
 
-impl ToString for ReasonCode {
-    fn to_string(&self) -> String {
+impl Display for ReasonCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ReasonCode::IDology(idology) => idology.to_string(),
-            ReasonCode::Other(s) => s.to_owned(),
+            ReasonCode::IDology(idology) => write!(f, "{}", idology),
+            ReasonCode::Other(s) => write!(f, "{}", s),
         }
     }
 }

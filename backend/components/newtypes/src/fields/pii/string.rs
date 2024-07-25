@@ -34,7 +34,7 @@ impl diesel::serialize::ToSql<Text, diesel::pg::Pg> for PiiString {
 
 impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for PiiString {
     fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        let s = String::from_sql(value)?;
+        let s = <String as diesel::deserialize::FromSql<Text, diesel::pg::Pg>>::from_sql(value)?;
         Ok(PiiString::new(s))
     }
 }
