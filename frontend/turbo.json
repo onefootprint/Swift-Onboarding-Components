@@ -2,7 +2,6 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "cache": false,
       "dependsOn": ["^build", "i18n:build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
       "env": [
@@ -84,10 +83,6 @@
     "test:ci:bun": {
       "cache": false,
       "dependsOn": []
-    },
-    "test:stress:ci": {
-      "cache": false,
-      "dependsOn": ["i18n:copy-en"]
     },
     "start": {},
     "lint": {

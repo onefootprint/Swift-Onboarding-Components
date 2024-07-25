@@ -13,8 +13,7 @@
     "test:e2e:real": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#real\"",
     "test:e2e:show-report": "npx playwright show-report",
     "test:e2e:trace": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --workers 16 --reporter=html --trace on --retries=0 -g \"#ci\"",
-    "test:e2e:ui": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --ui",
-    "test:stress:ci": "npx playwright test -g \"#stress\""
+    "test:e2e:ui": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --ui"
   },
   "keywords": [],
   "author": "",
