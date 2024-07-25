@@ -1,6 +1,7 @@
 use crate::*;
 use newtypes::CompanySize;
 use newtypes::PartnerTenantId;
+use newtypes::PreviewApi;
 use newtypes::TenantId;
 
 /// Organization
@@ -27,6 +28,7 @@ pub struct Organization {
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
     pub parent: Option<ParentOrganization>,
+    pub allowed_preview_apis: Vec<PreviewApi>,
 }
 
 /// Partner Organization

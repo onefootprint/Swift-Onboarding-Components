@@ -8094,6 +8094,33 @@
                             "allow_domain_access": {
                                 "type": "boolean"
                             },
+                            "allowed_preview_apis": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "risk_signals_list",
+                                        "create_user_decision",
+                                        "labels",
+                                        "tags",
+                                        "create_business_owner",
+                                        "list_business_owners",
+                                        "vault_proxy",
+                                        "vault_proxy_jit",
+                                        "onboardings_list",
+                                        "decisions_list",
+                                        "legacy_onboarding_status_webhook",
+                                        "legacy_list_users_businesses",
+                                        "implicit_auth",
+                                        "match_signals_list",
+                                        "liveness_list",
+                                        "auth_events_list",
+                                        "documents_list",
+                                        "onboarding_session_token",
+                                        "vault_integrity"
+                                    ]
+                                }
+                            },
                             "company_size": {
                                 "type": "string",
                                 "enum": [
@@ -8168,6 +8195,7 @@
                         },
                         "required": [
                             "allow_domain_access",
+                            "allowed_preview_apis",
                             "domains",
                             "id",
                             "is_prod_auth_playbook_restricted",
@@ -8490,6 +8518,33 @@
                             "allow_domain_access": {
                                 "type": "boolean"
                             },
+                            "allowed_preview_apis": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "risk_signals_list",
+                                        "create_user_decision",
+                                        "labels",
+                                        "tags",
+                                        "create_business_owner",
+                                        "list_business_owners",
+                                        "vault_proxy",
+                                        "vault_proxy_jit",
+                                        "onboardings_list",
+                                        "decisions_list",
+                                        "legacy_onboarding_status_webhook",
+                                        "legacy_list_users_businesses",
+                                        "implicit_auth",
+                                        "match_signals_list",
+                                        "liveness_list",
+                                        "auth_events_list",
+                                        "documents_list",
+                                        "onboarding_session_token",
+                                        "vault_integrity"
+                                    ]
+                                }
+                            },
                             "company_size": {
                                 "type": "string",
                                 "enum": [
@@ -8564,6 +8619,7 @@
                         },
                         "required": [
                             "allow_domain_access",
+                            "allowed_preview_apis",
                             "domains",
                             "id",
                             "is_prod_auth_playbook_restricted",
@@ -23952,6 +24008,33 @@
                             "allow_domain_access": {
                                 "type": "boolean"
                             },
+                            "allowed_preview_apis": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "risk_signals_list",
+                                        "create_user_decision",
+                                        "labels",
+                                        "tags",
+                                        "create_business_owner",
+                                        "list_business_owners",
+                                        "vault_proxy",
+                                        "vault_proxy_jit",
+                                        "onboardings_list",
+                                        "decisions_list",
+                                        "legacy_onboarding_status_webhook",
+                                        "legacy_list_users_businesses",
+                                        "implicit_auth",
+                                        "match_signals_list",
+                                        "liveness_list",
+                                        "auth_events_list",
+                                        "documents_list",
+                                        "onboarding_session_token",
+                                        "vault_integrity"
+                                    ]
+                                }
+                            },
                             "company_size": {
                                 "type": "string",
                                 "enum": [
@@ -24026,6 +24109,7 @@
                         },
                         "required": [
                             "allow_domain_access",
+                            "allowed_preview_apis",
                             "domains",
                             "id",
                             "is_prod_auth_playbook_restricted",
@@ -24246,6 +24330,33 @@
                     "allow_domain_access": {
                         "type": "boolean"
                     },
+                    "allowed_preview_apis": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "risk_signals_list",
+                                "create_user_decision",
+                                "labels",
+                                "tags",
+                                "create_business_owner",
+                                "list_business_owners",
+                                "vault_proxy",
+                                "vault_proxy_jit",
+                                "onboardings_list",
+                                "decisions_list",
+                                "legacy_onboarding_status_webhook",
+                                "legacy_list_users_businesses",
+                                "implicit_auth",
+                                "match_signals_list",
+                                "liveness_list",
+                                "auth_events_list",
+                                "documents_list",
+                                "onboarding_session_token",
+                                "vault_integrity"
+                            ]
+                        }
+                    },
                     "company_size": {
                         "type": "string",
                         "enum": [
@@ -24320,6 +24431,7 @@
                 },
                 "required": [
                     "allow_domain_access",
+                    "allowed_preview_apis",
                     "domains",
                     "id",
                     "is_prod_auth_playbook_restricted",

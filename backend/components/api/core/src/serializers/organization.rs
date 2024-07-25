@@ -71,6 +71,7 @@ impl
             support_email,
             support_phone,
             support_website,
+            allowed_preview_apis,
             ..
         } = t;
         Self {
@@ -95,6 +96,7 @@ impl
                 id: p.id,
                 name: p.name,
             }),
+            allowed_preview_apis,
         }
     }
 }
