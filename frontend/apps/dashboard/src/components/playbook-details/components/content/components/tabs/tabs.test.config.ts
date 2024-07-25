@@ -35,6 +35,7 @@ const playbookFixture: OnboardingConfig = {
     version: 1,
   },
   documentsToCollect: null,
+  promptForPasskey: true,
 };
 
 export default playbookFixture;

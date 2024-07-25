@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 
 import AmlMonitoring from './components/aml-monitoring';
 import DataCollection from './components/data-collection';
+import Passkeys from './components/passkeys';
 import Rules from './components/rules';
 
 export type TabsProps = {
@@ -19,6 +20,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
   const options = [
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
+    { value: 'passkeys', label: t('tabs.passkeys') },
     ...(playbook.kind !== OnboardingConfigKind.auth ? [{ value: 'rules', label: t('tabs.rules') }] : []),
   ];
   const [tab, setTab] = useState(options[0].value);
@@ -32,6 +34,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
       <UITabs options={options} onChange={handleChange} disabled={isTabsDisabled} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
+      {tab === 'passkeys' && <Passkeys playbook={playbook} />}
       {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
     </Container>
   );

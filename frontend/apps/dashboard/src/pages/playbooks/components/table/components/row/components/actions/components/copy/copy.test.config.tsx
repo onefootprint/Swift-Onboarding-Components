@@ -44,6 +44,7 @@ export const playbookFixture: OnboardingConfig = {
     version: 1,
   },
   documentsToCollect: null,
+  promptForPasskey: true,
 };
 
 export const authRolesFixture: GetAuthRoleResponse = [

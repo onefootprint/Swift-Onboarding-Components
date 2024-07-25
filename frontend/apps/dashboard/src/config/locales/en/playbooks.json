@@ -343,6 +343,7 @@
     "tabs": {
       "data-collection": "Data collection",
       "aml-monitoring": "AML monitoring",
+      "passkeys": "Passkeys",
       "rules": "Rules"
     },
     "data-collection": {
@@ -409,6 +410,20 @@
       "footer": {
         "label": "Note:",
         "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+      }
+    },
+    "passkeys": {
+      "title": "Passkey registration",
+      "form": {
+        "enable": {
+          "label": "Enable passkey registration",
+          "hint": "We use passkeys to validate your users’ identity without the need for a password."
+        }
+      },
+      "about": {
+        "title": "Learn more about passkeys",
+        "ios": "On iOS devices",
+        "android": "On Android devices"
       }
     },
     "rules": {

@@ -53,6 +53,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
     version: 1,
   },
   documentsToCollect: null,
+  promptForPasskey: true,
 };
 
 export const backtestedRulesFixture: RuleBacktestingData = {

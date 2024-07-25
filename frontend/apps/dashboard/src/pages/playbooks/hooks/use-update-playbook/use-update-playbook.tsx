@@ -12,6 +12,7 @@ const updatePlaybook = async (authHeaders: AuthHeaders, playbook: OrgOnboardingC
     data: {
       status: playbook.status,
       name: playbook.name,
+      promptForPasskey: playbook.promptForPasskey,
     },
   });
 
