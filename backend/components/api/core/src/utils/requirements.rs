@@ -441,24 +441,23 @@ fn get_requirement_inner(
         // (kind of confusing in that we are checking in real-time if they've been satisifed)
         OnboardingRequirementKind::RegisterPasskey => {
             // skip passkey registration on no-phone flows
-            let out = if obc.is_no_phone_flow {
-                None
-            } else {
-                let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
+            if !obc.prompt_for_passkey {
+                return Ok(vec![]);
+            }
+            let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
 
-                // Note: we should probably represent this another way, but for now we can determine if we
-                // want to skip passkey reg by checking for this liveness event on the
-                // scoped_vault
-                let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &wf.scoped_vault_id)?
-                    .into_iter()
-                    .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
-                    .collect_vec();
+            // Note: we should probably represent this another way, but for now we can determine if we
+            // want to skip passkey reg by checking for this liveness event on the
+            // scoped_vault
+            let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &wf.scoped_vault_id)?
+                .into_iter()
+                .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
+                .collect_vec();
 
-                (liveness_skip_events.is_empty() && credentials.is_empty())
-                    .then_some(OnboardingRequirement::RegisterPasskey)
-            };
-
-            out.into_iter().collect()
+            (liveness_skip_events.is_empty() && credentials.is_empty())
+                .then_some(OnboardingRequirement::RegisterPasskey)
+                .into_iter()
+                .collect()
         }
         OnboardingRequirementKind::CollectDocument => {
             let document_requests = DocumentRequest::get_all(conn, &wf.id)?;

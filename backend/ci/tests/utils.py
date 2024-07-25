@@ -302,6 +302,7 @@ def create_ob_config(
     curp_validation_enabled=False,
     skip_kyc=False,
     verification_checks=None,
+    prompt_for_passkey=None,
 ):
     kind = kind or "kyc"
     if kind == "kyb" and verification_checks is None:
@@ -330,6 +331,7 @@ def create_ob_config(
         "curp_validation_enabled": curp_validation_enabled,
         "skip_kyc": skip_kyc,
         "verification_checks": checks,
+        "prompt_for_passkey": prompt_for_passkey,
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)
