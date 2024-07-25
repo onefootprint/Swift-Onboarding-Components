@@ -1,7 +1,7 @@
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
-import { IcoArrowUpRight16 } from '@onefootprint/icons';
+import { IcoArrowUpRight16, IcoLightBulb16 } from '@onefootprint/icons';
 import { type OnboardingConfig } from '@onefootprint/types';
-import { Stack, Text, Toggle, createFontStyles } from '@onefootprint/ui';
+import { Box, Stack, Text, Toggle, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,9 +47,14 @@ const Passkeys = ({ playbook }: PasskeysProps) => {
         </Stack>
       </Stack>
       <Stack padding={5} gap={5} backgroundColor="secondary" flexDirection="column" borderRadius="default">
-        <Text variant="label-3" gap={2}>
-          {t('about.title')}
-        </Text>
+        <Stack gap={2}>
+          <Box position="relative" top="2px">
+            <IcoLightBulb16 />
+          </Box>
+          <Text variant="label-3" gap={2}>
+            {t('about.title')}
+          </Text>
+        </Stack>
         <Stack flexDirection="column" gap={3}>
           <StyledLink href="https://developer.apple.com/passkeys/" target="_blank">
             {t('about.ios')}

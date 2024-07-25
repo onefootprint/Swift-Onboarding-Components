@@ -82,6 +82,7 @@ export { default as IcoLang16 } from './ico-lang-16';
 export { default as IcoLaptop16 } from './ico-laptop-16';
 export { default as IcoLayer0116 } from './ico-layer01-16';
 export { default as IcoLeaf16 } from './ico-leaf-16';
+export { default as IcoLightBulb16 } from './ico-light-bulb-16';
 export { default as IcoLink16 } from './ico-link-16';
 export { default as IcoLinkedin16 } from './ico-linkedin-16';
 export { default as IcoLock16 } from './ico-lock-16';
