@@ -1,3 +1,4 @@
+from tests.types import ObConfiguration
 from tests.utils import post, get
 from tests.constants import (
     FIXTURE_PHONE_NUMBER,
@@ -32,7 +33,7 @@ class IdentifyClient:
 
     def __init__(
         self,
-        playbook,
+        playbook: ObConfiguration,
         sandbox_id,
         webauthn=None,
         phone_number=FIXTURE_PHONE_NUMBER,
@@ -55,15 +56,28 @@ class IdentifyClient:
         self.headers = args
         return self
 
-    def _signup_challenge(self, scope, kind="sms"):
-        if kind == "sms":
-            data = dict(
-                phone_number=dict(value=self.phone_number),
-                email=dict(value=self.email),
-            )
-        elif kind == "email":
-            data = dict(email=dict(value=self.email))
-        data = dict(**data, scope=scope)
+    def _signup_challenge(self, scope):
+        # Select the challenge kind based on the auth methods required by the playbook
+        if (
+            not self.playbook.required_auth_methods or
+            "phone" in self.playbook.required_auth_methods
+        ):
+            kind = "sms"
+        elif "email" in self.playbook.required_auth_methods:
+            kind = "email"
+        else:
+            assert (
+                False
+            ), f"Unsupported required auth methods: {self.playbook.required_auth_methods}"
+
+        data = dict(
+            phone_number=dict(value=self.phone_number),
+            email=dict(value=self.email),
+        )
+        if self.playbook.is_no_phone_flow:
+            # For backcompat, don't send phone when in the no phone flow
+            data.pop("phone_number")
+        data = dict(**data, scope=scope, kind=kind)
 
         assert (
             self.playbook_auth_h

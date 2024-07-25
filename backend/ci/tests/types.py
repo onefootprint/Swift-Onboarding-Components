@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 from pyparsing import Any
 from tests.headers import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
@@ -21,24 +21,28 @@ class SecretApiKey(NamedTuple):
 
 class ObConfiguration(NamedTuple):
     key: PublishableOnboardingKey
+    tenant: Any  # Tenant
     id: str
     name: str
     status: str
-    must_collect_data: list
-    can_access_data: list
+    must_collect_data: List[str]
+    can_access_data: List[str]
     is_live: bool
-    tenant: Any  # Tenant
+    required_auth_methods: List[str]
+    is_no_phone_flow: bool
 
     def from_response(resp, tenant):
         return ObConfiguration(
             PublishableOnboardingKey(resp["key"]),
+            tenant,
             resp["id"],
             resp["name"],
             resp["status"],
             resp["must_collect_data"],
             resp["can_access_data"],
             resp["is_live"],
-            tenant,
+            resp["required_auth_methods"],
+            resp["is_no_phone_flow"],
         )
 
 
