@@ -4,9 +4,9 @@ use crate::auth::user::UserIdentifier;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
-use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::webauthn_credential::WebauthnCredential;
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::AuthMethodKind;
 use newtypes::ChallengeKind;
@@ -14,7 +14,7 @@ use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier as DI;
 use newtypes::IdentityDataKind as IDK;
 
-pub struct UserChallengeContext {
+pub struct UserAuthMethodsContext {
     pub vw: VaultWrapper<Person>,
     pub webauthn_creds: Vec<WebauthnCredential>,
     pub auth_methods: Vec<AuthMethod>,
@@ -30,33 +30,30 @@ pub struct AuthMethod {
     pub can_initiate_challenge: bool,
 }
 
-/// Determine what challenge kinds are available for the given user
-pub async fn get_user_challenge_context(
-    state: &State,
+/// Determine what challenge kinds are available for the given user.
+/// We don't store any strong association of what constitutes a registered auth method in the
+/// database. So we have to assemble it from a combination of vault data, ContactInfo, and
+/// WebauthnCredentials. Eventually, we should create a table of registered AuthMethods in the
+/// database.
+pub fn get_user_auth_methods(
+    conn: &mut PgConn,
     identifier: UserIdentifier,
     user_auth: Option<CheckedUserAuthContext>,
-) -> FpResult<UserChallengeContext> {
-    let (uvw, passkeys, cis) = state
-        .db_pool
-        .db_query(move |conn| -> FpResult<_> {
-            let args = VwArgs::from(&identifier);
-            let uvw = VaultWrapper::build(conn, args)?;
+) -> FpResult<UserAuthMethodsContext> {
+    let args = VwArgs::from(&identifier);
+    let uvw = VaultWrapper::build(conn, args)?;
 
-            let passkeys = WebauthnCredential::list(conn, &uvw.vault.id)?;
+    let passkeys = WebauthnCredential::list(conn, &uvw.vault.id)?;
 
-            let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
-                .into_iter()
-                .filter_map(|ci| uvw.get_lifetime(&ci.into()).map(|d| (ci, d.clone())))
-                .collect_vec();
+    let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
+        .into_iter()
+        .filter_map(|ci| uvw.get_lifetime(&ci.into()).map(|d| (ci, d.clone())))
+        .collect_vec();
 
-            let cis = ci
-                .into_iter()
-                .map(|(ci, dl)| -> FpResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
-                .collect::<FpResult<Vec<_>>>()?;
-
-            Ok((uvw, passkeys, cis))
-        })
-        .await?;
+    let cis = ci
+        .into_iter()
+        .map(|(ci, dl)| -> FpResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
+        .collect::<FpResult<Vec<_>>>()?;
 
     let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
     let mut allowed_unverified_methods = user_auth
@@ -70,6 +67,7 @@ pub async fn get_user_challenge_context(
         // even though they are unverified.
         allowed_unverified_methods.append(&mut vec![AuthMethodKind::Phone, AuthMethodKind::Email]);
     }
+
     let auth_methods = cis
         .iter()
         // TODO one day, don't allow logging in via data added via bootstrap?
@@ -98,7 +96,7 @@ pub async fn get_user_challenge_context(
         .map(|m| m.kind.into())
         .collect_vec();
 
-    let ctx = UserChallengeContext {
+    let ctx = UserAuthMethodsContext {
         vw: uvw,
         webauthn_creds: passkeys,
         auth_methods,

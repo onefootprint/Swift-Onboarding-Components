@@ -5,8 +5,8 @@ use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserIdentifier;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
-use api_core::utils::identify::get_user_challenge_context;
-use api_core::utils::identify::UserChallengeContext;
+use api_core::utils::identify::get_user_auth_methods;
+use api_core::utils::identify::UserAuthMethodsContext;
 use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::FpResult;
 use api_core::State;
@@ -82,7 +82,7 @@ pub struct GetIdentifyChallengeArgs {
 }
 
 pub struct IdentifyChallengeContext {
-    pub ctx: UserChallengeContext,
+    pub ctx: UserAuthMethodsContext,
     pub tenant: Option<Tenant>,
     pub sv: Option<ScopedVault>,
     /// When true, allowed to create a new user via a signup challenge even when there's already
@@ -167,7 +167,10 @@ async fn get_identify_challenge_context(
     } else {
         UserIdentifier::Vault(existing_user_id)
     };
-    let ctx = get_user_challenge_context(state, identifier, user_auth).await?;
+    let ctx = state
+        .db_pool
+        .db_query(move |conn| get_user_auth_methods(conn, identifier, user_auth))
+        .await?;
     let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
     let ctx = IdentifyChallengeContext {
         ctx,

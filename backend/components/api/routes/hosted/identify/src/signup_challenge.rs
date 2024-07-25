@@ -14,7 +14,7 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::identify::UserChallengeContext;
+use api_core::utils::identify::UserAuthMethodsContext;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
@@ -103,7 +103,7 @@ pub async fn post(
             sv,
             ..
         } = ctx;
-        let UserChallengeContext { vw, .. } = ctx;
+        let UserAuthMethodsContext { vw, .. } = ctx;
         if !can_initiate_signup_challenge {
             // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge

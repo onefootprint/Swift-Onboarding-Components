@@ -3,7 +3,7 @@ use crate::auth::user::UserAuthScope;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::IsGuardMet;
 use api_core::types::ApiListResponse;
-use api_core::utils::identify::get_user_challenge_context;
+use api_core::utils::identify::get_user_auth_methods;
 use api_core::State;
 use itertools::Itertools;
 use paperclip::actix::api_v2_operation;
@@ -31,8 +31,10 @@ pub async fn get(
             _ => None,
         })
         .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
-
-    let ctx = get_user_challenge_context(&state, user_auth.user_identifier(), Some(user_auth)).await?;
+    let ctx = state
+        .db_pool
+        .db_query(move |conn| get_user_auth_methods(conn, user_auth.user_identifier(), Some(user_auth)))
+        .await?;
     let auth_methods = ctx
         .auth_methods
         .into_iter()

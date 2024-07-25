@@ -4,7 +4,7 @@ use crate::ChallengeState;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::State;
-use crate::UserChallengeContext;
+use crate::UserAuthMethodsContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::error_with_code::ErrorWithCode;
@@ -66,7 +66,7 @@ pub async fn post(
         return Err(ErrorWithCode::LoginChallengeUserNotFound.into());
     };
     let IdentifyChallengeContext { ctx, tenant, .. } = ctx;
-    let UserChallengeContext {
+    let UserAuthMethodsContext {
         vw,
         webauthn_creds: creds,
         available_challenge_kinds,

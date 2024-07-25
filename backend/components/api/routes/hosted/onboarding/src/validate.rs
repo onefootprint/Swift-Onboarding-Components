@@ -8,7 +8,7 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
-use api_core::utils::identify::get_user_challenge_context;
+use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::State;
@@ -78,7 +78,10 @@ pub async fn post(
             // without a playbook key.
             if let Some(required_auth_methods) = obc.required_auth_methods.as_ref() {
                 let id = UserIdentifier::ScopedVault(sv_id.clone());
-                let ctx = get_user_challenge_context(&state, id, None).await?;
+                let ctx = state
+                    .db_pool
+                    .db_query(move |conn| get_user_auth_methods(conn, id, None))
+                    .await?;
                 let verified_auth_methods = ctx
                     .auth_methods
                     .into_iter()

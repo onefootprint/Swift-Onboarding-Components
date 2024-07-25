@@ -1,6 +1,6 @@
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
-use crate::UserChallengeContext;
+use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -92,7 +92,7 @@ pub async fn post(
         can_initiate_signup_challenge,
         matching_fps,
     } = ctx;
-    let UserChallengeContext {
+    let UserAuthMethodsContext {
         webauthn_creds,
         available_challenge_kinds,
         is_vault_unverified,
