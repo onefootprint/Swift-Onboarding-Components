@@ -6,7 +6,6 @@ use crate::auth::Either;
 use crate::get;
 use crate::types::ApiResponse;
 use crate::State;
-use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -38,7 +37,6 @@ pub async fn get_dupes(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
-    let can_view_neuro = tenant_can_view_neuro(&state, &tenant_id);
 
     let (dupes, vws, neuro_dupes) = state
         .db_pool
@@ -80,11 +78,7 @@ pub async fn get_dupes(
         .map(|(sv_id, vw)| {
             let decrypted_data = decrypted_results.remove(&sv_id).unwrap_or_default();
             let duplicate_dis = sv_id_to_dupe_fps.remove(&sv_id).unwrap_or_default();
-            let duplicate_neuro_kinds = if can_view_neuro {
-                sv_id_to_dupe_neuro.remove(&sv_id).unwrap_or_default()
-            } else {
-                vec![]
-            };
+            let duplicate_neuro_kinds = sv_id_to_dupe_neuro.remove(&sv_id).unwrap_or_default();
 
             let duplicate_kinds = chain(
                 duplicate_dis

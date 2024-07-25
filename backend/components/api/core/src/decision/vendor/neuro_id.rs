@@ -15,7 +15,6 @@ use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::neuro_id_analytics_event::NewNeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
-use feature_flag::BoolFlag;
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::neuro_id::response::NeuroIdAttributes;
@@ -204,10 +203,6 @@ pub async fn save_neuro_event(
         .await?;
 
     Ok(())
-}
-
-pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
-    state.ff_client.flag(BoolFlag::TenantCanViewNeuro(tenant_id))
 }
 
 #[cfg(test)]

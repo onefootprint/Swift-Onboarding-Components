@@ -76,8 +76,6 @@ pub enum BoolFlag<'a> {
     MakeLexisCall(&'a TenantId),
     #[strum(to_string = "RequireCaptureOnStepUp")]
     RequireCaptureOnStepUp(&'a ObConfigurationKey),
-    #[strum(to_string = "TenantCanViewNeuro")]
-    TenantCanViewNeuro(&'a TenantId),
     #[strum(to_string = "UseKycWaterfallV2Rollout")]
     UseKycWaterfallV2Rollout(&'a TenantId),
 
@@ -135,7 +133,6 @@ impl<'a> BoolFlag<'a> {
             Self::PreferWhatsapp(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
-            Self::TenantCanViewNeuro(k) => Some(k.to_string()),
             Self::UseKycWaterfallV2Rollout(k) => Some(k.to_string()),
             Self::ApiKycSkipEmailAndPhoneRequirements(k) => Some(k.to_string()),
         }
@@ -180,7 +177,6 @@ impl<'a> BoolFlag<'a> {
             Self::PreferWhatsapp(_) => false,
             Self::MakeLexisCall(_) => false,
             Self::RequireCaptureOnStepUp(_) => false,
-            Self::TenantCanViewNeuro(_) => false,
             Self::UseKycWaterfallV2Rollout(_) => false,
             Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
         }
@@ -230,7 +226,6 @@ impl<'a> BoolFlag<'a> {
             | Self::MakeLexisCall(_)
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
-            | Self::TenantCanViewNeuro(_)
             | Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
             // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,

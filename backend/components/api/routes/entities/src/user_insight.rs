@@ -1,7 +1,6 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::serializers::user_insights;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -29,17 +28,11 @@ pub async fn get(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
-
-    let can_view_neuro = tenant_can_view_neuro(&state, &tenant_id);
     let (behavior_events, latest_completed_wf, insight_event_for_latest_wf) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let behavior = if can_view_neuro {
-                NeuroIdAnalyticsEvent::list(conn, &sv.id)?
-            } else {
-                vec![]
-            };
+            let behavior = NeuroIdAnalyticsEvent::list(conn, &sv.id)?;
             let latest_completed_wf = Workflow::latest_reonboardable(conn, &sv.id, true)?.map(|(wf, _)| wf);
             let insight_event_for_latest_wf = if let Some(ref wf) = latest_completed_wf {
                 InsightEvent::get_for_workflow(conn, &wf.id)?
