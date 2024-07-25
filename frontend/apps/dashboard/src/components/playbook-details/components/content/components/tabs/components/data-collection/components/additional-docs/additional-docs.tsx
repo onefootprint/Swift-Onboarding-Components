@@ -76,7 +76,7 @@ const DocItem = ({ label, identifier, description, requiresHumanReview }: DocIte
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
 
   return (
-    <Stack gap={3} alignItems="center">
+    <Stack gap={2} alignItems="center">
       <Text variant="body-3" color="secondary">
         {label}
       </Text>
