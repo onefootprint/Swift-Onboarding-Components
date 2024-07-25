@@ -85,10 +85,6 @@
       "cache": false,
       "dependsOn": []
     },
-    "test:stress:ci": {
-      "cache": false,
-      "dependsOn": ["i18n:copy-en"]
-    },
     "start": {},
     "lint": {
       "dependsOn": ["^build"]
