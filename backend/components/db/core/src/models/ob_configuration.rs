@@ -82,10 +82,6 @@ pub struct ObConfiguration {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
-    // DEPRECATED: use verification checks
-    /// When true on a KYB playbook, just collect business info without sending to vendors
-    #[allow(unused)]
-    skip_kyb: Option<bool>,
     /// When true on a KYC or KYB playbook, allows skipping confirm screen.
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
@@ -375,7 +371,6 @@ struct NewObConfiguration {
     allow_us_residents: bool,
     allow_us_territory_residents: bool,
     kind: ObConfigurationKind,
-    skip_kyb: Option<bool>,
     skip_confirm: bool,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     curp_validation_enabled: bool,
@@ -606,7 +601,6 @@ impl ObConfiguration {
     #[tracing::instrument("ObConfiguration::create", skip_all)]
     pub fn create(conn: &mut PgConn, args: NewObConfigurationArgs) -> DbResult<Self> {
         let enhanced_aml = args.verification_checks.enhanced_aml();
-        let skip_kyb = args.verification_checks.skip_kyb();
         let NewObConfigurationArgs {
             name,
             tenant_id,
@@ -654,7 +648,6 @@ impl ObConfiguration {
             allow_us_residents,
             allow_us_territory_residents,
             kind,
-            skip_kyb: Some(skip_kyb),
             skip_confirm,
             document_types_and_countries,
             curp_validation_enabled,

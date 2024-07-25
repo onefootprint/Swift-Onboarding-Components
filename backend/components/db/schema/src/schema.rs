@@ -766,7 +766,6 @@ diesel::table! {
         allow_us_residents -> Bool,
         allow_us_territory_residents -> Bool,
         kind -> Text,
-        skip_kyb -> Nullable<Bool>,
         skip_confirm -> Bool,
         document_types_and_countries -> Nullable<Jsonb>,
         curp_validation_enabled -> Bool,
