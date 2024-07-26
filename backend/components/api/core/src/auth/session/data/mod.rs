@@ -6,8 +6,8 @@ pub mod user;
 use crypto::aead::ScopedSealingKey;
 use newtypes::HasSessionKind;
 use newtypes::SealedSessionBytes;
-use newtypes::SessionAuthTokenKind;
 use newtypes::SessionKind;
+use newtypes::TenantSessionPurpose;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -59,20 +59,25 @@ pub enum AuthSessionData {
     SdkArgs(sdk_args::SdkArgsData),
 }
 
-// Would be nice to not have to have this, but SessionAuthTokenKind is needed in newtypes...
-impl<'a> From<&'a AuthSessionData> for SessionAuthTokenKind {
-    fn from(value: &'a AuthSessionData) -> Self {
-        match value {
-            AuthSessionData::WorkOs(_) => Self::WorkOs,
-            AuthSessionData::TenantRb(_) => Self::TenantRb,
-            AuthSessionData::FirmEmployee(_) => Self::FirmEmployee,
-            AuthSessionData::ClientTenant(_) => Self::ClientTenant,
-            AuthSessionData::User(_) => Self::User,
-            AuthSessionData::EmailVerify(_) => Self::EmailVerify,
-            AuthSessionData::ValidateUserToken(_) => Self::ValidateUserToken,
-            AuthSessionData::OnboardingSession(_) => Self::OnboardingSession,
-            AuthSessionData::BusinessOwner(_) => Self::BusinessOwner,
-            AuthSessionData::SdkArgs(_) => Self::SdkArgs,
+impl AuthSessionData {
+    /// A token-type-specific prefix to help differentiate between token kinds.
+    /// For example, a dashboard token will look like `dbtok_xxxxx` while a user token will look
+    /// like `utok_xxxx`.
+    pub fn token_prefix(&self) -> &str {
+        match self {
+            Self::ClientTenant(_) => "ct",
+            Self::User(_) => "u",
+            Self::EmailVerify(_) => "ev",
+            Self::ValidateUserToken(_) => "v",
+            Self::OnboardingSession(_) => "ob",
+            Self::BusinessOwner(_) => "bo",
+            Self::SdkArgs(_) => "sdk",
+            Self::TenantRb(d) if d.purpose == TenantSessionPurpose::Docs => "d",
+            Self::FirmEmployee(d) if d.purpose == TenantSessionPurpose::Docs => "d",
+            // These three are all very similar purpose.
+            Self::WorkOs(_) => "db",
+            Self::TenantRb(_) => "db",
+            Self::FirmEmployee(_) => "db",
         }
     }
 }

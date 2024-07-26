@@ -31,48 +31,15 @@ impl<'a> From<&'a PiiString> for SessionAuthToken {
     }
 }
 
-pub enum SessionAuthTokenKind {
-    WorkOs,
-    TenantRb,
-    FirmEmployee,
-    ClientTenant,
-    User,
-    EmailVerify,
-    ValidateUserToken,
-    OnboardingSession,
-    BusinessOwner,
-    SdkArgs,
-}
-
-impl SessionAuthTokenKind {
-    /// A token-type-specific prefix to help differentiate between tok_s
-    fn prefix(&self) -> &str {
-        match self {
-            Self::ClientTenant => "ct",
-            Self::User => "u",
-            Self::EmailVerify => "ev",
-            Self::ValidateUserToken => "v",
-            Self::OnboardingSession => "ob",
-            Self::BusinessOwner => "bo",
-            Self::SdkArgs => "sdk",
-            // These three are all very similar purpose. We also don't issue a new token when
-            // they are updated between these token types
-            Self::WorkOs => "db",
-            Self::TenantRb => "db",
-            Self::FirmEmployee => "db",
-        }
-    }
-}
-
 impl SessionAuthToken {
     const LEN_RANDOM_CHARS: usize = 34;
     const PREFIX: &'static str = "tok_";
 
     /// generates a random new auth token
-    pub fn generate(kind: SessionAuthTokenKind) -> Self {
+    pub fn generate(prefix: &str) -> Self {
         Self(format!(
             "{}{}{}",
-            kind.prefix(),
+            prefix,
             Self::PREFIX,
             gen_random_alphanumeric_code(Self::LEN_RANDOM_CHARS)
         ))

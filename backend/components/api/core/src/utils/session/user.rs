@@ -89,7 +89,8 @@ impl AuthSession {
         data: AuthSessionData,
         expiry: impl Into<Expiry>,
     ) -> DbResult<(SessionAuthToken, Session)> {
-        let token = SessionAuthToken::generate((&data).into());
+        let tok_prefix = data.token_prefix();
+        let token = SessionAuthToken::generate(tok_prefix);
         let auth_token_hash = token.id();
         tracing::info!(%auth_token_hash, "Token created");
         let expires_at = match expiry.into() {

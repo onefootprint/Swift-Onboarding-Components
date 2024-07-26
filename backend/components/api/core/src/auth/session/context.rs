@@ -224,12 +224,11 @@ mod test {
     use crate::utils::session::AuthSession;
     use chrono::Utc;
     use newtypes::SessionAuthToken;
-    use newtypes::SessionAuthTokenKind;
     use std::marker::PhantomData;
 
     impl<T> SessionContext<T> {
         pub(in crate::auth) fn create_fixture(data: T, session_data: AuthSessionData) -> Self {
-            let auth_token = SessionAuthToken::generate(SessionAuthTokenKind::User);
+            let auth_token = SessionAuthToken::generate("u");
             assert!(auth_token.to_string().starts_with("utok_"));
             let session = AuthSession {
                 key: auth_token.id(),
