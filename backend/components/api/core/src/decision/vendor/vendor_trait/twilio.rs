@@ -17,12 +17,14 @@ impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio
         &self,
         request: TwilioLookupV2Request,
     ) -> Result<TwilioLookupV2APIResponse, idv::twilio::Error> {
-        let phone_number = if let Some(ref phone_number) = request.idv_data.phone_number {
-            phone_number
-        } else {
-            return Err(idv::twilio::Error::PhoneNumberNotPopulated);
-        };
-        let raw_response = self.lookup_v2(phone_number.leak()).await?;
+        let TwilioLookupV2Request {
+            idv_data,
+            lookup_fields,
+        } = request;
+        let phone_number = idv_data
+            .phone_number
+            .ok_or(idv::twilio::Error::PhoneNumberNotPopulated)?;
+        let raw_response = self.lookup_v2(phone_number.leak(), lookup_fields).await?;
         let parsed_response = twilio::response::parse_response(raw_response.clone())?;
 
         Ok(TwilioLookupV2APIResponse {

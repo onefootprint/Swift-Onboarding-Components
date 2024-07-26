@@ -92,6 +92,9 @@ pub use user_insight::*;
 pub mod samba_webhook;
 pub use samba_webhook::*;
 
+pub mod phone;
+pub use phone::*;
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Invalid email address: {0}")]

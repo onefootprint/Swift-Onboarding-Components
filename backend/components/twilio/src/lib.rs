@@ -3,6 +3,7 @@ use crate::response::message::Status;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
 use newtypes::TenantId;
+use newtypes::TwilioLookupField;
 use rand::Rng;
 use request::send_message::SendMessage;
 use reqwest::IntoUrl;
@@ -65,6 +66,7 @@ impl TwilioConfig {
     }
 }
 
+
 #[derive(Clone)]
 pub struct Client {
     config: TwilioConfig,
@@ -108,8 +110,21 @@ impl Client {
     }
 
     /// lookup information on a phone number
-    pub async fn lookup_v2(&self, phone_number: &str) -> crate::response::Result<serde_json::Value> {
-        let url = format!("https://lookups.twilio.com/v2/PhoneNumbers/{phone_number}?Fields=caller_name,sim_swap,call_forwarding,live_activity,line_type_intelligence");
+    pub async fn lookup_v2(
+        &self,
+        phone_number: &str,
+        fields: Vec<TwilioLookupField>,
+    ) -> crate::response::Result<serde_json::Value> {
+        let fields = fields
+            .iter()
+            .map(serde_json::to_string)
+            .collect::<Result<Vec<_>, _>>()?
+            .join(",");
+
+        let url = format!(
+            "https://lookups.twilio.com/v2/PhoneNumbers/{phone_number}?Fields={}",
+            fields
+        );
 
         let response = self.request_builder(Method::GET, url).send().await?;
 
