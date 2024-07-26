@@ -170,11 +170,11 @@ macro_rules! list_query {
         }
 
         if let Some(timestamp_lte) = $params.timestamp_lte {
-            query = query.filter(scoped_vault::start_timestamp.le(timestamp_lte))
+            query = query.filter(scoped_vault::last_activity_at.le(timestamp_lte))
         }
 
         if let Some(timestamp_gte) = $params.timestamp_gte {
-            query = query.filter(scoped_vault::start_timestamp.ge(timestamp_gte))
+            query = query.filter(scoped_vault::last_activity_at.ge(timestamp_gte))
         }
 
         if let Some(kind) = $params.kind.as_ref() {

@@ -10,7 +10,7 @@ use serde_with::SerializeDisplay;
 use strum_macros::Display;
 use strum_macros::EnumString;
 
-#[derive(Default, Deserialize, Apiv2Schema)]
+#[derive(Debug, Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenRequest {
     /// The kind of token to create.
@@ -74,7 +74,15 @@ pub struct CreateTokenRequest {
 }
 
 #[derive(
-    Display, Clone, Copy, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    EnumString,
+    DeserializeFromStr,
+    SerializeDisplay,
+    Apiv2Schema,
+    ::macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

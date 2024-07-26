@@ -429,11 +429,11 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     # Create a token and make sure it does not have implied auth
     fp_id = user["id"]
     obc = sandbox_tenant.default_ob_config
-    data = dict(dict(kind="onboard", key=obc.key.value, use_implicit_auth=True))
+    data = dict(kind="onboard", key=obc.key.value, use_implicit_auth=True)
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    # Should immediately have onboarding scopes because auth was implied
+    # Should not have scopes
     body = get("hosted/user/token", None, auth_token)
     assert not body["scopes"]
 
