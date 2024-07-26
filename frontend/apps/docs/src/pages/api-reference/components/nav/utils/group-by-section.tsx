@@ -1,4 +1,4 @@
-import { HydratedArticle } from '../../../hooks/use-get-articles';
+import { HydratedArticle } from 'src/pages/api-reference/hooks';
 
 type Section = {
   title: string;
