@@ -18,6 +18,7 @@ use newtypes::BoData;
 use newtypes::BusinessDataFromVault;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DocVData;
 use newtypes::DocumentId;
 use newtypes::DocumentSide;
@@ -27,6 +28,7 @@ use newtypes::IdvData;
 use newtypes::PhoneNumber;
 use newtypes::PiiBytes;
 use newtypes::PiiString;
+use newtypes::ScopedVaultId;
 use std::collections::HashMap;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
@@ -79,6 +81,56 @@ pub async fn build_idv_data_from_verification_request(
         email,
         phone_number,
         verification_request_id: Some(vreq_id),
+    };
+    Ok(request)
+}
+
+
+// TODO: remove duplicate, see if we can get rid of build_idv_data_from_request
+#[tracing::instrument(skip_all)]
+pub async fn build_idv_data_at(
+    db_pool: &DbPool, // TODO: migrate to PgConn
+    enclave_client: &EnclaveClient,
+    sv_id: &ScopedVaultId,
+    seqno: DataLifetimeSeqno,
+) -> FpResult<IdvData> {
+    let sv_id = sv_id.clone();
+    // Build the set of data we will send to the vendor by re-building the UVW from the DB using
+    // the pointers to pieces of user data saved on the VerificationRequest
+    let uvw = db_pool
+        .db_query(move |conn| VaultWrapper::<Person>::build(conn, VwArgs::Historical(&sv_id, seqno)))
+        .await?;
+
+    let all_idks: Vec<_> = IDK::iter().map(DataIdentifier::from).collect();
+    let mut decrypted_values = uvw.decrypt_unchecked(enclave_client, &all_idks).await?;
+    // Remove sandbox suffixes
+    let email = decrypted_values
+        .remove(&IDK::Email.into())
+        .map(|x| Email::from_str(x.leak()).map(|x| x.email))
+        .transpose()?;
+    let phone_number = decrypted_values
+        .remove(&IDK::PhoneNumber.into())
+        .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.e164()))
+        .transpose()?;
+    let request = IdvData {
+        first_name: decrypted_values.remove(&IDK::FirstName.into()),
+        middle_name: decrypted_values.remove(&IDK::MiddleName.into()),
+        last_name: decrypted_values.remove(&IDK::LastName.into()),
+        address_line1: decrypted_values.remove(&IDK::AddressLine1.into()),
+        address_line2: decrypted_values.remove(&IDK::AddressLine2.into()),
+        city: decrypted_values.remove(&IDK::City.into()),
+        state: decrypted_values.remove(&IDK::State.into()),
+        zip: decrypted_values.remove(&IDK::Zip.into()),
+        country: decrypted_values.remove(&IDK::Country.into()),
+        ssn4: decrypted_values.remove(&IDK::Ssn4.into()),
+        ssn9: decrypted_values.remove(&IDK::Ssn9.into()),
+        itin: decrypted_values.remove(&IDK::Itin.into()),
+        dob: decrypted_values.remove(&IDK::Dob.into()),
+        drivers_license_number: decrypted_values.remove(&IDK::DriversLicenseNumber.into()),
+        drivers_license_state: decrypted_values.remove(&IDK::DriversLicenseState.into()),
+        email,
+        phone_number,
+        verification_request_id: None,
     };
     Ok(request)
 }

@@ -23,6 +23,7 @@ pub mod middesk;
 pub mod neuro_id;
 pub mod samba;
 pub mod tenant_vendor_control;
+pub mod twilio;
 pub mod vendor_api;
 pub mod vendor_result;
 pub mod vendor_trait;

@@ -17,6 +17,7 @@ use idv::ParsedResponse;
 use newtypes::vendor_api_struct::*;
 use newtypes::VendorAPIMarker;
 use serde::de::DeserializeOwned;
+use twilio::response::lookup::LookupV2Response;
 
 pub trait AsParsedResponse {
     fn into_parsed_response(self) -> ParsedResponse;
@@ -167,4 +168,9 @@ impl AsParsedResponse for CurpValidationResponse {
 // FootprintDeviceAttestationData
 impl VendorParsable for FootprintDeviceAttestation {
     type ParsedType = FootprintDeviceAttestationData;
+}
+
+// Twilio
+impl VendorParsable for TwilioLookupV2 {
+    type ParsedType = LookupV2Response;
 }
