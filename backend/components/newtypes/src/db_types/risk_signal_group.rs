@@ -33,6 +33,7 @@ pub enum RiskSignalGroupKind {
     NativeDevice,
     Aml,
     Behavior,
+    Phone,
 }
 
 impl_enum_str_diesel!(RiskSignalGroupKind);

@@ -224,6 +224,7 @@ where
         })
 }
 
+// TODO: get rid of this!
 // RiskSignalGroupKind is defined in `newtypes` with all the other
 /// db types, we have another "Wrapped" enum here so we can implement extra functionality that is
 /// helpful for working with RiskSignals in application code
@@ -238,6 +239,7 @@ pub enum WrappedRiskSignalGroupKind {
     NativeDevice,
     Aml,
     Behavior,
+    Phone,
 }
 use risk_signal_group_struct::*;
 
@@ -251,6 +253,7 @@ impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
             RiskSignalGroupKind::NativeDevice => Self::NativeDevice,
             RiskSignalGroupKind::Aml => Self::Aml,
             RiskSignalGroupKind::Behavior => Self::Behavior,
+            RiskSignalGroupKind::Phone => Self::Phone,
         }
     }
 }
@@ -265,6 +268,7 @@ impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
             WrappedRiskSignalGroupKind::NativeDevice => Self::NativeDevice,
             WrappedRiskSignalGroupKind::Aml => Self::Aml,
             WrappedRiskSignalGroupKind::Behavior => Self::Behavior,
+            WrappedRiskSignalGroupKind::Phone => Self::Phone,
         }
     }
 }

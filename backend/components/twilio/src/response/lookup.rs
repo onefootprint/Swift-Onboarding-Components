@@ -144,7 +144,34 @@ pub struct LineTypeIntelligence {
     pub carrier_name: Option<String>,
     // The phone number type. See Phone number type values for possible values.
     #[serde(rename = "type")]
-    pub kind: Option<String>,
+    pub kind: Option<LineType>,
     // The error code, if any, associated with your request.
     pub error_code: Option<i64>,
+}
+
+
+/// Phone line type
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LineType {
+    Landline,
+    Mobile,
+    FixedVoip,
+    NonFixedVoip,
+    Personal,
+    TollFree,
+    Premium,
+    SharedCost,
+    Uan,
+    Voicemail,
+    Pager,
+    Unknown,
+    #[serde(other)]
+    Other,
+}
+
+impl LineType {
+    pub fn is_voip(&self) -> bool {
+        matches!(self, LineType::FixedVoip | LineType::NonFixedVoip)
+    }
 }

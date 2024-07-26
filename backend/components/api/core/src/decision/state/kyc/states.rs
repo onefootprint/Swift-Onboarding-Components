@@ -281,7 +281,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             ff_client,
             curp_result,
             neuro_result,
-            _twilio_result,
+            twilio_result,
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
@@ -318,6 +318,19 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
             RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
+        }
+
+        if let Some((twilio_res, vres_id)) = twilio_result {
+            // TODO: cleaning this up in separate stack
+            // https://linear.app/footprint/issue/BE-365/remove-parsedresponse
+            let vendor_api: VendorAPI = VendorAPI::TwilioLookupV2;
+            let twilio_frc = crate::decision::features::twilio::footprint_reason_codes(&twilio_res)
+                .into_iter()
+                .map(|frc| (frc, vendor_api, vres_id.clone()))
+                .collect();
+
+            let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Phone)?;
+            RiskSignal::bulk_add(conn, twilio_frc, false, rsg.id)?;
         }
 
         let fixture_result = decision::utils::get_fixture_result(ff_client, &vw.vault, &wf, &self.t_id)?;

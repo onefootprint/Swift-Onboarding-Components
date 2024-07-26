@@ -12,4 +12,5 @@ pub mod neuro_id;
 pub mod risk_signals;
 pub mod socure_idplus;
 pub mod stytch;
+pub mod twilio;
 pub mod user_input;
