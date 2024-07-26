@@ -10,6 +10,7 @@ use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::neuro_id::run_neuro_call;
+use crate::decision::vendor::twilio::run_twilio_call;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::{
@@ -69,6 +70,7 @@ use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
+use twilio::response::lookup::LookupV2Response;
 
 #[tracing::instrument(skip(db_pool))]
 pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
@@ -159,6 +161,29 @@ pub async fn run_neuro_check(
         })
         .await?;
     run_neuro_call(state, &di, &wf.id, t_id).await
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn run_twilio_check(
+    state: &State,
+    wf_id: &WorkflowId,
+    obc: &ObConfiguration,
+) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
+    let wfid = wf_id.clone();
+    let (wf, di) = state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, di))
+        })
+        .await?;
+    run_twilio_call(state, &di, &wf.id, obc).await
 }
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls

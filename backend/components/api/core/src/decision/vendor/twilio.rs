@@ -22,6 +22,7 @@ use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
+use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 use twilio::response::lookup::LookupV2Response;
 
@@ -78,7 +79,7 @@ pub async fn run_twilio_call(
     di: &DecisionIntent,
     wf_id: &WorkflowId,
     obc: &ObConfiguration,
-) -> FpResult<Option<LookupV2Response>> {
+) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
     // TODO: Make this WF created
     let di_created = di._created_at;
@@ -101,8 +102,7 @@ pub async fn run_twilio_call(
         TwilioLookupV2,
     )
     .await?
-    .ok()
-    .map(|(r, _)| r);
+    .ok();
 
     if existing_vendor_result.is_some() {
         return Ok(existing_vendor_result);
@@ -129,9 +129,9 @@ pub async fn run_twilio_call(
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
     );
-    let _ = args.save(&state.db_pool).await?;
+    let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    let result = res.ok().map(|r| r.parsed_response);
+    let result = res.ok().map(|r| (r.parsed_response, vres_id));
 
     Ok(result)
 }

@@ -68,6 +68,7 @@ use newtypes::VerificationResultId;
 use newtypes::WorkflowFixtureResult;
 use std::collections::HashMap;
 use std::sync::Arc;
+use twilio::response::lookup::LookupV2Response;
 
 /////////////////////
 /// DataCollection
@@ -146,6 +147,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Arc<dyn FeatureFlagClient>,
         Option<VendorResult>,
         Option<VendorResult>,
+        Option<(LookupV2Response, VerificationResultId)>,
     )>;
 
     #[tracing::instrument(
@@ -202,6 +204,22 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
+        let twilio_result = if obc
+            .verification_checks()
+            .get(VerificationCheckKind::Phone)
+            .is_some()
+        {
+            match common::run_twilio_check(state, &self.wf_id, &obc).await {
+                Ok(res) => res,
+                Err(err) => {
+                    tracing::error!(?err, wf_id=?self.wf_id, "error running twilio");
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
         let is_neuro_enabled_obc = obc
             .verification_checks()
             .get(VerificationCheckKind::NeuroId)
@@ -244,6 +262,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             state.ff_client.clone(),
             curp_result,
             neuro_result,
+            twilio_result,
         )))
     }
 
@@ -262,6 +281,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             ff_client,
             curp_result,
             neuro_result,
+            _twilio_result,
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
