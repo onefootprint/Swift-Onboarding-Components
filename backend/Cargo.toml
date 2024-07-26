@@ -103,7 +103,6 @@ diesel = { version = "2.2.2", features = [
     "uuid",
     "postgres",
     "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
-    "64-column-tables"
 ] }
 diesel_migrations = "2.2.0"
 
