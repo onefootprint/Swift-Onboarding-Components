@@ -153,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_refs() {
-        define_newtype_id!(TestId, String, "");
+        define_newtype_id!(TestId, String, "TestId");
 
         table! {
             gadget {
