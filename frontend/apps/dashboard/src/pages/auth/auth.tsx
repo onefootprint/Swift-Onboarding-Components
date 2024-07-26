@@ -21,7 +21,7 @@ const Auth = () => {
   const loginMutation = useLogin();
   const { logIn } = useSession();
   const { isFinished, getRemainingDuration } = useTrackAnimationDuration();
-  const { data } = useLoggedOutStorage();
+  const { data, onLoginUrl, reset: resetLoggedOutStorage } = useLoggedOutStorage();
 
   const waitForAnimation = (callback: () => void) => {
     if (isFinished) {
@@ -68,7 +68,8 @@ const Auth = () => {
               },
             });
             waitForAnimation(() => {
-              router.push(requiresOnboarding ? '/onboarding' : DEFAULT_PUBLIC_ROUTE);
+              router.push(requiresOnboarding ? '/onboarding' : onLoginUrl);
+              resetLoggedOutStorage();
             });
           }
         },

@@ -12,11 +12,11 @@ import EmailForm from '../components/email-form';
 import Layout from '../components/layout';
 import SocialButtons from '../components/social-buttons';
 import SkatingPenguin from './components/skating-penguin';
-import useSetOrgId from './hooks/use-set-org-id';
+import useCaptureQueryParams from './hooks/use-capture-query-params';
 
 const Login = () => {
   const { t } = useTranslation('authentication', { keyPrefix: 'sign-in' });
-  useSetOrgId();
+  useCaptureQueryParams();
 
   return (
     <>

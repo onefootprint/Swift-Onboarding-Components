@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import type { LoggedOutStorageState, Session } from './use-logged-out-storage.types';
 import { defaultSession } from './use-logged-out-storage.types';
 
-// TODO Should we just reuse useSession?
 export const useStore = create<LoggedOutStorageState>()(
   persist(
     set => ({
@@ -33,12 +33,14 @@ export const useStore = create<LoggedOutStorageState>()(
 const useLoggedOutStorage = () => {
   const { data, reset, update } = useStore(state => state);
 
-  const setOrgId = (orgId?: string) => update({ orgId });
+  // After login, redirect to the redirectUrl if it exists, otherwise DEFAULT_PUBLIC_ROUTE
+  const onLoginUrl = data.redirectUrl ? decodeURIComponent(data.redirectUrl) : DEFAULT_PUBLIC_ROUTE;
 
   return {
     data,
     reset,
-    setOrgId,
+    update,
+    onLoginUrl,
   };
 };
 

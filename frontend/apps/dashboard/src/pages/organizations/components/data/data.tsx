@@ -4,11 +4,11 @@ import { Text, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
 import styled from 'styled-components';
 
+import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import ButtonGroup from '../button-group';
 
 type DataProps = {
@@ -23,6 +23,7 @@ const Data = ({ authToken, organizations, isMissingAccessToRequestedOrg }: DataP
   const router = useRouter();
   const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
+  const { onLoginUrl, reset: resetLoggedOutStorage } = useLoggedOutStorage();
 
   const handleClick = (tenantId: string) => () => {
     assumeRoleMutation.mutate(
@@ -30,7 +31,8 @@ const Data = ({ authToken, organizations, isMissingAccessToRequestedOrg }: DataP
       {
         async onSuccess({ token }) {
           await logIn({ auth: token });
-          router.push(DEFAULT_PUBLIC_ROUTE);
+          router.push(onLoginUrl);
+          resetLoggedOutStorage();
         },
         onError: showErrorToast,
       },

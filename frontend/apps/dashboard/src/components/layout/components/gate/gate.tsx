@@ -16,13 +16,13 @@ const Gate = ({ children }: GateProps) => {
     setShowPage(true);
   };
 
-  const redirect = (url: string) => {
+  const redirect = (url: string, query?: Record<string, string>) => {
     const waitPageChangeAndNext = () => {
       next();
       router.events.on('routeChangeComplete', waitPageChangeAndNext);
     };
     router.events.on('routeChangeComplete', waitPageChangeAndNext);
-    router.push(url);
+    router.push({ pathname: url, query });
   };
 
   usePermissionsByRoute({
@@ -40,7 +40,8 @@ const Gate = ({ children }: GateProps) => {
       },
       onError: ({ isLoggedIn, requiresOnboarding }) => {
         if (!isLoggedIn) {
-          redirect('/authentication/sign-in');
+          const currentPath = `${window.location.pathname}${window.location.search}`;
+          redirect('/authentication/sign-in', { redirectUrl: encodeURIComponent(currentPath) });
           return;
         }
         if (requiresOnboarding) {
