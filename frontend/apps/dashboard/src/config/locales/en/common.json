@@ -706,22 +706,16 @@
         "alt": "An image of a penguin using a smartphone"
       }
     },
-    "organizations": {
-      "page-title": "Footprint Login | Select an Organization",
-      "title": "Select an organization",
-      "title-missing-access": "Or log into another organization",
-      "no-access-to-requested-org": "You dont have access to the requested organization. Please request access from the admin.",
-      "errors": {
-        "no-auth-token": "No auth token provided. Please, log in again.",
-        "auth-method-not-supported": "{{orgName}} has disabled the ability to log in using this auth method. Please retry using another method."
-      }
-    },
     "auth": {
       "loading-aria-label": "Loading",
       "page-title": "Footprint Login | Logging in to the Footprint Dashboard",
       "workos-error": {
         "title": "Please try again",
         "description": "Your login session has expired or is invalid"
+      },
+      "missing-access": {
+        "title": "Note",
+        "description": "You dont have access to the requested organization. Please request access from the admin."
       },
       "invite": {
         "auth-expired": {

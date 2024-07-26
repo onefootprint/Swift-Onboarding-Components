@@ -15,7 +15,8 @@ export type OrgAuthLoginResponse = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
+  isMissingRequestedOrg: boolean;
   authToken: string;
-  user: Member | null;
+  user: Member;
   tenant: Organization | null;
 };

@@ -5,7 +5,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import useSession from 'src/hooks/use-session';
 
@@ -44,34 +43,30 @@ const Auth = () => {
       loginMutation.mutate(requestData, {
         onSuccess: async ({
           authToken,
-          user,
-          tenant,
           isFirstLogin,
           requiresOnboarding,
           createdNewTenant,
+          isMissingRequestedOrg,
         }: OrgAuthLoginResponse) => {
-          const requiresOrganizationSelection = !user || !tenant;
-          if (requiresOrganizationSelection) {
-            waitForAnimation(() => {
-              router.push({
-                pathname: '/organizations',
-                query: { token: authToken },
+          await logIn({
+            auth: authToken,
+            meta: {
+              isFirstLogin,
+              requiresOnboarding,
+              createdNewTenant,
+            },
+          });
+          waitForAnimation(() => {
+            if (isMissingRequestedOrg) {
+              toast.show({
+                title: t('missing-access.title'),
+                description: t('missing-access.description'),
+                variant: 'error',
               });
-            });
-          } else {
-            await logIn({
-              auth: authToken,
-              meta: {
-                isFirstLogin,
-                requiresOnboarding,
-                createdNewTenant,
-              },
-            });
-            waitForAnimation(() => {
-              router.push(requiresOnboarding ? '/onboarding' : onLoginUrl);
-              resetLoggedOutStorage();
-            });
-          }
+            }
+            router.push(requiresOnboarding ? '/onboarding' : onLoginUrl);
+            resetLoggedOutStorage();
+          });
         },
       });
     },
