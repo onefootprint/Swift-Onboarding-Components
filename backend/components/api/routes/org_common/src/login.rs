@@ -25,6 +25,7 @@ use newtypes::OrgIdentifier;
 use newtypes::OrgMemberEmail;
 use newtypes::TenantKind;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use newtypes::WorkosAuthMethod;
 use std::str::FromStr;
 use workos::sso::AuthorizationCode;
@@ -168,7 +169,7 @@ where
         .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
         .await?;
 
-    let session = TenantRbSession::create(&login_result).into();
+    let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard).into();
     let TenantRbLoginResult {
         t_user,
         rb,

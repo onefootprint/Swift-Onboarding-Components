@@ -9,6 +9,7 @@ use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
+use newtypes::TenantSessionPurpose;
 use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
@@ -21,6 +22,7 @@ pub struct FirmEmployeeAuth {
     pub tenant_user: TenantUser,
     pub is_risk_ops: bool,
     pub auth_method: WorkosAuthMethod,
+    pub purpose: TenantSessionPurpose,
 }
 
 /// Nests a private FirmEmployeeAuth and implements traits required to extract this session from an
@@ -50,15 +52,15 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         _: RequestInfo,
     ) -> FpResult<Self> {
         // Uniquely, this kind of auth allows extracting the user from two different types of tokens
-        let (tenant_user, auth_method) = match auth_session {
+        let (tenant_user, auth_method, purpose) = match auth_session {
             AuthSessionData::TenantRb(data) => {
                 let (_, rb, _, _) = TenantRolebinding::get(conn, &data.tenant_rolebinding_id)?;
                 let tu = TenantUser::get_firm_employee(conn, &rb.tenant_user_id)?;
-                (tu, data.auth_method)
+                (tu, data.auth_method, data.purpose)
             }
             AuthSessionData::FirmEmployee(data) => {
                 let tu = TenantUser::get_firm_employee(conn, &data.tenant_user_id)?;
-                (tu, data.auth_method)
+                (tu, data.auth_method, data.purpose)
             }
             _ => {
                 return Err(AuthError::SessionTypeError.into());
@@ -75,6 +77,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
             tenant_user,
             is_risk_ops,
             auth_method,
+            purpose,
         }))
     }
 

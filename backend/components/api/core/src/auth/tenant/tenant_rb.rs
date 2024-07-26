@@ -3,6 +3,7 @@ use super::CanCheckTenantGuard;
 use super::GetFirmEmployee;
 use super::TenantAuth;
 use crate::auth::session::get_is_live;
+use crate::auth::session::tenant::TenantRbSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
@@ -18,7 +19,6 @@ use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
-use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -31,7 +31,7 @@ pub struct TenantRbAuth {
     tenant_user: TenantUser,
     tenant_rolebinding: TenantRolebinding,
     is_live: bool,
-    pub(super) auth_method: WorkosAuthMethod,
+    pub(super) data: TenantRbSession,
 }
 
 /// Nests a private TenantRbAuth and implements traits required to extract this session from an
@@ -88,7 +88,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedTenantRbAuth<IS_
             tenant_role: tr,
             tenant_user: tu,
             is_live,
-            auth_method: data.auth_method,
+            data,
         }))
     }
 

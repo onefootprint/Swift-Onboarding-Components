@@ -3,6 +3,7 @@ use super::CanCheckTenantGuard;
 use super::GetFirmEmployee;
 use super::TenantAuth;
 use crate::auth::session::get_is_live;
+use crate::auth::session::tenant::FirmEmployeeSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
@@ -20,7 +21,6 @@ use feature_flag::FeatureFlagClient;
 use newtypes::DataLifetimeSource;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
-use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -37,7 +37,7 @@ pub struct FirmEmployeeAssumeAuth {
     /// This forces clients to explicitly acknowledge they're performing write actions on behalf of
     /// a tenant.
     requested_allow_writes: bool,
-    pub(super) auth_method: WorkosAuthMethod,
+    pub(super) data: FirmEmployeeSession,
 }
 
 /// Nests a private FirmEmployeeAssumeAuth and implements traits required to extract this session
@@ -107,7 +107,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
             role,
             is_risk_ops,
             is_live,
-            auth_method: data.auth_method,
+            data,
             requested_allow_writes: allow_writes,
         }))
     }
@@ -217,6 +217,7 @@ mod test {
     use macros::db_test_case;
     use newtypes::TenantRoleKind;
     use newtypes::TenantScope;
+    use newtypes::TenantSessionPurpose;
     use newtypes::WorkosAuthMethod;
 
     #[db_test_case(false, false, false => vec![TenantScope::Read])]
@@ -248,22 +249,23 @@ mod test {
         let role =
             TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();
         let tenant_user = db::tests::fixtures::tenant_user::create(conn);
-        let session_data = AuthSessionData::FirmEmployee(FirmEmployeeSession {
+        let session_data = FirmEmployeeSession {
             tenant_user_id: tenant_user.id.clone(),
             tenant_id: tenant.id.clone(),
             auth_method: WorkosAuthMethod::GoogleOauth,
-        });
+            purpose: TenantSessionPurpose::Dashboard,
+        };
         let data = FirmEmployeeAssumeAuth {
             tenant,
             tenant_user,
             role,
             is_risk_ops,
             is_live,
-            auth_method: WorkosAuthMethod::GoogleOauth,
+            data: session_data.clone(),
             requested_allow_writes,
         };
         let data = ParsedFirmEmployeeAssumeAuth::<false>(data);
-        let auth = SessionContext::create_fixture(data, session_data);
+        let auth = SessionContext::create_fixture(data, AuthSessionData::FirmEmployee(session_data));
         auth.token_scopes()
     }
 }

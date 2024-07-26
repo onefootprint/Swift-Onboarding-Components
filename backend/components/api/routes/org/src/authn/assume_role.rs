@@ -30,17 +30,18 @@ use paperclip::actix::web::Json;
 fn post(
     state: web::Data<State>,
     request: Json<AssumeRoleRequest>,
-    tenant_auth: AnyTenantSessionAuth,
+    auth: AnyTenantSessionAuth,
 ) -> ApiResponse<AssumeRoleResponse> {
     let AssumeRoleRequest { tenant_id } = request.into_inner();
-    let auth_method = tenant_auth.auth_method();
-    let tu_id = tenant_auth.clone().tenant_user_id()?;
+    let auth_method = auth.auth_method();
+    let purpose = auth.purpose();
+    let tu_id = auth.clone().tenant_user_id()?;
 
     let login_result = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method))
         .await?;
-    let session_data: AuthSessionData = TenantRbSession::create(&login_result).into();
+    let session_data: AuthSessionData = TenantRbSession::create(&login_result, purpose).into();
     let TenantRbLoginResult {
         t_user,
         rb,
@@ -54,7 +55,7 @@ fn post(
             return Err(AssertionError("expected tenant, found partner tenant").into());
         }
     };
-    let expires_at = tenant_auth.session().expires_at;
+    let expires_at = auth.session().expires_at;
     let session_sealing_key = state.session_sealing_key.clone();
     let token = state
         .db_pool

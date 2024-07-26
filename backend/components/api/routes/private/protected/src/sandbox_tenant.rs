@@ -35,6 +35,7 @@ pub async fn post(
     auth: FirmEmployeeAuthContext,
 ) -> ApiResponse<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
+    let purpose = auth.purpose;
     let SandboxTenantRequest {
         name,
         domains,
@@ -68,12 +69,12 @@ pub async fn post(
                 super_tenant_id,
             };
             let tenant = Tenant::create(conn, new_tenant)?;
-            // Update the auth session to be impersonating the newly created tenant
-            // TODO stop updating in place once the client starts using the new token
+            // Issue a new token to impersonate the new tenant
             let session = FirmEmployeeSession {
                 tenant_user_id,
                 tenant_id: tenant.id,
                 auth_method,
+                purpose,
             };
             let session = AuthSessionData::FirmEmployee(session);
             // The new token will expire at the same time as the existing token to prevent allowing

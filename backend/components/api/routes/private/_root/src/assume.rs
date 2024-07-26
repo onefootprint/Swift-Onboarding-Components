@@ -36,6 +36,7 @@ async fn post(
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let auth_method = auth.auth_method;
     let firm_employee = auth.tenant_user.clone();
+    let purpose = auth.purpose;
     let session_sealing_key = state.session_sealing_key.clone();
     let tenant_id = request.into_inner().tenant_id;
 
@@ -57,6 +58,7 @@ async fn post(
                 tenant_user_id: firm_employee.id,
                 tenant_id,
                 auth_method,
+                purpose,
             };
             let session = AuthSessionData::FirmEmployee(session);
             // The new token will expire at the same time as the existing token to prevent allowing

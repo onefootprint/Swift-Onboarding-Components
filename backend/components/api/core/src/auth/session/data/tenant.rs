@@ -4,8 +4,13 @@ use newtypes::FpId;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
 use newtypes::TenantRolebindingId;
+use newtypes::TenantSessionPurpose;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
+
+fn dashboard() -> TenantSessionPurpose {
+    TenantSessionPurpose::Dashboard
+}
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Basic auth used for dashboard sessions - this represents an authenticated TenantUser at a
@@ -14,13 +19,16 @@ pub struct TenantRbSession {
     pub tenant_rolebinding_id: TenantRolebindingId,
     /// The auth method used to log in via workos
     pub auth_method: WorkosAuthMethod,
+    #[serde(default = "dashboard")]
+    pub purpose: TenantSessionPurpose,
 }
 
 impl TenantRbSession {
-    pub fn create(login_info: &TenantRbLoginResult) -> Self {
+    pub fn create(login_info: &TenantRbLoginResult, purpose: TenantSessionPurpose) -> Self {
         Self {
             tenant_rolebinding_id: login_info.rb.id.clone(),
             auth_method: login_info.auth_method,
+            purpose,
         }
     }
 }
@@ -41,6 +49,8 @@ pub struct FirmEmployeeSession {
     pub tenant_id: TenantId,
     /// The auth method used to log in via workos
     pub auth_method: WorkosAuthMethod,
+    #[serde(default = "dashboard")]
+    pub purpose: TenantSessionPurpose,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

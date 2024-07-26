@@ -131,6 +131,8 @@ mod workos_auth_method;
 pub use workos_auth_method::*;
 mod action;
 pub use action::*;
+mod tenant_session_purpose;
+pub use tenant_session_purpose::*;
 mod verification_check;
 pub use verification_check::*;
 mod phone_intelligence;

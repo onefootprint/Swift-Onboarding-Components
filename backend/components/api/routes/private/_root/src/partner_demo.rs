@@ -26,6 +26,7 @@ use newtypes::TenantCompliancePartnershipId;
 use newtypes::TenantId;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
 use serde::Deserialize;
@@ -149,7 +150,8 @@ pub async fn post(
                         TenantRolebinding::create(conn, user.id.clone(), manager_role.id.clone(), &pt.id)?;
                     let login_result =
                         TenantRolebinding::login(conn, &manager_rb.id, WorkosAuthMethod::MagicLink)?;
-                    let session = TenantRbSession::create(&login_result).into();
+                    let session =
+                        TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard).into();
                     let (auth_token, _) =
                         AuthSession::create_sync(conn, &session_sealing_key, session, Duration::minutes(1))?;
 
@@ -220,7 +222,8 @@ pub async fn post(
                         )?;
                         let login_result =
                             TenantRolebinding::login(conn, &admin_rb.id, WorkosAuthMethod::MagicLink)?;
-                        let session = TenantRbSession::create(&login_result).into();
+                        let session =
+                            TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard).into();
                         let (auth_token, _) = AuthSession::create_sync(
                             conn,
                             &session_sealing_key,

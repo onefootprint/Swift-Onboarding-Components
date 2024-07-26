@@ -36,6 +36,7 @@ use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
 
@@ -49,15 +50,26 @@ pub type TenantOrPartnerTenantSessionAuth = Either<TenantSessionAuth, PartnerTen
 impl TenantSessionAuth {
     pub fn auth_method(&self) -> WorkosAuthMethod {
         match self {
-            Either::Left(l) => l.data.0.auth_method,
-            Either::Right(r) => r.data.0.auth_method,
+            Either::Left(l) => l.data.0.data.auth_method,
+            Either::Right(r) => r.data.0.data.auth_method,
+        }
+    }
+
+    pub fn purpose(&self) -> TenantSessionPurpose {
+        match self {
+            Either::Left(l) => l.data.0.data.purpose,
+            Either::Right(r) => r.data.0.data.purpose,
         }
     }
 }
 
 impl PartnerTenantSessionAuth {
     pub fn auth_method(&self) -> WorkosAuthMethod {
-        self.data.0.auth_method
+        self.data.0.data.auth_method
+    }
+
+    pub fn purpose(&self) -> TenantSessionPurpose {
+        self.data.0.data.purpose
     }
 }
 

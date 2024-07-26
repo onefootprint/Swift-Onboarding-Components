@@ -6,6 +6,7 @@ use super::SessionContext;
 use super::TenantSessionAuth;
 use super::WorkOsSessionData;
 use crate::FpResult;
+use newtypes::TenantSessionPurpose;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
 
@@ -15,6 +16,7 @@ pub type AnyPartnerTenantSessionAuth = Either<SessionContext<WorkOsSessionData>,
 pub trait AnyOrgSessionAuth {
     fn tenant_user_id(self) -> FpResult<TenantUserId>;
     fn auth_method(&self) -> WorkosAuthMethod;
+    fn purpose(&self) -> TenantSessionPurpose;
 }
 
 impl AnyOrgSessionAuth for AnyTenantSessionAuth {
@@ -39,6 +41,14 @@ impl AnyOrgSessionAuth for AnyTenantSessionAuth {
             Either::Right(r) => r.auth_method(),
         }
     }
+
+    fn purpose(&self) -> TenantSessionPurpose {
+        match self {
+            // Will remove this soon
+            Either::Left(_) => TenantSessionPurpose::Dashboard,
+            Either::Right(r) => r.purpose(),
+        }
+    }
 }
 
 impl AnyOrgSessionAuth for AnyPartnerTenantSessionAuth {
@@ -59,6 +69,13 @@ impl AnyOrgSessionAuth for AnyPartnerTenantSessionAuth {
         match self {
             Either::Left(l) => l.data.auth_method,
             Either::Right(r) => r.auth_method(),
+        }
+    }
+
+    fn purpose(&self) -> TenantSessionPurpose {
+        match self {
+            Either::Left(_) => TenantSessionPurpose::Dashboard,
+            Either::Right(r) => r.purpose(),
         }
     }
 }

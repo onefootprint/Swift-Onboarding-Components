@@ -1,6 +1,7 @@
 use super::AuthActor;
 use super::CanCheckTenantGuard;
 use super::PartnerTenantAuth;
+use crate::auth::session::tenant::TenantRbSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
@@ -15,7 +16,6 @@ use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::TenantScope;
-use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -27,9 +27,7 @@ pub struct PartnerTenantRbAuth {
     tenant_role: TenantRole,
     tenant_user: TenantUser,
     tenant_rolebinding: TenantRolebinding,
-    // TODO: this won't be dead code once we implement assume auth for partner tenants.
-    #[allow(dead_code)]
-    pub(super) auth_method: WorkosAuthMethod,
+    pub(super) data: TenantRbSession,
 }
 
 /// Nests a private PartnerTenantRbAuth and implements traits required to extract this session from
@@ -80,7 +78,7 @@ impl ExtractableAuthSession for ParsedPartnerTenantRbAuth {
             tenant_rolebinding: rb,
             tenant_role: tr,
             tenant_user: tu,
-            auth_method: data.auth_method,
+            data,
         }))
     }
 

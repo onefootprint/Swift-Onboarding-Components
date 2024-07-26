@@ -34,13 +34,14 @@ fn post(
     let AssumePartnerRoleRequest { partner_tenant_id } = request.into_inner();
     let auth_method = pt_auth.auth_method();
     let tu_id = pt_auth.clone().tenant_user_id()?;
+    let purpose = pt_auth.purpose();
 
     let login_result = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
         .await?;
 
-    let session_data = TenantRbSession::create(&login_result).into();
+    let session_data = TenantRbSession::create(&login_result, purpose).into();
     let TenantRbLoginResult {
         t_user,
         rb,
