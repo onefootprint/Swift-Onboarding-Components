@@ -13,7 +13,10 @@ export type PathProps = {
   type: string;
 };
 
-export type SecurityTypes = 'Secret API Key' | 'Client Token';
+export enum SecurityTypes {
+  apiKey = 'Secret API Key',
+  clientToken = 'Client Token',
+}
 
 export type ParameterProps = {
   description?: string;

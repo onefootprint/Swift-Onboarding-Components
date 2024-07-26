@@ -65,6 +65,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     isDomainAlreadyClaimed: false,
     companySize: null,
     parent: null,
+    allowedPreviewApis: [],
   },
   {
     id: 'org_hyZP3ksCvsT0AlLqMZsgrI',
@@ -83,6 +84,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     isDomainAlreadyClaimed: false,
     companySize: null,
     parent: null,
+    allowedPreviewApis: [],
   },
   {
     id: 'org_UT091oogB4RJv1QbBesp2h',
@@ -101,6 +103,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     isDomainAlreadyClaimed: false,
     companySize: null,
     parent: null,
+    allowedPreviewApis: [],
   },
 ];
 
@@ -145,6 +148,7 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     isDomainAlreadyClaimed: false,
     companySize: null,
     parent: null,
+    allowedPreviewApis: [],
   },
 };
 

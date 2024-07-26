@@ -136,7 +136,7 @@ def find_keys(node, key):
             yield node.get(key)
 
 
-def get_apis(open_api_spec, tag):
+def get_apis(open_api_spec, tags):
     """
     Replace the paths in the open API spec with only the public paths, and validate the tags for
     each endpoint.
@@ -153,7 +153,7 @@ def get_apis(open_api_spec, tag):
     used_entity_refs = set()
     used_security_schemes = set()
     for endpoint in endpoints:
-        if endpoint.identifying_tag == tag:
+        if endpoint.identifying_tag in tags:
             paths_dict[endpoint.url][endpoint.method] = endpoint.path_info
             used_entity_refs |= set(endpoint.schemas)
             used_security_schemes |= set(
@@ -196,14 +196,14 @@ if __name__ == "__main__":
     open_api_spec = requests.get(f"{BASE_URL}/docs-spec-v3").json()
 
     specs = [
-        ("PublicApi", "api-docs.json"),
-        ("Preview", "api-preview-docs.json"),
-        ("PhasedOut", "phased-out-api-docs.json"),
-        ("Hosted", "hosted-api-docs.json"),
-        ("Private", "private-api-docs.json"),
+        (["PublicApi"], "api-docs.json"),
+        (["Preview", "PhasedOut"], "api-preview-docs.json"),
+        (["PhasedOut"], "phased-out-api-docs.json"),
+        (["Hosted"], "hosted-api-docs.json"),
+        (["Private"], "private-api-docs.json"),
     ]
-    for tag, file_name in specs:
-        spec = get_apis(open_api_spec, tag)
+    for tags, file_name in specs:
+        spec = get_apis(open_api_spec, tags)
         with open(f"{path}/{file_name}", "w") as f:
             f.write(json.dumps(spec, indent=4))
             f.close()

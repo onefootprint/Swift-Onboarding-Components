@@ -21,6 +21,7 @@ export const orgFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const RolesFixture: Role[] = [

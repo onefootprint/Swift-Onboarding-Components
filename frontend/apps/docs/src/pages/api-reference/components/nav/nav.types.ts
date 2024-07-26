@@ -1,4 +1,4 @@
-import type { Article } from '../../api-reference.types';
+import { HydratedArticle } from '../../hooks';
 
 export type SupportFormData = {
   [FormField.name]: string;
@@ -32,5 +32,5 @@ export type PageNavProps = {
 export type PageNavSection = {
   title: string;
   isPreview: boolean;
-  articles: Article[];
+  articles: HydratedArticle[];
 };

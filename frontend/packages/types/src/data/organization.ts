@@ -1,3 +1,5 @@
+import { TenantPreviewApi } from '../api/get-tenants';
+
 export enum OrganizationSize {
   s1_to10 = `s1_to10`,
   s11_to50 = `s11_to50`,
@@ -22,6 +24,7 @@ export type Organization = {
   supportPhone?: string | null;
   supportWebsite?: string | null;
   parent: ParentOrganization | null;
+  allowedPreviewApis: TenantPreviewApi[];
 };
 
 export type ParentOrganization = {

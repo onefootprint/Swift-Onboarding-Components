@@ -1,11 +1,13 @@
-import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Badge, Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
-import type { Article as ApiReferenceArticle, SecurityTypes } from '@/api-reference/api-reference.types';
+import type { SecurityTypes } from '@/api-reference/api-reference.types';
 
+import useSession from 'src/hooks/use-session';
+import { HydratedArticle } from 'src/pages/api-reference/hooks';
 import TypeBadge from '../../../type-badge/type-badge';
 import DemoCode from './components/demo-code';
 import Description from './components/description';
@@ -17,7 +19,7 @@ import Security from './components/security';
 const API_BASE_URL = 'api.onefootprint.com';
 
 type ArticleProps = {
-  article: ApiReferenceArticle;
+  article: HydratedArticle;
 };
 
 const CONTENT_WIDTH = 900;
@@ -26,6 +28,13 @@ const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const { id, parameters, description, method, path, security, responses, requestBody } = article;
   const encodedId = encodeURIComponent(id);
+  const {
+    data: { user },
+  } = useSession();
+
+  if (article.isHidden) {
+    return null;
+  }
 
   return (
     <ArticleContainer id={encodedId} name={encodedId}>
@@ -41,6 +50,8 @@ const Article = ({ article }: ArticleProps) => {
                     {path}
                   </Text>
                 </Stack>
+                {/* TODO improve this badge. Show when API is preview, show when can see only because firm employee */}
+                {article.isPhasedOut && user?.isFirmEmployee ? <Badge variant="neutral">Deprecated</Badge> : null}
               </MethodContainer>
             )}
             {description && <Description>{description}</Description>}

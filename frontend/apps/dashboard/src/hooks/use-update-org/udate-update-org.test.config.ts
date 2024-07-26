@@ -14,6 +14,7 @@ export const organizationFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const withUpdateOrg = (newOrg: Partial<Organization>) =>

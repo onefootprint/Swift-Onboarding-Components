@@ -6,11 +6,11 @@ import styled, { css } from 'styled-components';
 
 import staticAPIData from './assets/api-docs.json';
 import staticPreviewAPIData from './assets/api-preview-docs.json';
-import phasedOutApiData from './assets/phased-out-api-docs.json';
 import Articles from './components/articles/articles';
 import Cmd from './components/cmd';
 import DesktopPageNav from './components/nav/desktop-page-nav';
 import MobilePageNav from './components/nav/mobile-page-nav';
+import useHydrateArticles from './hooks/use-hydrate-articles';
 import getArticles from './utils/get-articles';
 
 const staticArticles = getArticles(staticAPIData);
@@ -18,17 +18,19 @@ const staticPreviewArticles = getArticles(staticPreviewAPIData);
 
 const ApiReference = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
+  const articles = useHydrateArticles(staticArticles);
+  const previewArticles = useHydrateArticles(staticPreviewArticles);
 
   const sections = [
     {
       title: t('sections.footprint-api'),
       isPreview: false,
-      articles: staticArticles,
+      articles,
     },
     {
       title: t('sections.footprint-api-preview'),
       isPreview: true,
-      articles: staticPreviewArticles,
+      articles: previewArticles,
     },
   ];
 

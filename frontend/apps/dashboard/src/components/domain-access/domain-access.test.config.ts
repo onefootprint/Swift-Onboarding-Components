@@ -14,6 +14,7 @@ export const orgAllowDomainFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const orgEnabledAllowDomainAccessFixture: Organization = {
@@ -29,6 +30,7 @@ export const orgEnabledAllowDomainAccessFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const orgDomainAlreadyClaimed: Organization = {
@@ -44,6 +46,7 @@ export const orgDomainAlreadyClaimed: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const withOrgUpdate = () =>

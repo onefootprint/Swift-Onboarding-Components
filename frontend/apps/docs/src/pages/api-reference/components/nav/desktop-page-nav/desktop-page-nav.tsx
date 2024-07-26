@@ -1,13 +1,12 @@
 import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
 import { Divider, Stack, ThemeToggle, Tooltip, createFontStyles, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 import styled, { css } from 'styled-components';
 
-import type { Article } from '../../../api-reference.types';
 import TypeBadge from '../../type-badge';
 import NavigationScrollLink from '../components/navigation-scroll-link';
 import { PageNavProps } from '../nav.types';

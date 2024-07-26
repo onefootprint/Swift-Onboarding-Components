@@ -17,6 +17,7 @@ export const organizationFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
   parent: null,
+  allowedPreviewApis: [],
 };
 
 export const organizationDataLabels = [

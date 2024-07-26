@@ -7,15 +7,18 @@ import hostedApiData from '../api-reference/assets/hosted-api-docs.json';
 import privateApiData from '../api-reference/assets/private-api-docs.json';
 import Articles from '../api-reference/components/articles/articles';
 import PageNav from '../api-reference/components/nav/desktop-page-nav';
+import useHydrateArticles from '../api-reference/hooks/use-hydrate-articles';
 import getArticles from '../api-reference/utils/get-articles';
 
-const hostedArticles = getArticles(hostedApiData);
-const privateArticles = getArticles(privateApiData);
+const staticHostedArticles = getArticles(hostedApiData);
+const staticPrivateArticles = getArticles(privateApiData);
 
 const ApiReference = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.internal-api-reference',
   });
+  const hostedArticles = useHydrateArticles(staticHostedArticles);
+  const privateArticles = useHydrateArticles(staticPrivateArticles);
   const sections = [
     {
       title: t('sections.hosted'),
