@@ -12,6 +12,7 @@ use api_core::task;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
@@ -136,19 +137,14 @@ pub async fn post(
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, true)?;
 
             // Check requirements for this Business vault w.r.t the OBC
-            let reqs = api_core::utils::requirements::get_requirements_inner(
-                conn,
-                bvw,
-                &obc,
-                &biz_wf,
-                decrypted_values,
-                RequirementOpts::default(),
-            )?;
+            let opts = RequirementOpts::default();
+            let reqs = get_requirements_inner(conn, bvw, &obc, &biz_wf, decrypted_values, opts, &[])?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()
                 .filter(|r| !r.is_met())
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
+                .filter(|r| !matches!(r, OnboardingRequirement::RegisterAuthMethod { .. }))
                 .collect_vec();
             if !unmet_reqs.is_empty() {
                 let err = TfError::PlaybookMissingRequirements(

@@ -370,8 +370,8 @@ pub async fn adhoc_document_process(
     let unmet_requirements: Vec<_> = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let reqs =
-                get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
+            let opts = RequirementOpts::default();
+            let reqs = get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, opts, &[])?;
             Ok(reqs)
         })
         .await?

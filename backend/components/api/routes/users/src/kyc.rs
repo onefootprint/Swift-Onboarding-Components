@@ -170,13 +170,14 @@ pub async fn post(
             // /kyc endpoint currently does not properly handle IPK doc requirements!
             // Also does not check any requirements for the Business vault if this person is a primary BO for
             // a Business
-            let reqs =
-                get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
+            let opts = RequirementOpts::default();
+            let reqs = get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, opts, &[])?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()
                 .filter(|r| !r.is_met())
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
+                .filter(|r| !matches!(r, OnboardingRequirement::RegisterAuthMethod { .. }))
                 .filter(|r| {
                     !allow_skipping_phone_email_reqs
                         || !r.is_missing_collect_data_subset(&[

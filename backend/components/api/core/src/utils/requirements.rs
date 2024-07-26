@@ -1,5 +1,9 @@
 use super::vault_wrapper::Any;
+use crate::auth::session::user::AssociatedAuthEvent;
+use crate::auth::user::load_auth_events;
 use crate::auth::user::CheckUserWfAuthContext;
+use crate::auth::user::UserIdentifier;
+use crate::utils::identify::get_user_auth_methods;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
@@ -19,6 +23,7 @@ use feature_flag::BoolFlag;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
+use newtypes::AuthEventKind;
 use newtypes::AuthorizeFields;
 use newtypes::BusinessOwnerSource;
 use newtypes::CollectDocumentConfig;
@@ -51,6 +56,7 @@ pub struct GetRequirementsArgs {
     pub person_workflow: Workflow,
     pub business_sv: Option<ScopedVaultId>,
     pub biz_wf_id: Option<WorkflowId>,
+    pub auth_events: Vec<AssociatedAuthEvent>,
 }
 
 impl GetRequirementsArgs {
@@ -60,6 +66,7 @@ impl GetRequirementsArgs {
             person_workflow: value.workflow().clone(),
             business_sv: value.scoped_business_id(),
             biz_wf_id: value.business_workflow_id(),
+            auth_events: value.user_session.auth_events.clone(),
         })
     }
 }
@@ -113,6 +120,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
         person_workflow,
         business_sv,
         biz_wf_id,
+        auth_events,
     } = args;
 
     let su_id = person_workflow.scoped_vault_id.clone();
@@ -140,12 +148,11 @@ pub async fn get_requirements_for_person_and_maybe_business(
         None
     };
 
+    let require_capture_on_stepup = state
+        .ff_client
+        .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key));
     let person_requirement_opts = RequirementOpts {
-        require_capture_on_stepup: Some(
-            state
-                .ff_client
-                .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key)),
-        ),
+        require_capture_on_stepup: Some(require_capture_on_stepup),
     };
 
     let requirements = state
@@ -158,6 +165,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 &person_workflow,
                 person_decrypted_values,
                 person_requirement_opts,
+                &auth_events,
             )?;
 
 
@@ -173,6 +181,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                         &business_workflow,
                         business_decrypted_values,
                         RequirementOpts::default(),
+                        &[],
                     )?
                 } else {
                     vec![]
@@ -306,6 +315,7 @@ pub fn get_requirements_inner(
     wf: &Workflow,
     decrypted_values: DecryptUncheckedResultForReqs,
     opts: RequirementOpts,
+    aes: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = wf.state.relevant_requirements();
@@ -314,7 +324,7 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values, &opts))
+        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values, &opts, aes))
         .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .flatten()
@@ -357,6 +367,7 @@ pub fn get_requirements_inner(
 }
 
 /// Generates a requirement of the given kind `k`, if one exists.
+#[allow(clippy::too_many_arguments)]
 fn get_requirement_inner(
     k: OnboardingRequirementKind,
     conn: &mut PgConn,
@@ -365,8 +376,37 @@ fn get_requirement_inner(
     wf: &Workflow,
     decrypted_values: &DecryptUncheckedResultForReqs,
     opts: &RequirementOpts,
+    auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let req = match k {
+        // No need to generate RegisterAuthMethod requirements for business vaults
+        OnboardingRequirementKind::RegisterAuthMethod => {
+            let auth_events = load_auth_events(conn, auth_events)?;
+            if auth_events
+                .iter()
+                .any(|(ae, _)| ae.kind == AuthEventKind::ThirdParty)
+            {
+                // Third-party auth won't register an auth method, so we should waive the requirement that
+                // the playbook's auth methods are met.
+                // Perhaps when we start having more proper use of 3p auth from apiture we should actually
+                // mark the phone as verified
+                return Ok(vec![]);
+            }
+
+            let identifier = UserIdentifier::ScopedVault(wf.scoped_vault_id.clone());
+            let ctx = get_user_auth_methods(conn, identifier, None)?;
+            let verified_auth_methods = ctx
+                .auth_methods
+                .into_iter()
+                .filter(|am| am.is_verified)
+                .map(|am| am.kind)
+                .collect_vec();
+            let required_auth_methods = obc.required_auth_methods.iter().flatten().copied();
+            required_auth_methods
+                .filter(|amk| !verified_auth_methods.contains(amk))
+                .map(|auth_method_kind| OnboardingRequirement::RegisterAuthMethod { auth_method_kind })
+                .collect()
+        }
         OnboardingRequirementKind::CollectData => {
             obc.must_collect(DID::Id)
                 .then(|| {

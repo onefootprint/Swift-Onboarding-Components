@@ -1,3 +1,4 @@
+use crate::AuthMethodKind;
 use crate::CollectedDataOption;
 use crate::CustomDocumentConfig;
 use crate::DocumentKind;
@@ -20,6 +21,9 @@ use strum::EnumDiscriminants;
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingRequirement {
+    RegisterAuthMethod {
+        auth_method_kind: AuthMethodKind,
+    },
     /// There is missing identity data that must be collected
     CollectData {
         missing_attributes: Vec<CollectedDataOption>,
@@ -41,6 +45,8 @@ pub enum OnboardingRequirement {
     #[serde(rename = "liveness")]
     #[strum(to_string = "liveness")]
     #[strum_discriminants(strum(to_string = "liveness"))]
+    // Could eventually consolidate with RegisterAuthMethod, but that has different semantics in that it's
+    // unable to be skipped
     RegisterPasskey,
     /// A document needs to be collected
     CollectDocument {
@@ -95,36 +101,38 @@ impl OnboardingRequirement {
     pub fn priority(&self, is_doc_first: bool) -> OnboardingRequirementPriority {
         let priority = if !is_doc_first {
             match self {
-                OnboardingRequirement::CollectBusinessData { .. } => 0,
-                OnboardingRequirement::CollectData { .. } => 1,
-                OnboardingRequirement::CollectInvestorProfile { .. } => 2,
+                OnboardingRequirement::RegisterAuthMethod { .. } => 0,
+                OnboardingRequirement::CollectBusinessData { .. } => 1,
+                OnboardingRequirement::CollectData { .. } => 2,
+                OnboardingRequirement::CollectInvestorProfile { .. } => 3,
 
-                OnboardingRequirement::RegisterPasskey => 3,
+                OnboardingRequirement::RegisterPasskey => 4,
                 OnboardingRequirement::CollectDocument { config, .. } => match config {
-                    CollectDocumentConfig::Identity { .. } => 4,
-                    CollectDocumentConfig::ProofOfSsn { .. } => 5,
-                    CollectDocumentConfig::ProofOfAddress { .. } => 6,
-                    CollectDocumentConfig::Custom(..) => 7,
+                    CollectDocumentConfig::Identity { .. } => 5,
+                    CollectDocumentConfig::ProofOfSsn { .. } => 6,
+                    CollectDocumentConfig::ProofOfAddress { .. } => 7,
+                    CollectDocumentConfig::Custom(..) => 8,
                 },
-                OnboardingRequirement::Authorize { .. } => 8,
-                OnboardingRequirement::Process => 9,
+                OnboardingRequirement::Authorize { .. } => 9,
+                OnboardingRequirement::Process => 10,
             }
         } else {
             // For a doc-first config, we show passkey and doc collection first
             match self {
-                OnboardingRequirement::RegisterPasskey => 0,
+                OnboardingRequirement::RegisterAuthMethod { .. } => 0,
+                OnboardingRequirement::RegisterPasskey => 1,
                 OnboardingRequirement::CollectDocument { config, .. } => match config {
-                    CollectDocumentConfig::Identity { .. } => 1,
-                    CollectDocumentConfig::ProofOfSsn { .. } => 2,
-                    CollectDocumentConfig::ProofOfAddress { .. } => 3,
-                    CollectDocumentConfig::Custom(..) => 4,
+                    CollectDocumentConfig::Identity { .. } => 2,
+                    CollectDocumentConfig::ProofOfSsn { .. } => 3,
+                    CollectDocumentConfig::ProofOfAddress { .. } => 4,
+                    CollectDocumentConfig::Custom(..) => 5,
                 },
-                OnboardingRequirement::CollectBusinessData { .. } => 5,
-                OnboardingRequirement::CollectData { .. } => 6,
-                OnboardingRequirement::CollectInvestorProfile { .. } => 7,
+                OnboardingRequirement::CollectBusinessData { .. } => 6,
+                OnboardingRequirement::CollectData { .. } => 7,
+                OnboardingRequirement::CollectInvestorProfile { .. } => 8,
 
-                OnboardingRequirement::Authorize { .. } => 8,
-                OnboardingRequirement::Process => 9,
+                OnboardingRequirement::Authorize { .. } => 9,
+                OnboardingRequirement::Process => 10,
             }
         };
         let tie_breaker = if let OnboardingRequirement::CollectDocument {
@@ -146,6 +154,7 @@ impl OnboardingRequirement {
 impl OnboardingRequirement {
     pub fn is_met(&self) -> bool {
         match self {
+            Self::RegisterAuthMethod { .. } => false,
             Self::CollectData {
                 missing_attributes,
                 optional_attributes: _,
@@ -178,6 +187,9 @@ impl OnboardingRequirement {
     /// The human-readable error describing why this requirement is unmet
     pub fn unmet_str(&self) -> String {
         match self {
+            Self::RegisterAuthMethod { auth_method_kind } => {
+                format!("Requires registering {} as an auth method", auth_method_kind)
+            }
             Self::CollectData {
                 missing_attributes: cdos,
                 optional_attributes: _,
@@ -238,6 +250,7 @@ pub struct AuthorizeFields {
 
 #[cfg(test)]
 mod test {
+    use crate::AuthMethodKind;
     use crate::AuthorizeFields;
     use crate::CollectDocumentConfig;
     use crate::CustomDocumentConfig;
@@ -255,6 +268,9 @@ mod test {
 
     fn test_requirements() -> Vec<OnboardingRequirement> {
         let mut base = vec![
+            OnboardingRequirement::RegisterAuthMethod {
+                auth_method_kind: AuthMethodKind::Email,
+            },
             OnboardingRequirement::CollectBusinessData {
                 missing_attributes: vec![],
                 populated_attributes: vec![],
