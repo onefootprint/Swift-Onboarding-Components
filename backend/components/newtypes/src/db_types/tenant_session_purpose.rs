@@ -46,7 +46,7 @@ impl TenantSessionPurpose {
     pub fn allow_generating(&self, new_purpose: Self) -> bool {
         let can_generate = match self {
             Self::Dashboard => vec![Self::Dashboard, Self::Docs],
-            Self::Docs => vec![Self::Docs],
+            Self::Docs => vec![],
         };
         can_generate.contains(&new_purpose)
     }
