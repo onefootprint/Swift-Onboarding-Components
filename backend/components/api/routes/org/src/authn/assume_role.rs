@@ -3,6 +3,7 @@ use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::AnyOrgSessionAuth;
 use api_core::auth::tenant::AnyTenantSessionAuth;
+use api_core::auth::AuthError;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -16,6 +17,7 @@ use api_wire_types::OrganizationMember;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
+use newtypes::TenantSessionPurpose;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -32,10 +34,14 @@ fn post(
     request: Json<AssumeRoleRequest>,
     auth: AnyTenantSessionAuth,
 ) -> ApiResponse<AssumeRoleResponse> {
-    let AssumeRoleRequest { tenant_id } = request.into_inner();
+    let AssumeRoleRequest { tenant_id, purpose } = request.into_inner();
     let auth_method = auth.auth_method();
-    let purpose = auth.purpose();
     let tu_id = auth.clone().tenant_user_id()?;
+
+    let purpose = purpose.unwrap_or(TenantSessionPurpose::Dashboard);
+    if !auth.purpose().allow_generating(purpose) {
+        return Err(AuthError::AuthTokenPurposeRestricted.into());
+    }
 
     let login_result = state
         .db_pool

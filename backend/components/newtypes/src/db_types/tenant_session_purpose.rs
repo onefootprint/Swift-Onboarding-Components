@@ -1,4 +1,5 @@
 use super::TenantScope;
+use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 use strum_macros::EnumString;
 
@@ -12,7 +13,10 @@ use strum_macros::EnumString;
     Copy,
     Eq,
     PartialEq,
+    Apiv2Schema,
+    macros::SerdeAttr,
 )]
+#[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 pub enum TenantSessionPurpose {
     Dashboard,
@@ -35,5 +39,15 @@ impl TenantSessionPurpose {
                 _ => vec![],
             },
         }
+    }
+
+    /// Returns true if the current auth method's purpose supports generating a new token with the
+    /// provided `new_purpose`.
+    pub fn allow_generating(&self, new_purpose: Self) -> bool {
+        let can_generate = match self {
+            Self::Dashboard => vec![Self::Dashboard, Self::Docs],
+            Self::Docs => vec![Self::Docs],
+        };
+        can_generate.contains(&new_purpose)
     }
 }

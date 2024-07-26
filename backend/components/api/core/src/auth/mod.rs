@@ -44,6 +44,8 @@ pub enum AuthError {
     SandboxRestricted,
     #[error("Not allowed: docs site cannot access production data")]
     DocsTokenSandboxRestricted,
+    #[error("Not allowed: cannot create a session with the requested purpose")]
+    AuthTokenPurposeRestricted,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingUserPermission(String),
     #[error("Not allowed without business")]
@@ -88,6 +90,7 @@ impl api_errors::FpErrorTrait for AuthError {
             AuthError::SessionTypeError => StatusCode::UNAUTHORIZED,
             AuthError::SandboxRestricted => StatusCode::FORBIDDEN,
             AuthError::DocsTokenSandboxRestricted => StatusCode::FORBIDDEN,
+            AuthError::AuthTokenPurposeRestricted => StatusCode::FORBIDDEN,
             AuthError::MissingUserPermission(_) => StatusCode::FORBIDDEN,
             AuthError::MissingBusiness => StatusCode::FORBIDDEN,
             AuthError::MissingWorkflow => StatusCode::FORBIDDEN,
