@@ -1,4 +1,5 @@
 use crate::AdverseMediaListKind;
+use crate::PhoneLookupAttributes;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
@@ -47,4 +48,7 @@ pub enum VerificationCheck {
     IdentityDocument {},
     StytchDevice {},
     NeuroId {},
+    Phone {
+        attributes: Vec<PhoneLookupAttributes>,
+    },
 }
