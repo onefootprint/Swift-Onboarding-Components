@@ -5,6 +5,9 @@ on:
       pull_request_head_sha:
         type: string
         required: true
+      pull_request_number:
+        type: number
+        required: true
       image_tag:
         type: string
         required: true
@@ -52,10 +55,7 @@ jobs:
           git --version
           code_hash="$(git log -n 1 --format="%h" ./)"
 
-          # Keep these in sync with .github/labeler.yml If they get out of
-          # sync, ephemeral stacks may not get cleaned up.
-          # TODO: find a better way to synchronize them
-          infra_hash="$(git log -n 1 --format="%h" ./backend/infra ./backend/images/enclave ./backend/images/enclave-proxy ./.github/workflows/backend_deploy.yml ./.github/workflows/backend_deploy_ephemeral.yml)"
+          infra_hash="$(git log -n 1 --format="%h" ./backend/infra ':(exclude)backend/infra/Pulumi.prod.yaml' ':(exclude)backend/infra/src/alerts' ./backend/images/enclave ./backend/images/enclave-proxy ./.github/workflows/backend_deploy.yml ./.github/workflows/backend_deploy_ephemeral.yml)"
           infra_db_hash="$(git log -n 1 --format="%h" ./backend/infra/src/db.ts)"
 
           echo "code=${code_hash} infra=${infra_hash}"
@@ -70,6 +70,31 @@ jobs:
           else
             echo "ephemeral=false" >> $GITHUB_OUTPUT
           fi
+
+  label_pr:
+    needs: [detect_ephemeral_stack]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      # https://github.com/cli/cli/discussions/5307
+      repository-projects: read
+    steps:
+      - name: Label FastEphemeral
+        if: ${{ needs.detect_ephemeral_stack.outputs.hasInfraChanges == 'true' && needs.detect_ephemeral_stack.outputs.needsFullInfra == 'false' }}
+        run: gh pr edit "$PR_NUMBER" --add-label "$LABEL"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: FastEphemeral
+      - name: Label FastEphemeral
+        if: ${{ needs.detect_ephemeral_stack.outputs.hasInfraChanges == 'true' && needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true' }}
+        run: gh pr edit "$PR_NUMBER" --add-label "$LABEL"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: FullEphemeral
 
   deploy_ephemeral_stack:
     name: Deploy ephemeral
@@ -86,7 +111,7 @@ jobs:
       createStack: true
       stackName: 'dev-${{ needs.detect_ephemeral_stack.outputs.stackName }}'
       prefixDomain: 'api-${{ needs.detect_ephemeral_stack.outputs.stackName }}.'
-      useNeonDB: ${{ !contains(github.event.pull_request.labels.*.name, 'FullEphemeral') && !(needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true') }}
+      useNeonDB: ${{ contains(github.event.pull_request.labels.*.name, 'FullEphemeral') || (needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true') }}
       useEphemeralHoneycombApiKey: true
       # We deploy the images built for the PR HEAD commit to ephemeral.
       apiComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}

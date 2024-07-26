@@ -28,19 +28,6 @@ Enclave:
     - any-glob-to-any-file:
       - backend/components/enclave/**
 
-FastEphemeral:
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'backend/infra/**'
-      - 'backend/images/enclave/**'
-      - 'backend/images/enclave-proxy/**'
-      - '.github/workflows/backend_deploy.yml'
-
-FullEphemeral:
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'backend/infra/src/db.ts'
-
 Mobile:
   - changed-files:
     - any-glob-to-any-file:

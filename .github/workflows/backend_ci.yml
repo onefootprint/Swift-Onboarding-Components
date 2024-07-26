@@ -426,6 +426,7 @@ jobs:
     secrets: inherit
     with:
       pull_request_head_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      pull_request_number: ${{ github.event.pull_request.number }}
       image_tag: ${{ needs.build_images.outputs.image_tag }}
 
   deploy-and-test-dev:
