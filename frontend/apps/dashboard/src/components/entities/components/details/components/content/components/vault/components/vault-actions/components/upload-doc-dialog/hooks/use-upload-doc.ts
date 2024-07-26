@@ -2,7 +2,7 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import type { CustomDocumentIdentifier } from '@onefootprint/types';
 import { DataKind } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
+import { detectMimeType, useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -21,13 +21,15 @@ const uploadDoc = async (authHeaders: AuthHeaders, { entityId, identifier, file 
   const arrayBuffer = await file.arrayBuffer();
   const rawImage = new Uint8Array(arrayBuffer);
 
+  const mimeType = detectMimeType(Buffer.from(rawImage));
+
   const response = await request({
     method: 'POST',
     url: `/entities/${entityId}/vault/${identifier}/upload`,
     data: rawImage,
     headers: {
       ...authHeaders,
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': mimeType,
     },
   });
 
