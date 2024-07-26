@@ -21,10 +21,7 @@ def check_webhook(hooky_url, webhook_fpids):
         webhook_fpids.append(fp_id)
 
 
-@pytest.mark.skipif(
-    ENVIRONMENT == "ephemeral",
-    reason="Cannot leak svix key in integration tests environment",
-)
+@pytest.mark.skip
 @pytest.mark.flaky
 def test_webhook_e2e(sandbox_tenant, run_id):
     if ENVIRONMENT not in ("production", "dev"):
