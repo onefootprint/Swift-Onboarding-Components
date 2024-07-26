@@ -23947,7 +23947,7 @@
                 "type": "object",
                 "properties": {
                     "auth_token": {
-                        "description": "If the email is associated with one tenant, a long-lived TenantRbAuth token to perform\n actions on the dashboard. If the email is associated with multiple tenants, a a\n short-lived WorkOsAuth token that can be used to select the tenant as which to auth.",
+                        "description": "An cryptographically generated auth token to authenticate a session",
                         "type": "string"
                     },
                     "created_new_tenant": {
@@ -23956,6 +23956,10 @@
                     },
                     "is_first_login": {
                         "description": "Whether this user has logged into this tenant before",
+                        "type": "boolean"
+                    },
+                    "is_missing_requested_org": {
+                        "description": "True when a `request_org_id` was provided but the user doesn't have a matching rolebinding\n for that org_id",
                         "type": "boolean"
                     },
                     "partner_tenant": {
@@ -24120,7 +24124,7 @@
                         ]
                     },
                     "user": {
-                        "description": "Populated when we have logged into a TenantUser",
+                        "description": "Member of an organization",
                         "type": "object",
                         "properties": {
                             "created_at": {
@@ -24243,7 +24247,9 @@
                     "auth_token",
                     "created_new_tenant",
                     "is_first_login",
-                    "requires_onboarding"
+                    "is_missing_requested_org",
+                    "requires_onboarding",
+                    "user"
                 ]
             },
             "OrgMetricsResponse": {

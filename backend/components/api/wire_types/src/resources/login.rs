@@ -28,12 +28,11 @@ pub struct OrgLoginResponse {
     /// Whether tenant onboarding is still incomplete and we need to collect more info on the tenant
     /// from the user
     pub requires_onboarding: bool,
-    /// If the email is associated with one tenant, a long-lived TenantRbAuth token to perform
-    /// actions on the dashboard. If the email is associated with multiple tenants, a a
-    /// short-lived WorkOsAuth token that can be used to select the tenant as which to auth.
+    /// True when a `request_org_id` was provided but the user doesn't have a matching rolebinding
+    /// for that org_id
+    pub is_missing_requested_org: bool,
     pub auth_token: SessionAuthToken,
-    /// Populated when we have logged into a TenantUser
-    pub user: Option<OrganizationMember>,
+    pub user: OrganizationMember,
     pub tenant: Option<Organization>,
     pub partner_tenant: Option<PartnerOrganization>,
 }

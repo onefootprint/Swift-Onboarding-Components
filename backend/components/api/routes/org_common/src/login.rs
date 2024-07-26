@@ -1,9 +1,8 @@
 use actix_web::web;
 use api_core::auth::session::tenant::TenantRbSession;
-use api_core::auth::session::tenant::WorkOsSession;
-use api_core::auth::session::AuthSessionData;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::workos::WorkOsError;
+use api_core::errors::AssertionError;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::email_domain;
 use api_core::utils::session::AuthSession;
@@ -138,87 +137,71 @@ where
     };
 
     //
-    // Determine if there's only one rolebinding to log into
+    // Log into the requested rolebinding, otherwise the most recently used rolebinding
     //
 
-    let single_rb_and_t_pt = if let Some(org_id) = request_org_id.as_ref() {
-        // If a specific tenant ID was requested, only log into that tenant
-        matching_rolebindings
-            .into_iter()
-            .find(|(_, t_pt)| t_pt.id() == org_id.into())
-        // .find(|(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id ==
-        // org_id))
-    } else {
-        // If there's only one rolebinding for this user, log into it
-        (matching_rolebindings.len() == 1)
-            .then_some(matching_rolebindings.into_iter().next())
-            .flatten()
+    let (is_missing_requested_org, requested_rb) = match request_org_id {
+        Some(org_id) => {
+            let matching_rb = matching_rolebindings
+                .iter()
+                .find(|(_, t_pt)| t_pt.id() == (&org_id).into())
+                .cloned();
+            (matching_rb.is_none(), matching_rb)
+        }
+        None => (false, None),
     };
+    let most_recently_logged_into_rb = matching_rolebindings
+        .into_iter()
+        .max_by_key(|(rb, _)| (rb.last_login_at, rb.id.clone()));
+
+    let (rb, t_pt) = requested_rb
+        .or(most_recently_logged_into_rb)
+        .ok_or(AssertionError("User has no roles to log into"))?;
 
     //
     // Compose the with a token that has either logged into the single rolebinding OR with a token
     // that allows selecting amongst a list of available rolebindings
     //
 
-    let resp = if let Some((rb, t_pt)) = single_rb_and_t_pt {
-        // Log into the single user, updating the last_login_at and name (if new)
-        let login_result = state
-            .db_pool
-            .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
-            .await?;
+    let login_result = state
+        .db_pool
+        .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
+        .await?;
 
-        let session = TenantRbSession::create(&login_result).into();
-        let TenantRbLoginResult {
-            t_user,
-            rb,
-            role,
-            is_first_login,
-            ..
-        } = login_result;
-        let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
+    let session = TenantRbSession::create(&login_result).into();
+    let TenantRbLoginResult {
+        t_user,
+        rb,
+        role,
+        is_first_login,
+        ..
+    } = login_result;
+    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
 
-        let requires_onboarding = match &t_pt {
-            TenantOrPartnerTenant::Tenant(tenant) => {
-                role.scopes.contains(&TenantScope::Admin)
-                    && (tenant.website_url.is_none() || tenant.company_size.is_none())
-            }
-            TenantOrPartnerTenant::PartnerTenant(_) => false,
-        };
-
-        let (tenant, partner_tenant) = match t_pt {
-            TenantOrPartnerTenant::Tenant(tenant) => (Some(Organization::from_db(tenant)), None),
-            TenantOrPartnerTenant::PartnerTenant(partner_tenant) => {
-                (None, Some(PartnerOrganization::from_db(partner_tenant)))
-            }
-        };
-
-        OrgLoginResponse {
-            auth_token,
-            created_new_tenant,
-            is_first_login,
-            requires_onboarding,
-            user: Some(OrganizationMember::from_db((t_user, rb, role))),
-            tenant,
-            partner_tenant,
+    let requires_onboarding = match &t_pt {
+        TenantOrPartnerTenant::Tenant(tenant) => {
+            role.scopes.contains(&TenantScope::Admin)
+                && (tenant.website_url.is_none() || tenant.company_size.is_none())
         }
-    } else {
-        // If not exactly one rolebinding, create a WorkOsSession that just shows the email that
-        // was proven to be owned. This lets the user choose which tenant they'd like to log into
-        let session = AuthSessionData::WorkOs(WorkOsSession {
-            tenant_user_id: user.id,
-            auth_method,
-        });
-        let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
-        // Save tenant login in session data into the DB
-        OrgLoginResponse {
-            auth_token,
-            created_new_tenant,
-            is_first_login: false,
-            requires_onboarding: false,
-            user: None,
-            tenant: None,
-            partner_tenant: None,
+        TenantOrPartnerTenant::PartnerTenant(_) => false,
+    };
+
+    let (tenant, partner_tenant) = match t_pt {
+        TenantOrPartnerTenant::Tenant(tenant) => (Some(Organization::from_db(tenant)), None),
+        TenantOrPartnerTenant::PartnerTenant(partner_tenant) => {
+            (None, Some(PartnerOrganization::from_db(partner_tenant)))
         }
+    };
+
+    let resp = OrgLoginResponse {
+        auth_token,
+        created_new_tenant,
+        is_first_login,
+        requires_onboarding,
+        user: OrganizationMember::from_db((t_user, rb, role)),
+        tenant,
+        partner_tenant,
+        is_missing_requested_org,
     };
 
     Ok(resp)

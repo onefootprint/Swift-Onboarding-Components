@@ -46,6 +46,7 @@ pub struct FirmEmployeeSession {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Represents a session where a user has logged in but is part of multiple tenants and hasn't yet
 /// selected the tenant whose dashboard they want to view
+/// DEPRECATED
 pub struct WorkOsSession {
     /// The TenantUserId that is proven to be owned via a workos auth
     pub tenant_user_id: TenantUserId,
