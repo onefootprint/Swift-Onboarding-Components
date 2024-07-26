@@ -19,7 +19,7 @@ const Nav = () => {
   const {
     dangerouslyCastedData,
     logIn,
-    data: { user },
+    data: { user, org },
   } = useSession();
   const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
@@ -79,12 +79,17 @@ const Nav = () => {
         paddingRight={5}
         paddingTop={4}
       >
-        <Box>
+        <Box marginTop={3} height={'100%'}>
           <IcoUserCircle16 color="tertiary" />
         </Box>
-        <Text variant="label-4" color="tertiary" truncate width="100%" marginBottom={1}>
-          {userName || email}
-        </Text>
+        <Stack direction="column" width="100%" maxWidth="100%" overflow="auto">
+          <Text variant="body-3" color="primary" truncate width="100%">
+            {userName || email}
+          </Text>
+          <Text variant="body-4" color="tertiary" truncate width="100%">
+            {org?.name}
+          </Text>
+        </Stack>
         <Box>
           <NavDropdown
             currTenantId={currTenantId}
