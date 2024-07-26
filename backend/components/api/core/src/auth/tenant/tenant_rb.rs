@@ -17,8 +17,10 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
+use itertools::Itertools;
 use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -109,6 +111,16 @@ impl TenantRbAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
+
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        self.tenant_role
+            .scopes
+            .iter()
+            .cloned()
+            .flat_map(|s| self.data.purpose.restrict_scope(s))
+            .unique()
+            .collect()
+    }
 }
 
 /// A shorthand for the commonly used ParsedTenantRbAuth context
@@ -119,7 +131,7 @@ impl<const IS_SECONDARY: bool> CanCheckTenantGuard for TenantRbAuthContext<IS_SE
     type Auth = Box<dyn TenantAuth>;
 
     fn token_scopes(&self) -> Vec<TenantScope> {
-        self.0.tenant_role.scopes.clone()
+        self.0.token_scopes()
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
@@ -133,6 +145,9 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
             // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
         }
+        if self.data.data.purpose == TenantSessionPurpose::Docs && self.is_live {
+            return Err(AuthError::DocsTokenSandboxRestricted.into());
+        }
         Ok(self.is_live)
     }
 
@@ -145,7 +160,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
     }
 
     fn scopes(&self) -> Vec<TenantScope> {
-        self.tenant_role.scopes.clone()
+        self.token_scopes()
     }
 
     fn dl_source(&self) -> DataLifetimeSource {

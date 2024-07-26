@@ -18,9 +18,11 @@ use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
+use itertools::Itertools;
 use newtypes::DataLifetimeSource;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -161,6 +163,8 @@ impl FirmEmployeeAssumeAuth {
             .iter()
             .cloned()
             .chain(extra_permissions_for_user)
+            .flat_map(|s| self.data.purpose.restrict_scope(s))
+            .unique()
             .collect()
     }
 }
@@ -182,6 +186,9 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
         if self.tenant.sandbox_restricted && self.is_live {
             // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
+        }
+        if self.data.data.purpose == TenantSessionPurpose::Docs && self.is_live {
+            return Err(AuthError::DocsTokenSandboxRestricted.into());
         }
         Ok(self.is_live)
     }
