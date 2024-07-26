@@ -9,7 +9,8 @@ import staticPreviewAPIData from './assets/api-preview-docs.json';
 import phasedOutApiData from './assets/phased-out-api-docs.json';
 import Articles from './components/articles/articles';
 import Cmd from './components/cmd';
-import PageNav from './components/page-nav';
+import DesktopPageNav from './components/nav/desktop-page-nav';
+import MobilePageNav from './components/nav/mobile-page-nav';
 import getArticles from './utils/get-articles';
 
 const staticArticles = getArticles(staticAPIData);
@@ -35,7 +36,8 @@ const ApiReference = () => {
     <Box>
       <Seo title={t('html-title')} slug="/api-reference" />
       <Layout>
-        <PageNav sections={sections} />
+        <MobilePageNav sections={sections} />
+        <DesktopPageNav sections={sections} />
         <Articles sections={sections} />
       </Layout>
       <Cmd sections={sections} />
@@ -48,11 +50,13 @@ const Layout = styled.div`
     background: ${theme.backgroundColor.primary};
     width: 100vw;
     height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 'content';
 
     ${media.greaterThan('md')`
       overflow: hidden;
-      display: grid;
-      grid-template-columns: ${`var(--page-aside-nav-api-reference-width-small)`} 1fr;
+      grid-template-columns: ${`var(--page-aside-nav-api-reference-width-small)`} minmax(0, 1fr);
       grid-template-areas: 'nav content';
       transition: grid-template-columns 0.3s ease-in-out;
       width: 100%;

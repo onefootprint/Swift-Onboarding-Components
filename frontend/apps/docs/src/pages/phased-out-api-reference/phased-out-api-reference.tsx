@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import phasedOutApiData from '../api-reference/assets/phased-out-api-docs.json';
 import Articles from '../api-reference/components/articles/articles';
-import PageNav from '../api-reference/components/page-nav';
+import PageNav from '../api-reference/components/nav/desktop-page-nav';
 import getArticles from '../api-reference/utils/get-articles';
 
 const phasedOutArticles = getArticles(phasedOutApiData);

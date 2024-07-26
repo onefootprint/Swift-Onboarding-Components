@@ -6,9 +6,10 @@ import styled, { css } from 'styled-components';
 type NavigationScrollLinkProps = {
   id: string;
   children: React.ReactNode;
+  onClick?: () => void;
 };
 
-const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
+const NavigationScrollLink = ({ id, children, onClick }: NavigationScrollLinkProps) => (
   <StyledLink
     activeClass="active"
     containerId="articles-container"
@@ -17,6 +18,7 @@ const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
     data-id={id}
     to={encodeURIComponent(id)}
     smooth
+    onClick={onClick}
   >
     {children}
   </StyledLink>

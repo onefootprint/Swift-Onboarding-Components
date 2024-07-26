@@ -6,15 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 
-import useSession from 'src/hooks/use-session';
+import { useRouter } from 'next/router';
 import SupportList from '../support-list';
 import LoggedInUser from './components/logged-in-user';
 
-type NavigationFooterProps = {
-  linkTo: 'api-reference' | 'docs';
-};
-
-const NavigationFooter = ({ linkTo }: NavigationFooterProps) => {
+const NavigationFooter = () => {
+  const router = useRouter();
+  const isApiReference = router.pathname.startsWith(API_REFERENCE_PATH) || router.asPath.startsWith(API_REFERENCE_PATH);
   const { t } = useTranslation('common', {
     keyPrefix: 'components.navigation-footer',
   });
@@ -28,14 +26,16 @@ const NavigationFooter = ({ linkTo }: NavigationFooterProps) => {
     <Container>
       <LoggedInUser />
       <ExternalLink>
-        <LinkButton href={linkTo === 'api-reference' ? API_REFERENCE_PATH : '/'} iconComponent={IcoArrowUpRight16}>
-          {linkTo === 'api-reference' ? t('api-reference') : t('docs')}
+        <LinkButton href={isApiReference ? '/' : API_REFERENCE_PATH} iconComponent={IcoArrowUpRight16}>
+          {isApiReference ? t('docs') : t('api-reference')}
         </LinkButton>
       </ExternalLink>
       <SupportList />
-      <ThemeContainer>
-        <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} label={t('theme')} />
-      </ThemeContainer>
+      {!isApiReference && (
+        <ThemeContainer>
+          <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} label={t('theme')} />
+        </ThemeContainer>
+      )}
     </Container>
   );
 };

@@ -1,3 +1,5 @@
+import type { Article } from '../../api-reference.types';
+
 export type SupportFormData = {
   [FormField.name]: string;
   [FormField.email]: string;
@@ -21,4 +23,14 @@ export type NavigationSubsection = {
   method: 'post' | 'get' | 'put' | 'delete' | 'patch';
   path: string;
   id: string;
+};
+
+export type PageNavProps = {
+  sections: PageNavSection[];
+};
+
+export type PageNavSection = {
+  title: string;
+  isPreview: boolean;
+  articles: Article[];
 };

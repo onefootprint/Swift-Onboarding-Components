@@ -1,4 +1,4 @@
-import { createFontStyles } from '@onefootprint/ui';
+import { createFontStyles, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -44,21 +44,31 @@ const SectionTitle = styled(Link)`
     color: ${theme.color.tertiary};
     text-decoration: none;
     transition: opacity 0.2s ease-in-out;
+    margin-top: ${theme.spacing[2]};
 
     @media (hover: hover) {
       &:hover {
         opacity: 0.8;
       }
     }
+
+    ${media.greaterThan('md')`
+      margin-top: 0;
+    `}
   `}
 `;
 
 const Line = styled.div`
   ${({ theme }) => css`
+    display: none;
     height: 100%;
     width: 1px;
     background-color: ${theme.borderColor.tertiary};
     max-height: 20px;
+
+    ${media.greaterThan('md')`
+      display: block;
+    `}
   `};
 `;
 

@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import hostedApiData from '../api-reference/assets/hosted-api-docs.json';
 import privateApiData from '../api-reference/assets/private-api-docs.json';
 import Articles from '../api-reference/components/articles/articles';
-import PageNav from '../api-reference/components/page-nav';
+import PageNav from '../api-reference/components/nav/desktop-page-nav';
 import getArticles from '../api-reference/utils/get-articles';
 
 const hostedArticles = getArticles(hostedApiData);

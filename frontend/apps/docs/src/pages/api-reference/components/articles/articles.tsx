@@ -1,7 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { PageNavSection } from '../page-nav/page-nav';
+import { media } from '@onefootprint/ui';
+import type { PageNavSection } from '../nav/nav.types';
 import Article from './components/article';
 
 export type ArticlesProps = {
@@ -23,6 +24,11 @@ const ArticleList = styled.section`
     color: black;
     flex-direction: column;
     overflow-y: auto;
+    margin-top: var(--header-height);
+
+    ${media.greaterThan('md')`
+      margin-top: 0;
+    `}
   `}
 `;
 

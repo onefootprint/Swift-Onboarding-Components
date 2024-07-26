@@ -14,7 +14,7 @@ const MenuLinks = ({ navigation, onNavItemClick }: PageNavProps) => (
     <NavContainer>
       <AppNav navigation={navigation} onItemClick={onNavItemClick} />
     </NavContainer>
-    <NavigationFooter linkTo="api-reference" />
+    <NavigationFooter />
   </MenuLinksContainer>
 );
 

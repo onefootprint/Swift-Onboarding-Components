@@ -7,47 +7,15 @@ import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 import styled, { css } from 'styled-components';
 
-import type { Article } from '../../api-reference.types';
-import TypeBadge from '../type-badge';
-import NavigationScrollLink from './components/navigation-scroll-link';
-
-export type PageNavProps = {
-  sections: PageNavSection[];
-};
-
-export type PageNavSection = {
-  title: string;
-  isPreview: boolean;
-  articles: Article[];
-};
-
-type Section = {
-  title: string;
-  subsections: Article[];
-};
+import type { Article } from '../../../api-reference.types';
+import TypeBadge from '../../type-badge';
+import NavigationScrollLink from '../components/navigation-scroll-link';
+import { PageNavProps } from '../nav.types';
+import groupBySection from '../utils/group-by-section';
 
 const CHARACTER_LIMIT_FOR_TOOLTIP = 35;
 
-/// A stable operation that groups _adjacent_ articles that have the same section name.
-/// This preserves the order of the input articles so they are displayed in navigation in the same
-/// order in which they are displayed in the site body
-const groupBySection = (articles: Article[]) => {
-  const sections: Section[] = [];
-  articles.forEach(a => {
-    const currentSection = sections.length ? sections[sections.length - 1] : undefined;
-    if (currentSection?.title === a.section) {
-      currentSection.subsections.push(a);
-    } else {
-      sections.push({
-        title: a.section,
-        subsections: [a],
-      });
-    }
-  });
-  return sections;
-};
-
-const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
+const PageNav = ({ sections }: PageNavProps) => {
   const navInnerScrollRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -73,43 +41,41 @@ const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
   };
 
   return (
-    <PageNavContainer ref={ref}>
+    <PageNavContainer>
       <Header isScrolled={isScrolled}>
         <NavigationLogo />
         <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
       </Header>
       <NavContainer ref={navInnerScrollRef} onScroll={handleNavInnerScroll} id="nav-container">
-        <nav>
-          {sections.map((s, i) => (
-            <React.Fragment key={s.title}>
-              <SectionTitle>
-                {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
-                {s.title}
-              </SectionTitle>
-              {groupBySection(s.articles).map(({ title, subsections }) => (
-                <Group key={title}>
-                  <NavigationSectionTitle>{title}</NavigationSectionTitle>
-                  {subsections.map(({ method, path, id }) => (
-                    <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
-                      <NavigationScrollLink id={id}>
-                        <Stack justify="center">
-                          <TypeBadge skinny type={method} />
-                        </Stack>
-                        <PathLabel ref={overflowRef}>{path}</PathLabel>
-                      </NavigationScrollLink>
-                    </Tooltip>
-                  ))}
-                </Group>
-              ))}
-              {i !== sections.length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-        </nav>
+        {sections.map((s, i) => (
+          <React.Fragment key={s.title}>
+            <SectionTitle>
+              {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
+              {s.title}
+            </SectionTitle>
+            {groupBySection(s.articles).map(({ title, subsections }) => (
+              <Group key={title}>
+                <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                {subsections.map(({ method, path, id }) => (
+                  <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
+                    <NavigationScrollLink id={id}>
+                      <Stack justify="center">
+                        <TypeBadge skinny type={method} />
+                      </Stack>
+                      <PathLabel ref={overflowRef}>{path}</PathLabel>
+                    </NavigationScrollLink>
+                  </Tooltip>
+                ))}
+              </Group>
+            ))}
+            {i !== sections.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
       </NavContainer>
-      <NavigationFooter linkTo="docs" />
+      <NavigationFooter />
     </PageNavContainer>
   );
-});
+};
 
 const PathLabel = styled.span`
   text-transform: lowercase;
@@ -160,7 +126,7 @@ const SectionTitle = styled.h3`
   `}
 `;
 
-const NavContainer = styled.div`
+const NavContainer = styled.nav`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

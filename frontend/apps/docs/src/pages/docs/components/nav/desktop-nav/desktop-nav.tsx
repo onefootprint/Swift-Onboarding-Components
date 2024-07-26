@@ -14,7 +14,7 @@ const DesktopNav = ({ navigation }: DesktopNavProps) => (
     <NavContainer>
       <AppNav navigation={navigation} />
     </NavContainer>
-    <NavigationFooter linkTo="api-reference" />
+    <NavigationFooter />
   </DesktopNavContainer>
 );
 

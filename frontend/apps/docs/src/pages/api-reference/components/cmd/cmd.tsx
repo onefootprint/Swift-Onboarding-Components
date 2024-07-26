@@ -5,7 +5,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { PageNavProps } from '../page-nav/page-nav';
+import type { PageNavProps } from '../nav/nav.types';
 import TypeBadge from '../type-badge';
 import Footer from './components/footer/footer';
 import Keycaps from './components/keycaps/keycaps';

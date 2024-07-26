@@ -1,4 +1,4 @@
-import { Box, Stack, Text, media } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
@@ -33,17 +33,15 @@ const Article = ({ article }: ArticleProps) => {
         <ContentWidth>
           <TitleContainer direction="column" gap={3}>
             {method && path && (
-              <Stack direction="row" gap={2}>
+              <MethodContainer>
                 <TypeBadge type={method} />
                 <Stack direction="row" gap={1}>
-                  <Text variant="label-2" tag="h3" color="tertiary">
-                    {API_BASE_URL}
-                  </Text>
+                  <BaseUrl>{API_BASE_URL}</BaseUrl>
                   <Text variant="label-2" tag="h3">
                     {path}
                   </Text>
                 </Stack>
-              </Stack>
+              </MethodContainer>
             )}
             {description && <Description>{description}</Description>}
           </TitleContainer>
@@ -67,6 +65,26 @@ const Article = ({ article }: ArticleProps) => {
     </ArticleContainer>
   );
 };
+
+const BaseUrl = styled.div`
+  ${({ theme }) => css`
+    ${createFontStyles('label-2')}
+    color: ${theme.color.tertiary};
+    display: none;
+
+    ${media.greaterThan('md')`
+      display: block;
+    `}
+  `}
+`;
+
+const MethodContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[2]};
+  `}
+`;
 
 const ArticleContainer = styled(Element)<{ name: string }>`
   ${({ theme }) => css`
