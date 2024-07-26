@@ -3,14 +3,8 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnAgree,
   clickOnContinue,
-  clickOnVerifyWithSms,
   confirmData,
   continueOnDesktop,
-  fillAddress,
-  fillEmail,
-  fillNameAndDoB,
-  fillPhoneNumber,
-  fillSSN,
   selectOutcomeOptional,
   uploadImage,
   verifyAppIframeClick,
@@ -20,21 +14,41 @@ import {
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_DOC || 'ob_test_0DNRM31nSBCSqHLJQTeWi9';
 
-const firstName = 'Jane';
-const lastName = 'Doe';
+const firstName = 'E2E';
+const middleName = 'T';
+const lastName = 'Doc';
 const dob = '01/01/1990';
-const email = 'janedoe@acme.com';
-const phoneNumber = '5555550100';
-const addressLine1 = '432 3rd Ave';
-const city = 'Seward';
-const zipCode = '99664';
-const ssn = '418437970';
+const addressLine1 = '123 Main St';
+const addressLine2 = 'Apt 1';
+const city = 'San Francisco';
+const state = 'CA';
+const zipCode = '94105';
+const country = 'US';
+const ssn9 = '123412345';
+
+const userData = encodeURIComponent(
+  JSON.stringify({
+    'id.address_line1': addressLine1,
+    'id.address_line2': addressLine2,
+    'id.city': city,
+    'id.country': country,
+    'id.dob': dob,
+    'id.email': 'piip@onefootprint.com',
+    'id.first_name': firstName,
+    'id.last_name': lastName,
+    'id.middle_name': middleName,
+    'id.phone_number': '+15555550100',
+    'id.ssn9': ssn9,
+    'id.state': state,
+    'id.zip': zipCode,
+  }),
+);
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}&bootstrap_data=${userData}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -56,39 +70,19 @@ test('E2E.KYC.DriverDocOnly #ci', async ({ page, browser, isMobile }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillEmail(frame, email);
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillPhoneNumber(frame, phoneNumber);
-  await clickOnVerifyWithSms(frame);
-  await page.waitForLoadState();
-
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  await fillNameAndDoB(frame, { firstName, lastName, dob });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillAddress({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillSSN(frame, { ssn });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
   await confirmData(frame, {
-    firstName,
-    lastName,
-    dob,
     addressLine1,
     city,
+    country: 'US',
+    dob,
+    firstName,
+    lastName,
+    ssn: ssn9,
     state: 'AL',
     zipCode,
-    country: 'US',
-    ssn,
   });
   await clickOnContinue(frame);
   await page.waitForLoadState();

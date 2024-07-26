@@ -20,8 +20,8 @@ import {
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
 
-const firstName = 'Jane';
-const lastName = 'Doe';
+const firstName = 'E2E';
+const lastName = 'KYB';
 const dob = '01/01/1990';
 const email = 'janedoe@acme.com';
 const phoneNumber = '5555550100';

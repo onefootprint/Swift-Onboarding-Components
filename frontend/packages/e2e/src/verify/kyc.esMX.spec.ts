@@ -6,7 +6,6 @@ import {
   confirmData,
   continueOnDesktop,
   fillAddress,
-  fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
   selectOutcomeOptional,
@@ -18,8 +17,8 @@ const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_ES || 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
 const locale = 'es-MX';
 
-const firstName = 'Jorge';
-const lastName = 'Mejia';
+const firstName = 'E2E';
+const lastName = 'es-MX';
 const dob = '25/12/1990';
 const email = 'jorge@mejia.com';
 const phoneNumber = '5555550100';
@@ -27,11 +26,15 @@ const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
 
+const userData = encodeURIComponent(JSON.stringify({ 'id.email': email }));
+
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/verify?ob_key=${key}&locale=${locale}&app_url=${appUrl}&f=${flowId}`);
+  await page.goto(
+    `/components/verify?ob_key=${key}&locale=${locale}&app_url=${appUrl}&bootstrap_data=${userData}&f=${flowId}`,
+  );
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -49,10 +52,6 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillEmail(frame, email);
   await clickOnContinue(frame);
   await page.waitForLoadState();
 

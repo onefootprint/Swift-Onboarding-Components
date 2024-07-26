@@ -3,10 +3,6 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  fillAddress,
-  fillEmail,
-  fillNameAndDoB,
-  fillSSN,
   selectOutcomeOptional,
   verifyAppIframeClick,
   verifyEmail,
@@ -15,20 +11,40 @@ import {
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_NO_PHONE || 'ob_test_h9Qp2W3Trk1pfIoI7dTD5q';
 
-const firstName = 'Jane';
-const lastName = 'Doe';
+const addressLine1 = '123 Main St';
+const addressLine2 = 'Apt 1';
+const city = 'San Francisco';
+const country = 'US';
 const dob = '01/01/1990';
 const email: 'sandbox@onefootprint.com' = 'sandbox@onefootprint.com';
-const addressLine1 = '432 3rd Ave';
-const city = 'Seward';
-const zipCode = '99664';
+const firstName = 'E2E';
+const lastName = 'Doe';
 const ssn = '418437970';
+const state = 'CA';
+const zipCode = '94105';
+
+const userData = encodeURIComponent(
+  JSON.stringify({
+    'id.address_line1': addressLine1,
+    'id.address_line2': addressLine2,
+    'id.city': city,
+    'id.country': country,
+    'id.dob': dob,
+    'id.email': email,
+    'id.first_name': firstName,
+    'id.last_name': lastName,
+    'id.phone_number': '+15555550100',
+    'id.ssn9': ssn,
+    'id.state': state,
+    'id.zip': zipCode,
+  }),
+);
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&bootstrap_data=${userData}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -49,23 +65,7 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ page, isMobile }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  await fillEmail(frame, email);
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
   await verifyEmail({ frame, page });
-  await page.waitForLoadState();
-
-  await fillNameAndDoB(frame, { firstName, lastName, dob });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillAddress({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillSSN(frame, { ssn });
-  await clickOnContinue(frame);
   await page.waitForLoadState();
 
   await confirmData(frame, {
@@ -74,9 +74,9 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ page, isMobile }) => {
     dob,
     addressLine1,
     city,
-    state: 'AL',
+    state,
     zipCode,
-    country: 'US',
+    country,
     ssn,
   });
   await clickOnContinue(frame);

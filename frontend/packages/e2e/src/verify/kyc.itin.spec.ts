@@ -11,7 +11,7 @@ import {
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_ITIN || 'pb_test_84lqIB3DpsQUKgEQhAKGEt';
 
-const firstName = 'John';
+const firstName = 'E2E';
 const middleName = 'M';
 const lastName = 'Doe';
 const dob = '01/01/1990';

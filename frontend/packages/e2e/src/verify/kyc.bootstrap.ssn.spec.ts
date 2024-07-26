@@ -5,9 +5,9 @@ import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPho
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC || process.env.NEXT_PUBLIC_E2E_TENANT_PK || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 
-const firstName = 'John';
+const firstName = 'E2E';
 const middleName = 'M';
-const lastName = 'Doe';
+const lastName = 'BootstrapSSN';
 const dob = '01/01/1990';
 const addressLine1 = '123 Main St';
 const addressLine2 = 'Apt 1';

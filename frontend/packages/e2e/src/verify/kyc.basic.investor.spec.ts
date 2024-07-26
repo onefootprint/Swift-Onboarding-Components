@@ -13,7 +13,7 @@ const key = process.env.E2E_OB_INVESTOR || 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
 
 const firstName = 'E2E';
 const middleName = 'T';
-const lastName = 'Test';
+const lastName = 'Investor';
 const dob = '01/01/1990';
 const addressLine1 = '123 Main St';
 const addressLine2 = 'Apt 1';
