@@ -170,7 +170,6 @@ pub async fn post(
         document_types_and_countries,
         documents_to_collect,
         business_documents_to_collect,
-        curp_validation_enabled,
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,

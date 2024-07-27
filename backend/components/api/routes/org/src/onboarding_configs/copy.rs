@@ -171,7 +171,6 @@ fn copy_playbook(
         kind,
         skip_confirm,
         document_types_and_countries,
-        curp_validation_enabled,
         documents_to_collect,
         business_documents_to_collect,
         required_auth_methods,
@@ -194,6 +193,7 @@ fn copy_playbook(
         appearance_id: _,
         verification_checks: _,
         // TODO: only thing here is enhanced_aml and skip_kyb which will be removed shortly
+        curp_validation_enabled: _,
         ..
     } = pb;
 
@@ -217,7 +217,6 @@ fn copy_playbook(
         kind,
         skip_confirm,
         document_types_and_countries,
-        curp_validation_enabled,
         documents_to_collect: documents_to_collect.unwrap_or_default(),
         business_documents_to_collect,
         verification_checks,

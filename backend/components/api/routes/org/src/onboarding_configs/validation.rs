@@ -115,13 +115,6 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
-        if self.curp_validation_enabled && !is_collecting_doc {
-            return Err(TenantError::ValidationError(
-                "Must collect document if `curp_validation_enabled=true".to_owned(),
-            )
-            .into());
-        }
-
         if self.verification_checks.skip_kyc()
             && !self.allow_international_residents
             && !is_collecting_doc
