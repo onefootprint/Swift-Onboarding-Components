@@ -557,7 +557,7 @@ impl ObConfigurationArgsToValidate {
             .iter()
             .try_for_each(|c| -> FpResult<()> {
                 match c {
-                    newtypes::VerificationCheck::Kyb { .. } => {
+                    VerificationCheck::Kyb { .. } => {
                         if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
                             Err(TenantError::ValidationError(
                                 "Cannot run KYB for non-KYB Playbooks".to_owned(),
@@ -567,7 +567,7 @@ impl ObConfigurationArgsToValidate {
                             Ok(())
                         }
                     }
-                    newtypes::VerificationCheck::Aml {
+                    VerificationCheck::Aml {
                         ofac,
                         pep,
                         adverse_media,
@@ -577,6 +577,17 @@ impl ObConfigurationArgsToValidate {
                         if !(*adverse_media || *ofac || *pep) {
                             Err(TenantError::ValidationError(
                                 "at least one of adverse_media, ofac, or pep must be set for AML verification check".to_owned(),
+                            )
+                            .into())
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    VerificationCheck::CurpValidation {} => {
+                        // TODO: should be identity doc, not any doc
+                        if !self.collects_document() {
+                            Err(TenantError::ValidationError(
+                                "Must collect document if `curp_validation_enabled=true".to_owned(),
                             )
                             .into())
                         } else {

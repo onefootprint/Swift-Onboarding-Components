@@ -121,6 +121,7 @@ pub fn create_with_opts(
         Some(skip_kyc),
         Some(enhanced_aml.clone()),
         collects_identity_doc,
+        curp_validation_enabled,
     );
     let args = NewObConfigurationArgs {
         name,

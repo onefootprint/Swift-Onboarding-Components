@@ -118,15 +118,16 @@ pub async fn post(
 
 
     // VERIFICATION CHECK MIGRATION: construct verification checks
+    let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
     let verification_checks = VerificationChecks::new(
         tenant_id,
         verification_checks,
         skip_kyc,
         db_enhanced_aml.clone(),
         collects_identity_document,
+        curp_validation_enabled,
     );
 
-    let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
     let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
 
     // TODO remove once client start providing this

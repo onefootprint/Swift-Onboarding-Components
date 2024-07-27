@@ -755,6 +755,7 @@ impl VerificationChecks {
         skip_kyc: Option<bool>,
         enhanced_aml: Option<EnhancedAmlOption>,
         collects_identity_document: bool,
+        curp_validation_enabled: bool,
     ) -> Self {
         let vc = checks_from_request.unwrap_or_default();
 
@@ -764,6 +765,7 @@ impl VerificationChecks {
             skip_kyc,
             enhanced_aml,
             collects_identity_document,
+            curp_validation_enabled,
         ))
     }
 
@@ -775,6 +777,7 @@ impl VerificationChecks {
         skip_kyc: Option<bool>,
         enhanced_aml: Option<EnhancedAmlOption>,
         collects_identity_document: bool,
+        curp_validation_enabled: bool,
     ) -> Vec<VerificationCheck> {
         let skip_kyc_migrated = if let Some(skip) = skip_kyc {
             if !skip {
@@ -834,7 +837,21 @@ impl VerificationChecks {
             None
         };
 
-        tracing::info!(?identity_doc_migrated, %enhanced_aml_migrated, %skip_kyc_migrated, "VerificationCheck migration");
+        let curp_migrated = if curp_validation_enabled {
+            let curp_migrated = VerificationChecks::new_for_test(checks.clone())
+                .get(VerificationCheckKind::CurpValidation)
+                .is_some();
+
+            if !curp_migrated {
+                checks.push(VerificationCheck::CurpValidation {});
+            };
+
+            Some(curp_migrated)
+        } else {
+            None
+        };
+
+        tracing::info!(?identity_doc_migrated, %enhanced_aml_migrated, %skip_kyc_migrated, ?curp_migrated, "VerificationCheck migration");
 
         checks
     }
