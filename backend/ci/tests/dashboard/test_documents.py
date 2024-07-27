@@ -134,7 +134,6 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
         "Lots of docs config",
         must_collect_data + ["document_and_selfie"],
         must_collect_data + ["document_and_selfie"],
-        curp_validation_enabled=True,
         document_types_and_countries={
             "global": [],
             "country_specific": {"MX": ["voter_identification"]},
@@ -149,6 +148,11 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
                 ),
             ),
             dict(kind="proof_of_ssn", data=dict()),
+        ],
+        verification_checks=[
+            dict(kind="curp_validation", data={}),
+            # not used, but for consistency with what FE actually writes
+            dict(kind="identity_document", data={}),
         ],
     )
     bifrost = BifrostClient.new_user(obc)

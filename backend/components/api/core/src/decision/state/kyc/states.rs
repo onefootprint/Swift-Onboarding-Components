@@ -191,7 +191,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         //
         // Run Additional Checks
         //
-        let curp_result = if obc.curp_validation_enabled {
+        let curp_result = if obc
+            .verification_checks()
+            .is_enabled(VerificationCheckKind::CurpValidation)
+        {
             // once this is stable, we should err.
             match common::run_curp_check(state, &self.wf_id).await {
                 Ok(res) => res,
@@ -222,8 +225,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         let is_neuro_enabled_obc = obc
             .verification_checks()
-            .get(VerificationCheckKind::NeuroId)
-            .is_some();
+            .is_enabled(VerificationCheckKind::NeuroId);
         let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
         let neuro_result = if is_neuro_enabled_obc && is_neuro_enabled_for_workflow {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {

@@ -881,6 +881,10 @@ impl VerificationChecks {
             .find(|c| VerificationCheckKind::from(c) == kind)
     }
 
+    pub fn is_enabled(&self, kind: VerificationCheckKind) -> bool {
+        self.get(kind).is_some()
+    }
+
     pub fn skip_kyc(&self) -> bool {
         self.get(VerificationCheckKind::Kyc).is_none()
     }
