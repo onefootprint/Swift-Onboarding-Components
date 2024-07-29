@@ -51,7 +51,7 @@ impl_response_type!(IntegrityResponse);
 //TODO: replace handler with regular decrypt func
 #[route_alias(actix::post(
     "/users/{fp_id}/vault/integrity",
-    tags(Users, Vault, PhasedOut),
+    tags(Users, Vault, PhasedOut, HideWhenLocked),
     description = "Checks if provided data is valid before adding it to the vault."
 ))]
 #[api_v2_operation(

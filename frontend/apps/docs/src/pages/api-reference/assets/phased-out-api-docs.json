@@ -13,7 +13,8 @@
             "post": {
                 "tags": [
                     "Onboarding",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nGenerates a single-use session token for a playbook.",
                 "requestBody": {
@@ -51,7 +52,8 @@
             "get": {
                 "tags": [
                     "Users",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nView a user's recent device insights",
                 "parameters": [
@@ -108,7 +110,8 @@
             "get": {
                 "tags": [
                     "Users",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nView the documents uploaded successfully by this user.",
                 "parameters": [
@@ -150,7 +153,8 @@
             "get": {
                 "tags": [
                     "Users",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
                 "parameters": [
@@ -192,7 +196,8 @@
             "get": {
                 "tags": [
                     "Users",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nLists the match signals for the provided user. This API is deprecated.",
                 "parameters": [
@@ -232,7 +237,8 @@
                 "tags": [
                     "Users",
                     "Vault",
-                    "PhasedOut"
+                    "PhasedOut",
+                    "HideWhenLocked"
                 ],
                 "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nChecks if provided data is valid before adding it to the vault.",
                 "parameters": [

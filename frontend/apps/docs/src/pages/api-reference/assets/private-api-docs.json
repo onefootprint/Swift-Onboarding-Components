@@ -6298,7 +6298,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_disaster_recovery"
+                        ]
                     }
                 ]
             },
@@ -6322,7 +6324,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_disaster_recovery"
+                        ]
                     }
                 ]
             }
@@ -6358,7 +6362,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_disaster_recovery"
+                        ]
                     }
                 ]
             }
@@ -6394,7 +6400,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_disaster_recovery"
+                        ]
                     }
                 ]
             }
@@ -6420,7 +6428,9 @@
                 },
                 "security": [
                     {
-                        "Secret API Key": []
+                        "Secret API Key": [
+                            "preview:vault_disaster_recovery"
+                        ]
                     }
                 ]
             }
@@ -8076,6 +8086,13 @@
             "AssumeRoleRequest": {
                 "type": "object",
                 "properties": {
+                    "purpose": {
+                        "type": "string",
+                        "enum": [
+                            "dashboard",
+                            "docs"
+                        ]
+                    },
                     "tenant_id": {
                         "type": "string"
                     }
@@ -8112,6 +8129,7 @@
                                         "legacy_onboarding_status_webhook",
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
+                                        "vault_disaster_recovery",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -8536,6 +8554,7 @@
                                         "legacy_onboarding_status_webhook",
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
+                                        "vault_disaster_recovery",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -24030,6 +24049,7 @@
                                         "legacy_onboarding_status_webhook",
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
+                                        "vault_disaster_recovery",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -24354,6 +24374,7 @@
                                 "legacy_onboarding_status_webhook",
                                 "legacy_list_users_businesses",
                                 "implicit_auth",
+                                "vault_disaster_recovery",
                                 "match_signals_list",
                                 "liveness_list",
                                 "auth_events_list",
