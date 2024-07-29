@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ALTER COLUMN curp_validation_enabled DROP NOT NULL;

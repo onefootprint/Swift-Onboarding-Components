@@ -86,7 +86,8 @@ pub struct ObConfiguration {
     /// Will still collect all data if it's missing, but skips confirm.
     pub skip_confirm: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
-    pub curp_validation_enabled: bool,
+    // TODO: remove
+    pub curp_validation_enabled: Option<bool>,
     /// The list of additional non-identity documents to be collected by this playbook.
     /// Identity documents are still unfortunately specified in CDOs. We could migrate them
     /// to this field in the future.
@@ -373,7 +374,7 @@ struct NewObConfiguration {
     kind: ObConfigurationKind,
     skip_confirm: bool,
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
-    curp_validation_enabled: bool,
+    curp_validation_enabled: Option<bool>,
     documents_to_collect: Vec<DocumentRequestConfig>,
     business_documents_to_collect: Vec<DocumentRequestConfig>,
     verification_checks: Vec<VerificationCheck>,
@@ -648,7 +649,7 @@ impl ObConfiguration {
             kind,
             skip_confirm,
             document_types_and_countries,
-            curp_validation_enabled: false,
+            curp_validation_enabled: Some(false),
             documents_to_collect,
             business_documents_to_collect,
             verification_checks: verification_checks.into_inner(),

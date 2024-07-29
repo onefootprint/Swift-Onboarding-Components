@@ -121,6 +121,7 @@ impl
         let skip_kyc = vc.skip_kyc();
         let enhanced_aml = vc.enhanced_aml();
         let skip_kyb = vc.skip_kyc();
+        let curp_validation_enabled = vc.is_enabled(VerificationCheckKind::CurpValidation);
         let ObConfiguration {
             id,
             key,
@@ -144,7 +145,6 @@ impl
             documents_to_collect,
             business_documents_to_collect,
             cip_kind,
-            curp_validation_enabled,
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
@@ -155,6 +155,7 @@ impl
             _updated_at: _,
             appearance_id: _,
             author: _,
+            curp_validation_enabled: _,
             // TODO: only thing hidden here is enhanced_aml and skip_kyb which will be removed shortly
             ..
         } = ob_config;
