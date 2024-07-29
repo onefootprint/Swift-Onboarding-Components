@@ -19,8 +19,7 @@ const AssumeBanner = () => {
 
   const handleLogout = () => {
     router.push({
-      pathname: '/organizations',
-      query: { token: data.auth },
+      pathname: '/logout',
     });
   };
 
