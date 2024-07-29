@@ -51,13 +51,15 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let StytchTelemetryRequest { telemetry_id } = request.into_inner();
 
-    let req = StytchLookupRequest { telemetry_id };
+    let req = StytchLookupRequest {
+        telemetry_id: telemetry_id.clone(),
+    };
     let res = state.vendor_clients.stytch_lookup.make_request(req).await;
     let res = match res {
         Ok(res) => Either::Left(res),
         Err(err) => match err {
             idv::stytch::error::Error::ErrorWithResponse(err) => {
-                tracing::error!(?err, "Stytch error response");
+                tracing::warn!(?err, ?telemetry_id, "Stytch error response");
                 Either::Right(err.response.clone())
             }
             _ => Err(FpError::from(idv::Error::from(err)))?,
