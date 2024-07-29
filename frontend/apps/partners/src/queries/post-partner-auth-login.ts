@@ -9,24 +9,6 @@ export type OrgLoginResponse = {
   createdNewTenant: boolean;
   isFirstLogin: boolean;
   requiresOnboarding: boolean;
-  tenant?: {
-    allowDomainAccess: boolean;
-    companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
-    domains: Array<string>;
-    id: string;
-    isAuthMethodSupported?: boolean;
-    isDomainAlreadyClaimed?: boolean;
-    isProdAuthPlaybookRestricted: boolean;
-    isProdKybPlaybookRestricted: boolean;
-    isProdKycPlaybookRestricted: boolean;
-    isSandboxRestricted: boolean;
-    logoUrl?: string;
-    name: string;
-    supportEmail?: string;
-    supportPhone?: string;
-    supportWebsite?: string;
-    websiteUrl?: string;
-  };
   partnerTenant?: {
     id: string;
     name: string;
@@ -37,7 +19,7 @@ export type OrgLoginResponse = {
     logoUrl?: string;
     websiteUrl?: string;
   };
-  user?: {
+  user: {
     createdAt: string;
     email: string;
     firstName?: string;

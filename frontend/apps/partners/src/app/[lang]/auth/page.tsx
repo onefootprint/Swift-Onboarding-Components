@@ -25,7 +25,7 @@ const setLoginSession = (update: (x: Partial<Session>) => void, res: OrgLoginRes
   const { authToken, createdNewTenant, isFirstLogin, requiresOnboarding, user } = res;
   update({
     auth: authToken,
-    user: user ? getUserPayload(user) : undefined,
+    user: getUserPayload(user),
     meta: { isFirstLogin, requiresOnboarding, createdNewTenant },
   });
 };
@@ -44,12 +44,6 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
       code,
     })
       .then(res => {
-        /** Requires organization selection */
-        if (!res.user || !res.partnerTenant) {
-          router.push(`/auth/organizations?token=${res.authToken}`);
-          return;
-        }
-
         /** Can proceed to dashboard */
         setLoginSession(update, res);
         createAuthCookie(res.authToken).then(() => {
