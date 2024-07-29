@@ -6,12 +6,14 @@ use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::PgConn;
 use newtypes::DataIdentifier;
+use newtypes::DocumentFixtureResult;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::ObConfigurationKey;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::SealedVaultBytes;
 use newtypes::SessionAuthToken;
+use newtypes::WorkflowFixtureResult;
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
 use strum_macros::Display;
@@ -50,6 +52,10 @@ pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The components SDK wraps the verify SDK with the same args
     pub is_components_sdk: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fixture_result: Option<WorkflowFixtureResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_fixture_result: Option<DocumentFixtureResult>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
