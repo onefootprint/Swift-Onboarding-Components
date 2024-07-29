@@ -3,6 +3,7 @@ use crate::cli::api_client::get_cli_client;
 use crate::cli::confirm;
 use crate::cli::get_input;
 use crate::cli::wire_types::VaultDrEnrollRequest;
+use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
 use reqwest::Url;
@@ -86,8 +87,19 @@ pub async fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         }
     }
 
+
+    let enrolled_status = client
+        .get_status()
+        .await?
+        .enrolled_status
+        .ok_or(anyhow!("Enrollment details not found"))?;
+
     println!();
     println!("Enrollment complete.");
+
+    println!("Store the following information to locate your encrypted data for recovery:");
+    println!("  S3 Bucket Name:   {}", enrolled_status.s3_bucket_name);
+    println!("  Bucket Namespace: {}", enrolled_status.bucket_path_namespace);
 
     Ok(())
 }

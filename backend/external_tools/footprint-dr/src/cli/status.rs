@@ -38,10 +38,11 @@ pub async fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     println!("  AWS Account ID: {}", status.aws_account_id);
     println!("  AWS Role Name:  {}", status.aws_role_name);
     println!("  S3 Bucket Name: {}", status.s3_bucket_name);
+    println!("  Namespace:      {}", status.bucket_path_namespace);
     println!();
 
     println!(
-        "Latest backup record timestamp: {}",
+        "Latest Backup Record Timestamp: {}",
         status
             .latest_backup_record_timestamp
             .map(|ts| ts.to_string())

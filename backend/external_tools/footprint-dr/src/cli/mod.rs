@@ -28,6 +28,7 @@ const VAULT_SELECTOR_GROUP: &str = "vault selector";
 const RECORD_SELECTOR_GROUP: &str = "record selector";
 const PAGINATION_OR_SAMPLE_GROUP: &str = "pagination or sample";
 const NUMBER_OF_VAULTS_GROUP: &str = "number of vaults";
+const BUCKET_NAMESPACE_GROUP: &str = "bucket namespace";
 
 #[derive(Parser, Debug)]
 #[command(version, about, disable_help_subcommand = true, disable_help_flag = true)]
@@ -56,11 +57,11 @@ struct Command {
 #[derive(Args, Debug)]
 #[clap(group = ArgGroup::new(SANDBOX_GROUP).required(true))]
 struct SandboxFlags {
-    /// Use the live environment for the authenticated organization.
+    /// Use the live environment for the authenticated organization
     #[arg(long, global = true, group = SANDBOX_GROUP)]
     live: bool,
 
-    /// Use the sandbox environment for the authenticated organization.
+    /// Use the sandbox environment for the authenticated organization
     #[arg(long, global = true, group = SANDBOX_GROUP)]
     sandbox: bool,
 }
@@ -93,12 +94,18 @@ enum Subcommand {
         sandbox: SandboxFlags,
 
         #[clap(flatten)]
+        bucket_namespace: BucketNamespace,
+
+        #[clap(flatten)]
         vault_filter: VaultSelector,
     },
     /// List vault records
     ListRecords {
         #[clap(flatten)]
         sandbox: SandboxFlags,
+
+        #[clap(flatten)]
+        bucket_namespace: BucketNamespace,
 
         #[clap(flatten)]
         vault_filter: VaultSelector,
@@ -109,8 +116,9 @@ enum Subcommand {
     },
     /// Decrypt vault records from the Disaster Recovery backups
     ///
-    /// Requires the --org-private-key-plugin flag, pointing to an executable that emits the org
-    /// private key to stdout.
+    /// Requires the --org-identity flag, pointing to an age identity file for the org private key.
+    /// For an org private key on a YubiKey, this is a file from a command like the following:
+    ///     age-plugin-yubikey --identity --slot 1 > org-identity.txt
     ///
     /// Test recovery:
     ///     If the --wrapped-recovery-key flag is not provided, the CLI will run a test recovery.
@@ -120,11 +128,17 @@ enum Subcommand {
     /// Full recovery:
     ///     If the --wrapped-recovery-key flag is provided, the CLI will decrypt the records
     ///     in the cloud storage bucket without relying on Footprint services.
+    ///
+    ///     To perform a full recovery without depending on the Footprint API, provide the --bucket
+    ///     and --namespace flags using the details from the enrollment process.
     #[command(verbatim_doc_comment)]
     #[command(group = ArgGroup::new(RECORD_SELECTOR_GROUP).required(true))]
     Decrypt {
         #[clap(flatten)]
         sandbox: SandboxFlags,
+
+        #[clap(flatten)]
+        bucket_namespace: BucketNamespace,
 
         /// Decrypt all records
         #[arg(long, group = RECORD_SELECTOR_GROUP)]
@@ -132,14 +146,20 @@ enum Subcommand {
 
         /// Decrypt records from the given line-separated JSON file (.jsonl)
         #[arg(value_name = "path", group = RECORD_SELECTOR_GROUP)]
+        #[arg(long, value_name = "PATH", group = RECORD_SELECTOR_GROUP)]
         records: Option<PathBuf>,
 
         /// An that emits the organization private key to stdout
         #[arg(long, value_name = "path")]
         org_private_key_plugin: Option<PathBuf>,
+        /// Path to an age identity file for the org private key
+        #[arg(long, value_name = "PATH")]
+        org_identity: PathBuf,
 
         /// Wrapped recovery key file (.age)
         #[arg(long, value_name = "path")]
+        /// Path to the wrapped recovery key file (.age)
+        #[arg(long, value_name = "PATH")]
         wrapped_recovery_key: Option<PathBuf>,
     },
 }
@@ -147,7 +167,7 @@ enum Subcommand {
 #[derive(Args, Debug)]
 #[command(group = ArgGroup::new(PAGINATION_OR_SAMPLE_GROUP).requires("limit"))]
 struct VaultSelector {
-    /// Begin paginating over vaults after this FP ID.
+    /// Begin paginating over vaults after this FP ID
     #[arg(
         long,
         group = VAULT_SELECTOR_GROUP,
@@ -156,19 +176,39 @@ struct VaultSelector {
     )]
     fp_id_gt: Option<String>,
 
-    /// Randomly sample vaults.
+    /// Randomly sample vaults
     #[arg(long, group = VAULT_SELECTOR_GROUP, group = PAGINATION_OR_SAMPLE_GROUP)]
     sample: bool,
 
-    /// The maximum number of vaults to list.
+    /// The maximum number of vaults to list
     #[arg(
         short = 'n',
         long,
         group = NUMBER_OF_VAULTS_GROUP,
-        value_name = "count",
+        value_name = "COUNT",
     )]
     // We use a rather small u16 instead of a usize because S3 API sizes are i32.
     limit: Option<u16>,
+}
+
+#[derive(Args, Debug)]
+#[command(group = ArgGroup::new(BUCKET_NAMESPACE_GROUP).multiple(true).requires_all(["bucket", "namespace"]))]
+struct BucketNamespace {
+    /// Bucket where encrypted data is stored (only required if bypassing dependency on
+    /// Footprint API)
+    #[arg(
+        long,
+        group = BUCKET_NAMESPACE_GROUP,
+    )]
+    bucket: Option<String>,
+
+    /// Bucket namespace assigned during enrollment (only required if bypassing dependency on
+    /// Footprint API)
+    #[arg(
+        long,
+        group = BUCKET_NAMESPACE_GROUP,
+    )]
+    namespace: Option<String>,
 }
 
 pub async fn run() -> Result<()> {
@@ -193,13 +233,26 @@ pub async fn run() -> Result<()> {
         Subcommand::Enroll { sandbox } => enroll::enroll_cmd(api_root, sandbox.live.into()).await,
         Subcommand::ListVaults {
             sandbox,
+            bucket_namespace,
             vault_filter,
-        } => list_vaults::list_vaults_cmd(api_root, sandbox.live.into(), vault_filter).await,
+        } => {
+            list_vaults::list_vaults_cmd(api_root, sandbox.live.into(), bucket_namespace, vault_filter).await
+        }
         Subcommand::ListRecords {
             sandbox,
+            bucket_namespace,
             vault_filter,
             fp_ids,
-        } => list_records::list_records_cmd(api_root, sandbox.live.into(), vault_filter, fp_ids).await,
+        } => {
+            list_records::list_records_cmd(
+                api_root,
+                sandbox.live.into(),
+                bucket_namespace,
+                vault_filter,
+                fp_ids,
+            )
+            .await
+        }
         _ => unimplemented!(),
     }
 }

@@ -13,7 +13,9 @@ from tests.constants import VDR_AGE_KEYS
 
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
-def footprint_dr(*args):
+def footprint_dr(*args, api_root=None):
+    api_root = api_root or os.environ["TEST_URL"]
+
     return pexpect.spawn(
         "footprint-dr",
         list(args),
@@ -21,7 +23,7 @@ def footprint_dr(*args):
         logfile=sys.stdout.buffer,
         env=os.environ | {
             "LOG_LEVEL": "debug",
-            "FOOTPRINT_API_ROOT": os.environ["TEST_URL"],
+            "FOOTPRINT_API_ROOT": api_root,
             "AWS_PROFILE": "localstack",
         },
     )
@@ -154,6 +156,19 @@ class EnrollmentConfig:
     aws_account_id: str
     aws_role_name: str
     s3_bucket_name: str
+    namespace: str
+
+    def client_params_match(self, other):
+        if other is None:
+            return False
+
+        return (
+            self.org_public_keys == other.org_public_keys
+            and self.aws_account_id == other.aws_account_id
+            and self.aws_role_name == other.aws_role_name
+            and self.s3_bucket_name == other.s3_bucket_name
+            # Namespace is provided by the server, so it's excluded.
+        )
 
     # Extracts the config from the output of `footprint-dr status`.
     def parse_from_footprint_dr_status(output):
@@ -171,6 +186,7 @@ class EnrollmentConfig:
             aws_account_id=re.search(r"AWS Account ID:\s*(\d+)", output).group(1),
             aws_role_name=re.search(r"AWS Role Name:\s*(\S+)", output).group(1),
             s3_bucket_name=re.search(r"S3 Bucket Name:\s*(\S+)", output).group(1),
+            namespace=re.search(r"Namespace:\s*(\S+)", output).group(1),
         )
 
 
@@ -205,6 +221,9 @@ def enroll_tenant_in_live_vdr(tenant):
         aws_account_id=aws_account_id,
         aws_role_name=iam_role_name,
         s3_bucket_name=bucket_name,
+
+        # Won't be used in comparison.
+        namespace="unknown",
     )
 
     # Compare the current configuration with the desired configuration.
@@ -215,8 +234,8 @@ def enroll_tenant_in_live_vdr(tenant):
     got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
 
     # If the configuration is already correct, leave it as is.
-    if got_cfg == cfg:
-        return
+    if cfg.client_params_match(got_cfg):
+        return got_cfg
 
     # Otherwise, re-enroll the tenant in Vault Disaster Recovery.
     with footprint_dr("enroll", "--live") as cmd:
@@ -272,4 +291,6 @@ def enroll_tenant_in_live_vdr(tenant):
     assert cmd.exitstatus == 0
     output = cmd.before.decode()
     got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
-    assert got_cfg == cfg
+    assert cfg.client_params_match(got_cfg)
+
+    return got_cfg

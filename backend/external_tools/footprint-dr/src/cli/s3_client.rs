@@ -1,16 +1,22 @@
+use super::api_client::get_cli_client;
+use super::api_client::IsLive;
+use super::BucketNamespace;
 use anyhow::anyhow;
+use anyhow::bail;
 use anyhow::Result;
 use futures::Stream;
-use futures::StreamExt;
 use futures::TryStreamExt;
+use itertools::Itertools;
 use rand::distributions::Alphanumeric;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
+use reqwest::Url;
 use std::collections::HashSet;
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
+use tokio_stream::StreamExt;
 
 
 const S3_ACCESS_PROBE_KEY: &str = "footprint/.vdr-access-probe";
@@ -34,6 +40,23 @@ pub struct FpId {
     pub fp_id: String,
 }
 
+impl FpId {
+    pub fn new(bucket_prefix: &str, fp_id: &str) -> Result<Self> {
+        let parts: Vec<&str> = fp_id.split('_').collect();
+
+        let id = parts.last().ok_or(anyhow!("fp_id is empty"))?;
+        let id_first_two = id.chars().take(2).collect::<String>();
+
+        let prefix = parts.into_iter().rev().skip(1).rev().join("_");
+        let fp_id_partition = format!("{}_{}", prefix, id_first_two);
+
+        Ok(FpId {
+            path: format!("{}{}/{}/", bucket_prefix, fp_id_partition, fp_id),
+            fp_id: fp_id.to_string(),
+        })
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct FpIdPartition {
     pub path: String,
@@ -47,7 +70,25 @@ pub struct FpIdFields {
 }
 
 impl S3Client {
-    pub async fn new(bucket_name: &str, bucket_path_namespace: &str) -> Result<Self> {
+    pub async fn new(api_root: &Url, is_live: IsLive, bucket_namespace: BucketNamespace) -> Result<Self> {
+        let (bucket_name, bucket_path_namespace) = match bucket_namespace {
+            // Bypass Footprint API.
+            BucketNamespace {
+                bucket: Some(bucket),
+                namespace: Some(namespace),
+            } => (bucket, namespace),
+            // Infer bucket & namespace from Footprint API.
+            _ => {
+                let client = get_cli_client(api_root, is_live).await?;
+
+                let Some(status) = client.get_status().await?.enrolled_status else {
+                    bail!("Not enrolled in Vault Disaster Recovery.");
+                };
+
+                (status.s3_bucket_name, status.bucket_path_namespace)
+            }
+        };
+
         let config = aws_config::from_env().load().await;
 
         let s3_config = aws_sdk_s3::Config::from(&config)
@@ -60,7 +101,7 @@ impl S3Client {
         // Test the client.
         s3_client
             .list_objects_v2()
-            .bucket(bucket_name)
+            .bucket(&bucket_name)
             .max_keys(1)
             .send()
             .await
@@ -68,14 +109,14 @@ impl S3Client {
                 let svc_error = e.into_service_error();
                 anyhow!(
                     "Testing s3:ListBucket permissions failed for bucket {}: {:?}",
-                    bucket_name,
+                    &bucket_name,
                     svc_error
                 )
             })?;
 
         s3_client
             .get_object()
-            .bucket(bucket_name)
+            .bucket(&bucket_name)
             .key(S3_ACCESS_PROBE_KEY)
             .send()
             .await
@@ -83,7 +124,7 @@ impl S3Client {
                 let svc_error = e.into_service_error();
                 anyhow!(
                     "Testing s3:GetObject permissions failed for bucket {}: {:?}",
-                    bucket_name,
+                    &bucket_name,
                     svc_error,
                 )
             })?;
@@ -95,13 +136,21 @@ impl S3Client {
         })
     }
 
-    async fn list_common_prefixes(
+    fn list_common_prefixes(
         client: &aws_sdk_s3::Client,
         bucket_name: &str,
         prefix: &str,
         start_after: Option<String>,
         limit: Option<u16>,
     ) -> impl Stream<Item = Result<CommonPrefix>> {
+        log::debug!(
+            "Listing common prefixes: s3://{}/{} (start_after: {:?}, limit: {:?})",
+            bucket_name,
+            prefix,
+            start_after,
+            limit,
+        );
+
         let mut prefixes_stream = client
             .list_objects_v2()
             .bucket(bucket_name)
@@ -154,7 +203,7 @@ impl S3Client {
                     Err(e) => {
                         let svc_error = e.into_service_error();
                         let err = anyhow!(
-                            "Failed to list partitions in bucket {}: {:?}",
+                            "failed to list common prefixes in bucket {}: {:?}",
                             bucket_name,
                             svc_error
                         );
@@ -168,59 +217,25 @@ impl S3Client {
         ReceiverStream::new(rx)
     }
 
-    fn bucket_prefix(&self) -> String {
+    pub fn bucket_prefix(&self) -> String {
         format!("footprint/vdr/{}/", self.bucket_path_namespace)
     }
 
-    pub async fn list_fp_id_partitions(&self) -> impl Stream<Item = Result<FpIdPartition>> {
-        Self::list_common_prefixes(&self.client, &self.bucket_name, &self.bucket_prefix(), None, None)
-            .await
-            .map_ok(|cp| FpIdPartition {
+    pub fn list_fp_id_partitions(&self) -> impl Stream<Item = Result<FpIdPartition>> {
+        Self::list_common_prefixes(&self.client, &self.bucket_name, &self.bucket_prefix(), None, None).map_ok(
+            |cp| FpIdPartition {
                 path: cp.path,
                 fp_id_prefix: cp.partition,
-            })
+            },
+        )
     }
 
-    pub async fn fp_ids_from_strings(&self, fp_ids: Vec<String>) -> Result<Vec<FpId>> {
-        let partitions = self
-            .list_fp_id_partitions()
-            .await
-            .collect::<Vec<Result<_>>>()
-            .await
-            .into_iter()
-            .collect::<Result<Vec<_>>>()?;
-
-        let bucket_prefix = self.bucket_prefix();
-
-        let ret = fp_ids
-            .into_iter()
-            .flat_map(|fp_id| {
-                // Nested loop is fine if the input list is small.
-                //
-                // Doing it this inefficient way since the partition key calculation is somewhat
-                // compicated and it's in the server crate.
-                for partition in partitions.iter() {
-                    if fp_id.starts_with(&partition.fp_id_prefix) {
-                        return Some(FpId {
-                            path: format!("{}{}/{}/", bucket_prefix, partition.fp_id_prefix, fp_id),
-                            fp_id,
-                        });
-                    }
-                }
-
-                // If there's no live partition for the fp_id, then it must not be in the bucket.
-                None
-            })
-            .collect();
-        Ok(ret)
-    }
-
-    pub async fn list_fp_ids(
+    pub fn list_fp_ids(
         &self,
         fp_id_gt: Option<String>,
         limit: Option<u16>,
     ) -> impl Stream<Item = Result<FpId>> {
-        let mut partitions = self.list_fp_id_partitions().await;
+        let mut partitions = self.list_fp_id_partitions();
 
         let (tx, rx) = mpsc::channel::<Result<FpId>>(CHANNEL_BUFFER_SIZE);
 
@@ -266,7 +281,7 @@ impl S3Client {
                     //
                     // So we need to filter the results as well.
                     if fp_id_gt.starts_with(&partition.fp_id_prefix) {
-                        let fp_id_gt_key = format!("{}/{}", partition.path, fp_id_gt);
+                        let fp_id_gt_key = format!("{}{}", partition.path, fp_id_gt);
                         Some(fp_id_gt_key)
                     } else {
                         None
@@ -279,8 +294,7 @@ impl S3Client {
                     &partition.path,
                     start_after_key,
                     limit.map(|limit| limit - num_sent),
-                )
-                .await;
+                );
 
                 while let Some(bucket_prefix) = fp_id_prefixes.next().await {
                     if tx.is_closed() {
@@ -328,7 +342,6 @@ impl S3Client {
         let full_batch_size = limit + 1;
         let fp_id_batch = self
             .list_fp_ids(None, Some(full_batch_size))
-            .await
             .collect::<Vec<Result<_>>>()
             .await
             .into_iter()
@@ -346,7 +359,6 @@ impl S3Client {
         // Sampling partitions helps ensure we get a mix of fp_id kinds, like fp_id, fp_bid, etc.
         let partitions = self
             .list_fp_id_partitions()
-            .await
             .collect::<Vec<Result<_>>>()
             .await
             .into_iter()
@@ -420,6 +432,7 @@ impl S3Client {
         Ok(sample.into_iter().collect())
     }
 
+    // This will eventually be replaced with a read of fp_id's manifest file.
     pub async fn list_records(
         &self,
         mut fp_ids: Pin<Box<dyn Stream<Item = Result<FpId>> + Send>>,
@@ -448,7 +461,6 @@ impl S3Client {
 
                 let field_prefixes =
                     Self::list_common_prefixes(&client, &bucket_name, &fp_id_prefix, None, None)
-                        .await
                         .collect::<Vec<Result<_>>>()
                         .await
                         .into_iter()

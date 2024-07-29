@@ -9,7 +9,6 @@ use anyhow::Context;
 use anyhow::Ok;
 use anyhow::Result;
 use keyring::Entry;
-use log::debug;
 use reqwest::header::HeaderMap;
 use reqwest::header::HeaderValue;
 use reqwest::Client;
@@ -151,6 +150,7 @@ impl VaultDrApiClient {
     }
 
     fn request(&self, method: Method, path: &str) -> Result<RequestBuilder> {
+        log::debug!("{} {}", method, path);
         Ok(self.client.request(method, self.api_root.join(path)?))
     }
 
@@ -163,7 +163,7 @@ impl VaultDrApiClient {
             let message: String = serde_json::from_str(&body)
                 .map(|e: ApiError| e.message)
                 .unwrap_or(body.clone());
-            debug!("{}: {}", err, body);
+            log::debug!("{}: {}", err, body);
             bail!(message);
         };
 
@@ -213,7 +213,7 @@ pub(crate) async fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<Va
     let client = VaultDrApiClient::try_from_keyring(api_root, is_live)
         .await
         .map_err(|err| {
-            debug!("{:?}, ", err);
+            log::debug!("{:?}, ", err);
 
             anyhow!(
                 "Not logged in. Run `footprint login {}` to log in.",

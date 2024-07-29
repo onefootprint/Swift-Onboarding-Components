@@ -5,12 +5,15 @@ from tests.utils import patch, post
 import json
 
 
+INVALID_API_ROOT = "http://127.0.0.1:123"
+
+
 @pytest.mark.skipif(
     ENVIRONMENT in ("ephemeral", "dev", "production"),
     reason="This test relies on localstack",
 )
 def test_footprint_dr_backup(tenant):
-    enroll_tenant_in_live_vdr(tenant)
+    cfg = enroll_tenant_in_live_vdr(tenant)
 
     # Vault some data for backup.
     body = post("users", {
@@ -50,7 +53,7 @@ def test_footprint_dr_backup(tenant):
     assert resp["num_blobs"] == 8
 
     with footprint_dr("status", "--live") as cmd:
-        cmd.expect(r"Latest backup record timestamp: ([0-9:\.\- ]+ UTC)")
+        cmd.expect(r"Latest Backup Record Timestamp: ([0-9:\.\- ]+ UTC)")
         # We can't actually assert anything about the backup lag
         # since we aren't running the real worker in the test,
         # and only processing DLs for the fp_ids we created.
@@ -100,6 +103,18 @@ def test_footprint_dr_backup(tenant):
     assert cmd.exitstatus == 0
     assert 2 <= cmd.before.count(b"\nfp_") <= 10
 
+    # Listing records works without the API for recovery purposes.
+    with footprint_dr(
+        "list-vaults", "--live",
+        "--limit", "10",
+        "--bucket", cfg.s3_bucket_name,
+        "--namespace", cfg.namespace,
+        api_root=INVALID_API_ROOT,
+    ) as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    assert 2 <= cmd.before.count(b"\nfp_") <= 10
+
     # Check that each fp_id is present in the backup.
     for fp_id in [fp_id_1, fp_id_2]:
         with footprint_dr(
@@ -131,8 +146,8 @@ def test_footprint_dr_backup(tenant):
         "--fp-id-gt", fp_id,
         "--limit", "10",
     ) as cmd:
-        cmd.expect(r"fp_[A-Za-z0-9_]+")
-        assert cmd.match.group(0).decode() > fp_id
+        cmd.expect(r"(fp_[A-Za-z0-9_]+)\r")
+        assert cmd.match.group(1).decode() > fp_id
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
@@ -189,22 +204,47 @@ def test_footprint_dr_backup(tenant):
     assert cmd.exitstatus == 2
 
     # Fetch records for the two fp_ids.
+    fp_id_records = [
+        {
+            "fp_id": fp_id_1,
+            "fields": [
+                "id.email",
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+            ]
+        },
+        {
+            "fp_id": fp_id_2,
+            "fields": [
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+            ]
+        },
+    ]
+
     with footprint_dr(
         "list-records", "--live",
         fp_id_1, fp_id_2
     ) as cmd:
-        expected_lines = [
-            {
-                "fp_id": fp_id_1,
-                "fields": ["id.email", "id.first_name", "id.last_name", "id.phone_number"]
-            },
-            {
-                "fp_id": fp_id_2,
-                "fields": ["id.first_name", "id.last_name", "id.phone_number"]
-            },
-        ]
+        for expected_line in fp_id_records:
+            cmd.expect(r"(^|\n){.+}\r")
+            got_line = json.loads(cmd.match.group(0))
+            assert got_line == expected_line, f"Got: {got_line} Want: {expected_line}"
 
-        for expected_line in expected_lines:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+
+    # Fetching records works without the API for recovery purposes.
+    with footprint_dr(
+        "list-records", "--live",
+        "--bucket", cfg.s3_bucket_name,
+        "--namespace", cfg.namespace,
+        fp_id_1, fp_id_2,
+        api_root=INVALID_API_ROOT,
+    ) as cmd:
+        for expected_line in fp_id_records:
             cmd.expect(r"(^|\n){.+}\r")
             got_line = json.loads(cmd.match.group(0))
             assert got_line == expected_line, f"Got: {got_line} Want: {expected_line}"
