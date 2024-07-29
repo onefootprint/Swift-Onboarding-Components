@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN curp_validation_enabled BOOLEAN;
