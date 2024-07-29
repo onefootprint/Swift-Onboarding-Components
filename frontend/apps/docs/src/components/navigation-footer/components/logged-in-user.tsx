@@ -3,6 +3,8 @@ import { Box, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
 import type { User } from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
+import { useEffectOnce } from 'usehooks-ts';
 
 type LoggedInUserProps = {
   user: User;
@@ -12,6 +14,14 @@ type LoggedInUserProps = {
 const LoggedInUser = ({ user, children }: LoggedInUserProps) => {
   const { firstName, lastName, email } = user;
   const userName = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined;
+  const { refreshPermissions } = useSession();
+
+  useEffectOnce(() => {
+    refreshPermissions().catch(() => {
+      // No-op on error
+      return;
+    });
+  });
 
   return (
     <Box borderBottomWidth={1} borderColor="tertiary" borderStyle="solid">

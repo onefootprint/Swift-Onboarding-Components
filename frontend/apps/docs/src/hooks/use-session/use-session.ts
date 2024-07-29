@@ -62,10 +62,14 @@ const useSession = () => {
     await refreshPermissions(session.authToken);
   };
 
-  const refreshPermissions = async (newAuthToken: string) => {
+  const refreshPermissions = async (newAuthToken?: string) => {
+    const authToken = newAuthToken || data.authToken;
+    if (!authToken) {
+      return;
+    }
     try {
       // Fetch the new permissions from the backend
-      const user = await getOrgMemberRequest(newAuthToken);
+      const user = await getOrgMemberRequest(authToken);
       update({ user });
     } catch (error: unknown) {
       // If we can't fetch the user from the backend, just log out and display a toast
@@ -83,6 +87,7 @@ const useSession = () => {
     reset,
     logIn,
     logOut,
+    refreshPermissions,
   };
 };
 
