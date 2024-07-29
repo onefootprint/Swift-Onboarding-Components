@@ -221,20 +221,3 @@ async fn test_update_credentials(state: &mut State) {
         get_tenant_vendor_control(t, &state.db_pool, &state.config, &state.enclave_client).await;
     assert_eq!(default_creds_from_state.idology, updated.idology_credentials());
 }
-
-pub mod fixtures {
-    use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-    use crate::State;
-    use db::models::tenant::Tenant;
-    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
-
-    pub async fn create(
-        state: &State,
-        vendor_control: Option<DbTenantVendorControl>,
-        tenant: Tenant,
-    ) -> TenantVendorControl {
-        TenantVendorControl::new_for_test(&state.config, &state.enclave_client, vendor_control, tenant)
-            .await
-            .expect("couldn't create tenant vendor control")
-    }
-}

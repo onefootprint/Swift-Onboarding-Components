@@ -2,7 +2,6 @@ use super::make_request;
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::eval::RuleEvalConfig;
-use crate::decision::vendor::get_vendor_apis_for_verification_requests;
 use crate::decision::vendor::kyc::waterfall_rules::WaterfallRuleAction;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_result::HydratedVerificationResult;
@@ -17,6 +16,7 @@ use crate::utils::vault_wrapper::VwArgs;
 use crate::ApiCoreError;
 use crate::FpResult;
 use crate::State;
+use api_errors::AssertionError;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
@@ -58,8 +58,11 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     )
     .await?;
 
-    let available_vendor_apis = get_vendor_apis_for_verification_requests(vw.populated().as_slice(), &tvc)?;
-    let ordered_apis = WaterfallVendorAPI::ordered_apis(available_vendor_apis.clone());
+    let ordered_apis = WaterfallVendorAPI::available_ordered_apis(vw.populated().as_slice(), &tvc);
+    if ordered_apis.is_empty() {
+        return Err(AssertionError("Not enough information to send to any vendors").into());
+    }
+
     let ordered_apis2 = ordered_apis.clone();
 
     let diid2 = di.id.clone();

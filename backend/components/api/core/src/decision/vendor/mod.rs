@@ -1,5 +1,4 @@
 use self::tenant_vendor_control::TenantVendorControl;
-use crate::errors::AssertionError;
 use crate::FpResult;
 use api_errors::FpError;
 use api_errors::FpErrorCode;
@@ -9,7 +8,6 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use itertools::Itertools;
 use newtypes::DocumentFixtureResult;
 use newtypes::DocumentRequestKind;
-use newtypes::IdentityDataKind;
 use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
 use std::fmt::Display;
@@ -29,22 +27,6 @@ pub mod vendor_result;
 pub mod vendor_trait;
 pub mod verification_result;
 
-pub fn get_vendor_apis_for_verification_requests(
-    present_data_lifetime_kinds: &[IdentityDataKind],
-    tenant_vendor_control: &TenantVendorControl,
-) -> FpResult<Vec<VendorAPI>> {
-    // From the data in the vault, figure out which vendors we _can_ send to
-    let vendor_apis = idv::requirements::available_vendor_apis(present_data_lifetime_kinds)
-        .into_iter()
-        // filter available vendor apis by whether or not this vendor is enabled for a tenant
-        .filter(|v| tenant_vendor_control.enabled_vendor_apis().contains(v))
-        .collect::<Vec<_>>();
-    if vendor_apis.is_empty() {
-        Err(AssertionError("Not enough information to send to any vendors"))?;
-    } // probably should add some more validations in the future, like make sure we are _at least_ sending
-      // to a KYC vendor
-    Ok(vendor_apis)
-}
 
 #[derive(Debug)]
 pub struct VendorAPIError {

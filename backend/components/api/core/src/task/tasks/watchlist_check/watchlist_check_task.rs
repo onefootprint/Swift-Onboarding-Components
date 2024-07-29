@@ -26,14 +26,15 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::watchlist_check::WatchlistCheck;
 use db::DbResult;
 use db::TxnPgConn;
+use idv::requirements::HasIdentityDataRequirements;
 use newtypes::vendor_api_struct::IdologyPa;
+use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::DecisionIntentKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::TaskId;
-use newtypes::VendorAPI;
 use newtypes::WatchlistCheckArgs;
 use newtypes::WatchlistCheckCompletedPayload;
 use newtypes::WatchlistCheckError;
@@ -147,10 +148,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 .await?
                 .ok();
 
-                if idv::requirements::vendor_api_requirements_are_satisfied(
-                    &VendorAPI::IdologyPa,
-                    uvw.populated().as_slice(),
-                ) {
+                if IdologyPa.requirements_are_satisfied(uvw.populated().as_slice()) {
                     let reason_codes = idology::complete_vendor_call(
                         &self.state,
                         &sv.id,
@@ -179,10 +177,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 if !continuous_monitoring {
                     return AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str()).into();
                 }
-                if idv::requirements::vendor_api_requirements_are_satisfied(
-                    &VendorAPI::IncodeWatchlistCheck,
-                    uvw.populated().as_slice(),
-                ) {
+                if IncodeWatchlistCheck.requirements_are_satisfied(uvw.populated().as_slice()) {
                     let reason_codes =
                         incode::complete_vendor_call(&self.state, &sv.id, &di_id, obc, &uvw).await?;
                     WatchlistVendorResult::Completed(reason_codes)

@@ -70,7 +70,7 @@ pub async fn load_response_for_vendor_api<T>(
 where
     T: VendorParsable + std::fmt::Debug,
 {
-    let vendor_api = T::vendor_api();
+    let vendor_api = vendor_api_struct.vendor_api();
     let requests_and_result = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {

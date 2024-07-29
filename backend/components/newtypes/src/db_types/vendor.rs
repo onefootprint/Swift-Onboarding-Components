@@ -179,7 +179,7 @@ impl VendorAPI {
 }
 
 pub trait VendorAPIMarker: Into<VendorAPI> + Default {
-    fn vendor_api() -> VendorAPI {
+    fn vendor_api(&self) -> VendorAPI {
         Self::default().into()
     }
 }

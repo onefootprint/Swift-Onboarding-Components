@@ -1,12 +1,15 @@
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
+use idv::requirements::HasIdentityDataRequirements;
 use newtypes::vendor_api_struct::ExperianPreciseId;
 use newtypes::vendor_api_struct::IdologyExpectId;
 use newtypes::vendor_api_struct::LexisFlexId;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::IdentityDataKind;
 use newtypes::VendorAPI;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
@@ -70,15 +73,37 @@ impl WaterfallVendorAPI {
 
     // assumes we have a static ordering, which may not be the case. in future we'll define these
     // somewhere tenant-specific perhaps
-    pub fn ordered_apis(available_apis: Vec<VendorAPI>) -> Vec<Self> {
+    pub fn available_ordered_apis(
+        present_identity_data_kinds: &[IdentityDataKind],
+        tenant_vendor_control: &TenantVendorControl,
+    ) -> Vec<Self> {
         Self::iter()
-            .filter(|v| {
-                let vendor_api = (*v).into();
-                available_apis.contains(&vendor_api)
-            })
+            .filter(|v| v.is_available(present_identity_data_kinds, tenant_vendor_control))
             .collect()
     }
+
+    fn is_available(
+        &self,
+        present_identity_data_kinds: &[IdentityDataKind],
+        tenant_vendor_control: &TenantVendorControl,
+    ) -> bool {
+        let vendor_api = (*self).into();
+        let vendor_api_is_enabled = tenant_vendor_control.enabled_vendor_apis().contains(&vendor_api);
+        let requirements_are_met = match self {
+            WaterfallVendorAPI::Lexis => LexisFlexId.requirements_are_satisfied(present_identity_data_kinds),
+            WaterfallVendorAPI::Experian => {
+                ExperianPreciseId.requirements_are_satisfied(present_identity_data_kinds)
+            }
+            WaterfallVendorAPI::Idology => {
+                IdologyExpectId.requirements_are_satisfied(present_identity_data_kinds)
+            }
+        };
+
+        // let vendor_is_enabled = tenant_vendor_control.enabled_
+        vendor_api_is_enabled && requirements_are_met
+    }
 }
+
 
 impl From<WaterfallVendorAPI> for VendorAPI {
     fn from(value: WaterfallVendorAPI) -> Self {
