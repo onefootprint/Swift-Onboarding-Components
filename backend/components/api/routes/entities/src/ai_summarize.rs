@@ -90,7 +90,7 @@ pub async fn get(
     let message2 = ChatCompletionMessage {
         role: ChatCompletionMessageRole::User,
         content: Some(format!(
-            "summarize identity verification result is described by this JSON object: {} and output the result using JSON schema {}",
+            "summarize identity verification result is described by this JSON object: {} and output the result using JSON schema {}. Only recommend futher aspects to investigate or information to request, do not offer any strong conclusions such as denying or allowing the onboarding.",
             summary, schema
         )),
         name: None,
