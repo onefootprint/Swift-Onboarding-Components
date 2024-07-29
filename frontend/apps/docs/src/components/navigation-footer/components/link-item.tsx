@@ -3,16 +3,16 @@ import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type SupportListItemProps = {
+type LinkItemProps = {
   IconComponent: Icon;
   onClick: () => void;
   label: string;
 };
 
-const SupportListItem = ({ label, IconComponent, onClick }: SupportListItemProps) => (
+const LinkItem = ({ label, IconComponent, onClick }: LinkItemProps) => (
   <Item onClick={onClick}>
     <IconComponent color="tertiary" />
-    <Text variant="label-3" color="tertiary">
+    <Text variant="body-4" color="tertiary">
       {label}
     </Text>
   </Item>
@@ -27,6 +27,7 @@ const Item = styled.button`
     display: flex;
     gap: ${theme.spacing[3]};
     padding: 0;
+    height: 32px;
 
     @media (hover: hover) {
       &:hover {
@@ -42,4 +43,4 @@ const Item = styled.button`
   `}
 `;
 
-export default SupportListItem;
+export default LinkItem;

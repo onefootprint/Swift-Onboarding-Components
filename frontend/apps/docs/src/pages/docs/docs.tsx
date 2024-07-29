@@ -71,6 +71,7 @@ const Main = styled.main`
 `;
 
 const GridAssigner = styled.div`
+  z-index: 0;
   grid-area: sections;
 `;
 

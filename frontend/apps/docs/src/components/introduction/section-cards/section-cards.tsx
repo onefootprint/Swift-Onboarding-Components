@@ -40,73 +40,71 @@ const SectionCards = () => {
 
   return (
     <Grid>
-      <div ref={kycHover}>
-        <SectionCard
-          title={t('kyc.title')}
-          subtitle={t('kyc.description')}
-          href="/kyc/getting-started"
-          icon={IcoIdCard24}
-          gridArea="kyc"
-        >
-          <KycIllustration isHovered={isKycHover} />
-        </SectionCard>
-      </div>
-      <div ref={kybHover}>
-        <SectionCard
-          title={t('kyb.title')}
-          subtitle={t('kyb.description')}
-          href="/kyb/getting-started"
-          icon={IcoStore24}
-          gridArea="kyb"
-        >
-          <KybIllustration isHovered={isKybHover} />
-        </SectionCard>
-      </div>
-      <div ref={vaultingHover}>
-        <SectionCard
-          title={t('vaulting.title')}
-          subtitle={t('vaulting.description')}
-          href="https://docs.onefootprint.com/vault/fields"
-          icon={IcoDatabase24}
-          gridArea="vaulting"
-        >
-          <VaultingIllustration isHovered={isVaultingHover} />
-        </SectionCard>
-      </div>
-      <div ref={vaultProxyHover}>
-        <SectionCard
-          title={t('vault-proxy.title')}
-          subtitle={t('vault-proxy.description')}
-          href="/vault/proxy"
-          icon={IcoLayer0124}
-          gridArea="vault-proxy"
-        >
-          <VaultProxyIllustration isHovered={isVaultProxyHover} />
-        </SectionCard>
-      </div>
-      <div ref={otherComponentsHover}>
-        <SectionCard
-          title={t('embedded-components.title')}
-          subtitle={t('embedded-components.description')}
-          href="/embedded-components/getting-started"
-          icon={IcoGridMasonry24}
-          gridArea="components"
-        >
-          <OtherComponentsIllustration isHovered={isOtherComponentsHover} />
-        </SectionCard>
-      </div>
-      {/* <div ref={authCardHover}>
-        <SectionCard
+      <SectionCard
+        title={t('kyc.title')}
+        subtitle={t('kyc.description')}
+        href="/kyc/getting-started"
+        icon={IcoIdCard24}
+        gridArea="kyc"
+        ref={kycHover}
+      >
+        <KycIllustration isHovered={isKycHover} />
+      </SectionCard>
+
+      <SectionCard
+        title={t('kyb.title')}
+        subtitle={t('kyb.description')}
+        href="/kyb/getting-started"
+        icon={IcoStore24}
+        gridArea="kyb"
+        ref={kybHover}
+      >
+        <KybIllustration isHovered={isKybHover} />
+      </SectionCard>
+
+      <SectionCard
+        title={t('vaulting.title')}
+        subtitle={t('vaulting.description')}
+        href="https://docs.onefootprint.com/vault/fields"
+        icon={IcoDatabase24}
+        gridArea="vaulting"
+        ref={vaultingHover}
+      >
+        <VaultingIllustration isHovered={isVaultingHover} />
+      </SectionCard>
+
+      <SectionCard
+        title={t('vault-proxy.title')}
+        subtitle={t('vault-proxy.description')}
+        href="/vault/proxy"
+        icon={IcoLayer0124}
+        gridArea="vault-proxy"
+        ref={vaultProxyHover}
+      >
+        <VaultProxyIllustration isHovered={isVaultProxyHover} />
+      </SectionCard>
+
+      <SectionCard
+        title={t('embedded-components.title')}
+        subtitle={t('embedded-components.description')}
+        href="/embedded-components/getting-started"
+        icon={IcoGridMasonry24}
+        gridArea="components"
+        ref={otherComponentsHover}
+      >
+        <OtherComponentsIllustration isHovered={isOtherComponentsHover} />
+      </SectionCard>
+      {/* <SectionCard
           title={t('auth.title')}
           subtitle={t('auth.description')}
           // add href when auth is ready
           href="/"
           icon={IcoKey24}
           gridArea="auth"
+          ref={authCardHover}
         >
           <AuthIllustration isHovered={isAuthCardHover} />
-        </SectionCard>
-      </div> */}
+        </SectionCard> */}
     </Grid>
   );
 };

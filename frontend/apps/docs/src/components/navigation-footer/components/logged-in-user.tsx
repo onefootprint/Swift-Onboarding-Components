@@ -2,31 +2,33 @@ import { IcoUserCircle16 } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 
-import useSession from 'src/hooks/use-session';
-import NavDropdown from './nav-dropdown';
+import type { User } from 'src/hooks/use-session';
 
-const LoggedInUser = () => {
-  const {
-    data: { user },
-  } = useSession();
-  if (!user) {
-    return null;
-  }
+type LoggedInUserProps = {
+  user: User;
+  children: React.ReactElement;
+};
+
+const LoggedInUser = ({ user, children }: LoggedInUserProps) => {
   const { firstName, lastName, email } = user;
   const userName = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined;
+
   return (
     <Box borderBottomWidth={1} borderColor="tertiary" borderStyle="solid">
-      <Box marginBottom={5} marginLeft={6} marginRight={6} marginTop={5}>
-        <Stack direction="row" align="center" justify="space-between" width="100%" maxWidth="100%" gap={3}>
-          <Box>
+      <Box marginBottom={4} marginLeft={6} marginRight={6} marginTop={4}>
+        <Stack direction="row" width="100%" maxWidth="100%" gap={3} alignItems="center">
+          <Box marginTop={2} marginBottom={6} height={'100%'}>
             <IcoUserCircle16 color="tertiary" />
           </Box>
-          <Text variant="label-4" color="tertiary" truncate width="100%" marginBottom={1}>
-            {userName || email}
-          </Text>
-          <Box>
-            <NavDropdown name={userName} email={email} />
-          </Box>
+          <Stack direction="column" width="100%" maxWidth="100%" overflow="auto">
+            <Text variant="body-3" color="primary" truncate width="100%">
+              {userName || email}
+            </Text>
+            <Text variant="body-4" color="tertiary" truncate width="100%">
+              {user.tenant.name}
+            </Text>
+          </Stack>
+          <Box>{children}</Box>
         </Stack>
       </Box>
     </Box>

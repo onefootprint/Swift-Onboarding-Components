@@ -1,7 +1,17 @@
 import { baseRequest } from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
-import type { SupportFormData } from '../../support-list.types';
+export type SupportFormData = {
+  [FormField.name]: string;
+  [FormField.email]: string;
+  [FormField.message]: string;
+};
+
+export enum FormField {
+  email = 'email',
+  name = 'name',
+  message = 'message',
+}
 
 export type SupportFormRequest = {
   data: SupportFormData;

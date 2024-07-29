@@ -33,6 +33,8 @@ const DesktopNavContainer = styled.aside`
       position: fixed;
       top: var(--header-height);
       width: var(--page-aside-nav-width);
+      z-index: 1;
+      isolation: isolate;
     `};
   `}
 `;

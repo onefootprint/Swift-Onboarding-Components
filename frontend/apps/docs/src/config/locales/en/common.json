@@ -25,9 +25,22 @@
         }
       }
     },
-    "nav-dropdown": {
-      "dashboard": "Dashboard",
-      "log-out": "Log out"
+    "navigation-footer": {
+      "theme": "Theme",
+      "need-help": {
+        "label": "Need help?",
+        "dialog": {
+          "title": "Need help?",
+          "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
+        }
+      },
+      "dropdown": {
+        "dashboard": "Dashboard",
+        "log-out": "Log out",
+        "api-reference": "API Reference",
+        "docs": "Documentation",
+        "help": "Help"
+      }
     },
     "cmd": {
       "title": "Global command menu",
@@ -74,18 +87,6 @@
           "description": "We'll get back to you as soon as possible."
         },
         "submit-error": "Oops, something went wrong. Please try again."
-      }
-    },
-    "navigation-footer": {
-      "theme": "Theme",
-      "api-reference": "API Reference",
-      "docs": "Documentation",
-      "need-help": {
-        "label": "Need help?",
-        "dialog": {
-          "title": "Need help?",
-          "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
-        }
       }
     },
     "navigation-api-reference": {

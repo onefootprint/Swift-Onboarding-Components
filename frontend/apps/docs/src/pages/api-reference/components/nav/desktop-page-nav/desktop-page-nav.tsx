@@ -102,6 +102,7 @@ const PageNavContainer = styled.aside`
       position: relative;
       grid-area: nav;
       width: 100%;
+      z-index: 1;
     `};
   `}
 `;

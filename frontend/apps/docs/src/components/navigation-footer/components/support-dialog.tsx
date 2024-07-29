@@ -3,19 +3,18 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import useSupportForm from '../../hooks/use-support-form';
-import type { SupportFormData } from '../../support-list.types';
-import { FormField } from '../../support-list.types';
+import useSupportForm, { FormField, SupportFormData } from '../hooks/use-support-form';
 
 type SupportDialogProps = {
-  url: string;
   open: boolean;
   onClose: () => void;
   title: string;
   description: string;
 };
 
-const SupportDialog = ({ url, title, description, open, onClose }: SupportDialogProps) => {
+const GET_FORM_URL = 'https://getform.io/f/pbgxoqza';
+
+const SupportDialog = ({ title, description, open, onClose }: SupportDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.support-dialog',
   });
@@ -31,12 +30,11 @@ const SupportDialog = ({ url, title, description, open, onClose }: SupportDialog
   useEffect(() => {
     reset();
     submitFormMutation.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const onSubmit = (data: SupportFormData) => {
     submitFormMutation.mutate(
-      { url, data },
+      { url: GET_FORM_URL, data },
       {
         onSuccess() {
           onClose();

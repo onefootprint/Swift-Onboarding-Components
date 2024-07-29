@@ -2,15 +2,17 @@ import { Organization, RoleScope } from '@onefootprint/types';
 
 export type Session = {
   authToken?: string;
-  user?: {
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-    isAssumedSession?: boolean;
-    isFirmEmployee?: boolean;
-    scopes: RoleScope[];
-    tenant: Organization;
-  };
+  user?: User;
+};
+
+export type User = {
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  isAssumedSession?: boolean;
+  isFirmEmployee?: boolean;
+  scopes: RoleScope[];
+  tenant: Organization;
 };
 
 export const defaultSession = {

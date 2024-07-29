@@ -4,21 +4,31 @@ import { Dropdown, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSession from 'src/hooks/use-session';
+import { API_REFERENCE_PATH } from 'src/config/constants';
+import useSession, { User } from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 type NavDropdownProps = {
-  name?: string;
-  email: string;
+  user: User;
+  isApiReference: boolean;
+  handleOpenSupportDialog: () => void;
 };
 
-const NavDropdown = ({ name, email }: NavDropdownProps) => {
+const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation('common', { keyPrefix: 'components.nav-dropdown' });
+  const { t } = useTranslation('common', { keyPrefix: 'components.navigation-footer.dropdown' });
   const { logOut } = useSession();
+
+  const { firstName, lastName, email } = user;
+  const name = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined;
 
   const handleLogout = () => {
     logOut();
+  };
+
+  const handleClickHelp = () => {
+    setIsOpen(false);
+    handleOpenSupportDialog();
   };
 
   return (
@@ -44,6 +54,13 @@ const NavDropdown = ({ name, email }: NavDropdownProps) => {
               <StyledLink as={Link} href={`${DASHBOARD_BASE_URL}`} target="_blank">
                 {t('dashboard')}
                 <IcoArrowUpRight16 color="secondary" />
+              </StyledLink>
+              <StyledLink as={Link} href={isApiReference ? '/' : API_REFERENCE_PATH}>
+                {isApiReference ? t('docs') : t('api-reference')}
+                <IcoArrowUpRight16 color="secondary" />
+              </StyledLink>
+              <StyledLink as={'a'} onClick={handleClickHelp}>
+                {t('help')}
               </StyledLink>
             </Dropdown.Group>
             <Dropdown.Separator />
@@ -80,6 +97,7 @@ const UserDropdownItem = styled(Dropdown.Item)`
 const NavDropdownContent = styled(Dropdown.Content)`
   width: 260px;
   overflow: hidden;
+  z-index: 1000;
 `;
 
 const StyledLink = styled(Dropdown.Item)`

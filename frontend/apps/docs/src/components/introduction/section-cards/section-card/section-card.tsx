@@ -2,7 +2,7 @@ import type { Icon } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 type SectionCardProps = {
@@ -15,24 +15,28 @@ type SectionCardProps = {
   children?: React.ReactNode;
 };
 
-const SectionCard = ({ title, subtitle, icon: Icon, imageSrc, gridArea, children, href }: SectionCardProps) => {
-  const renderedIcon = Icon && <Icon />;
+const SectionCard = forwardRef<HTMLAnchorElement, SectionCardProps>(
+  ({ title, subtitle, icon: Icon, imageSrc, gridArea, children, href }, ref) => {
+    const renderedIcon = Icon && <Icon />;
 
-  return (
-    <Container href={href} gridArea={gridArea}>
-      <IllustrationContainer>
-        {children || (imageSrc && <Image src={imageSrc} alt={title} height={194} width={350} />)}
-      </IllustrationContainer>
-      <TextContainer>
-        <TitleContainer>
-          {renderedIcon}
-          <Title>{title}</Title>
-        </TitleContainer>
-        <Subtitle>{subtitle}</Subtitle>
-      </TextContainer>
-    </Container>
-  );
-};
+    return (
+      <Container href={href} gridArea={gridArea} ref={ref}>
+        <IllustrationContainer>
+          {children || (imageSrc && <Image src={imageSrc} alt={title} height={194} width={350} />)}
+        </IllustrationContainer>
+        <TextContainer>
+          <TitleContainer>
+            {renderedIcon}
+            <Title>{title}</Title>
+          </TitleContainer>
+          <Subtitle>{subtitle}</Subtitle>
+        </TextContainer>
+      </Container>
+    );
+  },
+);
+
+SectionCard.displayName = 'SectionCard';
 
 const Container = styled(Link)<{ gridArea?: string }>`
   ${({ theme, gridArea }) => css`
@@ -62,8 +66,9 @@ const IllustrationContainer = styled.div`
   overflow: hidden;
   position: relative;
   mask: linear-gradient(180deg, #fff 85%, transparent 100%);
-  height: 169px;
+  height: 170px;
   mask-mode: alpha;
+  isolation: isolate;
 
   img {
     object-fit: cover;
