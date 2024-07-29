@@ -5,22 +5,15 @@ import { Article, SecurityTypes } from '../api-reference.types';
 type AdditionalArticleProps = {
   /** True if the API is deprecated/phased out and the authed tenant doesn't have access to it. */
   isHidden: boolean;
-  /** True if the API is deprecated/phased out */
-  isPhasedOut: boolean;
-  /** The list of `TenantPreviewApi`s required to access this API. */
-  requiredPreviewGates: TenantPreviewApi[];
-  previewGateStatus: PreviewGateStatus;
+  /** True if the authenticated tenant has access to hit this API (with regards to preview gates). */
+  canAccessApi: boolean;
+  tag?: ArticleTag;
 };
 
-export enum PreviewGateStatus {
-  /** No preview gate is required for this API */
-  ungated = 'ungated',
-  /** A preview gate is required for this API and the tenant does not have access to it */
-  gatedNoAccess = 'gatedNoAccess',
-  /** A preview gate is required for this API and the tenant has access to it */
-  gatedWithAccess = 'gatedWithAccess',
-  /** A preview gate is required for this API and the authed user is a firm employee */
-  gatedWithAccessFirmEmployee = 'gatedWithAccessFirmEmployee',
+export enum ArticleTag {
+  preview = 'Preview',
+  phasedOut = 'PhasedOut',
+  publicApi = 'PublicApi',
 }
 
 export type HydratedArticle = Article & AdditionalArticleProps;
@@ -31,7 +24,6 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
   } = useSession();
 
   return articles.map(article => {
-    const isPhasedOut = article.tags?.includes('PhasedOut') || false;
     const requiredPreviewGates = (article.security || [])
       .flatMap(s => s[SecurityTypes.apiKey] || [])
       .filter(s => s.startsWith('preview:'))
@@ -41,18 +33,20 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
         `API with multiple required preview gates: ${article.method} ${article.path}, ${requiredPreviewGates}`,
       );
     }
+
+    const tag = Object.values(ArticleTag).filter(t => article.tags?.includes(t))[0];
     const requiredPreviewGate: TenantPreviewApi | undefined = requiredPreviewGates[0];
-    const canAccessGatedApi =
-      !requiredPreviewGate || user?.tenant?.allowedPreviewApis?.includes(requiredPreviewGate) || user?.isFirmEmployee;
-    const isHidden = isPhasedOut && !canAccessGatedApi;
+    const canAccessApi =
+      !requiredPreviewGate || user?.tenant?.allowedPreviewApis?.includes(requiredPreviewGate) || false;
+
+    // Employees should always be able to see every API
+    const isHidden = tag === ArticleTag.phasedOut && !canAccessApi && !user?.isFirmEmployee;
 
     return {
       ...article,
       isHidden,
-      isPhasedOut,
-      requiredPreviewGates,
-      // TODO
-      previewGateStatus: PreviewGateStatus.ungated,
+      canAccessApi,
+      tag,
     };
   });
 };

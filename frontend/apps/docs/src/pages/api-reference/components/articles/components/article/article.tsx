@@ -1,4 +1,4 @@
-import { Badge, Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components';
 
 import type { SecurityTypes } from '@/api-reference/api-reference.types';
 
-import useSession from 'src/hooks/use-session';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
 import TypeBadge from '../../../type-badge/type-badge';
 import DemoCode from './components/demo-code';
@@ -15,6 +14,7 @@ import Parameters from './components/parameters';
 import RequestBody from './components/request-body';
 import Responses from './components/responses';
 import Security from './components/security';
+import Tags from './components/tags';
 
 const API_BASE_URL = 'api.onefootprint.com';
 
@@ -28,9 +28,6 @@ const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const { id, parameters, description, method, path, security, responses, requestBody } = article;
   const encodedId = encodeURIComponent(id);
-  const {
-    data: { user },
-  } = useSession();
 
   if (article.isHidden) {
     return null;
@@ -41,7 +38,7 @@ const Article = ({ article }: ArticleProps) => {
       <ContentColumn>
         <ContentWidth>
           <TitleContainer direction="column" gap={3}>
-            {method && path && (
+            <Stack direction="row" justifyContent="space-between">
               <MethodContainer>
                 <TypeBadge type={method} />
                 <Stack direction="row" gap={1}>
@@ -50,10 +47,9 @@ const Article = ({ article }: ArticleProps) => {
                     {path}
                   </Text>
                 </Stack>
-                {/* TODO improve this badge. Show when API is preview, show when can see only because firm employee */}
-                {article.isPhasedOut && user?.isFirmEmployee ? <Badge variant="neutral">Deprecated</Badge> : null}
               </MethodContainer>
-            )}
+              <Tags article={article} />
+            </Stack>
             {description && <Description>{description}</Description>}
           </TitleContainer>
           {security && (

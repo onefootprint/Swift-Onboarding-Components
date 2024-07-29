@@ -227,6 +227,14 @@
       "sections": {
         "footprint-api": "Footprint API",
         "footprint-api-preview": "Footprint API (Preview)"
+      },
+      "tags": {
+        "phased-out": "Phased out",
+        "phased-out-tooltip": "This API is being phased out and should not be granted to future customers. You are only seeing this message as an employee.",
+        "preview": "Preview",
+        "preview-tooltip": "This is a preview API and may actively change.",
+        "locked": "Locked",
+        "locked-tooltip": "Please reach out to request access to this API."
       }
     },
     "internal-api-reference": {
