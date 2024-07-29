@@ -1,7 +1,7 @@
 use actix_web::web;
 use age::secrecy::ExposeSecret;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
@@ -11,6 +11,7 @@ use db::errors::FpOptionalExtension;
 use db::models::vault_dr::NewVaultDrConfig;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
@@ -30,7 +31,7 @@ use vault_dr::VaultDrAwsConfig;
 #[actix::post("/org/vault_dr/enroll")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyGated<preview_api::VaultDisasterRecovery>,
     request: web::Json<api_wire_types::VaultDrEnrollRequest>,
 ) -> ApiResponse<api_wire_types::VaultDrEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;

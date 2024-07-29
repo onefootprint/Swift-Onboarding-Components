@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::FpResult;
@@ -8,6 +8,7 @@ use api_core::State;
 use crypto::hex::ToHex;
 use db::models::vault_dr::NewVaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
+use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
@@ -20,7 +21,7 @@ use paperclip::actix::{
 #[actix::post("/org/vault_dr/aws_pre_enrollment")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyGated<preview_api::VaultDisasterRecovery>,
 ) -> ApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant().clone();
@@ -51,7 +52,7 @@ pub async fn post(
 #[actix::get("/org/vault_dr/aws_pre_enrollment")]
 pub async fn get(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyGated<preview_api::VaultDisasterRecovery>,
 ) -> ApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant_id = auth.tenant().id.clone();

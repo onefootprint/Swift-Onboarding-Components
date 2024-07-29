@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::CanDecrypt;
 use api_core::types::ApiResponse;
@@ -18,6 +18,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use itertools::Itertools;
+use newtypes::preview_api;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
@@ -35,7 +36,7 @@ const RECORD_LIMIT: usize = 50;
 #[actix::post("/org/vault_dr/reveal_wrapped_record_keys")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyGated<preview_api::VaultDisasterRecovery>,
     request: web::Json<VaultDrRevealWrappedRecordKeysRequest>,
     insight_headers: InsightHeaders,
 ) -> ApiResponse<VaultDrRevealWrappedRecordKeysResponse> {
