@@ -303,7 +303,6 @@ pub(super) fn eval_waterfall_rules(
     let reason_codes =
         decision::features::risk_signals::parse_reason_codes_from_vendor_result(res.clone(), vw)?
             .kyc
-            .footprint_reason_codes
             .into_iter()
             .map(|(frc, _, _)| frc)
             .collect_vec();

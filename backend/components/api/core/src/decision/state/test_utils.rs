@@ -1,5 +1,3 @@
-use crate::decision::features::risk_signals::risk_signal_group_struct::Doc;
-use crate::decision::features::risk_signals::RiskSignalGroupStruct;
 use crate::decision::tests::test_helpers::FixtureData;
 use crate::decision::tests::test_helpers::{
     self,
@@ -673,17 +671,12 @@ pub async fn mock_incode_doc_collection(
             )
             .unwrap();
 
-            let footprint_reason_codes = document_frcs
+            let signals = document_frcs
                 .into_iter()
                 .map(|frc| (frc, VendorAPI::IncodeFetchScores, vres.id.clone()))
                 .collect();
-            let rsg = RiskSignalGroupStruct::<Doc> {
-                footprint_reason_codes,
-                group: Doc,
-            };
             // incode state machine defaults this to not hidden
-            let rcs = rsg.footprint_reason_codes;
-            RiskSignal::bulk_create(conn, &scoped_vault_id, rcs, RiskSignalGroupKind::Doc, false)?;
+            RiskSignal::bulk_create(conn, &scoped_vault_id, signals, RiskSignalGroupKind::Doc, false)?;
 
             Ok(())
         })

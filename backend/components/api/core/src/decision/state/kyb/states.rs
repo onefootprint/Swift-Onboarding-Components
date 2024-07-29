@@ -418,7 +418,6 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let kyb_rsg = rsfd.kyb.unwrap_or_default();
 
         let vres_ids = kyb_rsg
-            .footprint_reason_codes
             .iter()
             .map(|(_, _, vres_id)| vres_id.clone())
             .unique()

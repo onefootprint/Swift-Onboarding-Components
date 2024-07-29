@@ -2,8 +2,6 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::features::incode_docv::{
     self,
 };
-use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
-use crate::decision::features::risk_signals::RiskSignalGroupStruct;
 use crate::decision::features::risk_signals::RiskSignalsForDecision;
 use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
@@ -328,26 +326,22 @@ pub fn get_aml_risk_signals_from_aml_call(
     obc: &ObConfiguration,
     watchlist_vres_id: &VerificationResultId,
     watchlist_result_response: &WatchlistResultResponse,
-) -> RiskSignalGroupStruct<Aml> {
+) -> Vec<NewRiskSignalInfo> {
     let wc_reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
         watchlist_result_response,
         &obc.verification_checks().enhanced_aml(),
         &obc.tenant_id,
     );
-    let footprint_reason_codes = wc_reason_codes
+    wc_reason_codes
         .into_iter()
         .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres_id.clone()))
-        .collect::<Vec<_>>();
-    RiskSignalGroupStruct {
-        footprint_reason_codes,
-        group: Aml,
-    }
+        .collect::<Vec<_>>()
 }
 
 pub fn get_aml_risk_signals_from_kyc_call(
     vw: &VaultWrapper,
     kyc_vendor_result: VendorResult,
-) -> FpResult<RiskSignalGroupStruct<Aml>> {
+) -> FpResult<Vec<NewRiskSignalInfo>> {
     decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw)
         .map(|r| r.aml)
 }
@@ -362,8 +356,7 @@ pub fn get_review_reasons(
         Some(CipKind::Alpaca) => {
             let watchlist_reason_codes: Vec<_> = risk_signals
                 .aml
-                .as_ref()
-                .map(|a| a.footprint_reason_codes.clone())
+                .clone()
                 .unwrap_or_default()
                 .iter()
                 .map(|(rc, _, _)| rc.clone())

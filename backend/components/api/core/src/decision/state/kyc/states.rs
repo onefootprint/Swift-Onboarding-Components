@@ -9,9 +9,6 @@ use super::MakeVendorCalls;
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use crate::decision::features::risk_signals::parse_reason_codes;
 use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
-use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
-use crate::decision::features::risk_signals::risk_signal_group_struct::Kyc;
-use crate::decision::features::risk_signals::RiskSignalGroupStruct;
 use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
 use crate::decision::features::{
     self,
@@ -342,20 +339,16 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 let reason_codes = decision::sandbox::get_fixture_kyc_reason_codes(fd, &obc);
                 let vres_id = kyc_vendor_result.verification_result_id.clone();
 
-                RiskSignalGroupStruct {
-                    footprint_reason_codes: reason_codes
-                        .into_iter()
-                        .map(|r| (r.0, r.1, vres_id.clone()))
-                        .collect(),
-                    group: Kyc,
-                }
+                reason_codes
+                    .into_iter()
+                    .map(|r| (r.0, r.1, vres_id.clone()))
+                    .collect()
             } else {
                 parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), &vw)?.kyc
                 // TODO: only call this once and re-use for aml portion below
             };
 
             let rses = kyc_risk_signals
-                .footprint_reason_codes
                 .into_iter()
                 .chain(user_input_risk_signals)
                 .collect();
@@ -367,13 +360,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             let aml_risk_signals = if let Some(fixture_result) = fixture_result {
                 let reason_codes = decision::sandbox::get_fixture_aml_reason_codes(&fixture_result, &obc);
 
-                RiskSignalGroupStruct {
-                    footprint_reason_codes: reason_codes
-                        .into_iter()
-                        .map(|r| (r.0, r.1, watchlist_vres_id.clone()))
-                        .collect(),
-                    group: Aml,
-                }
+                reason_codes
+                    .into_iter()
+                    .map(|r| (r.0, r.1, watchlist_vres_id.clone()))
+                    .collect()
             } else {
                 common::get_aml_risk_signals_from_aml_call(
                     &obc,
@@ -381,12 +371,22 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     &watchlist_result_response,
                 )
             };
-            let rcs = aml_risk_signals.footprint_reason_codes;
-            RiskSignal::bulk_create(conn, &self.sv_id, rcs, RiskSignalGroupKind::Aml, false)?;
+            RiskSignal::bulk_create(
+                conn,
+                &self.sv_id,
+                aml_risk_signals,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
         } else if let Some(kyc_vendor_result) = kyc_vendor_result {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
-            let rcs = aml_risk_signals.footprint_reason_codes;
-            RiskSignal::bulk_create(conn, &self.sv_id, rcs, RiskSignalGroupKind::Aml, false)?;
+            RiskSignal::bulk_create(
+                conn,
+                &self.sv_id,
+                aml_risk_signals,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
         };
 
         Ok(KycState::from(KycDecisioning::new(

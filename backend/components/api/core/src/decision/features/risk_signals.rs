@@ -7,9 +7,8 @@ use crate::decision::vendor::vendor_result::VendorResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
-use derive_more::Display;
-use enum_variant_type::EnumVariantType;
 use idv::ParsedResponse;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind as IDK;
@@ -19,62 +18,9 @@ use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use std::collections::HashMap;
 
-// There are 2 main ways we interact RiskSignals:
-//  - WRITE - when handling vendor responses, in order to produce and save risk signals
-//  - READ - when reading from the database for decisioning or populating an Alpaca CIP or
-//    displaying the dashboard etc
-//
-//
-// However, rules are defined per Vendor for a multitude of reasons (the main one being that reason
-// codes are different across vendors, or mean different things) so when using the most recent
-// grouping of risk signals, we need a way to decompose back into vendor-specific risk signals
-// (currently our `*Features`)
-//
-// Walking through an example:
-//  * Writing
-//   1. we make vendor requests
-//   2. we convert the responses into a `RiskSignalGroupStruct`. We have defined via traits how to
-//      convert a HashMap of vendor responses into the appropriate grouping of RiskSignals
-//   3. Save RiskSignals
-// * Reading
-//   1. We reach a decision point where we need all the latest risk signals for a specific
-//      RiskSignalGroupKind
-//   2. We fetch all RiskSignals from the latest RSG of that kind
-//   3. We define (via `From`) ways to convert from `RiskSignalGroupStruct` into the various
-//      Vendor-specific features that are used in rules
-//
-// Why all these traits?
-//  convenience and type safety, and makes the decisioning code more generic
-
-// Represents a typed grouping of FootprintReasonCodes
-#[derive(Clone)]
-pub struct RiskSignalGroupStruct<T>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-{
-    pub footprint_reason_codes: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-    pub group: T,
-}
-
-impl<T> Default for RiskSignalGroupStruct<T>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone + Default,
-{
-    fn default() -> Self {
-        Self {
-            footprint_reason_codes: vec![],
-            group: T::default(),
-        }
-    }
-}
-
-//
-// WRITE
-//
-
 pub struct ParsedFootprintReasonCodes {
-    pub kyc: RiskSignalGroupStruct<Kyc>, // TODO: just have these be Vec<FRC>
-    pub aml: RiskSignalGroupStruct<Aml>,
+    pub kyc: Vec<NewRiskSignalInfo>,
+    pub aml: Vec<NewRiskSignalInfo>,
 }
 
 // Helper to use in FRC construction
@@ -107,21 +53,16 @@ pub fn parse_reason_codes_from_vendor_result(
         .into_iter()
         .partition(|frc| frc.is_aml());
 
-    let kyc = RiskSignalGroupStruct {
-        footprint_reason_codes: kyc_frcs
-            .into_iter()
-            .map(|frc| (frc, vendor_api, vres_id.clone()))
-            .collect(),
-        group: Kyc,
-    };
+    let kyc = kyc_frcs
+        .into_iter()
+        .map(|frc| (frc, vendor_api, vres_id.clone()))
+        .collect();
 
-    let aml = RiskSignalGroupStruct {
-        footprint_reason_codes: aml_frcs
-            .into_iter()
-            .map(|frc| (frc, vendor_api, vres_id.clone()))
-            .collect(),
-        group: Aml,
-    };
+
+    let aml = aml_frcs
+        .into_iter()
+        .map(|frc| (frc, vendor_api, vres_id.clone()))
+        .collect();
 
     let res = ParsedFootprintReasonCodes { kyc, aml };
     Ok(res)
@@ -150,30 +91,6 @@ pub fn parse_reason_codes(
     }
 }
 
-//
-// READ
-//
-
-// temp hack for the AlpacaKyc workflow which makes an initial decision purely on KYC risk signals
-// and then later makes the AML vendor call and checks AML risk_signals this prevents scenarios
-// like: A user goes through AlpacaKyc and gets a watchlist hit, the Tenant asks them to redo KYC
-// and enter in their full name. They go through the flow again and enter a new name which doesn't
-// have any watchlist hits associated with it. But we immediatly fail them in AlpacaKycDecisioning
-// because their latest AML risk signals from the first onboarding still exist
-pub fn fetch_latest_kyc_risk_signals(
-    conn: &mut db::PgConn,
-    scoped_vault_id: &ScopedVaultId,
-) -> FpResult<RiskSignalsForDecision> {
-    let rsfd = fetch_latest_risk_signals_map(conn, scoped_vault_id)?;
-    Ok(RiskSignalsForDecision {
-        kyc: rsfd.kyc.clone(),
-        doc: None,
-        kyb: None,
-        aml: None,
-        risk_signals: rsfd.risk_signals.clone(),
-    })
-}
-
 pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
@@ -189,10 +106,10 @@ pub fn fetch_latest_risk_signals_map(
 
     let risk_signals = db_risk_signals_map.clone();
 
-    let kyc = extract_risk_signal_group(&mut db_risk_signals_map, Kyc);
-    let doc = extract_risk_signal_group(&mut db_risk_signals_map, Doc);
-    let kyb = extract_risk_signal_group(&mut db_risk_signals_map, Kyb);
-    let aml = extract_risk_signal_group(&mut db_risk_signals_map, Aml);
+    let kyc = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Kyc);
+    let doc = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Doc);
+    let kyb = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Kyb);
+    let aml = extract_risk_signal_group(&mut db_risk_signals_map, RiskSignalGroupKind::Aml);
 
     Ok(RiskSignalsForDecision {
         kyc,
@@ -203,82 +120,23 @@ pub fn fetch_latest_risk_signals_map(
     })
 }
 
-fn extract_risk_signal_group<T>(
+fn extract_risk_signal_group(
     db_risk_signals_map: &mut HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
-    group: T,
-) -> Option<RiskSignalGroupStruct<T>>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-{
-    let rsg_kind = group.clone().into().into();
-    db_risk_signals_map
-        .remove(&rsg_kind)
-        .map(|rs| {
-            rs.into_iter()
-                .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
-                .collect::<Vec<_>>()
-        })
-        .map(|frcs| RiskSignalGroupStruct {
-            footprint_reason_codes: frcs,
-            group,
-        })
-}
-
-// TODO: get rid of this!
-// RiskSignalGroupKind is defined in `newtypes` with all the other
-/// db types, we have another "Wrapped" enum here so we can implement extra functionality that is
-/// helpful for working with RiskSignals in application code
-#[derive(Debug, Display, Clone, Copy, Hash, PartialEq, Eq, EnumVariantType)]
-#[evt(module = "risk_signal_group_struct")]
-#[evt(derive(Clone, Hash, PartialEq, Eq, Default))]
-pub enum WrappedRiskSignalGroupKind {
-    Kyc,
-    Kyb,
-    Doc,
-    Device,
-    NativeDevice,
-    Aml,
-    Behavior,
-    Phone,
-}
-use risk_signal_group_struct::*;
-
-impl From<RiskSignalGroupKind> for WrappedRiskSignalGroupKind {
-    fn from(value: RiskSignalGroupKind) -> Self {
-        match value {
-            RiskSignalGroupKind::Kyc => Self::Kyc,
-            RiskSignalGroupKind::Kyb => Self::Kyb,
-            RiskSignalGroupKind::Doc => Self::Doc,
-            RiskSignalGroupKind::WebDevice => Self::Device,
-            RiskSignalGroupKind::NativeDevice => Self::NativeDevice,
-            RiskSignalGroupKind::Aml => Self::Aml,
-            RiskSignalGroupKind::Behavior => Self::Behavior,
-            RiskSignalGroupKind::Phone => Self::Phone,
-        }
-    }
-}
-
-impl From<WrappedRiskSignalGroupKind> for RiskSignalGroupKind {
-    fn from(value: WrappedRiskSignalGroupKind) -> Self {
-        match value {
-            WrappedRiskSignalGroupKind::Kyc => Self::Kyc,
-            WrappedRiskSignalGroupKind::Kyb => Self::Kyb,
-            WrappedRiskSignalGroupKind::Doc => Self::Doc,
-            WrappedRiskSignalGroupKind::Device => Self::WebDevice,
-            WrappedRiskSignalGroupKind::NativeDevice => Self::NativeDevice,
-            WrappedRiskSignalGroupKind::Aml => Self::Aml,
-            WrappedRiskSignalGroupKind::Behavior => Self::Behavior,
-            WrappedRiskSignalGroupKind::Phone => Self::Phone,
-        }
-    }
+    group: RiskSignalGroupKind,
+) -> Option<Vec<NewRiskSignalInfo>> {
+    db_risk_signals_map.remove(&group).map(|rs| {
+        rs.into_iter()
+            .map(|rs| (rs.reason_code, rs.vendor_api, rs.verification_result_id))
+            .collect::<Vec<_>>()
+    })
 }
 
 #[derive(Clone, Default)]
 pub struct RiskSignalsForDecision {
-    pub kyc: Option<RiskSignalGroupStruct<Kyc>>,
-    pub doc: Option<RiskSignalGroupStruct<Doc>>,
-    pub kyb: Option<RiskSignalGroupStruct<Kyb>>,
-    pub aml: Option<RiskSignalGroupStruct<Aml>>,
+    pub kyc: Option<Vec<NewRiskSignalInfo>>,
+    pub doc: Option<Vec<NewRiskSignalInfo>>,
+    pub kyb: Option<Vec<NewRiskSignalInfo>>,
+    pub aml: Option<Vec<NewRiskSignalInfo>>,
     pub risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
 }
 
