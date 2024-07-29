@@ -40,13 +40,17 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
     setIsOpen(false);
   };
 
-  let docsLink = DOCS_BASE_URL;
-  let apiReferenceLink = `${DOCS_BASE_URL}/api-reference`;
-  if (user?.isFirmEmployee) {
-    // For in-development logged-in docs site
-    docsLink = composeDocsLoginUrl('/');
-    apiReferenceLink = composeDocsLoginUrl('/api-reference');
-  }
+  const redirectToDocsSite = (url: string) => () => {
+    composeDocsLoginUrl(url)
+      .then(docsSiteLink => {
+        window.open(docsSiteLink, '_blank');
+      })
+      .catch(err => {
+        console.error(`Error generating authenticated docs site link: ${err}`);
+        // Open un-authed docs site in case of an error
+        window.open(`${DOCS_BASE_URL}/${url}`, '_blank');
+      });
+  };
 
   return (
     <>
@@ -65,11 +69,11 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             ) : null}
             <Dropdown.Separator />
             <Dropdown.Group>
-              <StyledLink as={Link} href={docsLink} target="_blank">
+              <StyledLink as="a" onClick={redirectToDocsSite('/')}>
                 {t('help-links.documentation')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
-              <StyledLink as={Link} href={apiReferenceLink} target="_blank">
+              <StyledLink as="a" onClick={redirectToDocsSite('/api-reference')}>
                 {t('help-links.api-reference')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>

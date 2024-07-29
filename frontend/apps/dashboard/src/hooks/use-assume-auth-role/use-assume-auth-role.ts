@@ -3,14 +3,14 @@ import type { OrgAssumeRoleRequest, OrgAssumeRoleResponse } from '@onefootprint/
 import { useMutation } from '@tanstack/react-query';
 import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 
-const assumeRole = async ({ tenantId, authToken }: OrgAssumeRoleRequest) => {
+const assumeRole = async ({ tenantId, authToken, purpose }: OrgAssumeRoleRequest) => {
   const response = await request<OrgAssumeRoleResponse>({
     method: 'POST',
     url: '/org/auth/assume_role',
     headers: {
       [DASHBOARD_AUTHORIZATION_HEADER]: authToken,
     },
-    data: { tenantId },
+    data: { tenantId, purpose },
   });
   return response.data;
 };

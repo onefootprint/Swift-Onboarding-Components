@@ -1,20 +1,30 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
+import { AssumeRolePurpose } from '@onefootprint/types';
+import useAssumeRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
 
 const useComposeDocsLoginUrl = () => {
   const {
-    // TODO use downscoped token retrieved from the backend instead of dashboard auth token
-    data: { auth },
+    data: { auth, org },
   } = useSession();
+  const assumeRole = useAssumeRole();
 
-  const composeDocsLoginUrl = (docsRedirectUrl: string) => {
-    return `${DOCS_BASE_URL}/login?redirectUrl=${docsRedirectUrl}#${auth}`;
+  const composeDocsLoginUrl = async (docsRedirectUrl: string) => {
+    if (!org?.id || !auth) {
+      throw Error('User is not logged in');
+    }
+    const response = await assumeRole.mutateAsync({
+      tenantId: org?.id,
+      authToken: auth,
+      purpose: AssumeRolePurpose.docs,
+    });
+    return `${DOCS_BASE_URL}/login?redirectUrl=${docsRedirectUrl}#${response.token}`;
   };
 
   return {
     /**
      * Creates the absolute URL to the docs site that will log the user into the docs site as the
-     * currently authenticated dashboard user.
+     * currently authenticated dashboard user using a docs-site-specific token.
      * After login, the user will be redirected to the relative `docsRedirectUrl` on the docs site.
      */
     composeDocsLoginUrl,

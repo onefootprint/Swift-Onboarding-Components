@@ -1,3 +1,4 @@
+import { AssumeRolePurpose } from '@onefootprint/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -29,6 +30,7 @@ const useRedirect = () => {
     const response = await assumeRoleMutation.mutateAsync({
       tenantId: options.tenantId,
       authToken: options.authToken,
+      purpose: AssumeRolePurpose.dashboard,
     });
     await logIn({ auth: response.token, newIsLive: options.mode === 'live' });
     router.replace(options.redirectUrl);

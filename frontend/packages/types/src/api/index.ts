@@ -221,6 +221,7 @@ export type {
   OrgAssumeRoleRequest,
   OrgAssumeRoleResponse,
 } from './org-assume-role';
+export { AssumeRolePurpose } from './org-assume-role';
 export type {
   OrgAuthLoginRequest,
   OrgAuthLoginResponse,

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { useRouter } from 'next/router';
 import useComposeDocsLoginUrl from 'src/hooks/use-compose-docs-login-url';
 import useFilters from 'src/hooks/use-filters';
@@ -20,19 +21,25 @@ const DocsLogin = () => {
   const { query, isReady } = useFilters<DocsLoginFilters>({});
   const { composeDocsLoginUrl } = useComposeDocsLoginUrl();
   const redirectUrl = query.redirectUrl || '/api-reference';
-  const docsSiteLink = composeDocsLoginUrl(redirectUrl);
+  const showErrorToast = useRequestErrorToast();
 
   useEffect(() => {
     if (!isReady) {
       return;
     }
     if (!isLoggedIn) {
-      // If we're not logged in, the Gate component will automatically redirect us to the login page.
-      // After login is complete, we'll be redirected back here.
+      // If we visit this page while not logged in, the Gate component will automatically redirect us to the
+      // login page and prompt the user to log into the dashboard.
+      // After the user is logged into the dashboard, we'll be redirected back here.
       return;
     }
-    router.push(docsSiteLink);
-  }, [isReady, isLoggedIn, docsSiteLink]);
+    // Redirect to the docs site with the docs-specific token in the URL hash.
+    composeDocsLoginUrl(redirectUrl)
+      .then(docsSiteLink => {
+        router.push(docsSiteLink);
+      })
+      .catch(showErrorToast);
+  }, [isReady, isLoggedIn, composeDocsLoginUrl, router, showErrorToast]);
 
   return (
     <>

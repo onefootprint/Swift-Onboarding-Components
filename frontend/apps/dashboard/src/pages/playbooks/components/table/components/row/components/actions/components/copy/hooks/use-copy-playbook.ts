@@ -1,10 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import type {
-  CopyPlaybookRequest,
-  CopyPlaybookResponse,
-  OnboardingConfig,
-  OrgAssumeRoleResponse,
+import {
+  AssumeRolePurpose,
+  type CopyPlaybookRequest,
+  type CopyPlaybookResponse,
+  type OnboardingConfig,
+  type OrgAssumeRoleResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -19,6 +20,7 @@ const copyPlaybook = async (authHeaders: AuthHeaders, { playbookId, name, isLive
     headers: authHeaders,
     data: {
       tenantId,
+      purpose: AssumeRolePurpose.dashboard,
     },
   });
 
