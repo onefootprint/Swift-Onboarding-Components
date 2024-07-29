@@ -45,7 +45,7 @@ const shouldRunTransfer = (ctx: MachineContext): boolean => {
   if (ctx.isTransferOnDesktopDisabled && !isDeviceMobile(ctx)) return false;
 
   if (isNoPhoneFlow(ctx)) return false;
-  if (ctx.didRunTransfer) return false;
+  if (ctx.isTransferVisited) return false;
   if (isTransfer(ctx)) return false;
 
   const nextRequirementIsLiveness = isRegisterPasskey(getFirstKind(ctx));

@@ -2,7 +2,7 @@ import { useInputMask } from '@onefootprint/hooks';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, CorporationType } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
-import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
+import { Grid, PhoneInput, Select, Stack, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,27 +12,26 @@ import { useL10nContext } from '../../../../../../components/l10n-provider';
 import checkIsPhoneValid from '../../../../../../utils/check-is-phone-valid';
 import type { BasicData } from '../../../../utils/state-machine/types';
 
-type FormData = {
-  name: string;
-  tin: string;
-  doingBusinessAs?: string;
-  corporationType?: SelectOption;
-  phoneNumber?: string;
-  website?: string;
-};
-
 type FormHints = Partial<{ [K in keyof FormData]: string }>;
 type FormProps = (keyof FormData)[];
 type FormErrors = Partial<{ [K in keyof FormData]: { message?: string } }>;
+type FormData = {
+  corporationType?: SelectOption;
+  doingBusinessAs?: string;
+  name: string;
+  phoneNumber?: string;
+  tin: string;
+  website?: string;
+};
 
 export type BasicDataFormProps = {
-  defaultValues?: Partial<FormData>;
-  optionalFields?: (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
-  isLoading: boolean;
-  onSubmit: (data: BasicData) => void;
-  onCancel?: () => void;
-  ctaLabel?: string;
   config?: PublicOnboardingConfig;
+  ctaLabel?: string;
+  defaultValues?: Partial<FormData>;
+  isLoading: boolean;
+  onCancel?: () => void;
+  onSubmit: (data: BasicData) => void;
+  optionalFields?: (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
 };
 
 const getFormHints = (list: FormProps, errors: FormErrors): FormHints =>
@@ -47,17 +46,15 @@ const getFormHints = (list: FormProps, errors: FormErrors): FormHints =>
 const FormHintsList: FormProps = ['phoneNumber', 'tin', 'website'];
 
 const BasicDataForm = ({
-  defaultValues,
-  optionalFields,
-  isLoading,
-  onSubmit,
-  onCancel,
-  ctaLabel,
   config,
+  ctaLabel,
+  defaultValues,
+  isLoading,
+  onCancel,
+  onSubmit,
+  optionalFields,
 }: BasicDataFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.pages.basic-data.form',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.basic-data.form' });
   const l10n = useL10nContext();
   const inputMasks = useInputMask(l10n?.locale);
   const {
@@ -106,7 +103,7 @@ const BasicDataForm = ({
 
   return (
     <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit(onSubmitFormData)}>
-      <Stack gap={5} direction="column">
+      <Stack gap={6} direction="column">
         <TextInput
           autoFocus
           data-dd-privacy="mask"
@@ -122,26 +119,30 @@ const BasicDataForm = ({
           placeholder={t('doing-business-as.placeholder')}
           {...register('doingBusinessAs')}
         />
-        <TextInput
-          data-dd-privacy="mask"
-          hasError={!!tinHint}
-          hint={tinHint}
-          mask={inputMasks.tin}
-          value={getValues('tin')}
-          label={t('tin.label')}
-          placeholder={t('tin.placeholder')}
-          {...register('tin', {
-            required: {
-              value: true,
-              message: t('tin.errors.required'),
-            },
-            pattern: {
-              value: /^\d{2}-\d{7}$/,
-              message: t('tin.errors.pattern'),
-            },
-          })}
-        />
-
+        <div>
+          <TextInput
+            data-dd-privacy="mask"
+            hasError={!!tinHint}
+            hint={tinHint}
+            mask={inputMasks.tin}
+            value={getValues('tin')}
+            label={t('tin.label')}
+            placeholder={t('tin.placeholder')}
+            {...register('tin', {
+              required: {
+                value: true,
+                message: t('tin.errors.required'),
+              },
+              pattern: {
+                value: /^\d{2}-\d{7}$/,
+                message: t('tin.errors.pattern'),
+              },
+            })}
+          />
+          <Text variant="caption-3" color="secondary" marginTop={2}>
+            {t('must-be-ein')}
+          </Text>
+        </div>
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
             data-dd-privacy="mask"
@@ -167,7 +168,6 @@ const BasicDataForm = ({
             )}
           />
         )}
-
         {optionalFields?.includes(BusinessDI.website) && (
           <TextInput
             data-dd-privacy="mask"

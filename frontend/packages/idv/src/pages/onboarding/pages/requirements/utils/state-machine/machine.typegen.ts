@@ -14,12 +14,13 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignRequirements: 'onboardingRequirementsReceived';
-    markDidRunTransfer: 'error' | 'xstate.stop';
+    assignMissingRequirements: 'onboardingRequirementsReceived';
     markLastHandledRequirement: 'error' | 'xstate.stop';
     setInvestorProfileCollected: 'error' | 'xstate.stop';
+    setKybDataCollected: 'error' | 'xstate.stop';
     setKycDataCollected: 'error' | 'xstate.stop';
-    startDataCollection: 'error' | 'xstate.stop';
+    setRequirementRouterVisited: 'error' | 'xstate.stop';
+    setTransferVisited: 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

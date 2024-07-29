@@ -619,7 +619,8 @@
               "required": "El número de teléfono no puede quedar vacío",
               "pattern": "El número de teléfono es inválido"
             }
-          }
+          },
+          "must-be-ein": "Debe ser su número de identificación patronal (EIN)"
         }
       },
       "business-address": {
@@ -758,7 +759,11 @@
           "last-name": "Apellido(s)",
           "email": "Correo electrónico",
           "ownership-stake": "Porcentaje de propiedad"
-        }
+        },
+        "hide": "Ocultar",
+        "reveal": "Revelar",
+        "something-went-wrong": "Algo salió mal",
+        "unable-to-reveal-tin": "No pudimos mostrarte tu TIN. Por favor, edita tu TIN para guardarlo de nuevo."
       },
       "cta": {
         "continue": "Continuar",

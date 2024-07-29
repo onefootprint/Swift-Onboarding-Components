@@ -32,4 +32,6 @@ export type ValueTypeForBusinessDI<K> = K extends BusinessDI.addressLine1
                           ? string
                           : K extends BusinessDI.zip
                             ? string
-                            : never;
+                            : K extends BusinessDI.formationDate
+                              ? string
+                              : never;

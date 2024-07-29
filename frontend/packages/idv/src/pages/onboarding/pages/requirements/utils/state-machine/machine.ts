@@ -47,7 +47,7 @@ const createOnboardingRequirementsMachine = ({
           overallOutcome,
         },
         requirements: [],
-        startedDataCollection: false,
+        isRequirementRouterVisited: false,
         isTransferOnDesktopDisabled,
       },
       on: {
@@ -84,18 +84,17 @@ const createOnboardingRequirementsMachine = ({
           on: {
             onboardingRequirementsReceived: {
               target: 'router',
-              actions: ['assignRequirements'],
+              actions: ['assignMissingRequirements'],
             },
           },
         },
         router: {
           always: NextRequirementTargets,
-          // The first time (and every time after) leaving router, mark data collection as started
-          exit: ['startDataCollection'],
+          exit: ['setRequirementRouterVisited'], // The first time (and every time after) leaving router, mark data collection as started
         },
         kybData: {
           // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
-          exit: ['setKycDataCollected', 'markLastHandledRequirement'],
+          exit: ['setKycDataCollected', 'setKybDataCollected', 'markLastHandledRequirement'],
           on: RequirementCompletedTransition,
         },
         investorProfile: {
@@ -110,7 +109,7 @@ const createOnboardingRequirementsMachine = ({
           on: RequirementCompletedTransition,
         },
         transfer: {
-          exit: ['markDidRunTransfer'],
+          exit: ['setTransferVisited'],
           on: RequirementCompletedTransition,
         },
         liveness: {
@@ -139,7 +138,7 @@ const createOnboardingRequirementsMachine = ({
     },
     {
       actions: {
-        assignRequirements: assign((ctx, event) => {
+        assignMissingRequirements: assign((ctx, event) => {
           const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
             // If the highest priority requirement hasn't changed after a refetch, the user is
@@ -151,11 +150,12 @@ const createOnboardingRequirementsMachine = ({
             requirements: [...event.payload],
           };
         }),
-        markDidRunTransfer: assign(ctx => ({ ...ctx, didRunTransfer: true })),
+        setTransferVisited: assign(ctx => ({ ...ctx, isTransferVisited: true })),
         markLastHandledRequirement: assign(ctx => ({ ...ctx, lastHandledRequirement: ctx.requirements[0] })),
         setInvestorProfileCollected: assign(ctx => ({ ...ctx, isInvestorProfileCollected: true })),
         setKycDataCollected: assign(ctx => ({ ...ctx, isKycDataCollected: true })),
-        startDataCollection: assign(ctx => ({ ...ctx, startedDataCollection: true })),
+        setKybDataCollected: assign(ctx => ({ ...ctx, isKybDataCollected: true })),
+        setRequirementRouterVisited: assign(ctx => ({ ...ctx, isRequirementRouterVisited: true })),
       },
     },
   );

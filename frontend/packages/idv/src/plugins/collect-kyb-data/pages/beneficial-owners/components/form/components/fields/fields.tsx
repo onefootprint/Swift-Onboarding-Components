@@ -3,7 +3,6 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Grid, InlineAlert, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import Email from './components/email';
 import Header from './components/header';
@@ -12,25 +11,27 @@ import OwnershipStake from './components/ownership-stake';
 import Phone from './components/phone';
 
 export type FieldsProps = {
+  config?: PublicOnboardingConfig;
+  hasBorder?: boolean;
   index: number;
+  l10n?: L10n;
   onRemove: (index: number) => void;
   requiresMultiKyc?: boolean;
-  config?: PublicOnboardingConfig;
-  l10n?: L10n;
 };
 
-const Fields = ({ index, onRemove, config, l10n, requiresMultiKyc }: FieldsProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.pages.beneficial-owners.form.fields',
-  });
-
-  const handleRemove = () => {
-    onRemove(index);
-  };
+const Fields = ({ config, hasBorder, index, l10n, onRemove, requiresMultiKyc }: FieldsProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form.fields' });
 
   return (
-    <Container gap={4} padding={5} borderWidth={1} borderColor="tertiary" borderRadius="default">
-      <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
+    <Grid.Container
+      gap={4}
+      padding={hasBorder ? 5 : 0}
+      borderWidth={hasBorder ? 1 : 0}
+      borderColor={hasBorder ? 'tertiary' : undefined}
+      borderRadius={hasBorder ? 'default' : undefined}
+      borderStyle={hasBorder ? 'solid' : undefined}
+    >
+      <Header shouldShowRemove={index > 0} onRemove={() => onRemove(index)} />
       {index === 0 && (
         <InlineAlert variant="info">
           <Text variant="body-2" color="info">
@@ -42,14 +43,8 @@ const Fields = ({ index, onRemove, config, l10n, requiresMultiKyc }: FieldsProps
       <Email index={index} requireMultiKyc={requiresMultiKyc} />
       <Phone index={index} config={config} locale={l10n?.locale} requireMultiKyc={requiresMultiKyc} />
       <OwnershipStake index={index} />
-    </Container>
+    </Grid.Container>
   );
 };
-
-const Container = styled(Grid.Container)`
-  ${({ theme }) => css`
-    box-shadow: ${theme.elevation[1]};
-  `}
-`;
 
 export default Fields;

@@ -113,9 +113,9 @@ describe('Onboarding Requirements Machine Tests', () => {
         type: 'initialized',
       });
       expect(state.value).toBe('checkRequirements');
-      const { requirements, startedDataCollection, onboardingContext, idvContext } = state.context;
+      const { idvContext, isRequirementRouterVisited, onboardingContext, requirements } = state.context;
       expect(requirements).toEqual([]);
-      expect(startedDataCollection).toBe(false);
+      expect(isRequirementRouterVisited).toBe(false);
       expect(onboardingContext).toEqual({
         config: TestOnboardingConfig,
         bootstrapData: {

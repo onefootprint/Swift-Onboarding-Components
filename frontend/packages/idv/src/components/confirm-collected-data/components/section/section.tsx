@@ -16,13 +16,14 @@ export type SectionProps = {
   IconComponent?: Icon;
   content: React.ReactNode;
   testID?: string;
+  noBorder?: boolean;
 };
 
-const Section = ({ title, IconComponent, actions, content, testID }: SectionProps) => {
+const Section = ({ title, IconComponent, actions, content, testID, noBorder = false }: SectionProps) => {
   const hasActions = actions && actions?.length > 0;
 
   return (
-    <Container data-testid={testID}>
+    <Container data-testid={testID} $noBorder={noBorder}>
       <Header>
         <TitleContainer>
           {IconComponent && <IconComponent />}
@@ -34,7 +35,7 @@ const Section = ({ title, IconComponent, actions, content, testID }: SectionProp
           <ActionsContainer>
             {actions?.map(({ label, onClick, isLoading, actionTestID }) =>
               isLoading ? (
-                <AnimatedLoadingSpinner key={label} animationStart />
+                <AnimatedLoadingSpinner key={label} animationStart size={16} />
               ) : (
                 <LinkButton key={label} onClick={onClick} disabled={isLoading} testID={actionTestID}>
                   {label}
@@ -57,20 +58,21 @@ const ActionsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[4]};
+    align-items: center;
   `}
 `;
 
-const Container = styled.div`
-  ${({ theme }) => css`
+const Container = styled.div<{ $noBorder: boolean }>`
+  ${({ theme, $noBorder }) => css`
     width: 100%;
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[6]};
+    border: ${$noBorder ? 'none' : `1px solid ${theme.borderColor.tertiary}`};
+    border-radius: ${$noBorder ? 'none' : theme.borderRadius.default};
+    padding: ${$noBorder ? 'none' : theme.spacing[6]};
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  `}
+  `};
 `;
 
 const Header = styled.div`

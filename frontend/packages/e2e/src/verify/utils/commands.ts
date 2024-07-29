@@ -8,7 +8,7 @@ type PageNFrame = WithFrame & WithPage;
 type Outcome = 'Success' | 'Manual Review' | 'Fail';
 
 // const handoffBaseUrl = process.env.E2E_HANDOFF_BASE_URL || 'http://localhost:3005';
-const attachedState = { state: 'attached' as const, timeout: 2000 };
+const attachedState = { state: 'attached' as const, timeout: 4000 };
 
 export const clickOn = async (hasText: RegExp, parent: FrameLocator | Page) => {
   const btn = parent.getByRole('button').filter({ hasText }).first();

@@ -2,13 +2,18 @@ import { assign, createMachine } from 'xstate';
 
 import {
   getBusinessDataFromContext,
-  hasAnyMissingRequiredAttribute,
-  hasMissingAddressData,
-  hasMissingBasicData,
-  hasMissingBeneficialOwners,
+  isMissingAddressData,
+  isMissingBasicData,
+  isMissingBeneficialOwnersData,
+  isMissingRequiredData,
 } from '../attributes';
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
+
+type PredicateFn = (ctx: MachineContext) => boolean;
+type LoadSuccessEvent = { type: 'businessDataLoadSuccess'; payload: MachineContext['data'] };
+
+const fromLoad = (predicate: PredicateFn) => (context: MachineContext, event: LoadSuccessEvent) =>
+  predicate({ ...context, data: { ...context.data, ...event.payload } });
 
 const createCollectKybDataMachine = (initialContext: MachineContext) =>
   createMachine(
@@ -19,7 +24,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
         ...initialContext,
@@ -28,17 +33,35 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       states: {
         init: {
           always: [
-            { target: 'introduction', cond: hasAnyMissingRequiredAttribute },
-            { target: 'introduction', cond: hasMissingBeneficialOwners },
+            { target: 'loadFromVault', cond: ctx => !!ctx.kybRequirement.isMet && isMissingBasicData(ctx) },
+            { target: 'introduction', cond: isMissingRequiredData },
+            { target: 'introduction', cond: isMissingBeneficialOwnersData },
             { target: 'confirm' },
           ],
+        },
+        loadFromVault: {
+          on: {
+            businessDataLoadSuccess: [
+              { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignData' },
+              { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignData' },
+              { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignData' },
+              { target: 'confirm', actions: 'assignData' },
+            ],
+            businessDataLoadError: [
+              { target: 'introduction', cond: isMissingRequiredData },
+              { target: 'basicData', cond: isMissingBasicData },
+              { target: 'businessAddress', cond: isMissingAddressData },
+              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
+              { target: 'confirm' },
+            ],
+          },
         },
         introduction: {
           on: {
             introductionCompleted: [
-              { target: 'basicData', cond: hasMissingBasicData },
-              { target: 'businessAddress', cond: hasMissingAddressData },
-              { target: 'beneficialOwners', cond: hasMissingBeneficialOwners },
+              { target: 'basicData', cond: isMissingBasicData },
+              { target: 'businessAddress', cond: isMissingAddressData },
+              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
               { target: 'confirm' },
             ],
           },
@@ -46,8 +69,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         basicData: {
           on: {
             basicDataSubmitted: [
-              { target: 'businessAddress', actions: 'assignData', cond: hasMissingAddressData },
-              { target: 'beneficialOwners', actions: 'assignData', cond: hasMissingBeneficialOwners },
+              { target: 'businessAddress', actions: 'assignData', cond: isMissingAddressData },
+              { target: 'beneficialOwners', actions: 'assignData', cond: isMissingBeneficialOwnersData },
               { target: 'confirm', actions: 'assignData' },
             ],
             navigatedToPrevPage: {
@@ -58,13 +81,13 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         businessAddress: {
           on: {
             businessAddressSubmitted: [
-              { target: 'beneficialOwners', actions: 'assignData', cond: hasMissingBeneficialOwners },
+              { target: 'beneficialOwners', actions: 'assignData', cond: isMissingBeneficialOwnersData },
               { target: 'confirm', actions: 'assignData' },
             ],
             navigatedToPrevPage: [
               {
                 target: 'basicData',
-                cond: hasMissingBasicData,
+                cond: isMissingBasicData,
               },
               { target: 'introduction' },
             ],
@@ -79,8 +102,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               },
             ],
             navigatedToPrevPage: [
-              { target: 'businessAddress', cond: hasMissingAddressData },
-              { target: 'basicData', cond: hasMissingBasicData },
+              { target: 'businessAddress', cond: isMissingAddressData },
+              { target: 'basicData', cond: isMissingBasicData },
               { target: 'introduction' },
             ],
           },
@@ -95,11 +118,13 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             businessAddressSubmitted: { actions: 'assignData' },
             beneficialOwnersSubmitted: { actions: 'assignData' },
             navigatedToPrevPage: [
-              { target: 'beneficialOwners', cond: hasMissingBeneficialOwners },
-              { target: 'businessAddress', cond: hasMissingAddressData },
-              { target: 'basicData', cond: hasMissingBasicData },
+              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
+              { target: 'businessAddress', cond: isMissingAddressData },
+              { target: 'basicData', cond: isMissingBasicData },
               { target: 'introduction' },
             ],
+            stepUpAuthTokenCompleted: { actions: ['assignAuthToken'] },
+            stepUpDecryptionCompleted: { actions: ['assignData'] },
           },
         },
         beneficialOwnerKyc: {
@@ -112,13 +137,17 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
     },
     {
       actions: {
-        assignData: assign((context, event) => {
-          context.data = {
-            ...context.data,
+        assignData: assign((ctx, event) => {
+          ctx.data = {
+            ...ctx.data,
             ...event.payload,
           };
-          return context;
+          return ctx;
         }),
+        assignAuthToken: assign((ctx, { payload }) => ({
+          ...ctx,
+          authToken: payload,
+        })),
       },
     },
   );

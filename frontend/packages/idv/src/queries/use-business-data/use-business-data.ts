@@ -4,8 +4,10 @@ import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const businessDataRequest = async (payload: BusinessDataRequest) => {
-  // Don't send null values
-  const data = Object.fromEntries(Object.entries(payload.data).filter(e => !!e[1]));
+  // Don't send null, undefined, 'decrypted', or falsy values
+  const data = Object.fromEntries(
+    Object.entries(payload.data).filter(([_key, value]) => !!value && value !== 'decrypted'),
+  );
 
   let method;
   let url;

@@ -13,7 +13,13 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignData: 'basicDataSubmitted' | 'beneficialOwnersSubmitted' | 'businessAddressSubmitted';
+    assignAuthToken: 'stepUpAuthTokenCompleted';
+    assignData:
+      | 'basicDataSubmitted'
+      | 'beneficialOwnersSubmitted'
+      | 'businessAddressSubmitted'
+      | 'businessDataLoadSuccess'
+      | 'stepUpDecryptionCompleted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -26,6 +32,7 @@ export interface Typegen0 {
     | 'completed'
     | 'confirm'
     | 'init'
-    | 'introduction';
+    | 'introduction'
+    | 'loadFromVault';
   tags: never;
 }

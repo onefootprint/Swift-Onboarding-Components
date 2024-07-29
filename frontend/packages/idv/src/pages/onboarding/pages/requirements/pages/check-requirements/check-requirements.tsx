@@ -2,9 +2,9 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 
 import { useGetOnboardingStatus } from '../../../../../../queries';
-import { Logger, getLogger } from '../../../../../../utils/logger';
+import { getLogger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import computeRequirementsToShow from './utils/compute-requirements-to-show';
+import filterRequirementsToShow from './utils/filter-requirements-to-show';
 
 const { logInfo, logError } = getLogger({ location: 'onboarding-check-requirements' });
 
@@ -31,8 +31,9 @@ const CheckRequirements = () => {
   const {
     idvContext: { authToken, isTransfer, componentsSdkContext },
     isInvestorProfileCollected,
+    isKybDataCollected,
     isKycDataCollected,
-    startedDataCollection,
+    isRequirementRouterVisited,
   } = state.context;
 
   useGetOnboardingStatus({
@@ -44,11 +45,12 @@ const CheckRequirements = () => {
         const context = {
           isComponentsSdk: !!componentsSdkContext,
           isInvestorProfileCollected: !!isInvestorProfileCollected,
+          isKybDataCollected: !!isKybDataCollected,
           isKycDataCollected: !!isKycDataCollected,
+          isRequirementRouterVisited,
           isTransfer: !!isTransfer,
-          startedDataCollection,
         };
-        const payload = computeRequirementsToShow(context, response);
+        const payload = filterRequirementsToShow(context, response);
         send({ type: 'onboardingRequirementsReceived', payload });
       },
       onError: (err: unknown) => {

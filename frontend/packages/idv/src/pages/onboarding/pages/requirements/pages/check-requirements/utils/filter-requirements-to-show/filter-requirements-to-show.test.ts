@@ -1,7 +1,7 @@
 import type { AuthorizeRequirement, CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, OnboardingRequirementKind } from '@onefootprint/types';
 
-import computeRequirementsToShow from './compute-requirements-to-show';
+import filterRequirementsToShow from './filter-requirements-to-show';
 
 const collectKycDataRequirement: CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData,
@@ -33,55 +33,60 @@ describe('computeRequirementsToShow', () => {
       const context = {
         isComponentsSdk: false,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: false,
+        isRequirementRouterVisited: true,
         isTransfer: false,
-        startedDataCollection: true,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeTruthy();
     });
     it('should return met KYC requirement when not yet shown and havent started collecting data', () => {
       const context = {
         isComponentsSdk: false,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: false,
+        isRequirementRouterVisited: false,
         isTransfer: false,
-        startedDataCollection: false,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeTruthy();
     });
     it('should not return met KYC requirement when in transfer', () => {
       const context = {
         isComponentsSdk: false,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: false,
+        isRequirementRouterVisited: false,
         isTransfer: true,
-        startedDataCollection: false,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
     it('should not return met KYC requirement when already shown', () => {
       const context = {
         isComponentsSdk: false,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: true,
+        isRequirementRouterVisited: false,
         isTransfer: false,
-        startedDataCollection: false,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
     it('should not return met KYC requirement when in components sdk', () => {
       const context = {
         isComponentsSdk: true,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: false,
+        isRequirementRouterVisited: false,
         isTransfer: false,
-        startedDataCollection: false,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
   });
@@ -95,11 +100,12 @@ describe('computeRequirementsToShow', () => {
       const context = {
         isComponentsSdk: false,
         isInvestorProfileCollected: false,
+        isKybDataCollected: false,
         isKycDataCollected: false,
+        isRequirementRouterVisited: false,
         isTransfer: false,
-        startedDataCollection: false,
       };
-      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
       expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
   });
@@ -109,8 +115,8 @@ describe('computeRequirementsToShow', () => {
       isComponentsSdk: false,
       isInvestorProfileCollected: false,
       isKycDataCollected: true,
+      isRequirementRouterVisited: true,
       isTransfer: false,
-      startedDataCollection: true,
     };
     const requirementsResponse = {
       allRequirements: [
@@ -143,7 +149,7 @@ describe('computeRequirementsToShow', () => {
       obConfiguration: {} as PublicOnboardingConfig,
     };
     // @ts-expect-error: enum vs string
-    const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+    const remainingRequirements = filterRequirementsToShow(context, requirementsResponse);
     expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.investorProfile)).toBeTruthy();
   });
 });

@@ -5,10 +5,10 @@ import { MachineContext } from '../state-machine/types';
 import {
   extractBootstrapBusinessDataValues,
   getBusinessDataFromContext,
-  hasAnyMissingRequiredAttribute,
-  hasMissingAddressData,
-  hasMissingBasicData,
-  hasMissingBeneficialOwners,
+  isMissingAddressData,
+  isMissingBasicData,
+  isMissingBeneficialOwnersData,
+  isMissingRequiredData,
 } from './attributes';
 
 describe('extractBootstrapBusinessDataValues', () => {
@@ -97,14 +97,14 @@ describe('getBusinessDataFromContext', () => {
   });
 });
 
-describe('hasAnyMissingRequiredAttribute', () => {
+describe('isMissingRequiredData', () => {
   it('should return true when some required attributes are missing', () => {
     const ctx = {
       kybRequirement: { missingAttributes: [CollectedKybDataOption.name] },
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    const result = hasAnyMissingRequiredAttribute(ctx);
+    const result = isMissingRequiredData(ctx);
     expect(result).toBe(true);
   });
 
@@ -114,12 +114,12 @@ describe('hasAnyMissingRequiredAttribute', () => {
       bootstrapBusinessData: {},
       data: { [BusinessDI.name]: 'Acme' },
     } as unknown as MachineContext;
-    const result = hasAnyMissingRequiredAttribute(ctx);
+    const result = isMissingRequiredData(ctx);
     expect(result).toBe(false);
   });
 });
 
-describe('hasMissingBasicData', () => {
+describe('isMissingBasicData', () => {
   it('should return true when all basic data attributes are missing', () => {
     const ctx = {
       kybRequirement: {
@@ -134,7 +134,7 @@ describe('hasMissingBasicData', () => {
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    const result = hasMissingBasicData(ctx);
+    const result = isMissingBasicData(ctx);
     expect(result).toBe(true);
   });
 
@@ -150,7 +150,7 @@ describe('hasMissingBasicData', () => {
         [BusinessDI.website]: 'https://acme.com',
       },
     } as unknown as MachineContext;
-    const result = hasMissingBasicData(ctx);
+    const result = isMissingBasicData(ctx);
     expect(result).toBe(false);
   });
 
@@ -166,19 +166,63 @@ describe('hasMissingBasicData', () => {
         [BusinessDI.corporationType]: 'LLC',
       },
     } as unknown as MachineContext;
-    const result = hasMissingBasicData(ctx);
+    const result = isMissingBasicData(ctx);
     expect(result).toBe(false);
+  });
+
+  it('should return true when "business_tin" is missing', () => {
+    const ctx = {
+      kybRequirement: {
+        missingAttributes: ['business_name'],
+        populatedAttributes: [
+          'business_tin',
+          'business_beneficial_owners',
+          'business_address',
+          'business_corporation_type',
+          'business_website',
+          'business_phone_number',
+        ],
+      },
+      bootstrapBusinessData: {},
+      data: {
+        'business.corporation_type': 'non_profit',
+        'business.kyced_beneficial_owners': null,
+        'business.state': 'NY',
+        'business.address_line2': null,
+        'business.phone_number': '+15555550100',
+        'business.country': 'US',
+        'business.address_line1': '111 Broadway',
+        'business.city': 'New York',
+        'business.dba': 'Banana',
+        'business.beneficial_owners': [
+          {
+            first_name: 'Bob',
+            last_name: 'Lee',
+            email: 'bruno@onefootprint.com',
+            phone_number: '+15555550100',
+            ownership_stake: 50,
+          },
+        ],
+        'business.formation_state': null,
+        'business.formation_date': null,
+        'business.website': 'https://www.banana.com',
+        'business.zip': '10006',
+        'business.name': 'Banana Biz',
+      },
+    } as unknown as MachineContext;
+    const result = isMissingBasicData(ctx);
+    expect(result).toBe(true);
   });
 });
 
-describe('hasMissingAddressData', () => {
+describe('isMissingAddressData', () => {
   it('should return false when there are no missing address attributes', () => {
     const ctx = {
       kybRequirement: { missingAttributes: [] },
       bootstrapBusinessData: {},
       data: { [BusinessDI.addressLine1]: '123 Main St' }, // Assuming address data is present
     } as unknown as MachineContext;
-    const result = hasMissingAddressData(ctx);
+    const result = isMissingAddressData(ctx);
     expect(result).toBe(false);
   });
 
@@ -188,7 +232,7 @@ describe('hasMissingAddressData', () => {
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    const result = hasMissingAddressData(ctx);
+    const result = isMissingAddressData(ctx);
     expect(result).toBe(false);
   });
 
@@ -198,7 +242,7 @@ describe('hasMissingAddressData', () => {
       bootstrapBusinessData: {},
       data: {}, // Missing address data
     } as unknown as MachineContext;
-    const result = hasMissingAddressData(ctx);
+    const result = isMissingAddressData(ctx);
     expect(result).toBe(true);
   });
 
@@ -214,19 +258,19 @@ describe('hasMissingAddressData', () => {
         [BusinessDI.country]: 'country',
       },
     } as unknown as MachineContext;
-    const result = hasMissingAddressData(ctx);
+    const result = isMissingAddressData(ctx);
     expect(result).toBe(false);
   });
 });
 
-describe('hasMissingBeneficialOwners', () => {
+describe('isMissingBeneficialOwnersData', () => {
   it('should return false if ctx.kybRequirement.missingAttributes is empty', () => {
     const ctx = {
       kybRequirement: { missingAttributes: [] },
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(false);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
   });
 
   it('should return true when beneficialOwners is required', () => {
@@ -235,7 +279,7 @@ describe('hasMissingBeneficialOwners', () => {
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return true when kycedBeneficialOwners is required', () => {
@@ -244,7 +288,7 @@ describe('hasMissingBeneficialOwners', () => {
       bootstrapBusinessData: {},
       data: {},
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return true if last_name are not present', () => {
@@ -263,7 +307,7 @@ describe('hasMissingBeneficialOwners', () => {
         ],
       },
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return true if first_name are not present', () => {
@@ -282,7 +326,7 @@ describe('hasMissingBeneficialOwners', () => {
         ],
       },
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return true if ownership_stake are not present', () => {
@@ -302,7 +346,7 @@ describe('hasMissingBeneficialOwners', () => {
         ],
       },
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(true);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return false if all required attributes are present', () => {
@@ -322,6 +366,6 @@ describe('hasMissingBeneficialOwners', () => {
         ],
       },
     } as unknown as MachineContext;
-    expect(hasMissingBeneficialOwners(ctx)).toBe(false);
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
   });
 });

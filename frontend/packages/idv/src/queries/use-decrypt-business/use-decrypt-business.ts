@@ -1,11 +1,11 @@
 import { useIntl } from '@onefootprint/hooks';
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
+import type { BusinessDIData, DecryptUserRequest } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const decryptBusiness = async ({ fields, authToken }: DecryptUserRequest, formatUtcDate: (date: Date) => string) => {
-  const response = await requestWithoutCaseConverter<DecryptUserResponse>({
+  const response = await requestWithoutCaseConverter<BusinessDIData>({
     method: 'POST',
     url: '/hosted/business/vault/decrypt',
     data: { fields },

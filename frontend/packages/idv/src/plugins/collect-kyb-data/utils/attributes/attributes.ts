@@ -2,6 +2,11 @@ import type { BeneficialOwner, BusinessDIData } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import type { MachineContext } from '../state-machine/types';
 
+const getRequiredAttributes = (ctx: MachineContext): CollectedKybDataOption[] => {
+  const { missingAttributes, populatedAttributes } = ctx.kybRequirement || {};
+  return (missingAttributes || []).concat(populatedAttributes || []);
+};
+
 const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
   return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
     if (typeof value === 'string' || typeof value === 'number') {
@@ -38,17 +43,22 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
   };
 };
 
-export const hasAnyMissingRequiredAttribute = (ctx: MachineContext): boolean => {
+const isMissingDataFromCollection = (ctx: MachineContext, list?: CollectedKybDataOption[]): boolean => {
   const data = getBusinessDataFromContext(ctx);
-  if (!ctx.kybRequirement || !Array.isArray(ctx.kybRequirement.missingAttributes)) return false;
-
-  return ctx.kybRequirement.missingAttributes.some(reqId => {
-    const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
-    return requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
-  });
+  return !Array.isArray(list)
+    ? false
+    : list.some(reqId => {
+        const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
+        return requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
+      });
 };
 
-export const hasMissingBasicData = (ctx: MachineContext): boolean => {
+export const isMissingRequiredData = (ctx: MachineContext): boolean => {
+  return !ctx.kybRequirement ? false : isMissingDataFromCollection(ctx, getRequiredAttributes(ctx));
+};
+
+export const isMissingBasicData = (ctx: MachineContext): boolean => {
+  const attrs = getRequiredAttributes(ctx);
   const data = getBusinessDataFromContext(ctx);
   const basic = [
     CollectedKybDataOption.name,
@@ -57,31 +67,35 @@ export const hasMissingBasicData = (ctx: MachineContext): boolean => {
     CollectedKybDataOption.phoneNumber,
     CollectedKybDataOption.website,
   ];
-  if (!ctx.kybRequirement || !Array.isArray(ctx.kybRequirement.missingAttributes)) return false;
+  if (!ctx.kybRequirement) return false;
 
-  return ctx.kybRequirement.missingAttributes.some(reqId => {
+  return attrs.some(reqId => {
     const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
     return basic.includes(reqId) && requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
   });
 };
 
-export const hasMissingAddressData = (ctx: MachineContext): boolean => {
+export const isMissingAddressData = (ctx: MachineContext): boolean => {
+  const attrs = getRequiredAttributes(ctx);
   const data = getBusinessDataFromContext(ctx);
   const address = [CollectedKybDataOption.address];
-  if (!ctx.kybRequirement || !Array.isArray(ctx.kybRequirement.missingAttributes)) return false;
 
-  return ctx.kybRequirement.missingAttributes.some(reqId => {
+  if (!ctx.kybRequirement) return false;
+
+  return attrs.some(reqId => {
     const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
     return address.includes(reqId) && requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
   });
 };
 
-export const hasMissingBeneficialOwners = (ctx: MachineContext): boolean => {
+export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
+  const attrs = getRequiredAttributes(ctx);
   const data = getBusinessDataFromContext(ctx);
   const propList = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
-  if (!ctx.kybRequirement || !Array.isArray(ctx.kybRequirement.missingAttributes)) return false;
 
-  return ctx.kybRequirement.missingAttributes.some(reqId => {
+  if (!ctx.kybRequirement) return false;
+
+  return attrs.some(reqId => {
     const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
     return (
       propList.includes(reqId) &&

@@ -29,6 +29,7 @@ export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
   isMet: boolean;
   missingAttributes: CollectedKybDataOption[];
+  populatedAttributes?: CollectedKybDataOption[];
 };
 
 export type CollectKycDataRequirement = {

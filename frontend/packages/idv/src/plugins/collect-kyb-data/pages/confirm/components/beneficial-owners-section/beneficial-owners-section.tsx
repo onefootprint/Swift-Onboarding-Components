@@ -3,6 +3,7 @@ import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption } from
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Box } from '@onefootprint/ui';
 import type { SectionItemProps, SectionProps } from '../../../../../../components/confirm-collected-data';
 import { MultiSection, Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
@@ -20,51 +21,53 @@ const BeneficialOwnersSection = () => {
 
   const beneficialOwners =
     (isMultiKyc ? data[BusinessDI.kycedBeneficialOwners] : data[BusinessDI.beneficialOwners]) ?? [];
+
   if (!beneficialOwners.length) {
     return null;
   }
 
   const sections: SectionProps[] = [];
   beneficialOwners.forEach((beneficialOwner, index) => {
-    const items: { text: string; subtext: string }[] = [
-      {
-        text: t('beneficial-owners.first-name'),
-        subtext: beneficialOwner[BeneficialOwnerDataAttribute.firstName],
-      },
-      {
-        text: t('beneficial-owners.last-name'),
-        subtext: beneficialOwner[BeneficialOwnerDataAttribute.lastName],
-      },
-    ];
-
+    const items: { text: string; subtext: string }[] = [];
+    const firstName = beneficialOwner[BeneficialOwnerDataAttribute.firstName];
+    const middleName = beneficialOwner[BeneficialOwnerDataAttribute.middleName];
+    const lastName = beneficialOwner[BeneficialOwnerDataAttribute.lastName];
     const email = beneficialOwner[BeneficialOwnerDataAttribute.email];
-    if (index > 0 && email) {
-      items.push({
-        text: t('beneficial-owners.email'),
-        subtext: email,
-      });
+    const ownershipStake = beneficialOwner[BeneficialOwnerDataAttribute.ownershipStake];
+
+    if (firstName) {
+      items.push({ text: t('beneficial-owners.first-name'), subtext: firstName });
     }
 
-    items.push({
-      text: t('beneficial-owners.ownership-stake'),
-      subtext: `${beneficialOwner[BeneficialOwnerDataAttribute.ownershipStake]}%`,
-    });
+    if (middleName) {
+      items.push({ text: t('beneficial-owners.middle-name'), subtext: middleName });
+    }
+
+    if (lastName) {
+      items.push({ text: t('beneficial-owners.last-name'), subtext: lastName });
+    }
+
+    if (index > 0 && email) {
+      items.push({ text: t('beneficial-owners.email'), subtext: email });
+    }
+
+    items.push({ text: t('beneficial-owners.ownership-stake'), subtext: `${ownershipStake}%` });
 
     sections.push({
       title: index === 0 ? t('beneficial-owners.beneficial-owner-you') : t('beneficial-owners.beneficial-owner-other'),
-      content: items.map(({ text, subtext, textColor }: SectionItemProps) => (
-        <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
-      )),
+      content: (
+        <Box display="flex" flexDirection="column" gap={6}>
+          {items.map(({ text, subtext, textColor }: SectionItemProps) => (
+            <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+          ))}
+        </Box>
+      ),
     });
   });
 
-  const startEditing = () => {
-    setEditing(true);
-  };
+  const startEditing = () => setEditing(true);
 
-  const stopEditing = () => {
-    setEditing(false);
-  };
+  const stopEditing = () => setEditing(false);
 
   return editing ? (
     <Section

@@ -1,8 +1,8 @@
 export {
   extractBootstrapBusinessDataValues,
   getBusinessDataFromContext,
-  hasAnyMissingRequiredAttribute,
-  hasMissingAddressData,
-  hasMissingBasicData,
-  hasMissingBeneficialOwners,
+  isMissingAddressData,
+  isMissingBasicData,
+  isMissingBeneficialOwnersData,
+  isMissingRequiredData,
 } from './attributes';

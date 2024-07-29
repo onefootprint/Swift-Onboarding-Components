@@ -569,10 +569,10 @@
       },
       "basic-data": {
         "title": "Basic data",
-        "subtitle": "We need some information about your business.",
+        "subtitle": "We need your business name and EIN.",
         "form": {
           "business-name": {
-            "label": "Business name",
+            "label": "Legal business name",
             "placeholder": "Acme Bank Inc.",
             "error": "Business name cannot be empty or is invalid"
           },
@@ -619,7 +619,8 @@
               "required": "Phone number cannot be empty",
               "pattern": "Phone number is invalid"
             }
-          }
+          },
+          "must-be-ein": "Must be your Employer Identification Number (EIN)"
         }
       },
       "business-address": {
@@ -739,7 +740,7 @@
         },
         "basic-data": {
           "title": "Basic data",
-          "business-name": "Business name",
+          "business-name": "Legal business name",
           "doing-business-as": "Doing Business As (optional)",
           "tin": "Taxpayer Identification Number (TIN)",
           "corporation-type": "Legal entity type",
@@ -758,7 +759,11 @@
           "last-name": "Last name",
           "email": "Email",
           "ownership-stake": "Ownership stake"
-        }
+        },
+        "hide": "Hide",
+        "reveal": "Reveal",
+        "something-went-wrong": "Something went wrong",
+        "unable-to-reveal-tin": "We were not able to reveal your TIN. Please edit your TIN to save it again."
       },
       "cta": {
         "continue": "Continue",

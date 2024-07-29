@@ -39,7 +39,7 @@ describe('<BasicDataForm />', () => {
       optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
     });
 
-    const name = screen.getByLabelText('Business name');
+    const name = screen.getByLabelText('Legal business name');
     await userEvent.type(name, 'Acme Inc.');
 
     const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
@@ -72,7 +72,7 @@ describe('<BasicDataForm />', () => {
         onSubmit,
       });
 
-      const name = screen.getByLabelText('Business name');
+      const name = screen.getByLabelText('Legal business name');
       await userEvent.type(name, 'Acme Inc.');
 
       const dba = screen.getByLabelText('Doing Business As (optional)');
@@ -112,7 +112,7 @@ describe('<BasicDataForm />', () => {
         onSubmit,
       });
 
-      const name = screen.getByLabelText('Business name');
+      const name = screen.getByLabelText('Legal business name');
       expect(name).toHaveValue('Acme Inc.');
 
       const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
@@ -176,7 +176,7 @@ describe('<BasicDataForm />', () => {
         optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
       });
 
-      const name = screen.getByLabelText('Business name');
+      const name = screen.getByLabelText('Legal business name');
       await userEvent.type(name, 'Acme Inc.');
 
       const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');

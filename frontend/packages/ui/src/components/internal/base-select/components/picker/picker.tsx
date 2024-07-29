@@ -118,7 +118,7 @@ const Picker = ({
             <Text variant="label-2">Search...</Text>
           </Header>
           <Content>
-            <SearchContainer hasScroll={hasScroll}>
+            <SearchContainer $hasScroll={hasScroll}>
               <Input
                 placeholder={placeholder}
                 id={id}
@@ -202,11 +202,11 @@ const Input = styled(SearchInput)`
   min-height: 40px;
 `;
 
-const SearchContainer = styled.div<{ hasScroll: boolean }>`
-  ${({ theme, hasScroll }) => css`
+const SearchContainer = styled.div<{ $hasScroll: boolean }>`
+  ${({ theme, $hasScroll }) => css`
     padding-bottom: ${theme.spacing[5]};
     ${
-      hasScroll &&
+      $hasScroll &&
       css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
     `

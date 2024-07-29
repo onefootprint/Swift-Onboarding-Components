@@ -13,19 +13,27 @@ import Fields from './components/fields';
 import type { FormData } from './types';
 
 export type FormProps = {
-  defaultValues?: BeneficialOwner[];
-  isLoading: boolean;
-  onSubmit: (data: BeneficialOwner[]) => void;
-  onCancel?: () => void;
-  ctaLabel?: string;
-  requireMultiKyc?: boolean;
   config?: PublicOnboardingConfig;
+  ctaLabel?: string;
+  defaultValues?: BeneficialOwner[];
+  hideHeader?: boolean;
+  isLoading: boolean;
+  onCancel?: () => void;
+  onSubmit: (data: BeneficialOwner[]) => void;
+  requireMultiKyc?: boolean;
 };
 
-const Form = ({ defaultValues, isLoading, onSubmit, onCancel, ctaLabel, requireMultiKyc, config }: FormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.pages.beneficial-owners.form',
-  });
+const Form = ({
+  config,
+  ctaLabel,
+  defaultValues,
+  hideHeader,
+  isLoading,
+  onCancel,
+  onSubmit,
+  requireMultiKyc,
+}: FormProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
   const l10n = useL10nContext();
   const defaultBeneficialOwnersData = defaultValues ?? [
@@ -125,6 +133,7 @@ const Form = ({ defaultValues, isLoading, onSubmit, onCancel, ctaLabel, requireM
               config={config}
               l10n={l10n}
               requiresMultiKyc={requireMultiKyc}
+              hasBorder={!hideHeader}
             />
             {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>

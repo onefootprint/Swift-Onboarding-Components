@@ -29,7 +29,13 @@ const MultiSection = ({ title, editLabel, onEdit, sections, IconComponent, testI
     <Sections>
       {sections.map((section: SectionProps, index: number) => (
         <React.Fragment key={section.title}>
-          <Section actions={section.actions} key={section.title} title={section.title} content={section.content} />
+          <Section
+            actions={section.actions}
+            key={section.title}
+            title={section.title}
+            content={section.content}
+            noBorder
+          />
           {index !== sections.length - 1 && <Divider />}
         </React.Fragment>
       ))}
@@ -45,11 +51,6 @@ const Sections = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    > * {
-      border: 0;
-      padding: 0;
-    }
   `}
 `;
 

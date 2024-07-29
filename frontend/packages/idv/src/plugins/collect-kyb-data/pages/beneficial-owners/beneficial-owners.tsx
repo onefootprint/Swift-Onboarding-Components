@@ -13,15 +13,15 @@ import BeneficialOwnersForm from './components/form';
 import useCheckDuplicateContacts from './hooks/check-duplicate-contacts';
 
 type BeneficialOwnersProps = {
-  hideHeader?: boolean;
   ctaLabel?: string;
-  onComplete?: () => void;
+  hideHeader?: boolean;
   onCancel?: () => void;
+  onComplete?: () => void;
 };
 
 const { logError } = getLogger({ location: 'kyb-beneficial-owners' });
 
-const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: BeneficialOwnersProps) => {
+const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
@@ -86,13 +86,14 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: Benefi
         </>
       )}
       <BeneficialOwnersForm
-        defaultValues={defaultValues}
-        onSubmit={handleSubmit}
-        onCancel={onCancel}
-        isLoading={mutation.isLoading}
-        ctaLabel={ctaLabel}
-        requireMultiKyc={requireMultiKyc}
         config={config}
+        ctaLabel={ctaLabel}
+        defaultValues={defaultValues}
+        hideHeader={hideHeader}
+        isLoading={mutation.isLoading}
+        onCancel={onCancel}
+        onSubmit={handleSubmit}
+        requireMultiKyc={requireMultiKyc}
       />
     </Stack>
   );

@@ -15,9 +15,7 @@ type SyncDataArgs = {
 
 const useSyncData = () => {
   const businessDataMutation = useBusinessData();
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.components.sync-data-error',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.components.sync-data-error' });
   const toast = useToast();
 
   const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
@@ -36,11 +34,7 @@ const useSyncData = () => {
     }
 
     businessDataMutation.mutate(
-      {
-        data,
-        authToken,
-        speculative,
-      },
+      { authToken, data, speculative },
       {
         onSuccess,
         onError: (error: unknown) => {
@@ -50,9 +44,7 @@ const useSyncData = () => {
             variant: 'error',
           });
           onError?.(
-            `KYB useSyncData encountered error while syncing data${
-              speculative ? ' speculatively' : ''
-            }: ${getErrorMessage(error)}`,
+            `KYB useSyncData encountered error while syncing data${speculative ? ' speculatively' : ''}: ${getErrorMessage(error)}`,
           );
         },
       },

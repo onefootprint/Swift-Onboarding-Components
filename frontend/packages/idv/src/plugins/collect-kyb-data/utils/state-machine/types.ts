@@ -44,25 +44,18 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'introductionCompleted';
-    }
-  | {
-      type: 'basicDataSubmitted';
-      payload: BasicData;
-    }
-  | {
-      type: 'businessAddressSubmitted';
-      payload: BusinessAddressData;
-    }
-  | {
-      type: 'beneficialOwnersSubmitted';
-      payload: BeneficialOwnersData;
-    }
-  | { type: 'navigatedToPrevPage' }
+  | { type: 'basicDataSubmitted'; payload: BasicData }
+  | { type: 'beneficialOwnerKycSubmitted' }
+  | { type: 'beneficialOwnersSubmitted'; payload: BeneficialOwnersData }
+  | { type: 'businessAddressSubmitted'; payload: BusinessAddressData }
+  | { type: 'businessDataLoadError' }
+  | { type: 'businessDataLoadSuccess'; payload: Partial<Omit<BasicData, BusinessDI.tin>> }
   | { type: 'confirmed' }
   | { type: 'editBasicData' }
-  | { type: 'editBusinessAddress' }
   | { type: 'editBeneficialOwners' }
+  | { type: 'editBusinessAddress' }
+  | { type: 'introductionCompleted' }
+  | { type: 'navigatedToPrevPage' }
   | { type: 'returnToSummary' }
-  | { type: 'beneficialOwnerKycSubmitted' };
+  | { type: 'stepUpAuthTokenCompleted'; payload: string }
+  | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData };
