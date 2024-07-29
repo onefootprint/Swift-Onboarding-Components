@@ -59,7 +59,6 @@ const StyledStack = styled(Stack)`
     ${createFontStyles('snippet-2')}
     padding: ${theme.spacing[3]} 0;
     top: 0;
-    z-index: 1;
     position: sticky;
     background: ${theme.backgroundColor.primary};
     top: 0;
