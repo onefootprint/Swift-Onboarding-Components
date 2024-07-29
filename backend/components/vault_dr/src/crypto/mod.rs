@@ -232,7 +232,7 @@ mod tests {
             let armored_reader = age::armor::ArmoredReader::new(wrapped_recovery_key.as_bytes());
             let decryptor = match age::Decryptor::new(armored_reader).unwrap() {
                 age::Decryptor::Recipients(d) => d,
-                age::Decryptor::Passphrase(_) => panic!("expected decryptor type"),
+                age::Decryptor::Passphrase(_) => panic!("unexpected decryptor type"),
             };
 
             let mut decrypted = vec![];

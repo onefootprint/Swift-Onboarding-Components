@@ -297,7 +297,7 @@ impl VaultDrWriter {
 
         let key = blob_key(&self.bucket_path_namespace, &fp_id, &dl, &digest_bytes)?;
 
-        let obj_metadata = document_mime_type.map(|mime_type| {
+        let obj_metadata = document_mime_type.as_ref().map(|mime_type| {
             let mut metadata = HashMap::new();
             metadata.insert(X_AMZ_META_FP_DOC_MIME_TYPE.to_owned(), mime_type.leak_to_string());
             metadata
@@ -335,6 +335,7 @@ impl VaultDrWriter {
             blob.response_checksum = result.checksum_sha256,
             blob.content_length = content_length,
             blob.etag = result.e_tag.as_deref().unwrap_or(""),
+            blob.doc_mime_type =? document_mime_type.map(|s| s.leak_to_string()),
             "Wrote blob to S3",
         );
 
@@ -384,6 +385,8 @@ fn blob_key(
     // An fp_id may be too fine-grained for a partition key for large customers, so we provide
     // a coarser partition key. Using the last two characters of the fp_id gives us ~4k
     // partitions max, which can be quickly paginated over for scheduling purposes
+    //
+    // The client relies on the same partitioning logic as below.
     let fp_id = fp_id.to_string();
     let parts: Vec<&str> = fp_id.split('_').collect();
 

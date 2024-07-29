@@ -255,10 +255,10 @@ CDO_TO_DIS = {
 VDR_AGE_KEYS = {
     "1": {
         "public": get_secret("VDR_AGE_PUBLIC_KEY_1"),
-        "private": get_secret("VDR_AGE_PUBLIC_KEY_1"),
+        "private": get_secret("VDR_AGE_PRIVATE_KEY_1"),
     },
     "2": {
         "public": get_secret("VDR_AGE_PUBLIC_KEY_2"),
-        "private": get_secret("VDR_AGE_PUBLIC_KEY_2"),
+        "private": get_secret("VDR_AGE_PRIVATE_KEY_2"),
     },
 }
