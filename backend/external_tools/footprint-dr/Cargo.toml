@@ -17,10 +17,13 @@ clap = { workspace = true }
 chrono = { workspace = true }
 env_logger = { workspace = true }
 futures= { workspace = true }
+indicatif = { workspace = true }
 itertools = { workspace = true }
 log = { workspace = true }
 rpassword = { workspace = true }
 keyring = { workspace = true }
+mime_guess = { workspace = true }
+num_cpus = { workspace = true }
 rand = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -29,5 +32,4 @@ test-case = { workspace = true }
 termcolor = { workspace = true }
 tokio = { workspace = true }
 tokio-stream = { workspace = true }
-
-
+tokio-util = { workspace = true }

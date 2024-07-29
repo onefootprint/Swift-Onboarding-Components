@@ -1,6 +1,8 @@
 use super::wire_types::VaultDrAwsPreEnrollResponse;
 use super::wire_types::VaultDrEnrollRequest;
 use super::wire_types::VaultDrEnrollResponse;
+use super::wire_types::VaultDrRevealWrappedRecordKeysRequest;
+use super::wire_types::VaultDrRevealWrappedRecordKeysResponse;
 use super::wire_types::VaultDrStatus;
 use crate::cli::wire_types::ApiError;
 use anyhow::anyhow;
@@ -201,6 +203,19 @@ impl VaultDrApiClient {
     pub(crate) async fn enroll(&self, req: VaultDrEnrollRequest) -> Result<VaultDrEnrollResponse> {
         let resp = self
             .request(Method::POST, "org/vault_dr/enroll")?
+            .json(&req)
+            .send()
+            .await?;
+
+        Self::handle_response(resp).await
+    }
+
+    pub(crate) async fn reveal_wrapped_record_keys(
+        &self,
+        req: VaultDrRevealWrappedRecordKeysRequest,
+    ) -> Result<VaultDrRevealWrappedRecordKeysResponse> {
+        let resp = self
+            .request(Method::POST, "org/vault_dr/reveal_wrapped_record_keys")?
             .json(&req)
             .send()
             .await?;

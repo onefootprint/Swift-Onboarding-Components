@@ -13,7 +13,9 @@ use std::io;
 use std::io::Write;
 use std::path::PathBuf;
 
+mod age;
 mod api_client;
+mod decrypt;
 mod enroll;
 mod get_external_id;
 mod list_records;
@@ -145,22 +147,24 @@ enum Subcommand {
         all: bool,
 
         /// Decrypt records from the given line-separated JSON file (.jsonl)
-        #[arg(value_name = "path", group = RECORD_SELECTOR_GROUP)]
         #[arg(long, value_name = "PATH", group = RECORD_SELECTOR_GROUP)]
         records: Option<PathBuf>,
 
-        /// An that emits the organization private key to stdout
-        #[arg(long, value_name = "path")]
-        org_private_key_plugin: Option<PathBuf>,
         /// Path to an age identity file for the org private key
         #[arg(long, value_name = "PATH")]
         org_identity: PathBuf,
 
-        /// Wrapped recovery key file (.age)
-        #[arg(long, value_name = "path")]
         /// Path to the wrapped recovery key file (.age)
         #[arg(long, value_name = "PATH")]
         wrapped_recovery_key: Option<PathBuf>,
+
+        /// Output directory for decrypted records
+        #[arg(long, value_name = "PATH")]
+        output_dir: PathBuf,
+
+        /// Concurrency limit for decryption operations (defaults to the number of CPUs)
+        #[arg(long)]
+        concurrency_limit: Option<usize>,
     },
 }
 
@@ -253,7 +257,29 @@ pub async fn run() -> Result<()> {
             )
             .await
         }
-        _ => unimplemented!(),
+        Subcommand::Decrypt {
+            sandbox,
+            bucket_namespace,
+            all,
+            records,
+            org_identity,
+            wrapped_recovery_key,
+            output_dir,
+            concurrency_limit,
+        } => {
+            decrypt::decrypt_cmd(
+                api_root,
+                sandbox.live.into(),
+                bucket_namespace,
+                all,
+                records,
+                org_identity,
+                wrapped_recovery_key,
+                output_dir,
+                concurrency_limit,
+            )
+            .await
+        }
     }
 }
 

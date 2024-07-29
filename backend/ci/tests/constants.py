@@ -262,3 +262,4 @@ VDR_AGE_KEYS = {
         "private": get_secret("VDR_AGE_PRIVATE_KEY_2"),
     },
 }
+FAKE_WRAPPED_RECOVERY_KEY_B64 = get_secret("FAKE_WRAPPED_RECOVERY_KEY_B64")

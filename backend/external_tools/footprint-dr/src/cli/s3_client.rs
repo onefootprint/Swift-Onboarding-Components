@@ -5,6 +5,7 @@ use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
 use futures::Stream;
+use futures::TryFutureExt;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use rand::distributions::Alphanumeric;
@@ -13,14 +14,17 @@ use rand::thread_rng;
 use rand::Rng;
 use reqwest::Url;
 use std::collections::HashSet;
+use std::future::Future;
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_stream::StreamExt;
+use tokio_util::compat::TokioAsyncReadCompatExt;
 
 
 const S3_ACCESS_PROBE_KEY: &str = "footprint/.vdr-access-probe";
 const CHANNEL_BUFFER_SIZE: usize = 64;
+const X_AMZ_META_FP_DOC_MIME_TYPE: &str = "x-amz-meta-fp-doc-mime-type";
 
 pub struct S3Client {
     client: aws_sdk_s3::Client,
@@ -67,6 +71,19 @@ pub struct FpIdPartition {
 pub struct FpIdFields {
     pub fp_id: FpId,
     pub fields: Vec<String>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub struct EncDataKey {
+    pub fp_id: FpId,
+    pub field: String,
+    pub key: String,
+}
+
+pub struct EncryptedRecord {
+    pub e_data: Box<dyn futures::AsyncBufRead + Send + Unpin>,
+    pub e_data_len: u64,
+    pub mime_type: Option<String>,
 }
 
 impl S3Client {
@@ -208,6 +225,62 @@ impl S3Client {
                             svc_error
                         );
                         let _ = tx.send(Err(err)).await;
+                        return;
+                    }
+                }
+            }
+        });
+
+        ReceiverStream::new(rx)
+    }
+
+    fn list_keys(
+        client: &aws_sdk_s3::Client,
+        bucket_name: &str,
+        prefix: &str,
+    ) -> impl Stream<Item = Result<String>> {
+        log::debug!("Listing keys: s3://{}/{}", bucket_name, prefix);
+        let mut obj_stream = client
+            .list_objects_v2()
+            .bucket(bucket_name)
+            .prefix(prefix)
+            .into_paginator()
+            .send();
+
+        let (tx, rx) = mpsc::channel::<Result<String>>(CHANNEL_BUFFER_SIZE);
+
+        let bucket_name = bucket_name.to_owned();
+        tokio::task::spawn(async move {
+            while let Some(resp) = obj_stream.next().await {
+                if tx.is_closed() {
+                    return;
+                }
+
+                let resp = match resp {
+                    Ok(resp) => resp,
+                    Err(e) => {
+                        log::debug!("ListObjectsV2 error: {:?}", &e);
+                        let svc_error = e.into_service_error();
+                        let err = anyhow!(
+                            "failed to list objects in bucket {}: {:?}",
+                            bucket_name,
+                            svc_error
+                        );
+                        let _ = tx.send(Err(err)).await;
+                        return;
+                    }
+                };
+
+                for obj in resp.contents.unwrap_or_default() {
+                    let result = if let Some(key) = obj.key {
+                        Ok(key)
+                    } else {
+                        Err(anyhow!("missing key in ListObjectsV2 response"))
+                    };
+
+                    let stop_tx = result.is_err();
+                    let _ = tx.send(result).await;
+                    if stop_tx {
                         return;
                     }
                 }
@@ -488,5 +561,96 @@ impl S3Client {
         });
 
         ReceiverStream::new(rx)
+    }
+
+    // Lists the keys for the latest version of each record.
+    // This will eventually be replaced with a read of fp_id's manifest file.
+    pub fn list_latest_enc_data_keys_unordered(
+        &self,
+        limit: usize,
+        records: Pin<Box<dyn Stream<Item = Result<FpIdFields>> + Send>>,
+    ) -> impl Stream<Item = Result<EncDataKey>> {
+        let client = self.client.clone();
+        let bucket_name = self.bucket_name.clone();
+
+        records
+            .map_ok(move |record| {
+                let FpIdFields { fp_id, fields } = record;
+
+                let client = client.clone();
+                let bucket_name = bucket_name.clone();
+                let fp_id_path = fp_id.path.clone();
+                let fp_id = fp_id.clone();
+
+                futures::stream::iter(fields)
+                    .then(move |field| {
+                        let prefix = format!("{}data/{}/", fp_id_path, field);
+
+                        let max_key_for_field = Self::list_keys(&client, &bucket_name, &prefix).fold(
+                            Ok(None),
+                            |max_acc: Result<Option<String>>, next_key| {
+                                let max_acc = max_acc?;
+                                let next_key = next_key?;
+
+                                Ok(max_acc.max(Some(next_key)))
+                            },
+                        );
+
+                        Box::pin(async move { (field, max_key_for_field.await) })
+                    })
+                    .filter_map(move |(field, max_key_for_field)| {
+                        let key = max_key_for_field.transpose()?;
+
+                        Some(key.map(|key| EncDataKey {
+                            fp_id: fp_id.clone(),
+                            field,
+                            key,
+                        }))
+                    })
+            })
+            .try_flatten_unordered(limit)
+    }
+
+    // We return an impl Future rather than making this an async fn to carefully avoid capturing the
+    // S3Client in the future.
+    pub fn get_encrypted_record(&self, key: String) -> impl Future<Output = Result<EncryptedRecord>> {
+        let bucket_name = self.bucket_name.clone();
+
+        let resp = self
+            .client
+            .get_object()
+            .bucket(&bucket_name)
+            .key(&key)
+            .send()
+            .map_err(move |e| {
+                let svc_error = e.into_service_error();
+                anyhow!(
+                    "Failed to GetObject s3://{}/{}: {:?}",
+                    &bucket_name,
+                    key,
+                    svc_error
+                )
+            });
+
+
+        resp.and_then(|resp| async move {
+            let mime_type = resp
+                .metadata
+                .and_then(|mut metadata| metadata.remove(X_AMZ_META_FP_DOC_MIME_TYPE));
+
+            let e_data = Box::new(resp.body.into_async_read().compat());
+            let e_data_len = resp
+                .content_length
+                .ok_or(anyhow!("GetObject response missing content length"))?
+                .try_into()?;
+
+            let e_record = EncryptedRecord {
+                e_data,
+                e_data_len,
+                mime_type,
+            };
+
+            Ok(e_record)
+        })
     }
 }

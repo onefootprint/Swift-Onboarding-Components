@@ -2,6 +2,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::fmt::Display;
 
@@ -46,6 +47,17 @@ pub struct VaultDrEnrollRequest {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct VaultDrEnrollResponse {}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct VaultDrRevealWrappedRecordKeysRequest {
+    pub record_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct VaultDrRevealWrappedRecordKeysResponse {
+    /// Maps record paths to their wrapped record keys.
+    pub wrapped_record_keys: HashMap<String, String>,
+}
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApiError {
