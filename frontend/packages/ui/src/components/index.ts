@@ -33,6 +33,8 @@ export { default as Hint } from './hint';
 export type { HintProps } from './hint';
 export { default as DateSelectorSheet } from './date-selector-sheet';
 export { default as DateRangeSelector } from './date-selector-sheet';
+export type { PopoverProps } from './popover';
+export { default as Popover } from './popover';
 export type {
   DialogAllButtons,
   DialogAllExceptHeaderButtons,

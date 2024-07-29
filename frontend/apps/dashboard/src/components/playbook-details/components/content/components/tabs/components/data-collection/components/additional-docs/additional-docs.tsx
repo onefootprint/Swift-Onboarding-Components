@@ -1,7 +1,8 @@
+import { FontVariant } from '@onefootprint/design-tokens';
 import { IcoInfo16 } from '@onefootprint/icons';
 import { IcoCode216, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
 import { type DocumentRequestConfig, DocumentRequestKind } from '@onefootprint/types';
-import { Box, Dropdown, Stack, Text } from '@onefootprint/ui';
+import { Box, Button, Dropdown, Popover, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -72,60 +73,63 @@ type DocItemProps = {
   requiresHumanReview: boolean;
 };
 
-const DocItem = ({ label, identifier, description, requiresHumanReview }: DocItemProps) => {
+const PopoverContent = ({ identifier, description, requiresHumanReview }: Omit<DocItemProps, 'label'>) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
 
+  const contentItems = [
+    { condition: identifier, icon: <IcoCode216 />, text: identifier, variant: 'snippet-2' },
+    { condition: description, icon: <IcoWriting16 />, text: description, variant: 'body-4' },
+    { condition: requiresHumanReview, icon: <IcoFlag16 />, text: t('requires-manual-review'), variant: 'body-4' },
+  ];
+
+  return (
+    <Stack direction="column" gap={3}>
+      {contentItems.map(
+        ({ condition, icon, text, variant }) =>
+          condition && (
+            <Stack key={text} gap={4}>
+              <Box position="relative" marginTop={1}>
+                {icon}
+              </Box>
+              <Text variant={variant as FontVariant} color="secondary">
+                {text}
+              </Text>
+            </Stack>
+          ),
+      )}
+    </Stack>
+  );
+};
+
+const DocItem = ({ label, identifier, description, requiresHumanReview }: DocItemProps) => {
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
   return (
     <Stack gap={2} alignItems="center">
       <Text variant="body-3" color="secondary">
         {label}
       </Text>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <IcoInfo16 />
-        </Dropdown.Trigger>
-        <StyledDropdownContent align="start" side="top" sideOffset={8}>
-          {identifier ? (
-            <Stack gap={4} marginBottom={3}>
-              <Box position="relative" top="3px">
-                <IcoCode216 />
-              </Box>
-              <Text variant="snippet-2" color="secondary">
-                {identifier}
-              </Text>
-            </Stack>
-          ) : null}
-          {description ? (
-            <Stack gap={4} marginBottom={3}>
-              <Box position="relative" top="3px">
-                <IcoWriting16 />
-              </Box>
-              <Text variant="body-4" color="secondary">
-                {description}
-              </Text>
-            </Stack>
-          ) : null}
-          {requiresHumanReview ? (
-            <Stack gap={4}>
-              <Box position="relative" top="3px">
-                <IcoFlag16 />
-              </Box>
-              <Text variant="body-4" color="secondary">
-                {t('requires-manual-review')}
-              </Text>
-            </Stack>
-          ) : null}
-        </StyledDropdownContent>
-      </Dropdown.Root>
+      {identifier || description || requiresHumanReview ? (
+        <>
+          <Text variant="body-3" color="secondary">
+            ⋅
+          </Text>
+          <Popover
+            content={
+              <PopoverContent
+                identifier={identifier}
+                description={description}
+                requiresHumanReview={requiresHumanReview}
+              />
+            }
+          >
+            <Text variant="body-3" color="secondary">
+              {t('more-details')}
+            </Text>
+          </Popover>
+        </>
+      ) : null}
     </Stack>
   );
 };
-
-const StyledDropdownContent = styled(Dropdown.Content)`
-  ${({ theme }) => css`
-    width: 320px;
-    padding: ${theme.spacing[4]};
-  `}
-`;
 
 export default AdditionalDocs;
