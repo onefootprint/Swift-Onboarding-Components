@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
 
-import { TRANSITION_ROUTES } from '../../config/constants';
+import { DOCS_SITE_LOGIN_ROUTE, TRANSITION_ROUTES } from '../../config/constants';
 import Gate from './components/gate';
 import ModeSwitcher from './components/mode-switcher';
 import PrivateLayout from './components/private-layout';
@@ -19,6 +19,15 @@ const Layout = ({ children, name = 'default' }: LayoutProps) => {
 
   if (TRANSITION_ROUTES.includes(router.pathname)) {
     return <PublicLayout>{children}</PublicLayout>;
+  }
+  if (router.pathname === DOCS_SITE_LOGIN_ROUTE) {
+    // The docs login screen is a little special - it requires the Gate to make sure the user is logged into
+    // the dashboard, but it should be rendered on the blank canvas of PublicLayout.
+    return (
+      <Gate>
+        <PublicLayout>{children}</PublicLayout>
+      </Gate>
+    );
   }
   return (
     <Gate>

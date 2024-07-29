@@ -75,6 +75,7 @@ const useSession = () => {
       // If we can't fetch the user from the backend, just log out and display a toast
       logOut();
       showRequestErrorToast(error);
+      throw error;
     }
   };
 

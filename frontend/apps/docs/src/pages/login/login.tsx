@@ -1,4 +1,4 @@
-import { Box } from '@onefootprint/ui';
+import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -6,6 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 import Loading from './components/loading';
+
+type LoginQuery = {
+  redirectUrl?: string;
+};
 
 /** The docs site piggybacks on the dashboard's authentication. In order to log in, we redirect to the dashboard. After logging into the dashboard, we are redirected here with the auth token in the URL fragment, along with a target page to visit in the querystring. */
 const Login = () => {
@@ -18,11 +22,18 @@ const Login = () => {
       return;
     }
     const urlFragment = router.asPath.split('#')[1];
-    const redirectUrl = API_REFERENCE_PATH;
+    const redirectUrl = (router.query as LoginQuery).redirectUrl || API_REFERENCE_PATH;
 
-    logIn({ authToken: urlFragment }).finally(() => {
-      router.push(redirectUrl);
-    });
+    logIn({ authToken: urlFragment })
+      .then(() => {
+        router.push(redirectUrl);
+      })
+      .catch(() => {
+        // If an error occurs, leave some time to show the toast before we redirect
+        setTimeout(() => {
+          router.push(redirectUrl);
+        }, 3000);
+      });
   }, [router.isReady, router.asPath]);
 
   return (

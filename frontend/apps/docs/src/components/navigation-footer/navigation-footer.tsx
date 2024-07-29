@@ -1,5 +1,6 @@
+import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoHelp16 } from '@onefootprint/icons';
-import { Stack, ThemeToggle, media } from '@onefootprint/ui';
+import { Button, Stack, ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +42,16 @@ const NavigationFooter = () => {
     router.push(isApiReference ? '/' : API_REFERENCE_PATH);
   };
 
+  const handleSignIn = () => {
+    // The docs site authentication piggybacks on top of dashboard authentication.
+    // We redirect to the dashboard here, which will sign the user in. Upon completion, this route will
+    // redirect back to `${DOCS_BASE_URL}/login#${authToken}`, which will capture the auth token and
+    // save it in local storage.
+    const currentPath = `${window.location.pathname}${window.location.search}`;
+    const docsSignInLink = `${DASHBOARD_BASE_URL}/authentication/docs?redirectUrl=${currentPath}`;
+    router.push(docsSignInLink);
+  };
+
   return (
     <Container>
       {user && (
@@ -49,9 +60,11 @@ const NavigationFooter = () => {
         </LoggedInUser>
       )}
       {!user && (
-        <>
-          {/* TODO sign in button */}
-          <Stack direction="column" marginTop={2} marginBottom={2} marginLeft={6} marginRight={6}>
+        <Stack direction="column" gap={4} marginTop={4} marginBottom={2} marginLeft={4} marginRight={4}>
+          <Button onClick={handleSignIn} variant="secondary">
+            {t('sign-in')}
+          </Button>
+          <Stack direction="column" marginLeft={3} marginRight={3}>
             <LinkItem
               IconComponent={IcoArrowUpRight16}
               label={isApiReference ? t('dropdown.docs') : t('dropdown.api-reference')}
@@ -59,7 +72,7 @@ const NavigationFooter = () => {
             />
             <LinkItem IconComponent={IcoHelp16} label={t('need-help.label')} onClick={handleOpenSupportDialog} />
           </Stack>
-        </>
+        </Stack>
       )}
       <SupportDialog
         title={t('need-help.dialog.title')}

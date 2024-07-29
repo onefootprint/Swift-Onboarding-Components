@@ -27,6 +27,7 @@
     },
     "navigation-footer": {
       "theme": "Theme",
+      "sign-in": "Sign in",
       "need-help": {
         "label": "Need help?",
         "dialog": {

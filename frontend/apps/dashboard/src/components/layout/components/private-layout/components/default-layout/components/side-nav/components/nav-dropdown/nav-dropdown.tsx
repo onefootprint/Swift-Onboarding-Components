@@ -11,8 +11,8 @@ import styled, { css } from 'styled-components';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import PgpUploadTool from 'src/components/pgp-upload-tool';
+import useComposeDocsLoginUrl from 'src/hooks/use-compose-docs-login-url';
 import type { UserSession } from 'src/hooks/use-session';
-import useSession from 'src/hooks/use-session';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
 
@@ -28,9 +28,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
-  const {
-    data: { auth },
-  } = useSession();
+  const { composeDocsLoginUrl } = useComposeDocsLoginUrl();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -42,10 +40,12 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
     setIsOpen(false);
   };
 
+  let docsLink = DOCS_BASE_URL;
   let apiReferenceLink = `${DOCS_BASE_URL}/api-reference`;
   if (user?.isFirmEmployee) {
     // For in-development logged-in docs site
-    apiReferenceLink = `${DOCS_BASE_URL}/login#${auth}`;
+    docsLink = composeDocsLoginUrl('/');
+    apiReferenceLink = composeDocsLoginUrl('/api-reference');
   }
 
   return (
@@ -65,7 +65,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             ) : null}
             <Dropdown.Separator />
             <Dropdown.Group>
-              <StyledLink as={Link} href={DOCS_BASE_URL} target="_blank">
+              <StyledLink as={Link} href={docsLink} target="_blank">
                 {t('help-links.documentation')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>

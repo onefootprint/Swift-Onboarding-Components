@@ -22,6 +22,10 @@
     "title": "Magic link sent!",
     "instructions": "We just sent an email to <b>{{email}}</b>. Click that link to proceed. It’s secure and lightning fast!"
   },
+  "docs": {
+    "page-title": "Footprint Login | Logging in to Footprint Docs",
+    "loading-aria-label": "Loading"
+  },
   "social-buttons": {
     "google": "Continue with Google"
   },

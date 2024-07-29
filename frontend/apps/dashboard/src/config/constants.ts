@@ -5,6 +5,7 @@ export const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 export const PUBLIC_ROUTES = ['/authentication/sign-up', '/authentication/sign-in', '/authentication/link-sent'];
 
 export const TRANSITION_ROUTES = ['/auth', '/logout'];
+export const DOCS_SITE_LOGIN_ROUTE = '/authentication/docs';
 export const DEFAULT_PUBLIC_ROUTE = '/home';
 export const DEFAULT_PRIVATE_ROUTE = '/authentication/sign-in';
 export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
