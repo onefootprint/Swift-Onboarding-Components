@@ -155,7 +155,6 @@ impl
             _updated_at: _,
             appearance_id: _,
             author: _,
-            curp_validation_enabled: _,
             // TODO: only thing hidden here is enhanced_aml and skip_kyb which will be removed shortly
             ..
         } = ob_config;

@@ -193,7 +193,6 @@ fn copy_playbook(
         appearance_id: _,
         verification_checks: _,
         // TODO: only thing here is enhanced_aml and skip_kyb which will be removed shortly
-        curp_validation_enabled: _,
         ..
     } = pb;
 
