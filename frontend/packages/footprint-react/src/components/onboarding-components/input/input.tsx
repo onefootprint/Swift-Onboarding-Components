@@ -30,7 +30,11 @@ const Input = ({ className, id, ...props }: InputProps) => {
       {...allProps}
       {...props}
       className={cx('fp-input', baseClassName, className)}
-      {...register(name, formOptions)}
+      {...register(name, {
+        ...formOptions,
+        onBlur: props.onBlur,
+        onChange: props.onChange,
+      })}
     />
   );
 };

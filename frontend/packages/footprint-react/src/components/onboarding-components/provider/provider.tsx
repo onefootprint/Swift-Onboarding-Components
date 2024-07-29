@@ -1,5 +1,6 @@
 import type { Component } from '@onefootprint/footprint-js/src/types/components';
 import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
+import { Box } from '@onefootprint/ui';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
@@ -75,7 +76,7 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
 
   return (
     <Context.Provider value={value}>
-      <div>{children}</div>
+      <Box height="100%">{children}</Box>
     </Context.Provider>
   );
 };

@@ -5,13 +5,6 @@
     margin-top: 24px;
   }
   
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 450px;
-  }
-  
   .form button {
     margin-top: 12px;
   }
@@ -56,3 +49,4 @@
     height: 44px;
     text-align: center;
   }
+

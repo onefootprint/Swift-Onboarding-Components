@@ -17,6 +17,9 @@ const GlobalStyles = createGlobalStyle`
     color: rgb(0, 0, 0);
     outline: none;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 
     &:hover {
       background: rgb(255, 255, 255);

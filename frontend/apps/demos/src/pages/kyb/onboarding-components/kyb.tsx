@@ -1,4 +1,5 @@
-import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import type { FormValues } from '@onefootprint/footprint-react';
+import { Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, InlineAlert, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';

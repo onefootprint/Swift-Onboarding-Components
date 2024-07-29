@@ -1,7 +1,7 @@
 import { ApiError } from '../../../../types';
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
-const API_BASE_URL = process.env.API_BASE_URL ?? '';
+const API_BASE_URL = process.env.API_BASE_URL ?? 'https://api.onefootprint.com';
 
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;

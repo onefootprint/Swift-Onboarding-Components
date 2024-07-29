@@ -1,0 +1,14 @@
+.container {
+  display: grid;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  grid-template-columns: 1fr 1fr auto;
+  grid-template-rows: 1fr;
+  grid-template-areas: 'stepper form';
+  margin-top: 32px;
+  height: 100%;
+  column-gap: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+}

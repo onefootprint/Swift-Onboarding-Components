@@ -1,207 +1,96 @@
-import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
-import { Box, Button, Container, Divider, Stack, Stepper, Text } from '@onefootprint/ui';
+import { Fp } from '@onefootprint/footprint-react';
+import { Grid, Stack, Stepper } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
+import ContentLayout from './components/content-layout';
 import Header from './components/header';
-import Layout from './components/layout';
+import LogsContainer from './components/logs-container';
 import GlobalStyles from './kyc.styles';
+import { EventLog, NativeEvent } from './kyc.types';
+import Confirmation from './steps/confirmation';
+import Identify from './steps/identify';
+import PersonalInformation from './steps/personal-information';
 
 const steps = [
   {
     label: 'Identify',
     value: 'identify',
+    component: Identify,
   },
   {
     label: 'Personal information',
     value: 'basic-data',
+    component: PersonalInformation,
   },
   {
     label: 'Confirmation',
     value: 'confirmation',
+    component: Confirmation,
   },
 ];
 
-const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_kX0VyaA37SyD9LsM6u6eKs';
+const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_DOBM63fG6uDzNUj62SRJkF';
 
 const Demo = () => {
-  const [option, setOption] = useState(steps[0]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showLogs, setShowLogs] = useState(false);
+  const [eventLog, setEventLog] = useState<EventLog[]>([]);
   const router = useRouter();
   const { ob_key: obKey } = router.query;
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
 
-  const isIdentify = option.value === 'identify';
-  const isBasicData = option.value === 'basic-data';
-  const isSuccess = option.value === 'confirmation';
+  const handleShowLogs = () => {
+    setShowLogs(!showLogs);
+  };
+
+  const recordEvent = (e: NativeEvent) => {
+    const { type, target, nativeEvent } = e;
+    const { value, name } = target as HTMLInputElement;
+    const createdAt = new Date();
+    const isAutoCompleted = !(nativeEvent instanceof InputEvent);
+    const isPaste = nativeEvent instanceof ClipboardEvent;
+    setEventLog(prevLog => [...prevLog, { type, value, name, createdAt, isAutoCompleted, isPaste }]);
+  };
+
+  const CurrentComponent = steps[currentStep].component;
+
+  const handleSubmit = () => {
+    setCurrentStep(prevStep => prevStep + 1);
+  };
 
   return (
     <>
       <GlobalStyles />
       <Fp.Provider publicKey={publicKey}>
-        <Header>Onboarding</Header>
-        <Container>
-          <Stack marginTop={7} gap={8}>
-            <Stepper onChange={() => undefined} value={{ option }} aria-label="Steps" options={steps} />
-            <Box>
-              {isIdentify && (
-                <Identify
-                  onDone={() => {
-                    setOption(steps[1]);
-                  }}
+        <Stack direction="row" width="100%">
+          <Stack direction="column" width="100%">
+            <Header showLogs={showLogs} onShowLogs={handleShowLogs}>
+              Onboarding
+            </Header>
+            <ContentLayout>
+              <Grid.Item gridArea="stepper">
+                <Stepper
+                  onChange={() => undefined}
+                  value={{ option: steps[currentStep] }}
+                  aria-label="Steps"
+                  options={steps}
                 />
-              )}
-              {isBasicData && (
-                <BasicData
-                  onDone={() => {
-                    setOption(steps[2]);
-                  }}
-                />
-              )}
-              {isSuccess && <Success />}
-            </Box>
+              </Grid.Item>
+              <Grid.Item gridArea="form" direction="column" maxWidth="480px" width="100%">
+                <CurrentComponent onFormSubmit={handleSubmit} onInputEvent={recordEvent} />
+              </Grid.Item>
+            </ContentLayout>
           </Stack>
-        </Container>
+          {showLogs && (
+            <Grid.Item gridArea="transparentMode">
+              <LogsContainer eventLog={eventLog} />
+            </Grid.Item>
+          )}
+        </Stack>
       </Fp.Provider>
     </>
   );
 };
-
-const Identify = ({ onDone }: { onDone: () => void }) => {
-  const fp = useFootprint();
-
-  const handleSubmit = (formValues: FormValues) => {
-    fp.launchIdentify(
-      {
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      },
-      { onAuthenticated: onDone },
-    );
-  };
-
-  return (
-    <Layout>
-      <Box marginBottom={7}>
-        <Text variant="heading-3">Identification</Text>
-        <Text variant="body-3" color="secondary">
-          Please provide your email and phone number
-        </Text>
-      </Box>
-      <Fp.Form onSubmit={handleSubmit}>
-        <Stack gap={4} direction="column">
-          <Fp.Field name="id.email">
-            <Fp.Label>Your email</Fp.Label>
-            <Fp.Input placeholder="jane@acme.com" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Fp.Label>Phone</Fp.Label>
-            <Fp.Input placeholder="(123) 456-7890" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Button type="submit">Continue</Button>
-        </Stack>
-      </Fp.Form>
-    </Layout>
-  );
-};
-
-const BasicData = ({ onDone }: { onDone: () => void }) => {
-  const fp = useFootprint();
-
-  const handleSubmit = (data: FormValues) => {
-    fp.save(data, {
-      onSuccess: () => {
-        fp.handoff({ onComplete: onDone });
-      },
-    });
-  };
-
-  return (
-    <Layout>
-      <Box marginBottom={7}>
-        <Text variant="heading-3">Basic information</Text>
-        <Text variant="body-3" color="secondary">
-          Please provide some basic personal information
-        </Text>
-      </Box>
-      <Fp.Form onSubmit={handleSubmit}>
-        <Stack gap={4} direction="column">
-          <Fp.Field name="id.first_name">
-            <Fp.Label>First name</Fp.Label>
-            <Fp.Input placeholder="Jane" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.middle_name">
-            <Fp.Label>Middle name</Fp.Label>
-            <Fp.Input placeholder="Sue" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.last_name">
-            <Fp.Label>Last name</Fp.Label>
-            <Fp.Input placeholder="Joe" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.dob">
-            <Fp.Label>DOB</Fp.Label>
-            <Fp.Input placeholder="MM/DD/YYYY" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Fp.Field name="id.country">
-            <Fp.Input placeholder="US" defaultValue="US" type="hidden" />
-          </Fp.Field>
-          <Fp.Field name="id.address_line1">
-            <Fp.Label>Address line 1</Fp.Label>
-            <Fp.Input placeholder="Street number" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.address_line2">
-            <Fp.Label>Address line 2 (optional)</Fp.Label>
-            <Fp.Input placeholder="Apartment, suite, etc." />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.city">
-            <Fp.Label>City</Fp.Label>
-            <Fp.Input placeholder="New York" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.state">
-            <Fp.Label>State</Fp.Label>
-            <Fp.Input placeholder="NY" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.zip">
-            <Fp.Label>Zip</Fp.Label>
-            <Fp.Input placeholder="11206" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Fp.Field name="id.ssn9">
-            <Fp.Label>SSN</Fp.Label>
-            <Fp.Input placeholder="XXX-XX-XXXX" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Button type="submit" loading={fp.busy === 'save'}>
-            Continue
-          </Button>
-        </Stack>
-      </Fp.Form>
-    </Layout>
-  );
-};
-
-const Success = () => (
-  <Layout>
-    <Box marginBottom={7}>
-      <Text variant="heading-3">Success</Text>
-      <Text variant="body-3" color="secondary">
-        You are all set!
-      </Text>
-    </Box>
-  </Layout>
-);
 
 export default Demo;
