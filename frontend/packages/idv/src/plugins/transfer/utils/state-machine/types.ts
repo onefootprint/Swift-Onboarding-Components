@@ -1,6 +1,6 @@
 import type { IdDocOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks';
 import type { TransferRequirements } from '../../types';
 
 export type MachineContext = {

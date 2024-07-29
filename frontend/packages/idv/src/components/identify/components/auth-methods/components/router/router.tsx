@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
-import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
-import { useDeviceInfo } from '../../../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../../../hooks';
+import { useDeviceInfo } from '../../../../../../hooks';
 import { getLogger } from '../../../../../../utils';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';

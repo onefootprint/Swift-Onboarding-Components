@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { LAYOUT_CONTAINER_ID } from '../../../components/layout/constants';
+import { LAYOUT_CONTAINER_ID } from '../../components/layout/constants';
 
 type MeasurementProps = {
   width: number;
@@ -12,6 +12,7 @@ type MeasurementProps = {
   right: number;
 };
 
+/** @deprecated: It seems not to be used */
 const useIdvContainerMeasurement = () => {
   const [measurement, setMeasurement] = useState<MeasurementProps>({
     width: 0,

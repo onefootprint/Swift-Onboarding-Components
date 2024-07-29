@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../../hooks';
 import CameraAccessDenied from '../../../components/camera-access-denied';
 import CameraAccessRequest from '../../../components/camera-access-request';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';

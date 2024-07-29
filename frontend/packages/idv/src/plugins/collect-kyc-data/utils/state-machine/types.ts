@@ -1,7 +1,7 @@
 import type { AuthMethodKind, CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import type { StateValue } from 'xstate';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks';
 import type { KycData } from '../data-types';
 
 export type MachineContext = {

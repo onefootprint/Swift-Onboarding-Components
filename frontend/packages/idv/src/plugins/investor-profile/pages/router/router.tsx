@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../hooks';
 import { trackAction } from '../../../../utils/logger';
 import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';

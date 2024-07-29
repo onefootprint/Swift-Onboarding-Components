@@ -13,7 +13,7 @@ import { useL10nContext } from '../../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
-import useIdvRequestErrorToast from '../../../../../../hooks/ui/use-idv-request-error-toast';
+import { useIdvRequestErrorToast } from '../../../../../../hooks';
 import { getLogger } from '../../../../../../utils/logger';
 import useSubmitDocType from '../../../../hooks/use-submit-doc-type';
 import { isMobileKind } from '../../../../utils/capture';

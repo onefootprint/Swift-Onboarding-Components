@@ -2,7 +2,7 @@ import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
 import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import React, { useEffect } from 'react';
 
-import useLogStateMachine from '../../../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../../../hooks';
 import {
   CollectDocument,
   CollectKybData,

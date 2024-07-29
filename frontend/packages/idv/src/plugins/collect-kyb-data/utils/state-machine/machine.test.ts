@@ -9,7 +9,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks';
 import createCollectKybDataMachine from './machine';
 import type { MachineContext } from './types';
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../hooks';
 import { trackAction } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import Register from '../register';

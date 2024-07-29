@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../hooks';
 import Processing from '../../components/processing';
 import useTransferMachine from '../../hooks/use-machine';
 import useRequirementsTitle from '../../hooks/use-requirements-title-translation-key';

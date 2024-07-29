@@ -5,8 +5,7 @@ import React, { useEffect } from 'react';
 import { ConfigRequestFailureReason } from '../../../src/utils/state-machine/types';
 import { InitShimmer } from '../../components';
 import type { DeviceInfo } from '../../hooks';
-import { useDeviceInfo } from '../../hooks';
-import useIdvMachine from '../../hooks/ui/use-idv-machine';
+import { useDeviceInfo, useIdvMachine } from '../../hooks';
 import { useGetOnboardingConfig } from '../../queries';
 import { getLogger, trackAction } from '../../utils';
 

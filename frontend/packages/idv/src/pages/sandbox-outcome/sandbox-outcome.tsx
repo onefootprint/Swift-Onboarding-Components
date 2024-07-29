@@ -1,6 +1,6 @@
 import React from 'react';
 
-import useIdvMachine from '../../hooks/ui/use-idv-machine';
+import { useIdvMachine } from '../../hooks';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 

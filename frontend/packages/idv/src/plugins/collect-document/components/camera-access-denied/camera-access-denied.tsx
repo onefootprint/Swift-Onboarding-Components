@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle, styled } from 'styled-components';
-import { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import { DeviceInfo } from '../../../../hooks';
 import { isAndroid, isChrome, isIOS, isMobileKind, isSafari } from '../../utils/capture';
 import IcoArrowCustom from './ico-arrow-custom';
 

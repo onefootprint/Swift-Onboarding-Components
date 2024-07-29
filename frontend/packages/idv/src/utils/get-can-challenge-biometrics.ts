@@ -1,6 +1,6 @@
 import { ChallengeKind } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../hooks';
 
 const getCanChallengeBiometrics = (
   availableChallengeKinds?: ChallengeKind[],

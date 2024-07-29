@@ -1,6 +1,6 @@
 import UAParser from 'ua-parser-js';
 import { useEffectOnce } from 'usehooks-ts';
-import { isFunction, isUndefined } from '../../../utils/type-guards';
+import { isFunction, isUndefined } from '../../utils/type-guards';
 
 export type BasicDeviceInfo = { browser: string; osName: string; type: string };
 export type DeviceInfo = BasicDeviceInfo & {

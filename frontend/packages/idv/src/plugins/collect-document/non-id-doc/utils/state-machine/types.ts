@@ -6,7 +6,7 @@ import type {
   IdDocImageUploadError,
 } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../../hooks';
 import type { CaptureKind, IdDocImageErrorType } from '../../../types';
 
 export type MachineContext = {

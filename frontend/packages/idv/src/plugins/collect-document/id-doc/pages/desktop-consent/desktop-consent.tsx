@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box';
 import { LAYOUT_CONTAINER_ID } from '../../../../../components/layout/constants';
-import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-error-toast';
+import { useIdvRequestErrorToast } from '../../../../../hooks';
 import { getLogger } from '../../../../../utils/logger';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';

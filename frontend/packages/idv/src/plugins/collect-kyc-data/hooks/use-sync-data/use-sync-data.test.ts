@@ -2,7 +2,7 @@ import { customRenderHook, screen, waitFor } from '@onefootprint/test-utils';
 import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
-import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../../hooks';
 import type { KycData } from '../../utils/data-types';
 import useSyncData from './use-sync-data';
 import { getCustomWrapper, withUserVault, withUserVaultError } from './use-sync-data.test.utils';

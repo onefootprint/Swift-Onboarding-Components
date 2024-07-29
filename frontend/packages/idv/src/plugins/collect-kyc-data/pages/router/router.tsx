@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { UpdateVerify } from '../../../../components/identify';
 import StepHeader from '../../../../components/step-header';
-import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';

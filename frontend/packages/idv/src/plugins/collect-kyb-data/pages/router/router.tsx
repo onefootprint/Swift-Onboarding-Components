@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { useLogStateMachine } from '../../../../hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';

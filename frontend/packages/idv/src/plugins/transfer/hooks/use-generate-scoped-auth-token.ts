@@ -4,7 +4,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { D2PGenerateResponse, IdDocOutcome, L10n, PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
-import type { DeviceInfo } from '../../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../../hooks';
 import { useD2PGenerate } from '../../../queries';
 import { Logger } from '../../../utils/logger';
 

@@ -2,7 +2,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { ChallengeKind as Kind } from '@onefootprint/types';
 import { AuthMethodKind } from '@onefootprint/types/src/data';
 
-import type { DeviceInfo } from '../../../hooks/ui/use-device-info/use-device-info';
+import type { DeviceInfo } from '../../../hooks';
 import type { IdentifyContext, IdentifyMachineContext, NavigatedToPrevPage } from './types';
 import { IdentifyVariant } from './types';
 

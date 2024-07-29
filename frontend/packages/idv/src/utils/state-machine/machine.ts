@@ -2,7 +2,7 @@ import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth } from '@onefootprint
 import { BusinessDI, IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { DeviceInfo } from '../../hooks/ui/use-device-info';
+import type { DeviceInfo } from '../../hooks';
 import type { BusinessData, UserData } from '../../types';
 import { ConfigRequestFailureReason } from './types';
 import type { CompletePayload, ComponentsSdkContext, MachineContext, MachineEvents } from './types';
