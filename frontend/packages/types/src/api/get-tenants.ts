@@ -34,6 +34,7 @@ export enum TenantPreviewApi {
   VaultDisasterRecovery = 'vault_disaster_recovery',
   LegacyOnboardingStatusWebhook = 'legacy_onboarding_status_webhook',
   LegacyListUsersBusinesses = 'legacy_list_users_businesses',
+  ClientVaulting = 'client_vaulting',
 }
 
 export enum TenantBillingProfileProduct {
