@@ -1,12 +1,12 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
 
-import * as getBiometricChallengeResponse from '../hooks/use-step-up/utils/get-biometric-challenge-response';
+import * as getBiometricChallengeResponse from '../../../../../../../hooks/use-step-up/utils/get-biometric-challenge-response';
 
 // This needs to be mocked here and in the test itself as it is a esModule
-jest.mock('../hooks/use-step-up/utils/get-biometric-challenge-response', () => ({
+jest.mock('../../../../../../../hooks/use-step-up/utils/get-biometric-challenge-response', () => ({
   __esModule: true,
-  ...jest.requireActual('../hooks/use-step-up/utils/get-biometric-challenge-response'),
+  ...jest.requireActual('../../../../../../../hooks/use-step-up/utils/get-biometric-challenge-response'),
 }));
 
 export const mockGenerateBiometricResponseImpl = jest.fn(

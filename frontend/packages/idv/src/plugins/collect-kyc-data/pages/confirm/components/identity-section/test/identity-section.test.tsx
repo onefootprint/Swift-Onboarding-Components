@@ -15,9 +15,9 @@ import {
 } from './identity-section.test.config';
 import { renderIdentitySection } from './render-identity-section';
 
-jest.mock('../hooks/use-step-up/utils/get-biometric-challenge-response', () => ({
+jest.mock('../../../../../../../hooks/use-step-up/utils/get-biometric-challenge-response', () => ({
   __esModule: true,
-  ...jest.requireActual('../hooks/use-step-up/utils/get-biometric-challenge-response'),
+  ...jest.requireActual('../../../../../../../hooks/use-step-up/utils/get-biometric-challenge-response'),
 }));
 
 describe('IdentitySection', () => {

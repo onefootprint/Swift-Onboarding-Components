@@ -7,3 +7,5 @@ export {
   useLogStateMachine,
   useParseHandoffUrl,
 } from './ui';
+
+export { default as useStepUp } from './use-step-up';

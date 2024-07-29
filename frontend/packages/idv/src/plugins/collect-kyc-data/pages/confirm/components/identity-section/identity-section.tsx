@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
 import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
+import { useStepUp } from '../../../../../../hooks';
 import { useDecryptUser } from '../../../../../../queries';
 import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
 import { getLogger } from '../../../../../../utils/logger';
@@ -25,7 +26,6 @@ import {
 import type { TaxIdKind } from '../../../../utils/ssn-utils';
 import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import Ssn from '../../../ssn';
-import useStepUp from './hooks/use-step-up';
 
 type T = TFunction<'idv', 'kyc.pages'>;
 type TaxIdData = ReturnType<typeof getTaxIdDataValue>;
