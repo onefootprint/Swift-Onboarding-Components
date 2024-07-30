@@ -115,11 +115,7 @@ impl Client {
         phone_number: &str,
         fields: Vec<TwilioLookupField>,
     ) -> crate::response::Result<serde_json::Value> {
-        let fields = fields
-            .iter()
-            .map(serde_json::to_string)
-            .collect::<Result<Vec<_>, _>>()?
-            .join(",");
+        let fields = fields.iter().map(|s| s.to_string()).collect::<Vec<_>>().join(",");
 
         let url = format!(
             "https://lookups.twilio.com/v2/PhoneNumbers/{phone_number}?Fields={}",
