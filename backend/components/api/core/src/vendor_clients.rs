@@ -209,7 +209,8 @@ impl IncodeClients {
         }
     }
 
-    pub fn new(footprint_client: Arc<FootprintVendorHttpClient>) -> Self {
+    pub fn new(_footprint_client: Arc<FootprintVendorHttpClient>) -> Self {
+        let footprint_client = Arc::new(FootprintVendorHttpClient::new_for_incode());
         Self {
             incode_start_onboarding: footprint_client.clone(),
             incode_add_front: footprint_client.clone(),

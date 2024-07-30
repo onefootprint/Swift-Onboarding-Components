@@ -41,6 +41,29 @@ impl FootprintVendorHttpClient {
 
         Ok(Self { client })
     }
+
+    pub fn new_for_incode() -> Self {
+        let num_retries = 0;
+        let retry_policy = ExponentialBackoff::builder()
+            .retry_bounds(Duration::from_millis(200), Duration::from_secs(3))
+            .base(1)
+            // .build_with_total_retry_duration_and_max_retries(Duration::from_secs(15))
+            .build_with_max_retries(num_retries);
+
+        // Note: the order of the middlewares matters
+        let client = ClientBuilder::new(reqwest::Client::new())
+            // Will only retry if:
+            // * The status was 5XX (server error)
+            // * The status was 408 (request timeout) or 429 (too many requests)
+            .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+            // Log when a soft timeout has been reached
+            .with(SoftTimeoutMiddleware)
+            // Trace each individual API request
+            .with(TracingMiddleware::<OtelPathSpanName>::new())
+            .build();
+
+        Self { client }
+    }
 }
 
 impl std::ops::Deref for FootprintVendorHttpClient {
