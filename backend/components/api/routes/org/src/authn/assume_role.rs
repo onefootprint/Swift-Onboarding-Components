@@ -17,7 +17,6 @@ use api_wire_types::OrganizationMember;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
-use newtypes::TenantSessionPurpose;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -38,7 +37,6 @@ fn post(
     let auth_method = auth.auth_method();
     let tu_id = auth.clone().tenant_user_id()?;
 
-    let purpose = purpose.unwrap_or(TenantSessionPurpose::Dashboard);
     if !auth.purpose().allow_generating(purpose) {
         return Err(AuthError::AuthTokenPurposeRestricted.into());
     }

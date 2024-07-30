@@ -7,8 +7,7 @@ use newtypes::TenantSessionPurpose;
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct AssumeRoleRequest {
     pub tenant_id: TenantId,
-    // TODO make required
-    pub purpose: Option<TenantSessionPurpose>,
+    pub purpose: TenantSessionPurpose,
 }
 
 #[derive(serde::Serialize, Apiv2Response, macros::JsonResponder)]
