@@ -1,6 +1,6 @@
 use crate::decision::vendor::build_request;
 use crate::decision::vendor::incode::common::call_start_onboarding;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
@@ -122,10 +122,10 @@ async fn call_watchlist_result(
             )
             .await?;
             let res = res
-                .map_err(map_to_api_error)?
+                .map_err(into_fp_error)?
                 .result
                 .into_success()
-                .map_err(map_to_api_error)?;
+                .map_err(into_fp_error)?;
             (vres_id, res)
         }
 
@@ -149,10 +149,10 @@ async fn call_watchlist_result(
             )
             .await?;
             let res = res
-                .map_err(map_to_api_error)?
+                .map_err(into_fp_error)?
                 .result
                 .into_success()
-                .map_err(map_to_api_error)?
+                .map_err(into_fp_error)?
                 .0;
             (vres_id, res)
         }

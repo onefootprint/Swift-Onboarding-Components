@@ -1,6 +1,6 @@
 use crate::decision::features::incode_utils::ParsedIncodeAddress;
 use crate::decision::features::incode_utils::ParsedIncodeNames;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
@@ -254,7 +254,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     };
 
     if !can_run_request_for_state {
-        return Err(map_to_api_error(idv::samba::error::Error::UnsupportedState(
+        return Err(into_fp_error(idv::samba::error::Error::UnsupportedState(
             "license_validation".to_string(),
         )));
     }
@@ -279,9 +279,9 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
 
     let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    let resp = res.map_err(map_to_api_error)?;
+    let resp = res.map_err(into_fp_error)?;
     // check we got a successful_response
-    let create_order_response = resp.result.into_success().map_err(map_to_api_error)?;
+    let create_order_response = resp.result.into_success().map_err(into_fp_error)?;
 
     state
         .db_pool
@@ -360,11 +360,11 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 
     let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    let resp = res.map_err(map_to_api_error)?;
+    let resp = res.map_err(into_fp_error)?;
     // check we got a successful_response
     // TODO: How should we handle this? i think this is right, we don't complete the order if we get
     // some sort of error..
-    let _ = resp.result.into_success().map_err(map_to_api_error)?;
+    let _ = resp.result.into_success().map_err(into_fp_error)?;
 
     state
         .db_pool

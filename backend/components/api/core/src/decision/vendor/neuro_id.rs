@@ -1,4 +1,4 @@
-use super::map_to_api_error;
+use super::into_fp_error;
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_api::loaders::load_response_for_vendor_api;
 use super::vendor_result::VendorResult;
@@ -138,9 +138,9 @@ pub async fn run_neuro_call(
         vw.vault.public_key.clone(),
     );
     let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
-    let neuro_response = res.map_err(map_to_api_error)?;
+    let neuro_response = res.map_err(into_fp_error)?;
     let raw_response = neuro_response.raw_response.clone();
-    let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(map_to_api_error)?;
+    let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(into_fp_error)?;
 
     // save event for metrics/dupes/user insights
     save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;

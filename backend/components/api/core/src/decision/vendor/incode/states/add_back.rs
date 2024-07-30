@@ -6,7 +6,7 @@ use super::VerificationSession;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
@@ -54,7 +54,7 @@ impl IncodeStateTransition for AddBack {
         args.save(db_pool).await?;
 
         // TODO: fix this
-        let response = request_result.map_err(map_to_api_error)?.result;
+        let response = request_result.map_err(into_fp_error)?.result;
 
         let (
             type_of_id,

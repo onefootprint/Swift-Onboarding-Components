@@ -1,3 +1,4 @@
+use super::into_fp_error;
 use super::vendor_api::loaders::load_response_for_vendor_api;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
@@ -131,7 +132,7 @@ pub async fn run_twilio_call(
     );
     let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    let result = res.ok().map(|r| (r.parsed_response, vres_id));
+    let res = res.map_err(into_fp_error)?;
 
-    Ok(result)
+    Ok(Some((res.parsed_response, vres_id)))
 }

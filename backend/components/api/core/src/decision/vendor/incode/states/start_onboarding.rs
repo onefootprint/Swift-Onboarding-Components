@@ -1,7 +1,7 @@
 use super::AddFront;
 use super::IncodeStateTransition;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::FpResult;
 use crate::State;
@@ -58,10 +58,10 @@ impl StartOnboarding {
         // If we get an error here, the response does not include interviewId or anything else, so we just
         // error here and will restart
         let successful_response = res
-            .map_err(map_to_api_error)?
+            .map_err(into_fp_error)?
             .result
             .into_success()
-            .map_err(map_to_api_error)?;
+            .map_err(into_fp_error)?;
 
         state
             .db_pool

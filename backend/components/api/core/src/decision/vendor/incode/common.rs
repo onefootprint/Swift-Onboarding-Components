@@ -1,5 +1,5 @@
 use super::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
@@ -36,7 +36,7 @@ impl SaveVerificationResultArgs {
                 let scrubbed_response = response
                     .result
                     .scrub()
-                    .map_err(map_to_api_error)
+                    .map_err(into_fp_error)
                     .unwrap_or(serde_json::json!("").into());
 
                 Self {
@@ -127,9 +127,9 @@ pub async fn call_start_onboarding(
     args.save(&state.db_pool).await?;
 
     let res = res
-        .map_err(map_to_api_error)?
+        .map_err(into_fp_error)?
         .result
         .into_success()
-        .map_err(map_to_api_error)?;
+        .map_err(into_fp_error)?;
     Ok(res)
 }

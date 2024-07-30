@@ -11,7 +11,7 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::VendorAPIError;
@@ -88,10 +88,10 @@ impl IncodeStateTransition for FetchScores {
 
         // Now ensure we don't have an error
         let score_response = scores_res
-            .map_err(map_to_api_error)?
+            .map_err(into_fp_error)?
             .result
             .into_success()
-            .map_err(map_to_api_error)?;
+            .map_err(into_fp_error)?;
 
         let (overall_score, overall_status) = score_response.document_score();
         if overall_score.is_none() || overall_status.is_none() {
@@ -110,10 +110,10 @@ impl IncodeStateTransition for FetchScores {
 
         // Now ensure we don't have an error
         let ocr_response = ocr_res
-            .map_err(map_to_api_error)?
+            .map_err(into_fp_error)?
             .result
             .into_success()
-            .map_err(map_to_api_error)?;
+            .map_err(into_fp_error)?;
 
         let wf_id = ctx.wf_id.clone();
         let sv_id = ctx.sv_id.clone();
@@ -351,15 +351,15 @@ async fn run_aws_rekognition(
 
 async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> FpResult<reqwest::Response> {
     let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
-    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_error)?;
+    let client = IncodeClientAdapter::new(credentials.credentials).map_err(into_fp_error)?;
     let authenticated_client =
         AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)
-            .map_err(map_to_api_error)?;
+            .map_err(into_fp_error)?;
 
     let res = authenticated_client
         .mark_session_complete(&http_client)
         .await
-        .map_err(map_to_api_error)?;
+        .map_err(into_fp_error)?;
 
     Ok(res)
 }
@@ -389,10 +389,10 @@ async fn add_customer_and_save_session(
     }
     // Otherwise, let's approve
     let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
-    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_error)?;
+    let client = IncodeClientAdapter::new(credentials.credentials).map_err(into_fp_error)?;
     let authenticated_client =
         AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)
-            .map_err(map_to_api_error)?;
+            .map_err(into_fp_error)?;
 
     let resp = authenticated_client.add_customer(&http_client).await;
     let res = match resp {
@@ -405,10 +405,10 @@ async fn add_customer_and_save_session(
     let _ = session_args.save(db_pool).await?;
 
     let parsed: AddCustomerResponse = res
-        .map_err(map_to_api_error)?
+        .map_err(into_fp_error)?
         .result
         .into_success()
-        .map_err(map_to_api_error)?;
+        .map_err(into_fp_error)?;
 
     let log_success = parsed.success;
     let mut log_created_customer = false;

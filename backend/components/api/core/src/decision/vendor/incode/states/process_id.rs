@@ -5,7 +5,7 @@ use super::VerificationSession;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
@@ -66,7 +66,7 @@ async fn process_id_inner(
     let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
     args.save(db_pool).await?;
 
-    let res = res.map_err(map_to_api_error)?.result;
+    let res = res.map_err(into_fp_error)?.result;
 
     // If we get the "Id already processed" error, then we ignore this an continue
     // else we throw other kinds of errors as usual
@@ -86,10 +86,10 @@ async fn process_id_inner(
                 "Received expected error in process_id response"
             );
         } else {
-            res.into_success().map_err(map_to_api_error)?;
+            res.into_success().map_err(into_fp_error)?;
         }
     } else {
-        res.into_success().map_err(map_to_api_error)?;
+        res.into_success().map_err(into_fp_error)?;
     }
 
     Ok(())

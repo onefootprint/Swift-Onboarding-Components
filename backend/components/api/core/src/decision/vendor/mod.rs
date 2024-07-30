@@ -64,7 +64,7 @@ impl std::error::Error for VendorAPIError {
     }
 }
 
-pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> FpError {
+pub fn into_fp_error<E: Into<idv::Error>>(e: E) -> FpError {
     FpError::from(e.into())
 }
 

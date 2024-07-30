@@ -4,7 +4,7 @@ use super::VerificationSession;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
@@ -42,7 +42,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
 
         match res {
             Ok(res) => {
-                res.result.into_success().map_err(map_to_api_error)?;
+                res.result.into_success().map_err(into_fp_error)?;
                 Ok(Some(Self {}))
             }
             Err(e) => {
@@ -55,7 +55,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
                     );
                     Ok(None)
                 } else {
-                    Err(map_to_api_error(e))?
+                    Err(into_fp_error(e))?
                 }
             }
         }

@@ -1,5 +1,5 @@
 use super::common::call_start_onboarding;
-use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_result::VendorResult;
@@ -167,7 +167,7 @@ pub async fn run_curp_validation_check(
                 ShouldSaveVerificationRequest::Yes(VendorAPI::IncodeCurpValidation),
             );
             let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
-            let curp_response = res.map_err(map_to_api_error)?;
+            let curp_response = res.map_err(into_fp_error)?;
             let raw_response = curp_response.raw_response.clone();
             match curp_response.result.safe_into_success() {
                 either::Either::Left(parsed) => {
@@ -230,7 +230,7 @@ pub async fn run_curp_validation_check(
                 either::Either::Right(errors) => {
                     handle_curp_error(state, &di.scoped_vault_id, &vres_id, errors).await?;
 
-                    Err(map_to_api_error(idv::incode::error::Error::InvalidCurp))
+                    Err(into_fp_error(idv::incode::error::Error::InvalidCurp))
                 }
             }
         }
