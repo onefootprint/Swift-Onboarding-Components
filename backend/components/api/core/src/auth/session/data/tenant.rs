@@ -53,17 +53,6 @@ pub struct FirmEmployeeSession {
     pub purpose: TenantSessionPurpose,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-/// Represents a session where a user has logged in but is part of multiple tenants and hasn't yet
-/// selected the tenant whose dashboard they want to view
-/// DEPRECATED
-pub struct WorkOsSession {
-    /// The TenantUserId that is proven to be owned via a workos auth
-    pub tenant_user_id: TenantUserId,
-    /// The auth method used to log in via workos
-    pub auth_method: WorkosAuthMethod,
-}
-
 /// Short-lived token that temporarily gives a tenant's access to perform operations on a single
 /// user. For now, they are only allowed to be generated with a tenant API key that has admin
 /// permissions. Otherwise, we have to deal with the complexity of permissions

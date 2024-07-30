@@ -1,5 +1,6 @@
-use api_core::auth::tenant::AnyOrgSessionAuth;
-use api_core::auth::tenant::AnyTenantSessionAuth;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::Any;
 use api_core::serializers::IsAuthMethodSupported;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
@@ -18,9 +19,11 @@ use paperclip::actix::web;
     tags(Auth, Private)
 )]
 #[get("/org/auth/roles")]
-fn get(state: web::Data<State>, tenant_auth: AnyTenantSessionAuth) -> ApiListResponse<Organization> {
-    let auth_method = tenant_auth.auth_method();
-    let tu_id = tenant_auth.tenant_user_id()?;
+fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiListResponse<Organization> {
+    let auth_method = auth.auth_method();
+    let auth = auth.check_guard(Any)?;
+    let actor = auth.actor();
+    let tu_id = actor.tenant_user_id()?.clone();
     let tenants = state
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::list_by_user(conn, &tu_id))

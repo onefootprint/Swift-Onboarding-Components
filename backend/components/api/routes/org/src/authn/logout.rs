@@ -1,5 +1,5 @@
-use api_core::auth::tenant::AnyTenantSessionAuth;
 use api_core::auth::tenant::InvalidateAuth;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ApiResponse;
 use api_core::State;
 use paperclip::actix::api_v2_operation;
@@ -11,7 +11,7 @@ use paperclip::actix::web;
     description = "Logs out the authenticated principal and invalidates the session"
 )]
 #[post("/org/auth/logout")]
-async fn handler(state: web::Data<State>, auth: AnyTenantSessionAuth) -> ApiResponse<api_wire_types::Empty> {
+async fn handler(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<api_wire_types::Empty> {
     auth.invalidate(&state).await?;
     Ok(api_wire_types::Empty)
 }

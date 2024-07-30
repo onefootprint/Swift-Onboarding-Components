@@ -1,8 +1,9 @@
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
-use api_core::auth::tenant::AnyOrgSessionAuth;
-use api_core::auth::tenant::AnyTenantSessionAuth;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::Any;
 use api_core::auth::AuthError;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
@@ -31,13 +32,17 @@ use paperclip::actix::web::Json;
 fn post(
     state: web::Data<State>,
     request: Json<AssumeRoleRequest>,
-    auth: AnyTenantSessionAuth,
+    auth: TenantSessionAuth,
 ) -> ApiResponse<AssumeRoleResponse> {
     let AssumeRoleRequest { tenant_id, purpose } = request.into_inner();
+    let current_purpose = auth.purpose();
     let auth_method = auth.auth_method();
-    let tu_id = auth.clone().tenant_user_id()?;
+    let expires_at = auth.clone().session().expires_at;
+    let auth = auth.check_guard(Any)?;
+    let actor = auth.actor();
+    let tu_id = actor.tenant_user_id()?.clone();
 
-    if !auth.purpose().allow_generating(purpose) {
+    if !current_purpose.allow_generating(purpose) {
         return Err(AuthError::AuthTokenPurposeRestricted.into());
     }
 
@@ -59,7 +64,6 @@ fn post(
             return Err(AssertionError("expected tenant, found partner tenant").into());
         }
     };
-    let expires_at = auth.session().expires_at;
     let session_sealing_key = state.session_sealing_key.clone();
     let token = state
         .db_pool

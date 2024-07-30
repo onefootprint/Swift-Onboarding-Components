@@ -26,9 +26,6 @@ impl AuthSessionData {
 /// in its encrypted session store
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AuthSessionData {
-    /// proven to own an email address via workos auth
-    WorkOs(tenant::WorkOsSession),
-
     /// authed as a user at a tenant for admin dashboard
     TenantRb(tenant::TenantRbSession),
 
@@ -74,8 +71,7 @@ impl AuthSessionData {
             Self::SdkArgs(_) => "sdk",
             Self::TenantRb(d) if d.purpose == TenantSessionPurpose::Docs => "d",
             Self::FirmEmployee(d) if d.purpose == TenantSessionPurpose::Docs => "d",
-            // These three are all very similar purpose.
-            Self::WorkOs(_) => "db",
+            // These two are very similar purpose and are basically interchangible.
             Self::TenantRb(_) => "db",
             Self::FirmEmployee(_) => "db",
         }
@@ -98,7 +94,6 @@ impl From<sdk_args::SdkArgsData> for AuthSessionData {
 impl HasSessionKind for AuthSessionData {
     fn session_kind(&self) -> SessionKind {
         match self {
-            Self::WorkOs(_) => SessionKind::WorkOs,
             Self::TenantRb(_) => SessionKind::TenantRb,
             Self::FirmEmployee(_) => SessionKind::FirmEmployee,
             Self::ClientTenant(_) => SessionKind::ClientTenant,

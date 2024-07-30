@@ -1,7 +1,8 @@
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::session::GetSessionForUpdate;
-use api_core::auth::tenant::AnyOrgSessionAuth;
-use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::PartnerTenantSessionAuth;
+use api_core::auth::Any;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -29,12 +30,15 @@ use paperclip::actix::web::Json;
 fn post(
     state: web::Data<State>,
     request: Json<AssumePartnerRoleRequest>,
-    pt_auth: AnyPartnerTenantSessionAuth,
+    pt_auth: PartnerTenantSessionAuth,
 ) -> ApiResponse<AssumePartnerRoleResponse> {
     let AssumePartnerRoleRequest { partner_tenant_id } = request.into_inner();
-    let auth_method = pt_auth.auth_method();
-    let tu_id = pt_auth.clone().tenant_user_id()?;
     let purpose = pt_auth.purpose();
+    let auth_method = pt_auth.auth_method();
+    let expires_at = pt_auth.clone().session().expires_at;
+    let pt_auth = pt_auth.check_guard(Any)?;
+    let actor = pt_auth.actor();
+    let tu_id = actor.tenant_user_id()?.clone();
 
     let login_result = state
         .db_pool
@@ -56,7 +60,6 @@ fn post(
         }
     };
     let session_sealing_key = state.session_sealing_key.clone();
-    let expires_at = pt_auth.session().expires_at;
     let token = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
