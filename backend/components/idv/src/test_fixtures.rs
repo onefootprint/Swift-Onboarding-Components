@@ -3217,7 +3217,7 @@ pub fn middesk_business_update_webhook_response() -> serde_json::Value {
                   "listed_at": null,
                   "agency_information_url": "http://bit.ly/1MLgpye",
                   "agency_list_url": "http://bit.ly/1I7ipyR",
-                  "score": null,
+                  "score": 66.7,
                   "addresses": [
                     {
                       "full_address": "PA"

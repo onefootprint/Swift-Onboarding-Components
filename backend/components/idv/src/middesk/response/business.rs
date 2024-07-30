@@ -427,7 +427,7 @@ pub struct Result {
     pub agency_list_url: Option<String>,
     pub agency_information_url: Option<String>,
     pub list_country: Option<String>,
-    pub score: Option<String>,
+    pub score: Option<serde_json::Value>,
     pub addresses: Option<ScrubbedPiiJsonValue>, /* schema not specified in docs and wierdly its a vec of
                                                   * json
                                                   * objects */
