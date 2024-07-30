@@ -152,7 +152,7 @@ pub struct LineTypeIntelligence {
 
 /// Phone line type
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 pub enum LineType {
     Landline,
     Mobile,

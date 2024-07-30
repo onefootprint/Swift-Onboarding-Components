@@ -561,6 +561,10 @@ footprint_reason_code_enum! {
         PhoneNumberLocatedIsVoip,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = None]
+        #[note = "VOIP phone number", severity = SignalSeverity::Medium,  description = "The user's provided phone number is associated with VoIP."]
+        PhoneNumberIsVoip,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = None]
         #[note = "Postpaid phone number", severity = SignalSeverity::Low,  description = "The type of mobile account is postpaid."]
         PhoneNumberMobileAccountTypePostpaid,
 

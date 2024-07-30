@@ -201,7 +201,13 @@ pub fn test_twilio_lookupv2_response() -> serde_json::Value {
           "roaming_carrier": null,
           "error_code": null
         },
-      "line_type_intelligence": null,
+      "line_type_intelligence": {
+            "carrier_name": "Google (Grand Central) - SVR",
+            "error_code": null,
+            "mobile_country_code": "111",
+            "mobile_network_code": "910",
+            "type": "nonFixedVoip"
+        },
       "url": "https://lookups.twilio.com/v2/PhoneNumbers/+447772000001"}
     )
 }
