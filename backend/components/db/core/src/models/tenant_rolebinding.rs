@@ -41,6 +41,8 @@ pub struct TenantRolebinding {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub tenant_id: Option<TenantId>,
+    pub partner_tenant_id: Option<PartnerTenantId>,
 }
 
 pub type IsFirstLogin = bool;
@@ -139,6 +141,8 @@ impl TenantRolebinding {
             // init to None since they haven't logged in yet!
             last_login_at: None,
             created_at: Utc::now(),
+            tenant_id: tenant_role.tenant_id.clone(),
+            partner_tenant_id: tenant_role.partner_tenant_id.clone(),
         };
         let rb = diesel::insert_into(tenant_rolebinding::table)
             .values(new)
@@ -415,6 +419,8 @@ struct NewTenantRolebinding {
     tenant_role_id: TenantRoleId,
     last_login_at: Option<DateTime<Utc>>,
     created_at: DateTime<Utc>,
+    tenant_id: Option<TenantId>,
+    partner_tenant_id: Option<PartnerTenantId>,
 }
 
 #[derive(AsChangeset, Default)]
