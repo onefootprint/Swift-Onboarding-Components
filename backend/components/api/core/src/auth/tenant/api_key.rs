@@ -141,11 +141,15 @@ impl TenantAuth for CheckedTenantApiKey {
 impl CanCheckTenantGuard for TenantApiKey {
     type Auth = Box<dyn TenantAuth>;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
         self.0.role.scopes.clone()
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.0)
+    }
+
+    fn purpose(&self) -> Option<newtypes::TenantSessionPurpose> {
+        None
     }
 }

@@ -40,12 +40,16 @@ impl<T: PreviewApiMarker> FromRequest for TenantApiKeyGated<T> {
 impl<T> CanCheckTenantGuard for TenantApiKeyGated<T> {
     type Auth = Box<dyn TenantAuth>;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
-        self.0.token_scopes()
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
+        self.0.raw_token_scopes()
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.0 .0)
+    }
+
+    fn purpose(&self) -> Option<newtypes::TenantSessionPurpose> {
+        None
     }
 }
 

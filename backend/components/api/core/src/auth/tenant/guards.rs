@@ -190,10 +190,10 @@ where
 {
     type Auth = T;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
         match self {
-            Either::Left(l) => l.token_scopes(),
-            Either::Right(r) => r.token_scopes(),
+            Either::Left(l) => l.raw_token_scopes(),
+            Either::Right(r) => r.raw_token_scopes(),
         }
     }
 
@@ -201,6 +201,13 @@ where
         match self {
             Either::Left(l) => l.auth(),
             Either::Right(r) => r.auth(),
+        }
+    }
+
+    fn purpose(&self) -> Option<newtypes::TenantSessionPurpose> {
+        match self {
+            Either::Left(l) => l.purpose(),
+            Either::Right(r) => r.purpose(),
         }
     }
 }

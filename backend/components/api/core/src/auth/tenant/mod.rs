@@ -3,6 +3,7 @@ pub use client::*;
 mod firm_employee;
 use db::models::partner_tenant::PartnerTenant;
 pub use firm_employee::*;
+use itertools::Itertools;
 mod firm_employee_assume;
 pub use self::firm_employee_assume::*;
 mod guards;
@@ -171,14 +172,33 @@ impl From<AuthActor> for DbActor {
 trait CanCheckTenantGuard: Sized {
     type Auth;
 
-    /// The list of TenantPermissions scopes that are allowed by this auth token
-    /// Though the impl is usually the same, don't provide a default since using Either will
-    /// overwrite any custom impl
-    fn token_scopes(&self) -> Vec<TenantScope>;
+    /// The list of raw TenantScopes that are allowed by the role associated with this auth
+    /// method, befoer any post-permission processing is applied.
+    /// This should NOT be used to check whether the user has proper permissions.
+    fn raw_token_scopes(&self) -> Vec<TenantScope>;
 
     /// The auth trait object (e.g. TenantAuth or PartnerTenantAuth) that can be utilized once
     /// permissions are checked
     fn auth(self) -> Self::Auth;
+
+    /// For short-lived session auth, the purpose for which the session was created
+    fn purpose(&self) -> Option<TenantSessionPurpose>;
+
+    /// The finalized of TenantScopes to which the authed principal has access.
+    /// These should be used for permission checking
+    fn token_scopes(&self) -> Vec<TenantScope> {
+        let raw_scopes = self.raw_token_scopes();
+        let Some(purpose) = self.purpose() else {
+            // If there's no TenantSessionPurpose, we won't down-scope any permissions
+            return raw_scopes;
+        };
+        // Otherwise, apply any restrictions from the TenantSessionPurpose
+        raw_scopes
+            .into_iter()
+            .flat_map(|s| purpose.restrict_scope(s))
+            .unique()
+            .collect()
+    }
 }
 
 /// Implemented for tenant TAuthExtractors. Provides one function, check_permissions, that

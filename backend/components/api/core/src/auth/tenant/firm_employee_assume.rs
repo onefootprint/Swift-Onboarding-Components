@@ -163,7 +163,6 @@ impl FirmEmployeeAssumeAuth {
             .iter()
             .cloned()
             .chain(extra_permissions_for_user)
-            .flat_map(|s| self.data.purpose.restrict_scope(s))
             .unique()
             .collect()
     }
@@ -172,12 +171,16 @@ impl FirmEmployeeAssumeAuth {
 impl<const IS_SECONDARY: bool> CanCheckTenantGuard for FirmEmployeeAssumeAuthContext<IS_SECONDARY> {
     type Auth = Box<dyn TenantAuth>;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
         self.0.token_scopes()
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.map(|d| d.0))
+    }
+
+    fn purpose(&self) -> Option<TenantSessionPurpose> {
+        Some(self.data.0.data.purpose)
     }
 }
 
@@ -269,6 +272,6 @@ mod test {
         };
         let data = ParsedFirmEmployeeAssumeAuth::<false>(data);
         let auth = SessionContext::create_fixture(data, AuthSessionData::FirmEmployee(session_data));
-        auth.token_scopes()
+        auth.raw_token_scopes()
     }
 }

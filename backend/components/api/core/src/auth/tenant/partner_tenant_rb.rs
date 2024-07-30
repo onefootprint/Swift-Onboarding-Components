@@ -16,6 +16,7 @@ use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::TenantScope;
+use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -106,12 +107,16 @@ pub type PartnerTenantRbAuthContext = SessionContext<ParsedPartnerTenantRbAuth>;
 impl CanCheckTenantGuard for PartnerTenantRbAuthContext {
     type Auth = Box<dyn PartnerTenantAuth>;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
         self.0.tenant_role.scopes.clone()
     }
 
     fn auth(self) -> Box<dyn PartnerTenantAuth> {
         Box::new(self.map(|d| d.0))
+    }
+
+    fn purpose(&self) -> Option<TenantSessionPurpose> {
+        Some(self.data.0.data.purpose)
     }
 }
 

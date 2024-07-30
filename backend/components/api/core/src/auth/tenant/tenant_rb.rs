@@ -17,7 +17,6 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use itertools::Itertools;
 use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
@@ -111,16 +110,6 @@ impl TenantRbAuth {
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
-
-    fn token_scopes(&self) -> Vec<TenantScope> {
-        self.tenant_role
-            .scopes
-            .iter()
-            .cloned()
-            .flat_map(|s| self.data.purpose.restrict_scope(s))
-            .unique()
-            .collect()
-    }
 }
 
 /// A shorthand for the commonly used ParsedTenantRbAuth context
@@ -130,12 +119,16 @@ pub type TenantRbAuthContext<const IS_SECONDARY: bool = false> =
 impl<const IS_SECONDARY: bool> CanCheckTenantGuard for TenantRbAuthContext<IS_SECONDARY> {
     type Auth = Box<dyn TenantAuth>;
 
-    fn token_scopes(&self) -> Vec<TenantScope> {
-        self.0.token_scopes()
+    fn raw_token_scopes(&self) -> Vec<TenantScope> {
+        self.0.tenant_role.scopes.clone()
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
         Box::new(self.map(|d| d.0))
+    }
+
+    fn purpose(&self) -> Option<TenantSessionPurpose> {
+        Some(self.data.0.data.purpose)
     }
 }
 
