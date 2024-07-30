@@ -1,3 +1,4 @@
+export type { UserAuthMethodsResponse } from './user-auth-methods';
 export type {
   AddListEntriesRequest,
   AddListEntriesResponse,

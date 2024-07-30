@@ -1,15 +1,9 @@
 import request from '@onefootprint/request';
-import type { AuthMethodKind } from '@onefootprint/types';
+import type { UserAuthMethodsResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { isString, isValidTokenFormat } from '../../../utils';
-
-export type UserAuthMethodsResponse = {
-  canUpdate: boolean;
-  isVerified: boolean;
-  kind: AuthMethodKind;
-}[];
+import { isString, isValidTokenFormat } from '../../utils';
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 

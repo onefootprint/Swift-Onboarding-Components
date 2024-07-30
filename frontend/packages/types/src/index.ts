@@ -214,6 +214,7 @@ export type {
   UserEmailObj,
   UserEmailRequest,
   UserEmailResponse,
+  UserAuthMethodsResponse,
   UserEmailVerifyRequest,
   UserEmailVerifyResponse,
   UsersVaultRequest,

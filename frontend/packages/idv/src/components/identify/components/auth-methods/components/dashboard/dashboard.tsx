@@ -1,4 +1,4 @@
-import type { AuthMethodKind } from '@onefootprint/types';
+import type { AuthMethodKind, UserAuthMethodsResponse } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import type { NextToast } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../../../utils/logger';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
-import type { UserAuthMethodsResponse } from '../../../../queries';
 import { useDecryptUser, useUserAuthMethods } from '../../../../queries';
 import { UpdateAuthMethodActionKind } from '../../../../types';
 import { useAuthMethodsMachine } from '../../state';

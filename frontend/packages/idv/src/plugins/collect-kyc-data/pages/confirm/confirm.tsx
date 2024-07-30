@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
-import { useUserAuthMethods } from '../../../../components/identify';
+import { useUserAuthMethods } from '../../../../queries';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData, { checkPhoneEmailBeforeSubmit } from '../../hooks/use-sync-data';
