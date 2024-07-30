@@ -9,6 +9,7 @@ import { useL10nContext } from '../../../l10n-provider';
 import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import { SuccessfulIdentifier } from '../../state/types';
+import { isAuthFlow, isPhoneVerificationRequired } from '../../state/utils';
 import type { HeaderProps } from '../../types';
 import getTokenScope from '../../utils/token-scope';
 import PhonePageStructure from '../phone-page-structure';
@@ -74,7 +75,10 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
       texts={{
         headerTitle: t('phone-step.title'),
         headerSubtitle: t('phone-step.subtitle'),
-        cta: t('phone-step.verify-with-sms'),
+        cta:
+          isPhoneVerificationRequired(state.context) || isAuthFlow(state.context.variant)
+            ? t('phone-step.verify-with-sms')
+            : t('continue'),
         emailChangeCta: t('change'),
         phoneInvalid: t('phone-step.form.input-invalid'),
         phoneLabel: t('phone-number'),

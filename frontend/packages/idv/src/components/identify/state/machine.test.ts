@@ -905,9 +905,7 @@ describe('Identify Machine Tests', () => {
       // Complete challenge to add phone
       state = machine.send({
         type: 'phoneAdded',
-        payload: {
-          phoneNumber: '+15555550100',
-        },
+        payload: '+15555550100',
       });
       expect(state.context.email?.value).toEqual('hayes@valley.com');
       expect(state.context.phoneNumber?.value).toEqual('+15555550100');

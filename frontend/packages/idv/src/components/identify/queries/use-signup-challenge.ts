@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import type { IdentifyTokenScope, ObConfigAuth, SignupChallengeResponse } from '@onefootprint/types';
+import type { ChallengeKind, IdentifyTokenScope, ObConfigAuth, SignupChallengeResponse } from '@onefootprint/types';
 import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { IS_COMPONENTS_SDK_HEADER } from '@onefootprint/types/src/api/identify';
 import { useMutation } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ type Payload = {
   sandboxId?: string;
   scope: IdentifyTokenScope;
   isComponentsSdk: boolean;
+  challengeKind: ChallengeKind;
 };
 
 const requestFn = async (payload: Payload) => {

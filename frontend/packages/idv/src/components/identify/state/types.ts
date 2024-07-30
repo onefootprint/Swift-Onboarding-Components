@@ -12,6 +12,38 @@ import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 import type { DeviceInfo } from '../../../hooks';
 import type { DIMetadata } from '../../../types';
 
+export enum SuccessfulIdentifier {
+  authToken = 'authToken',
+  email = 'email',
+  phone = 'phone',
+}
+
+export enum IdentifyVariant {
+  auth = 'auth',
+  updateLoginMethods = 'updateLoginMethods',
+  verify = 'verify',
+}
+
+export type IdentifyBootstrapData = { email?: string; phoneNumber?: string };
+
+export type LogoConfig = { orgName: string; logoUrl?: string };
+
+export type MachineChallengeContext = { authToken?: string; challengeData?: ChallengeData };
+
+export type IdentifyMachineArgs = {
+  initialAuthToken?: string;
+  isComponentsSdk?: boolean;
+  bootstrapData?: IdentifyBootstrapData;
+  config?: PublicOnboardingConfig;
+  isLive: boolean;
+  device: DeviceInfo;
+  obConfigAuth?: ObConfigAuth;
+  sandboxId?: string;
+  overallOutcome?: OverallOutcome;
+  logoConfig?: LogoConfig; // When provided, will render the logo
+  variant: IdentifyVariant;
+};
+
 export type IdentifyMachineContext = {
   bootstrapData: IdentifyBootstrapData;
   isComponentsSdk: boolean;
@@ -43,22 +75,11 @@ export type IdentifyMachineContext = {
   variant: IdentifyVariant;
 };
 
-export type IdentifyBootstrapData = {
-  email?: string;
-  phoneNumber?: string;
-};
-
 export type IdentifyContext = {
   user?: IdentifiedUser;
   successfulIdentifiers?: SuccessfulIdentifier[];
   identifyToken?: string;
 };
-
-export enum SuccessfulIdentifier {
-  phone = 'phone',
-  email = 'email',
-  authToken = 'authToken',
-}
 
 export type TransitionsFor<EVENT extends EventObject> = TransitionConfigOrTarget<
   IdentifyMachineContext,
@@ -66,20 +87,11 @@ export type TransitionsFor<EVENT extends EventObject> = TransitionConfigOrTarget
   IdentifyMachineEvents
 >;
 
-export enum IdentifyVariant {
-  auth = 'auth',
-  updateLoginMethods = 'updateLoginMethods',
-  verify = 'verify',
-}
-
-export type LogoConfig = {
-  orgName: string;
-  logoUrl?: string;
-};
-
-export type MachineChallengeContext = {
-  authToken?: string;
-  challengeData?: ChallengeData;
+export type IdentifiedEventPayload = {
+  user?: IdentifiedUser;
+  successfulIdentifiers?: SuccessfulIdentifier[];
+  phoneNumber?: string;
+  email?: string;
 };
 
 export type NavigatedToPrevPage = {
@@ -90,13 +102,6 @@ export type NavigatedToPrevPage = {
 export type ChallengeSucceededEvent = {
   type: 'challengeSucceeded';
   payload: { kind: AuthMethodKind; authToken: string };
-};
-
-export type IdentifiedEventPayload = {
-  user?: IdentifiedUser;
-  successfulIdentifiers?: SuccessfulIdentifier[];
-  phoneNumber?: string;
-  email?: string;
 };
 
 export type IdentifiedEvent = {
@@ -110,12 +115,13 @@ export type IdentifyMachineEvents =
   | IdentifiedEvent
   | NavigatedToPrevPage
   | { type: 'authTokenInvalid' }
-  | { type: 'loginWithDifferentAccount' }
   | { type: 'bootstrapDataInvalid' }
   | { type: 'challengeReceived'; payload: ChallengeData }
+  | { type: 'emailAdded'; payload: string }
   | { type: 'goToChallenge'; payload: ChallengeKind }
   | { type: 'identifiedWithSufficientScopes'; payload: { authToken: string } }
   | { type: 'kbaSucceeded'; payload: { identifyToken: string } }
-  | { type: 'phoneAdded'; payload: { phoneNumber: string } }
+  | { type: 'loginWithDifferentAccount' }
+  | { type: 'phoneAdded'; payload: string }
   | { type: 'sandboxIdChanged'; payload: { sandboxId: string } }
   | { type: 'tryAnotherWay'; payload: ChallengeKind };

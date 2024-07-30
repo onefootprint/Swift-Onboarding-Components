@@ -1,8 +1,8 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import type { IdentifyMachineArgs } from './machine';
 import createIdentifyMachine from './machine';
+import type { IdentifyMachineArgs } from './types';
 
 export const [IdentifyMachineProvider, useIdentifyMachine] = constate(({ args }: { args: IdentifyMachineArgs }) =>
   useMachine(() => createIdentifyMachine(args)),

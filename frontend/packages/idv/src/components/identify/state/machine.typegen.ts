@@ -15,6 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignAuthToken: 'identifiedWithSufficientScopes';
     assignChallengeData: 'challengeReceived';
+    assignEmail: 'emailAdded';
     assignIdentifyResult: 'identifyResult';
     assignIdentifyToken: 'kbaSucceeded';
     assignPhoneNumber: 'phoneAdded';
@@ -27,6 +28,7 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'addEmail'
     | 'addPhone'
     | 'authTokenInvalid'
     | 'challengeSelectOrPasskey'

@@ -1023,6 +1023,7 @@ describe('<Identify />', () => {
       const { body, headers } = onSignupChallengeCalled.mock.calls[0][0];
       expect(body).toEqual({
         scope: 'onboarding',
+        challenge_kind: 'sms',
         email: {
           value: 'sandbox@onefootprint.com',
           is_bootstrap: true,

@@ -121,6 +121,7 @@ const PinVerification = ({
       {
         email,
         phoneNumber,
+        challengeKind: preferredChallengeKind,
       },
       {
         onError: (error: unknown) => {

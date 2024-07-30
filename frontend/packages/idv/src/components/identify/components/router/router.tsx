@@ -19,7 +19,7 @@ import SmsChallenge from '../sms-challenge';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
-import { UpdatePhone } from '../user-update';
+import { UpdateEmail, UpdatePhone } from '../user-update';
 
 type RouterProps = { onDone: (payload: DoneArgs) => void };
 
@@ -109,12 +109,19 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
         authToken={challenge.authToken}
         actionKind={UpdateAuthMethodActionKind.addPrimary}
         identifyVariant={variant}
-        onSuccess={newPhoneNumber => {
-          send({
-            type: 'phoneAdded',
-            payload: { phoneNumber: newPhoneNumber },
-          });
-        }}
+        onSuccess={payload => send({ type: 'phoneAdded', payload })}
+      />
+    );
+  }
+  if (matches('addEmail') && challenge.authToken) {
+    return (
+      <UpdateEmail
+        actionKind={UpdateAuthMethodActionKind.addPrimary}
+        authToken={challenge.authToken}
+        Header={Header}
+        identifyVariant={variant}
+        initialEmail={email?.value}
+        onSuccess={payload => send({ type: 'emailAdded', payload })}
       />
     );
   }

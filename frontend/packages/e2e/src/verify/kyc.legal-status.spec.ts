@@ -54,7 +54,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYC with US legal status #ci #debug', async ({ page, browser, isMobile }) => {
+test('KYC with US legal status #ci', async ({ page, browser, isMobile }) => {
   test.slow(); // ~31.0s
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test

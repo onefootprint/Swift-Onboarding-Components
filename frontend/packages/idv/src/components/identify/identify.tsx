@@ -5,7 +5,7 @@ import React from 'react';
 import Router from './components/router';
 import SandboxFooter from './components/sandbox-footer';
 import { IdentifyMachineProvider } from './state';
-import type { IdentifyMachineArgs } from './state/machine';
+import type { IdentifyMachineArgs } from './state/types';
 import type { DoneArgs } from './types';
 
 type IdentifyProps = IdentifyMachineArgs & {

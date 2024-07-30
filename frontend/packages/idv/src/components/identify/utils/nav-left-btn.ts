@@ -1,6 +1,6 @@
 import type { NavigationHeaderLeftButtonProps } from '../../layout';
 import type { IdentifyMachineHook } from '../state';
-import { shouldShowChallengeSelector } from '../state/predicates';
+import { shouldShowChallengeSelector } from '../state/utils';
 
 const getLeftNavButton = (
   state: IdentifyMachineHook[0],

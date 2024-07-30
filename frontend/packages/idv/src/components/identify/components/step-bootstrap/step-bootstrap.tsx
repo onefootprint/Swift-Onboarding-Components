@@ -24,16 +24,17 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
       return;
     }
 
-    const identifyResult = await mutIdentify
+    const user = await mutIdentify
       .mutateAsync({
         email: email?.value,
         phoneNumber: phoneNumber?.value,
       })
+      .then(res => res.user)
       .catch((error: unknown) => {
         logError('Identifying user by bootstrap data failed in identify', error);
         return undefined;
       });
-    const { user } = identifyResult || {};
+
     const successfulIdentifiers = [];
     if (user?.matchingFps?.includes(IdDI.phoneNumber)) {
       successfulIdentifiers.push(SuccessfulIdentifier.phone);

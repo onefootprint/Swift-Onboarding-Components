@@ -14,16 +14,17 @@ type UpdateEmailProps = {
   authToken: string;
   Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: IdentifyVariant;
+  initialEmail?: string;
   onSuccess: (newEmail: string) => void;
 };
 
 const getHeaderTitle = (t: TFunction<'identify'>, kind: UpdateAuthMethodActionKind): string =>
   kind === UpdateAuthMethodActionKind.replace ? t('email-step.replace-title') : t('email-step.add-primary-title');
 
-const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, onSuccess }: UpdateEmailProps) => {
+const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, initialEmail, onSuccess }: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
-  const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
-  const [email, setEmail] = useState<string>('');
+  const [screen, setScreen] = useState<ScreenState>(initialEmail ? ScreenState.verify : ScreenState.collect);
+  const [email, setEmail] = useState<string>(initialEmail || '');
 
   return isCollectScreen(screen) || !email ? (
     <EmailPageStructure

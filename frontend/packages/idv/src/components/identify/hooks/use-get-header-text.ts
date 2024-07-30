@@ -2,7 +2,7 @@ import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { useIdentifyMachine } from '../state';
-import { shouldShowChallengeSelector } from '../state/predicates';
+import { shouldShowChallengeSelector } from '../state/utils';
 
 const useGetHeaderText = (): string => {
   const [state] = useIdentifyMachine();
