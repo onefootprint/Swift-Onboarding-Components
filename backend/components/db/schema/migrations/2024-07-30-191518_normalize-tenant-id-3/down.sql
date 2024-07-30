@@ -1,0 +1,5 @@
+DROP INDEX tenant_rolebinding_unique_tenant_user_id_partner_tenant_id;
+DROP INDEX tenant_rolebinding_unique_tenant_user_id_tenant_id;
+
+ALTER TABLE tenant_rolebinding
+DROP CONSTRAINT tenant_id_xor_partner_tenant_id;
