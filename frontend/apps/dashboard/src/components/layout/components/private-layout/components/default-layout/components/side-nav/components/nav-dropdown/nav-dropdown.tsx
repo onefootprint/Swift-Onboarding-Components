@@ -28,7 +28,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
-  const { composeDocsLoginUrl } = useComposeDocsLoginUrl();
+  const composeDocsLoginUrl = useComposeDocsLoginUrl();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -41,15 +41,16 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   };
 
   const redirectToDocsSite = (url: string) => () => {
-    composeDocsLoginUrl(url)
-      .then(docsSiteLink => {
+    composeDocsLoginUrl.mutate(url, {
+      onSuccess: docsSiteLink => {
         window.open(docsSiteLink, '_blank');
-      })
-      .catch(err => {
+      },
+      onError: err => {
         console.error(`Error generating authenticated docs site link: ${err}`);
         // Open un-authed docs site in case of an error
         window.open(`${DOCS_BASE_URL}/${url}`, '_blank');
-      });
+      },
+    });
   };
 
   return (

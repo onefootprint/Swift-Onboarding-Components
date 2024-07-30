@@ -19,12 +19,12 @@ const DocsLogin = () => {
   const { isLoggedIn } = useSession();
   const router = useRouter();
   const { query, isReady } = useFilters<DocsLoginFilters>({});
-  const { composeDocsLoginUrl } = useComposeDocsLoginUrl();
+  const composeDocsLoginUrl = useComposeDocsLoginUrl();
   const redirectUrl = query.redirectUrl || '/api-reference';
   const showErrorToast = useRequestErrorToast();
 
   useEffect(() => {
-    if (!isReady) {
+    if (!isReady || composeDocsLoginUrl.isLoading || composeDocsLoginUrl.isError) {
       return;
     }
     if (!isLoggedIn) {
@@ -34,11 +34,12 @@ const DocsLogin = () => {
       return;
     }
     // Redirect to the docs site with the docs-specific token in the URL hash.
-    composeDocsLoginUrl(redirectUrl)
-      .then(docsSiteLink => {
+    composeDocsLoginUrl.mutate(redirectUrl, {
+      onSuccess: docsSiteLink => {
         router.push(docsSiteLink);
-      })
-      .catch(showErrorToast);
+      },
+      onError: showErrorToast,
+    });
   }, [isReady, isLoggedIn, composeDocsLoginUrl, router, showErrorToast]);
 
   return (
