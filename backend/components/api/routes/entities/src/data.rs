@@ -25,6 +25,7 @@ pub async fn get(
     auth: TenantSessionAuth,
     filters: web::Query<api_wire_types::GetHistoricalDataRequest>,
 ) -> ApiListResponse<EntityAttribute> {
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let fp_id = fp_id.into_inner();
@@ -41,12 +42,12 @@ pub async fn get(
         })
         .await?;
 
-    let decrypted_results = decrypt_visible_attrs(&state, &auth, vec![&vw])
+    let decrypted_results = decrypt_visible_attrs(&state, &scopes, vec![&vw])
         .await?
         .into_values()
         .next()
         .unwrap_or_default();
 
-    let results = entity_attributes(&vw, &auth, decrypted_results);
+    let results = entity_attributes(&vw, &scopes, decrypted_results);
     Ok(results.into())
 }

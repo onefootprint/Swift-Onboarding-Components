@@ -1,4 +1,3 @@
-use crate::auth::tenant::TenantAuth;
 use crate::auth::CanDecrypt;
 use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
@@ -18,20 +17,21 @@ use db::models::workflow::Workflow;
 use db::VaultedData;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
+use newtypes::TenantScope;
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (
     SerializableEntity,
     &'a TenantVw<Any>,
-    &'a Box<dyn TenantAuth>,
+    &'a [TenantScope],
     DecryptedData,
 );
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
-    fn from_db((entity, vw, auth, decrypted_attrs): EntityDetail) -> Self {
+    fn from_db((entity, vw, scopes, decrypted_attrs): EntityDetail) -> Self {
         let (sv, watchlist_check, wr, label, mrs, wfs, tags) = entity;
 
-        let data = entity_attributes(vw, auth, decrypted_attrs);
+        let data = entity_attributes(vw, scopes, decrypted_attrs);
 
         //
         // All of these are derivative of the much more descriptive `data`.
@@ -164,7 +164,7 @@ impl DbToApi<(Workflow, Option<InsightEvent>)> for api_wire_types::EntityWorkflo
 #[allow(clippy::borrowed_box)]
 pub fn entity_attributes<'a>(
     vw: &'a TenantVw<Any>,
-    auth: &'a Box<dyn TenantAuth>,
+    scopes: &'a [TenantScope],
     decrypted_data: DecryptedData,
 ) -> Vec<EntityAttribute> {
     // Don't require any permissions to decrypt plaintext attributes - always show them
@@ -188,7 +188,7 @@ pub fn entity_attributes<'a>(
             // - The tenant must be able to decrypt the attribute (via ob config permissions)
             // - The authed user principal at the tenant must be able to decrypt the attribute (via IAM)
             let can_decrypt =
-                vw.tenant_can_decrypt(di.clone()) && CanDecrypt::single(di.clone()).is_met(&auth.scopes());
+                vw.tenant_can_decrypt(di.clone()) && CanDecrypt::single(di.clone()).is_met(scopes);
 
             let value = attribute_values.remove(&di.clone().into());
             let transforms = attribute_values

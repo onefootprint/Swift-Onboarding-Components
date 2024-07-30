@@ -201,10 +201,6 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
         AuthActor::FirmEmployee(self.tenant_user.id.clone())
     }
 
-    fn scopes(&self) -> Vec<TenantScope> {
-        self.token_scopes()
-    }
-
     fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }

@@ -26,6 +26,7 @@ pub async fn get(
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
 ) -> ApiResponse<EntityDetailResponse> {
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let fp_id = fp_id.into_inner();
@@ -44,12 +45,12 @@ pub async fn get(
         })
         .await?;
 
-    let decrypted_results = decrypt_visible_attrs(&state, &auth, vec![&vw])
+    let decrypted_results = decrypt_visible_attrs(&state, &scopes, vec![&vw])
         .await?
         .into_values()
         .next()
         .unwrap_or_default();
 
-    let result = api_wire_types::Entity::from_db((entity, &vw, &auth, decrypted_results));
+    let result = api_wire_types::Entity::from_db((entity, &vw, &scopes, decrypted_results));
     Ok(result)
 }

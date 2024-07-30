@@ -154,11 +154,6 @@ impl TenantAuth for SessionContext<ClientTenantData> {
         AuthActor::TenantApiKey(self.tenant_api_key_id.clone())
     }
 
-    fn scopes(&self) -> Vec<newtypes::TenantScope> {
-        // This is false in some cases. Maybe ClientTenantAuth shouldn't implement TenantAuth
-        vec![]
-    }
-
     fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::ClientTenant
     }

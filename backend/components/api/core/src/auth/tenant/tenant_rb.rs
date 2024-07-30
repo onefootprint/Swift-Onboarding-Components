@@ -159,10 +159,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
         AuthActor::from(self.tenant_user.id.clone())
     }
 
-    fn scopes(&self) -> Vec<TenantScope> {
-        self.token_scopes()
-    }
-
     fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }

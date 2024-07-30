@@ -33,6 +33,7 @@ pub async fn get_dupes(
     request: FpIdPath,
     auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<api_wire_types::Dupes> {
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -61,7 +62,7 @@ pub async fn get_dupes(
         .await?;
 
     let mut decrypted_results =
-        get::search::decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;
+        get::search::decrypt_visible_attrs(&state, &scopes, vws.values().collect()).await?;
     let mut sv_id_to_dupe_fps = dupes
         .internal
         .into_iter()
@@ -95,7 +96,7 @@ pub async fn get_dupes(
         .into_iter()
         // don't return dupes if there are no dupe kinds
         .filter(|(d, _, _)| !d.is_empty())
-        .map(|(d, vw, data)| api_wire_types::SameTenantDupe::from_db((d, vw, &auth, data)))
+        .map(|(d, vw, data)| api_wire_types::SameTenantDupe::from_db((d, vw, &scopes, data)))
         .collect();
 
     let other_tenant = dupes.external.map(|d| api_wire_types::OtherTenantDupes {

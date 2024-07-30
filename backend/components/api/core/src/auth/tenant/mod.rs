@@ -103,7 +103,6 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> FpResult<bool>;
     fn actor(&self) -> AuthActor;
-    fn scopes(&self) -> Vec<TenantScope>;
     fn dl_source(&self) -> DataLifetimeSource;
 }
 

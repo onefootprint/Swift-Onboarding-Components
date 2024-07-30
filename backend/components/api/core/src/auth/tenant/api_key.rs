@@ -133,10 +133,6 @@ impl TenantAuth for CheckedTenantApiKey {
         AuthActor::TenantApiKey(self.api_key.id.clone())
     }
 
-    fn scopes(&self) -> Vec<TenantScope> {
-        self.role.scopes.clone()
-    }
-
     fn dl_source(&self) -> DataLifetimeSource {
         DataLifetimeSource::Tenant
     }

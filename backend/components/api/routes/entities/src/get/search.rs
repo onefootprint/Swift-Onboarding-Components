@@ -6,7 +6,6 @@ use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
 use api_core::auth::IsGuardMet;
 use api_core::errors::AssertionError;
@@ -33,6 +32,7 @@ use newtypes::FilterFunction;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
+use newtypes::TenantScope;
 use newtypes::TimestampCursor;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -60,6 +60,7 @@ pub async fn post(
     body: OptionalJson<ListEntitiesSearchRequest>,
     auth: TenantSessionAuth,
 ) -> CursorPaginatedResponse<api_wire_types::Entity, TimestampCursor> {
+    let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
@@ -127,7 +128,7 @@ pub async fn post(
         .await?;
 
     // Always decrypt name and first letter of last name
-    let mut decrypted_results = decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;
+    let mut decrypted_results = decrypt_visible_attrs(&state, &scopes, vws.values().collect()).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = pagination
@@ -148,7 +149,7 @@ pub async fn post(
         })
         .collect::<FpResult<Vec<_>>>()?
         .into_iter()
-        .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
+        .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &scopes, d)))
         .collect();
     CursorPaginatedResponseInner::ok(entities, page_size, cursor, Some(count))
 }
@@ -158,7 +159,7 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 pub async fn decrypt_visible_attrs(
     state: &State,
-    auth: &Box<dyn TenantAuth>,
+    scopes: &[TenantScope],
     vws: Vec<&TenantVw<Any>>,
 ) -> FpResult<HashMap<ScopedVaultId, DecryptedData>> {
     let reqs = vws
@@ -191,7 +192,7 @@ pub async fn decrypt_visible_attrs(
             .into_iter()
             .chain(card_dis)
             // Filter out attributes that can't be decrypted
-            .filter(|target| CanDecrypt::single(target.identifier.clone()).is_met(&auth.scopes()))
+            .filter(|target| CanDecrypt::single(target.identifier.clone()).is_met(scopes))
             .filter(|target| vw.tenant_can_decrypt(target.identifier.clone()))
             .collect();
 
