@@ -1275,6 +1275,32 @@
                 ]
             }
         },
+        "/hosted/user/auth_requirements": {
+            "get": {
+                "tags": [
+                    "Challenge",
+                    "Hosted"
+                ],
+                "description": "Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthRequirementsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/user/authorized_orgs": {
             "get": {
                 "tags": [
@@ -2495,6 +2521,28 @@
                     "can_update",
                     "is_verified",
                     "kind"
+                ]
+            },
+            "AuthRequirementsResponse": {
+                "type": "object",
+                "properties": {
+                    "all_requirements": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "is_met": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "is_met"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "all_requirements"
                 ]
             },
             "AuthorizedOrg": {

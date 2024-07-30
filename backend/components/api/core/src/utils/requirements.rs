@@ -366,6 +366,40 @@ pub fn get_requirements_inner(
     Ok(requirements)
 }
 
+pub fn get_register_auth_method_requirements(
+    conn: &mut PgConn,
+    obc: &ObConfiguration,
+    sv_id: &ScopedVaultId,
+    auth_events: &[AssociatedAuthEvent],
+) -> FpResult<Vec<OnboardingRequirement>> {
+    let auth_events = load_auth_events(conn, auth_events)?;
+    if auth_events
+        .iter()
+        .any(|(ae, _)| ae.kind == AuthEventKind::ThirdParty)
+    {
+        // Third-party auth won't register an auth method, so we should waive the requirement that
+        // the playbook's auth methods are met.
+        // Perhaps when we start having more proper use of 3p auth from apiture we should actually
+        // mark the phone as verified
+        return Ok(vec![]);
+    }
+
+    let identifier = UserIdentifier::ScopedVault(sv_id.clone());
+    let ctx = get_user_auth_methods(conn, identifier, None)?;
+    let verified_auth_methods = ctx
+        .auth_methods
+        .into_iter()
+        .filter(|am| am.is_verified)
+        .map(|am| am.kind)
+        .collect_vec();
+    let required_auth_methods = obc.required_auth_methods.iter().flatten().copied();
+    let requirements = required_auth_methods
+        .filter(|amk| !verified_auth_methods.contains(amk))
+        .map(|auth_method_kind| OnboardingRequirement::RegisterAuthMethod { auth_method_kind })
+        .collect();
+    Ok(requirements)
+}
+
 /// Generates a requirement of the given kind `k`, if one exists.
 #[allow(clippy::too_many_arguments)]
 fn get_requirement_inner(
@@ -379,33 +413,8 @@ fn get_requirement_inner(
     auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let req = match k {
-        // No need to generate RegisterAuthMethod requirements for business vaults
         OnboardingRequirementKind::RegisterAuthMethod => {
-            let auth_events = load_auth_events(conn, auth_events)?;
-            if auth_events
-                .iter()
-                .any(|(ae, _)| ae.kind == AuthEventKind::ThirdParty)
-            {
-                // Third-party auth won't register an auth method, so we should waive the requirement that
-                // the playbook's auth methods are met.
-                // Perhaps when we start having more proper use of 3p auth from apiture we should actually
-                // mark the phone as verified
-                return Ok(vec![]);
-            }
-
-            let identifier = UserIdentifier::ScopedVault(wf.scoped_vault_id.clone());
-            let ctx = get_user_auth_methods(conn, identifier, None)?;
-            let verified_auth_methods = ctx
-                .auth_methods
-                .into_iter()
-                .filter(|am| am.is_verified)
-                .map(|am| am.kind)
-                .collect_vec();
-            let required_auth_methods = obc.required_auth_methods.iter().flatten().copied();
-            required_auth_methods
-                .filter(|amk| !verified_auth_methods.contains(amk))
-                .map(|auth_method_kind| OnboardingRequirement::RegisterAuthMethod { auth_method_kind })
-                .collect()
+            get_register_auth_method_requirements(conn, obc, &wf.scoped_vault_id, auth_events)?
         }
         OnboardingRequirementKind::CollectData => {
             obc.must_collect(DID::Id)

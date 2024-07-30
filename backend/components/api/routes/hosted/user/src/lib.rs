@@ -3,6 +3,7 @@ use paperclip::actix::web;
 mod access_events;
 mod attest_device;
 mod auth_methods;
+mod auth_requirements;
 mod authorized_orgs;
 mod challenge;
 mod consent;
@@ -20,6 +21,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(vault::patch::patch)
         .service(vault::patch::post_validate)
         .service(vault::decrypt::post)
+        .service(auth_requirements::get)
         .service(access_events::get)
         .service(authorized_orgs::get)
         .service(token::get)

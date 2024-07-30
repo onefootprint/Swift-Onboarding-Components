@@ -22,6 +22,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowIdentifier;
+use newtypes::AuthEventKind;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingStatus;
 use newtypes::VaultKind;
@@ -124,6 +125,8 @@ pub async fn post(
         fp_id: sv.fp_id.clone(),
         auth_events: auth_events
             .into_iter()
+            // Not sure if we'll keep this around forever, so hide from validate response
+            .filter(|ae| ae.kind != AuthEventKind::ThirdParty)
             .map(|ae| ValidateAuthEvent {
                 kind: ae.kind.into(),
                 timestamp: ae.created_at,

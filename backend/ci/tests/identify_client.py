@@ -59,8 +59,8 @@ class IdentifyClient:
     def _signup_challenge(self, scope):
         # Select the challenge kind based on the auth methods required by the playbook
         if (
-            not self.playbook.required_auth_methods or
-            "phone" in self.playbook.required_auth_methods
+            not self.playbook.required_auth_methods
+            or "phone" in self.playbook.required_auth_methods
         ):
             kind = "sms"
         elif "email" in self.playbook.required_auth_methods:
@@ -77,7 +77,7 @@ class IdentifyClient:
         if self.playbook.is_no_phone_flow:
             # For backcompat, don't send phone when in the no phone flow
             data.pop("phone_number")
-        data = dict(**data, scope=scope, kind=kind)
+        data = dict(**data, scope=scope, challenge_kind=kind)
 
         assert (
             self.playbook_auth_h

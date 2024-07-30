@@ -272,9 +272,5 @@ def live_phone_number():
 @pytest.fixture(scope="session")
 def auth_playbook(sandbox_tenant):
     return create_ob_config(
-        sandbox_tenant,
-        "Auth playbook",
-        ["phone_number", "email"],
-        ["phone_number", "email"],
-        kind="auth",
+        sandbox_tenant, "Auth playbook", ["phone_number", "email"], kind="auth"
     )

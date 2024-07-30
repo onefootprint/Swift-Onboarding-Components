@@ -303,6 +303,7 @@ def create_ob_config(
     skip_kyc=False,
     verification_checks=None,
     prompt_for_passkey=None,
+    required_auth_methods=None,
 ):
     kind = kind or "kyc"
     if kind == "kyb" and verification_checks is None:
@@ -333,6 +334,7 @@ def create_ob_config(
         "skip_kyc": skip_kyc,
         "verification_checks": checks,
         "prompt_for_passkey": prompt_for_passkey,
+        "required_auth_methods": required_auth_methods,
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)

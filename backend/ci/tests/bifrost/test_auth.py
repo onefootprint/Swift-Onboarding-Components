@@ -119,11 +119,7 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     Test onboarding onto a second tenant via an auth playbook
     """
     auth_playbook = create_ob_config(
-        foo_sandbox_tenant,
-        "Auth playbook",
-        ["phone_number", "email"],
-        ["phone_number", "email"],
-        kind="auth",
+        foo_sandbox_tenant, "Auth playbook", ["phone_number", "email"], kind="auth"
     )
     playbook = create_ob_config(
         foo_sandbox_tenant, "My product", must_collect_data, must_collect_data

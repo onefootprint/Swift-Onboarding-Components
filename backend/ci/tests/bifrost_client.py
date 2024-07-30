@@ -133,7 +133,6 @@ class BifrostClient:
         assert not body.get("user")
         # Check user_auth
         assert body["user_auth"]["fp_id"]
-        assert body["user_auth"]["auth_events"]
         assert all(
             e["kind"] in {"sms", "email", "passkey", "third_party"}
             for e in body["user_auth"]["auth_events"]
@@ -225,6 +224,8 @@ class BifrostClient:
             self.handle_collect_business(requirement)
         elif requirement["kind"] == "collect_document":
             self.handle_collect_document(requirement)
+        elif requirement["kind"] == "register_auth_method":
+            self.handle_register_auth_method(requirement)
         elif requirement["kind"] == "liveness":
             self.handle_liveness()
         elif requirement["kind"] == "authorize":
@@ -348,6 +349,19 @@ class BifrostClient:
             }
             patch("hosted/user/vault", data, self.auth_token)
 
+    def handle_register_auth_method(self, requirement):
+        CHALLENGE_INFO = {
+            "phone": dict(kind="sms", phone_number=self.data["id.phone_number"]),
+            "email": dict(kind="email", email=self.data["id.email"]),
+        }
+        challenge_info = CHALLENGE_INFO[requirement["auth_method_kind"]]
+
+        data = dict(**challenge_info, action_kind="add_primary")
+        body = post("hosted/user/challenge", data, self.auth_token)
+        chal_token = body["challenge_token"]
+        data = dict(challenge_token=chal_token, challenge_response="000000")
+        post("hosted/user/challenge/verify", data, self.auth_token)
+
     def handle_liveness(self):
         """Register the passkey credential"""
         data = dict(kind="passkey", action_kind="add_primary")
@@ -386,9 +400,8 @@ class BifrostClient:
         assert body["user"]["playbook_key"] == self.ob_config.key.value
         # Check user_auth
         assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
-        assert body["user_auth"]["auth_events"]
         assert all(
-            e["kind"] in {"sms", "email", "passkey", "third_party"}
+            e["kind"] in {"sms", "email", "passkey"}
             for e in body["user_auth"]["auth_events"]
         )
         assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])

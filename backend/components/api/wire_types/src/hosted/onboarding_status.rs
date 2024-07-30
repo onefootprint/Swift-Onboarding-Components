@@ -7,6 +7,11 @@ pub struct OnboardingStatusResponse {
     pub ob_configuration: PublicOnboardingConfiguration,
 }
 
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
+pub struct AuthRequirementsResponse {
+    pub all_requirements: Vec<ApiOnboardingRequirement>,
+}
+
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ApiOnboardingRequirement {
     pub is_met: bool,

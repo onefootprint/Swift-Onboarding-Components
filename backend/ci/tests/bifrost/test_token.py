@@ -257,11 +257,8 @@ def test_3p_auth(sandbox_tenant, ob_config):
         "process",
     ]
     assert user.fp_id == fp_id
-
-    assert all(
-        i["kind"] == "third_party"
-        for i in user.client.validate_response["user_auth"]["auth_events"]
-    )
+    # Shouldn't have auth 3p auth events
+    assert not user.client.validate_response["user_auth"]["auth_events"]
 
 
 @pytest.mark.parametrize("operation_kind", ["onboard", "reonboard"])

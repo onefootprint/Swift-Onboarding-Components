@@ -4,7 +4,9 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::IsGuardMet;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
+use api_core::errors::ValidationError;
 use api_core::types::ApiResponse;
+use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::State;
@@ -45,7 +47,22 @@ pub async fn post(
     } else {
         // We're generating a token after auth has finished
         let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
-        // TODO check unmet required auth methods here?
+        let obc = user_auth
+            .ob_config()
+            .ok_or(ValidationError("No playbook associated with session"))?
+            .clone();
+        let sv_id = user_auth
+            .scoped_user_id()
+            .ok_or(ValidationError("No scoped user associated with session"))?;
+        let auth_events = user_auth.auth_events.clone();
+        let reqs = state
+            .db_pool
+            .db_query(move |conn| get_register_auth_method_requirements(conn, &obc, &sv_id, &auth_events))
+            .await?;
+        let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
+        if !unmet_reqs.is_empty() {
+            return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
+        }
         (None, user_auth.data)
     };
 
