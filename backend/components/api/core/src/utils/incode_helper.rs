@@ -28,6 +28,7 @@ use newtypes::IncodeVerificationSessionState;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
 use std::sync::Arc;
+use std::time::Duration;
 
 #[tracing::instrument(skip_all)]
 #[allow(clippy::too_many_arguments)]
@@ -99,10 +100,24 @@ pub async fn handle_incode_request(
             if machine.session.hard_errored && !is_re_run {
                 None
             } else {
-                match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
-                    Ok((machine, retry_reasons)) => Some((machine.state.name(), retry_reasons)),
-                    Err(err) => {
+                let timeout = Duration::from_secs(50);
+                let run_fut = machine.run(&state.db_pool, &state.vendor_clients.incode);
+                let fut_with_timeout = actix_web::rt::time::timeout(timeout, run_fut);
+
+                match fut_with_timeout.await {
+                    Ok(Ok((machine, retry_reasons))) => Some((machine.state.name(), retry_reasons)),
+                    Ok(Err(err)) => {
                         on_incode_hard_error(&state.db_pool, err.error, &identity_document_id).await?;
+                        None
+                    }
+                    Err(_) => {
+                        // Timeout
+                        on_incode_hard_error(
+                            &state.db_pool,
+                            AssertionError("timeout running Incode machine").into(),
+                            &identity_document_id,
+                        )
+                        .await?;
                         None
                     }
                 }
