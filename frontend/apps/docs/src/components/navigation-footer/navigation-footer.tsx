@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoHelp16 } from '@onefootprint/icons';
-import { Button, Stack, ThemeToggle, media } from '@onefootprint/ui';
+import { Box, Button, LinkButton, Stack, ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,10 +38,6 @@ const NavigationFooter = () => {
     setShowSupportDialog(false);
   };
 
-  const handleDocsClick = () => {
-    router.push(isApiReference ? '/' : API_REFERENCE_PATH);
-  };
-
   const handleSignIn = () => {
     // The docs site authentication piggybacks on top of dashboard authentication.
     // We redirect to the dashboard here, which will sign the user in. Upon completion, this route will
@@ -60,16 +56,16 @@ const NavigationFooter = () => {
         </LoggedInUser>
       )}
       {!user && (
-        <Stack direction="column" gap={4} marginTop={4} marginBottom={2} marginLeft={4} marginRight={4}>
+        <Stack direction="column" gap={4} marginTop={4} marginBottom={3} marginLeft={4} marginRight={4}>
           <Button onClick={handleSignIn} variant="secondary">
             {t('sign-in')}
           </Button>
           <Stack direction="column" marginLeft={3} marginRight={3}>
-            <LinkItem
-              IconComponent={IcoArrowUpRight16}
-              label={isApiReference ? t('dropdown.docs') : t('dropdown.api-reference')}
-              onClick={handleDocsClick}
-            />
+            <Box height="32px" alignContent="center">
+              <LinkButton href={isApiReference ? '/' : API_REFERENCE_PATH} iconComponent={IcoArrowUpRight16}>
+                {isApiReference ? t('dropdown.docs') : t('dropdown.api-reference')}
+              </LinkButton>
+            </Box>
             <LinkItem IconComponent={IcoHelp16} label={t('need-help.label')} onClick={handleOpenSupportDialog} />
           </Stack>
         </Stack>
