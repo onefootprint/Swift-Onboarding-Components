@@ -1,7 +1,7 @@
 [package]
 name = "footprint-dr"
-version = "0.0.1"
-authors.workspace = true
+version = "0.1.0-rc1"
+authors = ["One Footprint Inc. <support@onefootprint.com>"]
 
 description = "CLI for interacting with the Footprint Vault Disaster Recovery system"
 edition.workspace = true

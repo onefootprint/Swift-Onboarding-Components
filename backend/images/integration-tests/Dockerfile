@@ -25,7 +25,7 @@ RUN cargo install diesel_cli --version $DIESEL_VERSION --locked --no-default-fea
 RUN --mount=type=bind,src=.,target=/build,readwrite \
     --mount=type=cache,target=/build/target \
     --mount=type=cache,target=/root/.cargo/registry  \
-    cargo install --path ./external_tools/footprint-dr
+    cargo install --locked --path ./external_tools/footprint-dr
 
 # ----------------------------
 

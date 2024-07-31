@@ -20,6 +20,7 @@ use reqwest::Response;
 use reqwest::StatusCode;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
+use std::env;
 use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
@@ -102,7 +103,10 @@ impl VaultDrApiClient {
             HeaderValue::from_str(api_key.leak_ref())?,
         );
 
-        let client = reqwest::Client::builder().default_headers(headers).build()?;
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .user_agent(concat!(env!("CARGO_PKG_NAME"), " ", env!("CARGO_PKG_VERSION")))
+            .build()?;
 
         Ok(Self {
             api_root,
