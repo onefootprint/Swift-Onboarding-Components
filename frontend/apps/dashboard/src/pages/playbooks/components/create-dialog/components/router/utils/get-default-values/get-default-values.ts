@@ -54,26 +54,40 @@ const templateToDefaultResidency = {
 };
 
 const getDefaultValues = (context: MachineContext): DefaultValues => {
-  const onboardingTemplate = context.onboardingTemplate || OnboardingTemplate.Custom;
   if (isAuth(context.kind)) {
     return {
-      ...defaultPlaybookValuesAuth,
-      name: context.nameForm || defaultPlaybookValuesAuth.name,
-      playbook: context.playbook || defaultPlaybookValuesAuth.playbook,
+      name: defaultNameFormData,
+      playbook: context.playbook || defaultPlaybookValuesAuth,
+      aml: defaultAmlFormData,
+      residency: {
+        allowUsResidents: true,
+        allowUsTerritories: false,
+        allowInternationalResidents: false,
+      },
+    };
+  }
+  if (isDocOnly(context.kind)) {
+    return {
+      name: defaultNameFormData,
+      playbook: context.playbook || defaultPlaybookValuesIdDoc,
+      aml: defaultAmlFormData,
+      residency: {
+        allowUsResidents: true,
+        allowUsTerritories: false,
+        allowInternationalResidents: false,
+      },
     };
   }
 
+  const onboardingTemplate = context.onboardingTemplate || OnboardingTemplate.Custom;
   let defaultValues = templateToDefaultValuesKYC[onboardingTemplate];
+  const defaultAml = templateToDefaultAml[onboardingTemplate];
+  let residency = templateToDefaultResidency[onboardingTemplate];
+
   if (isKyb(context.kind)) {
     defaultValues = defaultPlaybookValuesKYB;
   }
-  if (isDocOnly(context.kind)) {
-    defaultValues = defaultPlaybookValuesIdDoc;
-  }
 
-  const defaultAml = templateToDefaultAml[onboardingTemplate];
-
-  let residency = templateToDefaultResidency[onboardingTemplate];
   if (isKyc(context.kind) && context.residencyForm) {
     residency = context.residencyForm;
   }

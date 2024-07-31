@@ -15,7 +15,7 @@ const CustomDocs = () => {
   const [formIndex, setFormIndex] = useState<number | null>(null);
   const { fields, append, remove, update } = useFieldArray({
     control,
-    name: 'personal.additionalDocs.custom',
+    name: 'person.docs.additional.custom',
   });
 
   const handleAdd = () => {

@@ -55,6 +55,7 @@ const onboardingConfig: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export default onboardingConfig;

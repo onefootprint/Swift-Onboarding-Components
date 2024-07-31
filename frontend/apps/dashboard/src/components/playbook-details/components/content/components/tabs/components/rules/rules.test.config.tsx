@@ -62,6 +62,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export const kybPlaybookFixture: OnboardingConfig = {
@@ -119,6 +120,7 @@ export const kybPlaybookFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export const failMultiFieldRuleFixture = {

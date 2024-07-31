@@ -12,7 +12,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
   const createAuthOptions = () => {
     return [
       {
-        value: 'whoToOnboard',
+        value: 'kind',
         label: t('who-to-onboard.nav'),
         options: [{ value: 'residency', label: t('residency.nav') }],
       },
@@ -23,7 +23,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
 
   const createKybOptions = () => {
     return [
-      { value: 'whoToOnboard', label: t('who-to-onboard.nav') },
+      { value: 'kind', label: t('who-to-onboard.nav') },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
       {
         value: 'settingsKyb',
@@ -40,7 +40,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
   const createKycOptions = () => {
     const options = [
       {
-        value: 'whoToOnboard',
+        value: 'kind',
         label: t('who-to-onboard.nav'),
         options: [
           {
@@ -70,7 +70,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
   const createDocOnlyOptions = () => {
     return [
       {
-        value: 'whoToOnboard',
+        value: 'kind',
         label: t('who-to-onboard.nav'),
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },

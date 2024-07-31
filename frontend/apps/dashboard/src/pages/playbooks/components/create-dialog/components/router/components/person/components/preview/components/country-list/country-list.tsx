@@ -9,7 +9,7 @@ type CountryListProps = {
 
 const CountryList = ({ countries, limit = 1 }: CountryListProps) => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.settings-person.preview.non-us-residents.country-list',
+    keyPrefix: 'create.person.preview.non-us-residents.country-list',
   });
   const firstPart = countries.slice(0, limit);
   const lastPart = countries.slice(limit);

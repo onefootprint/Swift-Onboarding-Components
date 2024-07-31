@@ -3,9 +3,9 @@ import { useFormContext } from 'react-hook-form';
 
 const useGovDocs = () => {
   const { watch } = useFormContext<DataToCollectFormData>();
-  const globalDocs = watch('personal.docs.global') || [];
-  const countryDocs = watch('personal.docs.country') || {};
-  const selfie = watch('personal.docs.selfie') || false;
+  const globalDocs = watch('person.docs.gov.global') || [];
+  const countryDocs = watch('person.docs.gov.country') || {};
+  const selfie = watch('person.docs.gov.selfie') || false;
 
   const hasGlobalDocs = globalDocs.length > 0;
   const hasCountryDocs = Object.keys(countryDocs).length > 0;

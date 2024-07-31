@@ -1,9 +1,9 @@
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { RouterProps } from './router';
 import Router from './router';
-import { createPlaybook, enterName, moveForward, withCreateOnboardingConfigs } from './router.test.config';
+import { createPlaybook, enterName, moveBack, moveForward, withCreateOnboardingConfigs } from './router.test.config';
 
 const renderRouter = (
   { onCreate }: RouterProps = {
@@ -12,121 +12,207 @@ const renderRouter = (
 ) => customRender(<Router onCreate={onCreate} />);
 
 describe('<Router />', () => {
-  describe('when doing KYC', () => {
-    describe('when the request to create an ob config succeeds', () => {
-      it('should create an onboarding config and show a confirmation', async () => {
-        const onCreate = jest.fn();
-        withCreateOnboardingConfigs();
+  describe('Auth playbook', () => {
+    it('should create an onboarding config and show a confirmation', async () => {
+      const onCreate = jest.fn();
+      withCreateOnboardingConfigs();
+      renderRouter({ onCreate });
 
-        renderRouter({ onCreate });
+      // Kind
+      const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+      expect(kindStep).toBeInTheDocument();
 
-        // Who to onboard
-        const step1Title = screen.getByText('What type of playbook would you like to create?');
-        expect(step1Title).toBeInTheDocument();
-        await moveForward();
+      const authOption = screen.getByRole('button', { name: 'Auth' });
+      await userEvent.click(authOption);
+      await moveForward();
 
-        // Templates
-        const step2Title = screen.getByText('Configure your own KYC settings or select a pre-defined template.');
-        expect(step2Title).toBeInTheDocument();
-        await moveForward();
+      // Name
+      const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+      expect(nameStep).toBeInTheDocument();
+      await moveForward();
 
-        // Residency
-        const step3Title = screen.getByText('Select the countries from which your users may onboard.');
-        expect(step3Title).toBeInTheDocument();
-        await moveForward();
+      // Create
+      await createPlaybook();
+      await waitFor(() => {
+        const confirmation = screen.getByText('Playbook created successfully.');
+        expect(confirmation).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        expect(onCreate).toHaveBeenCalled();
+      });
+    });
+  });
 
-        // Name
-        const step4Title = screen.getByText('Name your playbook');
-        expect(step4Title).toBeInTheDocument();
-        await enterName('KYC');
-        await moveForward();
+  describe('DocOnly playbook', () => {
+    it('should create an onboarding config and show a confirmation', async () => {
+      const onCreate = jest.fn();
+      withCreateOnboardingConfigs();
+      renderRouter({ onCreate });
 
-        // Settings
-        const step5Title = screen.getByText(
-          "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        );
-        expect(step5Title).toBeInTheDocument();
-        await moveForward();
+      // Kind
+      const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+      expect(kindStep).toBeInTheDocument();
 
-        // AML
-        const step6Title = screen.getByText(
-          'Configure which verification checks will be performed with the collected identity data.',
-        );
-        expect(step6Title).toBeInTheDocument;
-        await createPlaybook();
+      const docOnlyOption = screen.getByRole('button', { name: 'Document only' });
+      await userEvent.click(docOnlyOption);
+      await moveForward();
 
-        await waitFor(() => {
-          const confirmation = screen.getByText('Playbook created successfully.');
-          expect(confirmation).toBeInTheDocument();
-        });
+      // Name
+      const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+      expect(nameStep).toBeInTheDocument();
+      await moveForward();
 
-        await waitFor(() => {
-          expect(onCreate).toHaveBeenCalled();
-        });
+      // Details
+      const govDocs = screen.getByRole('region', { name: 'Collect government-issued ID' });
+      const addButton = within(govDocs).getByRole('button', { name: 'Add' });
+      await userEvent.click(addButton);
+
+      const passportCheckbox = within(govDocs).getByRole('checkbox', { name: 'Passport' });
+      await userEvent.click(passportCheckbox);
+
+      const saveButton = within(govDocs).getByRole('button', { name: 'Save' });
+      await userEvent.click(saveButton);
+
+      // Create
+      await createPlaybook();
+      await waitFor(() => {
+        const confirmation = screen.getByText('Playbook created successfully.');
+        expect(confirmation).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        expect(onCreate).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('KYC playbook', () => {
+    it('should create an onboarding config and show a confirmation', async () => {
+      const onCreate = jest.fn();
+      withCreateOnboardingConfigs();
+
+      renderRouter({ onCreate });
+
+      // Kind
+      const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+      expect(kindStep).toBeInTheDocument();
+      await moveForward();
+
+      // Templates
+      const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+      expect(templatesStep).toBeInTheDocument();
+      await moveForward();
+
+      // Residency
+      const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+      expect(residencyStep).toBeInTheDocument();
+      await moveForward();
+
+      // Name
+      const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+      expect(nameStep).toBeInTheDocument();
+      await moveForward();
+
+      // Details
+      const detailsStep = screen.getByRole('heading', { name: 'Your Playbook recommendation' });
+      expect(detailsStep).toBeInTheDocument();
+      await moveForward();
+
+      // Verification checks
+      const verificationChecks = screen.getByRole('heading', { name: 'Verification checks' });
+      expect(verificationChecks).toBeInTheDocument;
+      await createPlaybook();
+
+      await waitFor(() => {
+        const confirmation = screen.getByText('Playbook created successfully.');
+        expect(confirmation).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(onCreate).toHaveBeenCalled();
       });
     });
 
     describe('when in the "Templates" step', () => {
-      it('should go to "Who to onboard" when clicking "Back"', async () => {
+      it('should go to "Playbook type" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
         await moveForward();
 
         // Templates
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
+        await moveBack();
 
-        // Who to onboard
-        const title = screen.getByText('What type of playbook would you like to create?');
-        expect(title).toBeInTheDocument();
+        // Kind step again
+        const kindStepAgain = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStepAgain).toBeInTheDocument();
       });
 
       it('should go to "Residency" when clicking "Next" with "custom" selected', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
         await moveForward();
 
         // Templates
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
         const next = screen.getByRole('button', { name: 'Next' });
         await userEvent.click(next);
 
         // Residency
-        const title = screen.getByText('Select the countries from which your users may onboard.');
-        expect(title).toBeInTheDocument();
+        const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+        expect(residencyStep).toBeInTheDocument();
       });
 
       it('should go to "Name your playbook" when clicking "Next" with "alpaca" selected', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
         await moveForward();
 
         // Templates
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
+
         await userEvent.click(screen.getByText('Alpaca'));
         await moveForward();
 
         // Name
-        const title = screen.getByText('Name your playbook');
-        expect(title).toBeInTheDocument();
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
       });
     });
 
     describe('when in the "Residency" step', () => {
-      it('should go to "Who to onboard" when clicking "Back"', async () => {
+      it('should go to "Templates" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
+        await moveForward();
+
+        // Templates
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
         await moveForward();
 
         // Residency
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+        expect(residencyStep).toBeInTheDocument();
+        await moveBack();
 
-        // Who to onboard
-        const title = screen.getByText('What type of playbook would you like to create?');
-        expect(title).toBeInTheDocument();
+        // Templates
+        const templatesStepAgain = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStepAgain).toBeInTheDocument();
       });
     });
 
@@ -134,228 +220,266 @@ describe('<Router />', () => {
       it('should go to "Residency" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
         await moveForward();
 
         // Templates
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
         await moveForward();
 
         // Residency
+        const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+        expect(residencyStep).toBeInTheDocument();
         await moveForward();
 
         // Name
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
+        await moveBack();
 
-        // Residency
-        const title = screen.getByText('Select the countries from which your users may onboard.');
-        expect(title).toBeInTheDocument();
+        // Residency again
+        const residencyStepAgain = screen.getByRole('heading', { name: 'Residency' });
+        expect(residencyStepAgain).toBeInTheDocument();
       });
 
       it('should go to "Templates" when clicking "Back" if Alpaca was selected', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
         await moveForward();
 
         // Templates
+        const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStep).toBeInTheDocument();
         await userEvent.click(screen.getByText('Alpaca'));
         await moveForward();
 
         // Name
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
+        await moveBack();
 
         // Templates
-        const title = screen.getByText('Configure your own KYC settings or select a pre-defined template.');
-        expect(title).toBeInTheDocument();
+        const templatesStepAgain = screen.getByRole('heading', { name: 'Templates' });
+        expect(templatesStepAgain).toBeInTheDocument();
       });
-    });
 
-    describe('when in the "Summary" step', () => {
-      it('should go to "Name your Playbook" when clicking "Back"', async () => {
-        renderRouter({ onCreate: jest.fn() });
+      describe('when in the "Details" step', () => {
+        it('should go to "Name your Playbook" when clicking "Back"', async () => {
+          renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        await moveForward();
+          // Kind
+          const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+          expect(kindStep).toBeInTheDocument();
+          await moveForward();
 
-        // Templates
-        await moveForward();
+          // Templates
+          const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+          expect(templatesStep).toBeInTheDocument();
+          await moveForward();
 
-        // Residency
-        await moveForward();
+          // Residency
+          const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+          expect(residencyStep).toBeInTheDocument();
+          await moveForward();
 
-        // Name
-        await enterName('KYC');
-        await moveForward();
+          // Name
+          const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+          expect(nameStep).toBeInTheDocument();
+          await moveForward();
 
-        // Summary
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+          // Details
+          const detailsStep = screen.getByRole('heading', { name: 'Your Playbook recommendation' });
+          expect(detailsStep).toBeInTheDocument();
+          await moveBack();
 
-        // Name
-        const title = screen.getByText('Name your playbook');
-        expect(title).toBeInTheDocument();
+          // Name
+          const nameStepAgain = screen.getByText('Name your playbook');
+          expect(nameStepAgain).toBeInTheDocument();
+        });
       });
-    });
 
-    describe('when in the "AML" step', () => {
-      it('should go to "Summary" when clicking "Back"', async () => {
-        renderRouter({ onCreate: jest.fn() });
+      describe('when in "verification checks" step', () => {
+        it('should go to "Details" when clicking "Back"', async () => {
+          renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        await moveForward();
+          // Kind
+          const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+          expect(kindStep).toBeInTheDocument();
+          await moveForward();
 
-        // Templates
-        await moveForward();
+          // Templates
+          const templatesStep = screen.getByRole('heading', { name: 'Templates' });
+          expect(templatesStep).toBeInTheDocument();
+          await moveForward();
 
-        // Residency
-        await moveForward();
+          // Residency
+          const residencyStep = screen.getByRole('heading', { name: 'Residency' });
+          expect(residencyStep).toBeInTheDocument();
+          await moveForward();
 
-        // Name
-        await enterName('KYC');
-        await moveForward();
+          // Name
+          const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+          expect(nameStep).toBeInTheDocument();
+          await moveForward();
 
-        // Summary
-        await moveForward();
+          // Details
+          const detailsStep = screen.getByRole('heading', { name: 'Your Playbook recommendation' });
+          expect(detailsStep).toBeInTheDocument();
+          await moveForward();
 
-        // AML
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+          // Verification checks
+          const verificationChecksStep = screen.getByRole('heading', { name: 'Verification checks' });
+          expect(verificationChecksStep).toBeInTheDocument();
+          await moveBack();
 
-        // Summary
-        const title = screen.getByText('Your Playbook recommendation');
-        expect(title).toBeInTheDocument();
+          // Details
+          const detailsStepAgain = screen.getByRole('heading', { name: 'Your Playbook recommendation' });
+          expect(detailsStepAgain).toBeInTheDocument();
+        });
       });
     });
   });
 
-  describe('when doing KYB', () => {
-    describe('when the request to create an ob config succeeds', () => {
-      it('should create an onboarding config and show a confirmation', async () => {
-        withCreateOnboardingConfigs();
-        renderRouter({ onCreate: jest.fn() });
+  describe('KYB playbook', () => {
+    it('should create an onboarding config and show a confirmation', async () => {
+      withCreateOnboardingConfigs();
+      renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        const step1Title = screen.getByText('What type of playbook would you like to create?');
-        expect(step1Title).toBeInTheDocument();
-        const option = screen.getByRole('button', {
-          name: 'Onboard businesses and their beneficial owners',
-        });
-        await userEvent.click(option);
-        await moveForward();
+      // Kind
+      const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+      expect(kindStep).toBeInTheDocument();
+      const kybOption = screen.getByRole('button', {
+        name: 'Onboard businesses and their beneficial owners',
+      });
+      await userEvent.click(kybOption);
+      await moveForward();
 
-        // Name
-        const step2 = screen.getByText('Name your playbook');
-        expect(step2).toBeInTheDocument();
-        await moveForward();
+      // Name
+      const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+      expect(nameStep).toBeInTheDocument();
+      await moveForward();
 
-        // Summary
-        const step3 = screen.getByText(
-          "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        );
-        expect(step3).toBeInTheDocument();
-        await moveForward();
+      // Business
+      const businessStep = screen.getByRole('heading', { name: 'Business information' });
+      expect(businessStep).toBeInTheDocument();
+      await moveForward();
 
-        // AML
-        const step4 = screen.getByText(
-          'Configure which verification checks will be performed with the collected identity data.',
-        );
-        expect(step4).toBeInTheDocument;
-        await createPlaybook();
+      // BOs
+      const bosStep = screen.getByRole('heading', { name: 'Business owners’ information' });
+      expect(bosStep).toBeInTheDocument();
+      await moveForward();
 
-        await waitFor(() => {
-          const confirmation = screen.getByText('Playbook created successfully.');
-          expect(confirmation).toBeInTheDocument();
-        });
+      // Verification checks
+      const verificationChecks = screen.getByRole('heading', { name: 'Verification checks' });
+      expect(verificationChecks).toBeInTheDocument();
+
+      // Submit
+      await createPlaybook();
+      await waitFor(() => {
+        const confirmation = screen.getByText('Playbook created successfully.');
+        expect(confirmation).toBeInTheDocument();
       });
     });
 
-    describe('when in the "Name your Playbook" step', () => {
-      it('should go to "Who to onboard" when clicking "Back"', async () => {
+    describe('when in the "Business" step', () => {
+      it('should go to "Name" step when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        const step1Title = screen.getByText('What type of playbook would you like to create?');
-        expect(step1Title).toBeInTheDocument();
-        const option = screen.getByRole('button', {
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
+        const kybOption = screen.getByRole('button', {
           name: 'Onboard businesses and their beneficial owners',
         });
-        await userEvent.click(option);
+        await userEvent.click(kybOption);
         await moveForward();
 
         // Name
-        const step2 = screen.getByText('Name your playbook');
-        expect(step2).toBeInTheDocument();
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
+        await moveBack();
 
-        // Who to onboard
-        const step3Title = screen.getByText('What type of playbook would you like to create?');
-        expect(step3Title).toBeInTheDocument();
+        // Kind
+        const kindStepAgain = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStepAgain).toBeInTheDocument();
       });
     });
 
-    describe('when in the "Summary" step', () => {
-      it('should go to "Name your Playbook" when clicking "Back"', async () => {
+    describe('when in the "Business owners’ information" step', () => {
+      it('should go to "Business" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        const step1Title = screen.getByText('What type of playbook would you like to create?');
-        expect(step1Title).toBeInTheDocument();
-        const option = screen.getByRole('button', {
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
+        const kybOption = screen.getByRole('button', {
           name: 'Onboard businesses and their beneficial owners',
         });
-        await userEvent.click(option);
+        await userEvent.click(kybOption);
         await moveForward();
 
         // Name
-        const step2 = screen.getByText('Name your playbook');
-        expect(step2).toBeInTheDocument();
-        await enterName('KYB');
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
         await moveForward();
 
-        // Summary
-        const step3 = screen.getByText(
-          "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        );
-        expect(step3).toBeInTheDocument();
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        // Business
+        const businessStep = screen.getByRole('heading', { name: 'Business information' });
+        expect(businessStep).toBeInTheDocument();
+        await moveForward();
+
+        // BOs
+        const bosStep = screen.getByRole('heading', { name: 'Business owners’ information' });
+        expect(bosStep).toBeInTheDocument();
+        await moveBack();
 
         // Name
-        const step4 = screen.getByText('Name your playbook');
-        expect(step4).toBeInTheDocument();
+        const businessStepAgain = screen.getByRole('heading', { name: 'Business information' });
+        expect(businessStepAgain).toBeInTheDocument();
       });
     });
 
-    describe('when in the "AML" step', () => {
-      it('should go to "Summary" when clicking "Back"', async () => {
+    describe('when in "verification checks" step', () => {
+      it('should go to "Business owners’ information" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
-        // Who to onboard
-        await moveForward();
-
-        // Templates
-        await moveForward();
-
-        // Residency
+        // Kind
+        const kindStep = screen.getByRole('heading', { name: 'What type of playbook would you like to create?' });
+        expect(kindStep).toBeInTheDocument();
+        const kybOption = screen.getByRole('button', {
+          name: 'Onboard businesses and their beneficial owners',
+        });
+        await userEvent.click(kybOption);
         await moveForward();
 
         // Name
-        await enterName('KYB');
+        const nameStep = screen.getByRole('heading', { name: 'Name your playbook' });
+        expect(nameStep).toBeInTheDocument();
         await moveForward();
 
-        // Summary
+        // Business
+        const businessStep = screen.getByRole('heading', { name: 'Business information' });
+        expect(businessStep).toBeInTheDocument();
         await moveForward();
 
-        // AML
-        const back = screen.getByRole('button', { name: 'Back' });
-        await userEvent.click(back);
+        // BOs
+        const bosStep = screen.getByRole('heading', { name: 'Business owners’ information' });
+        expect(bosStep).toBeInTheDocument();
+        await moveForward();
 
-        // Summary
-        const title = screen.getByText('Your Playbook recommendation');
-        expect(title).toBeInTheDocument();
+        // Verification checks
+        const verificationChecks = screen.getByRole('heading', { name: 'Verification checks' });
+        expect(verificationChecks).toBeInTheDocument();
+        await moveBack();
+
+        const bosStepAgain = screen.getByRole('heading', { name: 'Business owners’ information' });
+        expect(bosStepAgain).toBeInTheDocument();
       });
     });
   });

@@ -2785,59 +2785,7 @@
           "nav": "Name your Playbook"
         },
         "verification-checks": {
-          "nav": "Verification checks",
-          "title": "Verification checks",
-          "subtitle": "Configure which verification checks will be performed with the collected identity data.",
-          "aml-monitoring": {
-            "title": "Anti-Money Laundering (AML)",
-            "recommended": "Recommended",
-            "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
-            "aml": {
-              "label": "Enhanced AML monitoring",
-              "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
-            },
-            "ofac": {
-              "label": "Office of Foreign Assets Control (OFAC)",
-              "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
-            },
-            "pep": {
-              "label": "Politically Exposed Person (PEP)",
-              "hint": "An individual who has been entrusted with a prominent public function"
-            },
-            "adverse-media": {
-              "label": "Adverse media",
-              "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
-            },
-            "footer": {
-              "label": "Note:",
-              "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
-            },
-            "disabled-tooltip": {
-              "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable AML monitoring."
-            }
-          },
-          "kyc-checks": {
-            "title": "Know Your Customer (KYC)",
-            "disabled-tooltip": {
-              "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable KYC checks.",
-              "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
-            },
-            "toggle": {
-              "personal": {
-                "label": "Perform database checks with collected identity data",
-                "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
-              },
-              "business": {
-                "label": "Run KYC on beneficial owners",
-                "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
-              }
-            },
-            "bo-options": {
-              "all-bos": "On all business owners",
-              "only-primary-bo": "Only on business' primary owner",
-              "only-primary-bo-hint": "The person who fills out this form"
-            }
-          }
+          "nav": "Verification checks"
         }
       },
       "collected-data": {

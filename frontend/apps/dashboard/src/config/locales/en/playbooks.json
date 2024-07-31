@@ -63,6 +63,57 @@
         }
       }
     },
+    "business": {
+      "business-info": {
+        "title": "Business information",
+        "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+        "preview": {
+          "title": "Business information",
+          "basic-info": {
+            "title": "Basic information",
+            "name": "Legal business name",
+            "address": "Registered business address",
+            "tin": "TIN (EIN)",
+            "type": "Legal entity type",
+            "website": "Website",
+            "phone-number": "Phone number"
+          }
+        },
+        "form": {
+          "title": "Edit business information",
+          "address": {
+            "title": "Business address",
+            "label": "Request that users provide their business address"
+          },
+          "type": {
+            "title": "Legal entity type",
+            "label": "Request users to provide their business legal entity type"
+          },
+          "website": {
+            "title": "Website",
+            "label": "Request users to provide their business website"
+          },
+          "phone-number": {
+            "title": "Phone number",
+            "label": "Request that users provide their business phone number"
+          }
+        }
+      },
+      "custom-docs": {
+        "title": "Additional documents",
+        "description": "Additional proofs that may help you analyze the user",
+        "form": {
+          "custom": {
+            "label": "Custom"
+          }
+        }
+      }
+    },
+    "bo": {
+      "title": "Business owners’ information",
+      "subtitle": "Here's our recommendation for what you could request from business owners.",
+      "info": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
+    },
     "settings-auth": {
       "title": "Auth playbook details",
       "subtitle": "Here's how your auth configuration is going to work",
@@ -206,11 +257,16 @@
           "car-rental": "Here's your playbook configuration based on your selected template",
           "credit-card": "Here's your playbook configuration based on your selected template"
         }
-      },
+      }
+    },
+    "person": {
       "preview": {
-        "title": "Personal information",
+        "title": {
+          "kyc": "Personal information",
+          "kyb": "Beneficial owners"
+        },
         "edit": "Edit",
-        "editing": "Edit personal information",
+        "collect-bo-info": "Collect beneficial owners’ information",
         "basic-information": {
           "title": "Basic information",
           "name": "Full name",
@@ -221,9 +277,15 @@
         },
         "us-residents": {
           "title": "U.S. residents",
-          "ssn": "SSN",
+          "itin": "Accept ITIN",
           "legal-status": "Legal status in the U.S.",
-          "empty": "U.S. residents aren't allowed to be onboarded."
+          "empty": "U.S. residents aren't allowed to be onboarded.",
+          "ssn": {
+            "label": "SSN",
+            "last-4": "Last 4",
+            "full": "Full",
+            "optional": "Optional"
+          }
         },
         "non-us-residents": {
           "title": "Non U.S. residents",
@@ -234,12 +296,21 @@
             "and": "and",
             "more": "{{count}} more"
           }
+        },
+        "us-territories": {
+          "label": "Note",
+          "content": "Residents from U.S. territories are allowed to be onboarded."
         }
       },
       "form": {
-        "title": "Edit personal information",
+        "title": {
+          "kyc": "Editiding personal information",
+          "kyb": "Editing beneficial owners"
+        },
         "edit": "Edit",
-        "editing": "Edit personal information",
+        "collect-bo": {
+          "label": "Collect beneficial owners' information"
+        },
         "basic-information": {
           "title": "Basic information"
         },
@@ -252,12 +323,12 @@
           "empty": "Non U.S. residents aren't allowed to be onboarded."
         },
         "phone": {
-          "toggle": "Request users to provide their phone number",
+          "label": "Request users to provide their phone number",
           "title": "Phone number"
         },
         "ssn": {
           "title": "SSN",
-          "toggle": "Request users to provide their SSN",
+          "label": "Request users to provide their SSN",
           "full": "Full",
           "last4": "Last 4"
         },
@@ -281,82 +352,73 @@
         "accept-itin-label": "Accept ITIN"
       }
     },
-    "data-to-collect": {
-      "nav": "Playbook details",
-      "title": {
-        "id-doc": "Requested documents",
-        "default-editable": "Your Playbook recommendation",
-        "default-non-editable": "Your Playbook"
-      },
-      "subtitle": {
-        "international-only": "Here’s our recommended Playbook configuration.",
-        "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
-        "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
-        "apex": "Here's your Playbook configuration based on Apex's CIP.",
-        "tenant-screening": "Here's your playbook configuration based on your selected template",
-        "car-rental": "Here's your playbook configuration based on your selected template",
-        "credit-card": "Here's your playbook configuration based on your selected template"
-      },
-      "data-collection": {
-        "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
-      },
-      "id-doc": {
-        "title": "ID document scan",
-        "toggle": "Request users to scan an ID document",
-        "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
-        "no-id-doc-selected": "You must select at least one ID document type."
-      },
-      "business-information": {
-        "editing": {
-          "business-information": "Editing business information",
-          "legal-entity-type": {
-            "title": "Legal entity type",
-            "label": "Request users to provide their business legal entity type"
-          },
-          "website": {
-            "title": "Website",
-            "label": "Request users to provide their business website"
-          },
-          "phone-number": {
-            "title": "Phone number",
-            "label": "Request that users provide their business phone number"
-          },
-          "address": {
-            "title": "Business address",
-            "label": "Request that users provide their business address"
-          },
-          "save": "Save",
-          "cancel": "Cancel"
+    "verification-checks": {
+      "title": "Verification checks",
+      "subtitle": "Configure which verification checks will be performed with the collected identity data.",
+      "aml": {
+        "title": "Anti-Money Laundering (AML)",
+        "recommended": "Recommended",
+        "missing-selection": "You must choose one of OFAC, PEP or Adverse Media.",
+        "aml": {
+          "label": "Enhanced AML monitoring",
+          "hint": "Continuous monitoring, governmental watchlists, PEP and adverse media"
         },
-        "preview": {
-          "title": "Business information",
-          "edit": "Edit",
-          "remove": "Remove",
-          "business_corporation_type": "Legal entity type",
-          "business_website": "Website",
-          "business_phone_number": "Phone number",
-          "business_name": "Legal business name",
-          "doingBusinessAs": "Doing Business As (optional)",
-          "business_beneficial_owners": "Beneficial owners",
-          "business_address": "Registered business address",
-          "business_tin": "TIN (EIN)"
+        "ofac": {
+          "label": "Office of Foreign Assets Control (OFAC)",
+          "hint": "An agency within the U.S. Department of the Treasury that is responsible for administering and enforcing economic and trade sanctions against targeted foreign countries, organizations, and individuals"
+        },
+        "pep": {
+          "label": "Politically Exposed Person (PEP)",
+          "hint": "An individual who has been entrusted with a prominent public function"
+        },
+        "adverse-media": {
+          "label": "Adverse media",
+          "hint": "Negative or unfavorable information about individuals, entities, or organizations that could indicate potential involvement in financial crimes, corruption, or other illicit activities"
+        },
+        "footer": {
+          "label": "Note:",
+          "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
+        },
+        "disabled-tooltip": {
+          "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable AML monitoring."
         }
-      }
-    },
-    "kyb-checks": {
-      "title": "Know Your Business (KYB)",
-      "toggle": {
-        "label": "Run KYB",
-        "description": "If not enabled, we'll only collect the data and won't do any verification checks."
       },
-      "full": {
-        "label": "Full KYB",
-        "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
+      "kyc-checks": {
+        "title": "Know Your Customer (KYC)",
+        "disabled-tooltip": {
+          "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable KYC checks.",
+          "must-collect-id-doc": "You must collect ID document information to disable KYC checks."
+        },
+        "toggle": {
+          "personal": {
+            "label": "Perform database checks with collected identity data",
+            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+          },
+          "business": {
+            "label": "Run KYC on beneficial owners",
+            "hint": "Identity data collected will be verified against government databases, credit bureaus, or other official sources"
+          }
+        },
+        "bo-options": {
+          "all-bos": "On all business owners",
+          "only-primary-bo": "Only on business' primary owner",
+          "only-primary-bo-hint": "The person who fills out this form"
+        }
       },
-      "ein": {
-        "label": "TIN (EIN) verification only",
-        "description": "We'll only verify TIN (EIN) and business name."
+      "kyb-checks": {
+        "title": "Know Your Business (KYB)",
+        "toggle": {
+          "label": "Run KYB",
+          "description": "If not enabled, we'll only collect the data and won't do any verification checks."
+        },
+        "full": {
+          "label": "Full KYB",
+          "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
+        },
+        "ein": {
+          "label": "TIN (EIN) verification only",
+          "description": "We'll only verify TIN (EIN) and business name."
+        }
       }
     }
   },

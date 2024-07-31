@@ -1,10 +1,11 @@
-import { Stack } from '@onefootprint/ui';
+import { type DataToCollectMeta, PlaybookKind } from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
-import type { DataToCollectMeta } from '@/playbooks/utils/machine/types';
-
-import Form from './components/editing';
+import Panel from '../panel';
+import Cta from './components/cta';
+import Form from './components/form';
 import Preview from './components/preview';
 
 type PersonProps = {
@@ -12,27 +13,38 @@ type PersonProps = {
 };
 
 const Person = ({ meta }: PersonProps) => {
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.person' });
   const [showForm, setShowForm] = useState(false);
+  const isInternationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
+  const isFixedPlaybook =
+    meta.onboardingTemplate === OnboardingTemplate.Alpaca || meta.onboardingTemplate === OnboardingTemplate.Apex;
+  const canEdit = !isInternationalOnly && !isFixedPlaybook;
 
-  const stopEditing = () => setShowForm(false);
+  const getTitle = () => {
+    if (showForm) {
+      return meta.kind === PlaybookKind.Kyc ? t('form.title.kyc') : t('form.title.kyb');
+    }
+    return meta.kind === PlaybookKind.Kyc ? t('preview.title.kyc') : t('preview.title.kyb');
+  };
 
-  const startEditing = () => setShowForm(true);
+  const handleToggle = () => {
+    setShowForm(prev => !prev);
+  };
+
+  const handleClose = () => {
+    setShowForm(false);
+  };
+
+  const renderCta = () => {
+    if (!canEdit) return null;
+    return showForm ? null : <Cta onClick={handleToggle} />;
+  };
 
   return (
-    <Container>
-      {showForm ? <Form onStopEditing={stopEditing} /> : <Preview onStartEditing={startEditing} meta={meta} />}
-    </Container>
+    <Panel cta={renderCta()} title={getTitle()}>
+      {showForm ? <Form meta={meta} onClose={handleClose} /> : <Preview meta={meta} />}
+    </Panel>
   );
 };
-
-const Container = styled(Stack)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    padding: ${theme.spacing[5]} ${theme.spacing[6]};
-  `}
-`;
 
 export default Person;

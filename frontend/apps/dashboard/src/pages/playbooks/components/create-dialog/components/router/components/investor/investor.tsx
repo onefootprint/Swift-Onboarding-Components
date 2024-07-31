@@ -1,5 +1,5 @@
+import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
-import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
 import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -8,29 +8,28 @@ import styled, { css } from 'styled-components';
 import Panel from '../panel';
 
 const InvestorProfile = () => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.investor',
-  });
-  const { register, setValue, watch } = useFormContext();
-  const value = watch(CollectedInvestorProfileDataOption.investorProfile);
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.investor' });
+  const { setValue, watch } = useFormContext<DataToCollectFormData>();
+  const value = watch('person.investorProfile');
 
-  const toggle = () => setValue(CollectedInvestorProfileDataOption.investorProfile, !value);
+  const handleToggle = () => {
+    setValue('person.investorProfile', !value);
+  };
+
+  const renderCta = () => {
+    return value ? (
+      <LinkButton destructive iconComponent={IcoTrash16} iconPosition="left" onClick={handleToggle} variant="label-4">
+        {t('remove')}
+      </LinkButton>
+    ) : (
+      <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleToggle} variant="label-4">
+        {t('add')}
+      </LinkButton>
+    );
+  };
 
   return (
-    <Panel
-      title={t('title')}
-      cta={
-        value ? (
-          <LinkButton iconComponent={IcoTrash16} iconPosition="left" onClick={toggle} variant="label-4" destructive>
-            {t('remove')}
-          </LinkButton>
-        ) : (
-          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={toggle} variant="label-4">
-            {t('add')}
-          </LinkButton>
-        )
-      }
-    >
+    <Panel title={t('title')} cta={renderCta()}>
       {value ? (
         <List>
           <Text variant="body-3" tag="li">
@@ -60,7 +59,6 @@ const InvestorProfile = () => {
           {t('subtitle')}
         </Text>
       )}
-      <input type="hidden" {...register(CollectedInvestorProfileDataOption.investorProfile)} />
     </Panel>
   );
 };

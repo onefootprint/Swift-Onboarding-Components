@@ -13,7 +13,7 @@ const ExtraRequirements = () => {
   return (
     <>
       <Text variant="label-3">{t('title')}</Text>
-      <Checkbox label={t('selfie.title')} {...register('personal.docs.selfie')} />
+      <Checkbox label={t('selfie.title')} {...register('person.docs.gov.selfie')} />
     </>
   );
 };

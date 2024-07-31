@@ -21,9 +21,9 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
   const id = useId();
   const { formState, register, trigger, setFocus, getValues, setValue } = useFormContext<DataToCollectFormData>();
   const nameAttrs = {
-    name: `personal.additionalDocs.custom.${index}.name`,
-    identifier: `personal.additionalDocs.custom.${index}.identifier`,
-    description: `personal.additionalDocs.custom.${index}.description`,
+    name: `person.docs.additional.custom.${index}.name`,
+    identifier: `person.docs.additional.custom.${index}.identifier`,
+    description: `person.docs.additional.custom.${index}.description`,
   } as const;
 
   const [originalValues] = useState(() => {
@@ -31,7 +31,7 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
     return { name, identifier, description };
   });
   const isCreating = !originalValues.name && !originalValues.identifier && !originalValues.description;
-  const formErrors = get(formState.errors, `personal.additionalDocs.custom.${index}`);
+  const formErrors = get(formState.errors, `person.docs.additional.custom.${index}`);
 
   const focusOnFirstInvalidField = () => {
     if (typeof formErrors === 'object') {

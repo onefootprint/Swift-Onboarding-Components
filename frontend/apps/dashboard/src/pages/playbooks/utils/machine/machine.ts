@@ -14,22 +14,22 @@ export const createPlaybookMachine = () =>
       },
       // eslint-disable-next-line
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'whoToOnboard',
+      initial: 'kind',
       context: {
         kind: PlaybookKind.Unknown,
       },
       states: {
-        whoToOnboard: {
+        kind: {
           on: {
-            whoToOnboardSubmitted: [
+            kindSubmitted: [
               {
                 target: 'onboardingTemplates',
-                actions: ['assignWhoToOnboard'],
+                actions: ['assignKind'],
                 cond: (_, event) => event.payload.kind === PlaybookKind.Kyc,
               },
               {
                 target: 'nameYourPlaybook',
-                actions: ['assignWhoToOnboard'],
+                actions: ['assignKind'],
               },
             ],
           },
@@ -48,15 +48,15 @@ export const createPlaybookMachine = () =>
               },
             ],
             navigationBackward: {
-              target: 'whoToOnboard',
+              target: 'kind',
               actions: ['resetKind'],
             },
           },
         },
         residency: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
+            kindSelected: {
+              target: 'kind',
               actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             templateSelected: {
@@ -75,8 +75,8 @@ export const createPlaybookMachine = () =>
         },
         nameYourPlaybook: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
+            kindSelected: {
+              target: 'kind',
               actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             navigationBackward: [
@@ -91,10 +91,20 @@ export const createPlaybookMachine = () =>
                 cond: context => context.kind === PlaybookKind.Kyc,
               },
               {
-                target: 'whoToOnboard',
+                target: 'kind',
               },
             ],
             nameYourPlaybookSubmitted: [
+              {
+                target: 'settingsKyc',
+                actions: ['assignNameYourPlaybook'],
+                cond: context => context.kind === PlaybookKind.Kyc,
+              },
+              {
+                target: 'settingsKyb',
+                actions: ['assignNameYourPlaybook'],
+                cond: context => context.kind === PlaybookKind.Kyb,
+              },
               {
                 target: 'settingsAuth',
                 actions: ['assignNameYourPlaybook'],
@@ -105,18 +115,72 @@ export const createPlaybookMachine = () =>
                 actions: ['assignNameYourPlaybook'],
                 cond: context => context.kind === PlaybookKind.DocOnly,
               },
-              {
-                target: 'settingsKyc',
-                actions: ['assignNameYourPlaybook'],
-                cond: context => context.kind === PlaybookKind.Kyc,
-              },
             ],
+          },
+        },
+        settingsKyc: {
+          on: {
+            kindSelected: {
+              target: 'kind',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            playbookSubmitted: {
+              target: 'verificationChecks',
+              actions: 'assignPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
+            },
+          },
+        },
+        settingsKyb: {
+          initial: 'settingsBusiness',
+          states: {
+            settingsBusiness: {
+              on: {
+                playbookSubmitted: {
+                  target: 'settingsBo',
+                  actions: 'assignPlaybook',
+                },
+                navigationBackward: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+                kindSelected: {
+                  target: '#playbooks.kind',
+                  actions: ['resetKind', 'resetOnboardingTemplate'],
+                },
+                nameYourPlaybookSelected: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+              },
+            },
+            settingsBo: {
+              on: {
+                playbookSubmitted: {
+                  target: '#playbooks.verificationChecks',
+                  actions: 'assignPlaybook',
+                },
+                navigationBackward: {
+                  target: 'settingsBusiness',
+                },
+                kindSelected: {
+                  target: '#playbooks.kind',
+                  actions: ['resetKind', 'resetOnboardingTemplate'],
+                },
+                nameYourPlaybookSelected: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+              },
+            },
           },
         },
         settingsAuth: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
+            kindSelected: {
+              target: 'kind',
               actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             nameYourPlaybookSelected: {
@@ -129,66 +193,12 @@ export const createPlaybookMachine = () =>
         },
         settingsDocOnly: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
+            kindSelected: {
+              target: 'kind',
               actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
-            },
-            navigationBackward: {
-              target: 'nameYourPlaybook',
-            },
-          },
-        },
-        settingsKyc: {
-          on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-              actions: ['resetKind', 'resetOnboardingTemplate'],
-            },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            playbookSubmitted: {
-              target: 'verificationChecks',
-              actions: 'assignPlaybook',
-            },
-            navigationBackward: {
-              target: 'nameYourPlaybook',
-            },
-          },
-        },
-        settingsBusiness: {
-          on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-              actions: ['resetKind', 'resetOnboardingTemplate'],
-            },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            playbookSubmitted: {
-              target: 'verificationChecks',
-              actions: 'assignPlaybook',
-            },
-            navigationBackward: {
-              target: 'nameYourPlaybook',
-            },
-          },
-        },
-        settingsBo: {
-          on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-              actions: ['resetKind', 'resetOnboardingTemplate'],
-            },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            playbookSubmitted: {
-              target: 'verificationChecks',
-              actions: 'assignPlaybook',
             },
             navigationBackward: {
               target: 'nameYourPlaybook',
@@ -197,8 +207,8 @@ export const createPlaybookMachine = () =>
         },
         verificationChecks: {
           on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
+            kindSelected: {
+              target: 'kind',
               actions: ['resetKind', 'resetOnboardingTemplate'],
             },
             nameYourPlaybookSelected: {
@@ -207,9 +217,16 @@ export const createPlaybookMachine = () =>
             settingsKycSelected: {
               target: 'settingsKyc',
             },
-            navigationBackward: {
-              target: 'settingsKyc',
-            },
+            navigationBackward: [
+              {
+                target: 'settingsKyb.settingsBo',
+                cond: context => context.kind === PlaybookKind.Kyb,
+              },
+              {
+                target: 'settingsKyc',
+                cond: context => context.kind === PlaybookKind.Kyc,
+              },
+            ],
             verificationChecksSubmitted: {
               actions: 'assignVerificationChecks',
             },
@@ -219,7 +236,7 @@ export const createPlaybookMachine = () =>
     },
     {
       actions: {
-        assignWhoToOnboard: assign((context, event) => ({
+        assignKind: assign((context, event) => ({
           ...context,
           kind: event.payload.kind,
         })),

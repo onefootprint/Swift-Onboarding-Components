@@ -40,6 +40,7 @@ export const playbookWithPasskeysFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export const playbookWithoutPasskeysFixture: OnboardingConfig = {

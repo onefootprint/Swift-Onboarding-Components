@@ -10,8 +10,13 @@ export const moveForward = async () => {
   await userEvent.click(button);
 };
 
+export const moveBack = async () => {
+  const button = screen.getByRole('button', { name: 'Back' });
+  await userEvent.click(button);
+};
+
 export const createPlaybook = async () => {
-  const button = screen.getByRole('button', { name: 'Create Playbook' });
+  const button = screen.getByRole('button', { name: 'Create' });
   await userEvent.click(button);
 };
 

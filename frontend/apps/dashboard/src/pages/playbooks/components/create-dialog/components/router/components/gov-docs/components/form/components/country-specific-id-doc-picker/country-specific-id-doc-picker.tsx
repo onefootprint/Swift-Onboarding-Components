@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
@@ -15,8 +16,8 @@ const CountrySpecificIdDocPicker = () => {
     keyPrefix: 'create.gov-docs.country-specific',
   });
   const { t: allT } = useTranslation('common');
-  const { watch, setValue } = useFormContext();
-  const countryDocMap = watch('personal.docs.country');
+  const { watch, setValue } = useFormContext<DataToCollectFormData>();
+  const countryDocMap = watch('person.docs.gov.country');
   const existingCountries = Object.keys(countryDocMap);
   const isEmptyMap = existingCountries.length === 0;
   const [showPicker, setShowPicker] = useState(false);
@@ -29,7 +30,7 @@ const CountrySpecificIdDocPicker = () => {
     setEditingCountryDocMap({ [country]: selectedDocs });
     const newMap = { ...countryDocMap };
     delete newMap[country];
-    setValue('personal.docs.country', newMap);
+    setValue('person.docs.gov.country', newMap);
     setShowPicker(true);
   };
 
@@ -42,14 +43,14 @@ const CountrySpecificIdDocPicker = () => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, [newCountry]: newDocs };
     setEditingCountryDocMap(undefined);
-    setValue('personal.docs.country', newMap);
+    setValue('person.docs.gov.country', newMap);
   };
 
   const handleCancel = () => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, ...editingCountryDocMap };
     setEditingCountryDocMap(undefined);
-    setValue('personal.docs.country', newMap);
+    setValue('person.docs.gov.country', newMap);
   };
 
   const handleRemove = (country: CountryCode) => {
@@ -57,7 +58,7 @@ const CountrySpecificIdDocPicker = () => {
     const newMap = { ...countryDocMap };
     delete newMap[country];
     setEditingCountryDocMap(undefined);
-    setValue('personal.docs.country', newMap);
+    setValue('person.docs.gov.country', newMap);
   };
 
   return (

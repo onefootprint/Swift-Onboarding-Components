@@ -10,19 +10,20 @@ import playbookMachine from '@/playbooks/utils/machine';
 import type {
   DataToCollectFormData,
   MachineContext,
-  Personal,
   VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
-import Name from './components/name';
-import OnboardingTemplates from './components/onboarding-templates';
-import Residency from './components/residency';
-import SettingsAuth from './components/settings-auth';
-import SettingsDocOnly from './components/settings-doc-only';
-import SettingsKyc from './components/settings-kyc';
-import VerificationChecks from './components/verification-checks';
-import WhoToOnboard from './components/who-to-onboard';
+import StepAuth from './components/step-auth';
+import StepBO from './components/step-bo';
+import StepBusiness from './components/step-business';
+import StepDocOnly from './components/step-doc-only';
+import StepKind from './components/step-kind';
+import StepPerson from './components/step-kyc';
+import Name from './components/step-name';
+import OnboardingTemplates from './components/step-onboarding-templates';
+import StepResidency from './components/step-residency';
+import StepVerificationChecks from './components/step-verification-checks';
 import useCreatePlaybook from './hooks/use-create-playbook';
 import useOptions from './hooks/use-options';
 import { getFixedAuthPlaybook, getFixedIdDocPlaybook, getFixedTemplatePlaybook } from './utils/fixed-playbook';
@@ -48,12 +49,13 @@ const Router = ({ onCreate }: RouterProps) => {
   });
   const options = allOptions[kind];
   const { currentOption, currentSubOption } = getCurrentOption({
-    value: state.value as string,
+    value: state.value,
     options,
   });
+
   const defaultValues = getDefaultValues(state.context);
-  const idDocKinds = state.context.playbook?.personal.docs.global;
-  const countrySpecificIdDocKinds = state.context.playbook?.personal.docs.country;
+  const idDocKinds = state.context.playbook?.person.docs.gov.global;
+  const countrySpecificIdDocKinds = state.context.playbook?.person.docs.gov.country;
   const requiresIdDoc = (idDocKinds ?? []).length > 0 || Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
 
   const createPlaybook = (
@@ -78,6 +80,7 @@ const Router = ({ onCreate }: RouterProps) => {
       canAccessData,
       cipKind,
       documentsToCollect,
+      businessDocumentsToCollect,
       documentTypesAndCountries,
       internationalCountryRestrictions,
       isDocFirstFlow,
@@ -112,6 +115,7 @@ const Router = ({ onCreate }: RouterProps) => {
         canAccessData,
         cipKind,
         documentsToCollect,
+        businessDocumentsToCollect,
         documentTypesAndCountries,
         enhancedAml,
         internationalCountryRestrictions,
@@ -195,8 +199,8 @@ const Router = ({ onCreate }: RouterProps) => {
           onChange={option => {
             if (option.value === 'nameYourPlaybook') {
               send('nameYourPlaybookSelected');
-            } else if (option.value === 'whoToOnboard') {
-              send('whoToOnboardSelected');
+            } else if (option.value === 'kind') {
+              send('kindSelected');
             } else if (option.value === 'settingsKyc') {
               send('settingsKycSelected');
             } else if (option.value === 'settingBusiness') {
@@ -216,11 +220,11 @@ const Router = ({ onCreate }: RouterProps) => {
         />
       </StepperContainer>
       <Content>
-        {state.matches('whoToOnboard') && (
-          <WhoToOnboard
+        {state.matches('kind') && (
+          <StepKind
             defaultKind={state.context.kind}
             onSubmit={payload => {
-              send('whoToOnboardSubmitted', { payload });
+              send('kindSubmitted', { payload });
             }}
           />
         )}
@@ -239,7 +243,7 @@ const Router = ({ onCreate }: RouterProps) => {
           />
         )}
         {state.matches('residency') && (
-          <Residency
+          <StepResidency
             defaultValues={defaultValues.residency}
             onBack={() => {
               send('navigationBackward');
@@ -247,9 +251,8 @@ const Router = ({ onCreate }: RouterProps) => {
             onSubmit={formData => {
               const { allowInternationalResidents } = formData;
               if (allowInternationalResidents) {
-                defaultValues.playbook.personal.ssn = false;
-                (defaultValues.playbook.personal as Personal).ssnOptional = false;
-                (defaultValues.playbook.personal as Personal).ssnKind = undefined;
+                defaultValues.playbook.person.basic.ssn.collect = false;
+                defaultValues.playbook.person.basic.ssn.optional = false;
               }
               send('residencySubmitted', {
                 payload: { formData },
@@ -274,7 +277,7 @@ const Router = ({ onCreate }: RouterProps) => {
           />
         )}
         {state.matches('settingsKyc') && (
-          <SettingsKyc
+          <StepPerson
             defaultValues={defaultValues.playbook}
             meta={{
               kind: state.context.kind || defaultValues.playbook.kind,
@@ -287,8 +290,39 @@ const Router = ({ onCreate }: RouterProps) => {
             onSubmit={handleSubmitDataToCollect}
           />
         )}
+        {state.matches({ settingsKyb: 'settingsBusiness' }) && (
+          <StepBusiness
+            defaultValues={defaultValues.playbook}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
+              send('playbookSubmitted', {
+                payload: { formData },
+              });
+            }}
+          />
+        )}
+        {state.matches({ settingsKyb: 'settingsBo' }) && (
+          <StepBO
+            meta={{
+              kind: state.context.kind || defaultValues.playbook.kind,
+              residency: state.context.residencyForm || defaultValues.residency,
+              onboardingTemplate,
+            }}
+            defaultValues={defaultValues.playbook}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
+              send('playbookSubmitted', {
+                payload: { formData },
+              });
+            }}
+          />
+        )}
         {state.matches('settingsAuth') && (
-          <SettingsAuth
+          <StepAuth
             defaultValues={defaultValues.playbook}
             onBack={() => {
               send('navigationBackward');
@@ -298,7 +332,7 @@ const Router = ({ onCreate }: RouterProps) => {
           />
         )}
         {state.matches('settingsDocOnly') && (
-          <SettingsDocOnly
+          <StepDocOnly
             defaultValues={defaultValues.playbook}
             onBack={() => {
               send('navigationBackward');
@@ -308,7 +342,7 @@ const Router = ({ onCreate }: RouterProps) => {
           />
         )}
         {state.matches('verificationChecks') && (
-          <VerificationChecks
+          <StepVerificationChecks
             defaultAmlValues={defaultValues.aml}
             onBack={() => {
               send('navigationBackward');
@@ -321,8 +355,8 @@ const Router = ({ onCreate }: RouterProps) => {
             requiresDoc={requiresIdDoc}
             allowInternationalResident={state.context.residencyForm?.allowInternationalResidents}
             isKyb={state.context.kind === 'kyb'}
-            collectBO={state.context.playbook?.businessInformation?.business_beneficial_owners}
-            businessInfo={state.context.playbook?.businessInformation}
+            collectBO={state.context.playbook?.business?.basic.collectBOInfo}
+            businessInfo={state.context.playbook?.business}
           />
         )}
       </Content>
@@ -349,6 +383,7 @@ const StepperContainer = styled.div`
 const Content = styled.div`
   grid-area: content;
 
+
   @media (max-width: 960px) {
     display: flex;
     justify-content: center;
@@ -367,6 +402,7 @@ const Content = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 520px;
   }
 `;
 

@@ -9,26 +9,8 @@ const useSelectedDocuments = (preselectedDocs: DocSelectorOptionType[], selected
   const [selectedDocuments, setSelectedDocuments] = useState<DocSelectorOptionType[]>(preselectedDocs);
 
   useEffect(() => {
-    const sortFn = (
-      a: {
-        value: string;
-        label: string;
-      },
-      b: {
-        value: string;
-        label: string;
-      },
-    ) => {
-      if (a.value > b.value) {
-        return 1;
-      }
-      if (a.value < b.value) {
-        return -1;
-      }
-      return 0;
-    };
-    const sortedSelectedDocuments = selectedDocuments.toSorted(sortFn);
-    const sortedPreSelectedDocuments = preselectedDocs.toSorted(sortFn);
+    const sortedSelectedDocuments = [...selectedDocuments].sort((a, b) => a.value.localeCompare(b.value));
+    const sortedPreSelectedDocuments = [...preselectedDocs].sort((a, b) => a.value.localeCompare(b.value));
     if (!isEqual(sortedPreSelectedDocuments, sortedSelectedDocuments)) {
       setSelectedDocuments(preselectedDocs);
     }

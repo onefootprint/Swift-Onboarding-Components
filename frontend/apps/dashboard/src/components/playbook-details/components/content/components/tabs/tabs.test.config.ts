@@ -36,6 +36,7 @@ const playbookFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export default playbookFixture;

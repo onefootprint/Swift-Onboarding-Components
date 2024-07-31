@@ -119,6 +119,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
+    businessDocumentsToCollect: [],
   },
 ];
 

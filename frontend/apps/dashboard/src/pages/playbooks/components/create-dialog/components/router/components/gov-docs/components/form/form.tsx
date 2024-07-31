@@ -20,9 +20,9 @@ const Form = ({ onClose }: FormProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [originalValue] = useState(() => {
     return {
-      global: watch('personal.docs.global'),
-      country: watch('personal.docs.country'),
-      selfie: watch('personal.docs.selfie'),
+      global: watch('person.docs.gov.global'),
+      country: watch('person.docs.gov.country'),
+      selfie: watch('person.docs.gov.selfie'),
     };
   });
   const {
@@ -36,15 +36,15 @@ const Form = ({ onClose }: FormProps) => {
   }, [containerRef]);
 
   const handleCancel = () => {
-    setValue('personal.docs.global', originalValue.global);
-    setValue('personal.docs.country', originalValue.country);
-    setValue('personal.docs.selfie', originalValue.selfie);
+    setValue('person.docs.gov.global', originalValue.global);
+    setValue('person.docs.gov.country', originalValue.country);
+    setValue('person.docs.gov.selfie', originalValue.selfie);
     onClose();
   };
 
   const handleRemoveAll = () => {
-    setValue('personal.docs.global', []);
-    setValue('personal.docs.country', {});
+    setValue('person.docs.gov.global', []);
+    setValue('person.docs.gov.country', {});
     onClose();
   };
 

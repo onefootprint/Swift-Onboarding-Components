@@ -54,6 +54,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export const backtestedRulesFixture: RuleBacktestingData = {

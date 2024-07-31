@@ -12,7 +12,7 @@ type GovDocsProps = {
 };
 
 const GovDocs = ({ global = [], countrySpecific = {}, hasSelfie = false }: GovDocsProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.gov-docs' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.gov-docs' });
   const globalList = useIdDocList(global);
   const hasGlobal = globalList.length > 0;
   const hasCountrySpecific = Object.keys(countrySpecific).length > 0;

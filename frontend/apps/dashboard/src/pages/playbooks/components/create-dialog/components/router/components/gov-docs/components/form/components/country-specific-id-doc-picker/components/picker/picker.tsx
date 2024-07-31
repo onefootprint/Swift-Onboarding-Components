@@ -24,8 +24,8 @@ type PickerProps = {
 const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProps) => {
   const { t } = useTranslation('common');
   const { watch } = useFormContext();
-  const countryDocMap = watch('personal.docs.country');
-  const globalDocs = watch('personal.docs.global');
+  const countryDocMap = watch('person.docs.gov.country');
+  const globalDocs = watch('person.docs.gov.global');
   const editingCountry = editingCountryDocMap ? Object.keys(editingCountryDocMap)[0] : null;
   const editingCountryRecord = COUNTRIES.find(country => country.value === editingCountry);
   const editingDocs = editingCountryDocMap ? editingCountryDocMap[editingCountry as CountryCode] : null;

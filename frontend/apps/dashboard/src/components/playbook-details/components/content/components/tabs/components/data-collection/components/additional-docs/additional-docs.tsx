@@ -1,11 +1,9 @@
 import { FontVariant } from '@onefootprint/design-tokens';
-import { IcoInfo16 } from '@onefootprint/icons';
 import { IcoCode216, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
 import { type DocumentRequestConfig, DocumentRequestKind } from '@onefootprint/types';
-import { Box, Button, Dropdown, Popover, Stack, Text } from '@onefootprint/ui';
+import { Box, Popover, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 type AdditionalDocsProps = {
   docs: DocumentRequestConfig[];

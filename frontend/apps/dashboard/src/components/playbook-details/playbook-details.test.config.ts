@@ -39,6 +39,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   },
   documentsToCollect: null,
   promptForPasskey: true,
+  businessDocumentsToCollect: [],
 };
 
 export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>

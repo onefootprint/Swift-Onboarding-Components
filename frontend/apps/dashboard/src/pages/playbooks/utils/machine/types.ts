@@ -1,12 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { CountryCode, CustomDI } from '@onefootprint/types';
-import {
-  CollectedDocumentDataOption,
-  CollectedInvestorProfileDataOption,
-  CollectedKybDataOption,
-  CollectedKycDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
+import { CollectedDocumentDataOption, CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 
 export enum PlaybookKind {
   Auth = 'auth',
@@ -18,9 +12,8 @@ export enum PlaybookKind {
 
 export type DataToCollectFormData = {
   kind: PlaybookKind;
-  personal: Personal;
-  businessInformation?: BusinessInformation;
-  [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
+  person: Person;
+  business?: Business;
 };
 
 export type DataToCollectMeta = {
@@ -177,253 +170,336 @@ export type AdditionalDocs = {
   custom?: CustomDoc[];
 };
 
-export type Personal = {
-  [CollectedKycDataOption.email]: boolean;
-  [CollectedKycDataOption.phoneNumber]: boolean;
-  [CollectedKycDataOption.dob]: boolean;
-  [CollectedKycDataOption.usLegalStatus]: boolean;
-  [CollectedKycDataOption.address]: boolean;
-  ssn: boolean;
-  ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  docs: GovDocs;
-  additionalDocs: AdditionalDocs;
-  ssnOptional?: boolean;
-  usTaxIdAcceptable?: boolean;
+export type Person = {
+  basic: {
+    email: boolean;
+    phoneNumber: boolean;
+    dob: boolean;
+    usLegalStatus: boolean;
+    address: boolean;
+    ssn: {
+      collect: boolean;
+      optional: boolean;
+      kind: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
+    };
+    usTaxIdAcceptable: boolean;
+  };
+  docs: {
+    gov: GovDocs;
+    additional: AdditionalDocs;
+  };
+  investorProfile: boolean;
 };
 
-export type BusinessInformation = {
-  [CollectedKybDataOption.name]: boolean;
-  [CollectedKybDataOption.beneficialOwners]: boolean;
-  [CollectedKybDataOption.address]: boolean;
-  [CollectedKybDataOption.tin]: boolean;
-  [CollectedKybDataOption.corporationType]: boolean;
-  [CollectedKybDataOption.website]: boolean;
-  [CollectedKybDataOption.phoneNumber]: boolean;
+export type Business = {
+  basic: {
+    address: boolean;
+    collectBOInfo: boolean;
+    name: boolean;
+    phoneNumber: boolean;
+    tin: boolean;
+    type: boolean;
+    website: boolean;
+  };
+  docs: {
+    custom: CustomDoc[];
+  };
 };
 
 export const defaultBusinessInformation = {
-  [CollectedKybDataOption.name]: true,
-  [CollectedKybDataOption.beneficialOwners]: true,
-  [CollectedKybDataOption.address]: true,
-  [CollectedKybDataOption.tin]: true,
-  [CollectedKybDataOption.corporationType]: false,
-  [CollectedKybDataOption.website]: false,
-  [CollectedKybDataOption.phoneNumber]: false,
+  basic: {
+    address: true,
+    collectBOInfo: true,
+    name: true,
+    phoneNumber: false,
+    tin: true,
+    type: false,
+    website: false,
+  },
+  docs: {
+    custom: [],
+  },
 };
 
-export const defaultPlaybookValuesAuth = {
-  aml: defaultAmlFormData,
-  name: { kind: PlaybookKind.Auth, name: '' },
-  playbook: {
-    kind: PlaybookKind.Auth,
-    investor_profile: false,
-    personal: {
-      email: true,
-      phone_number: true,
+export const defaultPlaybookValuesAuth: DataToCollectFormData = {
+  kind: PlaybookKind.Auth,
+  person: {
+    basic: {
+      address: false,
       dob: false,
-      full_address: false,
-      docs: {
-        global: [],
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: false,
+        optional: false,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
+    docs: {
+      gov: {
         country: {},
+        global: [],
         selfie: true,
       },
-      additionalDocs: {
+      additional: {
+        custom: [],
         poa: false,
         possn: false,
-        custom: [],
       },
-      name: false,
-      ssn: false,
-      us_legal_status: false,
     },
-  },
-  residency: {
-    allowUsResidents: true,
-    allowUsTerritories: false,
-    allowInternationalResidents: false,
   },
 };
 
 export const defaultPlaybookValuesKYC: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: false,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: true,
+        optional: false,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [],
-      country: {},
-      selfie: true,
+      gov: {
+        country: {},
+        global: [],
+        selfie: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: true,
-    ssnKind: CollectedKycDataOption.ssn9,
   },
-  [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
 export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: true,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: true,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: true,
+        optional: false,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [],
-      country: {},
-      selfie: true,
+      gov: {
+        country: {},
+        global: [],
+        selfie: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: true,
-    ssnKind: CollectedKycDataOption.ssn9,
   },
-  [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
 export const defaultPlaybookValuesApex: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: true,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: true,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: true,
+        optional: false,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [],
-      country: {},
-      selfie: true,
+      gov: {
+        country: {},
+        global: [],
+        selfie: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: true,
-    ssnKind: CollectedKycDataOption.ssn9,
   },
-  [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
 export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: false,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: true,
+        optional: true,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [
-        SupportedIdDocTypes.driversLicense,
-        SupportedIdDocTypes.passport,
-        SupportedIdDocTypes.idCard,
-        SupportedIdDocTypes.residenceDocument,
-        SupportedIdDocTypes.passportCard,
-        SupportedIdDocTypes.visa,
-        SupportedIdDocTypes.workPermit,
-      ],
-      country: {},
-      selfie: false,
+      gov: {
+        country: {},
+        global: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.residenceDocument,
+          SupportedIdDocTypes.passportCard,
+          SupportedIdDocTypes.visa,
+          SupportedIdDocTypes.workPermit,
+        ],
+        selfie: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: true,
-    ssnKind: CollectedKycDataOption.ssn9,
-    ssnOptional: true,
   },
 };
 
 export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: false,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: false,
+        optional: true,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [SupportedIdDocTypes.driversLicense],
-      country: {},
-      selfie: false,
-      idDocFirst: true,
+      gov: {
+        country: {},
+        global: [SupportedIdDocTypes.driversLicense],
+        selfie: true,
+        idDocFirst: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: false,
   },
 };
 
 export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
-  personal: {
-    [CollectedKycDataOption.address]: true,
-    [CollectedKycDataOption.dob]: true,
-    [CollectedKycDataOption.phoneNumber]: true,
-    [CollectedKycDataOption.usLegalStatus]: false,
-    email: true,
+  person: {
+    basic: {
+      address: true,
+      dob: true,
+      email: true,
+      phoneNumber: true,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: true,
+        optional: true,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [
-        SupportedIdDocTypes.driversLicense,
-        SupportedIdDocTypes.passport,
-        SupportedIdDocTypes.idCard,
-        SupportedIdDocTypes.passportCard,
-        SupportedIdDocTypes.visa,
-        SupportedIdDocTypes.residenceDocument,
-        SupportedIdDocTypes.workPermit,
-        SupportedIdDocTypes.voterIdentification,
-      ],
-      country: {},
-      selfie: false,
+      gov: {
+        country: {},
+        global: [
+          SupportedIdDocTypes.driversLicense,
+          SupportedIdDocTypes.passport,
+          SupportedIdDocTypes.idCard,
+          SupportedIdDocTypes.passportCard,
+          SupportedIdDocTypes.visa,
+          SupportedIdDocTypes.residenceDocument,
+          SupportedIdDocTypes.workPermit,
+          SupportedIdDocTypes.voterIdentification,
+        ],
+        selfie: true,
+        idDocFirst: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: true,
-    ssnKind: CollectedKycDataOption.ssn9,
-    ssnOptional: true,
   },
 };
 
 export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
   kind: PlaybookKind.DocOnly,
-  personal: {
-    email: false,
+  person: {
+    basic: {
+      address: false,
+      dob: false,
+      email: false,
+      phoneNumber: false,
+      usLegalStatus: false,
+      usTaxIdAcceptable: false,
+      ssn: {
+        collect: false,
+        optional: false,
+        kind: CollectedKycDataOption.ssn9,
+      },
+    },
+    investorProfile: false,
     docs: {
-      global: [],
-      country: {},
-      selfie: true,
+      gov: {
+        country: {},
+        global: [],
+        selfie: true,
+      },
+      additional: {
+        custom: [],
+        poa: false,
+        possn: false,
+      },
     },
-    additionalDocs: {
-      poa: false,
-      possn: false,
-    },
-    ssn: false,
-    [CollectedKycDataOption.phoneNumber]: false,
-    [CollectedKycDataOption.dob]: false,
-    [CollectedKycDataOption.usLegalStatus]: false,
-    [CollectedKycDataOption.address]: false,
   },
-  [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
 export const defaultPlaybookValuesKYB: DataToCollectFormData = {
   ...defaultPlaybookValuesKYC,
   kind: PlaybookKind.Kyb,
-  businessInformation: defaultBusinessInformation,
+  business: defaultBusinessInformation,
 };
 
 export enum OnboardingTemplate {
@@ -447,14 +523,14 @@ export type MachineContext = {
 export type MachineEvents =
   | { type: 'navigationBackward' }
   | { type: 'nameYourPlaybookSelected' }
-  | { type: 'whoToOnboardSelected' }
+  | { type: 'kindSelected' }
   | { type: 'settingsKycSelected' }
   | { type: 'settingBusinessSelected' }
   | { type: 'settingsBoSelected' }
   | { type: 'settingsDocOnlySelected' }
   | { type: 'settingsAuthSelected' }
   | { type: 'templateSelected' }
-  | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
+  | { type: 'kindSubmitted'; payload: { kind: PlaybookKind } }
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
   | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
   | { type: 'playbookSubmitted'; payload: { formData: DataToCollectFormData } }

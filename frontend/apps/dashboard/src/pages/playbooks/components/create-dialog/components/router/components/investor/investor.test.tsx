@@ -9,63 +9,69 @@ const renderInvestorProfile = ({ investorProfileAdded }: InvestorProfileWithCont
 };
 
 describe('<InvestorProfile />', () => {
-  it('should show default text when not yet added', () => {
-    renderInvestorProfile({ investorProfileAdded: false });
-    expect(
-      screen.getByText(
+  describe('when is not added', () => {
+    it('should show the empty text', () => {
+      renderInvestorProfile({ investorProfileAdded: false });
+
+      const emptyText = screen.getByText(
         "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-      ),
-    ).toBeInTheDocument();
-    const add = screen.getByRole('button', { name: 'Add' });
-    expect(add).toBeInTheDocument();
+      );
+      expect(emptyText).toBeInTheDocument();
+
+      const add = screen.getByRole('button', { name: 'Add' });
+      expect(add).toBeInTheDocument();
+    });
   });
 
-  it('should change to questions when toggled', async () => {
-    renderInvestorProfile({ investorProfileAdded: false });
-    const add = screen.getByRole('button', { name: 'Add' });
-    await userEvent.click(add);
-    await waitFor(() => {
+  describe('when is added', () => {
+    it('should show questions when default enabled', async () => {
+      renderInvestorProfile({ investorProfileAdded: true });
+
       const remove = screen.getByRole('button', { name: 'Remove' });
       expect(remove).toBeInTheDocument();
-    });
 
-    expect(screen.getByText("What's your employment status and occupation?")).toBeInTheDocument();
-    expect(screen.getByText("What's your annual income?")).toBeInTheDocument();
-    expect(screen.getByText("What's your net worth?")).toBeInTheDocument();
-    expect(screen.getByText('What are your investment goals?')).toBeInTheDocument();
-    expect(screen.getByText('How would you describe your risk tolerance?')).toBeInTheDocument();
-    expect(screen.getByText('Do any of the following apply to you or your immediate family?')).toBeInTheDocument();
+      const occupation = screen.getByText("What's your employment status and occupation?");
+      expect(occupation).toBeInTheDocument();
+
+      const annualIncome = screen.getByText("What's your annual income?");
+      expect(annualIncome).toBeInTheDocument();
+
+      const source = screen.getByText('What’s the source of your account funding?');
+      expect(source).toBeInTheDocument();
+
+      const netWorth = screen.getByText("What's your net worth?");
+      expect(netWorth).toBeInTheDocument();
+
+      const investmentGoals = screen.getByText('What are your investment goals?');
+      expect(investmentGoals).toBeInTheDocument();
+
+      const riskTolerance = screen.getByText('How would you describe your risk tolerance?');
+      expect(riskTolerance).toBeInTheDocument();
+
+      const family = screen.getByText('Do any of the following apply to you or your immediate family?');
+      expect(family).toBeInTheDocument();
+    });
   });
 
-  it('should show questions when default enabled', async () => {
-    renderInvestorProfile({ investorProfileAdded: true });
-    await waitFor(() => {
+  describe('when toggling', () => {
+    it('should change to questions when toggled', async () => {
+      renderInvestorProfile({ investorProfileAdded: false });
+      const add = screen.getByRole('button', { name: 'Add' });
+      await userEvent.click(add);
+      await waitFor(() => {
+        const remove = screen.getByRole('button', { name: 'Remove' });
+        expect(remove).toBeInTheDocument();
+      });
+    });
+
+    it('should change to empty text when toggled', async () => {
+      renderInvestorProfile({ investorProfileAdded: true });
       const remove = screen.getByRole('button', { name: 'Remove' });
-      expect(remove).toBeInTheDocument();
+      await userEvent.click(remove);
+      await waitFor(() => {
+        const add = screen.getByRole('button', { name: 'Add' });
+        expect(add).toBeInTheDocument();
+      });
     });
-
-    expect(screen.getByText("What's your employment status and occupation?")).toBeInTheDocument();
-    expect(screen.getByText("What's your annual income?")).toBeInTheDocument();
-    expect(screen.getByText("What's your net worth?")).toBeInTheDocument();
-    expect(screen.getByText('What are your investment goals?')).toBeInTheDocument();
-    expect(screen.getByText('How would you describe your risk tolerance?')).toBeInTheDocument();
-    expect(screen.getByText('Do any of the following apply to you or your immediate family?')).toBeInTheDocument();
-  });
-
-  it('should show "add" after remove is clicked', async () => {
-    renderInvestorProfile({ investorProfileAdded: true });
-    const remove = screen.getByRole('button', { name: 'Remove' });
-    await waitFor(() => {
-      expect(remove).toBeInTheDocument();
-    });
-    await userEvent.click(remove);
-
-    expect(
-      screen.getByText(
-        "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-      ),
-    ).toBeInTheDocument();
-    const add = screen.getByRole('button', { name: 'Add' });
-    expect(add).toBeInTheDocument();
   });
 });

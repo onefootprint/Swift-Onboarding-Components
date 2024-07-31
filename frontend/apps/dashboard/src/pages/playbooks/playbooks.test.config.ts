@@ -54,6 +54,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
+    businessDocumentsToCollect: [],
   },
   {
     id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
@@ -88,6 +89,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
+    businessDocumentsToCollect: [],
   },
   {
     id: 'ob_config_id_m35ER0O2UEaAOHyZa0oAKR',
@@ -122,6 +124,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
+    businessDocumentsToCollect: [],
   },
 ];
 

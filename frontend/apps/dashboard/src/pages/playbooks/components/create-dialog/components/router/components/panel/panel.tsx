@@ -11,7 +11,7 @@ export type PanelProps = {
 
 const Panel = ({ children, cta, title }: PanelProps) => {
   return (
-    <Container>
+    <Container aria-label={title} role="region">
       <Header>
         <Text variant="label-3">{title}</Text>
         {cta}
@@ -29,6 +29,7 @@ const Container = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[6]};
     padding: ${theme.spacing[5]} ${theme.spacing[6]};
+    width: 100%;
   `};
 `;
 

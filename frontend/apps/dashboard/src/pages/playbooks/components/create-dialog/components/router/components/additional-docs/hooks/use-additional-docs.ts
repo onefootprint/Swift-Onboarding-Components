@@ -3,10 +3,10 @@ import { useFormContext } from 'react-hook-form';
 
 const useAdditionalDocs = () => {
   const { watch } = useFormContext<DataToCollectFormData>();
-  const poa = watch('personal.additionalDocs.poa') || false;
-  const possn = watch('personal.additionalDocs.possn') || false;
-  const custom = watch('personal.additionalDocs.custom') || [];
-  const requireManualReview = watch('personal.additionalDocs.requireManualReview') || false;
+  const poa = watch('person.docs.additional.poa') || false;
+  const possn = watch('person.docs.additional.possn') || false;
+  const custom = watch('person.docs.additional.custom') || [];
+  const requireManualReview = watch('person.docs.additional.requireManualReview') || false;
 
   const hasPoA = !!poa;
   const hasPoSsn = !!possn;

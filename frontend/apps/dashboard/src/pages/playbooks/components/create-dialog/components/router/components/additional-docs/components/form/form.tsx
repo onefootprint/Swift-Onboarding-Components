@@ -21,10 +21,10 @@ const Form = ({ onClose }: FormProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [originalValue] = useState(() => {
     return {
-      poa: watch('personal.additionalDocs.poa'),
-      possn: watch('personal.additionalDocs.possn'),
-      custom: watch('personal.additionalDocs.custom'),
-      requireManualReview: watch('personal.additionalDocs.requireManualReview'),
+      poa: watch('person.docs.additional.poa'),
+      possn: watch('person.docs.additional.possn'),
+      custom: watch('person.docs.additional.custom'),
+      requireManualReview: watch('person.docs.additional.requireManualReview'),
     };
   });
   const {
@@ -38,29 +38,29 @@ const Form = ({ onClose }: FormProps) => {
   }, [containerRef]);
 
   const handleCancel = () => {
-    setValue('personal.additionalDocs.poa', originalValue.poa);
-    setValue('personal.additionalDocs.possn', originalValue.possn);
-    setValue('personal.additionalDocs.custom', originalValue.custom);
-    setValue('personal.additionalDocs.requireManualReview', originalValue.requireManualReview);
+    setValue('person.docs.additional.poa', originalValue.poa);
+    setValue('person.docs.additional.possn', originalValue.possn);
+    setValue('person.docs.additional.custom', originalValue.custom);
+    setValue('person.docs.additional.requireManualReview', originalValue.requireManualReview);
     onClose();
   };
 
   const handleRemoveAll = () => {
-    setValue('personal.additionalDocs.poa', false);
-    setValue('personal.additionalDocs.possn', false);
-    setValue('personal.additionalDocs.custom', []);
-    setValue('personal.additionalDocs.requireManualReview', false);
+    setValue('person.docs.additional.poa', false);
+    setValue('person.docs.additional.possn', false);
+    setValue('person.docs.additional.custom', []);
+    setValue('person.docs.additional.requireManualReview', false);
     onClose();
   };
 
   return (
     <Stack direction="column" gap={8} ref={containerRef}>
       <Stack gap={4} direction="column">
-        <Checkbox label={t('form.poa.label')} hint={t('form.poa.hint')} {...register('personal.additionalDocs.poa')} />
+        <Checkbox label={t('form.poa.label')} hint={t('form.poa.hint')} {...register('person.docs.additional.poa')} />
         <Checkbox
           label={t('form.possn.label')}
           hint={t('form.possn.hint')}
-          {...register('personal.additionalDocs.possn')}
+          {...register('person.docs.additional.possn')}
         />
         <Divider variant="secondary" />
         <CustomDocs />
@@ -70,7 +70,7 @@ const Form = ({ onClose }: FormProps) => {
             <Checkbox
               label={t('form.require-manual-review.label')}
               hint={t('form.require-manual-review.description')}
-              {...register('personal.additionalDocs.requireManualReview')}
+              {...register('person.docs.additional.requireManualReview')}
             />
           </Stack>
         </AnimatedContainer>

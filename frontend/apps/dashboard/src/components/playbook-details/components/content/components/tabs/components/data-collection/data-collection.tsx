@@ -23,6 +23,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
     documentTypesAndCountries,
     optionalData = [],
     documentsToCollect = [],
+    businessDocumentsToCollect = [],
   } = playbook;
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
@@ -54,6 +55,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
                 businessType: mustCollectData.includes('business_corporation_type'),
               }}
             />
+            <AdditionalDocs docs={businessDocumentsToCollect || []} />
           </Stack>
         </Stack>
       )}

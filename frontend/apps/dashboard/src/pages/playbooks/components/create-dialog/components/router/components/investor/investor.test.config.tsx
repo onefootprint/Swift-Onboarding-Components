@@ -12,13 +12,14 @@ export type InvestorProfileWithContextProps = {
 };
 
 const InvestorProfileWithContext = ({ investorProfileAdded }: InvestorProfileWithContextProps) => {
-  const defaultValues = {
-    ...defaultPlaybookValuesKYC,
-    [CollectedInvestorProfileDataOption.investorProfile]: investorProfileAdded,
-  };
-
   const formMethods = useForm<DataToCollectFormData>({
-    defaultValues,
+    defaultValues: {
+      ...defaultPlaybookValuesKYC,
+      person: {
+        ...defaultPlaybookValuesKYC.person,
+        investorProfile: investorProfileAdded,
+      },
+    },
   });
 
   return (

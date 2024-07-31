@@ -87,6 +87,7 @@ export type OnboardingConfig = {
   skipConfirm?: boolean;
   documentTypesAndCountries?: DocumentTypesAndCountries;
   documentsToCollect: DocumentRequestConfig[] | null;
+  businessDocumentsToCollect: DocumentRequestConfig[] | null;
   promptForPasskey: boolean;
   ruleSet: {
     version: number;

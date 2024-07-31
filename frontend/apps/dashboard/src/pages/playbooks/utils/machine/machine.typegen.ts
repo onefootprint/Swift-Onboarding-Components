@@ -13,28 +13,30 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignKind: 'kindSubmitted';
     assignNameYourPlaybook: 'nameYourPlaybookSubmitted';
     assignOnboardingTemplate: 'onboardingTemplatesSelected';
     assignPlaybook: 'playbookSubmitted';
     assignResidency: 'residencySubmitted';
     assignVerificationChecks: 'verificationChecksSubmitted';
-    assignWhoToOnboard: 'whoToOnboardSubmitted';
-    resetKind: 'navigationBackward' | 'whoToOnboardSelected';
-    resetOnboardingTemplate: 'navigationBackward' | 'templateSelected' | 'whoToOnboardSelected';
+    resetKind: 'kindSelected' | 'navigationBackward';
+    resetOnboardingTemplate: 'kindSelected' | 'navigationBackward' | 'templateSelected';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'kind'
     | 'nameYourPlaybook'
     | 'onboardingTemplates'
     | 'residency'
     | 'settingsAuth'
-    | 'settingsBo'
-    | 'settingsBusiness'
     | 'settingsDocOnly'
+    | 'settingsKyb'
+    | 'settingsKyb.settingsBo'
+    | 'settingsKyb.settingsBusiness'
     | 'settingsKyc'
     | 'verificationChecks'
-    | 'whoToOnboard';
+    | { settingsKyb?: 'settingsBo' | 'settingsBusiness' };
   tags: never;
 }

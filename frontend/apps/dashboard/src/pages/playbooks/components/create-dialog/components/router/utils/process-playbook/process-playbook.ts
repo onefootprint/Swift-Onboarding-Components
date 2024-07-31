@@ -9,11 +9,9 @@ import {
 
 import { isAuth, isDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
-  BusinessInformation,
   DataToCollectFormData,
   KybChecksKind,
   NameFormData,
-  Personal,
   ResidencyFormData,
 } from '@/playbooks/utils/machine/types';
 import {
@@ -22,10 +20,6 @@ import {
   OnboardingTemplate,
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
-
-type OptionalSSN = CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9 | undefined;
-
-type MandatorySSN = OptionalSSN | CollectedKycDataOption.usTaxId;
 
 type ProcessPlaybookProps = {
   kind: PlaybookKind;
@@ -43,36 +37,284 @@ type ProcessPlaybookProps = {
   };
 };
 
-// KYB field handling;
-const optionalKYBFields = [
-  CollectedKybDataOption.address,
-  CollectedKybDataOption.corporationType,
-  CollectedKybDataOption.website,
-  CollectedKybDataOption.phoneNumber,
-];
+const requiredKybFields = [CollectedKybDataOption.name, CollectedKybDataOption.tin];
 
-const isSsn9 = (x: unknown): x is CollectedKycDataOption.ssn9 => x === CollectedKycDataOption.ssn9;
-
-const getRequiredKybCollectFields = () => [CollectedKybDataOption.name, CollectedKybDataOption.tin];
-
-const getRequiredKycCollectFields = () => [
+const requiredKycFields = [
   CollectedKycDataOption.email,
   CollectedKycDataOption.name,
   CollectedKycDataOption.dob,
   CollectedKycDataOption.address,
 ];
 
-export const getMandatoryAndOptionalTaxIdFields = (x: Personal): [MandatorySSN, OptionalSSN] => {
-  const mandatory = !!x.ssn && !!x.ssnKind && !x.ssnOptional ? x.ssnKind : undefined;
-  const optional = !!x.ssnKind && !!x.ssnOptional ? x.ssnKind : undefined;
-
-  return [
-    isSsn9(mandatory) && x.usTaxIdAcceptable ? CollectedKycDataOption.usTaxId : mandatory,
-    isSsn9(mandatory) && x.usTaxIdAcceptable ? undefined : optional,
+const processPlaybook = ({
+  kind,
+  nameForm,
+  playbook,
+  residencyForm,
+  verificationChecks,
+  template,
+  skipKyc,
+  kycOptionForBeneficialOwners,
+}: ProcessPlaybookProps) => {
+  const mustCollectData = [
+    ...createPersonMustCollectDataPayload(playbook, kind),
+    ...createBusinessMustCollectDataPayload(playbook, kind, kycOptionForBeneficialOwners, skipKyc),
   ];
+  const optionalData = [...createPersonOptionalDataPayload(playbook, kind)];
+
+  return {
+    ...createResidencyPayload(residencyForm),
+    isDocFirstFlow: createIsDocFirstFlowPayload(playbook, kind),
+    businessDocumentsToCollect: createBusinessCustomDocsPayload(playbook, kind),
+    canAccessData: [...mustCollectData, ...optionalData],
+    cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
+    documentsToCollect: createPersonAdditionalDocsPayload(playbook, kind),
+    documentTypesAndCountries: createPersonGovDocsPayload(playbook, kind),
+    isNoPhoneFlow: createIsNoPhoneFlowPayload(playbook, kind),
+    mustCollectData,
+    name: createNamePayload(nameForm),
+    optionalData,
+    skipConfirm: createSkipConfirmPayload(kind),
+    skipKyc: createShouldSkipKyc(skipKyc || false, playbook),
+    verificationChecks: createVerificationChecksPayload({ kind, verificationChecks }),
+  };
 };
 
-const getVerificationChecks = ({
+const collectsBOInfo = (formData: DataToCollectFormData) => {
+  return !!formData.business?.basic.collectBOInfo;
+};
+
+const collectsPersonInfo = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  return isKyc(kind) || (isKyb(kind) && collectsBOInfo(formData));
+};
+
+//
+// Person
+const createPersonMustCollectDataPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  if (isAuth(kind)) {
+    return createAuthMustCollectDataPayload();
+  }
+  if (isDocOnly(kind)) {
+    return createIdDocOnlyMustCollectDataPayload(formData);
+  }
+  if (collectsPersonInfo(formData, kind)) {
+    return createPersonBasicMustCollectDataPayload(formData);
+  }
+  return [];
+};
+
+const createAuthMustCollectDataPayload = () => {
+  return [CollectedKycDataOption.email, CollectedKycDataOption.phoneNumber];
+};
+
+const createIdDocOnlyMustCollectDataPayload = (formData: DataToCollectFormData) => {
+  const { global = [], country, selfie } = formData.person.docs.gov;
+  const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
+  if (hasIdDocuments) {
+    return [selfie ? 'document_and_selfie' : 'document'];
+  }
+  return [];
+};
+
+const createPersonAdditionalDocsPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  const documentsToCollect: DocumentRequestConfig[] = [];
+  if (collectsPersonInfo(formData, kind) || isDocOnly(kind)) {
+    const { poa, possn, custom, requireManualReview } = formData.person.docs.additional;
+    if (poa) {
+      documentsToCollect.push({
+        kind: DocumentRequestKind.ProofOfAddress,
+        data: {
+          requiresHumanReview: !!requireManualReview,
+        },
+      });
+    }
+    if (possn) {
+      documentsToCollect.push({
+        kind: DocumentRequestKind.ProofOfSsn,
+        data: {
+          requiresHumanReview: !!requireManualReview,
+        },
+      });
+    }
+    if (custom) {
+      custom.forEach(doc => {
+        documentsToCollect.push({
+          kind: DocumentRequestKind.Custom,
+          data: {
+            description: doc.description,
+            identifier: `document.custom.${doc.identifier}` as CustomDI,
+            name: doc.name,
+            requiresHumanReview: !!requireManualReview,
+          },
+        });
+      });
+    }
+    return documentsToCollect;
+  }
+  return documentsToCollect;
+};
+
+const createPersonBasicMustCollectDataPayload = (formData: DataToCollectFormData) => {
+  const mustCollectData: CollectedDataOption[] = [...requiredKycFields];
+  const { basic, investorProfile } = formData.person;
+  const { ssn } = basic;
+  if (basic.phoneNumber) {
+    mustCollectData.push(CollectedKycDataOption.phoneNumber);
+  }
+  if (basic.usLegalStatus) {
+    mustCollectData.push(CollectedKycDataOption.usLegalStatus);
+  }
+  if (investorProfile) {
+    mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
+  }
+
+  if (ssn.collect && ssn.kind && !ssn.optional) {
+    if (ssn.kind === CollectedKycDataOption.ssn9 && basic.usTaxIdAcceptable) {
+      mustCollectData.push(CollectedKycDataOption.usTaxId);
+    }
+    mustCollectData.push(ssn.kind);
+  }
+  return [...mustCollectData, ...createIdDocOnlyMustCollectDataPayload(formData)];
+};
+
+const createPersonGovDocsPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  if (collectsPersonInfo(formData, kind) || isDocOnly(kind)) {
+    const { global = [], country = {} } = formData.person.docs.gov;
+    return { countrySpecific: country, global: global };
+  }
+  return { countrySpecific: {}, global: [] };
+};
+
+const createPersonOptionalDataPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  const mustCollectData: CollectedDataOption[] = [];
+  if (collectsPersonInfo(formData, kind)) {
+    const {
+      basic: { ssn },
+    } = formData.person;
+    if (ssn.collect && ssn.optional && ssn.kind) {
+      mustCollectData.push(ssn.kind);
+    }
+    return mustCollectData;
+  }
+  return mustCollectData;
+};
+
+//
+// Business
+const createBusinessMustCollectDataPayload = (
+  formData: DataToCollectFormData,
+  kind: PlaybookKind,
+  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners,
+  skipKyc?: boolean,
+) => {
+  if (!isKyb(kind) || !formData.business) {
+    return [];
+  }
+  const { business } = formData;
+  const mustCollectData: CollectedDataOption[] = [...requiredKybFields];
+
+  if (collectsBOInfo(formData)) {
+    if (skipKyc) {
+      mustCollectData.push(CollectedKybDataOption.beneficialOwners);
+    } else {
+      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.all) {
+        mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
+      }
+      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary) {
+        mustCollectData.push(CollectedKybDataOption.beneficialOwners);
+      }
+    }
+  }
+
+  if (business.basic.address) {
+    mustCollectData.push(CollectedKybDataOption.address);
+  }
+  if (business.basic.website) {
+    mustCollectData.push(CollectedKybDataOption.website);
+  }
+  if (business.basic.phoneNumber) {
+    mustCollectData.push(CollectedKybDataOption.phoneNumber);
+  }
+  if (business.basic.type) {
+    mustCollectData.push(CollectedKybDataOption.corporationType);
+  }
+
+  return mustCollectData;
+};
+
+const createBusinessCustomDocsPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  const documentsToCollect: DocumentRequestConfig[] = [];
+  if (!isKyb(kind)) {
+    return documentsToCollect;
+  }
+  const custom = formData.business?.docs.custom;
+  if (custom) {
+    custom.forEach(doc => {
+      documentsToCollect.push({
+        kind: DocumentRequestKind.Custom,
+        data: {
+          description: doc.description,
+          identifier: `document.custom.${doc.identifier}` as CustomDI,
+          name: doc.name,
+          requiresHumanReview: true,
+        },
+      });
+    });
+  }
+  return documentsToCollect;
+};
+
+//
+// Others
+const createIsDocFirstFlowPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  if (isKyc(kind)) {
+    const { idDocFirst = false } = formData.person.docs.gov;
+    return idDocFirst;
+  }
+  return false;
+};
+
+const createShouldSkipKyc = (skipKyc: boolean, formData: DataToCollectFormData) => {
+  // If we are not collecting beneficial owners, we should skip KYC by default
+  return collectsBOInfo(formData) ? true : skipKyc;
+};
+
+const createNamePayload = (nameForm: NameFormData) => {
+  return nameForm.name;
+};
+
+const createIsNoPhoneFlowPayload = (formData: DataToCollectFormData, kind: PlaybookKind) => {
+  const hasPhone = !!formData.person.basic;
+  return !hasPhone && !isDocOnly(kind);
+};
+
+const createResidencyPayload = (residencyForm?: ResidencyFormData) => {
+  if (!residencyForm) {
+    return {};
+  }
+  const { allowUsResidents, allowUsTerritories, allowInternationalResidents, restrictCountries, countryList } =
+    residencyForm;
+
+  if (restrictCountries === CountryRestriction.restrict && countryList) {
+    const internationalCountryRestrictions: string[] = [];
+    const countryListCode = countryList.map(country => country.value);
+    internationalCountryRestrictions.push(...countryListCode);
+    return {
+      allowUsResidents,
+      allowUsTerritories,
+      allowInternationalResidents,
+      internationalCountryRestrictions,
+    };
+  }
+  return {
+    allowUsResidents,
+    allowUsTerritories: allowInternationalResidents ? false : allowUsTerritories,
+    allowInternationalResidents,
+    internationalCountryRestrictions: null,
+  };
+};
+
+const createVerificationChecksPayload = ({
   verificationChecks,
   kind,
 }: {
@@ -99,222 +341,8 @@ const getVerificationChecks = ({
   }
   return null;
 };
-
-const getResidency = (residencyForm?: ResidencyFormData) => {
-  if (!residencyForm) {
-    return {};
-  }
-  const { allowUsResidents, allowUsTerritories, allowInternationalResidents, restrictCountries, countryList } =
-    residencyForm;
-
-  if (restrictCountries === CountryRestriction.restrict && countryList) {
-    const internationalCountryRestrictions: string[] = [];
-    const countryListCode = countryList.map(country => country.value);
-    internationalCountryRestrictions.push(...countryListCode);
-    return {
-      allowUsResidents,
-      allowUsTerritories,
-      allowInternationalResidents,
-      internationalCountryRestrictions,
-    };
-  }
-  return {
-    allowUsResidents,
-    allowUsTerritories: allowInternationalResidents ? false : allowUsTerritories,
-    allowInternationalResidents,
-    internationalCountryRestrictions: null,
-  };
-};
-
-const getNoBoKycOptions = ({
-  mustCollectData,
-  optionalData,
-  nameForm,
-  shouldSkipKyc,
-  residencyForm,
-}: {
-  mustCollectData: CollectedDataOption[];
-  optionalData: CollectedDataOption[];
-  nameForm: NameFormData;
-  shouldSkipKyc?: boolean;
-  residencyForm?: ResidencyFormData;
-}) => {
-  const { name } = nameForm;
-  const canAccessData = mustCollectData.concat(optionalData);
-  const skipConfirm = false;
-  return {
-    canAccessData,
-    isDocFirstFlow: false,
-    isNoPhoneFlow: false,
-    mustCollectData,
-    name,
-    optionalData,
-    skipConfirm,
-    skipKyc: shouldSkipKyc,
-    documentTypesAndCountries: {
-      countrySpecific: {},
-      global: [],
-    },
-    documentsToCollect: [],
-    ...getResidency(residencyForm),
-    cipKind: undefined,
-  };
-};
-
-const createGovDocsPayload = (formData: DataToCollectFormData) => {
-  const { global = [], country = {} } = formData.personal.docs;
-  return {
-    countrySpecific: country,
-    global: global,
-  };
-};
-
-const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
-  const documentsToCollect: DocumentRequestConfig[] = [];
-  const { poa, possn, custom, requireManualReview } = formData.personal.additionalDocs;
-  if (poa) {
-    documentsToCollect.push({
-      kind: DocumentRequestKind.ProofOfAddress,
-      data: {
-        requiresHumanReview: !!requireManualReview,
-      },
-    });
-  }
-  if (possn) {
-    documentsToCollect.push({
-      kind: DocumentRequestKind.ProofOfSsn,
-      data: {
-        requiresHumanReview: !!requireManualReview,
-      },
-    });
-  }
-  if (custom) {
-    custom.forEach(doc => {
-      documentsToCollect.push({
-        kind: DocumentRequestKind.Custom,
-        data: {
-          description: doc.description,
-          identifier: `document.custom.${doc.identifier}` as CustomDI,
-          name: doc.name,
-          requiresHumanReview: !!requireManualReview,
-        },
-      });
-    });
-  }
-  return documentsToCollect;
-};
-
-const processPlaybook = ({
-  kind,
-  nameForm,
-  playbook,
-  residencyForm,
-  verificationChecks,
-  template,
-  skipKyc,
-  kycOptionForBeneficialOwners,
-}: ProcessPlaybookProps) => {
-  const mustCollectData: CollectedDataOption[] = [];
-  const optionalData: CollectedDataOption[] = [];
-  const { personal, businessInformation } = playbook;
-  let shouldSkipKyc = skipKyc;
-
-  if (isKyb(kind) && businessInformation) {
-    const requiredKybFields = getRequiredKybCollectFields();
-    mustCollectData.push(...requiredKybFields);
-    const collectBO = businessInformation[CollectedKybDataOption.beneficialOwners];
-    if (collectBO && !skipKyc) {
-      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.all) {
-        mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
-      } else if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary) {
-        mustCollectData.push(CollectedKybDataOption.beneficialOwners);
-      }
-    } else if (collectBO && skipKyc) {
-      mustCollectData.push(CollectedKybDataOption.beneficialOwners);
-    } else if (!collectBO) {
-      // If we are not collecting beneficial owners, we should skip KYC by default
-      shouldSkipKyc = true;
-    }
-    optionalKYBFields.forEach(field => {
-      if (businessInformation[field as keyof BusinessInformation]) {
-        mustCollectData.push(field);
-      }
-    });
-  }
-  const omitBeneficialOwnersKycForKybPlaybook =
-    isKyb(kind) && !businessInformation?.[CollectedKybDataOption.beneficialOwners];
-
-  if (omitBeneficialOwnersKycForKybPlaybook) {
-    return {
-      ...getNoBoKycOptions({
-        mustCollectData,
-        optionalData,
-        nameForm,
-        shouldSkipKyc,
-        residencyForm,
-      }),
-      verificationChecks: getVerificationChecks({ verificationChecks, kind }),
-    };
-  }
-
-  const requiredKycFields = getRequiredKycCollectFields();
-  if (isAuth(kind)) {
-    mustCollectData.push(CollectedKycDataOption.email);
-  } else if (!isDocOnly(kind)) {
-    mustCollectData.push(...requiredKycFields);
-  }
-
-  // US Legal Status
-  if (personal[CollectedKycDataOption.usLegalStatus]) {
-    mustCollectData.push(CollectedKycDataOption.usLegalStatus);
-  }
-
-  // SSN handling
-  const [mandatorySSN, optionalSSN] = getMandatoryAndOptionalTaxIdFields(personal);
-  if (mandatorySSN) mustCollectData.push(mandatorySSN);
-  if (optionalSSN) optionalData.push(optionalSSN);
-
-  // no phone flows handling
-  if (personal[CollectedKycDataOption.phoneNumber]) {
-    mustCollectData.push(CollectedKycDataOption.phoneNumber);
-  }
-  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isDocOnly(kind);
-
-  // id doc handling
-  const { global = [], country, selfie, idDocFirst } = personal.docs;
-  const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
-  if (hasIdDocuments) {
-    mustCollectData.push(selfie ? 'document_and_selfie' : 'document');
-  }
-
-  // investor profile handling
-  if (playbook?.[CollectedInvestorProfileDataOption.investorProfile] && isKyc(kind)) {
-    mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
-  }
-
-  const { name } = nameForm;
-  // We removed the ability to configure canAccessData separately from mustCollectData (and optionalData).
-  // No tenants are currently using this, so we simplify the playbook creation flow by always
-  // assuming canAccess = mustCollect + optional
-  const canAccessData = mustCollectData.concat(optionalData);
-
-  const skipConfirm = isDocOnly(kind);
-
-  return {
-    canAccessData,
-    isDocFirstFlow: idDocFirst,
-    isNoPhoneFlow,
-    mustCollectData,
-    name,
-    optionalData,
-    skipConfirm,
-    skipKyc: shouldSkipKyc,
-    documentTypesAndCountries: createGovDocsPayload(playbook),
-    documentsToCollect: createAdditionalDocsPayload(playbook),
-    verificationChecks: getVerificationChecks({ kind, verificationChecks }),
-    ...getResidency(residencyForm),
-    cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
-  };
+const createSkipConfirmPayload = (kind: PlaybookKind) => {
+  return isDocOnly(kind);
 };
 
 export default processPlaybook;

@@ -20,34 +20,38 @@ const GlobalIdDocPicker = () => {
           <Checkbox
             value={SupportedIdDocTypes.driversLicense}
             label={tDocs('drivers_license')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
-          <Checkbox value={SupportedIdDocTypes.idCard} label={tDocs('id_card')} {...register('personal.docs.global')} />
+          <Checkbox
+            value={SupportedIdDocTypes.idCard}
+            label={tDocs('id_card')}
+            {...register('person.docs.gov.global')}
+          />
           <Checkbox
             value={SupportedIdDocTypes.passport}
             label={tDocs('passport')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
           <Checkbox
             value={SupportedIdDocTypes.passportCard}
             label={tDocs('passport_card')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
-          <Checkbox value={SupportedIdDocTypes.visa} label={tDocs('visa')} {...register('personal.docs.global')} />
+          <Checkbox value={SupportedIdDocTypes.visa} label={tDocs('visa')} {...register('person.docs.gov.global')} />
           <Checkbox
             value={SupportedIdDocTypes.residenceDocument}
             label={tDocs('residence_document')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
           <Checkbox
             value={SupportedIdDocTypes.workPermit}
             label={tDocs('permit')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
           <Checkbox
             value={SupportedIdDocTypes.voterIdentification}
             label={tDocs('voter_identification')}
-            {...register('personal.docs.global')}
+            {...register('person.docs.gov.global')}
           />
         </Grid.Container>
       </Stack>
