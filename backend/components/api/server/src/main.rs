@@ -3,10 +3,13 @@
 
 use actix_web::dev::Service;
 use actix_web::http::KeepAlive;
+use actix_web::HttpMessage;
 use api_core::config::Config;
+use api_core::utils::timeouts::ResponseDeadline;
 use api_core::*;
 use clap::Parser;
 use clap::Subcommand;
+use std::time::Duration;
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
 use anyhow::Context;
@@ -149,27 +152,27 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
 
         App::new()
             .app_data(web::Data::new(state.clone()))
-            // .wrap_fn(|req, srv| {
-            //     // Set a timeout slightly below the ALB timeout to ensure that the API server
-            //     // generates its own timeouts in most cases. Otherwise, the ALB will return a 504
-            //     // to the client but the API server will continue processing the request,
-            //     // potentially yielding a different status code.
+            .wrap_fn(|req, srv| {
+                // Set a timeout slightly below the ALB timeout to ensure that the API server
+                // generates its own timeouts in most cases. Otherwise, the ALB will return a 504
+                // to the client but the API server will continue processing the request,
+                // potentially yielding a different status code.
 
-            //     let timeout = Duration::from_secs(58);
-            //     let deadline = ResponseDeadline::from_timeout(timeout);
-            //     req.extensions_mut().insert(deadline);
+                let timeout = Duration::from_secs(58);
+                let deadline = ResponseDeadline::from_timeout(timeout);
+                req.extensions_mut().insert(deadline);
 
-            //     let fut = srv.call(req);
-            //     let fut_with_timeout = actix_web::rt::time::timeout(timeout, fut);
-            //     async {
-            //         match fut_with_timeout.await {
-            //             Ok(res) => res,
-            //             Err(_) => {
-            //                 Err(ApiError::from(ApiCoreError::ResponseTimeout).into())
-            //             }
-            //         }
-            //     }
-            // })
+                let fut = srv.call(req);
+                let fut_with_timeout = actix_web::rt::time::timeout(timeout, fut);
+                async {
+                    match fut_with_timeout.await {
+                        Ok(res) => res,
+                        Err(_) => {
+                            Err(ApiError::from(ApiCoreError::ResponseTimeout).into())
+                        }
+                    }
+                }
+            })
             .wrap(request_metrics.clone()) // Export otel metrics for each API request
             // TODO also wrap RequestTracing::new()
             .wrap(
