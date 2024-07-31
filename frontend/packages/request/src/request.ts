@@ -161,7 +161,10 @@ export const useRequestError = () => {
   };
 };
 
-const getRequestOptions = (requestConfig: AxiosRequestConfig, extraOptions: { omitSessionId?: boolean } = {}) => {
+const getRequestOptions = (
+  requestConfig: AxiosRequestConfig,
+  extraOptions: { omitSessionId?: boolean; omitClientVersion?: boolean } = {},
+) => {
   const sessionId = getSessionId();
   return {
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -170,7 +173,7 @@ const getRequestOptions = (requestConfig: AxiosRequestConfig, extraOptions: { om
     ...requestConfig,
     headers: {
       'x-fp-session-id': extraOptions.omitSessionId ? undefined : sessionId,
-      'x-fp-client-version': clientVersion,
+      'x-fp-client-version': extraOptions.omitClientVersion ? undefined : clientVersion,
       ...requestConfig.headers,
     },
   };
@@ -184,7 +187,7 @@ const preservedKeys = (input: any) =>
 
 const request = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
-  extraOptions: { omitSessionId?: boolean } = {},
+  extraOptions: { omitSessionId?: boolean; omitClientVersion?: boolean } = {},
 ) => {
   const client = applyCaseMiddleware(axios.create(), { preservedKeys });
   const options = getRequestOptions(requestConfig, extraOptions);
