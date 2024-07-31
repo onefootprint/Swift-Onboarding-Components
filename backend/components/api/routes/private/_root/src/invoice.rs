@@ -45,7 +45,7 @@ async fn post(
     // We should make a separate task queue for lower-priority high latency operations
     state
         .db_pool
-        .db_query(move |conn| Task::create(conn, Utc::now(), task_data.into()))
+        .db_query(move |conn| Task::create(conn, Utc::now(), task_data))
         .await?;
 
     Ok(api_wire_types::Empty)

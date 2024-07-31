@@ -27,7 +27,6 @@ use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use newtypes::RunIncodeStuckWorkflowArgs;
-use newtypes::TaskData;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
 use paperclip::actix::api_v2_operation;
@@ -121,12 +120,10 @@ pub async fn post(
 async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &WorkflowId) -> FpResult<()> {
     let workflow_id = workflow_id.clone();
 
+    let task_data = RunIncodeStuckWorkflowArgs { workflow_id };
+    let scheduled_for = Utc::now() + Duration::seconds(30);
     db_pool
-        .db_query(move |conn| {
-            let task_data = TaskData::RunIncodeStuckWorkflow(RunIncodeStuckWorkflowArgs { workflow_id });
-            let scheduled_for = Utc::now() + Duration::seconds(30);
-            Task::create(conn, scheduled_for, task_data)
-        })
+        .db_query(move |conn| Task::create(conn, scheduled_for, task_data))
         .await?;
     Ok(())
 }

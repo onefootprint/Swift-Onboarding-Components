@@ -693,7 +693,7 @@ impl ScopedVault {
             is_live: self.is_live,
             webhook_event,
         };
-        Task::create(conn, Utc::now(), args.into())?;
+        Task::create(conn, Utc::now(), args)?;
         Ok(())
     }
 }

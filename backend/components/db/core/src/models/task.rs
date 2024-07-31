@@ -61,18 +61,20 @@ pub struct TaskUpdate {
 
 impl Task {
     #[tracing::instrument("Task::create", skip_all)]
-    pub fn create(
+    pub fn create<T: Into<TaskData>>(
         conn: &mut PgConn,
         scheduled_for: DateTime<Utc>,
-        task_data: TaskData,
+        task_data: T,
     ) -> Result<Task, DbError> {
+        let task_data = task_data.into();
+        let task_kind = TaskKind::from(&task_data);
         let new_task = NewTask {
             created_at: Utc::now(),
             scheduled_for,
-            task_data: task_data.clone(),
+            task_data,
             status: TaskStatus::Pending,
             num_attempts: 0,
-            max_lease_duration_s: Some(TaskKind::from(task_data).max_lease_duration().num_seconds() as i32),
+            max_lease_duration_s: Some(task_kind.max_lease_duration().num_seconds() as i32),
             last_leased_at: None,
         };
         let result = diesel::insert_into(task::table)

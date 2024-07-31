@@ -223,7 +223,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     error,
                     is_live: sv.is_live,
                 });
-                let task_data = sv.webhook_event(webhook_event).into();
+                let task_data = sv.webhook_event(webhook_event);
                 Task::create(conn, Utc::now(), task_data)?;
 
                 Ok(())
