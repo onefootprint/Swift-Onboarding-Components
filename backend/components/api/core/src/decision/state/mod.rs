@@ -6,6 +6,7 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
 use newtypes::WorkflowId;
+use std::time::Duration;
 use thiserror::Error;
 
 pub mod actions;
@@ -169,14 +170,25 @@ pub async fn run_incode_machine_and_workflow(
             let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
             // TODO: should or could this call handle_incode_request instead..?  yeah def cause then it can do
             // the new logic of setting latest_hard_error
-            let (machine, _) = machine
-                .run(&state.db_pool, &state.vendor_clients.incode)
-                .await
-                .map_err(|e| e.error)?;
-            if !machine.state.name().is_terminal() {
-                // we still timed out polling Incode and shouldn't proceed with running the workflow
-                tracing::error!("Re-running Incode machine did not succeed, not running Workflow");
-                return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
+            let timeout = Duration::from_secs(50);
+            let run_fut = machine.run(&state.db_pool, &state.vendor_clients.incode);
+            let fut_with_timeout = actix_web::rt::time::timeout(timeout, run_fut);
+
+            match fut_with_timeout.await {
+                Ok(Ok((machine, _))) => {
+                    if !machine.state.name().is_terminal() {
+                        // we still timed out polling Incode and shouldn't proceed with running the workflow
+                        tracing::error!("Re-running Incode machine did not succeed, not running Workflow");
+                        return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
+                    }
+                }
+                Ok(Err(e)) => {
+                    return Err(e.error);
+                }
+                Err(_) => {
+                    tracing::error!("Timeout running Incode machine via future cancellation");
+                    return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
+                }
             }
         }
     }
