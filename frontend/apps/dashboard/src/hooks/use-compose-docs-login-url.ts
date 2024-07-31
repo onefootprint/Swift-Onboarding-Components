@@ -1,5 +1,5 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
-import { AssumeRolePurpose, OrgAssumeRoleRequest } from '@onefootprint/types';
+import { AssumeRolePurpose } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 import { assumeRole } from './use-assume-auth-role/use-assume-auth-role';
@@ -23,7 +23,7 @@ const useComposeDocsLoginUrl = () => {
       authToken: auth,
       purpose: AssumeRolePurpose.docs,
     });
-    return `${DOCS_BASE_URL}/login?redirectUrl=${docsRedirectUrl}#${response.token}`;
+    return `${DOCS_BASE_URL}/auth?redirectUrl=${docsRedirectUrl}#${response.token}`;
   });
 };
 
