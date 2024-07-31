@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IcoUserCircle16 } from '@onefootprint/icons';
-import { Box, Divider, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { Divider, Stack, createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -10,6 +9,7 @@ import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 import { AssumeRolePurpose } from '@onefootprint/types';
+import CompanyName from './components/company-name';
 import NavDropdown from './components/nav-dropdown';
 import NavLink from './components/nav-link';
 import useRoutes from './hooks/use-routes/use-routes';
@@ -27,8 +27,6 @@ const Nav = () => {
   const routes = useRoutes();
   const tenantsQuery = useAuthRoles(dangerouslyCastedData.auth);
   const currTenantId = dangerouslyCastedData.org.id;
-  const { firstName, lastName, email } = dangerouslyCastedData.user;
-  const userName = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined;
   const tenants = moveTenantToFront(tenantsQuery.data ?? [], currTenantId);
 
   const onAssumeTenant = (tenantId: string) => {
@@ -79,26 +77,19 @@ const Nav = () => {
         paddingLeft={5}
         paddingRight={5}
         paddingTop={4}
+        height="56px"
       >
-        <Box marginTop={3} height={'100%'}>
-          <IcoUserCircle16 color="tertiary" />
-        </Box>
-        <Stack direction="column" width="100%" maxWidth="100%" overflow="auto">
-          <Text variant="body-3" color="primary" truncate width="100%">
-            {userName || email}
-          </Text>
-          <Text variant="body-4" color="tertiary" truncate width="100%">
-            {org?.name}
-          </Text>
-        </Stack>
-        <Box>
-          <NavDropdown
-            currTenantId={currTenantId}
-            onAssumeTenant={onAssumeTenant}
-            tenants={tenants}
-            user={dangerouslyCastedData.user}
-          />
-        </Box>
+        {org && (
+          <>
+            <CompanyName name={org.name} image={org.logoUrl} />
+            <NavDropdown
+              currTenantId={currTenantId}
+              onAssumeTenant={onAssumeTenant}
+              tenants={tenants}
+              user={dangerouslyCastedData.user}
+            />
+          </>
+        )}
       </Stack>
     </NavContainer>
   );
