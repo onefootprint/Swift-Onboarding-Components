@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:footprint_flutter/src/types/configuration.dart';
+import 'package:footprint_flutter/src/models/configuration.dart';
 import 'package:meta/meta.dart';
 
 @internal

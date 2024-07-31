@@ -205,6 +205,134 @@ class FootprintAppearanceVariables {
       this.radioSelectComponentsIconSelectedBg});
 
   @internal
+  FootprintAppearanceVariables.fromJson(Map<String, dynamic> json)
+      : borderRadius = json['borderRadius'] as String?,
+        colorError = json['colorError'] as String?,
+        colorWarning = json['colorWarning'] as String?,
+        colorSuccess = json['colorSuccess'] as String?,
+        colorAccent = json['colorAccent'] as String?,
+        borderColorError = json['borderColorError'] as String?,
+        linkColor = json['linkColor'] as String?,
+        dialogBg = json['dialogBg'] as String?,
+        dialogBoxShadow = json['dialogBoxShadow'] as String?,
+        dialogBorderRadius = json['dialogBorderRadius'] as String?,
+        fontFamily = json['fontFamily'] as String?,
+        labelColor = json['labelColor'] as String?,
+        labelFont = json['labelFont'] as String?,
+        inputBorderRadius = json['inputBorderRadius'] as String?,
+        inputBorderWidth = json['inputBorderWidth'] as String?,
+        inputFont = json['inputFont'] as String?,
+        inputHeight = json['inputHeight'] as String?,
+        inputPlaceholderColor = json['inputPlaceholderColor'] as String?,
+        inputColor = json['inputColor'] as String?,
+        inputBg = json['inputBg'] as String?,
+        inputBorderColor = json['inputBorderColor'] as String?,
+        inputHoverBg = json['inputHoverBg'] as String?,
+        inputHoverBorderColor = json['inputHoverBorderColor'] as String?,
+        inputFocusBg = json['inputFocusBg'] as String?,
+        inputFocusBorderColor = json['inputFocusBorderColor'] as String?,
+        inputFocusElevation = json['inputFocusElevation'] as String?,
+        inputErrorBg = json['inputErrorBg'] as String?,
+        inputErrorBorderColor = json['inputErrorBorderColor'] as String?,
+        inputErrorHoverBg = json['inputErrorHoverBg'] as String?,
+        inputErrorHoverBorderColor =
+            json['inputErrorHoverBorderColor'] as String?,
+        inputErrorFocusBg = json['inputErrorFocusBg'] as String?,
+        inputErrorFocusBorderColor =
+            json['inputErrorFocusBorderColor'] as String?,
+        inputErrorFocusElevation = json['inputErrorFocusElevation'] as String?,
+        hintColor = json['hintColor'] as String?,
+        hintErrorColor = json['hintErrorColor'] as String?,
+        hintFont = json['hintFont'] as String?,
+        linkButtonColor = json['linkButtonColor'] as String?,
+        linkButtonHoverColor = json['linkButtonHoverColor'] as String?,
+        linkButtonActiveColor = json['linkButtonActiveColor'] as String?,
+        linkButtonDestructiveColor =
+            json['linkButtonDestructiveColor'] as String?,
+        linkButtonDestructiveHoverColor =
+            json['linkButtonDestructiveHoverColor'] as String?,
+        linkButtonDestructiveActiveColor =
+            json['linkButtonDestructiveActiveColor'] as String?,
+        buttonBorderRadius = json['buttonBorderRadius'] as String?,
+        buttonBorderWidth = json['buttonBorderWidth'] as String?,
+        buttonElevation = json['buttonElevation'] as String?,
+        buttonElevationHover = json['buttonElevationHover'] as String?,
+        buttonElevationActive = json['buttonElevationActive'] as String?,
+        buttonOutlineOffset = json['buttonOutlineOffset'] as String?,
+        buttonPrimaryBg = json['buttonPrimaryBg'] as String?,
+        buttonPrimaryColor = json['buttonPrimaryColor'] as String?,
+        buttonPrimaryBorderColor = json['buttonPrimaryBorderColor'] as String?,
+        buttonPrimaryHoverBg = json['buttonPrimaryHoverBg'] as String?,
+        buttonPrimaryHoverColor = json['buttonPrimaryHoverColor'] as String?,
+        buttonPrimaryHoverBorderColor =
+            json['buttonPrimaryHoverBorderColor'] as String?,
+        buttonPrimaryActiveBg = json['buttonPrimaryActiveBg'] as String?,
+        buttonPrimaryActiveColor = json['buttonPrimaryActiveColor'] as String?,
+        buttonPrimaryActiveBorderColor =
+            json['buttonPrimaryActiveBorderColor'] as String?,
+        buttonPrimaryDisabledBg = json['buttonPrimaryDisabledBg'] as String?,
+        buttonPrimaryDisabledColor =
+            json['buttonPrimaryDisabledColor'] as String?,
+        buttonPrimaryDisabledBorderColor =
+            json['buttonPrimaryDisabledBorderColor'] as String?,
+        buttonPrimaryLoadingBg = json['buttonPrimaryLoadingBg'] as String?,
+        buttonPrimaryLoadingColor =
+            json['buttonPrimaryLoadingColor'] as String?,
+        buttonsPrimaryLoadingBorderColor =
+            json['buttonsPrimaryLoadingBorderColor'] as String?,
+        buttonSecondaryBg = json['buttonSecondaryBg'] as String?,
+        buttonSecondaryColor = json['buttonSecondaryColor'] as String?,
+        buttonSecondaryBorderColor =
+            json['buttonSecondaryBorderColor'] as String?,
+        buttonSecondaryHoverBg = json['buttonSecondaryHoverBg'] as String?,
+        buttonSecondaryHoverColor =
+            json['buttonSecondaryHoverColor'] as String?,
+        buttonSecondaryHoverBorderColor =
+            json['buttonSecondaryHoverBorderColor'] as String?,
+        buttonSecondaryActiveBg = json['buttonSecondaryActiveBg'] as String?,
+        buttonSecondaryActiveColor =
+            json['buttonSecondaryActiveColor'] as String?,
+        buttonSecondaryActiveBorderColor =
+            json['buttonSecondaryActiveBorderColor'] as String?,
+        buttonSecondaryDisabledBg =
+            json['buttonSecondaryDisabledBg'] as String?,
+        buttonSecondaryDisabledColor =
+            json['buttonSecondaryDisabledColor'] as String?,
+        buttonSecondaryDisabledBorderColor =
+            json['buttonSecondaryDisabledBorderColor'] as String?,
+        buttonSecondaryLoadingBg = json['buttonSecondaryLoadingBg'] as String?,
+        buttonSecondaryLoadingColor =
+            json['buttonSecondaryLoadingColor'] as String?,
+        dropdownBg = json['dropdownBg'] as String?,
+        dropdownHoverBg = json['dropdownHoverBg'] as String?,
+        dropdownBorderColor = json['dropdownBorderColor'] as String?,
+        dropdownBorderWidth = json['dropdownBorderWidth'] as String?,
+        dropdownBorderRadius = json['dropdownBorderRadius'] as String?,
+        dropdownElevation = json['dropdownElevation'] as String?,
+        dropdownColorPrimary = json['dropdownColorPrimary'] as String?,
+        dropdownColorSecondary = json['dropdownColorSecondary'] as String?,
+        dropdownFooterBg = json['dropdownFooterBg'] as String?,
+        radioSelectBg = json['radioSelectBg'] as String?,
+        radioSelectColor = json['radioSelectColor'] as String?,
+        radioSelectHoverColor = json['radioSelectHoverColor'] as String?,
+        radioSelectSelectedColor = json['radioSelectSelectedColor'] as String?,
+        radioSelectBorderRadius = json['radioSelectBorderRadius'] as String?,
+        radioSelectBorderWidth = json['radioSelectBorderWidth'] as String?,
+        radioSelectBorderColor = json['radioSelectBorderColor'] as String?,
+        radioSelectHoverBg = json['radioSelectHoverBg'] as String?,
+        radioSelectHoverBorderColor =
+            json['radioSelectHoverBorderColor'] as String?,
+        radioSelectSelectedBg = json['radioSelectSelectedBg'] as String?,
+        radioSelectSelectedBorderColor =
+            json['radioSelectSelectedBorderColor'] as String?,
+        radioSelectComponentsIconBg =
+            json['radioSelectComponentsIconBg'] as String?,
+        radioSelectComponentsIconHoverBg =
+            json['radioSelectComponentsIconHoverBg'] as String?,
+        radioSelectComponentsIconSelectedBg =
+            json['radioSelectComponentsIconSelectedBg'] as String?;
+
+  @internal
   Map<String, dynamic> toJson() {
     var map = {
       'borderRadius': borderRadius,
@@ -353,6 +481,60 @@ class FootprintAppearanceRules {
   });
 
   @internal
+  FootprintAppearanceRules.fromJson(Map<String, dynamic> json)
+      : button = json['button'] == null
+            ? null
+            : Map<String, String>.from(json['button']),
+        buttonHover = json['button:hover'] == null
+            ? null
+            : Map<String, String>.from(json['button:hover']),
+        buttonFocus = json['button:focus'] == null
+            ? null
+            : Map<String, String>.from(json['button:focus']),
+        buttonActive = json['button:active'] == null
+            ? null
+            : Map<String, String>.from(json['button:active']),
+        input = json['input'] == null
+            ? null
+            : Map<String, String>.from(json['input']),
+        inputHover = json['input:hover'] == null
+            ? null
+            : Map<String, String>.from(json['input:hover']),
+        inputFocus = json['input:focus'] == null
+            ? null
+            : Map<String, String>.from(json['input:focus']),
+        inputActive = json['input:active'] == null
+            ? null
+            : Map<String, String>.from(json['input:active']),
+        label = json['label'] == null
+            ? null
+            : Map<String, String>.from(json['label']),
+        hint = json['hint'] == null
+            ? null
+            : Map<String, String>.from(json['hint']),
+        link = json['link'] == null
+            ? null
+            : Map<String, String>.from(json['link']),
+        linkHover = json['link:hover'] == null
+            ? null
+            : Map<String, String>.from(json['link:hover']),
+        linkActive = json['link:active'] == null
+            ? null
+            : Map<String, String>.from(json['link:active']),
+        linkButton = json['linkButton'] == null
+            ? null
+            : Map<String, String>.from(json['linkButton']),
+        linkButtonHover = json['linkButton:hover'] == null
+            ? null
+            : Map<String, String>.from(json['linkButton:hover']),
+        linkButtonFocus = json['linkButton:focus'] == null
+            ? null
+            : Map<String, String>.from(json['linkButton:focus']),
+        linkButtonActive = json['linkButton:active'] == null
+            ? null
+            : Map<String, String>.from(json['linkButton:active']);
+
+  @internal
   Map<String, dynamic> toJson() {
     var map = {
       'button': button,
@@ -388,6 +570,16 @@ class FootprintAppearance {
     this.rules,
     this.variables,
   });
+
+  @internal
+  FootprintAppearance.fromJson(Map<String, dynamic> json)
+      : fontSrc = json['fontSrc'] as String?,
+        rules = json['rules'] == null
+            ? null
+            : FootprintAppearanceRules.fromJson(json['rules']),
+        variables = json['variables'] == null
+            ? null
+            : FootprintAppearanceVariables.fromJson(json['variables']);
 
   @internal
   Map<String, dynamic> toJson() {

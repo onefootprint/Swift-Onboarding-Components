@@ -1,8 +1,8 @@
 library;
 
 export 'src/footprint.dart';
-export 'src/types/configuration.dart';
-export 'src/types/appearance.dart';
-export 'src/types/bootstrap_data.dart';
-export 'src/types/l10n.dart';
-export 'src/types/options.dart';
+export 'src/models/configuration.dart';
+export 'src/models/appearance.dart';
+export 'src/models/bootstrap_data.dart';
+export 'src/models/l10n.dart';
+export 'src/models/options.dart';

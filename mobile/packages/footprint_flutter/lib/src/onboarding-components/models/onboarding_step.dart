@@ -1,0 +1,1 @@
+enum OnboardingStep { auth, onboard }

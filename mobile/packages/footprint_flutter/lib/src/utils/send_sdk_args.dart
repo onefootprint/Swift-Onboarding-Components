@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
-import 'package:footprint_flutter/src/types/configuration.dart';
+import 'package:footprint_flutter/src/models/configuration.dart';
 import 'package:http/http.dart' as http;
 
 class SdkArgsResponse {

@@ -1,7 +1,7 @@
-import 'package:footprint_flutter/src/types/appearance.dart';
-import 'package:footprint_flutter/src/types/bootstrap_data.dart';
-import 'package:footprint_flutter/src/types/l10n.dart';
-import 'package:footprint_flutter/src/types/options.dart';
+import 'package:footprint_flutter/src/models/appearance.dart';
+import 'package:footprint_flutter/src/models/bootstrap_data.dart';
+import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/models/options.dart';
 import 'package:meta/meta.dart';
 
 class FootprintConfiguration {
