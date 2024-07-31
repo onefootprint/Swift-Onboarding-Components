@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_DEFAULT } from '../../constants';
 
 type IdDocAnimationProps = {
   mode: 'loading' | 'success';

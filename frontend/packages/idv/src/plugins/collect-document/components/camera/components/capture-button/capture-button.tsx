@@ -1,9 +1,7 @@
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-
-const DEFAULT_OUTER_RADIUS = 72;
-const DEFAULT_INNER_RADIUS = 56;
+import { CAPTURE_BTN_DEFAULT_INNER_RADIUS, CAPTURE_BTN_DEFAULT_OUTER_RADIUS } from '../../../../constants';
 
 type CaptureButtonProps = {
   onClick: () => void;
@@ -31,14 +29,14 @@ const CaptureButton = ({ onClick, disabled = false, variant }: CaptureButtonProp
         aria-disabled={disabled}
         data-disabled={disabled}
         onClick={onClick}
-        $outerRadius={DEFAULT_OUTER_RADIUS}
+        $outerRadius={CAPTURE_BTN_DEFAULT_OUTER_RADIUS}
         data-dd-action-name="doc:take-photo"
       >
         {variant === 'round' ? (
           <InnerCircle
             aria-disabled={disabled}
             data-disabled={disabled}
-            $innerRadius={DEFAULT_INNER_RADIUS}
+            $innerRadius={CAPTURE_BTN_DEFAULT_INNER_RADIUS}
             data-dd-action-name="doc:take-photo"
           />
         ) : (

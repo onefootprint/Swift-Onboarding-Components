@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import { TRANSITION_DELAY_LONG } from '../../constants/transition-delay.constants';
+import { TRANSITION_DELAY_LONG } from '../../constants';
 import FadeInContainer from '../fade-in-container';
 import FeedbackIcon from '../feedback-icon';
 

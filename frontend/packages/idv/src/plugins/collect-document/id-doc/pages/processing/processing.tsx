@@ -11,7 +11,7 @@ import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
 import Success from '../../../components/success';
-import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../../constants/processing.constants';
+import { SLOW_CONNECTION_MESSAGE_TIMEOUT } from '../../../constants';
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
 import { bytesToMegabytes } from '../../../utils/capture';

@@ -2,6 +2,7 @@ import { useCountdownCustom } from '@onefootprint/hooks';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { REQUIRED_SUCCESSES, SELFIE_CHECK_INTERVAL, STATUS_CHANGE_DELAY } from '../../../constants';
 import type { CaptureStatus, Resolution, VideoRef } from '../types';
 import type { CardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
 import useFaceDetection, { FaceStatus } from './use-face-detection';
@@ -19,9 +20,6 @@ type AutoCaptureFaceProps = {
   videoSize: Resolution | undefined;
 };
 
-const SELFIE_CHECK_INTERVAL = 200; // We send a new capture from video every 200 milliseconds for selfie capture
-const REQUIRED_SUCCESSES = 2; // We will check if 2 tries were successful before considering it a complete success
-const STATUS_CHANGE_DELAY = 150; // We wait 150 ms before we change the status from ok to not-ok
 const CountDownProps = {
   countStart: 3, // This is an arbitray value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time
   intervalMs: STATUS_CHANGE_DELAY / 3,

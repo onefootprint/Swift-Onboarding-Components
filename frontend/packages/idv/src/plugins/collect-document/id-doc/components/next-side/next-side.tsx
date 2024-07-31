@@ -4,8 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
-import { TRANSITION_DELAY_DEFAULT } from '../../../constants/transition-delay.constants';
-import { imageIcons } from '../../constants/image-types';
+import { ImageIcons, TRANSITION_DELAY_DEFAULT } from '../../../constants';
 
 type NextSideProps = {
   nextSideImageType: IdDocImageTypes;
@@ -16,7 +15,7 @@ const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.id-doc.components.next-side',
   });
-  const Icon = imageIcons[nextSideImageType];
+  const Icon = ImageIcons[nextSideImageType];
 
   useTimeout(() => {
     onComplete();

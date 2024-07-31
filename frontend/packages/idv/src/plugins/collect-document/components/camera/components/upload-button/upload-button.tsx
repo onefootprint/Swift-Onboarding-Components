@@ -4,10 +4,9 @@ import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Logger } from '../../../../../../utils/logger';
+import { CAPTURE_BTN_DEFAULT_INNER_RADIUS } from '../../../../constants';
 import useProcessImage from '../../../../hooks/use-process-image';
 import type { CaptureKind } from '../../../../types';
-
-const BUTTON_RADIUS = 56;
 
 type UploadButtonProps = {
   onUploadBtnClick: () => void;
@@ -84,7 +83,7 @@ const UploadButton = ({
     <>
       <RoundButton
         onClick={handleUploadClick}
-        radius={BUTTON_RADIUS}
+        radius={CAPTURE_BTN_DEFAULT_INNER_RADIUS}
         disabled={isLoading}
         data-dd-action-name="doc:upload-photo"
       >

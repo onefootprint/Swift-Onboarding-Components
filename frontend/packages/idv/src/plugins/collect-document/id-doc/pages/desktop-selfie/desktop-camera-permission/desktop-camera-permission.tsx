@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../../components';
-import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../../constants/desktop-interaction-box.constants';
+import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../../../constants';
 import type { CameraPermissionState } from '../hooks/use-camera-permission';
 
 type DesktopCameraPermissionProps = {

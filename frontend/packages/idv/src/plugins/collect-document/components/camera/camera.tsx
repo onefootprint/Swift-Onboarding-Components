@@ -8,12 +8,18 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import { getLogger, trackAction } from '../../../../utils/logger';
-import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
+import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
   AUTOCAPTURE_START_DELAY,
   AUTOCAPTURE_TIMER_INTERVAL,
-} from '../../constants/transition-delay.constants';
+  AUTOCAPTURE_TIMER_START_VAL,
+  CAMERA_LOADING_FEEDBACK_DELAY,
+  FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP,
+  FEEFBACK_POSITION_FROM_BOTTOM_MOBILE,
+  FORCED_UPLOAD_DELAY,
+  PLAY_CHECK_INTERVAL,
+} from '../../constants';
 import type { CaptureKind } from '../../types';
 import {
   VideoEvents,
@@ -71,16 +77,10 @@ type CameraProps = {
   allowUpload: boolean;
 };
 
-const AUTOCAPTURE_TIMER_START_VAL = 3;
-const FEEFBACK_POSITION_FROM_BOTTOM_MOBILE = 150;
-const FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP = 50;
 const CountDownProps = {
   countStart: AUTOCAPTURE_TIMER_START_VAL,
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
-const PLAY_CHECK_INTERVAL = 1500;
-const FORCED_UPLOAD_DELAY = 7000;
-const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 
 const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'camera',

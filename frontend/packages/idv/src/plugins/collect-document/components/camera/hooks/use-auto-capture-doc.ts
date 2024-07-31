@@ -3,6 +3,7 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { DOC_DETECTION_PARAMS_BATCH_SIZE, REQUIRED_SUCCESSES, STATUS_CHANGE_DELAY } from '../../../constants';
 import type { CaptureStatus, DocSrcDimensions, Resolution, VideoRef } from '../types';
 import computeSrcDimensions, { docDrawer } from '../utils/auto-capture';
 import { CardCaptureStatus, getCardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
@@ -24,14 +25,6 @@ type AutoCaptureProps = {
   videoRef: VideoRef;
   videoSize: Resolution | undefined;
 };
-
-// const SELFIE_CHECK_INTERVAL = 200; // We send a new capture from video every 200 milliseconds for selfie capture
-const REQUIRED_SUCCESSES = 2; // We will check if 2 tries were successful before considering it a complete success
-const STATUS_CHANGE_DELAY = 150; // We wait 150 ms before we change the status from ok to not-ok
-
-// We pass through the graphics params set in batches of this size.
-// This is to make sure that the autocapture algorithm doesn't block the event queue for too long while passing through all params in one go
-const DOC_DETECTION_PARAMS_BATCH_SIZE = 1;
 
 const CountDownProps = {
   countStart: 3, // This is an arbitray value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time

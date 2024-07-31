@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
-import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
+import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import useProcessImage from '../../hooks/use-process-image';
 import transformCase from '../../id-doc/utils/transform-case';
 import type { CaptureKind, IdDocImageErrorType } from '../../types';

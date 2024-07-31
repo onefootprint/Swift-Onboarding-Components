@@ -9,7 +9,7 @@ import { NavigationHeader } from '../../../../../components';
 import DesktopHeader from '../../../components/desktop-header';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
 import ErrorComponent from '../../../components/error';
-import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interaction-box.constants';
+import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../../constants';
 import type { CaptureKind } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';

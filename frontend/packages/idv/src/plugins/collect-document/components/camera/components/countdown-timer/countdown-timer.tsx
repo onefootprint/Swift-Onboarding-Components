@@ -1,13 +1,12 @@
 import { Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { COUNTDOWN_TIMER_SIZE } from '../../../../constants';
 
 type CountdownTimerProps = {
   current: number;
   start: number;
 };
-
-const COUNTDOWN_TIMER_SIZE = 76;
 
 const CountdownTimer = ({ current, start }: CountdownTimerProps) => {
   if (start < current || current <= 0 || start <= 0) return null;

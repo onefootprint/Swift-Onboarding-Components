@@ -3,13 +3,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PhotoCapture from '../../../components/photo-capture/photo-capture';
+import { ID_OUTLINE_HEIGHT_RATIO, ID_OUTLINE_WIDTH_RATIO } from '../../../constants';
 import type { CaptureKind } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import transformCase from '../../utils/transform-case';
-
-const ID_OUTLINE_WIDTH_RATIO = 0.9;
-const ID_OUTLINE_HEIGHT_RATIO = 0.56;
 
 const FrontPhotoCapture = () => {
   const { t } = useTranslation('idv', {
