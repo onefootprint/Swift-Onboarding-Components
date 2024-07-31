@@ -28,7 +28,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
-  const composeDocsLoginUrl = useComposeDocsLoginUrl();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -38,19 +37,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const handleTenantChange = (tenantId: string) => {
     onAssumeTenant(tenantId);
     setIsOpen(false);
-  };
-
-  const redirectToDocsSite = (url: string) => () => {
-    composeDocsLoginUrl.mutate(url, {
-      onSuccess: docsSiteLink => {
-        window.open(docsSiteLink, '_blank');
-      },
-      onError: err => {
-        console.error(`Error generating authenticated docs site link: ${err}`);
-        // Open un-authed docs site in case of an error
-        window.open(`${DOCS_BASE_URL}/${url}`, '_blank');
-      },
-    });
   };
 
   return (
@@ -70,11 +56,11 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             ) : null}
             <Dropdown.Separator />
             <Dropdown.Group>
-              <StyledLink as="a" onClick={redirectToDocsSite('/')}>
+              <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
                 {t('help-links.documentation')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
-              <StyledLink as="a" onClick={redirectToDocsSite('/api-reference')}>
+              <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
                 {t('help-links.api-reference')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
