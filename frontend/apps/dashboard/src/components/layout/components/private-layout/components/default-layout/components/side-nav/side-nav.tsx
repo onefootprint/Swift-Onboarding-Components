@@ -8,7 +8,6 @@ import useAuthRoles from 'src/hooks/use-auth-roles';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
-import { AssumeRolePurpose } from '@onefootprint/types';
 import CompanyName from './components/company-name';
 import NavDropdown from './components/nav-dropdown';
 import NavLink from './components/nav-link';
@@ -32,7 +31,7 @@ const Nav = () => {
   const onAssumeTenant = (tenantId: string) => {
     const authToken = dangerouslyCastedData.auth;
     assumeRoleMutation.mutate(
-      { tenantId, authToken, purpose: AssumeRolePurpose.dashboard },
+      { tenantId, authToken },
       {
         async onSuccess({ token }) {
           await logIn({ auth: token });

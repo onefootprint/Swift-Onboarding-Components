@@ -1,8 +1,23 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
-import { AssumeRolePurpose } from '@onefootprint/types';
+import request from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
+import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
-import { assumeRole } from './use-assume-auth-role/use-assume-auth-role';
+
+type DocsTokenResponse = {
+  token: string;
+};
+
+const generateDocsToken = async (authToken: string) => {
+  const response = await request<DocsTokenResponse>({
+    method: 'POST',
+    url: '/org/auth/docs_token',
+    headers: {
+      [DASHBOARD_AUTHORIZATION_HEADER]: authToken,
+    },
+  });
+  return response.data;
+};
 
 /**
  * Creates the absolute URL to the docs site that will log the user into the docs site as the
@@ -11,19 +26,15 @@ import { assumeRole } from './use-assume-auth-role/use-assume-auth-role';
  */
 const useComposeDocsLoginUrl = () => {
   const {
-    data: { auth, org },
+    data: { auth },
   } = useSession();
 
   return useMutation(async (docsRedirectUrl: string) => {
-    if (!org?.id || !auth) {
+    if (!auth) {
       throw Error('User is not logged in');
     }
-    const response = await assumeRole({
-      tenantId: org?.id,
-      authToken: auth,
-      purpose: AssumeRolePurpose.docs,
-    });
-    return `${DOCS_BASE_URL}/auth?redirectUrl=${docsRedirectUrl}#${response.token}`;
+    const { token } = await generateDocsToken(auth);
+    return `${DOCS_BASE_URL}/login?redirectUrl=${docsRedirectUrl}#${token}`;
   });
 };
 

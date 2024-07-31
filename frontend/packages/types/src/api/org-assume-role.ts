@@ -7,13 +7,7 @@ export type OrgAssumeRoleResponse = {
   tenant: Organization;
 };
 
-export enum AssumeRolePurpose {
-  docs = 'docs',
-  dashboard = 'dashboard',
-}
-
 export type OrgAssumeRoleRequest = {
   tenantId: string;
   authToken: string;
-  purpose: AssumeRolePurpose;
 };

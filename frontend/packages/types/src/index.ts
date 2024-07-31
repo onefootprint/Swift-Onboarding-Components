@@ -234,7 +234,6 @@ export {
   getRequirement,
   IdentifyTokenScope,
   OnboardingRequirementKind,
-  AssumeRolePurpose,
   OrgAuthLoginTarget,
   SANDBOX_ID_HEADER,
   TokenKind,

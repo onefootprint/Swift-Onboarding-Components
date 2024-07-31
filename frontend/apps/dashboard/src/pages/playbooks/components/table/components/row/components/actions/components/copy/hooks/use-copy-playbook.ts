@@ -1,7 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
-  AssumeRolePurpose,
   type CopyPlaybookRequest,
   type CopyPlaybookResponse,
   type OnboardingConfig,
@@ -20,7 +19,6 @@ const copyPlaybook = async (authHeaders: AuthHeaders, { playbookId, name, isLive
     headers: authHeaders,
     data: {
       tenantId,
-      purpose: AssumeRolePurpose.dashboard,
     },
   });
 
