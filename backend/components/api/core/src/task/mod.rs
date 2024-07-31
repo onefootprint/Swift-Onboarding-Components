@@ -11,6 +11,7 @@ use db::models::task_execution::TaskExecutionUpdate;
 use db::DbError;
 use newtypes::TaskKind;
 use newtypes::TaskStatus;
+use tasks::generate_invoice::GenerateInvoiceTask;
 use tracing::Instrument;
 
 mod tasks;
@@ -107,6 +108,9 @@ async fn execute_task(task: Task, state: &State) -> FpResult<()> {
         newtypes::TaskData::FireWebhook(args) => FireWebhookTask::new(state.clone()).execute(args).await,
         newtypes::TaskData::RunIncodeStuckWorkflow(args) => {
             RunIncodeStuckWorkflowTask::new(state.clone()).execute(args).await
+        }
+        newtypes::TaskData::GenerateInvoice(args) => {
+            GenerateInvoiceTask::new(state.clone()).execute(args).await
         }
     }
 }

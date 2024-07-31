@@ -8,6 +8,7 @@ use crate::WatchlistCheckStatusKind;
 use crate::WorkflowId;
 use chrono::DateTime;
 use chrono::Duration;
+use chrono::NaiveDate;
 use chrono::Utc;
 use derive_more::Display;
 use diesel::sql_types::Text;
@@ -70,6 +71,7 @@ pub enum TaskData {
     WatchlistCheck(WatchlistCheckArgs),
     FireWebhook(FireWebhookArgs),
     RunIncodeStuckWorkflow(RunIncodeStuckWorkflowArgs),
+    GenerateInvoice(GenerateInvoiceArgs),
 }
 
 impl TaskData {
@@ -88,6 +90,7 @@ impl TaskKind {
             // happens
             TaskKind::FireWebhook => 3,
             TaskKind::RunIncodeStuckWorkflow => 3,
+            TaskKind::GenerateInvoice => 1,
         }
     }
 
@@ -98,6 +101,7 @@ impl TaskKind {
             TaskKind::WatchlistCheck => Duration::minutes(15),
             TaskKind::FireWebhook => Duration::seconds(30),
             TaskKind::RunIncodeStuckWorkflow => Duration::minutes(5),
+            TaskKind::GenerateInvoice => Duration::minutes(15),
         }
     }
 }
@@ -129,6 +133,12 @@ pub struct FireWebhookArgs {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RunIncodeStuckWorkflowArgs {
     pub workflow_id: WorkflowId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenerateInvoiceArgs {
+    pub tenant_id: TenantId,
+    pub billing_date: NaiveDate,
 }
 
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, EnumDiscriminants)]

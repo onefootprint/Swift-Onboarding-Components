@@ -6,12 +6,14 @@ use actix_web::web::{
 use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
-use billing::create_bill_for_tenant;
+use billing::generate_invoice_for_tenant;
 use chrono::Duration;
 use chrono::NaiveDate;
 use chrono::Utc;
+use db::models::task::Task;
 use db::models::tenant::Tenant;
 use futures::StreamExt;
+use newtypes::GenerateInvoiceArgs;
 use newtypes::TenantId;
 
 #[derive(Debug, serde::Deserialize)]
@@ -33,13 +35,18 @@ async fn post(
         billing_date,
     } = request.into_inner();
     let billing_date = billing_date.unwrap_or_else(|| Utc::now().date_naive());
+    let task_data = GenerateInvoiceArgs {
+        tenant_id,
+        billing_date,
+    };
 
-    let tenant = state
+    // Queue a task to generate the invoice, since it can take some time.
+    // NOTE: be careful using this as it can clog up our single task queue.
+    // We should make a separate task queue for lower-priority high latency operations
+    state
         .db_pool
-        .db_query(move |conn| Tenant::get(conn, &tenant_id))
+        .db_query(move |conn| Task::create(conn, Utc::now(), task_data.into()))
         .await?;
-
-    create_bill_for_tenant(&state.billing_client, &state.db_pool, tenant, billing_date).await?;
 
     Ok(api_wire_types::Empty)
 }
@@ -68,12 +75,8 @@ async fn post_all(
         std::pin::Pin<Box<dyn std::future::Future<Output = FpResult<()>>>>,
     >::new();
     for t in tenants {
-        tasks.push(Box::pin(create_bill_for_tenant(
-            &state.billing_client,
-            &state.db_pool,
-            t,
-            billing_date,
-        )))
+        let fut = generate_invoice_for_tenant(&state.billing_client, &state.db_pool, t.id, billing_date);
+        tasks.push(Box::pin(fut))
     }
     while tasks.next().await.is_some() {}
 

@@ -3,7 +3,7 @@ use anyhow::Result;
 use api_core::config::Config;
 use api_core::FpResult;
 use api_core::State;
-use billing::create_bill_for_tenant;
+use billing::generate_invoice_for_tenant;
 use chrono::Duration;
 use chrono::NaiveDate;
 use chrono::Utc;
@@ -39,12 +39,8 @@ impl GenerateInvoices {
         >::new();
         let num_tenants = tenants.len();
         for t in tenants {
-            tasks.push(Box::pin(create_bill_for_tenant(
-                &state.billing_client,
-                &state.db_pool,
-                t,
-                billing_date,
-            )))
+            let fut = generate_invoice_for_tenant(&state.billing_client, &state.db_pool, t.id, billing_date);
+            tasks.push(Box::pin(fut))
         }
         while tasks.next().await.is_some() {}
 

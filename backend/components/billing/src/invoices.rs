@@ -13,31 +13,33 @@ use db::DbPool;
 use db::DbResult;
 use itertools::chain;
 use newtypes::StripeCustomerId;
+use newtypes::TenantId;
 
-#[tracing::instrument(skip_all, fields(tenant_id=%tenant.id, billing_date))]
-pub async fn create_bill_for_tenant(
+#[tracing::instrument(skip_all, fields(tenant_id, billing_date))]
+pub async fn generate_invoice_for_tenant(
     client: &BillingClient,
     db_pool: &DbPool,
-    tenant: Tenant,
+    tenant_id: TenantId,
     billing_date: NaiveDate,
 ) -> FpResult<()> {
     let i = get_billing_interval(billing_date)?;
 
     // Count the number of billable uses of each product for this tenant
-    let t_id = tenant.id.clone();
-    let (billing_profile, counts) = db_pool
+    let (tenant, billing_profile, counts) = db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let tenant = Tenant::get(conn, &t_id)?;
+            let tenant = Tenant::get(conn, &tenant_id)?;
             if tenant.super_tenant_id.is_some() {
                 return ValidationError("Cannot generate invoice for subtenant").into();
             }
-            let children = Tenant::list_children(conn, &t_id)?;
-            let billing_profile = BillingProfile::get(conn, &t_id)?;
+            let children = Tenant::list_children(conn, &tenant_id)?;
+            let billing_profile = BillingProfile::get(conn, &tenant_id)?;
             let bp = billing_profile.as_ref();
 
             // Add up the count of each product used by the parent tenant and all children
-            let counts = chain!(Some(tenant), children)
-                .map(|t| BillingCounts::build_for_tenant(conn, &t.id, bp, &i).map(|counts| (t.id, counts)))
+            let counts = chain!(Some(&tenant), children.iter())
+                .map(|t| {
+                    BillingCounts::build_for_tenant(conn, &t.id, bp, &i).map(|counts| (t.id.clone(), counts))
+                })
                 .collect::<DbResult<Vec<_>>>()?;
             if counts.len() > 1 {
                 for (t_id, counts) in counts.iter() {
@@ -48,7 +50,7 @@ pub async fn create_bill_for_tenant(
                 .into_iter()
                 .map(|x| x.1)
                 .fold(BillingCounts::default(), |a, b| a + b);
-            Ok((billing_profile, counts))
+            Ok((tenant, billing_profile, counts))
         })
         .await?;
 
