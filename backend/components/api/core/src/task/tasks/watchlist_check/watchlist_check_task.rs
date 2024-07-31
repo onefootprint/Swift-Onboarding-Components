@@ -44,15 +44,10 @@ use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::WebhookEvent;
 
+#[derive(derive_more::Constructor)]
 pub(crate) struct WatchlistCheckTask {
     state: State,
     task_id: TaskId,
-}
-
-impl WatchlistCheckTask {
-    pub fn new(state: State, task_id: TaskId) -> Self {
-        Self { state, task_id }
-    }
 }
 
 enum WatchlistVendorResult {
@@ -86,17 +81,18 @@ impl WatchlistVendorResult {
 
 #[async_trait]
 impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
-    async fn execute(&self, args: &WatchlistCheckArgs) -> FpResult<()> {
-        let sv_id = args.scoped_vault_id.clone();
-        let task_id = self.task_id.clone();
+    async fn execute(self, args: WatchlistCheckArgs) -> FpResult<()> {
+        let Self { state, task_id } = self;
+        let WatchlistCheckArgs {
+            scoped_vault_id: sv_id,
+        } = args;
 
         // First we either create a new watchlist_check or we retrieve an existing one (ie if this is an
         // idempotent re-run of a failed execution) If we create a new watchlist_check, we either:
         //  - Create it with state Pending and a decision_intent is created at the same time
         //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to
         //    be made
-        let (tenant, sv, obc, uvw, wc) = self
-            .state
+        let (tenant, sv, obc, uvw, wc) = state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
@@ -140,7 +136,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 }
 
                 let existing_response = load_response_for_vendor_api(
-                    &self.state,
+                    &state,
                     VReqIdentifier::DiId(di_id.clone()),
                     &uvw.vault.e_private_key,
                     IdologyPa,
@@ -149,14 +145,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 .ok();
 
                 if IdologyPa.requirements_are_satisfied(uvw.populated().as_slice()) {
-                    let reason_codes = idology::complete_vendor_call(
-                        &self.state,
-                        &sv.id,
-                        &di_id,
-                        &tenant.id,
-                        existing_response,
-                    )
-                    .await?;
+                    let reason_codes =
+                        idology::complete_vendor_call(&state, &sv.id, &di_id, &tenant.id, existing_response)
+                            .await?;
                     WatchlistVendorResult::Completed(reason_codes)
                 } else {
                     WatchlistVendorResult::InsufficientData
@@ -179,7 +170,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 }
                 if IncodeWatchlistCheck.requirements_are_satisfied(uvw.populated().as_slice()) {
                     let reason_codes =
-                        incode::complete_vendor_call(&self.state, &sv.id, &di_id, obc, &uvw).await?;
+                        incode::complete_vendor_call(&state, &sv.id, &di_id, obc, &uvw).await?;
                     WatchlistVendorResult::Completed(reason_codes)
                 } else {
                     WatchlistVendorResult::InsufficientData
@@ -190,7 +181,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         // Save final status, write timeline event, and enqueue webhook task
         let vault_id = uvw.vault().id.clone();
         let wc_id = wc.id.clone();
-        self.state
+        state
             .db_pool
             .db_transaction(move |conn| -> DbResult<()> {
                 // not strictly necessarily since we aren't currently running multiple instances of a single
@@ -239,7 +230,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             })
             .await?;
 
-        task::execute_webhook_tasks(self.state.clone());
+        task::execute_webhook_tasks(state.clone());
 
         Ok(())
     }

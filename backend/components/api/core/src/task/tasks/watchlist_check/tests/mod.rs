@@ -107,7 +107,7 @@ async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) ->
     let args = WatchlistCheckArgs {
         scoped_vault_id: sv_id.clone(),
     };
-    wct.execute(&args).await
+    wct.execute(args).await
 }
 
 async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVaultId) -> VerificationResult {

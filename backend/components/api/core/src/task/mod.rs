@@ -7,13 +7,8 @@ use crate::State;
 use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::task::Task;
-use db::models::task_execution::TaskExecution;
 use db::models::task_execution::TaskExecutionUpdate;
 use db::DbError;
-use db::DbPool;
-use db::DbResult;
-use newtypes::TaskExecutionId;
-use newtypes::TaskId;
 use newtypes::TaskKind;
 use newtypes::TaskStatus;
 use tracing::Instrument;
@@ -47,38 +42,47 @@ pub async fn poll_and_execute_tasks(
     limit: u32,
     kind: Option<TaskKind>,
 ) -> Result<Vec<Task>, DbError> {
-    let tasks: Vec<(Task, TaskExecution)> = state
+    let tasks = state
         .db_pool
-        .db_transaction(move |conn| -> Result<Vec<_>, DbError> {
-            let tasks = Task::poll(conn, limit, kind)?;
-            Ok(tasks)
-        })
+        .db_transaction(move |conn| Task::poll(conn, limit, kind))
         .await?;
 
     tracing::info!(tasks = format!("{:?}", tasks), "Executing polled tasks");
-    let futs = tasks.iter().map(|(t, te)| async {
-        tracing::info!(task_id=%t.id, "Executing task");
+    let futs = tasks.into_iter().map(|(t, te)| async move {
+        let task_id = t.id.clone();
+        tracing::info!(%task_id, "Executing task");
+        let num_attempts = t.num_attempts;
+        let task_kind = TaskKind::from(&t.task_data);
+
         let task_result = execute_task(t, state).await;
-        let task_error_str = match &task_result {
+
+        let (new_task_status, task_error_str) = match task_result {
             Ok(_) => {
-                tracing::info!(task_id=%t.id, "Task completed successfully");
-                None
+                tracing::info!(%task_id, "Task completed successfully");
+                (TaskStatus::Completed, None)
             }
             Err(err) => {
-                tracing::error!(?err, task_id=%t.id, num_attempts=t.num_attempts, "Task failed");
-                Some(format!("{:?}", err))
+                let task_status = if num_attempts >= task_kind.max_attempts() {
+                    TaskStatus::Failed
+                } else {
+                    // if we havent exceeded our max number of attempts, then we set the task back to pending
+                    // so it will be re-polled and execution re-tried again in a future
+                    // run
+                    TaskStatus::Pending
+                };
+                tracing::error!(?err, %task_id, %num_attempts, "Task failed");
+                (task_status, Some(format!("{:?}", err)))
             }
         };
-        let task_new_status = task_result_to_status(t, task_result);
-        let task_execution_update = TaskExecutionUpdate::new(task_new_status, task_error_str);
-        update_task(
-            &state.db_pool,
-            t.id.clone(),
-            task_new_status,
-            &te.id,
-            task_execution_update,
-        )
-        .await
+
+        let task_execution_update = TaskExecutionUpdate::new(new_task_status, task_error_str);
+        let te_id = te.id.clone();
+        state
+            .db_pool
+            .db_transaction(move |conn| {
+                Task::update_running_task(conn, &task_id, new_task_status, &te_id, task_execution_update)
+            })
+            .await
     });
 
     futures::future::join_all(futs)
@@ -87,8 +91,8 @@ pub async fn poll_and_execute_tasks(
         .collect::<Result<Vec<Task>, DbError>>()
 }
 
-async fn execute_task(task: &Task, state: &State) -> FpResult<()> {
-    match &task.task_data {
+async fn execute_task(task: Task, state: &State) -> FpResult<()> {
+    match task.task_data {
         newtypes::TaskData::LogMessage(args) => LogMessageTask {}.execute(args).await,
         newtypes::TaskData::LogNumTenantApiKeys(args) => {
             LogNumTenantApiKeysTask::new(state.db_pool.clone())
@@ -107,41 +111,9 @@ async fn execute_task(task: &Task, state: &State) -> FpResult<()> {
     }
 }
 
-fn task_result_to_status(task: &Task, task_result: FpResult<()>) -> TaskStatus {
-    match task_result {
-        Ok(_) => TaskStatus::Completed,
-        Err(_) => {
-            if task.num_attempts >= task.task_data.kind().max_attempts() {
-                TaskStatus::Failed
-            } else {
-                // if we havent exceeded our max number of attempts, then we set the task back to pending so
-                // it will be re-polled and execution re-tried again in a future run
-                TaskStatus::Pending
-            }
-        }
-    }
-}
-
-async fn update_task(
-    db_pool: &DbPool,
-    task_id: TaskId,
-    task_status: TaskStatus,
-    task_execution_id: &TaskExecutionId,
-    task_execution_update: TaskExecutionUpdate,
-) -> DbResult<Task> {
-    let te_id = task_execution_id.clone();
-    db_pool
-        .db_transaction(move |conn| -> DbResult<Task> {
-            let updated_task =
-                Task::update_running_task(conn, &task_id, task_status, &te_id, task_execution_update)?;
-            Ok(updated_task)
-        })
-        .await
-}
-
 #[async_trait]
 trait ExecuteTask<T> {
-    async fn execute(&self, args: &T) -> FpResult<()>;
+    async fn execute(self, args: T) -> FpResult<()>;
 }
 
 #[cfg(test)]

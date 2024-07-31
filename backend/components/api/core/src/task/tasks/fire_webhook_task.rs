@@ -5,27 +5,25 @@ use async_trait::async_trait;
 use newtypes::FireWebhookArgs;
 use webhooks::events::WebhookEvent;
 
+#[derive(derive_more::Constructor)]
 pub(crate) struct FireWebhookTask {
     state: State,
 }
 
-impl FireWebhookTask {
-    #[allow(unused)]
-    pub fn new(state: State) -> Self {
-        Self { state }
-    }
-}
-
 #[async_trait]
 impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
-    async fn execute(&self, args: &FireWebhookArgs) -> FpResult<()> {
-        let t_id = args.tenant_id.clone();
-        let is_live = args.is_live;
-        let event = WebhookEvent::from(args.webhook_event.clone());
-        let _ = self
-            .state
+    async fn execute(self, args: FireWebhookArgs) -> FpResult<()> {
+        let Self { state } = self;
+        let FireWebhookArgs {
+            scoped_vault_id: _,
+            webhook_event,
+            tenant_id: t_id,
+            is_live,
+        } = args;
+        let event = WebhookEvent::from(webhook_event.clone());
+        state
             .webhook_client
-            .send_event_to_tenant(&self.state.db_pool, &t_id, is_live, event, None)
+            .send_event_to_tenant(&state.db_pool, &t_id, is_live, event, None)
             .await?;
         Ok(())
     }
@@ -93,6 +91,6 @@ mod tests {
         let mut state = State::test_state().await;
         state.set_webhook_client(Arc::new(mock_webhook_client));
         let task = FireWebhookTask::new(state);
-        task.execute(&args).await.unwrap();
+        task.execute(args).await.unwrap();
     }
 }
