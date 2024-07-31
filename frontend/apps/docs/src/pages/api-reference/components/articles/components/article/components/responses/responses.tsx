@@ -34,7 +34,7 @@ const Responses = ({ responses }: ResponsesProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[4]} 0;
+    padding-top: ${theme.spacing[4]};
     gap: ${theme.spacing[5]};
   `}
 `;

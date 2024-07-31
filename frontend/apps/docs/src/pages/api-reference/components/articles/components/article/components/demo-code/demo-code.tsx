@@ -123,14 +123,15 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-    position: relative;
-    margin-top: 0;
-    height: 100%;
+    padding-top: ${theme.spacing[8]};
+    padding-bottom: ${theme.spacing[8]};
     width: 100%;
     max-width: 720px;
 
     ${media.greaterThan('md')`
-      margin-top: ${theme.spacing[9]};
+      position: sticky;
+      top: 0;
+      z-index: 1;
     `}
   `}
 `;

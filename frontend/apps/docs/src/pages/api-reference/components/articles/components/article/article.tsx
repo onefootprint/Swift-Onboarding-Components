@@ -1,5 +1,5 @@
 import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';
@@ -36,37 +36,37 @@ const Article = ({ article }: ArticleProps) => {
   return (
     <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
-        <ContentWidth>
-          <TitleContainer direction="column" gap={3}>
-            <Stack direction="row" justifyContent="space-between">
-              <MethodContainer>
-                <TypeBadge type={method} />
-                <Stack direction="row" gap={1}>
-                  <BaseUrl>{API_BASE_URL}</BaseUrl>
-                  <Text variant="label-2" tag="h3">
-                    {path}
-                  </Text>
-                </Stack>
-              </MethodContainer>
-              <Tags article={article} />
-            </Stack>
-            {description && <Description>{description}</Description>}
-          </TitleContainer>
-          {security && (
-            <Requests>
-              <Text variant="label-1" marginTop={3}>
-                {t('request')}
+        <HeaderContainer>
+          <MethodContainer>
+            <TypeBadge type={method} />
+            <Stack direction="row" gap={1}>
+              <BaseUrl>{API_BASE_URL}</BaseUrl>
+              <Text variant="label-2" tag="h3">
+                {path}
               </Text>
-              {security.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
-              <Box marginTop={2} marginBottom={2} />
-              <Schema>
-                {parameters && <Parameters parameters={parameters} />}
-                {requestBody && <RequestBody requestBody={requestBody} />}
-                {responses && <Responses responses={responses} />}
-              </Schema>
-            </Requests>
-          )}
-        </ContentWidth>
+            </Stack>
+          </MethodContainer>
+          <Tags article={article} />
+        </HeaderContainer>
+        {description && (
+          <Box marginBottom={7}>
+            <Description>{description}</Description>
+          </Box>
+        )}
+        {security && (
+          <Requests>
+            <Text variant="label-1" marginTop={3}>
+              {t('request')}
+            </Text>
+            {security.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
+            <Box marginTop={2} marginBottom={2} />
+            <Schema>
+              {parameters && <Parameters parameters={parameters} />}
+              {requestBody && <RequestBody requestBody={requestBody} />}
+              {responses && <Responses responses={responses} />}
+            </Schema>
+          </Requests>
+        )}
       </ContentColumn>
       <CodeColumn>{responses && <DemoCode article={article} />}</CodeColumn>
     </ArticleContainer>
@@ -82,6 +82,17 @@ const BaseUrl = styled.div`
     ${media.greaterThan('md')`
       display: block;
     `}
+  `}
+`;
+
+const HeaderContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: ${theme.spacing[8]};
+    padding-bottom: ${theme.spacing[7]};
+    background-color: ${theme.backgroundColor.primary};
   `}
 `;
 
@@ -109,28 +120,12 @@ const ArticleContainer = styled(Element)<{ name: string }>`
   `}
 `;
 
-const ContentWidth = styled.div`
-  max-width: ${CONTENT_WIDTH}px;
-  margin: 0 auto;
-`;
-
-const TitleContainer = styled(Stack)`
-  ${({ theme }) => css`
-    width: 100%;
-    margin: 0 auto;
-    margin-bottom: ${theme.spacing[3]};
-
-    & > *:first-child {
-      margin-left: calc(-1 * ${theme.spacing[2]});
-    }
-  `}
-`;
-
 const ContentColumn = styled.div`
   ${({ theme }) => css`
     grid-area: article;
-    padding: ${theme.spacing[8]} ${theme.spacing[5]} ${theme.spacing[8]}
-      ${theme.spacing[8]};
+    padding: 0 ${theme.spacing[5]} ${theme.spacing[8]} ${theme.spacing[8]};
+    max-width: ${CONTENT_WIDTH}px;
+    margin: 0 auto;
   `}
 `;
 
@@ -153,10 +148,10 @@ const Schema = styled.div`
 const CodeColumn = styled.div`
   ${({ theme }) => css`
     grid-area: code;
-    padding: ${theme.spacing[4]} ${theme.spacing[6]} ${theme.spacing[10]};
+    padding: 0 ${theme.spacing[6]};
 
     ${media.greaterThan('md')`
-      padding: ${theme.spacing[4]} ${theme.spacing[6]};
+      padding: 0 ${theme.spacing[6]};
     `}
   `}
 `;
