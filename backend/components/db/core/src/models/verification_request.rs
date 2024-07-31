@@ -345,6 +345,19 @@ impl VerificationRequest {
 
         Ok(res)
     }
+
+    #[tracing::instrument("VerificationRequest::list_for_user_temp", skip_all)]
+    pub fn list_for_user_temp(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+        let res = verification_request::table
+            .left_join(verification_result::table)
+            .filter(verification_request::scoped_vault_id.eq(sv_id))
+            .get_results(conn)?;
+
+        Ok(res)
+    }
 }
 
 #[derive(Debug, Clone)]

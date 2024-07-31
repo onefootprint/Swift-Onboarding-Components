@@ -4,7 +4,6 @@ use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiCoreError;
-use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
 use async_trait::async_trait;
@@ -12,10 +11,8 @@ use db::models::document::Document;
 use db::models::document::DocumentUpdate;
 use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
-use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use db::TxnPgConn;
-use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
 use newtypes::DocumentStatus;
 use newtypes::FootprintReasonCode;
@@ -33,10 +30,11 @@ impl Fail {
     #[tracing::instrument("Fail::enter", skip_all)]
     pub fn enter(
         conn: &mut TxnPgConn,
-        di_id: &DecisionIntentId,
         sv_id: &ScopedVaultId,
         vault_id: &VaultId,
         id_doc_id: &DocumentId,
+        vres_id: VerificationResultId,
+        vendor_api: VendorAPI,
     ) -> FpResult<()> {
         // Mark the id doc as failed
         let update = DocumentUpdate {
@@ -50,18 +48,6 @@ impl Fail {
             validated_country_code: None,
             review_status: None,
         };
-
-        let (vres_id, vendor_api): (VerificationResultId, VendorAPI) = VerificationRequest::list(conn, di_id)?
-                .into_iter()
-                .filter(|(vreq, _)| vreq.vendor_api.is_incode_doc_flow_api())
-                .filter_map(|(vreq, vres)| vres.map(|v| (v.id, vreq.vendor_api)))
-                .collect::<Vec<_>>()
-                .first()
-                .cloned()
-                // TODO: if there's an issue with StartOnboarding and we fail, then this will error, fix in upstack
-                .ok_or(AssertionError(
-                    "cannot find incode vres for doc upload failed FRC",
-                ))?;
 
         let _ = RiskSignal::bulk_create(
             conn,

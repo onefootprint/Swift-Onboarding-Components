@@ -14,6 +14,7 @@ use api_core::decision::state::Authorize;
 use api_core::decision::state::WorkflowActions;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
+use api_core::decision::vendor::incode::states::Fail;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
@@ -40,6 +41,7 @@ use db::models::liveness_event::NewLivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
+use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
 use db::DbError;
 use newtypes::DecisionIntentKind;
@@ -70,6 +72,8 @@ pub struct Request {
     i_acknowledge_that_i_re_enabled_my_upload: Option<bool>,
     force_no_selfie: Option<bool>,
     environment: Option<IncodeEnvironment>,
+    force_failure: Option<bool>,
+    i_know_what_im_doing_to_force_a_failure: Option<bool>,
 }
 
 #[post("/private/incode/re_run")]
@@ -83,7 +87,23 @@ pub async fn rerun_machine(
         i_acknowledge_that_i_re_enabled_my_upload,
         force_no_selfie,
         environment,
+        force_failure,
+        i_know_what_im_doing_to_force_a_failure,
     } = request.into_inner();
+
+    // TODO: incident remediation, clean this up
+    let force_failure = force_failure.unwrap_or(false);
+    if force_failure {
+        if !i_know_what_im_doing_to_force_a_failure.unwrap_or_default() {
+            return Err(AssertionError(
+                "Please acknowledge that you know what you are doing to force a failure",
+            )
+            .into());
+        }
+        let res = handle_forcing_failure(&state, id).await?;
+        return Ok(res);
+    }
+
     if !i_acknowledge_that_i_re_enabled_my_upload.unwrap_or_default() {
         return Err(
             AssertionError("Please acknowledge that you re-enabled the relevant DocumentUpload").into(),
@@ -126,7 +146,7 @@ pub async fn rerun_machine(
         })
         .await?;
 
-    let response = api_core::utils::incode_helper::handle_incode_request(
+    let response: DocumentResponse = api_core::utils::incode_helper::handle_incode_request(
         &state,
         id_doc.id,
         su.tenant_id,
@@ -146,6 +166,52 @@ pub async fn rerun_machine(
     .await?;
     Ok(response)
 }
+
+
+async fn handle_forcing_failure(
+    state: &State,
+    id: IncodeVerificationSessionId,
+) -> FpResult<DocumentResponse> {
+    state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let old_session =
+                IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
+            let (_, dr) = Document::get(conn, &old_session.identity_document_id)?;
+            let su = ScopedVault::get(conn, &dr.workflow_id)?;
+            let (vres_id, vendor_api) = VerificationRequest::list_for_user_temp(conn, &su.id)?
+            .into_iter()
+            .filter(|(vreq, _)| vreq.vendor_api.is_incode_doc_flow_api())
+            .filter_map(|(vreq, vres)| vres.map(|v| (v.id, vreq.vendor_api)))
+            .collect::<Vec<_>>()
+            .first()
+            .cloned()
+            // TODO: if there's an issue with StartOnboarding and we fail, then this will error, fix in upstack
+            .ok_or(AssertionError(
+                "cannot find incode vres for doc upload failed FRC",
+            ))?;
+
+            Fail::enter(
+                conn,
+                &su.id,
+                &su.vault_id,
+                &old_session.identity_document_id,
+                vres_id,
+                vendor_api,
+            )?;
+
+            Ok(())
+        })
+        .await?;
+
+    let document_response = DocumentResponse {
+        next_side_to_collect: None,
+        errors: vec![],
+        is_retry_limit_exceeded: false,
+    };
+    Ok(document_response)
+}
+
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AdhocCreateDocumentRequest {

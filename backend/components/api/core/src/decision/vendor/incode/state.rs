@@ -11,18 +11,22 @@ use super::states::ProcessId;
 use super::states::VerificationSession;
 use super::IncodeContext;
 use crate::decision::state::StateError;
+use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
 use async_trait::async_trait;
 use db::models::document_upload::DocumentUpload;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::incode_verification_session::UpdateIncodeVerificationSession;
+use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use db::TxnPgConn;
 use enum_dispatch::enum_dispatch;
 use itertools::Itertools;
 use newtypes::DocumentSide;
 use newtypes::IncodeFailureReason;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use std::marker::PhantomData;
 
 pub struct Uninitialized<T>(PhantomData<T>);
@@ -196,8 +200,27 @@ where
                         // errors
                         let can_ignore_all_errors = unhandled_failure_reasons.iter().all(|s| s.can_ignore());
                         if !can_ignore_all_errors && !ctx.is_re_run {
+                            let (vres_id, vendor_api): (VerificationResultId, VendorAPI) =
+                                VerificationRequest::list(conn,  &ctx.di_id)?
+                            .into_iter()
+                            .filter(|(vreq, _)| vreq.vendor_api.is_incode_doc_flow_api())
+                            .filter_map(|(vreq, vres)| vres.map(|v| (v.id, vreq.vendor_api)))
+                            .collect::<Vec<_>>()
+                            .first()
+                            .cloned()
+                            // TODO: if there's an issue with StartOnboarding and we fail, then this will error, fix in upstack
+                            .ok_or(AssertionError(
+                                "cannot find incode vres for doc upload failed FRC",
+                            ))?;
                             // Fail if theres an unhandled error
-                            Fail::enter(conn, &ctx.di_id, &ctx.sv_id, &ctx.vault.id, &ctx.id_doc_id)?;
+                            Fail::enter(
+                                conn,
+                                &ctx.sv_id,
+                                &ctx.vault.id,
+                                &ctx.id_doc_id,
+                                vres_id,
+                                vendor_api,
+                            )?;
                             ((StepResult::Ready, Fail::new(), None), true)
                         } else {
                             let new_ignore_reasons = unhandled_failure_reasons
