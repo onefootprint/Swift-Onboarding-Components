@@ -4114,9 +4114,6 @@
                 },
                 "security": [
                     {
-                        "WorkOS Token": []
-                    },
-                    {
                         "Dashboard Token": []
                     },
                     {
@@ -4200,9 +4197,6 @@
                 },
                 "security": [
                     {
-                        "WorkOS Token": []
-                    },
-                    {
                         "Dashboard Token": []
                     },
                     {
@@ -4266,9 +4260,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "WorkOS Token": []
-                    },
                     {
                         "Dashboard Token": []
                     },
@@ -6557,9 +6548,6 @@
                 },
                 "security": [
                     {
-                        "WorkOS Token": []
-                    },
-                    {
                         "Dashboard Token": []
                     }
                 ]
@@ -6640,9 +6628,6 @@
                 },
                 "security": [
                     {
-                        "WorkOS Token": []
-                    },
-                    {
                         "Dashboard Token": []
                     }
                 ]
@@ -6703,9 +6688,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "WorkOS Token": []
-                    },
                     {
                         "Dashboard Token": []
                     }
@@ -7804,12 +7786,6 @@
                 "in": "header",
                 "name": "X-Footprint-Secret-Key",
                 "description": "Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server."
-            },
-            "WorkOS Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Dashboard-Authorization",
-                "description": "Short-lived auth token for a dashboard user before selecting an individual tenant."
             }
         },
         "schemas": {
@@ -8098,6 +8074,7 @@
                     }
                 },
                 "required": [
+                    "purpose",
                     "tenant_id"
                 ]
             },
@@ -8130,13 +8107,13 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
-                                        "client_vaulting",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
                                         "documents_list",
                                         "onboarding_session_token",
-                                        "vault_integrity"
+                                        "vault_integrity",
+                                        "client_vaulting_docs"
                                     ]
                                 }
                             },
@@ -8556,13 +8533,13 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
-                                        "client_vaulting",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
                                         "documents_list",
                                         "onboarding_session_token",
-                                        "vault_integrity"
+                                        "vault_integrity",
+                                        "client_vaulting_docs"
                                     ]
                                 }
                             },
@@ -12291,6 +12268,7 @@
                                                     "email_high_risk_domain",
                                                     "phone_number_input_invalid",
                                                     "phone_number_located_is_voip",
+                                                    "phone_number_is_voip",
                                                     "phone_number_mobile_account_type_postpaid",
                                                     "phone_number_mobile_account_type_prepaid",
                                                     "phone_number_mobile_account_type_unknown",
@@ -14790,6 +14768,7 @@
                                         "email_high_risk_domain",
                                         "phone_number_input_invalid",
                                         "phone_number_located_is_voip",
+                                        "phone_number_is_voip",
                                         "phone_number_mobile_account_type_postpaid",
                                         "phone_number_mobile_account_type_prepaid",
                                         "phone_number_mobile_account_type_unknown",
@@ -15930,6 +15909,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -16332,6 +16312,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -16734,6 +16715,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -17136,6 +17118,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -17538,6 +17521,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -17940,6 +17924,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -18342,6 +18327,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -18744,6 +18730,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -19146,6 +19133,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -19548,6 +19536,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -19950,6 +19939,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -20352,6 +20342,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -20754,6 +20745,7 @@
                                                 "email_high_risk_domain",
                                                 "phone_number_input_invalid",
                                                 "phone_number_located_is_voip",
+                                                "phone_number_is_voip",
                                                 "phone_number_mobile_account_type_postpaid",
                                                 "phone_number_mobile_account_type_prepaid",
                                                 "phone_number_mobile_account_type_unknown",
@@ -24052,13 +24044,13 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
-                                        "client_vaulting",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
                                         "documents_list",
                                         "onboarding_session_token",
-                                        "vault_integrity"
+                                        "vault_integrity",
+                                        "client_vaulting_docs"
                                     ]
                                 }
                             },
@@ -24378,13 +24370,13 @@
                                 "legacy_list_users_businesses",
                                 "implicit_auth",
                                 "vault_disaster_recovery",
-                                "client_vaulting",
                                 "match_signals_list",
                                 "liveness_list",
                                 "auth_events_list",
                                 "documents_list",
                                 "onboarding_session_token",
-                                "vault_integrity"
+                                "vault_integrity",
+                                "client_vaulting_docs"
                             ]
                         }
                     },
@@ -25943,6 +25935,7 @@
                             "email_high_risk_domain",
                             "phone_number_input_invalid",
                             "phone_number_located_is_voip",
+                            "phone_number_is_voip",
                             "phone_number_mobile_account_type_postpaid",
                             "phone_number_mobile_account_type_prepaid",
                             "phone_number_mobile_account_type_unknown",
@@ -26365,6 +26358,7 @@
                             "email_high_risk_domain",
                             "phone_number_input_invalid",
                             "phone_number_located_is_voip",
+                            "phone_number_is_voip",
                             "phone_number_mobile_account_type_postpaid",
                             "phone_number_mobile_account_type_prepaid",
                             "phone_number_mobile_account_type_unknown",

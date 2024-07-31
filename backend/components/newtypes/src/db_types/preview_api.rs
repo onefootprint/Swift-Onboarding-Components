@@ -50,8 +50,6 @@ pub enum PreviewApi {
     ImplicitAuth,
     /// Vault DR requires white-glove onboarding for now.
     VaultDisasterRecovery,
-    /// Client-side vaulting APIs using client_token
-    ClientVaulting,
 
     /// A catch-all variant here since we'll be scarily manually writing these values in a DB shell
     Other(String),
@@ -64,6 +62,12 @@ pub enum PreviewApi {
     DocumentsList,
     OnboardingSessionToken,
     VaultIntegrity,
+
+    //
+    // The below variants are used to hide documentation on the API reference docs site
+    /// Not used to gate any access on the backend - the docs site uses this to hide client vaulting
+    /// APIs
+    ClientVaultingDocs,
 }
 
 impl_enum_string_diesel!(PreviewApi);
@@ -75,6 +79,9 @@ impl ::core::str::FromStr for PreviewApi {
     fn from_str(s: &str) -> ::core::result::Result<PreviewApi, <Self as ::core::str::FromStr>::Err> {
         if let Some(v) = Self::iter().find(|v| v.to_string() == s) {
             Ok(v)
+        } else if s == "client_vaulting" {
+            // Alias
+            Ok(Self::ClientVaultingDocs)
         } else {
             tracing::error!(value = s, "Encountered unknown PreviewApi variant");
             Ok(Self::Other(s.to_string()))
