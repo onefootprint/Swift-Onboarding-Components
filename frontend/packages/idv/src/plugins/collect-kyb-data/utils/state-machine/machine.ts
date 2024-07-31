@@ -33,8 +33,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       states: {
         init: {
           always: [
-            { target: 'loadFromVault', cond: ctx => !!ctx.kybRequirement.isMet && isMissingBasicData(ctx) },
-            { target: 'introduction', cond: isMissingRequiredData },
+            { target: 'loadFromVault', cond: isMissingRequiredData },
             { target: 'introduction', cond: isMissingBeneficialOwnersData },
             { target: 'confirm' },
           ],
@@ -42,6 +41,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         loadFromVault: {
           on: {
             businessDataLoadSuccess: [
+              { target: 'introduction', cond: fromLoad(isMissingRequiredData) },
               { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignData' },
               { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignData' },
               { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignData' },

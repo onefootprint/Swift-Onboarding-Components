@@ -82,6 +82,9 @@ describe('Collect KYB Data Machine Tests', () => {
     );
     let { state } = machine;
 
+    expect(state.value).toEqual('loadFromVault');
+    state = machine.send('businessDataLoadError');
+
     expect(state.value).toEqual('introduction');
     state = machine.send('introductionCompleted');
     expect(state.value).toEqual('basicData');
@@ -183,6 +186,9 @@ describe('Collect KYB Data Machine Tests', () => {
     const machine = createMachine([CollectedKybDataOption.address], []);
 
     let { state } = machine;
+    expect(state.value).toEqual('loadFromVault');
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
+
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
@@ -239,6 +245,9 @@ describe('Collect KYB Data Machine Tests', () => {
         [],
       );
       let { state } = machine;
+
+      expect(state.value).toEqual('loadFromVault');
+      state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
 
       // Collect all fields first
       state = machine.send('introductionCompleted');
