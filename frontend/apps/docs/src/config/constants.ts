@@ -4,3 +4,4 @@ export const API_REFERENCE_PATH: string = '/api-reference';
 export const INTERNAL_API_REFERENCE_PATH: string = '/internal-api-reference';
 export const PHASED_OUT_API_REFERENCE_PATH: string = '/phased-out-api-reference';
 export const AUTH_PATH: string = '/auth';
+export const LOGIN_PATH: string = '/login';

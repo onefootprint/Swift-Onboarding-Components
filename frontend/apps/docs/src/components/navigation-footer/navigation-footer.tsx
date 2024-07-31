@@ -39,13 +39,8 @@ const NavigationFooter = () => {
   };
 
   const handleSignIn = () => {
-    // The docs site authentication piggybacks on top of dashboard authentication.
-    // We redirect to the dashboard here, which will sign the user in. Upon completion, this route will
-    // redirect back to `${DOCS_BASE_URL}/auth#${authToken}`, which will capture the auth token and
-    // save it in local storage.
     const currentPath = `${window.location.pathname}${window.location.search}`;
-    const docsSignInLink = `${DASHBOARD_BASE_URL}/authentication/docs?redirectUrl=${currentPath}`;
-    router.push(docsSignInLink);
+    router.push({ pathname: '/login', query: { redirectUrl: currentPath } });
   };
 
   return (

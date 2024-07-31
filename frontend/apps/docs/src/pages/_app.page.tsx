@@ -11,12 +11,14 @@ import {
   API_REFERENCE_PATH,
   AUTH_PATH,
   INTERNAL_API_REFERENCE_PATH,
+  LOGIN_PATH,
   PHASED_OUT_API_REFERENCE_PATH,
 } from '../config/constants';
 import ApiReference from './api-reference';
 import Auth from './auth';
 import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
+import Login from './login';
 import PhasedOutApiReference from './phased-out-api-reference';
 
 const defaultFont = DM_Sans({
@@ -41,7 +43,9 @@ const App = ({ Component, pageProps }: AppProps) => {
   const isInternalApiReference = router.asPath.startsWith(INTERNAL_API_REFERENCE_PATH);
   const isPhasedOutApiReference = router.asPath.startsWith(PHASED_OUT_API_REFERENCE_PATH);
   const isAuthPath = router.asPath.startsWith(AUTH_PATH);
-  const isDocsSite = !isApiReference && !isInternalApiReference && !isPhasedOutApiReference && !isAuthPath;
+  const isLoginPath = router.asPath.startsWith(LOGIN_PATH);
+  const isDocsSite =
+    !isApiReference && !isInternalApiReference && !isPhasedOutApiReference && !isAuthPath && !isLoginPath;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -60,6 +64,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         {isInternalApiReference && <InternalApiReference />}
         {isPhasedOutApiReference && <PhasedOutApiReference />}
         {isAuthPath && <Auth />}
+        {isLoginPath && <Login />}
         {isDocsSite && (
           <Docs article={pageProps.article} navigation={pageProps.page?.navigation}>
             <Component {...pageProps} />

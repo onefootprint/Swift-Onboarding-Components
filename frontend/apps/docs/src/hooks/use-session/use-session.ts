@@ -83,8 +83,11 @@ const useSession = () => {
     reset();
   };
 
+  const isLoggedIn = !!data.authToken;
+
   return {
     data,
+    isLoggedIn,
     reset,
     logIn,
     logOut,
