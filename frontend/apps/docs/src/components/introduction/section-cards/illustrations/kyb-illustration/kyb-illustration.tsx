@@ -11,7 +11,7 @@ type KybIllustrationProps = {
 const KybIllustration = ({ isHovered = false }: KybIllustrationProps) => (
   <Container>
     <StyledBackground isHovered={isHovered} />
-    <CardBack isHovered={isHovered}>
+    <CardBack $isHovered={isHovered}>
       <Dots>
         <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="0%" width={10} height={10} />
         <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="50%" width={10} height={10} />
@@ -64,8 +64,8 @@ const Dots = styled.div`
   height: 30px;
 `;
 
-const CardBack = styled.div<{ isHovered: boolean }>`
-  ${({ theme, isHovered }) => css`
+const CardBack = styled.div<{ $isHovered: boolean }>`
+  ${({ theme, $isHovered }) => css`
     z-index: 1;
     position: relative;
     width: 100%;
@@ -78,8 +78,8 @@ const CardBack = styled.div<{ isHovered: boolean }>`
     );
     padding: ${theme.spacing[8]} ${theme.spacing[6]} 0 ${theme.spacing[6]};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    box-shadow: ${isHovered ? theme.elevation[3] : theme.elevation[1]};
-    transform: translateY(${isHovered ? '-2px' : 0}) scale(1.1);
+    box-shadow: ${$isHovered ? theme.elevation[3] : theme.elevation[1]};
+    transform: translateY(${$isHovered ? '-2px' : 0}) scale(1.1);
     transition: all 0.3s ease-in-out;
   `}
 `;

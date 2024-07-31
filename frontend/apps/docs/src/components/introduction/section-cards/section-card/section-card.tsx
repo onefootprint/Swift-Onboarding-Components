@@ -20,7 +20,7 @@ const SectionCard = forwardRef<HTMLAnchorElement, SectionCardProps>(
     const renderedIcon = Icon && <Icon />;
 
     return (
-      <Container href={href} gridArea={gridArea} ref={ref}>
+      <Container href={href} $gridArea={gridArea} ref={ref}>
         <IllustrationContainer>
           {children || (imageSrc && <Image src={imageSrc} alt={title} height={194} width={350} />)}
         </IllustrationContainer>
@@ -38,14 +38,14 @@ const SectionCard = forwardRef<HTMLAnchorElement, SectionCardProps>(
 
 SectionCard.displayName = 'SectionCard';
 
-const Container = styled(Link)<{ gridArea?: string }>`
-  ${({ theme, gridArea }) => css`
+const Container = styled(Link)<{ $gridArea?: string }>`
+  ${({ theme, $gridArea }) => css`
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    grid-area: ${gridArea};
+    grid-area: ${$gridArea};
     text-decoration: none;
 
     @media (hover: hover) {

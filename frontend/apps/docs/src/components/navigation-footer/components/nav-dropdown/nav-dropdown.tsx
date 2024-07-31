@@ -65,10 +65,10 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
             </Dropdown.Group>
             <Dropdown.Separator />
             <Dropdown.Group>
-              <Dropdown.Item onSelect={handleLogout}>
+              <LogoutContainer onSelect={handleLogout}>
                 <LogoutIcon />
                 {t('log-out')}
-              </Dropdown.Item>
+              </LogoutContainer>
             </Dropdown.Group>
           </NavDropdownContent>
         )}
@@ -113,6 +113,12 @@ const StyledLink = styled(Dropdown.Item)`
 
 const LogoutIcon = styled(IcoLogOut24)`
   margin-left: -3px;
+`;
+
+const LogoutContainer = styled(Dropdown.Item)`
+  ${({ theme }) => css`
+    gap: ${theme.spacing[2]};
+  `}
 `;
 
 export default NavDropdown;

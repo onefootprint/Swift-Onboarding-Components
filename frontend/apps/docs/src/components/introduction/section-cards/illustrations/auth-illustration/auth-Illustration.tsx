@@ -14,7 +14,7 @@ type AuthIllustrationProps = {
 const AuthIllustration = ({ isHovered = false }: AuthIllustrationProps) => (
   <Container>
     <StyledBackground isHovered={isHovered} />
-    <Sheet isHovered={isHovered}>
+    <Sheet $isHovered={isHovered}>
       <Line darkColor={primitives.Gray700} lightColor={primitives.Gray100} top="20px" left="50%" width={80} />
       <Line darkColor={primitives.Gray800} lightColor={primitives.Gray50} top="40px" left="50%" width={150} />
       <CodeBox
@@ -70,8 +70,8 @@ const StyledBackground = styled(Background)`
   transform: scale(0.9);
 `;
 
-const Sheet = styled.div<{ isHovered?: boolean }>`
-  ${({ theme, isHovered }) => css`
+const Sheet = styled.div<{ $isHovered?: boolean }>`
+  ${({ theme, $isHovered }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     width: 240px;
@@ -84,7 +84,7 @@ const Sheet = styled.div<{ isHovered?: boolean }>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
     ${
-      isHovered &&
+      $isHovered &&
       css`
       box-shadow: ${theme.elevation[3]};
     `

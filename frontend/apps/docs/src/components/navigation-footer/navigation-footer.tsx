@@ -9,9 +9,9 @@ import styled, { css } from 'styled-components';
 
 import { useRouter } from 'next/router';
 import useSession from 'src/hooks/use-session';
-import LinkItem from './components/link-item';
-import LoggedInUser from './components/logged-in-user';
-import NavDropdown from './components/nav-dropdown';
+import CompanyName from './components/company-name';
+import LinkItem from './components/link-item/link-item';
+import NavDropdown from './components/nav-dropdown/nav-dropdown';
 import SupportDialog from './components/support-dialog';
 
 const NavigationFooter = () => {
@@ -45,10 +45,11 @@ const NavigationFooter = () => {
 
   return (
     <Container>
-      {user && (
-        <LoggedInUser user={user}>
+      {user && user.tenant.name && (
+        <Stack direction="row" justify="space-between" height="56px" align="center" padding={5}>
+          <CompanyName name={user.tenant.name} image={user.tenant.logoUrl} />
           <NavDropdown user={user} isApiReference={isApiReference} handleOpenSupportDialog={handleOpenSupportDialog} />
-        </LoggedInUser>
+        </Stack>
       )}
       {!user && (
         <Stack direction="column" gap={4} marginTop={4} marginBottom={3} marginLeft={4} marginRight={4}>

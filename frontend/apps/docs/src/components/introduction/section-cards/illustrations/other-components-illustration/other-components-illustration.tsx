@@ -11,13 +11,13 @@ type OtherComponentsIllustrationProps = {
 const OtherComponentsIllustration = ({ isHovered = false }: OtherComponentsIllustrationProps) => (
   <Container>
     <StyledBackground isHovered={isHovered} />
-    <CardBack isHovered={isHovered}>
+    <CardBack $isHovered={isHovered}>
       <Dots>
         <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="0%" width={10} height={10} />
         <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="50%" width={10} height={10} />
         <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="100%" width={10} height={10} />
       </Dots>
-      <Screen isHovered={isHovered}>
+      <Screen $isHovered={isHovered}>
         <Line darkColor="#303030" lightColor="#CDCDCD" top="40px" left="50%" width={80} />
         <Subsection>
           <Line darkColor="#A38BFF" lightColor="#4A24DB" top="14px" left="80%" width={40} />
@@ -76,8 +76,8 @@ const Container = styled.div`
   `}
 `;
 
-const CardBack = styled.div<{ isHovered: boolean }>`
-  ${({ theme, isHovered }) => css`
+const CardBack = styled.div<{ $isHovered: boolean }>`
+  ${({ theme, $isHovered }) => css`
     position: relative;
     width: 100%;
     height: 100%;
@@ -93,7 +93,7 @@ const CardBack = styled.div<{ isHovered: boolean }>`
     transition: all 0.2s ease-in-out;
 
     ${
-      isHovered &&
+      $isHovered &&
       css`
       box-shadow: ${theme.elevation[3]};
       transform: translateY(-2px);
@@ -102,8 +102,8 @@ const CardBack = styled.div<{ isHovered: boolean }>`
   `}
 `;
 
-const Screen = styled.div<{ isHovered: boolean }>`
-  ${({ theme, isHovered }) => css`
+const Screen = styled.div<{ $isHovered: boolean }>`
+  ${({ theme, $isHovered }) => css`
     width: 100%;
     height: 100%;
     position: relative;
@@ -112,7 +112,7 @@ const Screen = styled.div<{ isHovered: boolean }>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
     ${
-      isHovered &&
+      $isHovered &&
       css`
       box-shadow: ${theme.elevation[1]};
       transform: translateY(-2px);

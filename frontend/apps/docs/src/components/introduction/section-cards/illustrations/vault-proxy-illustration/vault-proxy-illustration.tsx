@@ -15,7 +15,7 @@ const VaultProxyIllustration = ({ isHovered = false }: VaultProxyIllustrationPro
   return (
     <Container>
       <StyledBackground isHovered={isHovered} />
-      <Knob isDark={isDark} isHovered={isHovered}>
+      <Knob $isDark={isDark} $isHovered={isHovered}>
         <IcoFootprint40 color={isDark ? 'primary' : 'septenary'} />
       </Knob>
     </Container>
@@ -34,8 +34,8 @@ const Container = styled.div`
   `}
 `;
 
-const Knob = styled.div<{ isDark: boolean; isHovered: boolean }>`
-  ${({ theme, isDark, isHovered }) => css`
+const Knob = styled.div<{ $isDark: boolean; $isHovered: boolean }>`
+  ${({ theme, $isDark, $isHovered }) => css`
     position: relative;
     padding: ${theme.spacing[7]};
     border-radius: ${theme.borderRadius.full};
@@ -47,7 +47,7 @@ const Knob = styled.div<{ isDark: boolean; isHovered: boolean }>`
     transition: all 0.2s ease-in-out;
 
     ${
-      isDark &&
+      $isDark &&
       css`
       box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset;
       background-color: ${theme.backgroundColor.secondary};
@@ -55,7 +55,7 @@ const Knob = styled.div<{ isDark: boolean; isHovered: boolean }>`
     }
 
     ${
-      isHovered &&
+      $isHovered &&
       css`
       box-shadow: ${theme.elevation[3]};
       transform: translateY(-2px) scale(1.03);
