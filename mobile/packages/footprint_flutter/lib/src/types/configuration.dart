@@ -1,4 +1,8 @@
-part of "../footprint_flutter.dart";
+import 'package:footprint_flutter/src/types/appearance.dart';
+import 'package:footprint_flutter/src/types/bootstrap_data.dart';
+import 'package:footprint_flutter/src/types/l10n.dart';
+import 'package:footprint_flutter/src/types/options.dart';
+import 'package:meta/meta.dart';
 
 class FootprintConfiguration {
   final FootprintAppearance? appearance;
@@ -23,14 +27,15 @@ class FootprintConfiguration {
     this.bootstrapData,
   });
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
-      'l10n': l10n?._toJson(),
-      'options': options?._toJson(),
+      'l10n': l10n?.toJson(),
+      'options': options?.toJson(),
       'auth_token': authToken,
       'public_key': publicKey,
-      'user_data': bootstrapData?._toJson(),
-      'appearance': appearance?._toJson(),
+      'user_data': bootstrapData?.toJson(),
+      'appearance': appearance?.toJson(),
     };
     map.removeWhere((key, value) => value == null);
     return map;

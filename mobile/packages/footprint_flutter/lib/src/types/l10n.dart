@@ -1,4 +1,4 @@
-part of "../footprint_flutter.dart";
+import 'package:meta/meta.dart';
 
 enum FootprintSupportedLocale {
   enUS, // represents 'en-US'
@@ -16,7 +16,8 @@ class FootprintL10n {
 
   FootprintL10n({this.locale, this.language});
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'locale': locale?.name,
       'language': language?.name,

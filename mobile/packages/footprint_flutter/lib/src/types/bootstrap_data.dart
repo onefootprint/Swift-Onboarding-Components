@@ -1,4 +1,4 @@
-part of "../footprint_flutter.dart";
+import 'package:meta/meta.dart';
 
 class FootprintBootstrapData {
   final String? email;
@@ -83,7 +83,8 @@ class FootprintBootstrapData {
       this.businessWebsite,
       this.businessZip});
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'id.email': email,
       'id.phone_number': phoneNumber,
@@ -111,7 +112,7 @@ class FootprintBootstrapData {
       'business.address_line1': businessAddressLine1,
       'business.address_line2': businessAddressLine2,
       'business.beneficial_owners':
-          businessBeneficialOwners?.map((e) => e._toJson()).toList(),
+          businessBeneficialOwners?.map((e) => e.toJson()).toList(),
       'business.city': businessCity,
       'business.corporation_type': businessCorporationType,
       'business.country': businessCountry,
@@ -119,7 +120,7 @@ class FootprintBootstrapData {
       'business.formation_date': businessFormationDate,
       'business.formation_state': businessFormationState,
       'business.kyced_beneficial_owners':
-          businessKycedBeneficialOwners?.map((e) => e._toJson()).toList(),
+          businessKycedBeneficialOwners?.map((e) => e.toJson()).toList(),
       'business.name': businessName,
       'business.phone_number': businessPhoneNumber,
       'business.state': businessState,
@@ -149,7 +150,8 @@ class BusinessBeneficialOwners {
     this.boPhoneNumber,
   });
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'email': boEmail,
       'first_name': boFirstName,

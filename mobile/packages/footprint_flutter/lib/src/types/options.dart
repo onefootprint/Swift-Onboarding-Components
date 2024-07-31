@@ -1,4 +1,4 @@
-part of "../footprint_flutter.dart";
+import 'package:meta/meta.dart';
 
 class FootprintOptions {
   final bool? showCompletionPage;
@@ -9,7 +9,8 @@ class FootprintOptions {
     this.showLogo,
   });
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'show_completion_page': showCompletionPage,
       'show_logo': showLogo,

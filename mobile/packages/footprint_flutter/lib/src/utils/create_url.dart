@@ -1,6 +1,10 @@
-part of "../footprint_flutter.dart";
+import 'dart:convert';
 
-String _createUrl({
+import 'package:footprint_flutter/src/types/configuration.dart';
+import 'package:meta/meta.dart';
+
+@internal
+String createUrl({
   FootprintConfiguration? config,
   String? redirectUrl,
   required String token,
@@ -22,8 +26,8 @@ String _createUrl({
   }
 
   if (appearance != null) {
-    var variables = _encode(appearance.variables?._toJson());
-    var rules = _encode(appearance.rules?._toJson());
+    var variables = _encode(appearance.variables?.toJson());
+    var rules = _encode(appearance.rules?.toJson());
 
     if (variables.isNotEmpty) {
       addParam('variables', variables);

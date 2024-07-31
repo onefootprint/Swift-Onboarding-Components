@@ -1,11 +1,14 @@
-part of '../footprint_flutter.dart';
+import 'dart:convert';
+
+import 'package:footprint_flutter/src/config/constants.dart';
+import 'package:footprint_flutter/src/utils/send_sdk_telemetry.dart';
 
 enum LogLevel {
   error,
   warn,
 }
 
-String getStringMessage(dynamic msg) {
+String _getStringMessage(dynamic msg) {
   if (msg is String) {
     return msg;
   }
@@ -24,23 +27,23 @@ String getStringMessage(dynamic msg) {
 }
 
 String _log(LogLevel level, dynamic message) {
-  final String formattedMessage = getStringMessage(message);
-  final String messageWithPrefix = '$_logPrefix: $formattedMessage';
+  final String formattedMessage = _getStringMessage(message);
+  final String messageWithPrefix = '$logPrefix: $formattedMessage';
 
-  if (_debugMode) {
+  if (debugMode) {
     final logPrefix = level == LogLevel.error ? 'ERROR' : 'WARNING';
     print('$logPrefix: $messageWithPrefix');
   } else {
-    _sendSdkTelemetry(formattedMessage, level.toString());
+    sendSdkTelemetry(formattedMessage, level.toString());
   }
 
   return messageWithPrefix;
 }
 
-String _logError(dynamic message) {
+String logError(dynamic message) {
   return _log(LogLevel.error, message);
 }
 
-String _logWarn(dynamic message) {
+String logWarn(dynamic message) {
   return _log(LogLevel.warn, message);
 }

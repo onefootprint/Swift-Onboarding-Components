@@ -1,4 +1,4 @@
-part of "../footprint_flutter.dart";
+import 'package:meta/meta.dart';
 
 class FootprintAppearanceVariables {
   final String? borderRadius;
@@ -204,7 +204,8 @@ class FootprintAppearanceVariables {
       this.radioSelectComponentsIconHoverBg,
       this.radioSelectComponentsIconSelectedBg});
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'borderRadius': borderRadius,
       'colorError': colorError,
@@ -351,7 +352,8 @@ class FootprintAppearanceRules {
     this.linkButtonActive,
   });
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'button': button,
       'button:hover': buttonHover,
@@ -387,11 +389,12 @@ class FootprintAppearance {
     this.variables,
   });
 
-  Map<String, dynamic> _toJson() {
+  @internal
+  Map<String, dynamic> toJson() {
     var map = {
       'fontSrc': fontSrc,
-      'rules': rules?._toJson(),
-      'variables': variables?._toJson(),
+      'rules': rules?.toJson(),
+      'variables': variables?.toJson(),
     };
     map.removeWhere((key, value) => value == null);
     return map;
