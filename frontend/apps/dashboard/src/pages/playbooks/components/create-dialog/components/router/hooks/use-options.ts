@@ -17,7 +17,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
         options: [{ value: 'residency', label: t('residency.nav') }],
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'dataToCollect', label: t('data-to-collect.nav') },
+      { value: 'settingsAuth', label: t('data-to-collect.nav') },
     ];
   };
 
@@ -25,14 +25,19 @@ const useOptions = ({ template }: UseOptionsProps) => {
     return [
       { value: 'whoToOnboard', label: t('who-to-onboard.nav') },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'dataToCollect', label: t('data-to-collect.nav') },
+      {
+        value: 'settingsKyb',
+        label: t('data-to-collect.nav'),
+        options: [
+          { value: 'settingsBusiness', label: 'Business information' },
+          { value: 'settingsBo', label: 'Business owners information' },
+        ],
+      },
       { value: 'verificationChecks', label: t('verification-checks.nav') },
     ];
   };
 
   const createKycOptions = () => {
-    const canEdit = template !== OnboardingTemplate.Apex && template !== OnboardingTemplate.Alpaca;
-
     const options = [
       {
         value: 'whoToOnboard',
@@ -45,8 +50,9 @@ const useOptions = ({ template }: UseOptionsProps) => {
         ],
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'dataToCollect', label: t('data-to-collect.nav') },
+      { value: 'settingsPerson', label: t('data-to-collect.nav') },
     ];
+    const canEdit = template !== OnboardingTemplate.Apex && template !== OnboardingTemplate.Alpaca;
     if (canEdit) {
       const [first] = options;
       first.options?.push({
@@ -61,32 +67,23 @@ const useOptions = ({ template }: UseOptionsProps) => {
     return options;
   };
 
-  const createDocOptions = () => {
+  const createDocOnlyOptions = () => {
     return [
       {
         value: 'whoToOnboard',
         label: t('who-to-onboard.nav'),
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'dataToCollect', label: t('data-to-collect.nav') },
-    ];
-  };
-
-  const createUnknownOptions = () => {
-    return [
-      { value: 'whoToOnboard', label: t('who-to-onboard.nav') },
-      { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'dataToCollect', label: t('data-to-collect.nav') },
-      { value: 'verificationChecks', label: t('verification-checks.nav') },
+      { value: 'settingsDocOnly', label: t('data-to-collect.nav') },
     ];
   };
 
   return {
     [PlaybookKind.Auth]: createAuthOptions(),
+    [PlaybookKind.DocOnly]: createDocOnlyOptions(),
     [PlaybookKind.Kyb]: createKybOptions(),
     [PlaybookKind.Kyc]: createKycOptions(),
-    [PlaybookKind.DocOnly]: createDocOptions(),
-    [PlaybookKind.Unknown]: createUnknownOptions(),
+    [PlaybookKind.Unknown]: createKycOptions(),
   };
 };
 

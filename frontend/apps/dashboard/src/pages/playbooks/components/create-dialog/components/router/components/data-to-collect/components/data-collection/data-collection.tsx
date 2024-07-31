@@ -1,13 +1,12 @@
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAuth, isDocOnly, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
+import { isDocOnly, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
 import { type DataToCollectMeta, OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
 import AdditionalDocs from './components/additional-docs';
-import Auth from './components/auth';
 import Business from './components/business';
 import GovDocs from './components/gov-docs';
 import Investor from './components/investor';
@@ -22,14 +21,6 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     keyPrefix: 'create.data-to-collect.data-collection',
   });
   const isCustom = meta.onboardingTemplate === OnboardingTemplate.Custom;
-
-  if (isAuth(meta.kind)) {
-    return (
-      <Container>
-        <Auth />
-      </Container>
-    );
-  }
 
   if (isDocOnly(meta.kind)) {
     return (

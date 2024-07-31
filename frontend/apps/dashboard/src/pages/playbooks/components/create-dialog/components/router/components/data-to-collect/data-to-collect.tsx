@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth, isDocOnly } from '@/playbooks/utils/kind';
+import { isDocOnly } from '@/playbooks/utils/kind';
 import {
   type DataToCollectFormData,
   type DataToCollectMeta,
@@ -24,7 +24,9 @@ type DataToCollectProps = {
 
 const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLoading }: DataToCollectProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect' });
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'create.data-to-collect',
+  });
   const formMethods = useForm<DataToCollectFormData>({ defaultValues });
   const { handleSubmit, watch } = formMethods;
   const selectedGlobalDocs = watch('personal.docs.global');
@@ -43,9 +45,6 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
   };
 
   const getTitle = (): string => {
-    if (isAuth(meta.kind)) {
-      return t('title.auth');
-    }
     if (isDocOnly(meta.kind)) {
       return t('title.id-doc');
     }
@@ -55,7 +54,6 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
   };
 
   const getSubtitle = (): string => {
-    if (isAuth(meta.kind)) return t('subtitle.auth');
     if (isDocOnly(meta.kind)) return t('subtitle.id-doc');
 
     const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;

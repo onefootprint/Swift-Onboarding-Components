@@ -21,6 +21,7 @@ type PopOverProps = {
 const PopOver = ({ label, content, triggerVariants, videoSrc }: PopOverProps) => {
   const hoverRef = useRef(null);
   const isHovered = useHover(hoverRef);
+
   return (
     <PopoverPrimitive.Root>
       <Trigger ref={hoverRef} isHovered={isHovered}>
@@ -73,7 +74,7 @@ const Trigger = styled(PopoverPrimitive.Trigger)<{
     position: relative;
 
     &:after {
-      content: '';
+      content: "";
       position: absolute;
       height: ${theme.spacing[1]};
       width: 100%;

@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Text, createFontStyles } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -8,29 +8,28 @@ import PopOver from '../pop-over';
 
 const Preview = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.auth',
+    keyPrefix: 'create.settings-auth',
   });
 
   return (
     <Container>
-      <div>
-        <MarginBottom>
+      <Stack flexDirection="column" gap={4}>
+        <Header>
           <Text variant="label-3" color="primary">
-            {t('signup')}
+            {t('title')}
           </Text>
           <Text variant="body-4" color="secondary">
-            {t('signup-method')}
+            {t('subtitle')}
           </Text>
-        </MarginBottom>
-
+        </Header>
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
             <Text variant="body-4" color="primary">
-              {t('email')}
+              {t('sign-up.email.label')}
             </Text>
             <Text variant="body-4" color="tertiary">
-              {t('email-validation-method')}
+              {t('sign-up.email.description')}
             </Text>
           </div>
         </Topic>
@@ -38,55 +37,63 @@ const Preview = () => {
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
             <Text variant="body-4" color="primary">
-              {t('phone-number')}
+              {t('sign-up.phone-number.label')}
             </Text>
             <Text variant="body-4" color="tertiary">
-              {t('sms-validation-method')}
+              {t('sign-up.phone-number.description')}
             </Text>
           </div>
         </Topic>
-      </div>
-
-      <div>
-        <MarginBottom>
+      </Stack>
+      <Stack flexDirection="column" gap={4}>
+        <Header>
           <Text variant="label-3" color="primary">
-            {t('signin')}
+            {t('sign-in.title')}
           </Text>
           <Text variant="body-4" color="secondary">
-            {t('signin-method')}
+            {t('sign-in.subtitle')}
           </Text>
-        </MarginBottom>
-
+        </Header>
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <Text variant="body-4" color="primary">
-            {t('code-sending')}
+            {t('sign-in.otp.label')}
           </Text>
         </Topic>
         <Topic>
           <IcoCheck16 className="icon" aria-label={t('enabled')} />
           <div>
             <Text variant="body-4" color="primary">
-              {t('passkeys')}
+              {t('sign-in.passkeys.label')}
             </Text>
             <Paragraph>
-              {t('passkeys-availability')}
+              {t('sign-in.passkeys.description')}
               <PopOver
                 videoSrc="/auth/passkeys.gif"
                 triggerVariants={{
                   variant: 'body-4',
                   color: 'tertiary',
                 }}
-                label={t('passkeys-more.title')}
-                content={t('passkeys-more.content')}
+                label={t('sign-in.passkeys.about.title')}
+                content={t('sign-in.passkeys.about.description')}
               />
             </Paragraph>
           </div>
         </Topic>
-      </div>
+      </Stack>
     </Container>
   );
 };
+
+const Container = styled(Stack)`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[5]} ${theme.spacing[6]};
+  `}
+`;
 
 const Paragraph = styled.p`
   ${({ theme }) => css`
@@ -99,29 +106,19 @@ const Paragraph = styled.p`
   `}
 `;
 
-const Container = styled.div`
+const Header = styled(Stack)`
   ${({ theme }) => css`
-    display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[1]};
   `}
 `;
 
-const MarginBottom = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-bottom: ${theme.spacing[4]};
-  `}
-`;
-
-const Topic = styled.div`
+const Topic = styled(Stack)`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[3]};
-    margin-bottom: ${theme.spacing[4]};
     align-content: center;
+
     .icon {
       flex-shrink: 0;
     }

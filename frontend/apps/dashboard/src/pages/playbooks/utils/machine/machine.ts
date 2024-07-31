@@ -94,13 +94,35 @@ export const createPlaybookMachine = () =>
                 target: 'whoToOnboard',
               },
             ],
-            nameYourPlaybookSubmitted: {
-              target: 'dataToCollect',
-              actions: ['assignNameYourPlaybook'],
+            nameYourPlaybookSubmitted: [
+              {
+                target: 'settingsAuth',
+                actions: ['assignNameYourPlaybook'],
+                cond: context => context.kind === PlaybookKind.Auth,
+              },
+              {
+                target: 'settingsPerson',
+                actions: ['assignNameYourPlaybook'],
+                cond: context => context.kind === PlaybookKind.Kyc,
+              },
+            ],
+          },
+        },
+        settingsAuth: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
             },
           },
         },
-        dataToCollect: {
+        settingsPerson: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -118,6 +140,57 @@ export const createPlaybookMachine = () =>
             },
           },
         },
+        settingsBusiness: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            playbookSubmitted: {
+              target: 'verificationChecks',
+              actions: 'assignPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
+            },
+          },
+        },
+        settingsBo: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            playbookSubmitted: {
+              target: 'verificationChecks',
+              actions: 'assignPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
+            },
+          },
+        },
+        settingsDocOnly: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
+            },
+          },
+        },
+
         verificationChecks: {
           on: {
             whoToOnboardSelected: {
@@ -127,11 +200,11 @@ export const createPlaybookMachine = () =>
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
             },
-            dataToCollectSelected: {
-              target: 'dataToCollect',
+            settingsPersonSelected: {
+              target: 'settingsPerson',
             },
             navigationBackward: {
-              target: 'dataToCollect',
+              target: 'settingsPerson',
             },
             verificationChecksSubmitted: {
               actions: 'assignVerificationChecks',

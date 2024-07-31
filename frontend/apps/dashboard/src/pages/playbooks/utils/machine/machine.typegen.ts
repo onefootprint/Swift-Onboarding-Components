@@ -26,10 +26,14 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'dataToCollect'
     | 'nameYourPlaybook'
     | 'onboardingTemplates'
     | 'residency'
+    | 'settingsAuth'
+    | 'settingsBo'
+    | 'settingsBusiness'
+    | 'settingsDocOnly'
+    | 'settingsPerson'
     | 'verificationChecks'
     | 'whoToOnboard';
   tags: never;

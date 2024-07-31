@@ -448,7 +448,11 @@ export type MachineEvents =
   | { type: 'navigationBackward' }
   | { type: 'nameYourPlaybookSelected' }
   | { type: 'whoToOnboardSelected' }
-  | { type: 'dataToCollectSelected' }
+  | { type: 'settingsPersonSelected' }
+  | { type: 'settingBusinessSelected' }
+  | { type: 'settingsBoSelected' }
+  | { type: 'settingsDocOnlySelected' }
+  | { type: 'settingsAuthSelected' }
   | { type: 'templateSelected' }
   | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }

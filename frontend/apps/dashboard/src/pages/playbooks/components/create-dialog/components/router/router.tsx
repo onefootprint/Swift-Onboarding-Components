@@ -20,6 +20,7 @@ import DataToCollect from './components/data-to-collect';
 import Name from './components/name';
 import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
+import SettingsAuth from './components/settings-auth';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useCreatePlaybook from './hooks/use-create-playbook';
@@ -147,6 +148,13 @@ const Router = ({ onCreate }: RouterProps) => {
     createPlaybook(context, verificationChecksForm);
   };
 
+  const handleAuthSubmitted = (formData: DataToCollectFormData) => {
+    const { nameForm } = state.context;
+    const payload = getFixedAuthPlaybook({ nameForm, ...formData });
+    const { verificationChecks, ...ctx } = payload;
+    createPlaybook(ctx, verificationChecks);
+  };
+
   const handleSubmitDataToCollect = (formData: DataToCollectFormData) => {
     const { nameForm } = state.context;
     if (isDocOnly(state.context.kind) && nameForm) {
@@ -156,13 +164,6 @@ const Router = ({ onCreate }: RouterProps) => {
       };
       const idDocContext = getFixedIdDocPlaybook(state.context, formData, verificationChecksForm);
       createPlaybook(idDocContext, verificationChecksForm);
-      return;
-    }
-
-    if (isAuth(formData.kind) && nameForm) {
-      const payload = getFixedAuthPlaybook({ nameForm, ...formData });
-      const { verificationChecks, ...ctx } = payload;
-      createPlaybook(ctx, verificationChecks);
       return;
     }
 
@@ -197,8 +198,16 @@ const Router = ({ onCreate }: RouterProps) => {
               send('nameYourPlaybookSelected');
             } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
-            } else if (option.value === 'dataToCollect') {
-              send('dataToCollectSelected');
+            } else if (option.value === 'settingsPerson') {
+              send('settingsPersonSelected');
+            } else if (option.value === 'settingBusiness') {
+              send('settingBusinessSelected');
+            } else if (option.value === 'settingsBo') {
+              send('settingsBoSelected');
+            } else if (option.value === 'settingsDocOnly') {
+              send('settingsDocOnlySelected');
+            } else if (option.value === 'settingsAuth') {
+              send('settingsAuthSelected');
             } else if (option.value === 'onboardingTemplates') {
               send('templateSelected');
             }
@@ -265,7 +274,49 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
           />
         )}
-        {state.matches('dataToCollect') && (
+        {state.matches('settingsAuth') && (
+          <SettingsAuth
+            defaultValues={defaultValues.playbook}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={handleAuthSubmitted}
+            isLoading={mutation.isLoading}
+          />
+        )}
+        {state.matches('settingsPerson') && (
+          <DataToCollect
+            defaultValues={defaultValues.playbook}
+            meta={{
+              kind: state.context.kind || defaultValues.playbook.kind,
+              residency: state.context.residencyForm || defaultValues.residency,
+              onboardingTemplate,
+            }}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={handleSubmitDataToCollect}
+            isLastStep={isLastStep}
+            isLoading={mutation.isLoading}
+          />
+        )}
+        {state.matches('settingsBusiness') && (
+          <DataToCollect
+            defaultValues={defaultValues.playbook}
+            meta={{
+              kind: state.context.kind || defaultValues.playbook.kind,
+              residency: state.context.residencyForm || defaultValues.residency,
+              onboardingTemplate,
+            }}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={handleSubmitDataToCollect}
+            isLastStep={isLastStep}
+            isLoading={mutation.isLoading}
+          />
+        )}
+        {state.matches('settingsBo') && (
           <DataToCollect
             defaultValues={defaultValues.playbook}
             meta={{
@@ -360,7 +411,7 @@ const Container = styled.div`
   @media (min-width: 1100px) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-areas: 'stepper content .';
+    grid-template-areas: "stepper content .";
   }
 `;
 

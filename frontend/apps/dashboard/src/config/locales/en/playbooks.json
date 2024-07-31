@@ -63,17 +63,47 @@
         }
       }
     },
+    "settings-auth": {
+      "title": "Auth playbook details",
+      "subtitle": "Here's how your auth configuration is going to work",
+      "enabled": "Enabled",
+      "sign-up": {
+        "title": "Sign up",
+        "description": "Users will create an account providing the following data",
+        "email": {
+          "label": "Email address",
+          "description": "We'll validate it sending a one-time password to users email address."
+        },
+        "phone-number": {
+          "label": "Phone number",
+          "description": "We'll validate it sending a one-time password in an SMS."
+        }
+      },
+      "sign-in": {
+        "title": "Sign in",
+        "subtitle": "Users will sign in using one of the following authenticated methods",
+        "otp": {
+          "label": "Code sent in an SMS to verified phone"
+        },
+        "passkeys": {
+          "label": "Passkeys",
+          "description": "Available for users who have onboarded onto Footprint using a KYC or KYB playbook in the past.",
+          "about": {
+            "title": "More about passkeys",
+            "description": "Passkey authentication simplifies the login process on iOS and Android devices, eliminating the need for traditional passwords. \nWhen we detect an already onboarded user wants to log-in, we will prompt them with a passkey challenge to sign-in to your platform. \nThis means fewer password-related headaches and enhanced security for all your customers’ online accounts. \nThis service has a cost based on the number of auth'd users."
+          }
+        }
+      }
+    },
     "data-to-collect": {
-      "nav": "Your Playbook",
+      "nav": "Playbook details",
       "title": {
-        "auth": "Auth playbook details",
         "id-doc": "Requested documents",
         "default-editable": "Your Playbook recommendation",
         "default-non-editable": "Your Playbook"
       },
       "subtitle": {
         "international-only": "Here’s our recommended Playbook configuration.",
-        "auth": "Here's how your auth configuration is going to work",
         "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
         "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
         "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
@@ -197,26 +227,6 @@
           "investment-goals": "What are your investment goals?",
           "risk-tolerance": "How would you describe your risk tolerance?",
           "immediate-family": "Do any of the following apply to you or your immediate family?"
-        }
-      },
-      "auth": {
-        "code-sending": "Code sent in an SMS to verified phone",
-        "email-validation-method": "We'll validate it sending a one-time password to users email address.",
-        "email": "Email address",
-        "enabled": "Enabled",
-        "passkeys-availability": "Available for users who have onboarded onto Footprint using a KYC or KYB playbook in the past.",
-        "passkeys": "Passkeys",
-        "phone-number": "Phone number",
-        "signin-method": "Users will sign in using one of the following authenticated methods",
-        "signin": "Sign in",
-        "signup-method": "Users will create an account providing the following data",
-        "signup": "Sign up",
-        "sms-validation-method": "We'll validate it sending a one-time password in an SMS.",
-        "subtitle": "Here's how your auth configuration is going to work",
-        "title": "Auth playbook details",
-        "passkeys-more": {
-          "title": "More about passkeys",
-          "content": "Passkey authentication simplifies the login process on iOS and Android devices, eliminating the need for traditional passwords. \nWhen we detect an already onboarded user wants to log-in, we will prompt them with a passkey challenge to sign-in to your platform. \nThis means fewer password-related headaches and enhanced security for all your customers’ online accounts. \nThis service has a cost based on the number of auth'd users."
         }
       },
       "gov-docs": {
