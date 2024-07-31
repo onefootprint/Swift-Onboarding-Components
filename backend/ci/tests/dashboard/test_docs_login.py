@@ -8,9 +8,8 @@ SANDBOX = IsLive("false")
 
 @pytest.fixture
 def docs_token(sandbox_tenant):
-    data = dict(tenant_id=sandbox_tenant.id, purpose="docs")
-    body = post("org/auth/assume_role", data, *sandbox_tenant.db_auths)
-    assert body["tenant"]["id"] == sandbox_tenant.id
+    data = dict(tenant_id=sandbox_tenant.id)
+    body = post("org/auth/docs_token", data, *sandbox_tenant.db_auths)
     assert body["token"].startswith("dtok_")
     docs_token = DashboardAuth(body["token"])
 
@@ -30,7 +29,7 @@ def test_docs_token_sandbox_only(docs_token):
 
 def test_cannot_elevate_docs_token(docs_token, sandbox_tenant):
     data = dict(tenant_id=sandbox_tenant.id, purpose="dashboard")
-    body = post("org/auth/assume_role", data, docs_token, status_code=403)
+    body = post("org/auth/docs_token", data, docs_token, status_code=403)
     assert (
         body["message"]
         == "Not allowed: cannot create a session with the requested purpose"

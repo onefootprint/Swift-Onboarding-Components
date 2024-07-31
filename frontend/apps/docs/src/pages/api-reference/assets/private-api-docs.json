@@ -4122,6 +4122,35 @@
                 ]
             }
         },
+        "/org/auth/docs_token": {
+            "post": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Create a token scoped for use on the docs site",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocsTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/auth/google_oauth": {
             "get": {
                 "tags": [
@@ -8062,19 +8091,11 @@
             "AssumeRoleRequest": {
                 "type": "object",
                 "properties": {
-                    "purpose": {
-                        "type": "string",
-                        "enum": [
-                            "dashboard",
-                            "docs"
-                        ]
-                    },
                     "tenant_id": {
                         "type": "string"
                     }
                 },
                 "required": [
-                    "purpose",
                     "tenant_id"
                 ]
             },
@@ -13024,6 +13045,18 @@
                         }
                     }
                 }
+            },
+            "DocsTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
+                ]
             },
             "Document": {
                 "type": "object",

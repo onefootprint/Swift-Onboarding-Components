@@ -2,12 +2,10 @@ use crate::*;
 use newtypes::PartnerTenantId;
 use newtypes::SessionAuthToken;
 use newtypes::TenantId;
-use newtypes::TenantSessionPurpose;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct AssumeRoleRequest {
     pub tenant_id: TenantId,
-    pub purpose: Option<TenantSessionPurpose>,
 }
 
 #[derive(serde::Serialize, Apiv2Response, macros::JsonResponder)]
