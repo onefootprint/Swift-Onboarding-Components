@@ -54,9 +54,7 @@ const Router = ({ onDone }: RouterProps) => {
           logError('error fetching investor_profile.*', error);
           send({ type: 'initFailed' });
         }}
-      >
-        {displayAnimation ? <Animation onAnimationEnd={() => setDisplayAnimation(false)} /> : null}
-      </Init>
+      />
     );
   }
   if (matches('employment')) {

@@ -5,7 +5,7 @@ import { useDecryptUser } from '../../../../queries';
 
 type InitProps = {
   authToken?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onError: (error?: unknown) => void;
   onSuccess: (data: InvestorProfileData) => void;
 };
