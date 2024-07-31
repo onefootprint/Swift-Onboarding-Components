@@ -34,7 +34,7 @@ const useComposeDocsLoginUrl = () => {
       throw Error('User is not logged in');
     }
     const { token } = await generateDocsToken(auth);
-    return `${DOCS_BASE_URL}/login?redirectUrl=${docsRedirectUrl}#${token}`;
+    return `${DOCS_BASE_URL}/auth?redirectUrl=${docsRedirectUrl}#${token}`;
   });
 };
 
