@@ -41,7 +41,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         loadFromVault: {
           on: {
             businessDataLoadSuccess: [
-              { target: 'introduction', cond: fromLoad(isMissingRequiredData) },
+              { target: 'introduction', cond: fromLoad(isMissingRequiredData), actions: 'assignData' },
               { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignData' },
               { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignData' },
               { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignData' },
