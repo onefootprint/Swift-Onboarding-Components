@@ -26,6 +26,7 @@ const LATENT_HTTP_ROUTES: string[] = [
   '/hosted/user/documents/{id}/process',
   '/hosted/documents/{id}/process',
   '/hosted/onboarding/tel',
+  '/hosted/onboarding/process',
   '/users/{fp_id}/kyc',
   '/org/access_events',
 ];
