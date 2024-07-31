@@ -67,7 +67,7 @@ pub async fn send_missing_secondary_bo_links(
             sessions_to_make
                 .into_iter()
                 .map(|(l_id, d)| -> FpResult<_> {
-                    let (token, _) = AuthSession::create_sync(conn, &sealing_key, d.into(), duration)?;
+                    let (token, _) = AuthSession::create_sync(conn, &sealing_key, d, duration)?;
                     Ok((l_id, token))
                 })
                 .collect()

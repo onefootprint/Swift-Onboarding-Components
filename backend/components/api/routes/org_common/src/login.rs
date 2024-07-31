@@ -169,7 +169,9 @@ where
         .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
         .await?;
 
-    let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard).into();
+    let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
+    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
+
     let TenantRbLoginResult {
         t_user,
         rb,
@@ -177,7 +179,6 @@ where
         is_first_login,
         ..
     } = login_result;
-    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
 
     let requires_onboarding = match &t_pt {
         TenantOrPartnerTenant::Tenant(tenant) => {

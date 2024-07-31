@@ -1,5 +1,4 @@
 use api_core::auth::session::tenant::TenantRbSession;
-use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
@@ -50,7 +49,7 @@ fn post(
         .db_pool
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method))
         .await?;
-    let session_data: AuthSessionData = TenantRbSession::create(&login_result, purpose).into();
+    let session_data = TenantRbSession::create(&login_result, purpose);
     let TenantRbLoginResult {
         t_user,
         rb,

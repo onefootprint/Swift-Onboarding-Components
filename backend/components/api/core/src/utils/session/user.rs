@@ -68,11 +68,12 @@ impl AuthSession {
         Ok(session)
     }
 
-    pub async fn create(
+    pub async fn create<T: Into<AuthSessionData>>(
         state: &State,
-        data: AuthSessionData,
+        data: T,
         expires_in: Duration,
     ) -> DbResult<SessionAuthToken> {
+        let data = data.into();
         let key = state.session_sealing_key.clone();
         let (auth_token, _) = state
             .db_pool
@@ -83,12 +84,13 @@ impl AuthSession {
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn create_sync(
+    pub fn create_sync<T: Into<AuthSessionData>>(
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
-        data: AuthSessionData,
+        data: T,
         expiry: impl Into<Expiry>,
     ) -> DbResult<(SessionAuthToken, Session)> {
+        let data = data.into();
         let tok_prefix = data.token_prefix();
         let token = SessionAuthToken::generate(tok_prefix);
         let auth_token_hash = token.id();

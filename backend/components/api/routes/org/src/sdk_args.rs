@@ -64,7 +64,7 @@ async fn post(
             };
             // Always save the session in the DB, even if some validation errors occurred.
             // This allows us to look up the session by hash even if it had invalid args
-            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
+            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             root_span.record("auth_token_hash", auth_token.id().to_string());
 
             if let Some(err) = err.err().or(obc.err()) {

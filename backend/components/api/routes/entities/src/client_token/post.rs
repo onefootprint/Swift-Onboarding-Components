@@ -186,7 +186,7 @@ pub async fn post(
                 decrypt_reason,
             };
             let duration = Duration::seconds(ttl.into());
-            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
+            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })
         .await?;

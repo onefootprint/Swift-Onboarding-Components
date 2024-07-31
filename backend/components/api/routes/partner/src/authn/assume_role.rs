@@ -45,7 +45,7 @@ fn post(
         .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
         .await?;
 
-    let session_data = TenantRbSession::create(&login_result, purpose).into();
+    let session_data = TenantRbSession::create(&login_result, purpose);
     let TenantRbLoginResult {
         t_user,
         rb,

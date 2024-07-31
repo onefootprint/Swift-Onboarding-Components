@@ -2,7 +2,6 @@ use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
 use api_core::auth::session::tenant::FirmEmployeeSession;
-use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
@@ -60,7 +59,6 @@ async fn post(
                 auth_method,
                 purpose,
             };
-            let session = AuthSessionData::FirmEmployee(session);
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself
             let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session, expires_at)?;

@@ -33,12 +33,6 @@ impl TenantRbSession {
     }
 }
 
-impl From<TenantRbSession> for super::AuthSessionData {
-    fn from(value: TenantRbSession) -> Self {
-        Self::TenantRb(value)
-    }
-}
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 /// Represents a session where a footprint employee is logged in to assume another tenant
 pub struct FirmEmployeeSession {
@@ -68,10 +62,4 @@ pub struct ClientTenantAuth {
     /// but for now it only makes sense to create a short-lived token through tenant API key
     pub tenant_api_key_id: TenantApiKeyId,
     pub decrypt_reason: Option<String>,
-}
-
-impl From<ClientTenantAuth> for super::AuthSessionData {
-    fn from(value: ClientTenantAuth) -> Self {
-        Self::ClientTenant(value)
-    }
 }

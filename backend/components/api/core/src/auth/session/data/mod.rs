@@ -24,7 +24,7 @@ impl AuthSessionData {
 
 /// Represents various types of session data our server maybe storing
 /// in its encrypted session store
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, derive_more::From)]
 pub enum AuthSessionData {
     /// authed as a user at a tenant for admin dashboard
     TenantRb(tenant::TenantRbSession),
@@ -75,18 +75,6 @@ impl AuthSessionData {
             Self::TenantRb(_) => "db",
             Self::FirmEmployee(_) => "db",
         }
-    }
-}
-
-impl From<ob_config::BoSession> for AuthSessionData {
-    fn from(value: ob_config::BoSession) -> Self {
-        Self::BusinessOwner(value)
-    }
-}
-
-impl From<sdk_args::SdkArgsData> for AuthSessionData {
-    fn from(value: sdk_args::SdkArgsData) -> Self {
-        Self::SdkArgs(value)
     }
 }
 

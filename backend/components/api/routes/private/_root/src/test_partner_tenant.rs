@@ -122,8 +122,7 @@ async fn post(
                 };
                 // Create a new partner tenant RB session for the integration test tenant user
                 let login_result = TenantRolebinding::login(conn, &rb.id, WorkosAuthMethod::GoogleOauth)?;
-                let session_data =
-                    TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard).into();
+                let session_data = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
                 let (auth_token, _) =
                     AuthSession::create_sync(conn, &key, session_data, Duration::minutes(30))?;
                 Ok(auth_token)
