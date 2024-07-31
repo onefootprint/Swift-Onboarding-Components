@@ -153,6 +153,12 @@ const Company = () => {
       linkedin: 'https://www.linkedin.com/in/rafamotta/',
       twitter: 'https://twitter.com/rafaelmotta021',
     },
+    {
+      name: 'Aran Murphy',
+      avatarSrc: '/team/member-aran.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/aranwmurphy/',
+    },
   ];
 
   const companyPhotos = [
