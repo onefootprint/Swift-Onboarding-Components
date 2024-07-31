@@ -7,7 +7,7 @@ import useAdditionalDocs from '../../hooks/use-additional-docs';
 
 const Preview = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.additional-docs',
+    keyPrefix: 'create.additional-docs',
   });
   const {
     custom,

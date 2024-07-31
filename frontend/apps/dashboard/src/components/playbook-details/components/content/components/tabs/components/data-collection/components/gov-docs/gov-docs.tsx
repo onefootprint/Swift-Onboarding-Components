@@ -12,7 +12,7 @@ type GovDocsProps = {
 };
 
 const GovDocs = ({ global = [], countrySpecific = {}, hasSelfie = false }: GovDocsProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.gov-docs' });
   const globalList = useIdDocList(global);
   const hasGlobal = globalList.length > 0;
   const hasCountrySpecific = Object.keys(countrySpecific).length > 0;
@@ -20,17 +20,17 @@ const GovDocs = ({ global = [], countrySpecific = {}, hasSelfie = false }: GovDo
   return (
     <Stack gap={7} flexDirection="column">
       <Stack gap={5} flexDirection="column">
-        <Text variant="label-3">{t('gov-docs.global.title')}</Text>
+        <Text variant="label-3">{t('global.title')}</Text>
         {hasGlobal ? (
           <List docList={globalList} hasSelfie={hasSelfie} />
         ) : (
           <Text variant="body-3" color="tertiary">
-            {t('gov-docs.global.empty')}
+            {t('global.empty')}
           </Text>
         )}
       </Stack>
       <Stack gap={5} flexDirection="column">
-        <Text variant="label-3">{t('gov-docs.country-specific.title')}</Text>
+        <Text variant="label-3">{t('country-specific.title')}</Text>
         {hasCountrySpecific ? (
           <Stack gap={3} flexDirection="column">
             {Object.entries(countrySpecific).map(([country, docs]) => {
@@ -42,7 +42,7 @@ const GovDocs = ({ global = [], countrySpecific = {}, hasSelfie = false }: GovDo
           </Stack>
         ) : (
           <Text variant="body-3" color="tertiary">
-            {t('gov-docs.country-specific.empty')}
+            {t('country-specific.empty')}
           </Text>
         )}
       </Stack>

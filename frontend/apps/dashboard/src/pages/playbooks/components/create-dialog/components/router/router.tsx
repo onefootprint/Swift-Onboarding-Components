@@ -6,7 +6,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isDocOnly } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
   DataToCollectFormData,
@@ -16,12 +15,12 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
-import DataToCollect from './components/data-to-collect';
 import Name from './components/name';
 import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
 import SettingsAuth from './components/settings-auth';
 import SettingsDocOnly from './components/settings-doc-only';
+import SettingsKyc from './components/settings-kyc';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useCreatePlaybook from './hooks/use-create-playbook';
@@ -48,7 +47,7 @@ const Router = ({ onCreate }: RouterProps) => {
     template: onboardingTemplate,
   });
   const options = allOptions[kind];
-  const { currentOption, currentSubOption, isLastStep } = getCurrentOption({
+  const { currentOption, currentSubOption } = getCurrentOption({
     value: state.value as string,
     options,
   });
@@ -198,8 +197,8 @@ const Router = ({ onCreate }: RouterProps) => {
               send('nameYourPlaybookSelected');
             } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
-            } else if (option.value === 'settingsPerson') {
-              send('settingsPersonSelected');
+            } else if (option.value === 'settingsKyc') {
+              send('settingsKycSelected');
             } else if (option.value === 'settingBusiness') {
               send('settingBusinessSelected');
             } else if (option.value === 'settingsBo') {
@@ -274,6 +273,20 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
           />
         )}
+        {state.matches('settingsKyc') && (
+          <SettingsKyc
+            defaultValues={defaultValues.playbook}
+            meta={{
+              kind: state.context.kind || defaultValues.playbook.kind,
+              residency: state.context.residencyForm || defaultValues.residency,
+              onboardingTemplate,
+            }}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={handleSubmitDataToCollect}
+          />
+        )}
         {state.matches('settingsAuth') && (
           <SettingsAuth
             defaultValues={defaultValues.playbook}
@@ -291,54 +304,6 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={handleDocOnlySubmitted}
-            isLoading={mutation.isLoading}
-          />
-        )}
-        {state.matches('settingsPerson') && (
-          <DataToCollect
-            defaultValues={defaultValues.playbook}
-            meta={{
-              kind: state.context.kind || defaultValues.playbook.kind,
-              residency: state.context.residencyForm || defaultValues.residency,
-              onboardingTemplate,
-            }}
-            onBack={() => {
-              send('navigationBackward');
-            }}
-            onSubmit={handleSubmitDataToCollect}
-            isLastStep={isLastStep}
-            isLoading={mutation.isLoading}
-          />
-        )}
-        {state.matches('settingsBusiness') && (
-          <DataToCollect
-            defaultValues={defaultValues.playbook}
-            meta={{
-              kind: state.context.kind || defaultValues.playbook.kind,
-              residency: state.context.residencyForm || defaultValues.residency,
-              onboardingTemplate,
-            }}
-            onBack={() => {
-              send('navigationBackward');
-            }}
-            onSubmit={handleSubmitDataToCollect}
-            isLastStep={isLastStep}
-            isLoading={mutation.isLoading}
-          />
-        )}
-        {state.matches('settingsBo') && (
-          <DataToCollect
-            defaultValues={defaultValues.playbook}
-            meta={{
-              kind: state.context.kind || defaultValues.playbook.kind,
-              residency: state.context.residencyForm || defaultValues.residency,
-              onboardingTemplate,
-            }}
-            onBack={() => {
-              send('navigationBackward');
-            }}
-            onSubmit={handleSubmitDataToCollect}
-            isLastStep={isLastStep}
             isLoading={mutation.isLoading}
           />
         )}

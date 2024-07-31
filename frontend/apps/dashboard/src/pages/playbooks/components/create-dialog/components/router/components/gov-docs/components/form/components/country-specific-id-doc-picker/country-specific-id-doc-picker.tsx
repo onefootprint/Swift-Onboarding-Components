@@ -12,7 +12,7 @@ import Picker from './components/picker';
 
 const CountrySpecificIdDocPicker = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.gov-docs.country-specific',
+    keyPrefix: 'create.gov-docs.country-specific',
   });
   const { t: allT } = useTranslation('common');
   const { watch, setValue } = useFormContext();

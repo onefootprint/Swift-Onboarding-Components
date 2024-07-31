@@ -33,7 +33,7 @@ export interface Typegen0 {
     | 'settingsBo'
     | 'settingsBusiness'
     | 'settingsDocOnly'
-    | 'settingsPerson'
+    | 'settingsKyc'
     | 'verificationChecks'
     | 'whoToOnboard';
   tags: never;

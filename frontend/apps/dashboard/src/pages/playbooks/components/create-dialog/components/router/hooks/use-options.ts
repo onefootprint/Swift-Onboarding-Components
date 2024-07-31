@@ -50,7 +50,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
         ],
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'settingsPerson', label: t('data-to-collect.nav') },
+      { value: 'settingsKyc', label: t('data-to-collect.nav') },
     ];
     const canEdit = template !== OnboardingTemplate.Apex && template !== OnboardingTemplate.Alpaca;
     if (canEdit) {

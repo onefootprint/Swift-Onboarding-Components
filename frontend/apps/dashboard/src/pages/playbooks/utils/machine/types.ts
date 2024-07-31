@@ -448,7 +448,7 @@ export type MachineEvents =
   | { type: 'navigationBackward' }
   | { type: 'nameYourPlaybookSelected' }
   | { type: 'whoToOnboardSelected' }
-  | { type: 'settingsPersonSelected' }
+  | { type: 'settingsKycSelected' }
   | { type: 'settingBusinessSelected' }
   | { type: 'settingsBoSelected' }
   | { type: 'settingsDocOnlySelected' }

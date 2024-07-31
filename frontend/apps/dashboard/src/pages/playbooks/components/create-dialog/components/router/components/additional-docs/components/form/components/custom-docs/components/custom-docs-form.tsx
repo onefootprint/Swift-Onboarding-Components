@@ -16,7 +16,7 @@ type CustomDocsFormProps = {
 const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsFormProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.custom-docs.form',
+    keyPrefix: 'create.custom-docs.form',
   });
   const id = useId();
   const { formState, register, trigger, setFocus, getValues, setValue } = useFormContext<DataToCollectFormData>();

@@ -9,7 +9,7 @@ import Panel from '../panel';
 
 const InvestorProfile = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.investor-profile',
+    keyPrefix: 'create.investor',
   });
   const { register, setValue, watch } = useFormContext();
   const value = watch(CollectedInvestorProfileDataOption.investorProfile);

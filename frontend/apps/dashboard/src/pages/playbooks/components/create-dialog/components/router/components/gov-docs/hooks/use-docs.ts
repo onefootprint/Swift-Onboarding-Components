@@ -1,7 +1,7 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { useFormContext } from 'react-hook-form';
 
-const useAdditionalDocs = () => {
+const useGovDocs = () => {
   const { watch } = useFormContext<DataToCollectFormData>();
   const globalDocs = watch('personal.docs.global') || [];
   const countryDocs = watch('personal.docs.country') || {};
@@ -25,4 +25,4 @@ const useAdditionalDocs = () => {
   };
 };
 
-export default useAdditionalDocs;
+export default useGovDocs;

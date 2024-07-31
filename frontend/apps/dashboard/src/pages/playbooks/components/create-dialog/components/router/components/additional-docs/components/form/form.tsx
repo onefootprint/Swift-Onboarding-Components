@@ -15,7 +15,7 @@ type FormProps = {
 const Form = ({ onClose }: FormProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.additional-docs',
+    keyPrefix: 'create.additional-docs',
   });
   const { watch, setValue, register } = useFormContext<DataToCollectFormData>();
   const containerRef = useRef<HTMLDivElement>(null);

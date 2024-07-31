@@ -9,7 +9,7 @@ import Form from './components/form';
 import Preview from './components/preview';
 
 const Govdocs = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.gov-docs' });
   const [showForm, setShowForm] = useState(false);
   const {
     meta: { hasDoc },

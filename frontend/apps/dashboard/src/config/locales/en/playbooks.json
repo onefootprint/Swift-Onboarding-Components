@@ -95,52 +95,157 @@
         }
       }
     },
+    "gov-docs": {
+      "title": "Collect government-issued ID",
+      "description": "Request that users submit scanned IDs",
+      "global": {
+        "title": "Globally accepted documents"
+      },
+      "country-specific": {
+        "title": "Country-specific requirements",
+        "subtitle": "You can select documents for specific countries, overriding global settings.",
+        "add": "Add",
+        "add-more": "Add more",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "list": {
+        "add": "and",
+        "more": "{{count}} more"
+      },
+      "extra-requirements": {
+        "title": "Extra requirements",
+        "selfie": {
+          "title": "Request a selfie after ID upload"
+        }
+      }
+    },
+    "additional-docs": {
+      "title": "Additional documents",
+      "description": "Additional proofs that may help you analyze the user",
+      "extra-requirements": "Extra requirements",
+      "form": {
+        "require-manual-review": {
+          "label": "Require manual review",
+          "description": "After the user uploads any of these documents, they will be flagged for manual review."
+        },
+        "poa": {
+          "label": "Proof of address",
+          "hint": "Official documents displaying the user's name and address."
+        },
+        "possn": {
+          "label": "Proof of SSN",
+          "hint": "Scan of Social Security card or official document displaying your name and Social Security Number."
+        },
+        "custom": {
+          "label": "Custom"
+        }
+      }
+    },
+    "custom-docs": {
+      "title": "Custom",
+      "description": "Specify extra documents required to meet specific onboarding criteria.",
+      "form": {
+        "name": {
+          "label": "Document label",
+          "placeholder": "City verification",
+          "hint": "The user-facing name for this document",
+          "errors": {
+            "required": "Please enter a label for the document."
+          }
+        },
+        "identifier": {
+          "label": "Identifier",
+          "placeholder": "document.custom.",
+          "hint": "The data identifier you can use to decrypt the document in the dashboard and via API",
+          "errors": {
+            "required": "Please enter an identifier for the document.",
+            "no-special-chars": "Only letters, numbers, underscores, and hyphens are allowed"
+          }
+        },
+        "description": {
+          "label": "Description (optional)",
+          "hint": "Describe the documents the user should submit. This information will be displayed to assist users in selecting the appropriate files."
+        }
+      }
+    },
+    "investor": {
+      "title": "Investor profile questions",
+      "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+      "add": "Add",
+      "remove": "Remove",
+      "done": "Done",
+      "questions": {
+        "employment-status": "What's your employment status and occupation?",
+        "annual-income": "What's your annual income?",
+        "net-worth": "What's your net worth?",
+        "funding-sources": "What’s the source of your account funding?",
+        "investment-goals": "What are your investment goals?",
+        "risk-tolerance": "How would you describe your risk tolerance?",
+        "immediate-family": "Do any of the following apply to you or your immediate family?"
+      }
+    },
     "settings-doc-only": {
       "title": "Requested documents",
       "subtitle": "All selected documents will be presented as viable upload options for users to select from."
     },
-    "data-to-collect": {
-      "nav": "Playbook details",
+    "settings-person": {
       "title": {
-        "id-doc": "Requested documents",
-        "default-editable": "Your Playbook recommendation",
-        "default-non-editable": "Your Playbook"
+        "editable": "Your Playbook recommendation",
+        "non-editable": "Your Playbook"
       },
       "subtitle": {
-        "international-only": "Here’s our recommended Playbook configuration.",
-        "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
-        "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
-        "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
-        "apex": "Here's your Playbook configuration based on Apex's CIP.",
-        "tenant-screening": "Here's your playbook configuration based on your selected template",
-        "car-rental": "Here's your playbook configuration based on your selected template",
-        "credit-card": "Here's your playbook configuration based on your selected template"
+        "editable": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+        "non-editable": "Here’s our recommended Playbook configuration.",
+        "templates": {
+          "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
+          "apex": "Here's your Playbook configuration based on Apex's CIP.",
+          "tenant-screening": "Here's your playbook configuration based on your selected template",
+          "car-rental": "Here's your playbook configuration based on your selected template",
+          "credit-card": "Here's your playbook configuration based on your selected template"
+        }
       },
-      "data-collection": {
-        "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
-      },
-      "person": {
-        "title": {
-          "kyb": {
-            "main": "Beneficial owners",
-            "tooltip": "For a stronger verification of the business, you may also verify its beneficial owners' identities."
-          },
-          "kyc": "Personal information"
-        },
+      "preview": {
+        "title": "Personal information",
         "edit": "Edit",
-        "editing": {
-          "kyc": "Edit Personal information",
-          "kyb": "Edit beneficial owners"
+        "editing": "Edit personal information",
+        "basic-information": {
+          "title": "Basic information",
+          "name": "Full name",
+          "email": "Email",
+          "phone": "Phone number",
+          "dob": "Date of birth",
+          "address": "Address"
         },
+        "us-residents": {
+          "title": "U.S. residents",
+          "ssn": "SSN",
+          "legal-status": "Legal status in the U.S.",
+          "empty": "U.S. residents aren't allowed to be onboarded."
+        },
+        "non-us-residents": {
+          "title": "Non U.S. residents",
+          "restrictions": "Restricted to these countries",
+          "all": "All nationalities are allowed to be onboarded (except for embargoed or sanctioned countries)",
+          "empty": "Non U.S. residents aren't allowed to be onboarded.",
+          "country-list": {
+            "and": "and",
+            "more": "{{count}} more"
+          }
+        }
+      },
+      "form": {
+        "title": "Edit personal information",
+        "edit": "Edit",
+        "editing": "Edit personal information",
         "basic-information": {
           "title": "Basic information"
         },
         "us-residents": {
           "title": "U.S. residents",
           "empty": "U.S. residents aren't allowed to be onboarded."
-        },
-        "beneficial-owner-collect": {
-          "toggle": "Collect beneficial owners' information"
         },
         "non-us-residents": {
           "title": "Non U.S. residents",
@@ -174,6 +279,27 @@
         },
         "accept-itin-hint": "Users may use either their SSN or ITIN as part of the verification process.",
         "accept-itin-label": "Accept ITIN"
+      }
+    },
+    "data-to-collect": {
+      "nav": "Playbook details",
+      "title": {
+        "id-doc": "Requested documents",
+        "default-editable": "Your Playbook recommendation",
+        "default-non-editable": "Your Playbook"
+      },
+      "subtitle": {
+        "international-only": "Here’s our recommended Playbook configuration.",
+        "id-doc": "All selected documents will be presented as viable upload options for users to select from.",
+        "default": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+        "alpaca": "Here's your Playbook configuration based on Alpaca's CIP.",
+        "apex": "Here's your Playbook configuration based on Apex's CIP.",
+        "tenant-screening": "Here's your playbook configuration based on your selected template",
+        "car-rental": "Here's your playbook configuration based on your selected template",
+        "credit-card": "Here's your playbook configuration based on your selected template"
+      },
+      "data-collection": {
+        "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
       },
       "id-doc": {
         "title": "ID document scan",
@@ -215,98 +341,6 @@
           "business_beneficial_owners": "Beneficial owners",
           "business_address": "Registered business address",
           "business_tin": "TIN (EIN)"
-        }
-      },
-      "investor-profile": {
-        "title": "Investor profile questions",
-        "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-        "add": "Add",
-        "remove": "Remove",
-        "done": "Done",
-        "questions": {
-          "employment-status": "What's your employment status and occupation?",
-          "annual-income": "What's your annual income?",
-          "net-worth": "What's your net worth?",
-          "funding-sources": "What’s the source of your account funding?",
-          "investment-goals": "What are your investment goals?",
-          "risk-tolerance": "How would you describe your risk tolerance?",
-          "immediate-family": "Do any of the following apply to you or your immediate family?"
-        }
-      },
-      "gov-docs": {
-        "title": "Collect government-issued ID",
-        "description": "Request that users submit scanned IDs",
-        "global": {
-          "title": "Globally accepted documents"
-        },
-        "country-specific": {
-          "title": "Country-specific requirements",
-          "subtitle": "You can select documents for specific countries, overriding global settings.",
-          "add": "Add",
-          "add-more": "Add more",
-          "edit": "Edit",
-          "save": "Save",
-          "cancel": "Cancel",
-          "delete": "Delete"
-        },
-        "list": {
-          "add": "and",
-          "more": "{{count}} more"
-        },
-        "extra-requirements": {
-          "title": "Extra requirements",
-          "selfie": {
-            "title": "Request a selfie after ID upload"
-          }
-        }
-      },
-      "additional-docs": {
-        "title": "Additional documents",
-        "description": "Additional proofs that may help you analyze the user",
-        "extra-requirements": "Extra requirements",
-        "form": {
-          "require-manual-review": {
-            "label": "Require manual review",
-            "description": "After the user uploads any of these documents, they will be flagged for manual review."
-          },
-          "poa": {
-            "label": "Proof of address",
-            "hint": "Official documents displaying the user's name and address."
-          },
-          "possn": {
-            "label": "Proof of SSN",
-            "hint": "Scan of Social Security card or official document displaying your name and Social Security Number."
-          },
-          "custom": {
-            "label": "Custom"
-          }
-        }
-      },
-      "custom-docs": {
-        "title": "Custom",
-        "description": "Specify extra documents required to meet specific onboarding criteria.",
-        "form": {
-          "name": {
-            "label": "Document label",
-            "placeholder": "City verification",
-            "hint": "The user-facing name for this document",
-            "errors": {
-              "required": "Please enter a label for the document."
-            }
-          },
-          "identifier": {
-            "label": "Identifier",
-            "placeholder": "document.custom.",
-            "hint": "The data identifier you can use to decrypt the document in the dashboard and via API",
-            "errors": {
-              "required": "Please enter an identifier for the document.",
-              "no-special-chars": "Only letters, numbers, underscores, and hyphens are allowed"
-            }
-          },
-          "description": {
-            "label": "Description (optional)",
-            "hint": "Describe the documents the user should submit. This information will be displayed to assist users in selecting the appropriate files."
-          }
         }
       }
     },

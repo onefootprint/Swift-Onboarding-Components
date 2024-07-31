@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const ExtraRequirements = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.gov-docs.extra-requirements',
+    keyPrefix: 'create.gov-docs.extra-requirements',
   });
   const { register } = useFormContext<DataToCollectFormData>();
 

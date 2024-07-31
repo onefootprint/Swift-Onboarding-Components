@@ -106,7 +106,7 @@ export const createPlaybookMachine = () =>
                 cond: context => context.kind === PlaybookKind.DocOnly,
               },
               {
-                target: 'settingsPerson',
+                target: 'settingsKyc',
                 actions: ['assignNameYourPlaybook'],
                 cond: context => context.kind === PlaybookKind.Kyc,
               },
@@ -141,7 +141,7 @@ export const createPlaybookMachine = () =>
             },
           },
         },
-        settingsPerson: {
+        settingsKyc: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -204,11 +204,11 @@ export const createPlaybookMachine = () =>
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
             },
-            settingsPersonSelected: {
-              target: 'settingsPerson',
+            settingsKycSelected: {
+              target: 'settingsKyc',
             },
             navigationBackward: {
-              target: 'settingsPerson',
+              target: 'settingsKyc',
             },
             verificationChecksSubmitted: {
               actions: 'assignVerificationChecks',

@@ -9,7 +9,7 @@ import useAdditionalDocs from './hooks/use-additional-docs';
 
 const AdditionalDocs = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.additional-docs',
+    keyPrefix: 'create.additional-docs',
   });
   const [showContent, setShowContent] = useState(false);
   const {

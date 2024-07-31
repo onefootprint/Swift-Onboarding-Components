@@ -8,7 +8,7 @@ import CountryIdDocList from './components/country-id-doc-list';
 import IdDocList from './components/id-doc-list';
 
 const Preview = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.gov-docs' });
   const {
     globalDocs,
     countryDocs,

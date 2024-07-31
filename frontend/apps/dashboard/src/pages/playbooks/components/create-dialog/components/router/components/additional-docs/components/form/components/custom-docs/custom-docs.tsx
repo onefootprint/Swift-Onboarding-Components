@@ -8,7 +8,7 @@ import CustomDocsForm from './components/custom-docs-form';
 
 const CustomDocs = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.custom-docs',
+    keyPrefix: 'create.custom-docs',
   });
   const { t: allT } = useTranslation('common');
   const { control } = useFormContext<DataToCollectFormData>();
