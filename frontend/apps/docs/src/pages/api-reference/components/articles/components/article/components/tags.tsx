@@ -21,6 +21,11 @@ const Tags = ({ article }: TagsProps) => {
 
   return (
     <Stack direction="row" gap={2}>
+      {article.hideWhenLocked && user?.isFirmEmployee && (
+        <Tooltip text={t('hide-when-locked-tooltip')}>
+          <Badge variant="warning">{t('hide-when-locked')}</Badge>
+        </Tooltip>
+      )}
       {identifyingTag && (
         <Tooltip text={identifyingTag.tooltip}>
           <Badge variant={identifyingTag.variant}>{identifyingTag.text}</Badge>

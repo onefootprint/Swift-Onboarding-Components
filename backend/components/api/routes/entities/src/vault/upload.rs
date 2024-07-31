@@ -89,12 +89,12 @@ pub async fn post(
 #[tracing::instrument(skip(state, auth, body))]
 #[route_alias(actix::post(
     "/users/vault/{identifier}/upload",
-    tags(Client, Vault, Users, PublicApi),
+    tags(ClientVaulting, Vault, Users, PublicApi, HideWhenLocked),
     description = "Updates data in a vault given a short-lived, entity-scoped client token."
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault given a short-lived, entity-scoped client token.",
-    tags(Client, Vault, Entities, Private)
+    tags(ClientVaulting, Vault, Entities, Private)
 )]
 #[actix::post("/entities/vault/{identifier}/upload")]
 pub async fn post_client(

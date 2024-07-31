@@ -493,10 +493,11 @@
         "/users/vault": {
             "patch": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Users",
-                    "PublicApi"
+                    "PublicApi",
+                    "HideWhenLocked"
                 ],
                 "description": "Updates data in a vault given a short-lived, entity-scoped client token.",
                 "requestBody": {
@@ -531,10 +532,11 @@
         "/users/vault/decrypt": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Users",
-                    "PublicApi"
+                    "PublicApi",
+                    "HideWhenLocked"
                 ],
                 "description": "Decrypts the specified list of fields given a short-lived, entity-scoped client token",
                 "requestBody": {
@@ -569,10 +571,11 @@
         "/users/vault/decrypt/{token}": {
             "get": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Users",
-                    "PublicApi"
+                    "PublicApi",
+                    "HideWhenLocked"
                 ],
                 "description": "Decrypts and downloads the user's data as specified by the provided token.",
                 "parameters": [
@@ -594,10 +597,11 @@
         "/users/vault/validate": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Users",
-                    "PublicApi"
+                    "PublicApi",
+                    "HideWhenLocked"
                 ],
                 "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
                 "requestBody": {
@@ -632,10 +636,11 @@
         "/users/vault/{identifier}/upload": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Users",
-                    "PublicApi"
+                    "PublicApi",
+                    "HideWhenLocked"
                 ],
                 "description": "Updates data in a vault given a short-lived, entity-scoped client token.",
                 "parameters": [
@@ -961,7 +966,7 @@
             "post": {
                 "tags": [
                     "Users",
-                    "Client",
+                    "ClientVaulting",
                     "PublicApi"
                 ],
                 "description": "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](https://docs.onefootprint.com/embedded-components/getting-started).",

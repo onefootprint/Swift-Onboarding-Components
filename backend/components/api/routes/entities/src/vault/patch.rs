@@ -90,12 +90,12 @@ pub async fn patch_business(
 
 #[route_alias(actix::patch(
     "/users/vault",
-    tags(Client, Vault, Users, PublicApi),
+    tags(ClientVaulting, Vault, Users, PublicApi, HideWhenLocked),
     description = "Updates data in a vault given a short-lived, entity-scoped client token."
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault given a short-lived, entity-scoped client token.",
-    tags(Client, Vault, Entities, Private)
+    tags(ClientVaulting, Vault, Entities, Private)
 )]
 #[actix::patch("/entities/vault")]
 pub async fn patch_client(

@@ -25,12 +25,12 @@ use paperclip::actix::web;
 
 #[route_alias(get(
     "/users/vault/decrypt/{token}",
-    tags(Client, Vault, Users, PublicApi),
+    tags(ClientVaulting, Vault, Users, PublicApi, HideWhenLocked),
     description = "Decrypts and downloads the user's data as specified by the provided token.",
 ))]
 #[api_v2_operation(
     description = "Works for either person or business entities. Decrypts and downloads the entity's data as specified by the provided token.",
-    tags(Client, Vault, Entities, Private)
+    tags(ClientVaulting, Vault, Entities, Private)
 )]
 #[get("/entities/vault/decrypt/{token}")]
 pub async fn get(

@@ -337,7 +337,7 @@
         "/entities/client_token": {
             "get": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Private"
                 ],
                 "description": "Returns information about the provided client auth token.",
@@ -403,7 +403,7 @@
         "/entities/vault": {
             "patch": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Entities",
                     "Private"
@@ -441,7 +441,7 @@
         "/entities/vault/decrypt": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Entities",
                     "Private"
@@ -479,7 +479,7 @@
         "/entities/vault/decrypt/{token}": {
             "get": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Entities",
                     "Private"
@@ -504,7 +504,7 @@
         "/entities/vault/validate": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Entities",
                     "Private"
@@ -542,7 +542,7 @@
         "/entities/vault/{identifier}/upload": {
             "post": {
                 "tags": [
-                    "Client",
+                    "ClientVaulting",
                     "Vault",
                     "Entities",
                     "Private"

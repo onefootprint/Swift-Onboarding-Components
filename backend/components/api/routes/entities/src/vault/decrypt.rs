@@ -169,11 +169,11 @@ pub async fn post_business(
 
 #[route_alias(post(
     "/users/vault/decrypt",
-    tags(Client, Vault, Users, PublicApi),
+    tags(ClientVaulting, Vault, Users, PublicApi, HideWhenLocked),
     description = "Decrypts the specified list of fields given a short-lived, entity-scoped client token"
 ))]
 #[api_v2_operation(
-    tags(Client, Vault, Entities, Private),
+    tags(ClientVaulting, Vault, Entities, Private),
     description = "Works for either person or business entities. Decrypts the specified list of fields given a short-lived, entity-scoped client token"
 )]
 #[post("/entities/vault/decrypt")]

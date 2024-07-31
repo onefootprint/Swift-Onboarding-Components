@@ -3,10 +3,15 @@ import useSession from 'src/hooks/use-session';
 import { Article, SecurityTypes } from '../api-reference.types';
 
 type AdditionalArticleProps = {
-  /** True if the API is deprecated/phased out and the authed tenant doesn't have access to it. */
+  /** True if this API should be hidden when the tenant doesn't have access to it. */
+  hideWhenLocked: boolean;
+  /** True if the API is should be hidden from the docs site. */
   isHidden: boolean;
   /** True if the authenticated tenant has access to hit this API (with regards to preview gates). */
   canAccessApi: boolean;
+  /** Though an API may have multiple tags associated with it, this is the singular "identifying" tag that
+   * controls some high-level visibility rules.
+   */
   tag?: ArticleTag;
 };
 
@@ -23,7 +28,12 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
     data: { user },
   } = useSession();
 
+  const canAccessPreviewApi = (previewApi: TenantPreviewApi) =>
+    user?.tenant?.allowedPreviewApis?.includes(previewApi) || false;
+
   return articles.map(article => {
+    const hasTag = (tag: string) => article.tags?.includes(tag) || false;
+
     const requiredPreviewGates = (article.security || [])
       .flatMap(s => s[SecurityTypes.apiKey] || [])
       .filter(s => s.startsWith('preview:'))
@@ -34,16 +44,26 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
       );
     }
 
-    const tag = Object.values(ArticleTag).filter(t => article.tags?.includes(t))[0];
+    const tag = Object.values(ArticleTag).filter(t => hasTag(t))[0];
     const requiredPreviewGate: TenantPreviewApi | undefined = requiredPreviewGates[0];
-    const canAccessApi =
-      !requiredPreviewGate || user?.tenant?.allowedPreviewApis?.includes(requiredPreviewGate) || false;
+    let canAccessApi = !requiredPreviewGate || canAccessPreviewApi(requiredPreviewGate);
+
+    const isClientVaultingApi = article.security?.some(s => Object.keys(s).includes(SecurityTypes.clientToken));
+    if (isClientVaultingApi) {
+      // Client-vaulting APIs have some custom visibility logic.
+      // We don't actually impose a preview API guard on the client vaulting APIs aside from generating the
+      // client_token. But we want to hide all client vaulting APIs if the tenant doesn't have access to
+      // generate the client_token
+      canAccessApi = canAccessPreviewApi(TenantPreviewApi.ClientVaultingDocs);
+    }
 
     // Employees should always be able to see every API
-    const isHidden = tag === ArticleTag.phasedOut && !canAccessApi && !user?.isFirmEmployee;
+    const hideWhenLocked = hasTag('HideWhenLocked');
+    const isHidden = hideWhenLocked && !canAccessApi && !user?.isFirmEmployee;
 
     return {
       ...article,
+      hideWhenLocked,
       isHidden,
       canAccessApi,
       tag,

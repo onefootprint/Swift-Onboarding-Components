@@ -1,11 +1,11 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
 use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::ClientTenantScope;
+use api_core::auth::tenant::TenantApiKey;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
@@ -31,14 +31,13 @@ use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](https://docs.onefootprint.com/embedded-components/getting-started).",
-    tags(Users, Client, PublicApi)
+    tags(Users, ClientVaulting, PublicApi)
 )]
 #[post("/users/{fp_id}/client_token")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: web::Json<CreateClientTokenRequest>,
-    // For now, only accept tenant API key
     auth: TenantApiKey,
     root_span: RootSpan,
 ) -> ApiResponse<CreateClientTokenResponse> {

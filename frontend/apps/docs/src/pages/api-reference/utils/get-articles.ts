@@ -33,8 +33,8 @@ export const getPath = (path: string) =>
 const getSectionTitle = (entry: unknown) => {
   // @ts-expect-error: fix-me
   let sectionTitle = entry.tags[0];
-  if (sectionTitle === 'Client') {
-    sectionTitle = 'Users (Client)';
+  if (sectionTitle === 'ClientVaulting') {
+    sectionTitle = 'Client vaulting';
   } else {
     // Split CamelCase into separate words
     sectionTitle = sectionTitle.replace(/[A-Z]/g, (l: string) => ` ${l.toLowerCase()}`).trim();

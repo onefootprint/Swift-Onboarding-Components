@@ -10,7 +10,7 @@ use paperclip::actix::{
 };
 
 #[api_v2_operation(
-    tags(Client, Private),
+    tags(ClientVaulting, Private),
     description = "Returns information about the provided client auth token."
 )]
 #[actix::get("/entities/client_token")]

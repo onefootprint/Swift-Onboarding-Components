@@ -79,9 +79,6 @@ impl ::core::str::FromStr for PreviewApi {
     fn from_str(s: &str) -> ::core::result::Result<PreviewApi, <Self as ::core::str::FromStr>::Err> {
         if let Some(v) = Self::iter().find(|v| v.to_string() == s) {
             Ok(v)
-        } else if s == "client_vaulting" {
-            // Alias
-            Ok(Self::ClientVaultingDocs)
         } else {
             tracing::error!(value = s, "Encountered unknown PreviewApi variant");
             Ok(Self::Other(s.to_string()))

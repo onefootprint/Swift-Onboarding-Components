@@ -70,12 +70,12 @@ pub async fn post_business(
 
 #[route_alias(actix::post(
     "/users/vault/validate",
-    tags(Client, Vault, Users, PublicApi),
+    tags(ClientVaulting, Vault, Users, PublicApi, HideWhenLocked),
     description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any."
 ))]
 #[api_v2_operation(
     description = "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
-    tags(Client, Vault, Entities, Private)
+    tags(ClientVaulting, Vault, Entities, Private)
 )]
 #[actix::post("/entities/vault/validate")]
 pub async fn post_client(
