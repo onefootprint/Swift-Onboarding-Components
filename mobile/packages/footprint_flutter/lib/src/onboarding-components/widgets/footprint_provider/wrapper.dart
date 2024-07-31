@@ -49,6 +49,12 @@ class _WrapperState extends ConsumerState<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    final fpProvider = ref.watch(fpContextNotifierProvider);
+    return FootprintService(
+      printContext: () {
+        print(fpProvider.publicKey); // TODO: remove
+      },
+      child: widget.child,
+    );
   }
 }
