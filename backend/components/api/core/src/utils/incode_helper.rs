@@ -19,11 +19,13 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::incode_verification_session::UpdateIncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
 use db::DbPool;
+use db::DbResult;
 use feature_flag::FeatureFlagClient;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
 use newtypes::DocumentSide;
 use newtypes::DocumentStatus;
+use newtypes::IncodeFailureReason;
 use newtypes::IncodeVerificationSessionState;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
@@ -56,6 +58,7 @@ pub async fn handle_incode_request(
     let disable_selfie = state
         .ff_client
         .flag(feature_flag::BoolFlag::DisableSelfieChecking(&tenant_id));
+
     // Initialize our state machine
     let ctx = IncodeContext {
         di_id: decision_intent_id.clone(),
@@ -75,57 +78,36 @@ pub async fn handle_incode_request(
         is_re_run,
         aws_selfie_client: state.aws_selfie_doc_client.clone(),
     };
-    let machine = IncodeStateMachine::init(
+
+
+    let machine_response_fut = init_and_run_incode_state_machine(
         state,
-        tenant_id.clone(),
-        // TODO: upstream this somewhere based on OBC
-        get_config_id(
-            state,
-            should_collect_selfie,
-            is_sandbox,
-            &tenant_id,
-            configuration_id_override.0,
-        ),
         ctx,
+        identity_document_id.clone(),
+        tenant_id,
+        should_collect_selfie,
         is_sandbox,
-    )
-    .await;
+        configuration_id_override,
+        is_re_run,
+    );
 
-    let successful_machine_response = match machine {
-        Err(err) => {
-            on_incode_hard_error(&state.db_pool, err, &identity_document_id).await?;
+    let timeout = Duration::from_secs(50);
+    let machine_response_fut_with_timeout = actix_web::rt::time::timeout(timeout, machine_response_fut);
+
+    let machine_response = match machine_response_fut_with_timeout.await {
+        Ok(result_without_timeout) => result_without_timeout?,
+        Err(_) => {
+            on_incode_hard_error(
+                &state.db_pool,
+                AssertionError("timeout running Incode machine").into(),
+                &identity_document_id,
+            )
+            .await?;
             None
-        }
-        Ok(machine) => {
-            if machine.session.hard_errored && !is_re_run {
-                None
-            } else {
-                let timeout = Duration::from_secs(50);
-                let run_fut = machine.run(&state.db_pool, &state.vendor_clients.incode);
-                let fut_with_timeout = actix_web::rt::time::timeout(timeout, run_fut);
-
-                match fut_with_timeout.await {
-                    Ok(Ok((machine, retry_reasons))) => Some((machine.state.name(), retry_reasons)),
-                    Ok(Err(err)) => {
-                        on_incode_hard_error(&state.db_pool, err.error, &identity_document_id).await?;
-                        None
-                    }
-                    Err(_) => {
-                        // Timeout
-                        on_incode_hard_error(
-                            &state.db_pool,
-                            AssertionError("timeout running Incode machine").into(),
-                            &identity_document_id,
-                        )
-                        .await?;
-                        None
-                    }
-                }
-            }
         }
     };
 
-    if let Some((machine_state_name, retry_reasons)) = successful_machine_response {
+    if let Some((machine_state_name, retry_reasons)) = machine_response {
         let next_side_to_collect = match machine_state_name {
             IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
             IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
@@ -180,8 +162,58 @@ pub async fn handle_incode_request(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
+async fn init_and_run_incode_state_machine(
+    state: &State,
+    ctx: IncodeContext,
+    identity_document_id: DocumentId,
+    tenant_id: TenantId,
+    should_collect_selfie: bool,
+    is_sandbox: bool,
+    configuration_id_override: IncodeConfigurationIdOverride,
+    is_re_run: bool,
+) -> DbResult<Option<(IncodeVerificationSessionState, Vec<IncodeFailureReason>)>> {
+    let machine = IncodeStateMachine::init(
+        state,
+        tenant_id.clone(),
+        // TODO: upstream this somewhere based on OBC
+        get_config_id(
+            state,
+            should_collect_selfie,
+            is_sandbox,
+            &tenant_id,
+            configuration_id_override.0,
+        ),
+        ctx,
+        is_sandbox,
+    )
+    .await;
+
+    let machine_response = match machine {
+        Err(err) => {
+            on_incode_hard_error(&state.db_pool, err, &identity_document_id).await?;
+            None
+        }
+        Ok(machine) => {
+            if machine.session.hard_errored && !is_re_run {
+                None
+            } else {
+                match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
+                    Ok((machine, retry_reasons)) => Some((machine.state.name(), retry_reasons)),
+                    Err(err) => {
+                        on_incode_hard_error(&state.db_pool, err.error, &identity_document_id).await?;
+                        None
+                    }
+                }
+            }
+        }
+    };
+
+    Ok(machine_response)
+}
+
 #[tracing::instrument(skip(db_pool))]
-async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> FpResult<()> {
+async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> DbResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
     if err.code() == Some(FpErrorCode::IncodeMachineConcurrentChange) {
@@ -190,7 +222,7 @@ async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &Docume
     }
 
     db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
+        .db_transaction(move |conn| -> DbResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
 
             if let Some(ivs) = ivs {
