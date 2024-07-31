@@ -18,6 +18,7 @@ mod tenant_rb;
 pub use self::tenant_rb::*;
 mod api_key_gated;
 pub use self::api_key_gated::*;
+use super::session::AuthSessionData;
 use super::AuthError;
 use super::Either;
 use super::IsGuardMet;
@@ -54,6 +55,22 @@ impl TenantSessionAuth {
         match self {
             Either::Left(l) => l.data.0.data.purpose,
             Either::Right(r) => r.data.0.data.purpose,
+        }
+    }
+
+    /// Generations a new AuthSessionData with the purpose replaced
+    pub fn replace_purpose(self, purpose: TenantSessionPurpose) -> AuthSessionData {
+        match self {
+            Either::Left(l) => {
+                let mut session_data = l.data.0.data;
+                session_data.purpose = purpose;
+                session_data.into()
+            }
+            Either::Right(r) => {
+                let mut session_data = r.data.0.data;
+                session_data.purpose = purpose;
+                session_data.into()
+            }
         }
     }
 }

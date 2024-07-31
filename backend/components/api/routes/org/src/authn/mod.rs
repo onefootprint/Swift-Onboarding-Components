@@ -1,6 +1,7 @@
 use paperclip::actix::web;
 
 mod assume_role;
+mod docs_token;
 mod google_oauth;
 mod login;
 mod logout;
@@ -11,6 +12,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(login::handler)
         .service(logout::handler)
+        .service(docs_token::post)
         .service(magic_link::handler)
         .service(google_oauth::handler)
         .service(roles::get)

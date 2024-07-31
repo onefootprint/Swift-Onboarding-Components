@@ -17,6 +17,7 @@ use api_wire_types::OrganizationMember;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
+use newtypes::TenantSessionPurpose;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -34,6 +35,7 @@ fn post(
     auth: TenantSessionAuth,
 ) -> ApiResponse<AssumeRoleResponse> {
     let AssumeRoleRequest { tenant_id, purpose } = request.into_inner();
+    let purpose = purpose.unwrap_or(TenantSessionPurpose::Dashboard);
     let current_purpose = auth.purpose();
     let auth_method = auth.auth_method();
     let expires_at = auth.clone().session().expires_at;
@@ -45,11 +47,19 @@ fn post(
         return Err(AuthError::AuthTokenPurposeRestricted.into());
     }
 
-    let login_result = state
+    let sealing_key = state.session_sealing_key.clone();
+    let (login_result, token) = state
         .db_pool
-        .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method))
+        .db_transaction(move |conn| -> FpResult<_> {
+            let login_result = TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method)?;
+            let session_data = TenantRbSession::create(&login_result, purpose);
+            // The new token will expire at the same time as the existing token to prevent allowing
+            // perpetually re-creating a new token for yourself
+            let (token, _) = AuthSession::create_sync(conn, &sealing_key, session_data, expires_at)?;
+            Ok((login_result, token))
+        })
         .await?;
-    let session_data = TenantRbSession::create(&login_result, purpose);
+
     let TenantRbLoginResult {
         t_user,
         rb,
@@ -63,17 +73,6 @@ fn post(
             return Err(AssertionError("expected tenant, found partner tenant").into());
         }
     };
-    let session_sealing_key = state.session_sealing_key.clone();
-    let token = state
-        .db_pool
-        .db_query(move |conn| -> FpResult<_> {
-            // The new token will expire at the same time as the existing token to prevent allowing
-            // perpetually re-creating a new token for yourself
-            let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session_data, expires_at)?;
-            Ok(token)
-        })
-        .await?;
-
     let data = AssumeRoleResponse {
         token,
         user: OrganizationMember::from_db((t_user, rb, role)),
