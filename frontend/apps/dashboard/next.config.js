@@ -17,7 +17,7 @@ const getNextConfig = () => {
     form-action 'self';
     frame-ancestors 'self';
     frame-src 'self' vercel.live https://app.svix.com calendly.com data: blob:;
-    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net i-dev.onefp.net;
+    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net;
     media-src 'self' https data:;
     script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${DATADOG_SRC};
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
@@ -106,6 +106,14 @@ const getNextConfig = () => {
         {
           protocol: 'https',
           hostname: 'i-dev.onefp.net',
+        },
+        {
+          protocol: 'https',
+          hostname: 'i.onefp.net',
+        },
+        {
+          protocol: 'https',
+          hostname: 'local.i-dev.onefp.net',
         },
       ],
     },
