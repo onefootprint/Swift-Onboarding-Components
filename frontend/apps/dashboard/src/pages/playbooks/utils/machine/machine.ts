@@ -101,6 +101,11 @@ export const createPlaybookMachine = () =>
                 cond: context => context.kind === PlaybookKind.Auth,
               },
               {
+                target: 'settingsDocOnly',
+                actions: ['assignNameYourPlaybook'],
+                cond: context => context.kind === PlaybookKind.DocOnly,
+              },
+              {
                 target: 'settingsPerson',
                 actions: ['assignNameYourPlaybook'],
                 cond: context => context.kind === PlaybookKind.Kyc,
@@ -109,6 +114,20 @@ export const createPlaybookMachine = () =>
           },
         },
         settingsAuth: {
+          on: {
+            whoToOnboardSelected: {
+              target: 'whoToOnboard',
+              actions: ['resetKind', 'resetOnboardingTemplate'],
+            },
+            nameYourPlaybookSelected: {
+              target: 'nameYourPlaybook',
+            },
+            navigationBackward: {
+              target: 'nameYourPlaybook',
+            },
+          },
+        },
+        settingsDocOnly: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -176,21 +195,6 @@ export const createPlaybookMachine = () =>
             },
           },
         },
-        settingsDocOnly: {
-          on: {
-            whoToOnboardSelected: {
-              target: 'whoToOnboard',
-              actions: ['resetKind', 'resetOnboardingTemplate'],
-            },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            navigationBackward: {
-              target: 'nameYourPlaybook',
-            },
-          },
-        },
-
         verificationChecks: {
           on: {
             whoToOnboardSelected: {

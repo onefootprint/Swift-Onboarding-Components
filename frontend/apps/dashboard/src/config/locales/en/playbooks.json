@@ -95,6 +95,10 @@
         }
       }
     },
+    "settings-doc-only": {
+      "title": "Requested documents",
+      "subtitle": "All selected documents will be presented as viable upload options for users to select from."
+    },
     "data-to-collect": {
       "nav": "Playbook details",
       "title": {

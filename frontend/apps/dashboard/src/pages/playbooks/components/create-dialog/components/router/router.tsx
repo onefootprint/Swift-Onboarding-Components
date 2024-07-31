@@ -1,12 +1,12 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { DocumentRequestKind, type OnboardingConfigKind } from '@onefootprint/types';
+import { type OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth, isDocOnly } from '@/playbooks/utils/kind';
+import { isDocOnly } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
   DataToCollectFormData,
@@ -21,6 +21,7 @@ import Name from './components/name';
 import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
 import SettingsAuth from './components/settings-auth';
+import SettingsDocOnly from './components/settings-doc-only';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useCreatePlaybook from './hooks/use-create-playbook';
@@ -155,18 +156,17 @@ const Router = ({ onCreate }: RouterProps) => {
     createPlaybook(ctx, verificationChecks);
   };
 
+  const handleDocOnlySubmitted = (formData: DataToCollectFormData) => {
+    const verificationChecksForm = {
+      skipKyc: true,
+      amlFormData: defaultValues.aml,
+    };
+    const idDocContext = getFixedIdDocPlaybook(state.context, formData, verificationChecksForm);
+    createPlaybook(idDocContext, verificationChecksForm);
+  };
+
   const handleSubmitDataToCollect = (formData: DataToCollectFormData) => {
     const { nameForm } = state.context;
-    if (isDocOnly(state.context.kind) && nameForm) {
-      const verificationChecksForm = {
-        skipKyc: true,
-        amlFormData: defaultValues.aml,
-      };
-      const idDocContext = getFixedIdDocPlaybook(state.context, formData, verificationChecksForm);
-      createPlaybook(idDocContext, verificationChecksForm);
-      return;
-    }
-
     if (onboardingTemplate === OnboardingTemplate.Alpaca && nameForm) {
       const verificationChecksForm = {
         skipKyc: false,
@@ -281,6 +281,16 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={handleAuthSubmitted}
+            isLoading={mutation.isLoading}
+          />
+        )}
+        {state.matches('settingsDocOnly') && (
+          <SettingsDocOnly
+            defaultValues={defaultValues.playbook}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={handleDocOnlySubmitted}
             isLoading={mutation.isLoading}
           />
         )}
