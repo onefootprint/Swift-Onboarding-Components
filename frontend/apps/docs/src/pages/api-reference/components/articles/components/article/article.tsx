@@ -125,6 +125,7 @@ const ContentColumn = styled.div`
     grid-area: article;
     padding: 0 ${theme.spacing[5]} ${theme.spacing[8]} ${theme.spacing[8]};
     max-width: ${CONTENT_WIDTH}px;
+    width: 100%;
     margin: 0 auto;
   `}
 `;
