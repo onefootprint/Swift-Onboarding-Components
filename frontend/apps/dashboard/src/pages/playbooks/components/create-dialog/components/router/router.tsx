@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { type OnboardingConfigKind } from '@onefootprint/types';
-import { Stepper, useToast } from '@onefootprint/ui';
+import { Stepper, media, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -366,64 +366,31 @@ const Router = ({ onCreate }: RouterProps) => {
 
 const StepperContainer = styled.div`
   ${({ theme }) => css`
-    white-space: nowrap;
-    margin-top: ${theme.spacing[5]};
-
-    @media (max-width: 960px) {
-      display: none;
-    }
-
-    @media (min-width: 960px) {
-      margin-left: ${theme.spacing[10]};
-      position: fixed;
-    }
+    display: none;
+    
+    ${media.greaterThan('md')`
+      display: block;
+      position: absolute;
+      top: ${theme.spacing[3]};
+      left: ${theme.spacing[7]};
+    `}
   `}
 `;
 
 const Content = styled.div`
-  grid-area: content;
-
-
-  @media (max-width: 960px) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @media (min-width: 960px) and (max-width: 1100px) {
-    margin-left: 220px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @media (min-width: 1100px) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 520px;
-  }
+  max-width: 520px;
+  margin: auto;
+ 
+  ${media.greaterThan('md')`
+    max-width: 580px;
+  `}
 `;
 
 const Container = styled.div`
-  @media (max-width: 959px) {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  @media (min-width: 960px) and (max-width: 1100px) {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-
-  @media (min-width: 1100px) {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas: "stepper content .";
-  }
+  ${({ theme }) => css`
+    position: relative;
+    padding: ${theme.spacing[5]};
+  `}
 `;
 
 export default Router;
