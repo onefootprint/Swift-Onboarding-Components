@@ -29,6 +29,12 @@ const businessFields: `${BusinessDI}`[] = [
   // 'business.tin', Requires an auth token with mobile access scope
 ];
 
+const omitNullAndUndefined = (data: BusinessDIData): BusinessDIData =>
+  Object.entries(data).reduce((response, [key, value]) => {
+    if (value != null) response[key] = value;
+    return response;
+  }, Object.create(null));
+
 const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess }: InitProps) => {
   const mutDecryptBusiness = useDecryptBusiness();
 
@@ -37,8 +43,10 @@ const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess }: InitP
       { authToken, fields: businessFields },
       {
         onError,
-        onSuccess: (res: BusinessDIData) =>
-          res['business.tin'] != null ? onSuccess(res) : onSuccess({ ...res, 'business.tin': 'decrypted' }),
+        onSuccess: (response: BusinessDIData) => {
+          const res = omitNullAndUndefined(response);
+          return res['business.tin'] != null ? onSuccess(res) : onSuccess({ ...res, 'business.tin': 'decrypted' });
+        },
       },
     );
   };

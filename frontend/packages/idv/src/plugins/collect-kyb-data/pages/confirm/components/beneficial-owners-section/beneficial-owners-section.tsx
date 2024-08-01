@@ -14,13 +14,15 @@ const BeneficialOwnersSection = () => {
   const [state] = useCollectKybDataMachine();
   const {
     data,
-    kybRequirement: { missingAttributes },
+    kybRequirement: { missingAttributes, populatedAttributes },
   } = state.context;
-  const isMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const isKycBoMissing = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
+  const isKycBoPopulated = populatedAttributes?.includes(CollectedKybDataOption.kycedBeneficialOwners) || false;
 
   const beneficialOwners =
-    (isMultiKyc ? data[BusinessDI.kycedBeneficialOwners] : data[BusinessDI.beneficialOwners]) ?? [];
+    (isKycBoMissing || isKycBoPopulated ? data[BusinessDI.kycedBeneficialOwners] : data[BusinessDI.beneficialOwners]) ??
+    [];
 
   if (!beneficialOwners.length) {
     return null;
@@ -65,11 +67,11 @@ const BeneficialOwnersSection = () => {
     });
   });
 
-  const startEditing = () => setEditing(true);
+  const startEditing = () => setIsEditing(true);
 
-  const stopEditing = () => setEditing(false);
+  const stopEditing = () => setIsEditing(false);
 
-  return editing ? (
+  return isEditing ? (
     <Section
       title={t('beneficial-owners.title')}
       IconComponent={IcoUserCircle24}
@@ -81,7 +83,7 @@ const BeneficialOwnersSection = () => {
   ) : (
     <MultiSection
       title={t('beneficial-owners.title')}
-      editLabel={t('summary.edit')}
+      editLabel={isKycBoPopulated ? '' : t('summary.edit')}
       onEdit={startEditing}
       IconComponent={IcoUserCircle24}
       sections={sections}

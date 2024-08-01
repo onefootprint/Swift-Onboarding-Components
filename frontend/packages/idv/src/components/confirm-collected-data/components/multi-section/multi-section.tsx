@@ -24,7 +24,7 @@ const MultiSection = ({ title, editLabel, onEdit, sections, IconComponent, testI
           {title}
         </Text>
       </TitleContainer>
-      {editLabel && <LinkButton onClick={onEdit}>{editLabel}</LinkButton>}
+      {editLabel ? <LinkButton onClick={onEdit}>{editLabel}</LinkButton> : null}
     </Header>
     <Sections>
       {sections.map((section: SectionProps, index: number) => (
