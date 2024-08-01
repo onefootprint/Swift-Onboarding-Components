@@ -18,9 +18,12 @@ use rust_decimal::Decimal;
 use std::collections::HashMap;
 use std::str::FromStr;
 pub use stripe::Client;
+use stripe::CollectionMethod;
 use stripe::CreateCustomer;
 use stripe::CreateInvoice;
 use stripe::CreateInvoiceItem;
+use stripe::CreateInvoicePaymentSettings;
+use stripe::CreateInvoicePaymentSettingsPaymentMethodTypes;
 use stripe::Currency;
 use stripe::Customer;
 use stripe::CustomerId;
@@ -40,6 +43,9 @@ pub mod interval;
 mod invoices;
 pub use invoices::*;
 mod profile;
+
+#[allow(clippy::inconsistent_digit_grouping)]
+const SMALL_INVOICE_NOTIONAL_CENTS: i64 = 500_00;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -223,14 +229,38 @@ impl BillingClient {
             return Ok(());
         }
 
+        //
         // Create the invoice, which will automatically include these billing items
+        //
+
         let extra_metadata = [("billing-interval".to_owned(), info.interval.label())];
         let metadata = chain!(extra_metadata, managed_metadata()).collect();
+
+        let mut payment_method_types = vec![
+            CreateInvoicePaymentSettingsPaymentMethodTypes::AchCreditTransfer,
+            CreateInvoicePaymentSettingsPaymentMethodTypes::UsBankAccount,
+        ];
+        let total_notional_cents: i64 = items.values().flat_map(|i| i.amount).sum();
+        if total_notional_cents < SMALL_INVOICE_NOTIONAL_CENTS {
+            // For small invoices, let tenants pay via card
+            payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Card);
+            payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Cashapp);
+        }
+
+        // TODO settings for which invoices can automatically be sent out
+
         let new_invoice = CreateInvoice {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
-            auto_advance: Some(false), // Don't let stripe automatically send out this invoice
             pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
+            collection_method: Some(CollectionMethod::SendInvoice),
+            payment_settings: Some(CreateInvoicePaymentSettings {
+                payment_method_types: Some(payment_method_types),
+                ..Default::default()
+            }),
+            days_until_due: Some(30),
+            // TODO Testing this for footprint live, then enable this for other tenants
+            auto_advance: Some(info.tenant_id.is_footprint_live()),
             description: None,
             ..Default::default()
         };

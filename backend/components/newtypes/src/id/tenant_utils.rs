@@ -47,6 +47,10 @@ impl TenantId {
     pub fn is_wingspan(&self) -> bool {
         self.0 == *"org_HfhfuQan6A6EXIYuFDwyNZ"
     }
+
+    pub fn is_footprint_live(&self) -> bool {
+        self.0 == *"org_e2FHVfOM5Hd3Ce492o5Aat"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
