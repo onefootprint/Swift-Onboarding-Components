@@ -21,7 +21,7 @@ const FeedbackIcon = ({
 }: FeedbackIconProps) => (
   <IconComponent>
     <ImageIcon color={imageIconColor} />
-    <StatusContainer data-status={status} backgroundColor={backgroundColor}>
+    <StatusContainer data-status={status} $backgroundColor={backgroundColor}>
       {statusIndicatorComponent}
     </StatusContainer>
   </IconComponent>
@@ -36,10 +36,8 @@ const IconComponent = styled.div`
   `}
 `;
 
-const StatusContainer = styled.div<{
-  backgroundColor: 'primary' | 'secondary';
-}>`
-  ${({ theme, backgroundColor }) => css`
+const StatusContainer = styled.div<{ $backgroundColor: 'primary' | 'secondary' }>`
+  ${({ theme, $backgroundColor }) => css`
     position: absolute;
     display: flex;
     justify-content: center;
@@ -47,7 +45,7 @@ const StatusContainer = styled.div<{
     bottom: calc(-1 * ${theme.spacing[4]} - ${theme.spacing[1]});
     border-width: ${theme.spacing[2]};
     border-style: solid;
-    border-color: ${theme.backgroundColor[backgroundColor]};
+    border-color: ${theme.backgroundColor[$backgroundColor]};
     border-radius: ${theme.borderRadius.full};
     padding: ${theme.spacing[2]};
 

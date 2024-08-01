@@ -9,7 +9,7 @@ const flashAnimation = keyframes`
   }
 `;
 
-const Flash = styled.div<{ flash: boolean }>`
+const Flash = styled.div<{ $flash: boolean }>`
   position: absolute;
   top: 0;
   right: 0;
@@ -21,8 +21,8 @@ const Flash = styled.div<{ flash: boolean }>`
     background-color: ${theme.backgroundColor.primary};
   `}
 
-  ${({ flash }) =>
-    flash &&
+  ${({ $flash }) =>
+    $flash &&
     css`
       animation: ${flashAnimation} 300ms ease-out;
     `}

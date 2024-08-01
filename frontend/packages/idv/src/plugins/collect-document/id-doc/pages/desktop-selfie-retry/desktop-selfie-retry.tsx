@@ -68,7 +68,7 @@ const DesktopSelfieRetry = () => {
       ) : (
         <Container>
           <DesktopHeader sideName={transformCase(sideName, 'first-letter-upper-only')} isSelfie />
-          <ErrorContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
+          <ErrorContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
             <ErrorComponent
               errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}
               sideName={sideName}
@@ -92,15 +92,13 @@ const Container = styled.div`
   `}
 `;
 
-const ErrorContainer = styled.div<{
-  height: number;
-}>`
-  ${({ theme, height }) => css`
+const ErrorContainer = styled.div<{ $height: number }>`
+  ${({ theme, $height }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: ${height}px;
+    min-height: ${$height}px;
     background-color: ${theme.backgroundColor.secondary};
     border: 1px dashed ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.default};

@@ -86,8 +86,8 @@ const DraggableInputField = ({
         onDragOver={handleDrag}
         onDragLeave={handleDragLeave}
         onDragEnter={handleDragEnter}
-        dragActive={dragActive}
-        activeBackgroundColorCode={primitives.Purple50}
+        $dragActive={dragActive}
+        $activeBackgroundColorCode={primitives.Purple50}
         data-error={hasError}
         height={height}
         data-loading={!!isLoading}
@@ -113,19 +113,19 @@ const Container = styled.div`
 `;
 
 const UploadBox = styled.div<{
-  dragActive: boolean;
-  activeBackgroundColorCode: string;
+  $dragActive: boolean;
+  $activeBackgroundColorCode: string;
   height: number;
 }>`
-  ${({ theme, dragActive, activeBackgroundColorCode, height }) => css`
+  ${({ theme, $dragActive, $activeBackgroundColorCode, height }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: ${height}px;
-    background-color: ${dragActive ? activeBackgroundColorCode : theme.backgroundColor.secondary};
+    background-color: ${$dragActive ? $activeBackgroundColorCode : theme.backgroundColor.secondary};
     border: 1px dashed
-      ${dragActive ? theme.borderColor.secondary : theme.borderColor.primary};
+      ${$dragActive ? theme.borderColor.secondary : theme.borderColor.primary};
     border-radius: ${theme.borderRadius.default};
     cursor: pointer;
 
@@ -135,7 +135,7 @@ const UploadBox = styled.div<{
     }
 
     &:active {
-      background-color: ${activeBackgroundColorCode};
+      background-color: ${$activeBackgroundColorCode};
       border: 1px dashed ${theme.borderColor.secondary};
     }
 
@@ -148,7 +148,7 @@ const UploadBox = styled.div<{
     }
 
     > * {
-      pointer-events: ${dragActive ? 'none' : 'all'};
+      pointer-events: ${$dragActive ? 'none' : 'all'};
     }
   `}
 `;

@@ -22,7 +22,7 @@ const DesktopCameraPermission = ({ permissionState }: DesktopCameraPermissionPro
         <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
         <HeaderTitle title={t('take-selfie')} />
       </Box>
-      <CameraStateContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
+      <CameraStateContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         {permissionState === 'undetected' ? (
           <AnimatedLoadingSpinner animationStart />
         ) : (
@@ -48,15 +48,13 @@ const Container = styled.div`
   `}
 `;
 
-const CameraStateContainer = styled.div<{
-  height: number;
-}>`
-  ${({ theme, height }) => css`
+const CameraStateContainer = styled.div<{ $height: number }>`
+  ${({ theme, $height }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: ${height}px;
+    min-height: ${$height}px;
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.default};
   `}

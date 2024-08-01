@@ -11,7 +11,7 @@ type FeedbackProps = {
 };
 
 const Feedback = ({ children, deviceKind, top }: FeedbackProps) => (
-  <Container data-device={deviceKind} top={top}>
+  <Container data-device={deviceKind} $top={top}>
     <FeedbackText>
       <Text variant="label-4" color="quinary">
         {children}
@@ -20,14 +20,14 @@ const Feedback = ({ children, deviceKind, top }: FeedbackProps) => (
   </Container>
 );
 
-const Container = styled.div<{ top: number }>`
-  ${({ top }) => css`
+const Container = styled.div<{ $top: number }>`
+  ${({ $top }) => css`
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     width: 100%;
-    top: ${top}px;
+    top: ${$top}px;
   `}
 `;
 

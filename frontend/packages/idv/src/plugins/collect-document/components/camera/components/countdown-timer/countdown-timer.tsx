@@ -12,7 +12,7 @@ const CountdownTimer = ({ current, start }: CountdownTimerProps) => {
   if (start < current || current <= 0 || start <= 0) return null;
 
   return (
-    <Container size={COUNTDOWN_TIMER_SIZE}>
+    <Container $size={COUNTDOWN_TIMER_SIZE}>
       <Text variant="display-2" color="quinary">
         {current}
       </Text>
@@ -20,13 +20,13 @@ const CountdownTimer = ({ current, start }: CountdownTimerProps) => {
   );
 };
 
-const Container = styled.div<{ size: number }>`
-  ${({ theme, size }) => css`
+const Container = styled.div<{ $size: number }>`
+  ${({ theme, $size }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: ${size}px;
-    height: ${size}px;
+    width: ${$size}px;
+    height: ${$size}px;
     border-radius: ${theme.borderRadius.full};
     background-color: #00000059;
   `}
