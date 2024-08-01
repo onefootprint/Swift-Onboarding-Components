@@ -34,14 +34,18 @@ export type BasicDataFormProps = {
   optionalFields?: (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
 };
 
-const getFormHints = (list: FormProps, errors: FormErrors): FormHints =>
-  list.reduce<FormHints>((hints, prop) => {
+const getFormHints = (list: FormProps, errors: FormErrors): FormHints => {
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.basic-data.form' });
+  return list.reduce<FormHints>((hints, prop) => {
     const error = errors[prop];
     if (error && error?.message) {
       hints[prop] = error.message; // eslint-disable-line no-param-reassign
+    } else if (prop === 'tin') {
+      hints[prop] = t('must-be-ein');
     }
     return hints;
   }, Object.create(null));
+};
 
 const FormHintsList: FormProps = ['phoneNumber', 'tin', 'website'];
 
@@ -122,7 +126,7 @@ const BasicDataForm = ({
         <div>
           <TextInput
             data-dd-privacy="mask"
-            hasError={!!tinHint}
+            hasError={!!errors.tin}
             hint={tinHint}
             mask={inputMasks.tin}
             value={getValues('tin')}
@@ -139,9 +143,6 @@ const BasicDataForm = ({
               },
             })}
           />
-          <Text variant="caption-3" color="secondary" marginTop={2}>
-            {t('must-be-ein')}
-          </Text>
         </div>
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
