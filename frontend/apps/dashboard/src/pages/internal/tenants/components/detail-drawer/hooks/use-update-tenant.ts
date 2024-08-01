@@ -1,6 +1,6 @@
 import request from '@onefootprint/request';
 import type {
-  TenantBillingProfile,
+  TenantBillingProfilePrices,
   TenantDetail,
   TenantPreviewApi,
   TenantSupportedAuthMethod,
@@ -15,6 +15,13 @@ export type UpdateTenantVendorControl = {
   lexisEnabled?: boolean;
   experianSubscriberCode?: string | null;
   middeskApiKey?: string | null;
+};
+
+export type UpdateTenantBillingProfile = {
+  prices?: TenantBillingProfilePrices;
+  billingEmail?: string | null;
+  omitBilling?: boolean;
+  sendAutomatically?: boolean;
 };
 
 export type PrivatePatchTenantRequest = {
@@ -33,7 +40,7 @@ export type PrivatePatchTenantRequest = {
   supportedAuthMethods?: TenantSupportedAuthMethod[] | null;
   allowedPreviewApis?: TenantPreviewApi[];
 
-  billingProfile?: TenantBillingProfile;
+  billingProfile?: UpdateTenantBillingProfile;
   vendorControl?: UpdateTenantVendorControl;
 };
 

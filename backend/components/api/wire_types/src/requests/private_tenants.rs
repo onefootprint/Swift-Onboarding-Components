@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::email::Email;
 use newtypes::AppClipExperienceId;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
@@ -55,8 +56,16 @@ pub struct PrivateTenantDetail {
     pub stripe_customer_id: Option<StripeCustomerId>,
     pub app_clip_experience_id: AppClipExperienceId,
 
-    pub billing_profile: Option<HashMap<Product, String>>,
+    pub billing_profile: Option<PrivateBillingProfile>,
     pub vendor_control: Option<PrivateTenantVendorControl>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct PrivateBillingProfile {
+    pub prices: HashMap<Product, String>,
+    pub billing_email: Option<String>,
+    pub omit_billing: bool,
+    pub send_automatically: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -68,9 +77,14 @@ pub struct PrivateTenantVendorControl {
     pub middesk_api_key_exists: bool,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema, derive_more::Deref)]
-#[serde(transparent)]
-pub struct PrivateUpdateBillingProfile(pub HashMap<Product, Patch<String>>);
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivateUpdateBillingProfile {
+    pub prices: Option<HashMap<Product, Patch<String>>>,
+    #[serde(default)]
+    pub billing_email: Patch<Email>,
+    pub omit_billing: Option<bool>,
+    pub send_automatically: Option<bool>,
+}
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateUpdateTvc {

@@ -6,9 +6,10 @@ use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::ValidationError;
+use api_wire_types::PrivateUpdateBillingProfile;
 use api_wire_types::PrivateUpdateTvc;
 use db::models::billing_profile::BillingProfile;
-use db::models::billing_profile::UpdateBillingProfile;
+use db::models::billing_profile::UpdateBillingProfileArgs;
 use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
@@ -65,7 +66,7 @@ fn make_tenant_update(
     req: api_wire_types::PrivatePatchTenant,
 ) -> FpResult<(
     PrivateUpdateTenant,
-    Option<UpdateBillingProfile>,
+    Option<UpdateBillingProfileArgs>,
     Option<UpdateTenantVendorControlArgs>,
 )> {
     let api_wire_types::PrivatePatchTenant {
@@ -98,12 +99,29 @@ fn make_tenant_update(
         is_demo_tenant,
         super_tenant_id: super_tenant_id.to_changeset(),
     };
-    let billing_profile =
-        billing_profile.map(|bp| bp.0.into_iter().map(|(k, v)| (k, v.to_changeset())).collect());
+    let billing_profile = billing_profile.map(make_bp_update);
     let vendor_control = vendor_control
         .map(|tvc| make_tvc_update(tenant, tvc))
         .transpose()?;
     Ok((update, billing_profile, vendor_control))
+}
+
+fn make_bp_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfileArgs {
+    let PrivateUpdateBillingProfile {
+        prices,
+        billing_email,
+        omit_billing,
+        send_automatically,
+    } = request;
+    let prices = prices.map(|p| p.into_iter().map(|(k, v)| (k, v.to_changeset())).collect());
+    UpdateBillingProfileArgs {
+        prices,
+        billing_email: billing_email
+            .map(|e| e.to_piistring().leak_to_string())
+            .to_changeset(),
+        omit_billing,
+        send_automatically,
+    }
 }
 
 fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<UpdateTenantVendorControlArgs> {

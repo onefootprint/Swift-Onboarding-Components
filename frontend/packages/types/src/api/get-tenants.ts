@@ -62,7 +62,14 @@ export enum TenantBillingProfileProduct {
 /**
  * The price of each product for this tenant, set in cents.
  */
-export type TenantBillingProfile = Partial<Record<TenantBillingProfileProduct, string | null>>;
+export type TenantBillingProfile = {
+  prices: TenantBillingProfilePrices;
+  billingEmail?: string;
+  omitBilling: boolean;
+  sendAutomatically: boolean;
+};
+
+export type TenantBillingProfilePrices = Partial<Record<TenantBillingProfileProduct, string | null>>;
 
 export type TenantVendorControl = {
   idologyEnabled: boolean;

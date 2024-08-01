@@ -20,6 +20,9 @@ pub struct BillingProfile {
     pub _updated_at: DateTime<Utc>,
     pub tenant_id: TenantId,
     pub prices: PriceMap,
+    pub billing_email: Option<String>,
+    pub omit_billing: bool,
+    pub send_automatically: bool,
 }
 
 
@@ -41,8 +44,9 @@ impl BillingProfile {
     pub fn update_or_create(
         conn: &mut TxnPgConn,
         tenant_id: &TenantId,
-        update: UpdateBillingProfile,
+        args: UpdateBillingProfileArgs,
     ) -> DbResult<Self> {
+        // Create a new BillingProfile row if one doesn't exist
         let existing = billing_profile::table
             .filter(billing_profile::tenant_id.eq(tenant_id))
             .for_no_key_update()
@@ -56,30 +60,65 @@ impl BillingProfile {
                 .values(new)
                 .get_result::<Self>(conn.conn())?
         };
+
+        let UpdateBillingProfileArgs {
+            prices,
+            billing_email,
+            omit_billing,
+            send_automatically,
+        } = args;
+
         let mut new_prices = existing.prices;
-        update.into_iter().for_each(|(product, value)| match value {
-            Some(Some(v)) => {
-                new_prices.insert(product, v);
-            }
-            Some(None) => {
-                new_prices.remove(&product);
-            }
-            None => (),
-        });
+        prices
+            .unwrap_or_default()
+            .into_iter()
+            .for_each(|(product, value)| match value {
+                Some(Some(v)) => {
+                    new_prices.insert(product, v);
+                }
+                Some(None) => {
+                    new_prices.remove(&product);
+                }
+                None => (),
+            });
+
+        let update = UpdateBillingProfileRow {
+            prices: Some(new_prices),
+            billing_email,
+            omit_billing,
+            send_automatically,
+        };
+
         // Apply onto existing prices
         let result = diesel::update(billing_profile::table)
             .filter(billing_profile::tenant_id.eq(tenant_id))
-            .set(billing_profile::prices.eq(new_prices))
+            .set(update)
             .get_result::<Self>(conn.conn())?;
         Ok(result)
     }
 }
 
-pub type UpdateBillingProfile = HashMap<Product, Option<Option<String>>>;
+#[derive(Debug, Clone, AsChangeset, Default)]
+#[diesel(table_name = billing_profile)]
+struct UpdateBillingProfileRow {
+    prices: Option<PriceMap>,
+    billing_email: Option<Option<String>>,
+    omit_billing: Option<bool>,
+    send_automatically: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UpdateBillingProfileArgs {
+    pub prices: Option<HashMap<Product, Option<Option<String>>>>,
+    pub billing_email: Option<Option<String>>,
+    pub omit_billing: Option<bool>,
+    pub send_automatically: Option<bool>,
+}
 
 #[cfg(test)]
 mod test {
     use crate::models::billing_profile::BillingProfile;
+    use crate::models::billing_profile::UpdateBillingProfileArgs;
     use crate::tests::prelude::TestPgConn;
     use crate::tests::prelude::*;
     use macros::db_test;
@@ -90,14 +129,19 @@ mod test {
     #[db_test]
     fn test_billing_profile(conn: &mut TestPgConn) {
         let tenant_id = TenantId::test_data("org_flerp".into());
-        let update = HashMap::from_iter([
+        let prices = HashMap::from_iter([
             (Product::Kyc, Some(Some("50".into()))),
             (Product::Kyb, Some(Some("700".into()))),
             (Product::KybEinOnly, Some(Some("100".into()))),
             (Product::Pii, Some(Some("3".into()))),
         ]);
+        let update = UpdateBillingProfileArgs {
+            prices: Some(prices),
+            ..Default::default()
+        };
         BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
-        let update = HashMap::from_iter([
+
+        let prices = HashMap::from_iter([
             // Should clear kyc
             (Product::Kyc, Some(None)),
             // Should leave kyb untouched, and KybEinOnly because omitted
@@ -105,6 +149,10 @@ mod test {
             // And should update pii
             (Product::Pii, Some(Some("5".into()))),
         ]);
+        let update = UpdateBillingProfileArgs {
+            prices: Some(prices),
+            ..Default::default()
+        };
         let bp = BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
         assert!(bp.prices.get(&Product::Kyc).is_none());
         assert_eq!(bp.prices.get(&Product::Kyb).unwrap(), "700");

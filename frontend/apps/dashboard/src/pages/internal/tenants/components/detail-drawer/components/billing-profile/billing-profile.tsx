@@ -2,12 +2,13 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { TenantDetail } from '@onefootprint/types';
 import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenants';
 import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
-import { Stack, Text, TextInput } from '@onefootprint/ui';
+import { Checkbox, Stack, Text, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';
 
+import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import useUpdateTenant from '../../hooks/use-update-tenant';
 import type { BillingProfileFormData } from './convert-form-data';
 import { convertFormData } from './convert-form-data';
@@ -71,7 +72,7 @@ const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
 };
 
-const SECTIONS = [
+const PRICE_SECTIONS = [
   {
     title: 'KYC',
     fields: KYC,
@@ -96,6 +97,12 @@ const SECTIONS = [
 
 const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData => bp || ({} as BillingProfileFormData);
 
+type TenantField = {
+  title: string;
+  content: React.ReactNode;
+  editModeContent?: React.ReactNode;
+};
+
 const BillingProfile = ({ tenant }: BillingProfileProps) => {
   const bp = tenant.billingProfile;
 
@@ -107,6 +114,26 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const updateTenantMutation = useUpdateTenant(tenant.id);
   const showErrorToast = useRequestErrorToast();
+
+  const checkbox = (value: boolean) => (value ? <IcoCheck24 /> : <IcoCloseSmall24 />);
+
+  const settings: TenantField[] = [
+    {
+      title: 'Billing email',
+      content: bp?.billingEmail || '-',
+      editModeContent: <TextInput placeholder="jane@acmebank.org" {...register('billingEmail')} />,
+    },
+    {
+      title: 'Send invoice automatically',
+      content: checkbox(bp?.sendAutomatically || false),
+      editModeContent: <Checkbox {...register(`sendAutomatically`, {})} />,
+    },
+    {
+      title: 'Omit generating invoices',
+      content: checkbox(bp?.omitBilling || false),
+      editModeContent: <Checkbox {...register(`omitBilling`, {})} />,
+    },
+  ];
 
   const handleFormSubmit = (formData: TenantBillingProfile) => {
     const bpRequestData = convertFormData(bp, formData);
@@ -160,13 +187,22 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     <FormProvider {...editMethods}>
       <form id={UPDATE_BP_FORM_ID} onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack direction="column">
-          {SECTIONS.map((section, i) => (
-            <Fieldset title={section.title} key={section.title} cta={i === 0 ? headerCta : undefined}>
+          <Fieldset title={'Settings'} cta={headerCta}>
+            <Stack direction="column" gap={5}>
+              {settings.map(f => (
+                <Field label={f.title} key={f.title}>
+                  {!isEditing || !f.editModeContent ? f.content : f.editModeContent}
+                </Field>
+              ))}
+            </Stack>
+          </Fieldset>
+          {PRICE_SECTIONS.map(section => (
+            <Fieldset title={section.title} key={section.title}>
               <Stack direction="column" gap={5}>
                 {section.fields.map(p => (
                   <Field label={ProductToTitle[p]} key={p}>
-                    {!isEditing && priceDisplay(bp?.[p])}
-                    {isEditing && <TextInput placeholder="0" {...register(p)} />}
+                    {!isEditing && priceDisplay(bp?.prices[p])}
+                    {isEditing && <TextInput placeholder="0" {...register(`prices.${p}`)} />}
                   </Field>
                 ))}
               </Stack>

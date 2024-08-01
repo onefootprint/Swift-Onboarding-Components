@@ -87,8 +87,26 @@ impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
             stripe_customer_id,
             app_clip_experience_id,
 
-            billing_profile: bp.map(|bp| bp.prices.into()),
+            billing_profile: bp.map(api_wire_types::PrivateBillingProfile::from_db),
             vendor_control: tvc.map(api_wire_types::PrivateTenantVendorControl::from_db),
+        }
+    }
+}
+
+impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
+    fn from_db(bp: BillingProfile) -> Self {
+        let BillingProfile {
+            prices,
+            billing_email,
+            send_automatically,
+            omit_billing,
+            ..
+        } = bp;
+        api_wire_types::PrivateBillingProfile {
+            prices: prices.into(),
+            billing_email,
+            omit_billing,
+            send_automatically,
         }
     }
 }

@@ -142,6 +142,9 @@ diesel::table! {
         _updated_at -> Timestamptz,
         tenant_id -> Text,
         prices -> Jsonb,
+        billing_email -> Nullable<Text>,
+        omit_billing -> Bool,
+        send_automatically -> Bool,
     }
 }
 
