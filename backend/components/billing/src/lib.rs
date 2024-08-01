@@ -200,20 +200,31 @@ impl BillingClient {
 
     #[tracing::instrument(skip(self))]
     pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
-        let billing_email = info
-            .billing_profile
-            .as_ref()
-            .and_then(|bp| bp.billing_email.clone());
-
         let customer_id = stripe::CustomerId::from_str(&info.customer_id)?;
+
+        // Delete the existing draft invoice that was created from a previous run, if any.
+
         let existing_invoice = self.get_draft_invoice(&customer_id, info.interval).await?;
         if let Some(i) = existing_invoice {
-            // Delete the existing draft invoice that was created from a previous run.
-            // This may fail if the invoice is no longer a draft
             Invoice::delete(&self.client, &i.id).await?;
         }
 
+        // Delete the existing pending invoice items from previous failed runs, if any.
+        let params = ListInvoiceItems {
+            customer: Some(customer_id.clone()),
+            pending: Some(true),
+            limit: Some(100),
+            ..Default::default()
+        };
+        let pending_invoice_items = InvoiceItem::list(&self.client, &params).await?;
+        for l in pending_invoice_items.data {
+            InvoiceItem::delete(&self.client, &l.id).await?;
+        }
+
+        //
         // Calculate each of the line items
+        //
+
         let prices = BillingProfile::new(info.billing_profile.clone())?;
         let mut items = HashMap::new();
         let line_items = info.counts.line_items(&info.tenant_id, &prices)?;
@@ -260,6 +271,7 @@ impl BillingClient {
         let billing_interval = [("billing-interval".to_owned(), info.interval.label())];
         let send_automatically = info
             .billing_profile
+            .as_ref()
             .is_some_and(|bp| bp.send_automatically)
             .then_some(("send-automatically".to_owned(), "true".to_string()));
         let metadata = chain!(billing_interval, send_automatically, managed_metadata()).collect();
@@ -288,6 +300,10 @@ impl BillingClient {
             description: None,
             ..Default::default()
         };
+        let billing_email = info
+            .billing_profile
+            .as_ref()
+            .and_then(|bp| bp.billing_email.as_ref());
         if billing_email.is_some() {
             // We want this collection method, but stripe errors if the customer doesn't have an email set up
             new_invoice.collection_method = Some(CollectionMethod::SendInvoice);
