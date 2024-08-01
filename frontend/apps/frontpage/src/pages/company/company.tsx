@@ -159,7 +159,13 @@ const Company = () => {
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/aranwmurphy/',
     },
-  ];
+    {
+      name: 'Rodrigo Pagnuzzi',
+      avatarSrc: '/team/member-rodrigo.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/rodrigo-pagnuzzi-b21669107/',
+    },
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   const companyPhotos = [
     {
