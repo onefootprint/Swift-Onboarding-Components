@@ -1,3 +1,4 @@
+import { STATES } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
@@ -20,6 +21,7 @@ import {
   SOSFiling,
   WatchlistHit,
 } from '@onefootprint/types';
+import { RawBusinessDetails } from '@onefootprint/types/src/data/business-details';
 import { useQuery } from '@tanstack/react-query';
 import capitalize from 'lodash/capitalize';
 import upperFirst from 'lodash/upperFirst';
@@ -48,81 +50,6 @@ const useEntityBusinessInsights = (id: string) => {
       enabled: !!id,
       select: response => {
         const { formatUtcDate } = useIntl();
-
-        const formatName = (name: RawBusinessName): BusinessName => {
-          const { kind, name: rawName, sources, subStatus, submitted, verified, notes } = name;
-          return {
-            kind: kind as BusinessNameKind,
-            name: rawName ?? EMPTY_VALUE,
-            sources,
-            subStatus: subStatus ?? EMPTY_VALUE,
-            submitted,
-            verified,
-            notes: notes ?? EMPTY_VALUE,
-          };
-        };
-
-        const formatDetail = (
-          label: BusinessDetail,
-          value: RawBusinesDetailValue,
-        ): Exclude<RawBusinesDetailValue, null> => {
-          const labelsWithValidation = [BusinessDetail.tin, BusinessDetail.phoneNumbers, BusinessDetail.website];
-          if (!value && !labelsWithValidation.includes(label)) return EMPTY_VALUE;
-
-          if (label === BusinessDetail.formationDate) {
-            const detailValue = value as string;
-            return formatUtcDate(new Date(detailValue));
-          }
-          if (label === BusinessDetail.formationState) {
-            const detailValue = value as string;
-            return formatState(detailValue, EMPTY_VALUE);
-          }
-          if (label === BusinessDetail.tin) {
-            const detailValue = value ?? {
-              tin: EMPTY_VALUE,
-              verified: null,
-            };
-            return detailValue as BusinessDetailTin;
-          }
-          if (label === BusinessDetail.entityType) {
-            const detailValue = value as string;
-            return capitalize(detailValue);
-          }
-          if (label === BusinessDetail.phoneNumbers) {
-            const detailValue = value as BusinessDetailPhoneNumber[];
-            const emptyPhoneNumber = {
-              phone: EMPTY_VALUE,
-              submitted: null,
-              verified: null,
-            } as BusinessDetailPhoneNumber;
-            return detailValue.length
-              ? detailValue.map(phoneNumber => phoneNumber || emptyPhoneNumber)
-              : [emptyPhoneNumber];
-          }
-          if (label === BusinessDetail.website) {
-            const detailValue = value ?? {
-              url: EMPTY_VALUE,
-              verified: null,
-            };
-            return detailValue as BusinessDetailWebsite;
-          }
-          return EMPTY_VALUE;
-        };
-        const formattedDetails: Partial<Record<BusinessDetail, Exclude<RawBusinesDetailValue, null>>> = {};
-        Object.entries(response.details).forEach(([label, value]) => {
-          formattedDetails[label as BusinessDetail] = formatDetail(label as BusinessDetail, value);
-        });
-
-        const formatPerson = (person: RawBusinessPerson): BusinessPerson => {
-          const { name, role, submitted, associationVerified, sources } = person;
-          return {
-            name: name ? upperFirst(name) : EMPTY_VALUE,
-            role: role ? upperFirst(role) : EMPTY_VALUE,
-            submitted,
-            associationVerified,
-            sources,
-          };
-        };
 
         const formatFiling = (filing: RawSOSFiling, id: string): SOSFiling => {
           const {
@@ -155,8 +82,117 @@ const useEntityBusinessInsights = (id: string) => {
             fileNumber: fileNumber ?? EMPTY_VALUE,
           };
         };
+        const formattedFilings = response.registrations.map((filing, index) => formatFiling(filing, `${index}`));
 
-        const formatWatchlist = (watchlist: RawBusinessWatchlist): BusinessWatchlist => {
+        const formatName = (name: RawBusinessName): BusinessName => {
+          const { kind, name: rawName, sources, subStatus, submitted, verified, notes } = name;
+
+          const getSourceSOSFiling = () => {
+            if (!sources) return undefined;
+            const filingWithSources = formattedFilings.map(({ id, state }) => {
+              const stateAbbrev = STATES.find(({ label }) => label === state)?.value;
+              const filingSources = `${stateAbbrev} - SOS`;
+              return { id, sources: filingSources };
+            });
+            return filingWithSources.find(({ sources: filingSources }) => filingSources === sources);
+          };
+          const sourceSOSFiling = getSourceSOSFiling();
+
+          return {
+            kind: kind as BusinessNameKind,
+            name: rawName ?? EMPTY_VALUE,
+            sources,
+            sourceSOSFilingId: sourceSOSFiling?.id,
+            subStatus: subStatus ?? EMPTY_VALUE,
+            submitted,
+            verified,
+            notes: notes ?? EMPTY_VALUE,
+          };
+        };
+
+        const formatDetails = (details: RawBusinessDetails | null): BusinessDetails => {
+          const formatDetail = (
+            label: BusinessDetail,
+            value: RawBusinesDetailValue,
+          ): Exclude<RawBusinesDetailValue, null> => {
+            const labelsWithValidation = [BusinessDetail.tin, BusinessDetail.phoneNumbers, BusinessDetail.website];
+            if (!value && !labelsWithValidation.includes(label)) return EMPTY_VALUE;
+
+            if (label === BusinessDetail.formationDate) {
+              const detailValue = value as string;
+              return formatUtcDate(new Date(detailValue));
+            }
+            if (label === BusinessDetail.formationState) {
+              const detailValue = value as string;
+              return formatState(detailValue, EMPTY_VALUE);
+            }
+            if (label === BusinessDetail.tin) {
+              const detailValue = value ?? {
+                tin: EMPTY_VALUE,
+                verified: null,
+              };
+              return detailValue as BusinessDetailTin;
+            }
+            if (label === BusinessDetail.entityType) {
+              const detailValue = value as string;
+              return value ? capitalize(detailValue) : EMPTY_VALUE;
+            }
+            if (label === BusinessDetail.phoneNumbers) {
+              const detailValue = value as BusinessDetailPhoneNumber[];
+              const emptyPhoneNumber = {
+                phone: EMPTY_VALUE,
+                submitted: null,
+                verified: null,
+              } as BusinessDetailPhoneNumber;
+              return detailValue.length
+                ? detailValue.map(phoneNumber => phoneNumber ?? emptyPhoneNumber)
+                : [emptyPhoneNumber];
+            }
+            if (label === BusinessDetail.website) {
+              const detailValue = value ?? {
+                url: EMPTY_VALUE,
+                verified: null,
+              };
+              return detailValue as BusinessDetailWebsite;
+            }
+            return EMPTY_VALUE;
+          };
+
+          if (!details) {
+            const emptyDetails = {
+              [BusinessDetail.entityType]: formatDetail(BusinessDetail.entityType, null),
+              [BusinessDetail.formationDate]: formatDetail(BusinessDetail.formationDate, null),
+              [BusinessDetail.formationState]: formatDetail(BusinessDetail.formationState, null),
+              [BusinessDetail.phoneNumbers]: formatDetail(BusinessDetail.phoneNumbers, []),
+              [BusinessDetail.tin]: formatDetail(BusinessDetail.tin, null),
+              [BusinessDetail.website]: formatDetail(BusinessDetail.website, null),
+            };
+            return emptyDetails as BusinessDetails;
+          }
+
+          const formattedDetails = {} as BusinessDetails;
+          Object.entries(details).forEach(([label, value]) => {
+            const detailLabel = label as BusinessDetail;
+            // @ts-expect-error
+            formattedDetails[detailLabel] = formatDetail(detailLabel, value);
+          });
+          return formattedDetails;
+        };
+
+        const formatPerson = (person: RawBusinessPerson): BusinessPerson => {
+          const { name, role, submitted, associationVerified, sources } = person;
+          return {
+            name: name ? upperFirst(name) : EMPTY_VALUE,
+            role: role ? upperFirst(role) : EMPTY_VALUE,
+            submitted,
+            associationVerified,
+            sources,
+          };
+        };
+
+        const formatWatchlist = (watchlist: RawBusinessWatchlist | null): BusinessWatchlist => {
+          if (!watchlist) return { hitCount: 0, watchlist: {} };
+
           const formatHit = (hit: WatchlistHit) => {
             const {
               entityName,
@@ -182,17 +218,20 @@ const useEntityBusinessInsights = (id: string) => {
             };
           };
 
-          const flattedWatchlist = {} as BusinessWatchlist;
+          const flattedWatchlist = {
+            hitCount: watchlist.hitCount,
+            watchlist: {},
+          } as BusinessWatchlist;
           watchlist.business.forEach(({ screenedEntityName, hits }) => {
             const entityName = screenedEntityName || EMPTY_VALUE;
-            flattedWatchlist[entityName] = {
+            flattedWatchlist.watchlist[entityName] = {
               kind: EntityKind.business,
               hits: hits.map(hit => formatHit(hit)),
             };
           });
           watchlist.people.forEach(({ screenedEntityName, hits }) => {
             const entityName = screenedEntityName || EMPTY_VALUE;
-            flattedWatchlist[entityName] = {
+            flattedWatchlist.watchlist[entityName] = {
               kind: EntityKind.person,
               hits: hits.map(hit => formatHit(hit)),
             };
@@ -202,9 +241,9 @@ const useEntityBusinessInsights = (id: string) => {
 
         return {
           names: response.names.map(name => formatName(name)),
-          details: formattedDetails as BusinessDetails,
+          details: formatDetails(response.details),
           people: response.people.map(person => formatPerson(person)),
-          registrations: response.registrations.map((filing, index) => formatFiling(filing, `${index}`)),
+          registrations: formattedFilings,
           watchlist: formatWatchlist(response.watchlist),
         };
       },

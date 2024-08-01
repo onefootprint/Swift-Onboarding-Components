@@ -24,8 +24,11 @@ export type WatchlistHit = {
 };
 
 export type BusinessWatchlist = {
-  [screenedEntityName: string]: {
-    kind: EntityKind;
-    hits: WatchlistHit[];
+  watchlist: {
+    [screenedEntityName: string]: {
+      kind: EntityKind;
+      hits: WatchlistHit[];
+    };
   };
+  hitCount: number;
 };

@@ -1748,7 +1748,7 @@
           "title": "Other business details",
           "formation-date": "Formation date",
           "formation-state": "Formation state",
-          "tin": "TIN (EID)",
+          "tin": "TIN (EIN)",
           "entity-type": "Entity type",
           "phone-number": "Phone number",
           "website": "Website"
@@ -1817,7 +1817,7 @@
           }
         },
         "watchlist": {
-          "title": "Watchlist",
+          "title": "Watchlist ({{count}})",
           "select-label": "Hits for {{entity}}",
           "tags": {
             "business": "Business",

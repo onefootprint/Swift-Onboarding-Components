@@ -1,19 +1,19 @@
+import { IcoArrowTopRight16 } from '@onefootprint/icons';
 import { SOSFiling } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import useFilingStatusText from '../../../../hooks/use-filing-status-text';
-import LineItem from '../../../line-item';
-import statusVariant from '../../constants';
+import useFilingStatusText from '../../hooks/use-filing-status-text';
+import LineItem from '../line-item';
+import statusVariant from '../sos-filings/constants';
 
-export type DetailsProps = {
+export type FilingDetailsProps = {
   filing: SOSFiling;
-  open: boolean;
   onClose: () => void;
 };
 
-const Details = ({ filing, open, onClose }: DetailsProps) => {
+const FilingDetails = ({ filing, onClose }: FilingDetailsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights.sos-filings',
   });
@@ -33,7 +33,7 @@ const Details = ({ filing, open, onClose }: DetailsProps) => {
   } = filing;
 
   return (
-    <Dialog onClose={onClose} open={open} title={t('title')}>
+    <Dialog onClose={onClose} open title={t('title')}>
       <Container>
         <Header>
           <Text variant="label-3">{state}</Text>
@@ -71,7 +71,11 @@ const Details = ({ filing, open, onClose }: DetailsProps) => {
             {source ? (
               <LineItem
                 leftText={t('dialog.filing-details.source')}
-                customRight={<LinkButton href={source}>{source}</LinkButton>}
+                customRight={
+                  <LinkButton href={source} iconComponent={IcoArrowTopRight16}>
+                    {source}
+                  </LinkButton>
+                }
               />
             ) : (
               <LineItem leftText={t('dialog.filing-details.source')} rightText={source} />
@@ -126,4 +130,4 @@ const Title = styled.p`
   `};
 `;
 
-export default Details;
+export default FilingDetails;

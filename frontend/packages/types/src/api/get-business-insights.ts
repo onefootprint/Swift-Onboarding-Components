@@ -3,8 +3,8 @@ import { RawBusinessDetails } from '../data/business-details';
 
 export type GetBusinessInsightsResponse = {
   names: RawBusinessName[];
-  details: RawBusinessDetails;
+  details: RawBusinessDetails | null;
   people: RawBusinessPerson[];
   registrations: RawSOSFiling[];
-  watchlist: RawBusinessWatchlist;
+  watchlist: RawBusinessWatchlist | null;
 };

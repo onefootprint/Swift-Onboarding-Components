@@ -8,12 +8,12 @@ export type RawBusinessDetails = {
 };
 
 export type BusinessDetails = {
-  entityType: string;
-  formationDate: string;
-  formationState: string;
-  phoneNumbers: BusinessDetailPhoneNumber[];
-  tin: BusinessDetailTin;
-  website: BusinessDetailWebsite;
+  [BusinessDetail.entityType]: string;
+  [BusinessDetail.formationDate]: string;
+  [BusinessDetail.formationState]: string;
+  [BusinessDetail.phoneNumbers]: BusinessDetailPhoneNumber[];
+  [BusinessDetail.tin]: BusinessDetailTin;
+  [BusinessDetail.website]: BusinessDetailWebsite;
 };
 
 export type BusinessDetailPhoneNumber = {

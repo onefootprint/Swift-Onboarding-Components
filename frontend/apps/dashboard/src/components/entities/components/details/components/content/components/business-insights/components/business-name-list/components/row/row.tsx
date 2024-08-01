@@ -8,14 +8,15 @@ import useBusinessNameKindText from '../../../../hooks/use-business-name-kind-te
 
 type RowProps = {
   businessName: BusinessName;
+  onOpen: (id: string) => void;
 };
 
-const Row = ({ businessName }: RowProps) => {
+const Row = ({ businessName, onOpen }: RowProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights',
   });
   const kindT = useBusinessNameKindText();
-  const { name, sources, submitted, verified, kind, notes } = businessName;
+  const { name, sources, sourceSOSFilingId, submitted, verified, kind, notes } = businessName;
 
   return (
     <>
@@ -29,7 +30,12 @@ const Row = ({ businessName }: RowProps) => {
               position="bottom"
               alignment="start"
             >
-              <Stack gap={2} align="center">
+              <Stack
+                gap={2}
+                align="center"
+                onClick={sourceSOSFilingId ? () => onOpen(sourceSOSFilingId) : undefined}
+                cursor={sourceSOSFilingId ? 'pointer' : 'default'}
+              >
                 {name}
                 <IcoInfo16 />
               </Stack>

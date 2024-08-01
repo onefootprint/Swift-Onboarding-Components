@@ -6,9 +6,10 @@ import Row from './components/row';
 
 type BusinessNameListProps = {
   data: BusinessName[];
+  onOpen: (id: string) => void;
 };
 
-const BusinessNameList = ({ data }: BusinessNameListProps) => {
+const BusinessNameList = ({ data, onOpen }: BusinessNameListProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights.name.table',
   });
@@ -18,6 +19,8 @@ const BusinessNameList = ({ data }: BusinessNameListProps) => {
     { text: t('header.type'), width: '22%' },
     { text: t('header.notes'), width: '36%' },
   ];
+
+  const renderTr = ({ item }: TableRow<BusinessName>) => <Row businessName={item} onOpen={onOpen} />;
 
   return (
     <Table<BusinessName>
@@ -30,7 +33,5 @@ const BusinessNameList = ({ data }: BusinessNameListProps) => {
     />
   );
 };
-
-const renderTr = ({ item }: TableRow<BusinessName>) => <Row businessName={item} />;
 
 export default BusinessNameList;

@@ -95,6 +95,7 @@ const DrawerTrigger = styled.button`
     color: ${theme.color.secondary};
     cursor: pointer;
     display: flex;
+    gap: ${theme.spacing[2]};
     align-items: center;
     transition: all 200ms ease-in-out;
 

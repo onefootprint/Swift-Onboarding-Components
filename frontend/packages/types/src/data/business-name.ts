@@ -12,6 +12,7 @@ export type BusinessName = {
   kind: BusinessNameKind | null;
   name: string;
   sources: string | null;
+  sourceSOSFilingId: string | undefined;
   subStatus: string;
   submitted: boolean | null;
   verified: boolean | null;

@@ -12,9 +12,10 @@ const Watchlist = ({ data }: WatchlistProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.business-insights.watchlist',
   });
-  const defaultSelection = Object.entries(data).length ? Object.entries(data)[0][0] : undefined;
+  const { watchlist } = data;
+  const defaultSelection = Object.entries(watchlist).length ? Object.entries(watchlist)[0][0] : undefined;
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(defaultSelection);
-  const options = Object.keys(data).map(name => ({
+  const options = Object.keys(watchlist).map(name => ({
     label: name,
     value: name,
   }));
@@ -36,11 +37,11 @@ const Watchlist = ({ data }: WatchlistProps) => {
               triggerWidth="300px"
               contentWidth="300px"
             />
-            <Tag>{data[selectedEntity].kind === EntityKind.business ? t('tags.business') : t('tags.person')}</Tag>
+            <Tag>{watchlist[selectedEntity].kind === EntityKind.business ? t('tags.business') : t('tags.person')}</Tag>
           </>
         )}
       </Stack>
-      <HitsList entity={selectedEntity} hits={selectedEntity ? data[selectedEntity].hits : []} />
+      <HitsList entity={selectedEntity} hits={selectedEntity ? watchlist[selectedEntity].hits : []} />
     </Stack>
   );
 };
