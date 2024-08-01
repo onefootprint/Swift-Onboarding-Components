@@ -14,7 +14,6 @@ import { FaceStatus } from './use-face-detection';
 type AutoCaptureProps = {
   canvasRef: MutableRefObject<HTMLCanvasElement | undefined>;
   isCaptured: boolean;
-  mediaStream: MediaStream | null;
   onDetectionComplete: () => void;
   onDetectionReset: () => void;
   onStatusChange: (currStatus: CaptureStatus | undefined) => void;
@@ -23,6 +22,7 @@ type AutoCaptureProps = {
   outlineOffsetY?: number;
   outlineWidth: number;
   videoRef: VideoRef;
+  videoResolution?: Resolution;
   videoSize: Resolution | undefined;
 };
 
@@ -56,7 +56,6 @@ const getNextIndexForBatch = (
 const useAutoCaptureDoc = ({
   canvasRef,
   isCaptured,
-  mediaStream,
   onDetectionComplete,
   onDetectionReset,
   onStatusChange,
@@ -65,6 +64,7 @@ const useAutoCaptureDoc = ({
   outlineOffsetY,
   outlineWidth,
   videoRef,
+  videoResolution,
   videoSize,
 }: AutoCaptureProps) => {
   const successCountRef = useRef(0);
@@ -89,11 +89,11 @@ const useAutoCaptureDoc = ({
             outlineHeight,
             outlineOffsetY,
             videoRef,
-            mediaStream,
+            videoResolution,
             outlineOffsetX,
           )
         : undefined,
-    [videoSize, outlineWidth, outlineHeight, outlineOffsetY, videoRef, mediaStream, outlineOffsetX],
+    [videoSize, outlineWidth, outlineHeight, outlineOffsetY, videoRef, videoResolution, outlineOffsetX],
   );
 
   const docImageDrawer = useCallback(

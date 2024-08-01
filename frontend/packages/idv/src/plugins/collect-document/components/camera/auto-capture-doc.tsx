@@ -7,7 +7,7 @@ type AutoCaptureDocProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
   feedbackPositionFromBottom: number;
   isCaptured: boolean;
-  mediaStream: MediaStream | null;
+  videoResolution: Resolution | undefined;
   onDetectionComplete: () => void;
   onDetectionReset: () => void;
   outlineHeight: number;
@@ -21,7 +21,7 @@ const AutoCaptureDoc = ({
   canvasAutoCaptureRef,
   feedbackPositionFromBottom,
   isCaptured,
-  mediaStream,
+  videoResolution,
   onDetectionComplete,
   onDetectionReset,
   outlineHeight,
@@ -33,7 +33,7 @@ const AutoCaptureDoc = ({
   useAutoCaptureDoc({
     canvasRef: canvasAutoCaptureRef,
     isCaptured,
-    mediaStream,
+    videoResolution,
     onDetectionComplete,
     onDetectionReset,
     onStatusChange: setAutocaptureFeedback,

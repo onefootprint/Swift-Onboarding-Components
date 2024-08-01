@@ -220,7 +220,7 @@ const PhotoCapture = ({
         {({
           canvasAutoCaptureRef,
           feedbackPositionFromBottom,
-          mediaStream,
+          videoResolution,
           onDetectionComplete,
           onDetectionReset,
           outlineHeight,
@@ -234,7 +234,7 @@ const PhotoCapture = ({
                 canvasAutoCaptureRef={canvasAutoCaptureRef}
                 feedbackPositionFromBottom={feedbackPositionFromBottom}
                 isCaptured={isCaptured}
-                mediaStream={mediaStream}
+                videoResolution={videoResolution}
                 onDetectionComplete={onDetectionComplete}
                 onDetectionReset={onDetectionReset}
                 outlineHeight={outlineHeight}

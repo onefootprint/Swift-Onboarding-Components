@@ -48,7 +48,7 @@ import getOutlineDimensions from './utils/get-outline-dimensions';
 type ChildrenProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
   feedbackPositionFromBottom: number;
-  mediaStream: MediaStream | null;
+  videoResolution?: Resolution;
   onDetectionComplete: () => void;
   onDetectionReset: () => void;
   outlineHeight: number;
@@ -82,9 +82,7 @@ const CountDownProps = {
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
 
-const { logError, logInfo, logTrack, logWarn } = getLogger({
-  location: 'camera',
-});
+const { logError, logInfo, logTrack, logWarn } = getLogger({ location: 'camera' });
 
 const videoElementStateListener =
   (
@@ -145,6 +143,27 @@ const getDesiredSize = (
   return videoSize; // We capture the full height for selfie
 };
 
+const getVideoTrackSettings = (stream?: MediaStream | null): MediaTrackSettings | undefined => {
+  if (!stream) return undefined;
+
+  const videoTracks = stream.getVideoTracks();
+  if (videoTracks.length === 0) {
+    return undefined;
+  }
+
+  const videoTrack = videoTracks[0];
+  if (!videoTrack) {
+    return undefined;
+  }
+
+  return videoTrack.getSettings();
+};
+
+const getVideoResolution = (stream?: MediaStream | null): Resolution | undefined => {
+  const settings = getVideoTrackSettings(stream);
+  return settings && settings.width && settings.height ? { width: settings.width, height: settings.height } : undefined;
+};
+
 const Camera = ({
   autocaptureFeedback,
   autocaptureKind,
@@ -164,9 +183,7 @@ const Camera = ({
   allowUpload,
   hasBadConnectivity,
 }: CameraProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'document-flow.components.camera',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'document-flow.components.camera' });
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
   const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
   const videoRef: VideoRef = useRef<HTMLVideoElement>(null);
@@ -211,7 +228,7 @@ const Camera = ({
     logInfo('Setting video src object');
     videoRef.current.srcObject = mediaStream;
   } else {
-    logWarn(
+    logTrack(
       `Could not set video src object. MediaStream ${mediaStream}, videoRef ${videoRef.current}, has srcObject ${!!videoRef?.current?.srcObject}`,
     );
   }
@@ -336,7 +353,7 @@ const Camera = ({
       context,
       desiredImageHeight: desiredSize.height,
       desiredImageWidth: desiredSize.width,
-      mediaStream,
+      videoResolution: getVideoResolution(mediaStream),
       videoRef,
     });
 
@@ -451,7 +468,7 @@ const Camera = ({
             ? children({
                 canvasAutoCaptureRef,
                 feedbackPositionFromBottom: positionFromBottom,
-                mediaStream,
+                videoResolution: getVideoResolution(mediaStream),
                 onDetectionComplete: handleDetectionComplete,
                 onDetectionReset: handleResetDetectionTimer,
                 outlineHeight,

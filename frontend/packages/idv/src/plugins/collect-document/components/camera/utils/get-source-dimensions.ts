@@ -1,8 +1,8 @@
-import type { VideoRef } from '../types';
+import type { Resolution, VideoRef } from '../types';
 
 type GetSourceDImensionsProps = {
   videoRef: VideoRef;
-  mediaStream: MediaStream | null;
+  videoResolution?: Resolution;
   desiredImageWidth: number;
   desiredImageHeight: number;
   centerOffsetX?: number;
@@ -28,7 +28,7 @@ const getScalingFactor = (mediaWidth: number, mediaHeight: number, clientWidth: 
 
 const getSourceDimensions = ({
   videoRef,
-  mediaStream,
+  videoResolution,
   desiredImageWidth,
   desiredImageHeight,
   centerOffsetX = 0,
@@ -41,13 +41,13 @@ const getSourceDimensions = ({
     sHeight: 0,
   };
 
-  if (!videoRef.current || !mediaStream) {
+  if (!videoRef.current || !videoResolution) {
     return initialDimensions;
   }
 
   const { clientWidth, clientHeight, videoWidth, videoHeight } = videoRef.current;
 
-  const { width: mediaWidth, height: mediaHeight } = mediaStream.getVideoTracks()[0].getSettings();
+  const { width: mediaWidth, height: mediaHeight } = videoResolution;
   if (!mediaWidth || !mediaHeight) return initialDimensions;
 
   const scalingFactor = getScalingFactor(mediaWidth, mediaHeight, clientWidth, clientHeight);
