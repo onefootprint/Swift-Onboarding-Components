@@ -54,8 +54,16 @@ pub async fn generate_invoice_for_tenant(
         })
         .await?;
 
+    if billing_profile.as_ref().is_some_and(|bp| bp.omit_billing) {
+        tracing::warn!("Omitting invoice generation for tenant");
+        return Ok(());
+    }
+
     // Generate the invoice in stripe
     let customer_id = get_or_create_customer_id(client, db_pool, &tenant).await?;
+    client
+        .update_customer_email(&customer_id, billing_profile.as_ref())
+        .await?;
     let info = BillingInfo {
         tenant_id: tenant.id.clone(),
         billing_profile,

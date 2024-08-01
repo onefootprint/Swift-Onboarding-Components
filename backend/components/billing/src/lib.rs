@@ -34,6 +34,7 @@ use stripe::InvoiceStatus;
 use stripe::ListCustomers;
 use stripe::ListInvoiceItems;
 use stripe::ListInvoices;
+use stripe::UpdateCustomer;
 
 pub type BResult<T> = Result<T, Error>;
 
@@ -144,6 +145,24 @@ impl BillingClient {
         Ok(customer.id.to_string().into())
     }
 
+    pub async fn update_customer_email(
+        &self,
+        customer_id: &StripeCustomerId,
+        bp: Option<&DbBillingProfile>,
+    ) -> BResult<()> {
+        let Some(email) = bp.and_then(|bp| bp.billing_email.as_deref()) else {
+            return Ok(());
+        };
+        let customer_id = stripe::CustomerId::from_str(customer_id)?;
+        let params = UpdateCustomer {
+            invoice_prefix: None,
+            email: Some(email),
+            ..Default::default()
+        };
+        Customer::update(&self.client, &customer_id, params).await?;
+        Ok(())
+    }
+
     #[tracing::instrument(skip(self))]
     async fn get_or_create_invoice_item(
         &self,
@@ -181,6 +200,11 @@ impl BillingClient {
 
     #[tracing::instrument(skip(self))]
     pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
+        let billing_email = info
+            .billing_profile
+            .as_ref()
+            .and_then(|bp| bp.billing_email.clone());
+
         let customer_id = stripe::CustomerId::from_str(&info.customer_id)?;
         let existing_invoice = self.get_draft_invoice(&customer_id, info.interval).await?;
         if let Some(i) = existing_invoice {
@@ -190,9 +214,9 @@ impl BillingClient {
         }
 
         // Calculate each of the line items
-        let profile = BillingProfile::new(info.billing_profile.clone())?;
+        let prices = BillingProfile::new(info.billing_profile.clone())?;
         let mut items = HashMap::new();
-        let line_items = info.counts.line_items(&info.tenant_id, &profile)?;
+        let line_items = info.counts.line_items(&info.tenant_id, &prices)?;
         let monthly_spend_cents: Decimal = line_items
             .iter()
             .filter(|li| li.product.applies_to_monthly_minimum())
@@ -209,7 +233,7 @@ impl BillingClient {
 
         // If the tenant didn't hit their monthly minimum, add another line item for the remaining
         // amount
-        if let Some(monthly_minimum_price) = profile.get(&Product::MonthlyMinimumOnIdentity) {
+        if let Some(monthly_minimum_price) = prices.get(&Product::MonthlyMinimumOnIdentity) {
             if monthly_spend_cents < *monthly_minimum_price {
                 let remaining_cents = monthly_minimum_price - monthly_spend_cents;
                 let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
@@ -233,8 +257,12 @@ impl BillingClient {
         // Create the invoice, which will automatically include these billing items
         //
 
-        let extra_metadata = [("billing-interval".to_owned(), info.interval.label())];
-        let metadata = chain!(extra_metadata, managed_metadata()).collect();
+        let billing_interval = [("billing-interval".to_owned(), info.interval.label())];
+        let send_automatically = info
+            .billing_profile
+            .is_some_and(|bp| bp.send_automatically)
+            .then_some(("send-automatically".to_owned(), "true".to_string()));
+        let metadata = chain!(billing_interval, send_automatically, managed_metadata()).collect();
 
         let mut payment_method_types = vec![
             CreateInvoicePaymentSettingsPaymentMethodTypes::AchCreditTransfer,
@@ -247,24 +275,24 @@ impl BillingClient {
             payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Cashapp);
         }
 
-        // TODO settings for which invoices can automatically be sent out
-
-        let new_invoice = CreateInvoice {
+        let mut new_invoice = CreateInvoice {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
             pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
-            // TODO: Only set to SendInvoice if there's an email on the billing profile
-            collection_method: Some(CollectionMethod::ChargeAutomatically),
             payment_settings: Some(CreateInvoicePaymentSettings {
                 payment_method_types: Some(payment_method_types),
                 ..Default::default()
             }),
-            days_until_due: Some(30),
             // TODO Testing this for footprint live, then enable this for other tenants
             auto_advance: Some(info.tenant_id.is_footprint_live()),
             description: None,
             ..Default::default()
         };
+        if billing_email.is_some() {
+            // We want this collection method, but stripe errors if the customer doesn't have an email set up
+            new_invoice.collection_method = Some(CollectionMethod::SendInvoice);
+            new_invoice.days_until_due = Some(30);
+        }
         let invoice = Invoice::create(&self.client, new_invoice).await?;
 
         // Do some basic validation on the invoice. When the invoice is created, it will
