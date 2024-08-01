@@ -9,15 +9,19 @@ import styled, { css } from 'styled-components';
 import fakeSdk from '../../../helpers/fake-sdk';
 import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
+const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 const fallbackPKey = process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+const fallbackAppUrl = ENV === 'production' ? 'https://id.onefootprint.com' : 'http://localhost:3000';
 
 const getVerifyArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
   appUrl:
-    o.appUrl.startsWith('https://bifrost') || o.appUrl.startsWith('http://localhost')
+    o.appUrl.startsWith('https://id') ||
+    o.appUrl.startsWith('https://bifrost') ||
+    o.appUrl.startsWith('http://localhost')
       ? o.appUrl
-      : 'http://localhost:3000',
+      : fallbackAppUrl,
 });
 
 const onComplete = (token: string) => {

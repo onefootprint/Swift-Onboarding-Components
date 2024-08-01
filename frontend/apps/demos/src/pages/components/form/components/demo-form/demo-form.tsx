@@ -11,12 +11,13 @@ import getQueryArgs from '../../../../../helpers/get-query-args';
 
 type DemoFormProps = { authToken: string };
 
+const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
+const fallbackAppUrl = ENV === 'production' ? 'https://components.onefootprint.com' : 'http://localhost:3010/form';
+
 const getFormArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   appUrl:
-    o.appUrl.startsWith('https://components') || o.appUrl.startsWith('http://localhost')
-      ? o.appUrl
-      : 'http://localhost:3010/form',
+    o.appUrl.startsWith('https://components') || o.appUrl.startsWith('http://localhost') ? o.appUrl : fallbackAppUrl,
 });
 
 const formSetup = (

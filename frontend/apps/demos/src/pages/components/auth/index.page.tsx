@@ -8,12 +8,14 @@ import styled, { css } from 'styled-components';
 import fakeSdk from '../../../helpers/fake-sdk';
 import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
+const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 const fallbackPKey = process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+const fallbackAppUrl = ENV === 'production' ? 'https://auth.onefootprint.com' : 'http://localhost:3011';
+
 const getAuthArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
-  appUrl:
-    o.appUrl.startsWith('https://auth') || o.appUrl.startsWith('http://localhost') ? o.appUrl : 'http://localhost:3011',
+  appUrl: o.appUrl.startsWith('https://auth') || o.appUrl.startsWith('http://localhost') ? o.appUrl : fallbackAppUrl,
 });
 
 const AuthDemo = () => {
