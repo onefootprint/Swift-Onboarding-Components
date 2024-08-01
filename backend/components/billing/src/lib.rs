@@ -253,7 +253,8 @@ impl BillingClient {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
             pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
-            collection_method: Some(CollectionMethod::SendInvoice),
+            // TODO: Only set to SendInvoice if there's an email on the billing profile
+            collection_method: Some(CollectionMethod::ChargeAutomatically),
             payment_settings: Some(CreateInvoicePaymentSettings {
                 payment_method_types: Some(payment_method_types),
                 ..Default::default()

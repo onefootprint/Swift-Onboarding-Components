@@ -192,7 +192,6 @@ impl Add for BillingCounts {
 /// For a few legacy tenants, applies the "minimum of(x, y)" clauses.
 fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<LineItem> {
     let minimums_product_bundles = match tenant_id.as_str() {
-        TenantId::GRID => vec![vec![Product::HotVaults], vec![Product::Pii]],
         TenantId::ARYEO => vec![
             vec![
                 Product::VaultsWithNonPci,

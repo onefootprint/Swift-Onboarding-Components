@@ -6,7 +6,6 @@ use derive_more::From;
 impl TenantId {
     pub const ARYEO: &'static str = "org_6CTPv02MXFKKWjB6wc5zHg";
     pub const BLOOM: &'static str = "org_xpRKH6lk73aZxuJbsGkUaJ";
-    pub const GRID: &'static str = "org_AiK8peOw9mrqsb6yeHWEG8";
 
     pub fn is_findigs(&self) -> bool {
         self.0 == *"org_UrS3zJj1RDg3DXv3V5HUIv"
