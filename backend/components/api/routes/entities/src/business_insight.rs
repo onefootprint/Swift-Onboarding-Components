@@ -1,10 +1,10 @@
 use crate::auth::tenant::TenantApiKey;
-use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::CanDecrypt;
 use api_core::decision::business_insights::BusinessInsights;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use api_core::errors::ValidationError;
@@ -17,9 +17,11 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use newtypes::vendor_api_struct::MiddeskBusinessUpdateWebhook;
 use newtypes::vendor_api_struct::MiddeskGetBusiness;
+use newtypes::BusinessDataKind as BDK;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
+use strum::IntoEnumIterator;
 
 #[api_v2_operation(
     description = "Retrieve business insights for a given fp_bid.",
@@ -31,7 +33,8 @@ pub async fn get_business_insights(
     request: FpIdPath,
     auth: Either<TenantSessionAuth, TenantApiKey>,
 ) -> ApiResponse<BusinessInsights> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
+    let dis = BDK::iter().collect();
+    let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = request.into_inner();
