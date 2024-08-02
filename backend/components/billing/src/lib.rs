@@ -145,9 +145,10 @@ impl BillingClient {
         Ok(customer.id.to_string().into())
     }
 
-    pub async fn update_customer_email(
+    pub async fn update_customer(
         &self,
         customer_id: &StripeCustomerId,
+        tenant: &Tenant,
         bp: Option<&DbBillingProfile>,
     ) -> BResult<()> {
         // NOTE: the stripe API won't let us clear a customer's email if it's removed from their billing
@@ -156,8 +157,18 @@ impl BillingClient {
             return Ok(());
         };
         let customer_id = stripe::CustomerId::from_str(customer_id)?;
+        // Set the invoice prefix to the first word of the tenant's name
+        let invoice_prefix = {
+            let first_word = &tenant.name.split(' ').next().unwrap_or_default();
+            let alphabetic: String = first_word
+                .chars()
+                .filter(|c| c.is_alphabetic())
+                .take(12)
+                .collect();
+            alphabetic.to_ascii_uppercase()
+        };
         let params = UpdateCustomer {
-            invoice_prefix: None,
+            invoice_prefix: Some(&invoice_prefix),
             email: Some(email),
             ..Default::default()
         };
@@ -282,8 +293,9 @@ impl BillingClient {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
             pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
-            // TODO Testing this for footprint live, then enable this for other tenants
-            auto_advance: Some(info.tenant_id.is_footprint_live()),
+            // Cannot set auto_advance or the draft invoices will become finalized within an hour.
+            // Instead, need to set this flag immediately before finalizing
+            auto_advance: Some(false),
             description: None,
             ..Default::default()
         };

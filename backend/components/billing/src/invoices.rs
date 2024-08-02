@@ -62,7 +62,7 @@ pub async fn generate_invoice_for_tenant(
     // Generate the invoice in stripe
     let customer_id = get_or_create_customer_id(client, db_pool, &tenant).await?;
     client
-        .update_customer_email(&customer_id, billing_profile.as_ref())
+        .update_customer(&customer_id, &tenant, billing_profile.as_ref())
         .await?;
     let info = BillingInfo {
         tenant_id: tenant.id.clone(),
