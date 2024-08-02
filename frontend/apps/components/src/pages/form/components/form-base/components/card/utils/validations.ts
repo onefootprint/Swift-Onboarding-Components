@@ -1,5 +1,5 @@
 import creditcardutils from 'creditcardutils';
-import { isPast, isValid, parse } from 'date-fns';
+import { isPast, isSameMonth, isValid, parse } from 'date-fns';
 
 export const isCardNumberValid = (cardNumber: string) => cardNumber && creditcardutils.validateCardNumber(cardNumber);
 
@@ -8,7 +8,8 @@ export const isCardExpiryValid = (dateValue: string) => {
     return false;
   }
   const parsedDate = parse(dateValue, 'MM/yy', new Date());
-  return !isPast(parsedDate) && isValid(parsedDate);
+  const isCurrentMonth = isSameMonth(parsedDate, new Date());
+  return (!isPast(parsedDate) || isCurrentMonth) && isValid(parsedDate);
 };
 
 enum CvcLength {
