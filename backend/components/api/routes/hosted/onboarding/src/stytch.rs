@@ -4,6 +4,8 @@ use crate::types::ApiResponse;
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserAuth;
+use api_core::auth::user::UserSessionContext;
+use api_core::auth::SessionContext;
 use api_core::decision;
 use api_core::decision::vendor;
 use api_core::errors::AssertionError;
@@ -43,14 +45,26 @@ use paperclip::actix::{
 )]
 #[actix::post("/hosted/onboarding/tel")]
 pub async fn post(
-    request: Json<StytchTelemetryRequest>,
-    state: web::Data<State>,
+    _request: Json<StytchTelemetryRequest>,
+    _state: web::Data<State>,
     user_auth: UserAuthContext,
-    telemetry_headers: TelemetryHeaders,
+    _telemetry_headers: TelemetryHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
-    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let StytchTelemetryRequest { telemetry_id } = request.into_inner();
+    let _user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    // let StytchTelemetryRequest { telemetry_id } = request.into_inner();
+    // 2024-08-02, temporarily disabling since stytch seems to be down
+    // post_inner(&state, telemetry_id).await?;
 
+    Ok(api_wire_types::Empty)
+}
+
+#[allow(unused)]
+async fn post_inner(
+    state: &State,
+    telemetry_id: String,
+    user_auth: SessionContext<UserSessionContext>,
+    telemetry_headers: TelemetryHeaders,
+) -> FpResult<()> {
     let req = StytchLookupRequest {
         telemetry_id: telemetry_id.clone(),
     };
@@ -122,9 +136,8 @@ pub async fn post(
         })
         .await?;
 
-    Ok(api_wire_types::Empty)
+    Ok(())
 }
-
 #[allow(clippy::too_many_arguments)]
 fn save_successful_response(
     conn: &mut TxnPgConn,
