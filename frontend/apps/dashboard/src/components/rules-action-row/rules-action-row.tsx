@@ -20,7 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import useLists from '@/lists/pages/list/hooks/use-lists';
+import useLists from 'src/hooks/use-lists';
 
 import { ListRuleChip, RiskSignalRuleChip } from './components/rule-chip';
 

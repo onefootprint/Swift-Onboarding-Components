@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
+import useLists from 'src/hooks/use-lists';
 import CreateDialog from './components/create-dialog';
 import Table from './components/table';
-import useLists from './hooks/use-lists';
 
 const List = () => {
   const { t } = useTranslation('lists', { keyPrefix: 'list' });

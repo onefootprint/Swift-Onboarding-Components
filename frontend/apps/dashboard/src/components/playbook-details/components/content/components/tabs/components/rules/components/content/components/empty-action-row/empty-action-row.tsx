@@ -9,7 +9,7 @@ import { ListRuleChip, RiskSignalRuleChip } from 'src/components/rules-action-ro
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import useLists from '@/lists/pages/list/hooks/use-lists';
+import useLists from 'src/hooks/use-lists';
 
 import type { AddedRuleWithId } from '../..';
 

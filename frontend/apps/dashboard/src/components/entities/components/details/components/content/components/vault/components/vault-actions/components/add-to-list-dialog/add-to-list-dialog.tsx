@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 
 import useAddEntries from '@/lists/pages/details/components/content/components/entries/components/add-entries-dialog/hooks/use-add-entries';
-import useLists from '@/lists/pages/list/hooks/use-lists';
+import useLists from 'src/hooks/use-lists';
 
 import useDecrypt from '../../hooks/use-decrypt-controls/hooks/use-decrypt-fields/hooks/use-decrypt';
 import getAttributeForListKind from './utils/get-attribute-for-list-kind';
