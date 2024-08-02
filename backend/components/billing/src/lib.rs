@@ -150,6 +150,8 @@ impl BillingClient {
         customer_id: &StripeCustomerId,
         bp: Option<&DbBillingProfile>,
     ) -> BResult<()> {
+        // NOTE: the stripe API won't let us clear a customer's email if it's removed from their billing
+        // profile
         let Some(email) = bp.and_then(|bp| bp.billing_email.as_deref()) else {
             return Ok(());
         };
@@ -276,38 +278,39 @@ impl BillingClient {
             .then_some(("send-automatically".to_owned(), "true".to_string()));
         let metadata = chain!(billing_interval, send_automatically, managed_metadata()).collect();
 
-        let mut payment_method_types = vec![
-            CreateInvoicePaymentSettingsPaymentMethodTypes::AchCreditTransfer,
-            CreateInvoicePaymentSettingsPaymentMethodTypes::UsBankAccount,
-        ];
-        let total_notional_cents: i64 = items.values().flat_map(|i| i.amount).sum();
-        if total_notional_cents < SMALL_INVOICE_NOTIONAL_CENTS {
-            // For small invoices, let tenants pay via card
-            payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Card);
-            payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Cashapp);
-        }
-
         let mut new_invoice = CreateInvoice {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
             pending_invoice_items_behavior: Some(InvoicePendingInvoiceItemsBehavior::Include),
-            payment_settings: Some(CreateInvoicePaymentSettings {
-                payment_method_types: Some(payment_method_types),
-                ..Default::default()
-            }),
             // TODO Testing this for footprint live, then enable this for other tenants
             auto_advance: Some(info.tenant_id.is_footprint_live()),
             description: None,
             ..Default::default()
         };
+
         let billing_email = info
             .billing_profile
             .as_ref()
             .and_then(|bp| bp.billing_email.as_ref());
         if billing_email.is_some() {
-            // We want this collection method, but stripe errors if the customer doesn't have an email set up
+            // When the customer has an email set up, we can automatically enable all sorts of options
             new_invoice.collection_method = Some(CollectionMethod::SendInvoice);
             new_invoice.days_until_due = Some(30);
+
+            let mut payment_method_types = vec![
+                CreateInvoicePaymentSettingsPaymentMethodTypes::AchCreditTransfer,
+                CreateInvoicePaymentSettingsPaymentMethodTypes::UsBankAccount,
+            ];
+            let total_notional_cents: i64 = items.values().flat_map(|i| i.amount).sum();
+            if total_notional_cents < SMALL_INVOICE_NOTIONAL_CENTS {
+                // For small invoices, let tenants pay via card
+                payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Card);
+                payment_method_types.push(CreateInvoicePaymentSettingsPaymentMethodTypes::Cashapp);
+            }
+            new_invoice.payment_settings = Some(CreateInvoicePaymentSettings {
+                payment_method_types: Some(payment_method_types),
+                ..Default::default()
+            });
         }
         let invoice = Invoice::create(&self.client, new_invoice).await?;
 
