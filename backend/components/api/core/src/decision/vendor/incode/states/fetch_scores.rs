@@ -177,15 +177,15 @@ impl IncodeStateTransition for FetchScores {
         let sv_id2 = ctx.sv_id.clone();
         tokio::spawn(async move {
             let resp = mark_status_as_complete(creds).await;
-            let log_msg = "error marking incode status as complete";
+            let message = "error marking incode status as complete";
 
             match resp {
                 Ok(r) => {
                     if r.status() != StatusCode::OK {
-                        tracing::warn!(status_code = r.status().to_string(), scoped_vault_id=%sv_id2, log_msg)
+                        tracing::warn!(status_code = r.status().to_string(), scoped_vault_id=%sv_id2, message)
                     }
                 }
-                Err(err) => tracing::warn!(err=?err, scoped_vault_id=%sv_id2, log_msg),
+                Err(err) => tracing::warn!(err=?err, scoped_vault_id=%sv_id2, message),
             }
         }.in_current_span());
 

@@ -263,7 +263,7 @@ pub async fn make_vendor_requests(
         .into_iter()
         .enumerate()
         .map(|(idx, res)| {
-            let log_msg = "VerificationRequest failed";
+            let message = "VerificationRequest failed";
 
             match res {
                 Ok(vr) => Ok((reqs[idx].clone(), vr)),
@@ -271,7 +271,7 @@ pub async fn make_vendor_requests(
                     tracing::error!(
                         ?err,
                         vendor_api = %err.vendor_api,
-                        log_msg
+                        message
                     );
 
                     Err((reqs[idx].clone(), err))

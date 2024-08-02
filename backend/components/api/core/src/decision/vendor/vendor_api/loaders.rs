@@ -78,15 +78,15 @@ where
         })
         .await?;
 
-    let log_msg = "load_response_for_vendor_api failed";
+    let message = "load_response_for_vendor_api failed";
 
     let Some((vreq, vres)) = requests_and_result else {
-        tracing::warn!(reason = "not found", ?vendor_api, log_msg);
+        tracing::warn!(reason = "not found", ?vendor_api, message);
         return Ok(LoadVendorResponseResult::NotFound);
     };
 
     let Some(e_resp) = vres.e_response.as_ref() else {
-        tracing::warn!(reason = "no response", ?vendor_api, log_msg);
+        tracing::warn!(reason = "no response", ?vendor_api, message);
         return Ok(LoadVendorResponseResult::NoResponse);
     };
 
@@ -98,14 +98,14 @@ where
     .await?;
 
     let Some(pii_json) = decrypted.first().cloned() else {
-        tracing::warn!(reason = "no response after decrypt", ?vendor_api, log_msg);
+        tracing::warn!(reason = "no response after decrypt", ?vendor_api, message);
         return Ok(LoadVendorResponseResult::NoResponse);
     };
 
     match vendor_api_struct.parse(pii_json.into_leak()) {
         Ok(s) => Ok(LoadVendorResponseResult::Success((s, vreq, vres))),
         Err(e) => {
-            tracing::warn!(reason = "deser error", ?vendor_api, log_msg);
+            tracing::warn!(reason = "deser error", ?vendor_api, message);
             Ok(LoadVendorResponseResult::Error(e.into()))
         }
     }

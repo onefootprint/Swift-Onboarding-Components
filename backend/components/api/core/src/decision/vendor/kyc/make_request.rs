@@ -49,16 +49,16 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
 
     if let Err(err) = vendor_result.as_ref() {
         let VendorAPIError { vendor_api: _, error } = err;
-        let log_msg = "Error making vendor call";
+        let message = "Error making vendor call";
         match error {
             idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => match e.is_known_error() {
                 true => {
-                    tracing::warn!(?err, log_msg);
+                    tracing::warn!(?err, message);
                 }
-                false => tracing::error!(?err, log_msg),
+                false => tracing::error!(?err, message),
             },
             _ => {
-                tracing::error!(?err, log_msg);
+                tracing::error!(?err, message);
             }
         };
     }
