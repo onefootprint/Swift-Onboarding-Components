@@ -212,7 +212,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
         "--limit",
         "10",
     ) as cmd:
-        cmd.expect(r"(fp_[A-Za-z0-9_]+)\r")
+        cmd.expect(r"(fp_[A-Za-z0-9_]+)([\r\n]|$)")
         assert cmd.match.group(1).decode() > fp_id
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
@@ -293,7 +293,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
 
     with footprint_dr("list-records", "--live", fp_id_1, fp_id_2) as cmd:
         for expected_line in fp_id_records:
-            cmd.expect(r"(^|\n){.+}\r")
+            cmd.expect(r"([\r\n]|^){.+}([\r\n]|$)")
             got_line = json.loads(cmd.match.group(0))
             assert got_line == expected_line, f"Got: {got_line} Want: {expected_line}"
 
@@ -313,7 +313,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
         api_root=INVALID_API_ROOT,
     ) as cmd:
         for expected_line in fp_id_records:
-            cmd.expect(r"(^|\n){.+}\r")
+            cmd.expect(r"([\r\n]|^){.+}([\r\n]|$)")
             got_line = json.loads(cmd.match.group(0))
             assert got_line == expected_line, f"Got: {got_line} Want: {expected_line}"
 
@@ -340,8 +340,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         "10",
     ) as cmd:
         # There should be at least two fp_ids in the sample, one for each we created.
-        cmd.expect(r"(^|\n){.+}\r")
-        cmd.expect(r"(^|\n){.+}\r")
+        cmd.expect(r"([\r\n]|^){.+}([\r\n]|$)")
+        cmd.expect(r"([\r\n]|^){.+}([\r\n]|$)")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
@@ -356,7 +356,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
         "--limit",
         "10",
     ) as cmd:
-        cmd.expect(r"(^|\n){.+}\r")
+        cmd.expect(r"([\r\n]|^){.+}([\r\n]|$)")
         assert json.loads(cmd.match.group(0))["fp_id"] > fp_id
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
