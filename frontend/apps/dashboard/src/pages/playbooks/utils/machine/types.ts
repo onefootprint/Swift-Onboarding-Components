@@ -14,6 +14,7 @@ export type DataToCollectFormData = {
   kind: PlaybookKind;
   person: Person;
   business?: Business;
+  requiredAuthMethods: AuthMethods;
 };
 
 export type DataToCollectMeta = {
@@ -170,6 +171,13 @@ export type AdditionalDocs = {
   custom?: CustomDoc[];
 };
 
+export type AuthMethods = {
+  email: false;
+  phone: true;
+  // This is an internal field used to check if no auth methods are selected
+  hasOptionSelected?: boolean;
+};
+
 export type Person = {
   basic: {
     email: boolean;
@@ -223,6 +231,7 @@ export const defaultBusinessInformation = {
 
 export const defaultPlaybookValuesAuth: DataToCollectFormData = {
   kind: PlaybookKind.Auth,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: false,
@@ -255,6 +264,7 @@ export const defaultPlaybookValuesAuth: DataToCollectFormData = {
 
 export const defaultPlaybookValuesKYC: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -287,6 +297,7 @@ export const defaultPlaybookValuesKYC: DataToCollectFormData = {
 
 export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -319,6 +330,7 @@ export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
 
 export const defaultPlaybookValuesApex: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -351,6 +363,7 @@ export const defaultPlaybookValuesApex: DataToCollectFormData = {
 
 export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -391,6 +404,7 @@ export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
 
 export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -424,6 +438,7 @@ export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
 
 export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: true,
@@ -466,6 +481,7 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
 
 export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
   kind: PlaybookKind.DocOnly,
+  requiredAuthMethods: { email: false, phone: true },
   person: {
     basic: {
       address: false,

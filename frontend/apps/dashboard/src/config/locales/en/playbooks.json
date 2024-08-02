@@ -259,6 +259,13 @@
         }
       }
     },
+    "required-auth": {
+      "title": "Login methods",
+      "subtitle": "Select the login methods that will be required to be verified (using a one-time-passcode) while onboarding onto this playbook.",
+      "phone": "Phone OTP",
+      "email": "Email OTP",
+      "error": "At least one verification is needed"
+    },
     "person": {
       "preview": {
         "title": {
@@ -275,6 +282,7 @@
           "dob": "Date of birth",
           "address": "Address"
         },
+
         "us-residents": {
           "title": "U.S. residents",
           "itin": "Accept ITIN",
@@ -314,6 +322,7 @@
         "basic-information": {
           "title": "Basic information"
         },
+
         "us-residents": {
           "title": "U.S. residents",
           "empty": "U.S. residents aren't allowed to be onboarded."
