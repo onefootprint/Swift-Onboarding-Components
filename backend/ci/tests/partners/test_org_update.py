@@ -1,15 +1,27 @@
 import os
-
+import requests
 from tests.utils import put, patch, get, _gen_random_str
 
 
-def _logo_path():
-    return os.path.dirname(__file__) + "/data/logo.png"
-
-
 def test_partner_org_updates(partner_tenant):
+    # SVG logo not allowed
+    logo_path = os.path.dirname(__file__) + "/data/malicious_logo.svg"
+    files = {"upload_file": ("logo.svg", open(logo_path, "rb"), "image/svg")}
+    resp = put("partner/logo", None, *partner_tenant.db_auths, files=files, status_code=400)
+    assert resp["code"] == "E112"
+
+    # SVG uploaded with PNG content type is downloaded as a PNG.
+    files = {"upload_file": ("logo.svg", open(logo_path, "rb"), "image/png")}
+    body = put("partner/logo", None, *partner_tenant.db_auths, files=files)
+    assert body["logo_url"].endswith(".png")
+
+    resp = requests.get(body["logo_url"])
+    resp.raise_for_status()
+    assert resp.headers["Content-Type"] == "image/png"
+
     # POST /partner/logo
-    files = {"upload_file": ("logo.png", open(_logo_path(), "rb"), "image/png")}
+    logo_path = os.path.dirname(__file__) + "/data/logo.png"
+    files = {"upload_file": ("logo.png", open(logo_path, "rb"), "image/png")}
 
     body = put(
         "partner/logo",

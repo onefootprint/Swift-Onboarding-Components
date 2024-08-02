@@ -19,7 +19,7 @@ pub async fn upload_org_logo(
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,
-        Some(vec![mime::IMAGE_PNG, mime::IMAGE_SVG, mime::IMAGE_JPEG]),
+        Some(vec![mime::IMAGE_PNG, mime::IMAGE_JPEG]),
         MAX_IMAGE_SIZE_BYTES,
         0,
     )
