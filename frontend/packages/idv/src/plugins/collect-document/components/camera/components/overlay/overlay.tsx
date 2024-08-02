@@ -3,13 +3,13 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { AUTOCAPTURE_TIMER_INTERVAL } from '../../../../constants';
-import type { AutocaptureKind } from '../../types';
+import type { AutoCaptureKind } from '../../types';
 
 type OverlayProps = {
   width: number; // Fits the size of video
   height: number;
   videoHeight: number;
-  captureKind: AutocaptureKind;
+  captureKind: AutoCaptureKind;
   outlineWidth: number;
   outlineHeight: number;
   timerAnimationVal?: number;

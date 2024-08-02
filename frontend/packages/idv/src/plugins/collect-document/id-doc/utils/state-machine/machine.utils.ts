@@ -1,14 +1,14 @@
 import type { CountryCode, IdDocImageTypes } from '@onefootprint/types';
 
-import type { MachineContext, ProccessingSucceededEvent } from './types';
+import type { MachineContext, ProcessingSucceededEvent } from './types';
 
 type MachineTarget = {
   target: string;
-  cond?: (context: MachineContext, event: ProccessingSucceededEvent) => boolean;
-  actions?: (context: MachineContext, event: ProccessingSucceededEvent) => void;
+  cond?: (context: MachineContext, event: ProcessingSucceededEvent) => boolean;
+  actions?: (context: MachineContext, event: ProcessingSucceededEvent) => void;
 };
 
-const assignCurrSide = (context: MachineContext, event: ProccessingSucceededEvent) => {
+const assignCurrSide = (context: MachineContext, event: ProcessingSucceededEvent) => {
   context.currSide = event.payload.nextSideToCollect as IdDocImageTypes;
   context.errors = [];
 };

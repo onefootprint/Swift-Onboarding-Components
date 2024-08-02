@@ -38,7 +38,7 @@ export type MachineContext = {
   forceUpload?: boolean;
 };
 
-export type ProccessingSucceededEvent = {
+export type ProcessingSucceededEvent = {
   type: 'processingSucceeded';
   payload: { nextSideToCollect?: string };
 };
@@ -58,4 +58,4 @@ export type MachineEvents =
   | { type: 'retryLimitExceeded' }
   | { type: 'startImageCapture' }
   | { type: 'uploadErrored'; payload: { errors: { errorType: IdDocImageUploadError; errorInfo?: string }[] } }
-  | ProccessingSucceededEvent;
+  | ProcessingSucceededEvent;

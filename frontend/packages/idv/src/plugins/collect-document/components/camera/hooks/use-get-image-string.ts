@@ -2,7 +2,7 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 
 import { Logger } from '../../../../../utils/logger';
-import type { AutocaptureKind, Resolution, VideoRef } from '../types';
+import type { AutoCaptureKind, Resolution, VideoRef } from '../types';
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
 
@@ -13,7 +13,7 @@ type GetImageStringProps = {
   videoResolution?: Resolution;
   desiredImageWidth: number;
   desiredImageHeight: number;
-  autocaptureKind: AutocaptureKind;
+  autoCaptureKind: AutoCaptureKind;
   centerOffsetX?: number;
   centerOffsetY?: number;
 };
@@ -28,7 +28,7 @@ const useGetImageString = () => {
     videoResolution,
     desiredImageWidth,
     desiredImageHeight,
-    autocaptureKind,
+    autoCaptureKind,
     centerOffsetX = 0,
     centerOffsetY = 0,
   }: GetImageStringProps) => {
@@ -70,7 +70,7 @@ const useGetImageString = () => {
       canvasRef.current?.clientHeight,
     );
 
-    if (loaded && cv && autocaptureKind !== 'face') {
+    if (loaded && cv && autoCaptureKind !== 'face') {
       const src = cv.imread(canvasRef.current);
       const sharpenedImage = sharpenImage(cv, src, true);
       cv.imshow(canvasRef.current, sharpenedImage);

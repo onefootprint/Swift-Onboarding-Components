@@ -41,7 +41,7 @@ import UploadButton from './components/upload-button';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
-import type { AutocaptureKind, CaptureStatus, DeviceKind, Resolution, VideoRef } from './types';
+import type { AutoCaptureKind, CaptureStatus, DeviceKind, Resolution, VideoRef } from './types';
 import type { CameraSide } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
@@ -58,8 +58,8 @@ type ChildrenProps = {
 };
 
 type CameraProps = {
-  autocaptureFeedback?: CaptureStatus;
-  autocaptureKind: AutocaptureKind;
+  autoCaptureFeedback?: CaptureStatus;
+  autoCaptureKind: AutoCaptureKind;
   cameraSide: CameraSide;
   children: (props: ChildrenProps) => JSX.Element | null;
   deviceKind: DeviceKind;
@@ -123,14 +123,14 @@ const getPositionFromTop = (kind: DeviceKind, size?: Resolution): number =>
 
 const getDesiredSize = (
   videoSize: Resolution,
-  autocaptureKind: AutocaptureKind,
+  autoCaptureKind: AutoCaptureKind,
   positionFromBottom: number,
   outlineHeightRatio: number,
   outlineWidthRatio: number,
 ) => {
   // For document capture, we keep the captured width/height spect ratio same as the outline aspect ratio
   // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
-  if (isDocument(autocaptureKind)) {
+  if (isDocument(autoCaptureKind)) {
     return {
       width: videoSize.width,
       height: Math.min(
@@ -165,8 +165,8 @@ const getVideoResolution = (stream?: MediaStream | null): Resolution | undefined
 };
 
 const Camera = ({
-  autocaptureFeedback,
-  autocaptureKind,
+  autoCaptureFeedback,
+  autoCaptureKind,
   cameraSide,
   children,
   deviceKind,
@@ -340,16 +340,16 @@ const Camera = ({
 
     const desiredSize = getDesiredSize(
       videoSize,
-      autocaptureKind,
+      autoCaptureKind,
       positionFromBottom,
       outlineHeightRatio,
       outlineWidthRatio,
     );
 
     const imageString = getImageStringFromVideo({
-      autocaptureKind,
+      autoCaptureKind,
       canvasRef: canvasImageCaptureRef,
-      centerOffsetY: isDocument(autocaptureKind) ? -positionFromBottom / 2 : 0,
+      centerOffsetY: isDocument(autoCaptureKind) ? -positionFromBottom / 2 : 0,
       context,
       desiredImageHeight: desiredSize.height,
       desiredImageWidth: desiredSize.width,
@@ -424,7 +424,7 @@ const Camera = ({
 
   useEffect(() => () => clearTimeout(autocaptureRestartTimeoutRef.current), []);
   const feedbackText = t(
-    `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}` as unknown as TemplateStringsArray,
+    `autocapture.feedback.${autoCaptureKind}.${autoCaptureFeedback}` as unknown as TemplateStringsArray,
     {
       side: sideName ?? '',
       documentType: docName ?? '',
@@ -483,7 +483,7 @@ const Camera = ({
                 width={videoSize?.width ?? 0}
                 height={positionFromTop}
                 videoHeight={videoSize?.height ?? 0}
-                captureKind={autocaptureKind}
+                captureKind={autoCaptureKind}
                 outlineWidth={outlineWidth}
                 outlineHeight={outlineHeight}
                 timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
@@ -498,7 +498,7 @@ const Camera = ({
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
-              {autocaptureFeedback ? (
+              {autoCaptureFeedback ? (
                 <Feedback deviceKind={deviceKind} top={positionFromTop}>
                   {feedbackText}
                 </Feedback>
@@ -510,7 +510,7 @@ const Camera = ({
                   disabled={!isCameraVisible || !videoSize}
                 />
               )}
-              {isDocument(autocaptureKind) && allowUpload && (
+              {isDocument(autoCaptureKind) && allowUpload && (
                 <UploadButton
                   onUploadBtnClick={onImageUpload}
                   onUploadChangeDone={onUploadComplete}

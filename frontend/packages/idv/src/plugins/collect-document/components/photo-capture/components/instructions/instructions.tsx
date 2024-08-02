@@ -4,20 +4,20 @@ import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { AutocaptureKind } from '../../../camera/types';
+import type { AutoCaptureKind } from '../../../camera/types';
 import InstructionItems from './components/instruction-item';
 
 type InstructionProps = {
   onClose: () => void;
   isOpen: boolean;
-  autocaptureKind: AutocaptureKind;
+  autoCaptureKind: AutoCaptureKind;
 };
 
-const Instructions = ({ onClose, isOpen, autocaptureKind }: InstructionProps) => {
+const Instructions = ({ onClose, isOpen, autoCaptureKind }: InstructionProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.photo-capture.instructions',
   });
-  const captureKind = autocaptureKind === 'face' ? 'face' : 'document';
+  const captureKind = autoCaptureKind === 'face' ? 'face' : 'document';
   const instructionItems: {
     title: string;
     description: string;

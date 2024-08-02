@@ -3,7 +3,7 @@ import React from 'react';
 import useAutoCaptureDoc from './hooks/use-auto-capture-doc';
 import type { CaptureStatus, Resolution, VideoRef } from './types';
 
-type AutoCaptureDocProps = {
+export type AutoCaptureDocProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
   feedbackPositionFromBottom: number;
   isCaptured: boolean;
@@ -12,7 +12,7 @@ type AutoCaptureDocProps = {
   onDetectionReset: () => void;
   outlineHeight: number;
   outlineWidth: number;
-  setAutocaptureFeedback: (x?: CaptureStatus) => void;
+  setAutoCaptureFeedback: (x?: CaptureStatus) => void;
   videoRef: VideoRef;
   videoSize: Resolution | undefined;
 };
@@ -26,7 +26,7 @@ const AutoCaptureDoc = ({
   onDetectionReset,
   outlineHeight,
   outlineWidth,
-  setAutocaptureFeedback,
+  setAutoCaptureFeedback,
   videoRef,
   videoSize,
 }: AutoCaptureDocProps): null => {
@@ -36,7 +36,7 @@ const AutoCaptureDoc = ({
     videoResolution,
     onDetectionComplete,
     onDetectionReset,
-    onStatusChange: setAutocaptureFeedback,
+    onStatusChange: setAutoCaptureFeedback,
     outlineHeight,
     outlineOffsetY: -feedbackPositionFromBottom / 2, // Negative Y direction (upward)
     outlineWidth,

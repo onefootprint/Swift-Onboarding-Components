@@ -14,7 +14,7 @@ import { bytesToMegabytes, isDesktop, isDocument, isFace, isMobile } from '../..
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
 import AutoCaptureFace from '../camera/auto-capture-face';
-import type { AutocaptureKind, CaptureStatus, DeviceKind } from '../camera/types';
+import type { AutoCaptureKind, CaptureStatus, DeviceKind } from '../camera/types';
 import type { CameraSide } from '../camera/utils/get-camera-options';
 import Loading from '../loading';
 import Instructions from './components/instructions';
@@ -24,7 +24,7 @@ type HeaderTextType = { camera: string; preview: string };
 type OnComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
 
 type PhotoCaptureProps = {
-  autocaptureKind: AutocaptureKind;
+  autocaptureKind: AutoCaptureKind;
   cameraKind: CameraSide;
   deviceKind: DeviceKind;
   sideName?: string;
@@ -200,8 +200,8 @@ const PhotoCapture = ({
         />
       )}
       <Camera
-        autocaptureFeedback={autocaptureFeedback}
-        autocaptureKind={autocaptureKind}
+        autoCaptureFeedback={autocaptureFeedback}
+        autoCaptureKind={autocaptureKind}
         cameraSide={cameraKind}
         deviceKind={deviceKind}
         docName={docName}
@@ -239,7 +239,7 @@ const PhotoCapture = ({
                 onDetectionReset={onDetectionReset}
                 outlineHeight={outlineHeight}
                 outlineWidth={outlineWidth}
-                setAutocaptureFeedback={setAutocaptureFeedback}
+                setAutoCaptureFeedback={setAutocaptureFeedback}
                 videoRef={videoRef}
                 videoSize={videoSize}
               />
@@ -254,7 +254,7 @@ const PhotoCapture = ({
               onDetectionComplete={onDetectionComplete}
               onDetectionReset={onDetectionReset}
               outlineWidth={outlineWidth}
-              setAutocaptureFeedback={setAutocaptureFeedback}
+              setAutoCaptureFeedback={setAutocaptureFeedback}
               videoRef={videoRef}
               videoSize={videoSize}
             />
@@ -264,7 +264,7 @@ const PhotoCapture = ({
       <Instructions
         onClose={() => setShowInstructions(false)}
         isOpen={showInstructions}
-        autocaptureKind={autocaptureKind}
+        autoCaptureKind={autocaptureKind}
       />
     </>
   );
