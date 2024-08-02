@@ -35,7 +35,7 @@ use newtypes::DocumentDiKind;
 use newtypes::DocumentRequestConfig;
 use newtypes::DocumentRequestKind;
 use newtypes::DocumentStatus;
-use newtypes::DocumentUploadMode;
+use newtypes::DocumentUploadSettings;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
@@ -540,25 +540,26 @@ fn get_requirement_inner(
                         DocumentRequestConfig::ProofOfSsn { .. } => CollectDocumentConfig::ProofOfSsn {},
                         DocumentRequestConfig::Custom(info) => CollectDocumentConfig::Custom(info),
                     };
-                    // if FF'd into require capture only
-                    // TODO: this will come from rule configuration table at some point in future
-                    let upload_mode = match dr.kind {
+
+                    let upload_settings = match dr.kind {
                         DocumentRequestKind::Identity => {
                             if opts.require_capture_on_stepup.unwrap_or(false) {
-                                DocumentUploadMode::CaptureOnly
+                                // Only for coba
+                                DocumentUploadSettings::CaptureOnlyOnMobile
                             } else {
-                                DocumentUploadMode::Default
+                                DocumentUploadSettings::PreferCapture
                             }
                         }
-                        DocumentRequestKind::ProofOfSsn => DocumentUploadMode::Default,
-                        DocumentRequestKind::ProofOfAddress => DocumentUploadMode::AllowUpload,
-                        // TODO this might be a new mode - select between capture or upload, no preference
-                        DocumentRequestKind::Custom => DocumentUploadMode::AllowUpload,
+                        DocumentRequestKind::ProofOfSsn => DocumentUploadSettings::PreferCapture,
+                        DocumentRequestKind::ProofOfAddress => DocumentUploadSettings::PreferUpload,
+                        // TODO support configuring this
+                        DocumentRequestKind::Custom => DocumentUploadSettings::PreferUpload,
                     };
 
                     let req = OnboardingRequirement::CollectDocument {
                         document_request_id: dr.id.clone(),
-                        upload_mode,
+                        upload_settings,
+                        upload_mode: upload_settings.into(),
                         config,
                     };
 

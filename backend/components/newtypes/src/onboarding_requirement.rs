@@ -4,9 +4,10 @@ use crate::CustomDocumentConfig;
 use crate::DocumentKind;
 use crate::DocumentRequestId;
 use crate::DocumentRequestKind;
-use crate::DocumentUploadMode;
+use crate::DocumentUploadSettings;
 use crate::IdDocKind;
 use crate::Iso3166TwoDigitCountryCode;
+use crate::LegacyDocumentUploadMode;
 use chrono::DateTime;
 use chrono::Utc;
 use itertools::Itertools;
@@ -51,8 +52,10 @@ pub enum OnboardingRequirement {
     /// A document needs to be collected
     CollectDocument {
         document_request_id: DocumentRequestId,
-        upload_mode: DocumentUploadMode,
         config: CollectDocumentConfig,
+        upload_settings: DocumentUploadSettings,
+        /// DEPRECATED: todo remove this
+        upload_mode: LegacyDocumentUploadMode,
     },
     /// The client needs to display the authorization consent page and confirm the user authorizes
     /// access
@@ -177,6 +180,7 @@ impl OnboardingRequirement {
             Self::RegisterPasskey => false,
             Self::CollectDocument {
                 document_request_id: _,
+                upload_settings: _,
                 upload_mode: _,
                 config: _,
             } => false,
@@ -218,6 +222,7 @@ impl OnboardingRequirement {
             Self::RegisterPasskey => "Missing passkey registration".into(),
             Self::CollectDocument {
                 document_request_id: _,
+                upload_settings: _,
                 upload_mode: _,
                 config,
             } => format!("Missing {} document", DocumentRequestKind::from(config)),
@@ -257,7 +262,8 @@ mod test {
     use crate::DataIdentifier;
     use crate::DocumentRequestId;
     use crate::DocumentRequestKind;
-    use crate::DocumentUploadMode;
+    use crate::DocumentUploadSettings;
+    use crate::LegacyDocumentUploadMode;
     use crate::OnboardingRequirement;
     use crate::OnboardingRequirementKind;
     use itertools::Itertools;
@@ -300,7 +306,8 @@ mod test {
         for dr_kind in DocumentRequestKind::iter() {
             base.push(OnboardingRequirement::CollectDocument {
                 document_request_id: DocumentRequestId::from_str("dr12").unwrap(),
-                upload_mode: DocumentUploadMode::AllowUpload,
+                upload_settings: DocumentUploadSettings::PreferUpload,
+                upload_mode: LegacyDocumentUploadMode::AllowUpload,
                 config: match dr_kind {
                     DocumentRequestKind::Identity => CollectDocumentConfig::Identity {
                         should_collect_selfie: false,
