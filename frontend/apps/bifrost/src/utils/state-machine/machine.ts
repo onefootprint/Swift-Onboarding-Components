@@ -57,8 +57,26 @@ export const createBifrostMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context: MachineContext, event) => {
-          const { bootstrapData, config, l10n, showCompletionPage, showLogo, authToken, publicKey, isComponentsSdk } =
-            event.payload;
+          const {
+            bootstrapData,
+            config,
+            l10n,
+            showCompletionPage,
+            showLogo,
+            authToken,
+            publicKey,
+            isComponentsSdk,
+            fixtureResult,
+            documentFixtureResult,
+          } = event.payload;
+
+          let sandboxOutcome = undefined;
+          if (fixtureResult || documentFixtureResult) {
+            sandboxOutcome = {
+              overallOutcome: fixtureResult,
+              idDocOutcome: documentFixtureResult,
+            };
+          }
 
           context.config = isUndefined(config) ? context.config : config;
           context.l10n = isUndefined(l10n) ? context.l10n : l10n;
@@ -76,6 +94,8 @@ export const createBifrostMachine = () =>
           context.publicKey = isUndefined(publicKey) ? context.publicKey : publicKey;
 
           context.isComponentsSdk = isUndefined(isComponentsSdk) ? context.isComponentsSdk : isComponentsSdk;
+
+          context.sandboxOutcome = isUndefined(sandboxOutcome) ? context.sandboxOutcome : sandboxOutcome;
 
           return context;
         }),

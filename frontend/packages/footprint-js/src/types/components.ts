@@ -63,6 +63,14 @@ type BootstrapKeys = 'userData' | 'bootstrapData';
 
 type VerifyDataKeys = BootstrapKeys | 'publicKey' | 'options' | 'authToken' | 'l10n';
 
+type OverallOutcome = 'pass' | 'fail' | 'manual_review' | 'use_rules_outcome' | 'step_up';
+type IdDocOutcome = 'pass' | 'fail' | 'real';
+
+export type SandboxOutcome = {
+  readonly overallOutcome?: OverallOutcome;
+  readonly documentOutcome?: IdDocOutcome;
+};
+
 type VerifyPropsBase<TAuth> = PropsBase & {
   readonly bootstrapData?: BootstrapData;
   readonly onAuth?: (validationToken: string) => void;
@@ -70,6 +78,7 @@ type VerifyPropsBase<TAuth> = PropsBase & {
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Options;
+  readonly sandboxOutcome?: SandboxOutcome;
   /** @deprecated use bootstrapData instead */
   readonly userData?: FootprintUserData;
 } & TAuth;
@@ -82,6 +91,8 @@ export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
 // The subset of VerifyProps that are sent to the iframe via sdk_args
 export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
   isComponentsSdk?: boolean;
+  fixtureResult?: OverallOutcome;
+  documentFixtureResult?: IdDocOutcome;
 };
 
 /** Components SDK. Just a subset of Verify */

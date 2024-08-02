@@ -1,4 +1,4 @@
-import type { Component } from '@onefootprint/footprint-js/src/types/components';
+import type { Component, SandboxOutcome } from '@onefootprint/footprint-js/src/types/components';
 import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import type { Dispatch, SetStateAction } from 'react';
@@ -18,6 +18,7 @@ export type ContextData = {
     onError?: (error: unknown) => void;
   };
   onboardingConfig: PublicOnboardingConfig | null;
+  sandboxOutcome?: SandboxOutcome;
   publicKey: string;
   locale?: SupportedLocale;
 };
@@ -35,17 +36,21 @@ const Context = createContext<[ContextData, UpdateContext]>([
 ]);
 
 // These are the props users can set on the provider
-export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey' | 'locale'> & {
+export type ProviderProps = Pick<
+  ContextData,
+  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxOutcome'
+> & {
   children: React.ReactNode;
 };
 
-const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US' }: ProviderProps) => {
+const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US', sandboxOutcome }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
     locale,
     fpInstance: null,
     onboardingConfig: null,
+    sandboxOutcome,
     publicKey,
     // when calling handoff, we can listen to fp instance events
     handoffCallbacks: {

@@ -47,6 +47,8 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       authToken: props.authToken,
       options: props.options,
       l10n: props.l10n,
+      fixtureResult: props.sandboxOutcome?.overallOutcome,
+      documentFixtureResult: props.sandboxOutcome?.documentOutcome,
       isComponentsSdk: kind === ComponentKind.Components,
     };
   }

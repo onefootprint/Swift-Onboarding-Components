@@ -24,6 +24,7 @@ export const useFootprint = () => {
     const fp = footprint.init({
       appearance: context.appearance,
       publicKey: context.publicKey,
+      sandboxOutcome: context.sandboxOutcome,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,

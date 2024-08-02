@@ -1,9 +1,10 @@
-import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
+import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth, OverallOutcome } from '@onefootprint/types';
 import { BusinessDI, IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks';
 import type { BusinessData, UserData } from '../../types';
+import getRandomID from '../get-random-id';
 import { ConfigRequestFailureReason } from './types';
 import type { CompletePayload, ComponentsSdkContext, MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
@@ -19,6 +20,7 @@ export type IdvMachineArgs = {
   isInIframe?: boolean;
   device?: DeviceInfo;
   idDocOutcome?: IdDocOutcome;
+  overallOutcome?: OverallOutcome;
   showLogo?: boolean;
   onClose?: () => void;
   onComplete?: (payload: CompletePayload) => void;
@@ -96,7 +98,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
               },
               {
                 target: 'identify',
-                actions: ['assignInitContext'],
+                actions: ['assignInitContext', 'assignSandboxId'],
                 cond: (context, event) => isContextReady(context, event) && shouldShowIdentify(context, event),
               },
               {
@@ -189,6 +191,13 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           sandboxId: event.payload.sandboxId,
           overallOutcome: event.payload.overallOutcome,
         })),
+        assignSandboxId: assign(context => {
+          if (context.sandboxId) {
+            return context;
+          }
+          const sandboxId = getRandomID();
+          return { ...context, sandboxId };
+        }),
         assignIdentifyResult: assign((context, event) => {
           // Pass the phone and email collected in the identify machine into the requirements
           // machine. In very few cases, the phone and email are needed in the requirements machine

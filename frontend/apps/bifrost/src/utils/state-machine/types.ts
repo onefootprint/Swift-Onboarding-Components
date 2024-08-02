@@ -1,6 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import type { IdvCompletePayload } from '@onefootprint/idv';
-import type { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
+import type { IdDocOutcome, IdvBootstrapData, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;
@@ -13,6 +13,10 @@ export type MachineContext = {
   l10n?: L10n;
   idvCompletePayload?: IdvCompletePayload;
   isComponentsSdk?: boolean;
+  sandboxOutcome?: {
+    overallOutcome?: OverallOutcome;
+    idDocOutcome?: IdDocOutcome;
+  };
 };
 
 export type MachineEvents =
@@ -27,6 +31,8 @@ export type MachineEvents =
         authToken?: string;
         publicKey?: string;
         isComponentsSdk?: boolean;
+        fixtureResult?: OverallOutcome;
+        documentFixtureResult?: IdDocOutcome;
       };
     }
   | { type: 'configRequestFailed' }

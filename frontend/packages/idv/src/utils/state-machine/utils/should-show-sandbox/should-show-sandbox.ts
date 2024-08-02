@@ -5,7 +5,7 @@ const shouldShowSandbox = (context: MachineContext, event: MachineEvents): boole
     return false;
   }
 
-  const { componentsSdkContext } = context;
+  const { componentsSdkContext, overallOutcome, idDocOutcome } = context;
   const isMobileComponentSdk = componentsSdkContext?.componentsSdkType === ComponentsSdkTypes.MOBILE;
   const skipRelayToComponents = componentsSdkContext?.skipRelayToComponents;
   if (isMobileComponentSdk && skipRelayToComponents) {
@@ -14,7 +14,9 @@ const shouldShowSandbox = (context: MachineContext, event: MachineEvents): boole
   }
 
   const config = context.config || event.payload.config;
-  return !config?.isLive && !context.isTransfer;
+  const requiresIdDocOutcome = config?.requiresIdDoc && !idDocOutcome;
+  const requiresOverallOutcome = !overallOutcome;
+  return !config?.isLive && !context.isTransfer && (requiresIdDocOutcome || requiresOverallOutcome);
 };
 
 export default shouldShowSandbox;

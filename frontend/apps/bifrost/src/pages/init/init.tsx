@@ -8,7 +8,7 @@ import {
   useGetOnboardingConfig,
 } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
-import type { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
+import type { IdDocOutcome, IdvBootstrapData, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
@@ -98,7 +98,15 @@ const Init = () => {
     (props: FootprintVerifyDataProps) => {
       if (isPropsSaved(state.context)) return;
 
-      const { authToken = '', isComponentsSdk = false, l10n = {}, options = {}, publicKey = '' } = props;
+      const {
+        authToken = '',
+        isComponentsSdk = false,
+        l10n = {},
+        options = {},
+        publicKey = '',
+        fixtureResult,
+        documentFixtureResult,
+      } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       send({
         type: 'initContextUpdated',
@@ -110,6 +118,8 @@ const Init = () => {
           publicKey,
           showCompletionPage,
           showLogo,
+          fixtureResult: fixtureResult as OverallOutcome,
+          documentFixtureResult: documentFixtureResult as IdDocOutcome,
         },
       });
     },

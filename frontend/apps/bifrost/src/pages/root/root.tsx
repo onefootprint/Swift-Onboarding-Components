@@ -25,7 +25,16 @@ const { logError, logInfo } = getLogger({ location: 'bifrost-root' });
 const Root = ({ variant }: RootProps) => {
   const fpProvider = useFootprintProvider();
   const [state, send] = useBifrostMachine();
-  const { bootstrapData, l10n, showCompletionPage, showLogo, authToken, publicKey, isComponentsSdk } = state.context;
+  const {
+    bootstrapData,
+    l10n,
+    showCompletionPage,
+    showLogo,
+    authToken,
+    publicKey,
+    isComponentsSdk,
+    sandboxOutcome: { overallOutcome, idDocOutcome } = {},
+  } = state.context;
   const obConfigAuth = publicKey ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey } : undefined;
 
   const isWebview = !checkIsIframe();
@@ -109,6 +118,8 @@ const Root = ({ variant }: RootProps) => {
             onIdentifyDone={handleIdentifyCompletion}
             showLogo={showLogo}
             componentsSdkContext={componentsSdkContext}
+            overallOutcome={overallOutcome}
+            idDocOutcome={idDocOutcome}
             l10n={l10n}
           />
         )}

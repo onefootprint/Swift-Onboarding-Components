@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignDeviceResponseJson: 'receivedDeviceResponseJson';
     assignIdentifyResult: 'identifyCompleted';
     assignInitContext: 'initContextUpdated';
+    assignSandboxId: 'initContextUpdated';
     assignSandboxOutcome: 'sandboxOutcomeSubmitted';
     assignValidationToken: 'onboardingCompleted';
     eraseAuthToken: 'reset';
