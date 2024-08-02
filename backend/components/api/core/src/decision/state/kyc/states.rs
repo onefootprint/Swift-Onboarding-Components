@@ -223,6 +223,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let is_neuro_enabled_obc = obc
             .verification_checks()
             .is_enabled(VerificationCheckKind::NeuroId);
+
         let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
         let neuro_result = if is_neuro_enabled_obc && is_neuro_enabled_for_workflow {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {

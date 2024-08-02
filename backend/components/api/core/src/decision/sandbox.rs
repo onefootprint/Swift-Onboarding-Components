@@ -3,7 +3,10 @@ use super::vendor::{
     self,
 };
 use super::Error;
+use crate::decision::vendor::neuro_id::save_neuro_event;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::FpResult;
+use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
@@ -12,18 +15,25 @@ use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use db::DbPool;
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::neuro_id::response::NeuroAPIResult;
+use idv::neuro_id::response::NeuroApiResponse;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use idv::test_fixtures::NeuroTestOpts;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::CipKind;
 use newtypes::DecisionIntentId;
 use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode;
+use newtypes::NeuroIdentityId;
 use newtypes::ScopedVaultId;
 use newtypes::SignalSeverity;
+use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
@@ -292,6 +302,63 @@ pub async fn save_fixture_incode_watchlist_result(
         .await?;
 
     Ok((vres, parsed))
+}
+
+pub async fn save_fixture_neuro_result(
+    state: &State,
+    fixture_result: WorkflowFixtureResult,
+    di_id: &DecisionIntentId,
+    sv_id: &ScopedVaultId,
+    wf_id: &WorkflowId,
+    t_id: &TenantId,
+    vault_public_key: &VaultPublicKey,
+) -> FpResult<VendorResult> {
+    let raw = match fixture_result {
+        WorkflowFixtureResult::Fail => {
+            let opts = NeuroTestOpts {
+                automated_activity: true,
+                factory_reset: true,
+                fraud_ring_indicator: true,
+                bot_framework: true,
+                device_id: None,
+                cookie_id: None,
+            };
+            idv::test_fixtures::neuro_id_success_response(opts)
+        }
+        WorkflowFixtureResult::Pass
+        | WorkflowFixtureResult::ManualReview
+        | WorkflowFixtureResult::StepUp
+        | WorkflowFixtureResult::UseRulesOutcome => {
+            idv::test_fixtures::neuro_id_success_response(NeuroTestOpts::default())
+        }
+    };
+
+    let parsed = serde_json::from_value::<NeuroIdAnalyticsResponse>(raw.clone())?;
+    let request_result = Ok(NeuroApiResponse {
+        result: NeuroAPIResult::Success(parsed.clone()),
+        raw_response: raw.clone().into(),
+    });
+
+    let args = SaveVerificationResultArgs::new_for_neuro(
+        &request_result,
+        di_id.clone(),
+        sv_id.clone(),
+        vault_public_key.clone(),
+    );
+
+    let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
+    let vendor_response = VendorResponse {
+        response: ParsedResponse::NeuroIdAnalytics(parsed.clone()),
+        raw_response: raw.into(),
+    };
+
+    let neuro_id = NeuroIdentityId::from(wf_id.clone());
+    save_neuro_event(state, &parsed, t_id, neuro_id, sv_id, wf_id, &vres_id).await?;
+    Ok(VendorResult {
+        response: vendor_response,
+        verification_result_id: vres_id,
+        verification_request_id: vreq_id,
+    })
 }
 
 #[cfg(test)]

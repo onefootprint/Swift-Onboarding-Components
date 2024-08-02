@@ -145,20 +145,37 @@ pub async fn run_neuro_check(
     t_id: &TenantId,
 ) -> FpResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
-    let (wf, di) = state
+    let (wf, v, di) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
                 &wf.scoped_vault_id,
                 &wfid,
                 DecisionIntentKind::OnboardingKyc,
             )?;
-            Ok((wf, di))
+            Ok((wf, v, di))
         })
         .await?;
-    run_neuro_call(state, &di, &wf.id, t_id).await
+
+    let ff_client = state.ff_client.clone();
+    let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, t_id)?;
+    if let Some(fixture_result) = fixture_result {
+        let vendor_result = decision::sandbox::save_fixture_neuro_result(
+            state,
+            fixture_result,
+            &di.id,
+            &wf.scoped_vault_id,
+            &wf.id,
+            t_id,
+            &v.public_key,
+        )
+        .await?;
+        Ok(Some(vendor_result))
+    } else {
+        run_neuro_call(state, &di, &wf.id, t_id).await
+    }
 }
 
 #[tracing::instrument(skip(state))]
