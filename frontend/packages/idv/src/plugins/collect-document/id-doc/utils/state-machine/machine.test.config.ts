@@ -1,7 +1,39 @@
-import { IdDocImageProcessingError, IdDocImageTypes, IdDocImageUploadError } from '@onefootprint/types';
+import {
+  DocumentRequestKind,
+  DocumentRequirement,
+  IdDocImageProcessingError,
+  IdDocImageTypes,
+  IdDocImageUploadError,
+  IdDocRequirementConfig,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 
 import type { MachineContext } from './types';
+
+const documentRequirement: DocumentRequirement<IdDocRequirementConfig> = {
+  kind: OnboardingRequirementKind.document,
+  isMet: false,
+  documentRequestId: 'id',
+  uploadMode: 'default',
+  config: {
+    kind: DocumentRequestKind.Identity,
+    shouldCollectSelfie: true,
+    shouldCollectConsent: true,
+    supportedCountryAndDocTypes: {
+      US: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+        SupportedIdDocTypes.voterIdentification,
+      ],
+      CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+    },
+  },
+};
 
 export const initialContextDL: MachineContext = {
   authToken: 'token',
@@ -13,25 +45,11 @@ export const initialContextDL: MachineContext = {
   },
   currSide: IdDocImageTypes.front,
   orgId: 'orgId',
-  documentRequestId: 'id',
-  shouldCollectSelfie: true,
+  requirement: documentRequirement,
   isConsentMissing: true,
-  uploadMode: 'default',
   idDoc: {
     country: 'US',
     type: SupportedIdDocTypes.driversLicense,
-  },
-  supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
   cameraPermissionState: 'prompt',
 };

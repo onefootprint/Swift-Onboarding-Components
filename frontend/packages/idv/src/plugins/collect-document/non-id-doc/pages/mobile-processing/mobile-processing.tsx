@@ -36,8 +36,8 @@ const MobileProcessing = () => {
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
   const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
-  const { document, authToken, id, config } = state.context;
-  const { kind: documentRequestKind } = config;
+  const { document, authToken, id, requirement } = state.context;
+  const { kind: documentRequestKind } = requirement.config;
 
   useEffectOnce(() => {
     trackAction(`document-processing-${documentRequestKind}:started`);

@@ -34,14 +34,14 @@ const IdDocPhotoRetryPrompt = ({
   hideUploadButton,
 }: IdDocPhotoRetryPromptProps) => {
   const [state, send] = useIdDocMachine();
-  const { forceUpload, uploadMode, hasBadConnectivity } = state.context;
+  const { forceUpload, requirement, hasBadConnectivity } = state.context;
   const { getDocName, getSideName } = useDocName({ docType, imageType });
   const docName = getDocName();
   const sideName = getSideName();
 
   const hideCaptureButton = !!forceUpload;
-  const hideUpload = hideUploadButton || (uploadMode === 'capture_only' && !forceUpload);
-  const allowPdf = uploadMode === 'allow_upload';
+  const hideUpload = hideUploadButton || (requirement.uploadMode === 'capture_only' && !forceUpload);
+  const allowPdf = requirement.uploadMode === 'allow_upload';
 
   const handleClickBack = () => {
     send({

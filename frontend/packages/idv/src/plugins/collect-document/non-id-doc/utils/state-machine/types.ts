@@ -1,5 +1,6 @@
 import type {
   CountryCode,
+  DocumentRequirement,
   DocumentRequirementConfig,
   DocumentUploadMode,
   IdDocImageProcessingError,
@@ -14,9 +15,7 @@ export type MachineContext = {
   cameraPermissionState?: PermissionState;
   device: DeviceInfo;
   orgId: string;
-  documentRequestId: string;
-  config: DocumentRequirementConfig;
-  uploadMode: DocumentUploadMode;
+  requirement: DocumentRequirement;
   document?: {
     imageFile: File | Blob;
     captureKind: CaptureKind;

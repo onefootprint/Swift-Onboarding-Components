@@ -1,11 +1,12 @@
 import { IcoClock40 } from '@onefootprint/icons';
-import type { CountryCode, DocumentUploadMode } from '@onefootprint/types';
+import type { CountryCode } from '@onefootprint/types';
 import { IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
 import { Box, Button, Stack, Text, media } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { DocumentRequirement } from '@onefootprint/types/src/api/onboarding-status';
 import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
@@ -28,7 +29,7 @@ type DesktopPhotoPromptProps = {
   isRetry?: boolean;
   errors?: IdDocImageErrorType[];
   hasBadConnectivity?: boolean;
-  uploadMode: DocumentUploadMode;
+  requirement: DocumentRequirement;
   onUploadSuccess: (arg: {
     imageFile: File | Blob;
     captureKind: CaptureKind;
@@ -46,7 +47,7 @@ const DesktopPhotoPrompt = ({
   isRetry,
   errors,
   hasBadConnectivity,
-  uploadMode,
+  requirement,
   onUploadSuccess,
   onUploadError,
   showCameraFallbackText,
@@ -56,7 +57,7 @@ const DesktopPhotoPrompt = ({
     keyPrefix: 'document-flow.components.desktop-photo-prompt',
   });
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const allowPdf = uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadMode === 'allow_upload';
   const { processImageFile, acceptedFileFormats } = useProcessImage({
     allowPdf,
   });

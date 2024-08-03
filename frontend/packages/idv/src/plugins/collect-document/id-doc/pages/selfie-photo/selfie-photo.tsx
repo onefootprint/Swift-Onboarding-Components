@@ -12,7 +12,7 @@ const SelfiePhoto = () => {
     keyPrefix: 'document-flow.id-doc.pages.selfie-photo',
   });
   const [state, send] = useIdDocMachine();
-  const { orgId, uploadMode, hasBadConnectivity } = state.context;
+  const { orgId, requirement, hasBadConnectivity } = state.context;
 
   const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
@@ -36,7 +36,7 @@ const SelfiePhoto = () => {
       cameraKind="front"
       deviceKind="mobile"
       orgId={orgId}
-      uploadMode={uploadMode}
+      requirement={requirement}
       hasBadConnectivity={hasBadConnectivity}
       outlineHeightRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
       outlineWidthRatio={FACE_OUTLINE_TO_WIDTH_RATIO}

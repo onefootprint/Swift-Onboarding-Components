@@ -18,7 +18,7 @@ const BackPhotoCapture = () => {
   const {
     idDoc: { type: docType },
     orgId,
-    uploadMode,
+    requirement,
     hasBadConnectivity,
   } = state.context;
   const { getDocName, getSideName } = useDocName({
@@ -60,7 +60,7 @@ const BackPhotoCapture = () => {
       sideName={sideName}
       docName={docName}
       orgId={orgId}
-      uploadMode={uploadMode}
+      requirement={requirement}
       hasBadConnectivity={hasBadConnectivity}
       outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
       outlineWidthRatio={ID_OUTLINE_WIDTH_RATIO}

@@ -1,4 +1,4 @@
-import type { DocumentUploadMode, IdDocOutcome, IdDocRequirementConfig } from '@onefootprint/types';
+import type { DocumentRequirement, IdDocOutcome, IdDocRequirementConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../hooks';
 
@@ -7,9 +7,7 @@ export type InitialContext = {
   authToken: string;
   device: DeviceInfo;
   orgId: string;
-  documentRequestId: string;
-  uploadMode: DocumentUploadMode;
-  config: IdDocRequirementConfig;
+  requirement: DocumentRequirement<IdDocRequirementConfig>;
 };
 
 export type IdDocProps = {

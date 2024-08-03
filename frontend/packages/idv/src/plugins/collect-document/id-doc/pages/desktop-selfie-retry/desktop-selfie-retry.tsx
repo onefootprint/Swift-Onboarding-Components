@@ -20,7 +20,7 @@ const DesktopSelfieRetry = () => {
     keyPrefix: 'document-flow.id-doc.pages.desktop-selfie-retry',
   });
   const [state, send] = useIdDocMachine();
-  const { hasBadConnectivity, uploadMode, errors, forceUpload } = state.context;
+  const { hasBadConnectivity, requirement, errors, forceUpload } = state.context;
   const { getSideName } = useDocName({
     imageType: IdDocImageTypes.selfie,
   });
@@ -58,7 +58,7 @@ const DesktopSelfieRetry = () => {
         <DesktopPhotoPrompt
           sideName={sideName}
           hasBadConnectivity={hasBadConnectivity}
-          uploadMode={uploadMode}
+          requirement={requirement}
           onUploadSuccess={handleUploadSuccess}
           onUploadError={handleUploadError}
           errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}

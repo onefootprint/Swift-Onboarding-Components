@@ -13,13 +13,13 @@ import useDocName from '../../hooks/use-doc-name';
 
 const MobileRetry = () => {
   const [state, send] = useNonIdDocMachine();
-  const { uploadMode, hasBadConnectivity, config, errors } = state.context;
-  const { kind: documentRequestKind } = config;
+  const { requirement, hasBadConnectivity, errors } = state.context;
+  const { kind: documentRequestKind } = requirement.config;
 
-  const docName = useDocName(config);
+  const docName = useDocName(requirement.config);
 
-  const hideUploadButton = uploadMode === 'capture_only';
-  const allowPdf = uploadMode === 'allow_upload';
+  const hideUploadButton = requirement.uploadMode === 'capture_only';
+  const allowPdf = requirement.uploadMode === 'allow_upload';
 
   const handleClickBack = () => {
     send({

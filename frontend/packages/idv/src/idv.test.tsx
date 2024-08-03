@@ -78,7 +78,7 @@ export const idDocRequirement: OnboardingRequirement = {
     shouldCollectConsent: false,
     shouldCollectSelfie: false,
     supportedCountryAndDocTypes: {
-      us: [
+      US: [
         SupportedIdDocTypes.driversLicense,
         SupportedIdDocTypes.idCard,
         SupportedIdDocTypes.passport,
@@ -86,7 +86,7 @@ export const idDocRequirement: OnboardingRequirement = {
         SupportedIdDocTypes.visa,
         SupportedIdDocTypes.workPermit,
       ],
-      ca: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+      CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     },
   },
 };

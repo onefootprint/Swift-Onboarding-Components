@@ -1,6 +1,22 @@
-import { DocumentRequestKind, IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
+import {
+  DocumentRequestKind,
+  DocumentRequirement,
+  IdDocImageProcessingError,
+  IdDocImageUploadError,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 
 import type { MachineContext } from './types';
+
+const documentRequirement: DocumentRequirement = {
+  kind: OnboardingRequirementKind.document,
+  isMet: false,
+  documentRequestId: 'id',
+  uploadMode: 'default',
+  config: {
+    kind: DocumentRequestKind.ProofOfAddress,
+  },
+};
 
 export const argsRegularMobile: MachineContext = {
   authToken: 'token',
@@ -11,12 +27,8 @@ export const argsRegularMobile: MachineContext = {
     osName: 'iOS',
     browser: 'Mobile Safari',
   },
+  requirement: documentRequirement,
   orgId: 'orgId',
-  uploadMode: 'default',
-  documentRequestId: 'id',
-  config: {
-    kind: DocumentRequestKind.ProofOfAddress,
-  },
 };
 
 export const getArgsRegularMobile = (overrides?: Partial<MachineContext>) =>

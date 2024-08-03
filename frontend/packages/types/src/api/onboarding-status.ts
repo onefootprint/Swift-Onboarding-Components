@@ -1,4 +1,4 @@
-import type { AuthMethodKind, DocumentRequestKind } from '..';
+import type { AuthMethodKind, CountryCode, DocumentRequestKind } from '..';
 import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -46,12 +46,12 @@ export type CollectInvestorProfileRequirement = {
   missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
-export type DocumentRequirement = {
+export type DocumentRequirement<TConfig = DocumentRequirementConfig> = {
   kind: OnboardingRequirementKind.document;
   isMet: boolean;
   documentRequestId: string;
   uploadMode: DocumentUploadMode;
-  config: DocumentRequirementConfig;
+  config: TConfig;
 };
 
 export type DocumentUploadMode = 'default' | 'allow_upload' | 'capture_only';
@@ -60,7 +60,7 @@ export type IdDocRequirementConfig = {
   kind: DocumentRequestKind.Identity;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
-  supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
+  supportedCountryAndDocTypes: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
 };
 
 export type ProofOfAddressRequirementConfig = {

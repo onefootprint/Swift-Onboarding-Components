@@ -7,10 +7,7 @@ import Router from './pages/router';
 import type { MachineContext } from './utils/state-machine';
 
 type NonIdDocFlowProps = {
-  initialContext: Pick<
-    MachineContext,
-    'authToken' | 'device' | 'orgId' | 'uploadMode' | 'config' | 'documentRequestId'
-  >;
+  initialContext: Pick<MachineContext, 'authToken' | 'device' | 'orgId' | 'requirement'>;
   onDone: () => void;
 };
 

@@ -76,7 +76,7 @@ export const NextSideTargetsDesktop: MachineTarget[] = [
 ];
 
 export const isSingleDocCountryMap = (context: MachineContext) => {
-  const { supportedCountryAndDocTypes } = context;
+  const { supportedCountryAndDocTypes } = context.requirement.config;
   const supportedCountries = Object.keys(supportedCountryAndDocTypes);
   const numCountries = supportedCountries.length;
   if (numCountries !== 1) {

@@ -44,15 +44,8 @@ const IdDocCountryAndTypeContainer = ({
   const { isLoading: isDocTypeSubmissionLoading } = submitDocTypeMutation;
   const [consentVisible, setConsentVisible] = useState(false);
   const l10n = useL10nContext();
-  const {
-    idDoc: defaultCountryDoc,
-    authToken,
-    sandboxOutcome,
-    device,
-    supportedCountryAndDocTypes,
-    isConsentMissing,
-    documentRequestId,
-  } = state.context;
+  const { idDoc: defaultCountryDoc, sandboxOutcome, isConsentMissing, authToken, device, requirement } = state.context;
+  const { supportedCountryAndDocTypes } = requirement.config;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
   const supportedCountries = new Set(getRecordKeys(supportedCountryAndDocTypes));
   const supportedCountryRecords = COUNTRIES.filter(country => supportedCountries.has(country.value));
@@ -96,7 +89,7 @@ const IdDocCountryAndTypeContainer = ({
         fixtureResult: sandboxOutcome,
         deviceType: isMobileKind(deviceType) ? 'mobile' : 'desktop',
         skipSelfie: !hasWebcam,
-        requestId: documentRequestId,
+        requestId: requirement.documentRequestId,
       },
       {
         onSuccess: data => {

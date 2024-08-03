@@ -20,12 +20,12 @@ const DocumentPrompt = () => {
     keyPrefix: 'document-flow.non-id-doc.pages.document-prompt',
   });
   const [state, send] = useNonIdDocMachine();
-  const { device, config, hasBadConnectivity, uploadMode, obConfigSupportedCountries, orgId } = state.context;
-  const allowPdf = uploadMode === 'allow_upload';
+  const { device, hasBadConnectivity, requirement, obConfigSupportedCountries, orgId } = state.context;
+  const allowPdf = requirement.uploadMode === 'allow_upload';
   const isMobile = device.type === 'mobile';
-  const { kind: documentRequestKind } = config;
+  const { kind: documentRequestKind } = requirement.config;
   const guidelines = useGuidelines({ docKind: documentRequestKind, orgId });
-  const { title, description } = useTitleAndDescription(config);
+  const { title, description } = useTitleAndDescription(requirement.config);
   let alertMessage: string | undefined;
   if (
     obConfigSupportedCountries &&

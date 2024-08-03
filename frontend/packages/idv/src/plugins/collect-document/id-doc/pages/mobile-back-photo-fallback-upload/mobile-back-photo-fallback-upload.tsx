@@ -19,11 +19,11 @@ const MobileBackPhotoFallbackUpload = () => {
   const {
     idDoc: { type: docType },
     hasBadConnectivity,
-    uploadMode,
+    requirement,
   } = state.context;
 
   if (!docType) return null;
-  const allowPdf = uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadMode === 'allow_upload';
 
   const onComplete = (payload: {
     imageFile: File | Blob;

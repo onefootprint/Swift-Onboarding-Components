@@ -17,7 +17,7 @@ const Init = () => {
     keyPrefix: 'document-flow.non-id-doc.pages.init',
   });
   const [state, send] = useNonIdDocMachine();
-  const { authToken, device, config, documentRequestId } = state.context;
+  const { authToken, device, requirement } = state.context;
   const submitDocTypeMutation = useSubmitDocType();
   const { isError } = submitDocTypeMutation;
   const [numRetries, setNumRetries] = useState(0);
@@ -27,8 +27,8 @@ const Init = () => {
     submitDocTypeMutation.mutate(
       {
         authToken,
-        documentType: requestKindToDocType[config.kind as NonIdDocKinds],
-        requestId: documentRequestId,
+        documentType: requestKindToDocType[requirement.config.kind as NonIdDocKinds],
+        requestId: requirement.documentRequestId,
         deviceType: isMobileKind(device.type) ? 'mobile' : 'desktop',
       },
       {
@@ -42,7 +42,7 @@ const Init = () => {
         },
         onError: err => {
           const errorMsg = getErrorMessage(err);
-          Logger.error(`Failed to submit non id-doc document type ${config.kind}. Error: ${errorMsg}`, {
+          Logger.error(`Failed to submit non id-doc document type ${requirement.config.kind}. Error: ${errorMsg}`, {
             location: 'id-doc-country-and-type-container',
           });
         },

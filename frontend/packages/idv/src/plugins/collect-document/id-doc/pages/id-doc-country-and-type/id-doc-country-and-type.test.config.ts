@@ -18,9 +18,15 @@ export const initialContextSomeDocTypes: MachineContext = {
     country: undefined,
     type: undefined,
   },
-  supportedCountryAndDocTypes: {
-    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-    CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+  requirement: {
+    ...initialContextDL.requirement,
+    config: {
+      ...initialContextDL.requirement.config,
+      supportedCountryAndDocTypes: {
+        US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+        CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+      },
+    },
   },
 };
 
@@ -30,8 +36,14 @@ export const initialContextOnlyUS: MachineContext = {
     country: 'US',
     type: undefined,
   },
-  supportedCountryAndDocTypes: {
-    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+  requirement: {
+    ...initialContextDL.requirement,
+    config: {
+      ...initialContextDL.requirement.config,
+      supportedCountryAndDocTypes: {
+        US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+      },
+    },
   },
 };
 
@@ -41,8 +53,14 @@ export const initialContextBD: MachineContext = {
     country: 'BD',
     type: undefined,
   },
-  supportedCountryAndDocTypes: {
-    BD: [SupportedIdDocTypes.passport],
+  requirement: {
+    ...initialContextDL.requirement,
+    config: {
+      ...initialContextDL.requirement.config,
+      supportedCountryAndDocTypes: {
+        BD: [SupportedIdDocTypes.passport],
+      },
+    },
   },
 };
 
@@ -52,8 +70,15 @@ export const initialContextNoSupportedDoc: MachineContext = {
     country: 'SG',
     type: undefined,
   },
-  supportedCountryAndDocTypes: {
-    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+  requirement: {
+    ...initialContextDL.requirement,
+    config: {
+      ...initialContextDL.requirement.config,
+      supportedCountryAndDocTypes: {
+        BD: [SupportedIdDocTypes.passport],
+        US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+      },
+    },
   },
 };
 

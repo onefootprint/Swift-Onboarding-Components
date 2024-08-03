@@ -16,9 +16,9 @@ const MobileImageCapture = () => {
     keyPrefix: 'document-flow.non-id-doc.pages.mobile-image-capture',
   });
   const [state, send] = useNonIdDocMachine();
-  const { hasBadConnectivity, orgId, config } = state.context;
+  const { hasBadConnectivity, orgId, requirement } = state.context;
   const toast = useToast();
-  const docName = useDocName(config);
+  const docName = useDocName(requirement.config);
 
   const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
@@ -54,7 +54,7 @@ const MobileImageCapture = () => {
       deviceKind="mobile"
       docName={docName}
       orgId={orgId}
-      uploadMode="allow_upload"
+      requirement={requirement}
       hasBadConnectivity={hasBadConnectivity}
       onCameraErrored={handleCameraError}
       onCameraStuck={handleCameraStuck}

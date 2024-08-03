@@ -10,7 +10,7 @@ import useDocName from '../../hooks/use-doc-name';
 
 const DesktopSelfieFallbackUpload = () => {
   const [state, send] = useIdDocMachine();
-  const { hasBadConnectivity, uploadMode } = state.context;
+  const { hasBadConnectivity, requirement } = state.context;
   const { getSideName } = useDocName({
     imageType: IdDocImageTypes.selfie,
   });
@@ -42,7 +42,7 @@ const DesktopSelfieFallbackUpload = () => {
       <DesktopPhotoPrompt
         sideName={sideName}
         hasBadConnectivity={hasBadConnectivity}
-        uploadMode={uploadMode}
+        requirement={requirement}
         onUploadSuccess={handleUploadSuccess}
         onUploadError={handleUploadError}
         showCameraFallbackText

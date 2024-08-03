@@ -9,9 +9,9 @@ import useDocName from '../../hooks/use-doc-name';
 
 const DesktopRetry = () => {
   const [state, send] = useNonIdDocMachine();
-  const { config, errors, hasBadConnectivity, uploadMode } = state.context;
+  const { requirement, errors, hasBadConnectivity } = state.context;
 
-  const docName = useDocName(config);
+  const docName = useDocName(requirement.config);
 
   const handleClickBack = () => {
     send({
@@ -47,7 +47,7 @@ const DesktopRetry = () => {
         isRetry
         errors={errors}
         hasBadConnectivity={hasBadConnectivity}
-        uploadMode={uploadMode}
+        requirement={requirement}
         onUploadSuccess={handleComplete}
         onUploadError={handleUploadError}
       />

@@ -14,9 +14,9 @@ const MobileSelfieFallbackUpload = () => {
     keyPrefix: 'document-flow.id-doc.pages.mobile-selfie-fallback-upload',
   });
   const [state, send] = useIdDocMachine();
-  const { hasBadConnectivity, uploadMode } = state.context;
+  const { hasBadConnectivity, requirement } = state.context;
 
-  const allowPdf = uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadMode === 'allow_upload';
 
   const onComplete = (payload: {
     imageFile: File | Blob;

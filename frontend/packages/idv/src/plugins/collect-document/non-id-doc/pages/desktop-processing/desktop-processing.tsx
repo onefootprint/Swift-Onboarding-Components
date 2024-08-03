@@ -41,9 +41,9 @@ const DesktopProcessing = () => {
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
   const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
-  const { document, authToken, id, config } = state.context;
-  const { kind: documentRequestKind } = config;
-  const documentName = transformCase(useDocName(config), 'first-letter-upper-only');
+  const { document, authToken, id, requirement } = state.context;
+  const { kind: documentRequestKind } = requirement.config;
+  const documentName = transformCase(useDocName(requirement.config), 'first-letter-upper-only');
 
   useEffectOnce(() => {
     trackAction(`document-processing-${documentRequestKind}:started`);

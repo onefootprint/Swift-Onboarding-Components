@@ -1,4 +1,4 @@
-import { DocumentRequestKind } from '@onefootprint/types';
+import { DocumentRequestKind, DocumentRequirement, IdDocRequirementConfig } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import { trackAction } from '../../utils/logger';
@@ -8,46 +8,50 @@ import type { IdDocProps } from './types';
 
 const CollectDocument = ({ idvContext, context, onDone }: IdDocProps) => {
   const { authToken, device } = idvContext;
-  const { sandboxOutcome, obConfigSupportedCountries } = context;
-  const { uploadMode, documentRequestId, config } = context.requirement;
+  const { requirement, sandboxOutcome } = context;
 
   const initialContext = {
     authToken,
     device,
     orgId: context.orgId,
-    documentRequestId,
-    uploadMode,
-    config,
   };
-
-  const nonIdDocInitialContext = {
-    ...initialContext,
-    obConfigSupportedCountries,
-  };
-  const idDocInitialContext = { ...initialContext, sandboxOutcome };
 
   const handleFlowCompletion = () => {
     onDone();
-    trackAction('id-doc:completed', { kind: config.kind });
+    trackAction('id-doc:completed', { kind: requirement.config.kind });
   };
 
   useEffect(() => {
-    trackAction('id-doc:started', { kind: config.kind });
+    trackAction('id-doc:started', { kind: requirement.config.kind });
   }, []);
 
-  if (config.kind === DocumentRequestKind.Identity) {
+  if (isIdDocRequirement(requirement)) {
     return (
       <IdDoc
         initialContext={{
-          ...idDocInitialContext,
-          config,
+          ...initialContext,
+          sandboxOutcome,
+          requirement,
         }}
         onDone={handleFlowCompletion}
       />
     );
   }
 
-  return <NonIdDoc initialContext={{ ...nonIdDocInitialContext }} onDone={handleFlowCompletion} />;
+  return (
+    <NonIdDoc
+      initialContext={{
+        ...initialContext,
+        requirement,
+      }}
+      onDone={handleFlowCompletion}
+    />
+  );
 };
+
+const isIdDocRequirement = (
+  requirement: DocumentRequirement,
+): requirement is DocumentRequirement<IdDocRequirementConfig> =>
+  requirement.config.kind === DocumentRequestKind.Identity;
 
 export default CollectDocument;

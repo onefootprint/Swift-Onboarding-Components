@@ -13,7 +13,7 @@ const DesktopFrontPhotoRetry = () => {
   const {
     idDoc: { type, country },
     hasBadConnectivity,
-    uploadMode,
+    requirement,
     errors,
   } = state.context;
   const { getDocName, getSideName } = useDocName({
@@ -62,7 +62,7 @@ const DesktopFrontPhotoRetry = () => {
         sideName={sideName}
         country={country}
         hasBadConnectivity={hasBadConnectivity}
-        uploadMode={uploadMode}
+        requirement={requirement}
         onUploadSuccess={handleUploadSuccess}
         onUploadError={handleUploadError}
         isRetry

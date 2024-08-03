@@ -13,7 +13,7 @@ const DesktopBackPhoto = () => {
   const {
     idDoc: { type, country },
     hasBadConnectivity,
-    uploadMode,
+    requirement,
   } = state.context;
   const { getDocName, getSideName } = useDocName({
     docType: type,
@@ -61,7 +61,7 @@ const DesktopBackPhoto = () => {
         sideName={sideName}
         country={country}
         hasBadConnectivity={hasBadConnectivity}
-        uploadMode={uploadMode}
+        requirement={requirement}
         onUploadSuccess={handleUploadSuccess}
         onUploadError={handleUploadError}
       />

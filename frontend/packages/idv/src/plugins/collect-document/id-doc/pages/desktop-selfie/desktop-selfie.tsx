@@ -14,7 +14,7 @@ const DesktopSelfie = () => {
     keyPrefix: 'document-flow.id-doc.pages.desktop-selfie',
   });
   const [state, send] = useIdDocMachine();
-  const { orgId, uploadMode, hasBadConnectivity } = state.context;
+  const { orgId, requirement, hasBadConnectivity } = state.context;
   const permissionState = useCameraPermission();
 
   const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
@@ -33,7 +33,7 @@ const DesktopSelfie = () => {
       cameraKind="front"
       deviceKind="desktop"
       orgId={orgId}
-      uploadMode={uploadMode}
+      requirement={requirement}
       hasBadConnectivity={hasBadConnectivity}
       outlineHeightRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
       outlineWidthRatio={FACE_OUTLINE_TO_WIDTH_RATIO}

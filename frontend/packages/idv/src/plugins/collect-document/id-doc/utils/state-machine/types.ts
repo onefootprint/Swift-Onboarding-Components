@@ -1,10 +1,12 @@
 import type {
   CountryCode,
+  DocumentRequirement,
   DocumentUploadMode,
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
   IdDocOutcome,
+  IdDocRequirementConfig,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 
@@ -16,11 +18,8 @@ export type MachineContext = {
   cameraPermissionState: PermissionState;
   device: DeviceInfo;
   orgId: string;
-  documentRequestId: string;
-  shouldCollectSelfie: boolean;
+  requirement: DocumentRequirement<IdDocRequirementConfig>;
   isConsentMissing: boolean;
-  supportedCountryAndDocTypes: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
-  uploadMode: DocumentUploadMode;
   image?: {
     imageFile: File | Blob;
     captureKind: CaptureKind;

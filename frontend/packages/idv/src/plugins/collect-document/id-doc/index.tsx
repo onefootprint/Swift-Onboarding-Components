@@ -14,33 +14,27 @@ import type { MachineContext } from './utils/state-machine';
 
 const IdDoc = ({ initialContext, onDone }: IdDocProps) => {
   const l10n = useL10nContext();
-  const { authToken, config, device, documentRequestId, orgId, sandboxOutcome, uploadMode } = initialContext;
-  const { shouldCollectConsent, shouldCollectSelfie, supportedCountryAndDocTypes } = config;
+  const { authToken, device, orgId, sandboxOutcome, requirement } = initialContext;
 
   const context: MachineContext = {
     authToken,
     device,
     orgId,
-    documentRequestId,
-    shouldCollectSelfie,
-    isConsentMissing: shouldCollectConsent,
-    uploadMode,
+    requirement,
+    isConsentMissing: requirement.config.shouldCollectConsent,
     currSide: IdDocImageTypes.front,
     idDoc: {
       country: getCountryCodeFromLocale(l10n?.locale),
       type: undefined,
     },
     sandboxOutcome,
-    supportedCountryAndDocTypes: {
-      ...supportedCountryAndDocTypes,
-    },
     cameraPermissionState: device.initialCameraPermissionState || 'prompt',
   };
 
   return (
     <MachineProvider args={context}>
       <MissingPermissionsSheetProvider device={device}>
-        <FaceModelProvider isSelfieRequired={shouldCollectSelfie}>
+        <FaceModelProvider isSelfieRequired={requirement.config.shouldCollectSelfie}>
           <OpenCvProvider>
             <ImgProcessorsContextProvider>
               <Router onDone={onDone} />
