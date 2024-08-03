@@ -4,7 +4,7 @@ import React from 'react';
 import DesktopConsent from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import contextDesktopConsent from './desktop-consent.test.config';
+import { initialContextDL } from '../../utils/state-machine/machine.test.config';
 
 const renderDesktopConsent = (context: MachineContext) => renderPage(context, <DesktopConsent />, 'desktopConsent');
 
@@ -21,13 +21,13 @@ describe('<DesktopConsent />', () => {
   });
 
   it('Contains the consent title', () => {
-    renderDesktopConsent(contextDesktopConsent);
+    renderDesktopConsent(initialContextDL);
     const title = screen.getByText('Consent to use your images');
     expect(title).toBeInTheDocument();
   });
 
   it('Contains the consent subtitle', () => {
-    renderDesktopConsent(contextDesktopConsent);
+    renderDesktopConsent(initialContextDL);
     const subtitle = screen.getByText(
       'Consent and Written Release for Collection, Use, Disclosure and Storage of Personal Data (including Biometric Information and Identifiers)',
     );
@@ -35,13 +35,13 @@ describe('<DesktopConsent />', () => {
   });
 
   it('Contains consent body', () => {
-    renderDesktopConsent(contextDesktopConsent);
+    renderDesktopConsent(initialContextDL);
     const consentBody = screen.getByLabelText('consent-body');
     expect(consentBody).toBeInTheDocument();
   });
 
   it('Consent button initially asks to scroll and is disables', () => {
-    renderDesktopConsent(contextDesktopConsent);
+    renderDesktopConsent(initialContextDL);
     const consentButton = screen.getByTestId('consent-button') as HTMLButtonElement;
     const consentButtonText = screen.getByText('Scroll to agree');
     expect(consentButton).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe('<DesktopConsent />', () => {
 
   // Since we started using intersection observer, this test wouldn't work anymore
   it.skip('Scrolling body to the end enables consent button and changes the button text', async () => {
-    renderDesktopConsent(contextDesktopConsent);
+    renderDesktopConsent(initialContextDL);
     const consentBody = screen.getByLabelText('consent-body');
     fireEvent.scroll(consentBody);
     await waitFor(() => {

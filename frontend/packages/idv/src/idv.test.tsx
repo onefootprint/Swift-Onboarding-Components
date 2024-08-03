@@ -68,7 +68,7 @@ const collectKycDataRequirement: OnboardingRequirement = {
   optionalAttributes: [],
 };
 
-const idDocRequirement: OnboardingRequirement = {
+export const idDocRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
   documentRequestId: 'id',

@@ -2,54 +2,18 @@ import { mockRequest } from '@onefootprint/test-utils';
 import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
+import { initialContextDL } from '../../utils/state-machine/machine.test.config';
 
 export const initialContextAllDocTypes: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-  },
-  documentRequestId: 'id',
+  ...initialContextDL,
   idDoc: {
     country: undefined,
     type: undefined,
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const initialContextSomeDocTypes: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  documentRequestId: 'id',
+  ...initialContextDL,
   idDoc: {
     country: undefined,
     type: undefined,
@@ -58,23 +22,10 @@ export const initialContextSomeDocTypes: MachineContext = {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const initialContextOnlyUS: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  documentRequestId: 'id',
+  ...initialContextDL,
   idDoc: {
     country: 'US',
     type: undefined,
@@ -82,23 +33,10 @@ export const initialContextOnlyUS: MachineContext = {
   supportedCountryAndDocTypes: {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const initialContextBD: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  documentRequestId: 'id',
+  ...initialContextDL,
   idDoc: {
     country: 'BD',
     type: undefined,
@@ -106,23 +44,10 @@ export const initialContextBD: MachineContext = {
   supportedCountryAndDocTypes: {
     BD: [SupportedIdDocTypes.passport],
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const initialContextNoSupportedDoc: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  documentRequestId: 'id',
+  ...initialContextDL,
   idDoc: {
     country: 'SG',
     type: undefined,
@@ -130,7 +55,6 @@ export const initialContextNoSupportedDoc: MachineContext = {
   supportedCountryAndDocTypes: {
     US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const withSubmitDocTypeAndCountry = () => {

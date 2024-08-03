@@ -1,42 +1,19 @@
 import type {
   AuthorizeRequirement,
   CollectKycDataRequirement,
-  IdDocRequirement,
   PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  DocumentRequestKind,
-  IdDI,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
+import { idDocRequirement } from 'src/idv.test';
 import type { OnboardingRequirementsMachineArgs } from './machine';
 import createOnboardingRequirementsMachine from './machine';
 
 const livenessRequirement: RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey,
   isMet: false,
-};
-
-const idDocRequirement: IdDocRequirement = {
-  kind: OnboardingRequirementKind.idDoc,
-  isMet: false,
-  uploadMode: 'default',
-  documentRequestId: 'id',
-  config: {
-    kind: DocumentRequestKind.Identity,
-    shouldCollectConsent: false,
-    shouldCollectSelfie: false,
-    supportedCountryAndDocTypes: {
-      us: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-      ca: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-    },
-  },
 };
 
 const kycRequirement: CollectKycDataRequirement = {

@@ -6,38 +6,7 @@ import {
 } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
-
-export const initialContextDL: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  orgId: 'orgId',
-  documentRequestId: 'id',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  idDoc: {
-    country: 'US',
-    type: SupportedIdDocTypes.driversLicense,
-  },
-  supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
-    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-  },
-  cameraPermissionState: 'prompt',
-};
+import { initialContextDL } from '../../utils/state-machine/machine.test.config';
 
 export const initialContextWithErrors: MachineContext = {
   ...initialContextDL,

@@ -2,36 +2,10 @@ import { mockRequest } from '@onefootprint/test-utils';
 import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
+import { initialContextDL as baseInitialContextDL } from '../../utils/state-machine/machine.test.config';
 
 export const initialContextDL: MachineContext = {
-  authToken: 'token',
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: true,
-    osName: 'iOS',
-    browser: 'Mobile Safari',
-  },
-  currSide: IdDocImageTypes.front,
-  documentRequestId: 'id',
-  orgId: 'orgId',
-  shouldCollectSelfie: true,
-  isConsentMissing: true,
-  uploadMode: 'default',
-  idDoc: {
-    country: 'US',
-    type: SupportedIdDocTypes.driversLicense,
-  },
-  supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
-    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
-  },
+  ...baseInitialContextDL,
   id: 'testID',
   image: {
     imageFile: new File(['foo'], 'foo.txt', {
@@ -39,7 +13,6 @@ export const initialContextDL: MachineContext = {
     }),
     captureKind: 'manual',
   },
-  cameraPermissionState: 'prompt',
 };
 
 export const initialContextBD: MachineContext = {

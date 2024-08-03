@@ -2,6 +2,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { DocumentRequestKind, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { TransferRequirements } from '../../types';
+import { idDocReq } from '../../utils/state-machine/machine.test';
 
 export const onboardingConfigFixture: PublicOnboardingConfig = {
   allowInternationalResidents: false,
@@ -22,24 +23,12 @@ export const onboardingConfigFixture: PublicOnboardingConfig = {
 };
 
 export const missingRequirementsFixture: TransferRequirements = {
-  documents: [
-    {
-      kind: OnboardingRequirementKind.idDoc,
-      isMet: false,
-      documentRequestId: '1',
-      uploadMode: 'default',
-      config: {
-        kind: DocumentRequestKind.Identity,
-        shouldCollectSelfie: false,
-        shouldCollectConsent: false,
-        supportedCountryAndDocTypes: {},
-      },
-    },
-  ],
+  documents: [idDocReq],
 };
 
 export const missingRequirementsNonAvailableFixture: TransferRequirements = {
   documents: [
+    idDocReq,
     {
       kind: OnboardingRequirementKind.idDoc,
       isMet: false,

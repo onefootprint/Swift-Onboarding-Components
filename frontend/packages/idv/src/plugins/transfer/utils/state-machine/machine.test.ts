@@ -9,7 +9,8 @@ const livenessReq: RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey,
   isMet: false,
 };
-const idDocReq: IdDocRequirement = {
+
+export const idDocReq: IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc,
   isMet: false,
   uploadMode: 'default',

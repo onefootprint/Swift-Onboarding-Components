@@ -23,19 +23,12 @@ export const getArgsRegularMobile = (overrides?: Partial<MachineContext>) =>
   JSON.parse(JSON.stringify({ ...argsRegularMobile, ...overrides }));
 
 export const argsRegularDesktop: MachineContext = {
-  authToken: 'token',
-  cameraPermissionState: 'prompt',
+  ...argsRegularMobile,
   device: {
     hasSupportForWebauthn: true,
     type: 'desktop',
     osName: 'Windows',
     browser: 'Chrome',
-  },
-  orgId: 'orgId',
-  uploadMode: 'default',
-  documentRequestId: 'id',
-  config: {
-    kind: DocumentRequestKind.ProofOfAddress,
   },
 };
 

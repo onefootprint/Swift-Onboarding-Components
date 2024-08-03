@@ -4,9 +4,9 @@ import React from 'react';
 import DesktopBackPhoto from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
+import { initialContextDL } from '../../utils/state-machine/machine.test.config';
 import {
   initialContextBD,
-  initialContextDL,
   initialContextGreenCard,
   initialContextIdCard,
   initialContextWorkPermit,
