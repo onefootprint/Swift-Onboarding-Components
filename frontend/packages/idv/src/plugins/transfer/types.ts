@@ -1,6 +1,6 @@
 import type {
+  DocumentRequirement,
   IdDocOutcome,
-  IdDocRequirement,
   PublicOnboardingConfig,
   RegisterPasskeyRequirement,
 } from '@onefootprint/types';
@@ -9,7 +9,7 @@ import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type TransferRequirements = {
   liveness?: RegisterPasskeyRequirement;
-  documents: IdDocRequirement[];
+  documents: DocumentRequirement[];
 };
 
 export type TransferContext = {

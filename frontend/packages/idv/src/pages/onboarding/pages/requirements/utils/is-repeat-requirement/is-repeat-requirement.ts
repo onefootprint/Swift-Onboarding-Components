@@ -10,7 +10,7 @@ const isRepeatRequirement = (a?: OnboardingRequirement, b?: OnboardingRequiremen
     return false;
   }
 
-  if (a.kind === OnboardingRequirementKind.idDoc && b.kind === OnboardingRequirementKind.idDoc) {
+  if (a.kind === OnboardingRequirementKind.document && b.kind === OnboardingRequirementKind.document) {
     if (a.config.kind === DocumentRequestKind.Custom && b.config.kind === DocumentRequestKind.Custom) {
       return a.config.name === b.config.name;
     }

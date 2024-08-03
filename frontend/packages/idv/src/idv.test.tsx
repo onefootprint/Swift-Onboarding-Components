@@ -69,7 +69,7 @@ const collectKycDataRequirement: OnboardingRequirement = {
 };
 
 export const idDocRequirement: OnboardingRequirement = {
-  kind: OnboardingRequirementKind.idDoc,
+  kind: OnboardingRequirementKind.document,
   isMet: false,
   documentRequestId: 'id',
   uploadMode: 'allow_upload',

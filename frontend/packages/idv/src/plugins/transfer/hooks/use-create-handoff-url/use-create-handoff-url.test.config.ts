@@ -30,7 +30,7 @@ export const missingRequirementsNonAvailableFixture: TransferRequirements = {
   documents: [
     idDocReq,
     {
-      kind: OnboardingRequirementKind.idDoc,
+      kind: OnboardingRequirementKind.document,
       isMet: false,
       documentRequestId: '1',
       uploadMode: 'default',

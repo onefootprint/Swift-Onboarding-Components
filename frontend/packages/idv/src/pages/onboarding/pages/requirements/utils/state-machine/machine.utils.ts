@@ -14,7 +14,7 @@ const isTransfer = (c: MachineContext): boolean => Boolean(c?.idvContext?.isTran
 const isAuthorize = (x: unknown) => x === OnboardingRequirementKind.authorize;
 const isCollectKyb = (x: unknown) => x === OnboardingRequirementKind.collectKybData;
 const isCollectKyc = (x: unknown) => x === OnboardingRequirementKind.collectKycData;
-const isCollectDoc = (x: unknown) => x === OnboardingRequirementKind.idDoc;
+const isCollectDoc = (x: unknown) => x === OnboardingRequirementKind.document;
 const isInvProfile = (x: unknown) => x === OnboardingRequirementKind.investorProfile;
 const isRegisterPasskey = (x: unknown) => x === OnboardingRequirementKind.registerPasskey;
 const isProcess = (x: unknown) => x === OnboardingRequirementKind.process;

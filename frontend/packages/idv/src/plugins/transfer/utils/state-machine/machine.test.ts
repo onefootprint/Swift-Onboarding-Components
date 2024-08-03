@@ -1,4 +1,4 @@
-import type { IdDocRequirement, RegisterPasskeyRequirement } from '@onefootprint/types';
+import type { DocumentRequirement, RegisterPasskeyRequirement } from '@onefootprint/types';
 import { DocumentRequestKind, OnboardingRequirementKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
@@ -10,8 +10,8 @@ const livenessReq: RegisterPasskeyRequirement = {
   isMet: false,
 };
 
-export const idDocReq: IdDocRequirement = {
-  kind: OnboardingRequirementKind.idDoc,
+export const idDocReq: DocumentRequirement = {
+  kind: OnboardingRequirementKind.document,
   isMet: false,
   uploadMode: 'default',
   documentRequestId: 'id',

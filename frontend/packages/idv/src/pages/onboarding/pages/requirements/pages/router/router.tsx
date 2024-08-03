@@ -38,7 +38,7 @@ const Router = ({ onDone }: RouterProps) => {
   const kyb = getRequirement(requirements, OnboardingRequirementKind.collectKybData);
   const kyc = getRequirement(requirements, OnboardingRequirementKind.collectKycData);
   const liveness = getRequirement(requirements, OnboardingRequirementKind.registerPasskey);
-  const idDocReqs = getRequirements(requirements, OnboardingRequirementKind.idDoc);
+  const idDocReqs = getRequirements(requirements, OnboardingRequirementKind.document);
   const bootstrapUserData = filterUserData(bootstrapData);
   const bootstrapBusinessData = filterBusinessData(bootstrapData);
   useLogStateMachine('onboarding-requirements', state);

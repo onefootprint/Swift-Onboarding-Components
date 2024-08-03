@@ -1,15 +1,15 @@
 import type {
   CountryCode,
+  DocumentRequirement,
   IdDocImageProcessingError,
   IdDocImageUploadError,
   IdDocOutcome,
-  IdDocRequirement,
 } from '@onefootprint/types';
 
 import type { CommonIdvContext } from '../../utils/state-machine';
 
 export type IdDocContext = {
-  requirement: IdDocRequirement;
+  requirement: DocumentRequirement;
   orgId: string;
   sandboxOutcome?: IdDocOutcome;
   obConfigSupportedCountries?: CountryCode[];

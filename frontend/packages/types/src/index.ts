@@ -129,7 +129,7 @@ export type {
   GetTimelineResponse,
   GetUserInsightsRequest,
   GetUserInsightsResponse,
-  IdDocRequirement,
+  DocumentRequirement,
   IdDocRequirementConfig,
   IdentifyRequest,
   IdentifyResponse,

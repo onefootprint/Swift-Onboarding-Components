@@ -11,7 +11,7 @@ import type { PublicOnboardingConfig } from '../data/onboarding-config';
 export enum OnboardingRequirementKind {
   registerAuthMethod = 'register_auth_method',
   registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate
-  idDoc = 'collect_document',
+  document = 'collect_document',
   collectKycData = 'collect_data',
   collectKybData = 'collect_business_data',
   investorProfile = 'collect_investor_profile',
@@ -46,8 +46,8 @@ export type CollectInvestorProfileRequirement = {
   missingAttributes: CollectedInvestorProfileDataOption[];
 };
 
-export type IdDocRequirement = {
-  kind: OnboardingRequirementKind.idDoc;
+export type DocumentRequirement = {
+  kind: OnboardingRequirementKind.document;
   isMet: boolean;
   documentRequestId: string;
   uploadMode: DocumentUploadMode;
@@ -104,7 +104,7 @@ export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
-  | IdDocRequirement
+  | DocumentRequirement
   | RegisterPasskeyRequirement
   | AuthorizeRequirement
   | ProcessRequirement;
@@ -126,8 +126,8 @@ export type OnboardingStatusResponse = {
 
 export type RequirementForKind<K> = K extends OnboardingRequirementKind.registerPasskey
   ? RegisterPasskeyRequirement
-  : K extends OnboardingRequirementKind.idDoc
-    ? IdDocRequirement
+  : K extends OnboardingRequirementKind.document
+    ? DocumentRequirement
     : K extends OnboardingRequirementKind.collectKycData
       ? CollectKycDataRequirement
       : K extends OnboardingRequirementKind.collectKybData

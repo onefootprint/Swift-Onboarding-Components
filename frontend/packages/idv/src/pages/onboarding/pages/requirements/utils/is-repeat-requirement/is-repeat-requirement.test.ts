@@ -17,13 +17,13 @@ describe('isRepeatRequirement', () => {
     },
     {
       a: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Identity,
         },
       },
       b: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.ProofOfAddress,
         },
@@ -32,13 +32,13 @@ describe('isRepeatRequirement', () => {
     },
     {
       a: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Identity,
         },
       },
       b: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Identity,
         },
@@ -47,14 +47,14 @@ describe('isRepeatRequirement', () => {
     },
     {
       a: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Custom,
           name: 'flerp',
         },
       },
       b: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Custom,
           name: 'flerp',
@@ -64,14 +64,14 @@ describe('isRepeatRequirement', () => {
     },
     {
       a: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Custom,
           name: 'flerp',
         },
       },
       b: {
-        kind: OnboardingRequirementKind.idDoc,
+        kind: OnboardingRequirementKind.document,
         config: {
           kind: DocumentRequestKind.Custom,
           name: 'derp',

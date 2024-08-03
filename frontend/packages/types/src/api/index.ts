@@ -190,7 +190,7 @@ export type {
   CustomDocumentRequirementConfig,
   DocumentRequirementConfig,
   DocumentUploadMode,
-  IdDocRequirement,
+  DocumentRequirement,
   IdDocRequirementConfig,
   OnboardingRequirement,
   OnboardingStatusRequest,
