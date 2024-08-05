@@ -1,10 +1,9 @@
+import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Button, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import Header from '../header';
 import Preview from './components/preview';
 

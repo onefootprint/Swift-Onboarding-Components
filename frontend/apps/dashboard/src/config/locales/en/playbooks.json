@@ -260,8 +260,8 @@
       }
     },
     "required-auth": {
-      "title": "Login methods",
-      "subtitle": "Select the login methods that will be required to be verified (using a one-time-passcode) while onboarding onto this playbook.",
+      "title": "OTP (One Time Password) verifications",
+      "subtitle": "Select the data to verify during onboarding.",
       "phone": "Phone OTP",
       "email": "Email OTP",
       "error": "At least one verification is needed"

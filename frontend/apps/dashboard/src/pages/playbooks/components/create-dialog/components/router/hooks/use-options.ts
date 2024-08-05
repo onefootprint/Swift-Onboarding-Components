@@ -29,8 +29,8 @@ const useOptions = ({ template }: UseOptionsProps) => {
         value: 'settingsKyb',
         label: t('data-to-collect.nav'),
         options: [
-          { value: 'settingsBusiness', label: 'Business information' },
-          { value: 'settingsBo', label: 'Business owners information' },
+          { value: 'settingsBusiness', label: t('data-to-collect.business-nav') },
+          { value: 'settingsBo', label: t('data-to-collect.bo-nav') },
         ],
       },
       { value: 'verificationChecks', label: t('verification-checks.nav') },
@@ -50,7 +50,14 @@ const useOptions = ({ template }: UseOptionsProps) => {
         ],
       },
       { value: 'nameYourPlaybook', label: t('name-your-playbook.nav') },
-      { value: 'settingsKyc', label: t('data-to-collect.nav') },
+      {
+        value: 'settingsKyc',
+        label: t('data-to-collect.nav'),
+        options: [
+          { value: 'personalInfo', label: t('data-to-collect.personal-info-nav') },
+          { value: 'otpVerifications', label: t('data-to-collect.otp-verifications-nav') },
+        ],
+      },
     ];
     const canEdit = template !== OnboardingTemplate.Apex && template !== OnboardingTemplate.Alpaca;
     if (canEdit) {

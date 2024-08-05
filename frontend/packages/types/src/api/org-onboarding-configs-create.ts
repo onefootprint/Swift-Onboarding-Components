@@ -1,3 +1,4 @@
+import { AuthMethodKind } from '../data/auth-method';
 import type { CollectedDataOption } from '../data/collected-data-option';
 import type { DocumentRequestConfig } from '../data/document-request-config';
 import type { DocumentTypesAndCountries, OnboardingConfigKind } from '../data/onboarding-config';
@@ -35,6 +36,7 @@ export type OrgOnboardingConfigCreateRequest = {
   skipConfirm?: boolean;
   skipKyc?: boolean;
   verificationChecks: VerificationCheck[] | null;
+  requiredAuthMethods?: AuthMethodKind[];
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

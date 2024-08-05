@@ -14,6 +14,7 @@ import type {
 } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
+import StepRequiredAuthMethods from '@/create-playbook/components/router/components/step-required-auth-methods';
 import StepAuth from './components/step-auth';
 import StepBO from './components/step-bo';
 import StepBusiness from './components/step-business';
@@ -91,6 +92,7 @@ const Router = ({ onCreate }: RouterProps) => {
       skipConfirm,
       skipKyc,
       verificationChecks,
+      requiredAuthMethods,
     } = processPlaybook({
       kind,
       nameForm,
@@ -128,6 +130,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipConfirm,
         skipKyc,
         verificationChecks,
+        requiredAuthMethods,
       },
       {
         onSuccess: () => {
@@ -213,6 +216,10 @@ const Router = ({ onCreate }: RouterProps) => {
               send('settingsAuthSelected');
             } else if (option.value === 'onboardingTemplates') {
               send('templateSelected');
+            } else if (option.value === 'personalInfo') {
+              send('personalInfoSelected');
+            } else if (option.value === 'otpVerifications') {
+              send('otpVerificationsSelected');
             }
           }}
           value={{ option: currentOption, subOption: currentSubOption }}
@@ -276,7 +283,7 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
           />
         )}
-        {state.matches('settingsKyc') && (
+        {state.matches({ settingsKyc: 'personalInfo' }) && (
           <StepPerson
             defaultValues={defaultValues.playbook}
             meta={{
@@ -288,6 +295,19 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={handleSubmitDataToCollect}
+          />
+        )}
+        {state.matches({ settingsKyc: 'otpVerifications' }) && (
+          <StepRequiredAuthMethods
+            defaultValues={defaultValues.playbook}
+            onBack={() => {
+              send('navigationBackward');
+            }}
+            onSubmit={formData => {
+              send('playbookSubmitted', {
+                payload: { formData },
+              });
+            }}
           />
         )}
         {state.matches({ settingsKyb: 'settingsBusiness' }) && (

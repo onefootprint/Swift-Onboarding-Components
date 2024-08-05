@@ -35,7 +35,9 @@ export interface Typegen0 {
     | 'settingsKyb'
     | 'settingsKyb.settingsBo'
     | 'settingsKyb.settingsBusiness'
-    | 'settingsKyc'
+    | 'settingsKyc.personalInfo'
+    | 'settingsKyc.otpVerifications'
+    | { settingsKyc?: 'personalInfo' | 'otpVerifications' }
     | 'verificationChecks'
     | { settingsKyb?: 'settingsBo' | 'settingsBusiness' };
   tags: never;

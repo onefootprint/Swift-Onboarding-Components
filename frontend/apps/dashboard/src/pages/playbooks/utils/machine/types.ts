@@ -543,6 +543,8 @@ export type MachineEvents =
   | { type: 'settingsKycSelected' }
   | { type: 'settingBusinessSelected' }
   | { type: 'settingsBoSelected' }
+  | { type: 'personalInfoSelected' }
+  | { type: 'otpVerificationsSelected' }
   | { type: 'settingsDocOnlySelected' }
   | { type: 'settingsAuthSelected' }
   | { type: 'templateSelected' }

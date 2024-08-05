@@ -119,20 +119,43 @@ export const createPlaybookMachine = () =>
           },
         },
         settingsKyc: {
-          on: {
-            kindSelected: {
-              target: 'kind',
-              actions: ['resetKind', 'resetOnboardingTemplate'],
+          initial: 'personalInfo',
+          states: {
+            personalInfo: {
+              on: {
+                kindSelected: {
+                  target: '#playbooks.kind',
+                  actions: ['resetKind', 'resetOnboardingTemplate'],
+                },
+                nameYourPlaybookSelected: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+                playbookSubmitted: {
+                  target: 'otpVerifications',
+                  actions: 'assignPlaybook',
+                },
+                navigationBackward: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+              },
             },
-            nameYourPlaybookSelected: {
-              target: 'nameYourPlaybook',
-            },
-            playbookSubmitted: {
-              target: 'verificationChecks',
-              actions: 'assignPlaybook',
-            },
-            navigationBackward: {
-              target: 'nameYourPlaybook',
+            otpVerifications: {
+              on: {
+                kindSelected: {
+                  target: '#playbooks.kind',
+                  actions: ['resetKind', 'resetOnboardingTemplate'],
+                },
+                nameYourPlaybookSelected: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+                playbookSubmitted: {
+                  target: '#playbooks.verificationChecks',
+                  actions: 'assignPlaybook',
+                },
+                navigationBackward: {
+                  target: 'personalInfo',
+                },
+              },
             },
           },
         },
@@ -223,7 +246,7 @@ export const createPlaybookMachine = () =>
                 cond: context => context.kind === PlaybookKind.Kyb,
               },
               {
-                target: 'settingsKyc',
+                target: 'settingsKyc.otpVerifications',
                 cond: context => context.kind === PlaybookKind.Kyc,
               },
             ],

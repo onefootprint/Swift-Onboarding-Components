@@ -1,4 +1,4 @@
-import type { CollectedDataOption, CustomDI } from '@onefootprint/types';
+import { AuthMethodKind, CollectedDataOption, CustomDI } from '@onefootprint/types';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
@@ -74,6 +74,7 @@ const processPlaybook = ({
     mustCollectData,
     name: createNamePayload(nameForm),
     optionalData,
+    requiredAuthMethods: createRequiredAuthMethodsPayload(playbook),
     skipConfirm: createSkipConfirmPayload(kind),
     skipKyc: createShouldSkipKyc(skipKyc || false, playbook),
     verificationChecks: createVerificationChecksPayload({ kind, verificationChecks }),
@@ -197,6 +198,17 @@ const createPersonOptionalDataPayload = (formData: DataToCollectFormData, kind: 
     return mustCollectData;
   }
   return mustCollectData;
+};
+
+const createRequiredAuthMethodsPayload = (formData: DataToCollectFormData) => {
+  const requiredAuthMethods: AuthMethodKind[] = [];
+  if (formData.requiredAuthMethods.email) {
+    requiredAuthMethods.push(AuthMethodKind.email);
+  }
+  if (formData.requiredAuthMethods.phone) {
+    requiredAuthMethods.push(AuthMethodKind.phone);
+  }
+  return requiredAuthMethods;
 };
 
 //

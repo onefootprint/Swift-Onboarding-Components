@@ -2787,7 +2787,11 @@
           "countries": "Countries"
         },
         "data-to-collect": {
-          "nav": "Playbook details"
+          "nav": "Playbook details",
+          "personal-info-nav": "Personal information",
+          "otp-verifications-nav": "OTP verifications",
+          "business-nav": "Business information",
+          "bo-nav": "Business owners information"
         },
         "name-your-playbook": {
           "nav": "Name your Playbook"
