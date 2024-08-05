@@ -51,6 +51,7 @@ pub fn from_db(
             suspicious_device_emulator,
             suspicious_device_frida,
             suspicious_device_missing_expected_properties,
+            model_bot_framework_result,
             ..
         } = ev;
 
@@ -64,6 +65,12 @@ pub fn from_db(
             (
                 Insight::AutomatedActivity,
                 model_automated_activity_result,
+                UserInsightScope::Behavior,
+                UserInsightUnit::Boolean,
+            ),
+            (
+                Insight::BotDetected,
+                model_bot_framework_result,
                 UserInsightScope::Behavior,
                 UserInsightUnit::Boolean,
             ),
@@ -226,6 +233,8 @@ user_insight! {
         SuspiciousDevice,
         #[ser = "Emulator Usage", description = "Device exhibits properties of using an emulator"]
         SuspiciousDeviceEmulator,
+        #[ser = "Bot detected", description = "Device and/or user behavior exhibits bot-like qualities"]
+        BotDetected,
         #[ser = "Missing Expected Properties", description = "Device is missing expected properties, and appears to be modified"]
         SuspiciousDeviceMissingExpectedProperties,
         #[ser = "Frida Usage", description = "Device exhibits properties of using Frida"]
