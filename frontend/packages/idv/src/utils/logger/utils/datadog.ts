@@ -1,6 +1,7 @@
 import type { LogsEvent } from '@datadog/browser-logs';
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
+import { RumInitConfiguration } from '@datadog/browser-rum-core';
 
 type BaseConfig = { applicationId: string; clientToken: string; env: string; service: string };
 
@@ -129,6 +130,9 @@ export const initDataDogRum = (appName: string): boolean => {
   const config = getDataDogConfig(appName);
   if (!config) return false;
 
+  const localBackendTracing: RumInitConfiguration['allowedTracingUrls'] =
+    NODE_ENV === 'development' ? [{ match: 'http://localhost:8000', propagatorTypes: ['tracecontext'] }] : [];
+
   // https://docs.datadoghq.com/real_user_monitoring/browser/setup/#initialization-parameters
   datadogRum.init({
     ...config,
@@ -150,6 +154,11 @@ export const initDataDogRum = (appName: string): boolean => {
     trackSessionAcrossSubdomains: true, // Track session across subdomains
     trackUserInteractions: true, // The trackUserInteractions parameter enables the automatic collection of user clicks in your application. Sensitive and private data contained in your pages may be included to identify the elements interacted with.
     usePartitionedCrossSiteSessionCookie: true, // Use partitioned cross-site session cookies.
+    allowedTracingUrls: [
+      { match: 'https://api.onefootprint.com', propagatorTypes: ['tracecontext'] },
+      { match: 'https://api.dev.onefootprint.com', propagatorTypes: ['tracecontext'] },
+      ...localBackendTracing,
+    ],
   });
 
   return true;

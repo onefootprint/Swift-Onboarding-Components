@@ -198,20 +198,6 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
             .with_json_spec_v3_at("docs-spec-v3")
             .with_rapidoc_at("docs-ui")
             .default_service(actix_web::web::to(default_not_found))
-            // Don't move this middleware, it must be applied before our tracing middleware
-            .wrap_fn(|mut req, srv| {
-                // Remove some tracing headers. These are normally used to pass context across
-                // different services so inter-service traces can be grouped.
-                // Some of our customers are passing these headers to us, which causes us to
-                // incorrectly group traces using a trace ID from our customer's backend.
-                // NOTE: when we start doing our own inter-service tracing, this will break it.
-                // Ideally, we should remove the headers at Cloudfront or perhaps the ALB, but I
-                // couldn't find an easy way to do that.
-                // https://linear.app/footprint/issue/FP-6986/figure-out-why-some-honeycomb-traces-have-a-missing-root-span
-                req.headers_mut().remove("traceparent");
-                req.headers_mut().remove("tracestate");
-                srv.call(req)
-            })
             .build()
     })
     // Our loadbalancer has a keep alive idle timeout of 60s. To make sure that the target doesn't
