@@ -11,7 +11,7 @@ type CompanyNameProps = {
 
 const CompanyName = ({ name, image }: CompanyNameProps) => {
   return (
-    <Stack direction="row" alignItems="center" gap={3}>
+    <Stack direction="row" alignItems="center" gap={3} maxWidth="100%" overflow="hidden" marginRight={3}>
       <LogoContainer>
         {image ? <Image src={image} alt="company logo" width={16} height={16} /> : <IcoBuilding16 />}
       </LogoContainer>
