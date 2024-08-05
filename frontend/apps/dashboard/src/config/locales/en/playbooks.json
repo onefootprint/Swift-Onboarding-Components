@@ -116,33 +116,24 @@
     },
     "settings-auth": {
       "title": "Auth playbook details",
-      "subtitle": "Here's how your auth configuration is going to work",
+      "subtitle": "Choose the login methods to allow. We will require verification (with a one-time passcode) during onboarding.",
       "enabled": "Enabled",
       "sign-up": {
-        "title": "Sign up",
-        "description": "Users will create an account providing the following data",
+        "title": "Sign up information",
         "email": {
-          "label": "Email address",
-          "description": "We'll validate it sending a one-time password to users email address."
+          "label": "Email address"
         },
         "phone-number": {
-          "label": "Phone number",
-          "description": "We'll validate it sending a one-time password in an SMS."
+          "label": "Phone number"
         }
       },
       "sign-in": {
-        "title": "Sign in",
-        "subtitle": "Users will sign in using one of the following authenticated methods",
+        "title": "Sign in methods",
+        "subtitle": "Your chosen method will be verified during the signup process.",
         "otp": {
-          "label": "Code sent in an SMS to verified phone"
-        },
-        "passkeys": {
-          "label": "Passkeys",
-          "description": "Available for users who have onboarded onto Footprint using a KYC or KYB playbook in the past.",
-          "about": {
-            "title": "More about passkeys",
-            "description": "Passkey authentication simplifies the login process on iOS and Android devices, eliminating the need for traditional passwords. \nWhen we detect an already onboarded user wants to log-in, we will prompt them with a passkey challenge to sign-in to your platform. \nThis means fewer password-related headaches and enhanced security for all your customers’ online accounts. \nThis service has a cost based on the number of auth'd users."
-          }
+          "phone": "Phone OTP",
+          "email": "Email OTP",
+          "error": "At least one verification is needed "
         }
       }
     },
@@ -260,7 +251,7 @@
       }
     },
     "required-auth": {
-      "title": "OTP (One Time Password) verifications",
+      "title": "OTP (one-time-passcode) verifications",
       "subtitle": "Select the data to verify during onboarding.",
       "phone": "Phone OTP",
       "email": "Email OTP",

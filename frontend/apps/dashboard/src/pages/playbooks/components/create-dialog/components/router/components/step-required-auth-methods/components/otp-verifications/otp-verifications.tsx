@@ -24,7 +24,7 @@ const OtpVerifications = () => {
           {t('required-auth.subtitle')}
         </Text>
       </Stack>
-      <Stack flexDirection="column" gap={5} paddingLeft={3}>
+      <Stack flexDirection="column" gap={3} paddingLeft={3}>
         <Checkbox label={t('required-auth.phone')} {...register('requiredAuthMethods.phone')} />
         <Checkbox label={t('required-auth.email')} {...register('requiredAuthMethods.email')} />
       </Stack>

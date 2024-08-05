@@ -1,11 +1,12 @@
+import SignInMethods from '@/create-playbook/components/router/components/step-auth/components/sign-in-methods/sign-in-methods';
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
-import { Button, Text } from '@onefootprint/ui';
+import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import Header from '../header';
-import Preview from './components/preview';
+import Signup from './components/sign-up';
 
 type StepAuthProps = {
   defaultValues: DataToCollectFormData;
@@ -19,22 +20,27 @@ const StepAuth = ({ onSubmit, onBack, defaultValues, isLoading }: StepAuthProps)
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'create.settings-auth',
   });
-  const { handleSubmit } = useForm<DataToCollectFormData>({ defaultValues });
+  const formMethods = useForm<DataToCollectFormData>({ defaultValues });
 
   return (
     <Container>
-      <Header title={t('title')} subtitle={t('subtitle')} />
-      <Preview />
-      <Form id="settings-auth-form" onSubmit={handleSubmit(onSubmit)}>
-        <ButtonContainer>
-          <Button variant="secondary" onClick={onBack}>
-            {allT('back')}
-          </Button>
-          <Button type="submit" loading={isLoading}>
-            {allT('create')}
-          </Button>
-        </ButtonContainer>
-      </Form>
+      <FormProvider {...formMethods}>
+        <Header title={t('title')} subtitle={t('subtitle')} />
+        <Stack flexDirection="column" gap={4}>
+          <Signup />
+          <SignInMethods />
+        </Stack>
+        <Form id="settings-auth-form" onSubmit={formMethods.handleSubmit(onSubmit)}>
+          <ButtonContainer>
+            <Button variant="secondary" onClick={onBack}>
+              {allT('back')}
+            </Button>
+            <Button type="submit" loading={isLoading}>
+              {allT('create')}
+            </Button>
+          </ButtonContainer>
+        </Form>
+      </FormProvider>
     </Container>
   );
 };
