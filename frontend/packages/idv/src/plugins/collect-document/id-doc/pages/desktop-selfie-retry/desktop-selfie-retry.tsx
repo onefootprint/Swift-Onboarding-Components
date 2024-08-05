@@ -5,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import upperFirst from 'lodash/upperFirst';
 import { NavigationHeader } from '../../../../../components';
 import DesktopHeader from '../../../components/desktop-header';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
@@ -13,7 +14,6 @@ import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../../constants';
 import type { CaptureKind } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import transformCase from '../../utils/transform-case';
 
 const DesktopSelfieRetry = () => {
   const { t } = useTranslation('idv', {
@@ -67,7 +67,7 @@ const DesktopSelfieRetry = () => {
         />
       ) : (
         <Box display="flex" flexDirection="column" gap={7} paddingBottom={5}>
-          <DesktopHeader sideName={transformCase(sideName, 'first-letter-upper-only')} isSelfie />
+          <DesktopHeader sideName={upperFirst(sideName)} isSelfie />
           <ErrorContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
             <ErrorComponent
               errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}

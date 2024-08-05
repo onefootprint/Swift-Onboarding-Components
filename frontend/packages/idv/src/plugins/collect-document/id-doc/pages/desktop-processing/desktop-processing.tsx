@@ -6,7 +6,8 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { css, styled } from 'styled-components';
+import upperFirst from 'lodash/upperFirst';
+import styled, { css } from 'styled-components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { getLogger, trackAction } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
@@ -20,7 +21,6 @@ import useSubmitDoc from '../../../hooks/use-submit-doc';
 import { bytesToMegabytes } from '../../../utils/capture';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import transformCase from '../../utils/transform-case';
 
 const { logError, logInfo, logWarn } = getLogger({
   location: 'desktop-processing',
@@ -55,8 +55,8 @@ const DeskTopProcessing = () => {
     docType: type,
     imageType: currSide,
   });
-  const docName = transformCase(getDocName(), 'first-letter-upper-only');
-  const sideName = transformCase(getSideName(), 'first-letter-upper-only');
+  const docName = upperFirst(getDocName());
+  const sideName = upperFirst(getSideName());
 
   useEffectOnce(() => {
     trackAction(`document-processing-${currSide}:started`);

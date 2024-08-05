@@ -2,8 +2,8 @@ import { useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import upperFirst from 'lodash/upperFirst';
 import PhotoCapture from '../../../components/photo-capture';
-import transformCase from '../../../id-doc/utils/transform-case';
 import type { CaptureKind } from '../../../types';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import useDocName from '../../hooks/use-doc-name';
@@ -63,8 +63,8 @@ const MobileImageCapture = () => {
       outlineHeightRatio={OUTLINE_HEIGHT_RATIO}
       outlineWidthRatio={OUTLINE_WIDTH_RATIO}
       title={{
-        camera: transformCase(docName, 'first-letter-upper-only'),
-        preview: transformCase(docName, 'first-letter-upper-only'),
+        camera: upperFirst(docName),
+        preview: upperFirst(docName),
       }}
     />
   );

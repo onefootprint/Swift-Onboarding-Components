@@ -7,11 +7,11 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { DocumentRequirement } from '@onefootprint/types/src/api/onboarding-status';
+import upperFirst from 'lodash/upperFirst';
 import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import useProcessImage from '../../hooks/use-process-image';
-import transformCase from '../../id-doc/utils/transform-case';
 import type { CaptureKind, IdDocImageErrorType } from '../../types';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 import DesktopHeader from '../desktop-header/desktop-header';
@@ -116,9 +116,9 @@ const DesktopPhotoPrompt = ({
   return (
     <Container>
       <DesktopHeader
-        docName={docName ? transformCase(docName, 'first-letter-upper-only') : docName}
+        docName={docName ? upperFirst(docName) : docName}
         country={country}
-        sideName={sideName ? transformCase(sideName, 'first-letter-upper-only') : sideName}
+        sideName={sideName ? upperFirst(sideName) : sideName}
         isSelfie={isSelfie}
       />
       <DraggableInputField

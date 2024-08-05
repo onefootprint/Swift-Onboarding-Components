@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import upperFirst from 'lodash/upperFirst';
 import { HeaderTitle } from '../../../../../components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { getLogger, trackAction } from '../../../../../utils/logger';
@@ -17,7 +18,6 @@ import Success from '../../../components/success';
 import { DESKTOP_INTERACTION_BOX_HEIGHT, SLOW_CONNECTION_MESSAGE_TIMEOUT } from '../../../constants';
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
-import transformCase from '../../../id-doc/utils/transform-case';
 import { bytesToMegabytes } from '../../../utils/capture';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import useDocName from '../../hooks/use-doc-name';
@@ -43,7 +43,7 @@ const DesktopProcessing = () => {
 
   const { document, authToken, id, requirement } = state.context;
   const { kind: documentRequestKind } = requirement.config;
-  const documentName = transformCase(useDocName(requirement.config), 'first-letter-upper-only');
+  const documentName = upperFirst(useDocName(requirement.config));
 
   useEffectOnce(() => {
     trackAction(`document-processing-${documentRequestKind}:started`);

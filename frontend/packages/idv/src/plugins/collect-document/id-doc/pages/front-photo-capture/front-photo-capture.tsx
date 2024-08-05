@@ -2,12 +2,13 @@ import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import upperCase from 'lodash/upperCase';
+import upperFirst from 'lodash/upperFirst';
 import PhotoCapture from '../../../components/photo-capture/photo-capture';
 import { ID_OUTLINE_HEIGHT_RATIO, ID_OUTLINE_WIDTH_RATIO } from '../../../constants';
 import type { CaptureKind } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
-import transformCase from '../../utils/transform-case';
 
 const FrontPhotoCapture = () => {
   const { t } = useTranslation('idv', {
@@ -27,9 +28,9 @@ const FrontPhotoCapture = () => {
   });
   if (!docType) return null;
   const docName = getDocName();
-  const docNameCapitalized = transformCase(docName, 'first-letter-upper-only');
+  const docNameCapitalized = upperFirst(docName);
   const sideName = getSideName();
-  const sideNameCapitalized = transformCase(sideName, 'upper');
+  const sideNameCapitalized = upperCase(sideName);
   const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
       type: 'receivedImage',
