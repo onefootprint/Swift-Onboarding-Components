@@ -1,11 +1,11 @@
-import type { ContentSchema, ParameterProps } from '@/api-reference/api-reference.types';
+import type { ContentSchemaNoRef, ParameterProps } from '@/api-reference/api-reference.types';
 
 const filterByIn = (parameters: ParameterProps[], inValue: string) =>
   parameters.filter(parameter => parameter.in === inValue);
 
-const createSchema = (parameter: ParameterProps[], inValue: string): ContentSchema => {
+const createSchema = (parameter: ParameterProps[], inValue: string): ContentSchemaNoRef => {
   const params = filterByIn(parameter, inValue);
-  const properties: Record<string, ContentSchema> = {};
+  const properties: Record<string, ContentSchemaNoRef> = {};
   const requiredForSchema: string[] = [];
   params.forEach(param => {
     if (param.required) requiredForSchema.push(param.name);

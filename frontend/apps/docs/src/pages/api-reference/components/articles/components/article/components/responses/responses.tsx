@@ -3,12 +3,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { ContentSchema } from '@/api-reference/api-reference.types';
+import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';
 
 import Schema from '../schema';
 
 export type ResponsesProps = {
-  responses: Record<string, ContentSchema>;
+  responses: Record<string, ContentSchemaNoRef>;
 };
 
 const Responses = ({ responses }: ResponsesProps) => {

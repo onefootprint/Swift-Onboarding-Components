@@ -2,10 +2,9 @@ import { IcoChevronRight16 } from '@onefootprint/icons';
 import { Box, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 import styled, { css } from 'styled-components';
 
-import type { ContentSchema } from '@/api-reference/api-reference.types';
+import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';
 
 import Description from '../../../../../description';
 import Enum from '../../../enum';
@@ -13,7 +12,7 @@ import Enum from '../../../enum';
 export type PropertyProps = {
   isRequired?: boolean;
   level?: number;
-  schema: ContentSchema;
+  schema: ContentSchemaNoRef;
   title: string;
   isArray?: boolean;
 };
@@ -38,13 +37,6 @@ const ObjectProperties = ({ isRequired, title, schema, level = 0, isArray = fals
     if (schema.type) {
       typeLabelParts.push(t('of'));
       typeLabelParts.push(plural(schema.type));
-    } else if (schema.$ref) {
-      // Sometimes the array is of a referenced schema
-      const referencedSchema = evaluateSchemaRef(schema.$ref);
-      if (referencedSchema) {
-        typeLabelParts.push(t('of'));
-        typeLabelParts.push(plural(referencedSchema.type));
-      }
     }
     // Just leave the text as "array" if we can't find the type of the object in the array
   } else {

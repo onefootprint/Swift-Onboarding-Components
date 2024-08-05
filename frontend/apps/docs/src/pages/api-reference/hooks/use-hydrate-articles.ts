@@ -1,6 +1,7 @@
 import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import useSession from 'src/hooks/use-session';
-import { Article, ContentSchema, SecurityTypes } from '../api-reference.types';
+import { Article, ContentSchema, ContentSchemaNoRef, SecurityTypes } from '../api-reference.types';
+import { evaluateSchemaRef } from '../utils/get-schemas';
 
 type AdditionalArticleProps = {
   /** True if this API should be hidden when the tenant doesn't have access to it. */
@@ -21,7 +22,7 @@ export enum ArticleTag {
   publicApi = 'PublicApi',
 }
 
-export type HydratedArticle = Article<ContentSchema> & AdditionalArticleProps;
+export type HydratedArticle = Article<ContentSchemaNoRef> & AdditionalArticleProps;
 
 const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
   const {
@@ -61,12 +62,18 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
     const hideWhenLocked = hasTag('HideWhenLocked');
     const isHidden = hideWhenLocked && !canAccessApi && !user?.isFirmEmployee;
 
-    const requestBody = article.requestBody?.content['application/json'].schema;
+    const requestBodyRef = article.requestBody?.content['application/json'].schema;
+    const requestBody = requestBodyRef
+      ? {
+          ...dereferenceSchema(requestBodyRef),
+          isRequired: article.requestBody?.required || false,
+        }
+      : undefined;
     const responses = Object.fromEntries(
-      Object.entries(article.responses || {}).map(([code, content]) => [
-        code,
-        content.content['application/json'].schema,
-      ]),
+      Object.entries(article.responses || {}).map(([code, content]) => {
+        const schemaRef = content.content['application/json'].schema;
+        return [code, dereferenceSchema(schemaRef)];
+      }),
     );
 
     return {
@@ -79,6 +86,23 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
       responses,
     };
   });
+};
+
+const dereferenceSchema = (schema: ContentSchema): ContentSchemaNoRef => {
+  if (schema.$ref) {
+    const dereferencedSchema = evaluateSchemaRef(schema.$ref);
+    if (!dereferencedSchema) {
+      throw Error(`Couldn't dereference schema ${schema.$ref}`);
+    }
+    return dereferencedSchema;
+  }
+  if (schema.items?.$ref) {
+    return {
+      ...schema,
+      items: dereferenceSchema(schema.items),
+    };
+  }
+  return schema;
 };
 
 export default useHydrateArticles;

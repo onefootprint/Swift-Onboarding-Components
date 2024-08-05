@@ -1,16 +1,9 @@
-import type { Content, ContentSchema } from '../api-reference.types';
+import type { Content, ContentSchema, ContentSchemaNoRef } from '../api-reference.types';
 import staticApiData from '../assets/api-docs.json';
 import staticPreviewData from '../assets/api-preview-docs.json';
 import hostedApiData from '../assets/hosted-api-docs.json';
 import phasedOutApiData from '../assets/phased-out-api-docs.json';
 import privateApiData from '../assets/private-api-docs.json';
-
-export const maybeEvaluateSchemaRef = (schema: ContentSchema | undefined) => {
-  if (schema?.$ref) {
-    return evaluateSchemaRef(schema.$ref);
-  }
-  return schema;
-};
 
 export const evaluateSchemaRef = (ref: string) => {
   const parts = ref?.split('/');
@@ -20,21 +13,21 @@ export const evaluateSchemaRef = (ref: string) => {
 
 const getSchema = (schemaKey: string) => {
   const schema = staticApiData.components.schemas[schemaKey as keyof typeof staticApiData.components.schemas] as
-    | ContentSchema
+    | ContentSchemaNoRef
     | undefined;
   const previewSchema = staticPreviewData.components.schemas[
     schemaKey as keyof typeof staticPreviewData.components.schemas
-  ] as ContentSchema | undefined;
+  ] as ContentSchemaNoRef | undefined;
   const phasedOutSchema = phasedOutApiData.components.schemas[
     schemaKey as keyof typeof phasedOutApiData.components.schemas
-  ] as ContentSchema | undefined;
+  ] as ContentSchemaNoRef | undefined;
   // TODO this logic is pretty messy... we shouldn't do this with globals
   const hostedSchemas = hostedApiData.components.schemas[schemaKey as keyof typeof hostedApiData.components.schemas] as
-    | ContentSchema
+    | ContentSchemaNoRef
     | undefined;
   const privateSchema = privateApiData.components.schemas[
     schemaKey as keyof typeof privateApiData.components.schemas
-  ] as ContentSchema | undefined;
+  ] as ContentSchemaNoRef | undefined;
 
   return schema || previewSchema || phasedOutSchema || hostedSchemas || privateSchema || undefined;
 };
@@ -52,15 +45,9 @@ const DefaultFieldValues: Record<string, string> = {
   ip_address: '192.168.1.1',
 };
 
-export const getExample = (schema?: ContentSchema, name?: string, index = 0): unknown => {
+export const getExample = (schema?: ContentSchemaNoRef, name?: string, index = 0): unknown => {
   if (!schema) {
     return null;
-  }
-  if (schema.$ref) {
-    // Some schemas are just pointers to schemas defined elsewhere - evaluate the schema ref
-    // and then return its example
-    const referencedSchema = evaluateSchemaRef(schema.$ref);
-    return getExample(referencedSchema);
   }
   if (schema.example !== undefined) {
     // Some schemas have a hardcoded example. `null` is a valid hardcoded example

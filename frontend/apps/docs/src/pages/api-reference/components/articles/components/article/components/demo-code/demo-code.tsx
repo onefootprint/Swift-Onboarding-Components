@@ -3,9 +3,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Article, SecurityTypes } from '@/api-reference/api-reference.types';
-import type { ContentSchema } from '@/api-reference/api-reference.types';
-import { getExample, maybeEvaluateSchemaRef } from '@/api-reference/utils/get-schemas';
+import type { ContentSchemaNoRef, SecurityTypes } from '@/api-reference/api-reference.types';
+import { getExample } from '@/api-reference/utils/get-schemas';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
 
 export type DemoCodeProps = {
@@ -14,7 +13,6 @@ export type DemoCodeProps = {
 
 const computeCurlRequest = (article: HydratedArticle) => {
   const requestSchema = article.requestBody;
-  const referencedSchema = maybeEvaluateSchemaRef(requestSchema);
   const exampleRequest = useMemo(() => getExample(requestSchema), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const lines = [];
@@ -50,7 +48,7 @@ const computeCurlRequest = (article: HydratedArticle) => {
   } else {
     // Add data fields to curl request
     httpMethodArgs = `-X ${article.method.toUpperCase()}`;
-    if (referencedSchema?.type === 'object' || referencedSchema?.type === 'array') {
+    if (requestSchema?.type === 'object' || requestSchema?.type === 'array') {
       const exampleRequestJson = JSON.stringify(exampleRequest, null, 2);
       lines.push(`-d '${exampleRequestJson}'`);
     } else if (article.requestBody) {
@@ -106,7 +104,7 @@ const DemoCode = ({ article }: DemoCodeProps) => {
 
 type BlockProps = {
   title: string;
-  schema: ContentSchema;
+  schema: ContentSchemaNoRef;
 };
 
 const Block = ({ title, schema }: BlockProps) => {

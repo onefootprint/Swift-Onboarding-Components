@@ -1,13 +1,12 @@
 import { CodeInline, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
-import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
+import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 import styled, { css } from 'styled-components';
 
 type HeaderProps = {
   title: string;
-  schema: ContentSchema;
+  schema: ContentSchemaNoRef;
   isRequired?: boolean;
   isInBrackets?: boolean;
 };
@@ -27,13 +26,6 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
     if (schema.items?.type) {
       typeLabelParts.push(t('of'));
       typeLabelParts.push(plural(schema.items?.type));
-    } else if (schema.items?.$ref) {
-      // Sometimes the array is of a referenced schema
-      const referencedSchema = evaluateSchemaRef(schema.items?.$ref);
-      if (referencedSchema) {
-        typeLabelParts.push(t('of'));
-        typeLabelParts.push(plural(referencedSchema.type));
-      }
     }
     // Just leave the text as "array" if we can't find the type of the object in the array
   } else {

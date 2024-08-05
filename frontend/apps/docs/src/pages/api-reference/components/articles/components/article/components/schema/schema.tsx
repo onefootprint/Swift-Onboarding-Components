@@ -1,15 +1,14 @@
 import React from 'react';
-import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 import styled, { css } from 'styled-components';
 
-import type { ContentSchema } from '@/api-reference/api-reference.types';
+import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';
 
 import Description from '../description';
 import Header from './components/header';
 import Properties from './components/properties/properties';
 
 type SchemaProps = {
-  schema: ContentSchema;
+  schema: ContentSchemaNoRef;
   isInBrackets?: boolean;
 };
 
@@ -17,14 +16,6 @@ type SchemaProps = {
 /// Intended to be used as the top-level component to render a schema so each property in the schema.
 /// The top-level schema doesn't have a name
 const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
-  // Render referenced schema
-  if (schema.$ref) {
-    const referencedSchema = evaluateSchemaRef(schema.$ref);
-    if (referencedSchema) {
-      return <Schema schema={referencedSchema} isInBrackets={isInBrackets} />;
-    }
-    console.warn("Couldn't find referenced schema!", schema.$ref);
-  }
   // Render array by rendering the array's elements
   if (schema.type === 'array' && schema.items) {
     return <Schema schema={schema.items} isInBrackets={isInBrackets} />;
