@@ -1,6 +1,6 @@
 import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import useSession from 'src/hooks/use-session';
-import { Article, SecurityTypes } from '../api-reference.types';
+import { Article, ContentSchema, SecurityTypes } from '../api-reference.types';
 
 type AdditionalArticleProps = {
   /** True if this API should be hidden when the tenant doesn't have access to it. */
@@ -21,7 +21,7 @@ export enum ArticleTag {
   publicApi = 'PublicApi',
 }
 
-export type HydratedArticle = Article & AdditionalArticleProps;
+export type HydratedArticle = Article<ContentSchema> & AdditionalArticleProps;
 
 const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
   const {
@@ -61,12 +61,22 @@ const useHydrateArticles = (articles: Article[]): HydratedArticle[] => {
     const hideWhenLocked = hasTag('HideWhenLocked');
     const isHidden = hideWhenLocked && !canAccessApi && !user?.isFirmEmployee;
 
+    const requestBody = article.requestBody?.content['application/json'].schema;
+    const responses = Object.fromEntries(
+      Object.entries(article.responses || {}).map(([code, content]) => [
+        code,
+        content.content['application/json'].schema,
+      ]),
+    );
+
     return {
       ...article,
       hideWhenLocked,
       isHidden,
       canAccessApi,
       tag,
+      requestBody,
+      responses,
     };
   });
 };

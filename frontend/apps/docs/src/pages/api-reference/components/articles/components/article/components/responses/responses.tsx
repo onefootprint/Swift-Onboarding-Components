@@ -3,13 +3,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Content } from '@/api-reference/api-reference.types';
-import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
+import type { ContentSchema } from '@/api-reference/api-reference.types';
 
 import Schema from '../schema';
 
 export type ResponsesProps = {
-  responses: Record<string, Content>;
+  responses: Record<string, ContentSchema>;
 };
 
 const Responses = ({ responses }: ResponsesProps) => {
@@ -21,8 +20,7 @@ const Responses = ({ responses }: ResponsesProps) => {
     // We have an assertion in update_open_api.py that we only have one response per API
     console.error('Multiple responses for API');
   }
-  const [code, response] = Object.entries(responses)[0];
-  const schema = getSchemaFromComponent(response as Content);
+  const [code, schema] = Object.entries(responses)[0];
 
   return (
     <Container>

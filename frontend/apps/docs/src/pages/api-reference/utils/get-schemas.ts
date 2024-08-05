@@ -39,11 +39,6 @@ const getSchema = (schemaKey: string) => {
   return schema || previewSchema || phasedOutSchema || hostedSchemas || privateSchema || undefined;
 };
 
-export const getSchemaFromComponent = (component?: Content) => {
-  if (!component) return undefined;
-  return component.content['application/json'].schema;
-};
-
 // Open API allows us to use "format"s other than the default ones. We should eventually have the
 // backend provide data types for each of these fields instead of inferring based on the name
 // https://swagger.io/docs/specification/data-models/data-types/#string

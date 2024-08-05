@@ -5,14 +5,15 @@ import styled, { css } from 'styled-components';
 
 import type { Article, SecurityTypes } from '@/api-reference/api-reference.types';
 import type { ContentSchema } from '@/api-reference/api-reference.types';
-import { getExample, getSchemaFromComponent, maybeEvaluateSchemaRef } from '@/api-reference/utils/get-schemas';
+import { getExample, maybeEvaluateSchemaRef } from '@/api-reference/utils/get-schemas';
+import { HydratedArticle } from 'src/pages/api-reference/hooks';
 
 export type DemoCodeProps = {
-  article: Article;
+  article: HydratedArticle;
 };
 
-const computeCurlRequest = (article: Article) => {
-  const requestSchema = getSchemaFromComponent(article.requestBody);
+const computeCurlRequest = (article: HydratedArticle) => {
+  const requestSchema = article.requestBody;
   const referencedSchema = maybeEvaluateSchemaRef(requestSchema);
   const exampleRequest = useMemo(() => getExample(requestSchema), []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -96,9 +97,8 @@ const DemoCode = ({ article }: DemoCodeProps) => {
         {computeCurlRequest(article)}
       </CodeBlock>
       {responses &&
-        Object.entries(responses).map(([code]) => {
-          const schema = getSchemaFromComponent(responses[code]);
-          return schema ? <Block key={code} title={t('response-example')} schema={schema} /> : null;
+        Object.entries(responses).map(([code, schema]) => {
+          return <Block key={code} title={t('response-example')} schema={schema} />;
         })}
     </Container>
   );

@@ -3,21 +3,19 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Content } from '@/api-reference/api-reference.types';
-import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
+import type { ContentSchema } from '@/api-reference/api-reference.types';
 
 import Schema from '../schema';
 
 type RequestBodyProps = {
-  requestBody: Content;
+  requestBody: ContentSchema;
 };
 
 const RequestBody = ({ requestBody }: RequestBodyProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const schema = getSchemaFromComponent(requestBody);
   const isOptional = !requestBody?.required;
 
-  return schema ? (
+  return requestBody ? (
     <Box>
       <Header>
         <Title>{t('request-body')}</Title>
@@ -30,7 +28,7 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
           </>
         )}
       </Header>
-      <Schema schema={schema} isInBrackets />
+      <Schema schema={requestBody} isInBrackets />
     </Box>
   ) : null;
 };

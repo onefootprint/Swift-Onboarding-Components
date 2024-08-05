@@ -29,11 +29,11 @@ export type ParameterProps = {
   style: string;
 };
 
-export type Article = {
+export type Article<TContent = Content> = {
   description?: string;
   parameters?: ParameterProps[];
-  responses?: Record<string, Content>;
-  requestBody?: Content;
+  responses?: Record<string, TContent>;
+  requestBody?: TContent;
   security?: Record<SecurityTypes, string[]>[];
   tags?: string[];
   // These are added on top of the open API spec
