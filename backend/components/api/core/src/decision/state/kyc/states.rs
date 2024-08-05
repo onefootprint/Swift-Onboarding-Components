@@ -50,6 +50,7 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
 use newtypes::DocumentRequestKind;
 use newtypes::EnhancedAmlOption;
@@ -99,7 +100,6 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
     fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> FpResult<KycState> {
         DbWorkflow::update_status_if_valid(wf, conn, OnboardingStatus::Pending)?;
-
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
@@ -143,7 +143,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
         Option<VendorResult>,
-        Option<VendorResult>,
+        Option<(NeuroIdAnalyticsResponse, VerificationResultId)>,
         Option<(LookupV2Response, VerificationResultId)>,
     )>;
 
@@ -308,10 +308,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, new_doc_reason_codes, false, rsg.id)?;
         }
 
-        if let Some(neuro_res) = neuro_result {
-            let vendor_api: VendorAPI = (&neuro_res.response.response).into();
-            let vres_id = neuro_res.verification_result_id.clone();
-            let neuro_frc = parse_reason_codes(neuro_res, user_submitted_info)
+        if let Some((neuro_res, vres_id)) = neuro_result {
+            let vendor_api: VendorAPI = VendorAPI::NeuroIdAnalytics;
+            let neuro_frc = features::neuro_id::footprint_reason_codes(&neuro_res)
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
@@ -324,7 +323,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             // TODO: cleaning this up in separate stack
             // https://linear.app/footprint/issue/BE-365/remove-parsedresponse
             let vendor_api: VendorAPI = VendorAPI::TwilioLookupV2;
-            let twilio_frc = crate::decision::features::twilio::footprint_reason_codes(&twilio_res)
+            let twilio_frc = features::twilio::footprint_reason_codes(&twilio_res)
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();

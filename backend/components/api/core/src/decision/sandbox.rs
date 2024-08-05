@@ -32,6 +32,7 @@ use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
 use rand::seq::SliceRandom;
@@ -312,7 +313,7 @@ pub async fn save_fixture_neuro_result(
     wf_id: &WorkflowId,
     t_id: &TenantId,
     vault_public_key: &VaultPublicKey,
-) -> FpResult<VendorResult> {
+) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let raw = match fixture_result {
         WorkflowFixtureResult::Fail => {
             let opts = NeuroTestOpts {
@@ -336,7 +337,7 @@ pub async fn save_fixture_neuro_result(
     let parsed = serde_json::from_value::<NeuroIdAnalyticsResponse>(raw.clone())?;
     let request_result = Ok(NeuroApiResponse {
         result: NeuroAPIResult::Success(parsed.clone()),
-        raw_response: raw.clone().into(),
+        raw_response: raw.into(),
     });
 
     let args = SaveVerificationResultArgs::new_for_neuro(
@@ -346,19 +347,10 @@ pub async fn save_fixture_neuro_result(
         vault_public_key.clone(),
     );
 
-    let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
-    let vendor_response = VendorResponse {
-        response: ParsedResponse::NeuroIdAnalytics(parsed.clone()),
-        raw_response: raw.into(),
-    };
-
+    let (vres_id, _) = args.save(&state.db_pool).await?;
     let neuro_id = NeuroIdentityId::from(wf_id.clone());
     save_neuro_event(state, &parsed, t_id, neuro_id, sv_id, wf_id, &vres_id).await?;
-    Ok(VendorResult {
-        response: vendor_response,
-        verification_result_id: vres_id,
-        verification_request_id: vreq_id,
-    })
+    Ok(Some((parsed, vres_id)))
 }
 
 #[cfg(test)]

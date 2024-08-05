@@ -43,6 +43,7 @@ use db::DbResult;
 use db::PgConn;
 use db::TxnPgConn;
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
@@ -143,7 +144,7 @@ pub async fn run_neuro_check(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> FpResult<Option<VendorResult>> {
+) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
         .db_pool
@@ -162,7 +163,7 @@ pub async fn run_neuro_check(
     let ff_client = state.ff_client.clone();
     let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, t_id)?;
     if let Some(fixture_result) = fixture_result {
-        let vendor_result = decision::sandbox::save_fixture_neuro_result(
+        decision::sandbox::save_fixture_neuro_result(
             state,
             fixture_result,
             &di.id,
@@ -171,8 +172,7 @@ pub async fn run_neuro_check(
             t_id,
             &v.public_key,
         )
-        .await?;
-        Ok(Some(vendor_result))
+        .await
     } else {
         run_neuro_call(state, &di, &wf.id, t_id).await
     }

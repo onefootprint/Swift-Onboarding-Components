@@ -1,7 +1,6 @@
 use super::into_fp_error;
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_api::loaders::load_response_for_vendor_api;
-use super::vendor_result::VendorResult;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
 use crate::utils::vault_wrapper::Any;
@@ -19,8 +18,6 @@ use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::neuro_id::response::NeuroIdAttributes;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
-use idv::ParsedResponse;
-use idv::VendorResponse;
 use newtypes::vendor_api_struct::NeuroIdAnalytics;
 use newtypes::vendor_credentials::NeuroIdCredentials;
 use newtypes::vendor_credentials::NeuroIdSiteId;
@@ -84,35 +81,34 @@ pub async fn run_neuro_call(
     di: &DecisionIntent,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> FpResult<Option<VendorResult>> {
+) -> FpResult<Option<(NeuroIdAnalyticsResponse, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
     let (vw, scoped_vault) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
-
             let scoped_vault = ScopedVault::get(conn, &svid)?;
-
             Ok((vw, scoped_vault))
         })
         .await?;
 
     // If we already have a successful neuro validation for this DI, we return early
-    let existing_vendor_result = load_response_for_vendor_api(
+    let existing_neuro_id_result = load_response_for_vendor_api(
         state,
         VReqIdentifier::WfId(wf_id.clone()),
         &vw.vault.e_private_key,
         NeuroIdAnalytics,
     )
     .await?
-    .into_vendor_result();
+    .ok();
 
-    if existing_vendor_result.is_some() {
-        return Ok(existing_vendor_result);
+    if existing_neuro_id_result.is_some() {
+        return Ok(existing_neuro_id_result);
     }
 
     let tvc =
         TenantVendorControl::new(t_id.clone(), &state.db_pool, &state.config, &state.enclave_client).await?;
+
     // TODO: get this site_id from a playbook config somewhere
     let use_test_key = !(state.config.service_config.is_production() && scoped_vault.is_live);
     let credentials = NeuroIdCredentials::new(
@@ -120,8 +116,8 @@ pub async fn run_neuro_call(
         NeuroIdSiteId("form_humor717".into()),
         use_test_key,
     );
-    let id = NeuroIdentityId::from(wf_id.clone());
 
+    let id = NeuroIdentityId::from(wf_id.clone());
     let res = state
         .vendor_clients
         .neuro_id
@@ -137,24 +133,14 @@ pub async fn run_neuro_call(
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
     );
-    let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
+
+    let (vres_id, _) = args.save(&state.db_pool).await?;
     let neuro_response = res.map_err(into_fp_error)?;
-    let raw_response = neuro_response.raw_response.clone();
     let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(into_fp_error)?;
 
     // save event for metrics/dupes/user insights
     save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;
-
-    let vendor_result = VendorResult {
-        response: VendorResponse {
-            response: ParsedResponse::NeuroIdAnalytics(parsed),
-            raw_response,
-        },
-        verification_result_id: vres_id,
-        verification_request_id: vreq_id,
-    };
-
-    Ok(Some(vendor_result))
+    Ok(Some((parsed, vres_id)))
 }
 
 pub async fn save_neuro_event(
