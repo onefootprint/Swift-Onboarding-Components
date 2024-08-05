@@ -65,7 +65,7 @@ const DrawerFilter = ({ states }: DrawerFilterProps) => {
                 <Legend>{t('states.label')}</Legend>
                 <Stack direction="column" gap={3}>
                   {states.map(state => (
-                    <Checkbox label={state} value={state} {...register('states')} />
+                    <Checkbox key={state} label={state} value={state} {...register('states')} />
                   ))}
                 </Stack>
               </fieldset>

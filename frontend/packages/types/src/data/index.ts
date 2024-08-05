@@ -189,6 +189,7 @@ export { RiskSignalSeverity } from './risk-signal';
 export { BusinessNameKind } from './business-name';
 export { BusinessDetail } from './business-details';
 export type { RawBusinessName, BusinessName } from './business-name';
+export type { RawBusinessAddress, BusinessAddress } from './business-address';
 export type { BusinessInsights } from './business-insights';
 export type {
   BusinessDetails,

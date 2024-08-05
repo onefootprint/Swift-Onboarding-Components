@@ -352,6 +352,8 @@ export type {
   RiskSignal,
   RawBusinessName,
   BusinessName,
+  RawBusinessAddress,
+  BusinessAddress,
   BusinessDetails,
   BusinessInsights,
   BusinessDetailValue,

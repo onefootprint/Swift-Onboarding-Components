@@ -1,4 +1,10 @@
-import type { RawBusinessName, RawBusinessPerson, RawBusinessWatchlist, RawSOSFiling } from '../data';
+import type {
+  RawBusinessAddress,
+  RawBusinessName,
+  RawBusinessPerson,
+  RawBusinessWatchlist,
+  RawSOSFiling,
+} from '../data';
 import { RawBusinessDetails } from '../data/business-details';
 
 export type GetBusinessInsightsResponse = {
@@ -7,4 +13,5 @@ export type GetBusinessInsightsResponse = {
   people: RawBusinessPerson[];
   registrations: RawSOSFiling[];
   watchlist: RawBusinessWatchlist | null;
+  addresses: RawBusinessAddress[];
 };

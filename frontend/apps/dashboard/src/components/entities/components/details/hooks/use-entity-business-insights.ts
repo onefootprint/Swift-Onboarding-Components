@@ -2,6 +2,7 @@ import { STATES } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
+  BusinessAddress,
   BusinessDetail,
   BusinessDetailPhoneNumber,
   BusinessDetailTin,
@@ -14,6 +15,7 @@ import {
   EntityKind,
   FilingStatus,
   GetBusinessInsightsResponse,
+  RawBusinessAddress,
   RawBusinessName,
   RawBusinessPerson,
   RawBusinessWatchlist,
@@ -239,12 +241,20 @@ const useEntityBusinessInsights = (id: string) => {
           return flattedWatchlist;
         };
 
+        const formatAddresses = (addresses: RawBusinessAddress[]): BusinessAddress[] => {
+          return addresses.map(address => ({
+            id: JSON.stringify(address),
+            ...address,
+          }));
+        };
+
         return {
           names: response.names.map(name => formatName(name)),
           details: formatDetails(response.details),
           people: response.people.map(person => formatPerson(person)),
           registrations: formattedFilings,
           watchlist: formatWatchlist(response.watchlist),
+          addresses: formatAddresses(response.addresses),
         };
       },
     },

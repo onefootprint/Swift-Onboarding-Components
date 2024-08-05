@@ -11,7 +11,7 @@ type Coordinates = {
   lng: number | undefined;
 };
 
-const getCoordinatesFromAddress = async (address: string): Promise<Coordinates | undefined> => {
+export const getCoordinatesFromAddress = async (address: string): Promise<Coordinates | undefined> => {
   try {
     await GoogleMapsLoader.importLibrary('geocoding');
     const geocoder = new google.maps.Geocoder();

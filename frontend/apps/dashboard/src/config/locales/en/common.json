@@ -1834,6 +1834,14 @@
               "country": "Country"
             }
           }
+        },
+        "offices": {
+          "title": "Offices",
+          "empty": "No data",
+          "notes": "Notes",
+          "usps": "USPS",
+          "deliverable": "Deliverable",
+          "not-deliverable": "Not deliverable"
         }
       },
       "risk-signals": {

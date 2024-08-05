@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
-import { IcoEye16, IcoFileText16, IcoStore16, IcoUsers16 } from '@onefootprint/icons';
+import { IcoBuilding16, IcoEye16, IcoFileText16, IcoStore16, IcoUsers16 } from '@onefootprint/icons';
 import { BusinessInsights } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import BusinessNameList from '../business-name-list';
 import FilingDetailsDialog from '../filing-details';
+import Offices from '../offices/content/content';
 import OtherBusinessDetails from '../other-business-details';
 import PeopleList from '../people-list';
 import SOSFilings from '../sos-filings';
@@ -55,6 +56,10 @@ const DecryptedContent = ({ insights }: DecryptedContentProps) => {
       }),
       iconComponent: IcoEye16,
     },
+    offices: {
+      title: t('offices.title'),
+      iconComponent: IcoBuilding16,
+    },
   };
 
   return (
@@ -74,6 +79,9 @@ const DecryptedContent = ({ insights }: DecryptedContentProps) => {
         </Subsection>
         <Subsection icon={subsections.watchlist.iconComponent} title={subsections.watchlist.title}>
           <Watchlist data={insights.watchlist} />
+        </Subsection>
+        <Subsection icon={subsections.offices.iconComponent} title={subsections.offices.title}>
+          <Offices data={insights.addresses} />
         </Subsection>
       </Stack>
       {!!openFiling && <FilingDetailsDialog filing={openFiling} onClose={handleClose} />}
