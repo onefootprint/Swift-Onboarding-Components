@@ -1,7 +1,6 @@
-import { SuccessCheck, Text } from '@onefootprint/ui';
+import { Box, SuccessCheck, Text } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants';
 
@@ -22,19 +21,13 @@ const Success = ({ onComplete }: SuccessProps) => {
   }, [onComplete]);
 
   return (
-    <Container>
+    <Box display="flex" flexDirection="column" alignItems="center">
       <SuccessCheck animationStart />
       <Text variant="label-1" textAlign="center" marginTop={5} color="success">
         {t('title')}
       </Text>
-    </Container>
+    </Box>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 export default Success;

@@ -1,6 +1,6 @@
 import { IcoWarning24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { AnimatedLoadingSpinner, Button, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Box, Button, Text } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -58,7 +58,7 @@ const Init = () => {
   if (isError) {
     return (
       <ErrorContainer>
-        <ErrorMessage>
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap={3}>
           <IcoWarning24 color="error" />
           {retryLimitExceeded ? (
             <Text variant="body-2" color="secondary" textAlign="center">
@@ -69,7 +69,7 @@ const Init = () => {
               {t('error')}
             </Text>
           )}
-        </ErrorMessage>
+        </Box>
         {!retryLimitExceeded && <Button onClick={handleRetry}>{t('try-again')}</Button>}
       </ErrorContainer>
     );
@@ -101,16 +101,6 @@ const ErrorContainer = styled.div`
     align-items: center;
     gap: ${theme.spacing[5]};
     padding: ${theme.spacing[5]} ${theme.spacing[7]};
-  `}
-`;
-
-const ErrorMessage = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[3]};
   `}
 `;
 

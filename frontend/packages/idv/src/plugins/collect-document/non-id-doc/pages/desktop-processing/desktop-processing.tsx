@@ -205,7 +205,7 @@ const DesktopProcessing = () => {
     <Container>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <HeaderTitle title={documentName} />
-      <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
+      <FeedbackContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
           loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
           successComponent={<Success />}
@@ -232,15 +232,13 @@ const Container = styled.div`
   `}
 `;
 
-const FeedbackContainer = styled.div<{
-  height: number;
-}>`
-  ${({ theme, height }) => css`
+const FeedbackContainer = styled.div<{ $height: number }>`
+  ${({ theme, $height }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: ${height}px;
+    min-height: ${$height}px;
     background-color: ${theme.backgroundColor.secondary};
     border: 1px dashed ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.default};

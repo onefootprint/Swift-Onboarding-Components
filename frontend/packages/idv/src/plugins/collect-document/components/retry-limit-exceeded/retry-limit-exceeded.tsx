@@ -1,8 +1,7 @@
 import { IcoRepeat40, IcoWarning16 } from '@onefootprint/icons';
-import { Text } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
@@ -15,9 +14,7 @@ type RetryLimitExceededProps = {
 };
 
 const RetryLimitExceeded = ({ onRetryLimitExceeded }: RetryLimitExceededProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'document-flow.components.retry-limit-exceeded',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'document-flow.components.retry-limit-exceeded' });
 
   useTimeout(() => {
     onRetryLimitExceeded();
@@ -25,7 +22,7 @@ const RetryLimitExceeded = ({ onRetryLimitExceeded }: RetryLimitExceededProps) =
 
   return (
     <FadeInContainer>
-      <ErrorContainer>
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={5}>
         <NavigationHeader />
         <FeedbackIcon
           imageIcon={{ component: IcoRepeat40 }}
@@ -34,37 +31,17 @@ const RetryLimitExceeded = ({ onRetryLimitExceeded }: RetryLimitExceededProps) =
             status: 'error',
           }}
         />
-        <ErrorMessage>
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={3}>
           <Text variant="label-1" color="error" textAlign="center">
             {t('title')}
           </Text>
           <Text variant="body-2" color="secondary" textAlign="center">
             {t('description')}
           </Text>
-        </ErrorMessage>
-      </ErrorContainer>
+        </Box>
+      </Box>
     </FadeInContainer>
   );
 };
-
-const ErrorContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const ErrorMessage = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 export default RetryLimitExceeded;

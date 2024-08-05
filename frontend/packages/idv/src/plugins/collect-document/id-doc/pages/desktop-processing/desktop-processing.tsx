@@ -4,9 +4,9 @@ import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types'
 import { Button, Text, media } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { css, styled } from 'styled-components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { getLogger, trackAction } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
@@ -229,7 +229,7 @@ const DeskTopProcessing = () => {
         sideName={sideName}
         isSelfie={isSelfie}
       />
-      <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
+      <FeedbackContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
           loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
           successComponent={<Success />}
@@ -262,15 +262,13 @@ const Container = styled.div`
   `}
 `;
 
-const FeedbackContainer = styled.div<{
-  height: number;
-}>`
-  ${({ theme, height }) => css`
+const FeedbackContainer = styled.div<{ $height: number }>`
+  ${({ theme, $height }) => css`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: ${height}px;
+    min-height: ${$height}px;
     background-color: ${theme.backgroundColor.secondary};
     border: 1px dashed ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.default};

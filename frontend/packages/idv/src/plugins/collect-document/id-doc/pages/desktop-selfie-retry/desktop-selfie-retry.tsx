@@ -1,6 +1,6 @@
 import type { IdDocImageUploadError } from '@onefootprint/types';
 import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
-import { Button } from '@onefootprint/ui';
+import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -66,7 +66,7 @@ const DesktopSelfieRetry = () => {
           isSelfie
         />
       ) : (
-        <Container>
+        <Box display="flex" flexDirection="column" gap={7} paddingBottom={5}>
           <DesktopHeader sideName={transformCase(sideName, 'first-letter-upper-only')} isSelfie />
           <ErrorContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
             <ErrorComponent
@@ -77,20 +77,11 @@ const DesktopSelfieRetry = () => {
           <Button fullWidth onClick={handleSelfieRetake} size="large" data-dd-action-name="selfie:retry">
             {t('take-selfie-again')}
           </Button>
-        </Container>
+        </Box>
       )}
     </>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-    padding-bottom: ${theme.spacing[5]};
-  `}
-`;
 
 const ErrorContainer = styled.div<{ $height: number }>`
   ${({ theme, $height }) => css`

@@ -83,7 +83,7 @@ const UploadButton = ({
     <>
       <RoundButton
         onClick={handleUploadClick}
-        radius={CAPTURE_BTN_DEFAULT_INNER_RADIUS}
+        $radius={CAPTURE_BTN_DEFAULT_INNER_RADIUS}
         disabled={isLoading}
         data-dd-action-name="doc:upload-photo"
       >
@@ -100,14 +100,14 @@ const UploadButton = ({
 };
 
 const RoundButton = styled.button<{
-  radius: number;
+  $radius: number;
 }>`
-  ${({ theme, radius }) => css`
+  ${({ theme, $radius }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: ${radius}px;
-    width: ${radius}px;
+    height: ${$radius}px;
+    width: ${$radius}px;
     background-color: #00000033;
     border: none;
     border-radius: 50%;

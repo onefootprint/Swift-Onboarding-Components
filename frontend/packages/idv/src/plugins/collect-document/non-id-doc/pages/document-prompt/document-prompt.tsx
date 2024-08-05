@@ -4,7 +4,6 @@ import { DocumentRequestKind } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../../components';
 import FadeInContainer from '../../../components/fade-in-container';
@@ -57,7 +56,7 @@ const DocumentPrompt = () => {
   return (
     <FadeInContainer>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <PromptContainer direction="column" gap={7} align="center" justify="center">
+      <Stack height="100%" direction="column" gap={7} align="center" justify="center">
         <PromptWithGuidelines
           title={title}
           icon={IcoShieldFlash24}
@@ -73,13 +72,9 @@ const DocumentPrompt = () => {
           onTakePhoto={handleTakePhoto}
           hasBadConnectivity={hasBadConnectivity}
         />
-      </PromptContainer>
+      </Stack>
     </FadeInContainer>
   );
 };
-
-const PromptContainer = styled(Stack)`
-  height: 100%;
-`;
 
 export default DocumentPrompt;
