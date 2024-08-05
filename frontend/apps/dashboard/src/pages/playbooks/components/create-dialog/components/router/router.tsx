@@ -297,7 +297,7 @@ const Router = ({ onCreate }: RouterProps) => {
             onSubmit={handleSubmitDataToCollect}
           />
         )}
-        {state.matches({ settingsKyc: 'otpVerifications' }) && (
+        {(state.matches({ settingsKyc: 'otpVerifications' }) || state.matches({ settingsKyb: 'otpVerifications' })) && (
           <StepRequiredAuthMethods
             defaultValues={defaultValues.playbook}
             onBack={() => {

@@ -172,8 +172,8 @@ export type AdditionalDocs = {
 };
 
 export type AuthMethods = {
-  email: false;
-  phone: true;
+  email: boolean;
+  phone: boolean;
   // This is an internal field used to check if no auth methods are selected
   hasOptionSelected?: boolean;
 };
@@ -481,7 +481,7 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
 
 export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
   kind: PlaybookKind.DocOnly,
-  requiredAuthMethods: { email: false, phone: true },
+  requiredAuthMethods: { email: false, phone: false },
   person: {
     basic: {
       address: false,

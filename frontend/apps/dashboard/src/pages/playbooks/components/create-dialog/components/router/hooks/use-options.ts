@@ -31,6 +31,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
         options: [
           { value: 'settingsBusiness', label: t('data-to-collect.business-nav') },
           { value: 'settingsBo', label: t('data-to-collect.bo-nav') },
+          { value: 'otpVerifications', label: t('data-to-collect.otp-verifications-nav') },
         ],
       },
       { value: 'verificationChecks', label: t('verification-checks.nav') },

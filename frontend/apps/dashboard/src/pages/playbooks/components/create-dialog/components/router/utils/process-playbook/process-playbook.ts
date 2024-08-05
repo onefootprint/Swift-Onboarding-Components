@@ -208,7 +208,9 @@ const createRequiredAuthMethodsPayload = (formData: DataToCollectFormData) => {
   if (formData.requiredAuthMethods.phone) {
     requiredAuthMethods.push(AuthMethodKind.phone);
   }
-  return requiredAuthMethods;
+
+  // we should never return an empty array, otherwise the mutation will return a validation error
+  return requiredAuthMethods.length > 0 ? requiredAuthMethods : undefined;
 };
 
 //

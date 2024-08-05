@@ -35,10 +35,11 @@ export interface Typegen0 {
     | 'settingsKyb'
     | 'settingsKyb.settingsBo'
     | 'settingsKyb.settingsBusiness'
+    | 'settingsKyb.otpVerifications'
     | 'settingsKyc.personalInfo'
     | 'settingsKyc.otpVerifications'
     | { settingsKyc?: 'personalInfo' | 'otpVerifications' }
     | 'verificationChecks'
-    | { settingsKyb?: 'settingsBo' | 'settingsBusiness' };
+    | { settingsKyb?: 'settingsBo' | 'settingsBusiness' | 'otpVerifications' };
   tags: never;
 }

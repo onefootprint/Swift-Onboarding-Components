@@ -183,7 +183,7 @@ export const createPlaybookMachine = () =>
             settingsBo: {
               on: {
                 playbookSubmitted: {
-                  target: '#playbooks.verificationChecks',
+                  target: 'otpVerifications',
                   actions: 'assignPlaybook',
                 },
                 navigationBackward: {
@@ -195,6 +195,24 @@ export const createPlaybookMachine = () =>
                 },
                 nameYourPlaybookSelected: {
                   target: '#playbooks.nameYourPlaybook',
+                },
+              },
+            },
+            otpVerifications: {
+              on: {
+                kindSelected: {
+                  target: '#playbooks.kind',
+                  actions: ['resetKind', 'resetOnboardingTemplate'],
+                },
+                nameYourPlaybookSelected: {
+                  target: '#playbooks.nameYourPlaybook',
+                },
+                playbookSubmitted: {
+                  target: '#playbooks.verificationChecks',
+                  actions: 'assignPlaybook',
+                },
+                navigationBackward: {
+                  target: 'settingsBo',
                 },
               },
             },
@@ -242,7 +260,7 @@ export const createPlaybookMachine = () =>
             },
             navigationBackward: [
               {
-                target: 'settingsKyb.settingsBo',
+                target: 'settingsKyb.otpVerifications',
                 cond: context => context.kind === PlaybookKind.Kyb,
               },
               {
