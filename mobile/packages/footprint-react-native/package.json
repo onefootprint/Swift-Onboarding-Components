@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react-native",
   "private": false,
   "type": "module",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "main": "./dist/footprint-react-native.cjs",
   "module": "./dist/footprint-react-native.js",
   "unpkg": "./dist/footprint-react-native.js",
