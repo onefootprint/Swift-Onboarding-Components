@@ -11,6 +11,10 @@ meta:
   }
 ---
 
+<inline-alert variant="warning">
+Onboarding Components is currently in beta. If you have any feedback, please reach out using the "Need help" button at the bottom left of the page.
+</inline-alert>
+
 ## 1. Before you start
 
 Make sure you have read our [article](/guides/onboarding-components-overview) about onboarding components.
@@ -19,15 +23,19 @@ Make sure you have read our [article](/guides/onboarding-components-overview) ab
 
 In this guide, we'll show you how to integrate Footprint's Onboarding Components into your React application to collect user data.
 
-These are the steps you'll need to follow:
+### 2.1 Installation
 
-- Identify the user: for this part, we'll collect the user's email and phone number and use our OTP components to validate the user;
-- Collect user basic information, such as name, address and etc;
-- Finalize the onboarding: this is the last step, where we'll collect any missing data, register passkeys (if needed) and finalize the onboarding sending you a validation token.
+Onboarding components are available through a beta version of the `@onefootprint/footprint-react-native` package. To install it, run:
 
-<br />
+```terminal
+# With NPM
+npm install @onefootprint/footprint-react-native@beta
 
-### 2.1. Get a public key
+# With yarn
+yarn add @onefootprint/footprint-react-native@beta
+```
+
+### 2.2 Get a public key
 
 - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
 - Use an existing playbook or create a new one.
