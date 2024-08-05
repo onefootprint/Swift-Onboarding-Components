@@ -1,4 +1,4 @@
-import { BusinessDI, BusinessDIData } from '@onefootprint/types';
+import { BusinessDI, BusinessDIData, CollectedKybDataOption } from '@onefootprint/types';
 import React from 'react';
 import useEffectOnceStrict from '../../../../components/identify/hooks/use-effect-once-strict';
 import { useDecryptBusiness } from '../../../../queries';
@@ -8,6 +8,7 @@ type InitProps = {
   children: React.ReactNode;
   onError: (error?: unknown) => void;
   onSuccess: (data: BusinessDIData) => void;
+  populatedAttributes?: CollectedKybDataOption[];
 };
 
 const businessFields: `${BusinessDI}`[] = [
@@ -35,7 +36,7 @@ const omitNullAndUndefined = (data: BusinessDIData): BusinessDIData =>
     return response;
   }, Object.create(null));
 
-const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess }: InitProps) => {
+const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess, populatedAttributes }: InitProps) => {
   const mutDecryptBusiness = useDecryptBusiness();
 
   const fetchBusinessDIData = (authToken: string) => {
@@ -45,7 +46,9 @@ const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess }: InitP
         onError,
         onSuccess: (response: BusinessDIData) => {
           const res = omitNullAndUndefined(response);
-          return res['business.tin'] != null ? onSuccess(res) : onSuccess({ ...res, 'business.tin': 'decrypted' });
+          return populatedAttributes?.includes(CollectedKybDataOption.tin)
+            ? onSuccess({ ...res, 'business.tin': 'decrypted' })
+            : onSuccess(res);
         },
       },
     );

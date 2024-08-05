@@ -46,3 +46,5 @@ export const fromUSDateToISO8601Format = (date?: string | string[]): string | un
   const [month, day, year] = date.trim().split('/');
   return !day || !month || !year ? undefined : `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 };
+
+export const isISO8601Format = (str: string): boolean => /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(str);

@@ -39,6 +39,7 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <BusinessFieldsLoader
         authToken={state.context.idvContext.authToken}
+        populatedAttributes={state.context.kybRequirement.populatedAttributes}
         onSuccess={payload => send({ type: 'businessDataLoadSuccess', payload })}
         onError={err => {
           logError('error fetching business.*', err);

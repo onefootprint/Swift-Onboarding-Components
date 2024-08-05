@@ -5,8 +5,7 @@ import { BeneficialOwner, BusinessDI, BusinessDIData, SupportedLocale } from '@o
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import { getLogger } from '../../../../utils/logger';
-import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../utils/string';
-import { isString } from '../../../../utils/type-guards';
+import { fromUSDateToISO8601Format, isISO8601Format, strInputToUSDate } from '../../../../utils/string';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import BasicDataSection from './components/basic-data-section';
@@ -28,8 +27,10 @@ const shouldOmitFromPayload = (key: string, value: unknown): boolean => {
 const formatPayload = (locale: SupportedLocale, data: BusinessDIData) =>
   Object.entries(data).reduce((payload, [key, value]) => {
     if (isDate(key)) {
-      const dateInputValue = isString(value) ? strInputToUSDate(locale, value) : undefined;
-      payload[key] = fromUSDateToISO8601Format(dateInputValue);
+      payload[key] = isISO8601Format(value)
+        ? value
+        : fromUSDateToISO8601Format(strInputToUSDate(locale, value)) || undefined;
+
       return payload;
     }
 

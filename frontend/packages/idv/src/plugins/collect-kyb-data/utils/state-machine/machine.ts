@@ -34,7 +34,9 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         init: {
           always: [
             { target: 'loadFromVault', cond: isMissingRequiredData },
-            { target: 'introduction', cond: isMissingBeneficialOwnersData },
+            { target: 'loadFromVault', cond: isMissingBasicData },
+            { target: 'loadFromVault', cond: isMissingAddressData },
+            { target: 'loadFromVault', cond: isMissingBeneficialOwnersData },
             { target: 'confirm' },
           ],
         },

@@ -117,6 +117,37 @@ describe('isMissingRequiredData', () => {
     const result = isMissingRequiredData(ctx);
     expect(result).toBe(false);
   });
+
+  it('should be true if TIN is missing', () => {
+    const ctx = {
+      kybRequirement: {
+        missingAttributes: ['business_tin'],
+        populatedAttributes: ['business_name', 'business_kyced_beneficial_owners', 'business_address'],
+      },
+      bootstrapBusinessData: {},
+      data: {
+        'business.address_line1': '300 Park Avenue',
+        'business.city': 'New York',
+        'business.country': 'US',
+        'business.formation_date': '12/12/1990',
+        'business.name': 'Piper',
+        'business.state': 'NY',
+        'business.zip': '10022',
+        'business.kyced_beneficial_owners': [
+          {
+            email: null,
+            first_name: 'asd',
+            last_name: 'asd',
+            link_id: 'bo_link_primary',
+            ownership_stake: 100,
+            phone_number: '+1234',
+          },
+        ],
+      },
+    } as unknown as MachineContext;
+    const result = isMissingRequiredData(ctx);
+    expect(result).toBe(true);
+  });
 });
 
 describe('isMissingBasicData', () => {
