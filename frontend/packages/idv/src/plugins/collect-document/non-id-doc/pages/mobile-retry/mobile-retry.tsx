@@ -1,4 +1,4 @@
-import { DocumentRequestKind } from '@onefootprint/types';
+import { DocumentRequestKind, DocumentUploadSettings } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 
 import { NavigationHeader } from '../../../../../components';
@@ -15,8 +15,8 @@ const MobileRetry = () => {
 
   const docName = useDocName(requirement.config);
 
-  const hideUploadButton = requirement.uploadMode === 'capture_only';
-  const allowPdf = requirement.uploadMode === 'allow_upload';
+  const hideUploadButton = requirement.uploadSettings === DocumentUploadSettings.captureOnlyOnMobile;
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
 
   return (
     <FadeInContainer>

@@ -1,5 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
+import { DocumentUploadSettings } from '@onefootprint/types';
 import type { MachineContext, MachineEvents } from './types';
 
 const createTransferMachine = (initialContext: MachineContext) =>
@@ -99,7 +100,9 @@ const createTransferMachine = (initialContext: MachineContext) =>
                 target: 'confirmContinueOnDesktop',
                 cond: ctx =>
                   !!ctx.missingRequirements.documents.length &&
-                  ctx.missingRequirements.documents.some(req => req.uploadMode !== 'allow_upload'),
+                  ctx.missingRequirements.documents.some(
+                    req => req.uploadSettings !== DocumentUploadSettings.preferUpload,
+                  ),
                 description:
                   'The document upload experience is better on mobile, so if the user is trying to upload on desktop, warn them we recommend they continue on mobile.',
               },

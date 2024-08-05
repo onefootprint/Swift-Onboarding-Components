@@ -1,5 +1,10 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { DocumentRequestKind, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
+import {
+  DocumentRequestKind,
+  DocumentUploadSettings,
+  OnboardingConfigStatus,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 
 import type { TransferRequirements } from '../../types';
 import { idDocReq } from '../../utils/state-machine/machine.test';
@@ -33,7 +38,7 @@ export const missingRequirementsNonAvailableFixture: TransferRequirements = {
       kind: OnboardingRequirementKind.document,
       isMet: false,
       documentRequestId: '1',
-      uploadMode: 'default',
+      uploadSettings: DocumentUploadSettings.preferCapture,
       config: {
         kind: DocumentRequestKind.ProofOfSsn,
       },

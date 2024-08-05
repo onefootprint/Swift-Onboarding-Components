@@ -1,6 +1,7 @@
 import {
   DocumentRequestKind,
   DocumentRequirement,
+  DocumentUploadSettings,
   IdDocImageProcessingError,
   IdDocImageUploadError,
   OnboardingRequirementKind,
@@ -12,7 +13,7 @@ const documentRequirement: DocumentRequirement = {
   kind: OnboardingRequirementKind.document,
   isMet: false,
   documentRequestId: 'id',
-  uploadMode: 'default',
+  uploadSettings: DocumentUploadSettings.preferCapture,
   config: {
     kind: DocumentRequestKind.ProofOfAddress,
   },

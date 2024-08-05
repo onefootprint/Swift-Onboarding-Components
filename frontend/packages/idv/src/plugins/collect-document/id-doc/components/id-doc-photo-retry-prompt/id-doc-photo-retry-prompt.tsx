@@ -1,5 +1,5 @@
 import type { SupportedIdDocTypes } from '@onefootprint/types';
-import { IdDocImageTypes } from '@onefootprint/types';
+import { DocumentUploadSettings, IdDocImageTypes } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
@@ -40,8 +40,9 @@ const IdDocPhotoRetryPrompt = ({
   const sideName = getSideName();
 
   const hideCaptureButton = !!forceUpload;
-  const hideUpload = hideUploadButton || (requirement.uploadMode === 'capture_only' && !forceUpload);
-  const allowPdf = requirement.uploadMode === 'allow_upload';
+  const hideUpload =
+    hideUploadButton || (requirement.uploadSettings === DocumentUploadSettings.captureOnlyOnMobile && !forceUpload);
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
 
   const handleClickBack = () => {
     send({

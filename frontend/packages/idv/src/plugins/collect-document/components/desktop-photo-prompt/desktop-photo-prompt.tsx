@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { DocumentRequirement } from '@onefootprint/types/src/api/onboarding-status';
+import { DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types/src/api/onboarding-status';
 import upperFirst from 'lodash/upperFirst';
 import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
@@ -57,7 +57,7 @@ const DesktopPhotoPrompt = ({
     keyPrefix: 'document-flow.components.desktop-photo-prompt',
   });
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const allowPdf = requirement.uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
   const { processImageFile, acceptedFileFormats } = useProcessImage({
     allowPdf,
   });

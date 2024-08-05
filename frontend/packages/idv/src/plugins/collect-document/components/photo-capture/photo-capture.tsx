@@ -1,5 +1,5 @@
 import { IcoInfo24 } from '@onefootprint/icons';
-import type { DocumentRequirement, DocumentUploadMode } from '@onefootprint/types';
+import { type DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
@@ -67,8 +67,8 @@ const PhotoCapture = ({
   subtitle,
   title,
 }: PhotoCaptureProps) => {
-  const allowPdf = requirement.uploadMode === 'allow_upload';
-  const allowUpload = requirement.uploadMode !== 'capture_only';
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
+  const allowUpload = requirement.uploadSettings !== DocumentUploadSettings.captureOnlyOnMobile;
   const { processImageUrl } = useProcessImage({ allowPdf });
   const onCameraErrorToast = useHandleCameraError();
   const [image, setImage] = useState<string | null>(null);

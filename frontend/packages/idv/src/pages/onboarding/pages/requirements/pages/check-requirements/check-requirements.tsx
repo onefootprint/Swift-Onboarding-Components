@@ -17,7 +17,7 @@ const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
         }
 
         if (req.kind === 'collect_document' && req.config.kind === 'identity') {
-          return `${req.kind}:${req.isMet ? 1 : 0} uploadMode:${req.uploadMode} collectConsent:${req.config.shouldCollectConsent ? 1 : 0} collectSelfie:${req.config.shouldCollectSelfie ? 1 : 0}`;
+          return `${req.kind}:${req.isMet ? 1 : 0} uploadSettings:${req.uploadSettings} collectConsent:${req.config.shouldCollectConsent ? 1 : 0} collectSelfie:${req.config.shouldCollectSelfie ? 1 : 0}`;
         }
 
         return `${req.kind}:${req.isMet ? 1 : 0}`;

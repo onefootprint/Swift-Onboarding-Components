@@ -1,5 +1,5 @@
 import type { DocumentRequirement, RegisterPasskeyRequirement } from '@onefootprint/types';
-import { DocumentRequestKind, OnboardingRequirementKind } from '@onefootprint/types';
+import { DocumentRequestKind, DocumentUploadSettings, OnboardingRequirementKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createTransferMachine from './machine';
@@ -13,7 +13,7 @@ const livenessReq: RegisterPasskeyRequirement = {
 export const idDocReq: DocumentRequirement = {
   kind: OnboardingRequirementKind.document,
   isMet: false,
-  uploadMode: 'default',
+  uploadSettings: DocumentUploadSettings.preferCapture,
   documentRequestId: 'id',
   config: {
     kind: DocumentRequestKind.Identity,

@@ -189,7 +189,6 @@ export type {
   CollectKycDataRequirement,
   CustomDocumentRequirementConfig,
   DocumentRequirementConfig,
-  DocumentUploadMode,
   DocumentRequirement,
   IdDocRequirementConfig,
   OnboardingRequirement,
@@ -201,7 +200,7 @@ export type {
   RegisterPasskeyRequirement,
   RequirementForKind,
 } from './onboarding-status';
-export { getRequirement, OnboardingRequirementKind } from './onboarding-status';
+export { getRequirement, OnboardingRequirementKind, DocumentUploadSettings } from './onboarding-status';
 export type {
   OnboardingSubmitRequest,
   OnboardingSubmitResponse,

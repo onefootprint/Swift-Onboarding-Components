@@ -1,8 +1,6 @@
 import type {
   CountryCode,
   DocumentRequirement,
-  DocumentRequirementConfig,
-  DocumentUploadMode,
   IdDocImageProcessingError,
   IdDocImageUploadError,
 } from '@onefootprint/types';

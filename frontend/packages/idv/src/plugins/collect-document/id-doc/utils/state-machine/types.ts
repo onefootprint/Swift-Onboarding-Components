@@ -1,7 +1,6 @@
 import type {
   CountryCode,
   DocumentRequirement,
-  DocumentUploadMode,
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,

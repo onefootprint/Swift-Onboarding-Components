@@ -39,15 +39,35 @@ export type CollectInvestorProfileRequirement = {
 
 export type IdDocSupportedCountryAndDocTypes = Record<string, SupportedIdDocTypes[]>;
 
+export enum DocumentUploadSettings {
+  /**
+   * Useful for documents that are usually uploaded as a captured image, like an SSN card or
+   * driver's license. When on desktop, we prefer to hand off these document requirements to
+   * mobile for capture. And on mobile, we will show the capture interface with an option to
+   * upload.
+   */
+  preferCapture = 'prefer_capture',
+  /**
+   * Useful for documents that are usually uploaded as a file image, like a lease or utility
+   * bill. When on desktop, we first give the option to upload on desktop but fall back to
+   * handoff to mobile. And on mobile, we will show the option to upload or capture.
+   */
+  preferUpload = 'prefer_upload',
+  /**
+   * Not configurable by tenants yet, only used by Coba for their identity documents.
+   * On mobile, only allows capturing without the option to upload.
+   * On desktop though, we will allow uploading if the user didn't hand off
+   */
+  captureOnlyOnMobile = 'capture_only_on_mobile',
+}
+
 export type IdDocRequirement = {
   kind: OnboardingRequirementKind.idDoc;
   isMet: boolean;
   documentRequestId: string;
-  uploadMode: DocumentUploadMode;
+  uploadSettings: DocumentUploadSettings;
   config: DocumentRequirementConfig;
 };
-
-export type DocumentUploadMode = 'default' | 'allow_upload' | 'capture_only';
 
 export type IdDocRequirementConfig = {
   kind: DocumentRequestKind.Identity;

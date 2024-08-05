@@ -10,6 +10,7 @@ import {
   CollectedKycDataOption,
   D2PStatus,
   DocumentRequestKind,
+  DocumentUploadSettings,
   IdDI,
   OnboardingRequirementKind,
   SupportedIdDocTypes,
@@ -72,7 +73,7 @@ export const idDocRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.document,
   isMet: false,
   documentRequestId: 'id',
-  uploadMode: 'allow_upload',
+  uploadSettings: DocumentUploadSettings.preferUpload,
   config: {
     kind: DocumentRequestKind.Identity,
     shouldCollectConsent: false,

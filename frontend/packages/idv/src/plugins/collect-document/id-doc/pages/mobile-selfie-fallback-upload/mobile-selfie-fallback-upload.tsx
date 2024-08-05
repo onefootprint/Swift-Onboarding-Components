@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { DocumentUploadSettings } from '@onefootprint/types';
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';
 import type { CaptureKind } from '../../../types';
@@ -16,7 +17,7 @@ const MobileSelfieFallbackUpload = () => {
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity, requirement } = state.context;
 
-  const allowPdf = requirement.uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
 
   const onComplete = (payload: {
     imageFile: File | Blob;

@@ -1,6 +1,6 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import { IcoShieldFlash24 } from '@onefootprint/icons';
-import { DocumentRequestKind } from '@onefootprint/types';
+import { DocumentRequestKind, DocumentUploadSettings } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ const DocumentPrompt = () => {
   });
   const [state, send] = useNonIdDocMachine();
   const { device, hasBadConnectivity, requirement, obConfigSupportedCountries, orgId } = state.context;
-  const allowPdf = requirement.uploadMode === 'allow_upload';
+  const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
   const isMobile = device.type === 'mobile';
   const { kind: documentRequestKind } = requirement.config;
   const guidelines = useGuidelines({ docKind: documentRequestKind, orgId });
