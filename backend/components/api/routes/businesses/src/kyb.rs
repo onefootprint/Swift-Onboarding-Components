@@ -84,7 +84,6 @@ pub async fn post(
             Ok((bvw, sb))
         })
         .await?;
-
     if bvw.vault.kind != VaultKind::Business {
         return Err(TenantError::IncorrectVaultKindForKyb.into());
     }

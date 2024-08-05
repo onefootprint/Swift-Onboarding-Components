@@ -267,7 +267,7 @@ fn create_business_details(business_response: &BusinessResponse) -> Option<Busin
     let website = create_website(website, website_verification_task);
 
     // create info about the phone
-    let phone_number = business_response.phone_numers.clone();
+    let phone_number = business_response.phone_numbers.clone();
     let phone_number_verification_task = get_task(business_response, TaskKindDiscriminant::Phone);
     let phone_numbers = create_phone_numbers(phone_number, phone_number_verification_task);
 
@@ -731,7 +731,10 @@ mod tests {
         // assertions
         let details = insight.details.clone().unwrap();
         assert_eq!(details.entity_type, Some("CORPORATION".to_string()));
-        assert!(details.phone_numbers.is_empty());
+        assert_eq!(
+            details.phone_numbers.first().unwrap().phone,
+            "+12222222222".into()
+        );
         assert_eq!(
             details.website.as_ref().map(|w| w.url.clone()),
             Some("https://www.wafflehouse.com".into())

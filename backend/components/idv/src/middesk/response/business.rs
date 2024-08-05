@@ -34,7 +34,7 @@ pub struct BusinessResponse {
     pub bankruptcies: Option<ScrubbedPiiJsonValue>, /* This is a premium feature we aren't using, and the
                                                      * schema
                                                      * is also not really specified by Middesk */
-    pub phone_numers: Option<Vec<PhoneNumber>>,
+    pub phone_numbers: Option<Vec<PhoneNumber>>,
     pub industry_classification: Option<IndustryClassification>,
     pub liens: Option<ScrubbedPiiJsonValue>, // premium feature we aren't using
     pub tags: Option<Vec<String>>,
