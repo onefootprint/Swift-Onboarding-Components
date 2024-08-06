@@ -1,0 +1,38 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:DescribeParameters",
+        "ssm:ListTagsForResource",
+        "secretsmanager:BatchGetSecretValue",
+        "secretsmanager:ListSecrets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:ListSecretVersionIds",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:RotateSecret",
+        "secretsmanager:RestoreSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["ssm:DeleteParameter", "ssm:GetParameter", "ssm:PutParameter", "ssm:GetParameters"],
+      "Resource": "arn:aws:ssm:*:*:parameter/*"
+    }
+  ]
+}

@@ -274,10 +274,10 @@ jobs:
           # Make sure you configure backend/compose.yaml to forward these env
           # vars to the integration_test container or else they won't take effect.
           EXPECTED_SERVER_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
-          TEST_URL: 'http://localhost:8000'
+          TEST_URL: "http://localhost:8000"
           IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
           IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
-          DITTO_URL: 'https://ditto.footprint.dev'
+          DITTO_URL: "https://ditto.footprint.dev"
           IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ci
         run: |
@@ -317,8 +317,8 @@ jobs:
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: 'Local integration tests'
+          comment-author: "github-actions[bot]"
+          body-includes: "Local integration tests"
 
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@c9fcb64660bc90ec1cc535646af190c992007c32 # ratchet:peter-evans/create-or-update-comment@v2.0.0
@@ -391,8 +391,8 @@ jobs:
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: 'Rustfmt output'
+          comment-author: "github-actions[bot]"
+          body-includes: "Rustfmt output"
 
       - name: Create or update rustfmt comment
         uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666

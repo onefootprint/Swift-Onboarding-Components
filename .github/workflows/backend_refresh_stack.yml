@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       stackName:
-        description: 'Name of the stack to refresh'
+        description: "Name of the stack to refresh"
         required: true
         type: string
-        default: 'dev'
+        default: "dev"
 
       environment:
-        description: 'Environment to run against'
+        description: "Environment to run against"
         type: environment
         required: true
 
@@ -31,9 +31,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ALT }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ALT }}
 
       - name: Install Pulumi CLI
         uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
@@ -49,5 +49,5 @@ jobs:
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: '${{ github.event.inputs.stackName }}'
+          stack-name: "${{ github.event.inputs.stackName }}"
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}

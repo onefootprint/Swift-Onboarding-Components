@@ -17,7 +17,7 @@ on:
     types: [labeled]
 
 concurrency:
-  group: 'ephem-stack-group-${{ github.head_ref }}'
+  group: "ephem-stack-group-${{ github.head_ref }}"
 
 jobs:
   detect_ephemeral_stack:
@@ -109,21 +109,21 @@ jobs:
       environment: dev
       baseStackName: dev
       createStack: true
-      stackName: 'dev-${{ needs.detect_ephemeral_stack.outputs.stackName }}'
-      prefixDomain: 'api-${{ needs.detect_ephemeral_stack.outputs.stackName }}.'
+      stackName: "dev-${{ needs.detect_ephemeral_stack.outputs.stackName }}"
+      prefixDomain: "api-${{ needs.detect_ephemeral_stack.outputs.stackName }}."
       useNeonDB: ${{ contains(github.event.pull_request.labels.*.name, 'FullEphemeral') || (needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true') }}
       useEphemeralHoneycombApiKey: true
       # We deploy the images built for the PR HEAD commit to ephemeral.
       apiComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
       enclaveComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_ALT }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_ALT }}
       ENCLAVE_SIGNING_KEY: ${{ secrets.ENCLAVE_SIGNING_KEY }}
       ENCLAVE_SIGNING_CERT: ${{ secrets.ENCLAVE_SIGNING_CERT }}
       PULUMI_CLOUD_URL: ${{ secrets.PULUMI_CLOUD_URL }}
-      AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
+      AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER_ALT }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
       IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
       IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
@@ -137,7 +137,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
+      testUrl: "${{ needs.deploy_ephemeral_stack.outputs.url }}"
       isPR: true
       expectedApiCommitHash: ${{ inputs.pull_request_head_sha || github.sha }}
       environment_name: ephemeral

@@ -1,0 +1,41 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["kms:CreateKey"],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus",
+        "kms:ListResourceTags",
+        "kms:PutKeyPolicy",
+        "kms:ScheduleKeyDeletion",
+        "kms:TagResource"
+      ],
+      "Resource": "arn:aws:kms:*:*:key/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["kms:CreateGrant", "kms:Decrypt"],
+      "Resource": "arn:aws:kms:*:*:alias/pulumi_secrets"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["kms:CreateGrant", "kms:Decrypt"],
+      "Resource": "arn:aws:kms:*:*:key/4e61ea01-1193-475e-82ee-e9639743efd6"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["kms:CreateGrant", "kms:Decrypt"],
+      "Resource": "arn:aws:kms:*:*:key/2d02d130-c1a6-4aab-b318-797f6d8253ee"
+    }
+  ]
+}

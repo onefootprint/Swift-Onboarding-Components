@@ -28,9 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Compute commit hash
     outputs:
-      apiCommitHash: '${{ steps.constants.outputs.apiCommitHash }}'
-      apiComponentVersion: '${{ steps.components.outputs.apiComponentVersion }}'
-      enclaveComponentVersion: '${{ steps.components.outputs.enclaveComponentVersion }}'
+      apiCommitHash: "${{ steps.constants.outputs.apiCommitHash }}"
+      apiComponentVersion: "${{ steps.components.outputs.apiComponentVersion }}"
+      enclaveComponentVersion: "${{ steps.components.outputs.enclaveComponentVersion }}"
     steps:
       - name: Hash
         shell: bash
@@ -64,9 +64,9 @@ jobs:
       enclaveComponentVersion: ${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
 
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_ALT }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_ALT }}
       ENCLAVE_SIGNING_KEY: ${{ secrets.ENCLAVE_SIGNING_KEY }}
       ENCLAVE_SIGNING_CERT: ${{ secrets.ENCLAVE_SIGNING_CERT }}
       PULUMI_CLOUD_URL: ${{ secrets.PULUMI_CLOUD_URL }}
@@ -76,7 +76,7 @@ jobs:
       IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
   run_tests:
-    name: 'integration tests'
+    name: "integration tests"
     needs: [deploy_stack_prod, extract_commit_hash]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
@@ -84,7 +84,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: '${{ needs.deploy_stack_prod.outputs.url }}'
+      testUrl: "${{ needs.deploy_stack_prod.outputs.url }}"
       isPR: false
       expectedApiCommitHash: ${{ needs.extract_commit_hash.outputs.apiCommitHash }}
       environment_name: production

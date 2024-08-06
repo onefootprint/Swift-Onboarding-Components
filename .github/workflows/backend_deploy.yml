@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'secrets environment to use'
+        description: "secrets environment to use"
         type: string
         required: true
 
@@ -14,39 +14,39 @@ on:
         required: true
 
       stackName:
-        description: 'stack or possibly ephemeral stack name, i.e. dev'
+        description: "stack or possibly ephemeral stack name, i.e. dev"
         type: string
         required: true
 
       createStack:
-        description: 'create a new stack'
+        description: "create a new stack"
         type: boolean
         default: false
         required: false
 
       baseDomain:
-        description: 'override the base domain for the stack'
+        description: "override the base domain for the stack"
         type: string
         required: false
 
       prefixDomain:
-        description: 'override the prefix domain for the stack'
+        description: "override the prefix domain for the stack"
         type: string
         required: false
 
       useEphemeralHoneycombApiKey:
-        description: 'override the honeycomb API key for the stack with the ephemeral API key'
+        description: "override the honeycomb API key for the stack with the ephemeral API key"
         type: boolean
         required: false
         default: false
 
       commitHash:
-        description: 'hash of commit that we will be deploying'
+        description: "hash of commit that we will be deploying"
         type: string
         required: false
 
       useNeonDB:
-        description: 'uses NeonDB for faster ephemeral env'
+        description: "uses NeonDB for faster ephemeral env"
         type: boolean
         required: false
         default: false
@@ -63,7 +63,7 @@ on:
 
     outputs:
       url:
-        description: 'stack url'
+        description: "stack url"
         value: ${{ jobs.deploy_stack.outputs.url }}
 
     secrets:
@@ -230,10 +230,10 @@ jobs:
     name: deploy stack
     runs-on: ubuntu-latest
     outputs:
-      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
+      url: "${{ steps.pulumi_deploy.outputs.apiUrl }}"
     environment:
       name: ${{ inputs.environment }}
-      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
+      url: "${{ steps.pulumi_deploy.outputs.apiUrl }}"
     needs: [copy_images, sign_push_enclave]
     if: success()
     steps:
@@ -262,7 +262,7 @@ jobs:
         working-directory: ./backend/infra
 
       # create our stack if needed
-      - name: 'create stack'
+      - name: "create stack"
         if: ${{ inputs.createStack }}
         working-directory: ./backend/infra
         run: |
@@ -273,65 +273,65 @@ jobs:
         working-directory: ./backend/infra
         run: pulumi stack select "${{ inputs.stackName }}"
 
-      - name: 'use fast ephemeral db'
+      - name: "use fast ephemeral db"
         if: ${{ inputs.createStack && inputs.useNeonDB }}
         working-directory: ./backend/infra
         run: |
           pulumi config set useNeonEphemeralDbProjectId bitter-shape-200807
 
-      - name: 'override base domain'
+      - name: "override base domain"
         if: ${{ inputs.baseDomain || false }}
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.domain.base ${{ inputs.baseDomain }}
 
-      - name: 'override prefix domain'
+      - name: "override prefix domain"
         if: ${{ inputs.prefixDomain || false }}
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.domain.prefix ${{ inputs.prefixDomain }}
 
-      - name: 'override honeycomb API key'
+      - name: "override honeycomb API key"
         if: ${{ inputs.useEphemeralHoneycombApiKey || false }}
         working-directory: ./backend/infra
         run: |
           pulumi config set --secret --path constants.honeycomb.apiKey $(pulumi config get --path constants.honeycomb.ephemeralApiKey)
 
-      - name: 'set api/enclave image version'
+      - name: "set api/enclave image version"
         working-directory: ./backend/infra
         run: |
           pulumi config set --path constants.containers.apiVersion ${{ inputs.apiComponentVersion }}
           pulumi config set --path constants.containers.enclaveVersion ${{ inputs.enclaveComponentVersion }}
 
       # refresh the state
-      - name: 'pulumi refresh'
+      - name: "pulumi refresh"
         uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: '${{ inputs.stackName }}'
+          stack-name: "${{ inputs.stackName }}"
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
           comment-on-pr: false
 
       # preview the stack
-      - name: 'pulumi preview'
+      - name: "pulumi preview"
         uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: preview
           work-dir: ./backend/infra
-          stack-name: '${{ inputs.stackName }}'
+          stack-name: "${{ inputs.stackName }}"
           comment-on-pr: false
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
       # deploy the stack
-      - name: 'pulumi up'
+      - name: "pulumi up"
         uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         id: pulumi_deploy
         with:
           command: up
           work-dir: ./backend/infra
-          stack-name: '${{ inputs.stackName }}'
-          message: 'Deployed component ${{ inputs.apiComponentVersion }} and ${{ inputs.enclaveComponentVersion }}'
+          stack-name: "${{ inputs.stackName }}"
+          message: "Deployed component ${{ inputs.apiComponentVersion }} and ${{ inputs.enclaveComponentVersion }}"
           comment-on-pr: true
           edit-pr-comment: true
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}

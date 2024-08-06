@@ -1,0 +1,7 @@
+secretsprovider: awskms://alias/pulumi_infra_global_config?region=us-east-1
+encryptedkey: AQICAHj55L+yAm4v89j/oGf37w1WQKQdLE4gdWO2E8pq+F49lwEKFZwRuQsd0zviyz8tOHdFAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMGCpf59VL94gGuu1vAgEQgDt4FXK1LV01ImUm0WYUB5+Yjg04ZeGFul8qWEjMfgoALpRrij1AK8b8PZJTfa/vwvJDahX/nkAxmKs0Uw==
+config:
+  github:owner: onefootprint
+  github:token:
+    secure: v1:1QTp+75u6VnYoGJi:LtCCqaom6kQfVlh6PVyMtdBzvCk8oHTWV5WpabjGqb2BjsZhEbs47ePM0OnZh6brrtrpHZCYFqW29y1hGfzQmFQn+XwuyMlKySqLBzEn6ICoaaoAfoPaZ+9JDLFJz1aqMEjMwZHTZCFb7USM5g==
+  infra_global:githubActionsSecretEnv: production
