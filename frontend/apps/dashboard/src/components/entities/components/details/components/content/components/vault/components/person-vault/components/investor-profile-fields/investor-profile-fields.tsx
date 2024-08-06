@@ -11,6 +11,7 @@ import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
 import FieldSection from './components/field-section';
+import FinraField from './components/finra-field';
 
 type InvestorProfileFieldsProps = WithEntityProps;
 
@@ -172,7 +173,13 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             <Field di={InvestorProfileDI.politicalOrganization} entity={entity} />
           )}
           {isVaultDataEmpty(vaultData?.[DocumentDI.finraComplianceLetter]) ? null : (
-            <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
+            <Field
+              di={DocumentDI.finraComplianceLetter}
+              entity={entity}
+              renderValue={(value, isValueDecrypted) =>
+                isValueDecrypted ? <FinraField base64Data={value as string} /> : <FieldOrPlaceholder data={value} />
+              }
+            />
           )}
         </FieldSection>
       </Column>

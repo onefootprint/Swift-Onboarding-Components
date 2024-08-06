@@ -26,7 +26,15 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
           if (!filteredDocs.length) {
             return;
           }
-          return <DocumentFieldOrPlaceholder kind={docType} vault={vault} entity={entity} documents={filteredDocs} />;
+          return (
+            <DocumentFieldOrPlaceholder
+              key={docType}
+              kind={docType}
+              vault={vault}
+              entity={entity}
+              documents={filteredDocs}
+            />
+          );
         })}
     </Stack>
   ) : null;
