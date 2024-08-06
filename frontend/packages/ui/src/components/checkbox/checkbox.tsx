@@ -72,7 +72,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             type="checkbox"
             value={value}
           />
-          {label}
+          <LabelText>{label}</LabelText>
         </Label>
         {hint && (
           <Hint
@@ -93,16 +93,16 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 const Label = styled.label<Pick<CheckboxProps, 'hasError'>>`
   ${({ theme, hasError }) => css`
     ${createFontStyles('body-3')};
-    align-items: start;
+    align-items: center;
     color: ${hasError ? theme.color.error : theme.color.primary};
     display: inline-flex;
     gap: ${theme.spacing[4]};
-
-    input {
-      margin-top: ${theme.spacing[2]};
-      margin-bottom: ${theme.spacing[1]};
-    }
   `}
+`;
+
+const LabelText = styled.span`
+  display: flex;
+  align-items: center;
 `;
 
 const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
