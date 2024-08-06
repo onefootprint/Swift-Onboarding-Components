@@ -17,7 +17,7 @@ const IcoDiners24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) 
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M3.166 11.727a7.65 7.65 0 1 1 15.3 0 7.65 7.65 0 0 1-15.3 0"
+        d="M3.166 11.727a7.65 7.65 0 1 1 15.3 0 7.65 7.65 0 0 1-15.3 0Z"
         fill="#FFFFFE"
       />
       <path

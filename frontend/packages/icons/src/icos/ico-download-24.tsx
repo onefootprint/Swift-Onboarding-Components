@@ -19,7 +19,7 @@ const IcoDownload24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       <path
         d="M18.875 14.292v3.75c0 .46-.373.833-.833.833H5.958a.833.833 0 0 1-.833-.833v-3.75M12 14.5V5.125m0 9.375-2.917-2.917M12 14.5l2.917-2.917"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

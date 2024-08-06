@@ -19,7 +19,7 @@ const IcoServer24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       <path
         d="M19.708 12V6.792a.833.833 0 0 0-.833-.834H5.125a.833.833 0 0 0-.833.834V12m15.416 0H4.292m15.416 0v5.208c0 .46-.373.834-.833.834H5.125a.833.833 0 0 1-.833-.834V12"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="square"
         strokeLinejoin="round"
       />

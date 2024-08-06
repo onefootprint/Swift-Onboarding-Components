@@ -19,7 +19,7 @@ const IcoPlusBig24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       <path
         d="M12 5.333V12m0 0v6.667M12 12H5.333M12 12h6.667"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
       />
     </svg>

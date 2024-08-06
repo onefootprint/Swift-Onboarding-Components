@@ -19,7 +19,7 @@ const IcoRefresh24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       <path
         d="M14.5 5.818a6.667 6.667 0 0 0-5.417 12.179M9.5 14.5v4.167H5.333"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

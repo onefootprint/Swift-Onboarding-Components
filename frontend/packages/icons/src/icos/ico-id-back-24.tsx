@@ -23,7 +23,7 @@ const IcoIdBack24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
         height={15}
         rx={1.667}
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinejoin="round"
       />
       <rect x={7.556} y={7} width={8.889} height={1.25} rx={0.625} fill={theme.color[color]} />

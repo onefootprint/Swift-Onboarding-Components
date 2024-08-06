@@ -19,7 +19,7 @@ const IcoSpinner24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       <path
         d="M19.708 12A7.708 7.708 0 0 0 12 4.292"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="square"
       />
     </svg>

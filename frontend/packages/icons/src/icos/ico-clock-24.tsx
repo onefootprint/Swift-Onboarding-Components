@@ -19,7 +19,7 @@ const IcoClock24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       <path
         d="M12 8.667V12l2.083 2.083M19.5 12a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

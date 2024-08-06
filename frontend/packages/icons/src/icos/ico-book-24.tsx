@@ -19,7 +19,7 @@ const IcoBook24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       <path
         d="M9.5 4.917H6.583a.833.833 0 0 0-.833.833v12.5c0 .46.373.833.833.833H9.5m0-14.166h7.917c.46 0 .833.373.833.833v12.5c0 .46-.373.833-.833.833H9.5m0-14.166v14.166m3.333-10.416h2.084M12.833 12h2.084"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

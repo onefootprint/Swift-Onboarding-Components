@@ -19,7 +19,7 @@ const IcoUpload24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       <path
         d="M12 5.125V14.5m0-9.375 3.75 3.75M12 5.125l-3.75 3.75m10.625 3.75v5.417c0 .46-.373.833-.833.833H5.958a.833.833 0 0 1-.833-.833v-5.417"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

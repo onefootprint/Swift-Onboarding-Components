@@ -19,7 +19,7 @@ const IcoPassport24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       <path
         d="M9.917 15.333h4.166m0-4.583a2.083 2.083 0 1 1-4.166 0 2.083 2.083 0 0 1 4.166 0Zm-7.5 8.333h10.834c.46 0 .833-.373.833-.833V5.75a.833.833 0 0 0-.833-.833H6.583a.833.833 0 0 0-.833.833v12.5c0 .46.373.833.833.833Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

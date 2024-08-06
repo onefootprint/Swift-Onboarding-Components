@@ -19,7 +19,7 @@ const IcoMenu24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       <path
         d="M4.292 12h15.416M4.292 6.792h15.416M4.292 17.208h15.416"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -20,7 +20,7 @@ const IcoCrosshair24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
         <path
           d="M12 3.458v5.417M20.542 12h-5.417M12 15.125v5.417M8.875 12H3.458M12 18.042a6.042 6.042 0 1 1 0-12.084 6.042 6.042 0 0 1 0 12.084Z"
           stroke={theme.color[color]}
-          strokeWidth={1.25}
+          strokeWidth={1.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />

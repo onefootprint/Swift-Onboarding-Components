@@ -19,7 +19,7 @@ const IcoCode224 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       <path
         d="m10.125 18.875 3.75-13.75m3.334 3.333 2.795 2.97a.833.833 0 0 1 0 1.143l-2.796 2.97m-10.416 0-2.796-2.97a.833.833 0 0 1 0-1.142l2.796-2.97"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -19,7 +19,7 @@ const IcoArrowUpRight24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       <path
         d="M17 14.5V7m0 0H9.5M17 7 7.21 16.792"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

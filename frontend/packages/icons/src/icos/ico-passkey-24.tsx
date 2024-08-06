@@ -19,7 +19,7 @@ const IcoPasskey24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       <path
         d="M11.312 12.684c-3.163 0-5.472 2.102-6.107 4.93-.108.478.281.903.772.903h7.002m1.25-11.25a2.917 2.917 0 1 1-5.834 0 2.917 2.917 0 0 1 5.834 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

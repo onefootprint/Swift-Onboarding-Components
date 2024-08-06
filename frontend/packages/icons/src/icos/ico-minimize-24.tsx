@@ -19,7 +19,7 @@ const IcoMinimize24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       <path
         d="M13.667 5.333v5m0 0h5m-5 0 5.208-5.208m-8.542 13.542v-5m0 0h-5m5 0-5.208 5.208"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

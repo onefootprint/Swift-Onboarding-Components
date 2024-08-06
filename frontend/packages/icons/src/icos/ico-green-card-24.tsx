@@ -19,7 +19,7 @@ const IcoGreenCard24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       <path
         d="M7.625 14.708h3.75m2.916 0h2.084m-8.75-3.333h1.25m2.916 0h4.584M5.125 5.958h13.75c.46 0 .833.373.833.834v10.416c0 .46-.373.834-.833.834H5.125a.833.833 0 0 1-.833-.834V6.792c0-.46.373-.834.833-.834Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

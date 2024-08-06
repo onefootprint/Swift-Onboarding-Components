@@ -19,7 +19,7 @@ const IcoActivity24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       <path
         d="M3.667 11.933h2.722a.833.833 0 0 0 .795-.582L9.3 4.646a.208.208 0 0 1 .397 0l4.603 14.575a.208.208 0 0 0 .397 0l2.118-6.706a.833.833 0 0 1 .795-.582h2.722"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

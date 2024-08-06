@@ -19,7 +19,7 @@ const IcoCheckSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       <path
         d="m8.666 12.667 2 2 4.667-5.334"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -19,7 +19,7 @@ const IcoShield24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       <path
         d="m9.708 11.583 1.459 1.459 3.125-3.125m4.583 2.01V7.184a.833.833 0 0 0-.57-.79l-6.041-2.015a.833.833 0 0 0-.527 0L5.694 6.393a.833.833 0 0 0-.57.791v4.743c0 4.144 3.542 6.115 6.875 7.913 3.333-1.798 6.875-3.77 6.875-7.913Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

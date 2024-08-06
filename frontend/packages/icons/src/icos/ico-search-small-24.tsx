@@ -19,7 +19,7 @@ const IcoSearchSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       <path
         d="m17 17-2.469-2.469m1.219-3.156a4.375 4.375 0 1 1-8.75 0 4.375 4.375 0 0 1 8.75 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
       />
     </svg>

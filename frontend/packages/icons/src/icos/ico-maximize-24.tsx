@@ -19,7 +19,7 @@ const IcoMaximize24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       <path
         d="M13.667 5.333h5v5m-5 0 4.375-4.375m-7.709 7.709-4.375 4.375m-.625-4.375v5h5"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

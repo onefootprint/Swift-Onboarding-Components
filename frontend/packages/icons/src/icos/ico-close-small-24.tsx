@@ -19,7 +19,7 @@ const IcoCloseSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       <path
         d="m8.666 8.667 6.667 6.666m0-6.666-6.667 6.666"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
       />
     </svg>

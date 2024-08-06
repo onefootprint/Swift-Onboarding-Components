@@ -19,7 +19,7 @@ const IcoLeaf24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       <path
         d="M12 12v-.833a5.833 5.833 0 0 0-5.833-5.834h-.833v.834A5.833 5.833 0 0 0 11.166 12H12Zm0 0v1.667m0 0a5.833 5.833 0 0 1 5.834-5.834h.833v.834a5.833 5.833 0 0 1-5.834 5.833H12m0-.833v.833m0 0v4.167"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

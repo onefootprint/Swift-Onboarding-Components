@@ -19,7 +19,7 @@ const IcoMessage24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       <path
         d="M20.125 12c0-4.297-3.16-6.875-8.125-6.875S3.875 7.703 3.875 12c0 1.114.767 3.005.887 3.293.01.026.022.05.031.076.083.226.421 1.425-.918 3.2 1.806.86 3.723-.553 3.723-.553 1.327.7 2.905.859 4.402.859 4.965 0 8.125-2.578 8.125-6.875Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="square"
         strokeLinejoin="round"
       />

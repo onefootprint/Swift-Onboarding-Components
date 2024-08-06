@@ -19,7 +19,7 @@ const IcoMoon24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       <path
         d="M19.47 12.64a5.833 5.833 0 0 1-8.113-8.113 7.5 7.5 0 1 0 8.113 8.112Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

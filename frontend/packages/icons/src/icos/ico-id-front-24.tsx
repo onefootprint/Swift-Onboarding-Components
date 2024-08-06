@@ -26,7 +26,7 @@ const IcoIdFront24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       />
       <rect x={14.143} y={14.143} width={2.857} height={1.25} rx={0.625} fill={theme.color[color]} />
       <rect x={12.238} y={16.048} width={4.762} height={1.25} rx={0.625} fill={theme.color[color]} />
-      <rect x={4.5} y={4.5} width={15} height={15} rx={1.667} stroke={theme.color[color]} strokeWidth={1.25} />
+      <rect x={4.5} y={4.5} width={15} height={15} rx={1.667} stroke={theme.color[color]} strokeWidth={1.5} />
     </svg>
   );
 };

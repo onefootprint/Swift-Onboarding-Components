@@ -19,7 +19,7 @@ const IcoChevronDown24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       <path
         d="m8.666 10.333 2.892 2.892c.244.244.64.244.884 0l2.891-2.892"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

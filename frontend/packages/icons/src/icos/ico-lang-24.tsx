@@ -19,14 +19,14 @@ const IcoLang24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       <path
         d="M5.125 6.847h7.083M8.666 6.792V5.125M12 13.875C8.612 12.999 6.87 10.845 6.375 7"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M5.333 13.667c3.387-.85 5.129-2.94 5.626-6.667M13.953 16.27h4.427m1.328 1.772-2.762-7.312c-.271-.718-1.288-.718-1.559 0l-2.762 7.312"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

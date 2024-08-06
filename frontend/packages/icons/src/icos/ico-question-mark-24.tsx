@@ -19,7 +19,7 @@ const IcoQuestionMark24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       <path
         d="M10.333 9.917V9.5c0-.46.373-.833.834-.833h1.666c.46 0 .834.373.834.833v.833c0 .263-.124.51-.334.667l-1 .75a.833.833 0 0 0-.333.667v.416m0 2.5v.009M19.5 12a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.25}
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
