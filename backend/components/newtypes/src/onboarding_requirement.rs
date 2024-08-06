@@ -314,6 +314,7 @@ mod test {
                         name: "Flerp".to_string(),
                         description: None,
                         requires_human_review: true,
+                        upload_settings: DocumentUploadSettings::PreferUpload,
                     }),
                 },
             });

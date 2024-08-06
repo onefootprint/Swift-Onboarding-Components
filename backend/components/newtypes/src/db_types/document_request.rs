@@ -1,5 +1,6 @@
 use crate::DataIdentifier;
 use crate::DocumentDiKind;
+use crate::DocumentUploadSettings;
 use crate::NtResult;
 use crate::ValidationError;
 use diesel::sql_types::Text;
@@ -18,16 +19,7 @@ use strum_macros::Display;
 use strum_macros::EnumString;
 
 #[derive(
-    Debug,
-    Clone,
-    Eq,
-    PartialEq,
-    Serialize,
-    Deserialize,
-    AsJsonb,
-    EnumDiscriminants,
-    Apiv2Schema,
-    derive_more::IsVariant,
+    Debug, Clone, Serialize, Deserialize, AsJsonb, EnumDiscriminants, Apiv2Schema, derive_more::IsVariant,
 )]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
@@ -66,7 +58,7 @@ pub enum DocumentRequestConfig {
     Custom(CustomDocumentConfig),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr)]
 #[serde(rename_all = "snake_case")]
 pub struct CustomDocumentConfig {
     /// Custom document identifier under which the document will be vaulted
@@ -77,11 +69,16 @@ pub struct CustomDocumentConfig {
     pub description: Option<String>,
     #[serde(default = "yes")]
     pub requires_human_review: bool,
-    // pub accepted_types: Vec<DocumentType>, // image? pdf?
+    #[serde(default = "prefer_upload")]
+    pub upload_settings: DocumentUploadSettings,
 }
 
 fn yes() -> bool {
     true
+}
+
+fn prefer_upload() -> DocumentUploadSettings {
+    DocumentUploadSettings::PreferUpload
 }
 
 impl DocumentRequestKind {

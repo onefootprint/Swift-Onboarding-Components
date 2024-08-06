@@ -143,8 +143,15 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     assert_eq!(OnboardingStatus::Incomplete, wf.status);
     // We have the correct pending doc requests
     assert_have_same_elements(
-        doc_requests.iter().map(|d| d.config.clone()).collect(),
-        step_up_kind.to_doc_configs(),
+        doc_requests
+            .iter()
+            .map(|d| DocumentRequestKind::from(&d.config))
+            .collect(),
+        step_up_kind
+            .to_doc_configs()
+            .into_iter()
+            .map(DocumentRequestKind::from)
+            .collect(),
     );
     // assert correct action was applied
     assert_eq!(

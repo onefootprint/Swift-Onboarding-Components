@@ -33,7 +33,6 @@ use newtypes::Declaration;
 use newtypes::DocumentCdoInfo;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentRequestConfig;
-use newtypes::DocumentRequestKind;
 use newtypes::DocumentStatus;
 use newtypes::DocumentUploadSettings;
 use newtypes::IdentityDataKind as IDK;
@@ -520,6 +519,20 @@ fn get_requirement_inner(
                         return Ok(None);
                     }
 
+                    let upload_settings = match &dr.config {
+                        DocumentRequestConfig::Identity { .. } => {
+                            if opts.require_capture_on_stepup.unwrap_or(false) {
+                                // Only for coba
+                                DocumentUploadSettings::CaptureOnlyOnMobile
+                            } else {
+                                DocumentUploadSettings::PreferCapture
+                            }
+                        }
+                        DocumentRequestConfig::ProofOfSsn { .. } => DocumentUploadSettings::PreferCapture,
+                        DocumentRequestConfig::ProofOfAddress { .. } => DocumentUploadSettings::PreferUpload,
+                        DocumentRequestConfig::Custom(c) => c.upload_settings,
+                    };
+
                     let country = decrypted_values
                         .get(&IDK::Country.into())
                         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
@@ -539,21 +552,6 @@ fn get_requirement_inner(
                         }
                         DocumentRequestConfig::ProofOfSsn { .. } => CollectDocumentConfig::ProofOfSsn {},
                         DocumentRequestConfig::Custom(info) => CollectDocumentConfig::Custom(info),
-                    };
-
-                    let upload_settings = match dr.kind {
-                        DocumentRequestKind::Identity => {
-                            if opts.require_capture_on_stepup.unwrap_or(false) {
-                                // Only for coba
-                                DocumentUploadSettings::CaptureOnlyOnMobile
-                            } else {
-                                DocumentUploadSettings::PreferCapture
-                            }
-                        }
-                        DocumentRequestKind::ProofOfSsn => DocumentUploadSettings::PreferCapture,
-                        DocumentRequestKind::ProofOfAddress => DocumentUploadSettings::PreferUpload,
-                        // TODO support configuring this
-                        DocumentRequestKind::Custom => DocumentUploadSettings::PreferUpload,
                     };
 
                     let req = OnboardingRequirement::CollectDocument {

@@ -7,7 +7,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 // TODO: probs consolidate this into WorkflowState somehow
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowConfig {
@@ -28,7 +28,7 @@ impl WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 
 pub struct KycConfig {
     /// This isn't really used in many places anymore, can maybe rm
@@ -41,7 +41,7 @@ impl From<KycConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 
 pub struct AlpacaKycConfig {
     /// This isn't really used in many places anymore, can maybe rm
@@ -54,7 +54,7 @@ impl From<AlpacaKycConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DocumentConfig {
     pub configs: Vec<DocumentRequestConfig>,
 }
@@ -65,7 +65,7 @@ impl From<DocumentConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KybConfig {}
 
 impl From<KybConfig> for WorkflowConfig {

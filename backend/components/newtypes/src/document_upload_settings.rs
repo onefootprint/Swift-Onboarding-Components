@@ -1,3 +1,4 @@
+use paperclip::actix::Apiv2Schema;
 use strum::EnumString;
 
 #[derive(
@@ -9,6 +10,7 @@ use strum::EnumString;
     Copy,
     EnumString,
     macros::SerdeAttr,
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

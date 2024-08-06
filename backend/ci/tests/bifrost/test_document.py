@@ -94,6 +94,7 @@ def test_custom_document_playbook(sandbox_tenant, must_collect_data):
                 name="Utility bill",
                 identifier="document.custom.utility_bill",
                 description="Please upload a utility bill that shows your full name and address.",
+                upload_settings="prefer_capture",
             ),
         )
     ]
@@ -103,10 +104,12 @@ def test_custom_document_playbook(sandbox_tenant, must_collect_data):
 
     bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
     user = bifrost.run()
-    assert any(
-        r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
+    requirement = next(
+        r
         for r in bifrost.handled_requirements
+        if r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
     )
+    assert requirement["upload_settings"] == "prefer_capture"
 
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     assert any(i["identifier"] == "document.custom.utility_bill" for i in body["data"])

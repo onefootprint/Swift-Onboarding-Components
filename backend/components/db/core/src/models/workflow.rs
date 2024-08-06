@@ -54,7 +54,7 @@ use newtypes::WorkflowStartedInfo;
 use newtypes::WorkflowState;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = workflow)]
 pub struct Workflow {
     pub id: WorkflowId,
@@ -692,7 +692,10 @@ mod tests {
         .unwrap();
         assert!(wf.kind == WorkflowKind::Kyc);
         assert!(wf.state == WorkflowState::Kyc(KycState::VendorCalls));
-        assert!(wf.config == WorkflowConfig::Kyc(KycConfig { is_redo: false }));
+        let WorkflowConfig::Kyc(KycConfig { is_redo }) = wf.config else {
+            panic!("Workflow config is not KycConfig");
+        };
+        assert!(!is_redo);
     }
 
     #[db_test]
