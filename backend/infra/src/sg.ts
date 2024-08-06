@@ -29,12 +29,14 @@ export const FPC_SERVICE_PORT: number = 8000;
 /**
  *  Create the core security groups referenced throughout the infrastructure
  */
-export function CreateCoreSecurityGroups(
+export async function CreateCoreSecurityGroups(
   vpc: FootprintVpc,
   provider: aws.Provider,
   stackMetadata: StackMetadata,
-): CoreSecurityGroups {
-  const fpcServiceLoadBalancer = new awsx.ec2.SecurityGroup(
+): Promise<CoreSecurityGroups> {
+
+  // todo: remove this unused, due to new approach for SGs
+  const _oldFpcServiceLoadBalancer = new awsx.ec2.SecurityGroup(
     `fpc-service-lb-sg-${stackMetadata.shortStackName}`,
     {
       vpc: vpc.vpc,
@@ -44,6 +46,33 @@ export function CreateCoreSecurityGroups(
     },
     { provider },
   );
+
+  // SG for Load balancer fronting main ECS API service
+  const fpcServiceLoadBalancer = new awsx.ec2.SecurityGroup(`fpc-service-lb-sgn-${stackMetadata.shortStackName}`, {
+    description: "Main FP cloud service load balancer (all egress and cloudfront inbound)",
+    ingress: [],
+    egress: [],
+    vpc: vpc.vpc,
+  }, { provider });
+
+  // add a rule to allow only cloudfront to talk to this LB
+  const cfPrefixList = await aws.ec2.getManagedPrefixList({
+    name: "com.amazonaws.global.cloudfront.origin-facing",
+  }, { provider });
+
+  const _allowCloudfront = new aws.vpc.SecurityGroupIngressRule(`fpc-lb-sg-rule-cf-${stackMetadata.shortStackName}`, {
+    securityGroupId: fpcServiceLoadBalancer.id,
+    fromPort: 443,
+    ipProtocol: "tcp",
+    toPort: 443,
+    prefixListId: cfPrefixList.id,
+  });
+  
+  const _allowAllEgress = new aws.vpc.SecurityGroupEgressRule(`fpc-lb-sg-rule-allegress-${stackMetadata.shortStackName}`, {
+    securityGroupId: fpcServiceLoadBalancer.id,
+    ipProtocol: "-1",    
+    cidrIpv4: "0.0.0.0/0",
+  });
 
   const fpcService = new awsx.ec2.SecurityGroup(
     `fpc-service-api-sg-${stackMetadata.shortStackName}`,
@@ -108,10 +137,6 @@ export function CreateCoreSecurityGroups(
             // retool
             '35.90.103.132/30',
             '44.208.168.68/30',
-            // metabase
-            '18.207.81.126/32',
-            '3.211.20.157/32',
-            '50.17.234.169/32',
           ],
           description: 'Inbound connections to the JBRO',
         },

@@ -1,6 +1,6 @@
-#! /bin/sh
+#!/bin/sh
 
-set -euf -o pipefail
+set -euf pipefail
 
 name=$(git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
 

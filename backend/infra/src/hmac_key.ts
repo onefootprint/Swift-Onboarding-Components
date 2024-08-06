@@ -38,9 +38,9 @@ export async function Initialize(
     description: `HMAC signing key for ${pulumi.getStack()}-default-region`,
   });
 
-  const replicas = replicaRegions.map(region => {
+  const replicas = replicaRegions.map(region => {    
     const provider = new aws_native.Provider(`kms-hmac-provider-${region}`, {
-      region,
+      region: region as aws_native.Region,
     });
     return new aws_native.kms.ReplicaKey(
       `hmac_signing_root_key_replica-${region}`,

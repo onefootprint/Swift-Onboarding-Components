@@ -92,7 +92,7 @@ export default async function main() {
   );
 
   // setup core security groups
-  const coreSecurityGroups = sg.CreateCoreSecurityGroups(
+  const coreSecurityGroups = await sg.CreateCoreSecurityGroups(
     vpc,
     provider,
     stackMetadata,

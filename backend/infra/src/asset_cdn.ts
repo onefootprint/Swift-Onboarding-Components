@@ -121,6 +121,11 @@ export async function CreateAssetCdn(
           accessControlMaxAgeSec: 31536000,
           override: false,
         },
+        contentSecurityPolicy: {
+          contentSecurityPolicy:
+            "default-src 'none'",
+          override: true,
+        },
         frameOptions: {
           frameOption: 'SAMEORIGIN',
           override: false,

@@ -517,7 +517,7 @@ export async function LoadSecrets(
     ),
     // Datadog Forwarder Lambda needs a Secrets Manager secret.
     datadogApiKey: createSecretsManagerSecret(
-      `datadog-api-key-${stack}`,
+      `datadog-api-key2-${stack}`,
       datadogApiKey,
     ),
     sambaSafetyApiKey: createSecretParameter(
@@ -547,7 +547,6 @@ function createSecretParameter(
     type: 'SecureString',
     value: secretVal,
     name: `/static_secrets/${name}`,
-    overwrite: true,
     description: name,
   });
 

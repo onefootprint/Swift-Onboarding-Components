@@ -104,7 +104,7 @@ export async function CreateRegionalVPC(
       {
         tags: { stack: stack },
         numberOfAvailabilityZones: NUM_AZ,
-        cidrBlock,
+        cidrBlock,       
       },
       { provider, protect: true },
     );
@@ -117,6 +117,15 @@ export async function CreateRegionalVPC(
 
     await createVpcEndpoints(vpc, vpcName, provider, region);
   }
+
+  // block public IPs on public subnets by default
+  (await vpc.publicSubnets).forEach(subnet => {
+    const existingSubnet = aws.ec2.Subnet.get(`sn-existing-${subnet.subnetName}`, subnet.id);    
+    const _updatedSubnet = new aws.ec2.Subnet(`sn-up-${subnet.subnetName}`, {
+      vpcId: existingSubnet.vpcId,        
+      mapPublicIpOnLaunch: false        
+    }, { provider, id: existingSubnet.id });
+  });
 
   await createEgressDnsRecord(natGateways, dnsConfig, provider);
 

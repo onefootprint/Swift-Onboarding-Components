@@ -222,7 +222,7 @@ async function createCdnFrontedLoadBalancer(
     {
       vpc,
       external: true,
-      securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer],
+      securityGroups: [g.coreSecurityGroups.fpcServiceLoadBalancer.id],
       subnets: vpc.publicSubnetIds,
       // Be careful changing this - we have to make sure it is not any higher than the application's
       // keep-alive timeout
@@ -263,7 +263,7 @@ async function createCdnFrontedLoadBalancer(
   const web = loadBalancer.createListener(
     `fpc-https-${serviceName}`,
     {
-      external: true,
+      external: false,
       certificateArn: cert.arn,
       protocol: 'HTTPS',
       sslPolicy: 'ELBSecurityPolicy-2016-08',
@@ -334,6 +334,7 @@ async function createCdnFrontedLoadBalancer(
   loadBalancer.createListener(
     `fpc-lb-httpredir-${serviceName}`,
     {
+      external: false,
       protocol: 'HTTP',
       defaultAction: {
         type: 'redirect',
@@ -346,6 +347,35 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
+  // create WAF for load balancer
+  const waf = new aws.wafv2.WebAcl(`fpc-lb-waf-${serviceName}`, {
+    name: `FPCWAF-lb-${serviceName}`,
+    visibilityConfig: {
+      metricName: 'fpcLbWAF',
+      cloudwatchMetricsEnabled: true,
+      sampledRequestsEnabled: false,
+    },
+    defaultAction: {
+      allow: {
+        customRequestHandling: {
+          insertHeaders: [{ name: 'lb-waf-action', value: 'allow' }],
+        },
+      },
+    },
+    scope: 'REGIONAL',
+    rules: [
+      awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0, true),
+      awsManagedRule('AWSManagedRulesCommonRuleSet', 1, false),
+      awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2, true),
+    ],
+  });
+
+  const _wafAssociation = new aws.wafv2.WebAclAssociation(`fpc-lb-waf-assoc-${serviceName}`, {
+    resourceArn: loadBalancer.loadBalancer.arn,
+    webAclArn: waf.arn,
+  });
+
+  // create DNS
   const albDomainName = `internal.${g.dnsConfig.apiDomain}`;
   const record = new route53.Record(
     `dns-alb-${serviceName}-${region}`,
@@ -382,5 +412,26 @@ async function createCdnFrontedLoadBalancer(
     cdnDomain: g.dnsConfig.apiDomain,
     lbCname: albDomainName,
     distribution,
+  };
+}
+
+function awsManagedRule(name: string, priority: number, sample: boolean) {
+  return {
+    name: name,
+    priority: priority,
+    overrideAction: {
+      count: {},
+    },
+    statement: {
+      managedRuleGroupStatement: {
+        name: name,
+        vendorName: 'AWS',
+      },
+    },
+    visibilityConfig: {
+      metricName: name,
+      cloudwatchMetricsEnabled: true,
+      sampledRequestsEnabled: sample,
+    },
   };
 }
