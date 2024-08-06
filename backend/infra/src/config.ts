@@ -14,7 +14,6 @@ export interface Config {
   twilioBackup: Twilio;
   s3: S3;
   sendgrid: Sendgrid;
-  sentryUrl: string;
   apple: Apple;
   google: Google;
 }

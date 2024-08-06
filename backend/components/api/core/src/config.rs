@@ -101,12 +101,6 @@ pub struct Config {
     #[envconfig(from = "SENDGRID_API_KEY")]
     pub sendgrid_api_key: String,
 
-    #[envconfig(from = "DISABLE_SENTRY")]
-    pub disable_sentry: Option<String>,
-
-    #[envconfig(from = "SENTRY_URL")]
-    pub sentry_url: String,
-
     #[envconfig(from = "DEFAULT_PAGE_SIZE", default = "10")]
     pub default_page_size: usize,
 

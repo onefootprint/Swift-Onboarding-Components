@@ -574,10 +574,6 @@ export abstract class ServiceContainers {
                 value: constants.workos.defaultOrg,
               },
               {
-                name: 'SENTRY_URL',
-                value: constants.sentryUrl,
-              },
-              {
                 name: 'SERVICE_ENVIRONMENT',
                 value: serviceEnvironment,
               },

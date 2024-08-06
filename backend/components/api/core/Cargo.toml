@@ -94,8 +94,6 @@ webhooks = { path = "../../webhooks" }
 billing = { path = "../../billing" }
 rand = { workspace = true }
 
-
-sentry-tracing = { workspace = true }
 once_cell = { workspace = true }
 
 paste = { workspace = true }

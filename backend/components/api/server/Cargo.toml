@@ -26,8 +26,6 @@ actix-cors = { workspace = true }
 paperclip = { workspace = true }
 
 chrono = { workspace = true }
-sentry = { workspace = true }
-sentry-actix = { workspace = true }
 
 itertools = { workspace = true }
 

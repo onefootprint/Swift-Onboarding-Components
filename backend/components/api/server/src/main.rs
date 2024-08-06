@@ -39,33 +39,8 @@ enum Command {
 fn main() -> Result<()> {
     let config = config::Config::load_from_env().with_context(|| "failed to load config")?;
 
-    // sentry
-    let sample_rate: f32 = if config.service_config.is_local() {
-        // Don't send local errors to sentry
-        0.0
-    } else {
-        1.0
-    };
-
-    let _guard: sentry::ClientInitGuard = sentry::init((
-        config.sentry_url.as_str(),
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            environment: Some(Cow::Owned(config.service_config.environment.clone())),
-            sample_rate,
-            attach_stacktrace: false,
-            ..Default::default()
-        },
-    ));
-
-    // Add custom sentry tags here!
-    sentry::configure_scope(|scope| {
-        scope.set_tag("footprint-server-version", crate::GIT_HASH.to_string());
-    });
-
     std::env::set_var("RUST_BACKTRACE", "full");
 
-    // Sentry initialization may not be compaible with #[tokio::main]
     let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
     runtime.block_on(async move { run(config).await })
 }
@@ -175,9 +150,6 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
             })
             .wrap(request_metrics.clone()) // Export otel metrics for each API request
             // TODO also wrap RequestTracing::new()
-            .wrap(
-                sentry_actix::Sentry::new()
-            )
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())

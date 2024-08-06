@@ -151,8 +151,6 @@ config:
       apiKey:
         secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==
       fromEmail: verify@noreply.onefootprint.com
-    sentryUrl:
-      secure: v1:Ppt53FIYgHl6OQN8:eV5cnm9Eqlo1XPMv/nXYd7V7HqgeizALAvdntlpsutbGsFln9Di1hnf8kMogZJj6JVw8ECgFDbo3WUYScuXlKfI6zmp7tjwYG5lO2M8/ycL1qBbJV+teR3zL
     socure:
       certificationApiKey:
         secure: v1:+aZfvN92irHYxlcW:L4orljMQLkT681z+XjSgYq2nkS+xKH4kKBnp/LXnAqeBDWSsHTXOWQfmj3SwftO8eLYy2A==

@@ -188,10 +188,6 @@ mockall = "0.12.1"
 predicates = "3.1.0"
 url = "2.3.1"
 
-sentry = "0.31.5"
-sentry-actix = "0.31.5"
-sentry-tracing = "0.31.5"
-
 log = "0.4.14"
 byteorder = "1.4"
 

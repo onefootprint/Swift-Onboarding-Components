@@ -83,17 +83,6 @@ pub fn init(config: &Config) -> Result<Option<BasicController>> {
         layers.push(tracing_opentelemetry::layer().with_tracer(tracer).boxed());
     }
 
-    // sentry layer
-    if config.disable_sentry.is_none() {
-        let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
-            tracing::Level::ERROR => sentry_tracing::EventFilter::Exception,
-            tracing::Level::INFO | tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,
-            _ => sentry_tracing::EventFilter::Ignore,
-        });
-
-        layers.push(sentry_layer.boxed());
-    }
-
     // n.b.: env_filter needs to go first for level filtering to work correctly.
     let sub = Registry::default().with(env_filter).with(layers);
     tracing::subscriber::set_global_default(sub)?;
