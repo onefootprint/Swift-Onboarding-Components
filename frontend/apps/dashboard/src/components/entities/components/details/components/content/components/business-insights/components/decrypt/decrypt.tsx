@@ -1,12 +1,16 @@
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
-import { LinkButton, Stack, Text } from '@onefootprint/ui';
+import { LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useDecryptControls } from '../../../vault/components/vault-actions';
 
-const Decrypt = () => {
+type DecryptProps = {
+  canDecrypt: boolean;
+};
+
+const Decrypt = ({ canDecrypt }: DecryptProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+    keyPrefix: 'pages.entity.business-insights.decrypt',
   });
   const decryptControls = useDecryptControls();
 
@@ -15,15 +19,14 @@ const Decrypt = () => {
   };
 
   return (
-    <Stack align="flex-start">
-      <Text variant="body-3">
-        <Trans
-          i18nKey="pages.entity.business-insights.decrypt.message"
-          components={{
-            link: <LinkButton onClick={handleDecryptAll}>{t('decrypt.decrypt-all')}</LinkButton>,
-          }}
-        />
-      </Text>
+    <Stack align="center" gap={2}>
+      <Text variant="body-3">{t('message-start')}</Text>
+      <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
+        <LinkButton disabled={!canDecrypt} onClick={handleDecryptAll}>
+          {t('decrypt-all')}
+        </LinkButton>
+      </Tooltip>
+      <Text variant="body-3">{t('message-end')}</Text>
     </Stack>
   );
 };

@@ -6,12 +6,14 @@ import type { WithEntityProps } from '@/entity/components/with-entity';
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
 import useEntityId from '@/entity/hooks/use-entity-id';
 import {
+  BusinessDI,
   DecisionStatus,
   EntityVault,
   OnboardingDecisionEvent,
   TimelineEventKind,
   WorkflowKind,
   isVaultDataDecrypted,
+  isVaultDataEmpty,
 } from '@onefootprint/types';
 import Section from '../section';
 import Content from './components/content';
@@ -26,6 +28,7 @@ const BusinessInsights = ({ entity }: BusinessInsightsProps) => {
   const entityId = useEntityId();
   const { data: vaultData } = useEntityVault(entityId, entity);
   const { data: timelineData } = useCurrentEntityTimeline();
+  const canDecrypt = !!entity.decryptableAttributes.length;
 
   const isKybOnboardingComplete = (event: OnboardingDecisionEvent) => {
     return (
@@ -45,16 +48,20 @@ const BusinessInsights = ({ entity }: BusinessInsightsProps) => {
   };
 
   const hasDecryptedAll = (entityVault: EntityVault | undefined) => {
-    if (!entityVault) return false;
-    return entity.decryptableAttributes.every(di => {
+    if (!entityVault || !canDecrypt) return false;
+    return Object.values(BusinessDI).every(di => {
       const value = entityVault?.[di];
-      return isVaultDataDecrypted(value);
+      return isVaultDataEmpty(value) || isVaultDataDecrypted(value);
     });
   };
 
   if (hasNoInsights()) return null;
 
-  return <Section title={t('title')}>{hasDecryptedAll(vaultData?.vault) ? <Content /> : <Decrypt />}</Section>;
+  return (
+    <Section title={t('title')}>
+      {hasDecryptedAll(vaultData?.vault) ? <Content /> : <Decrypt canDecrypt={canDecrypt} />}
+    </Section>
+  );
 };
 
 export default BusinessInsights;

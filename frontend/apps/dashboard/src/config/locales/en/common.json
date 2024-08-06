@@ -1720,8 +1720,10 @@
       "business-insights": {
         "title": "Business insights",
         "decrypt": {
-          "message": "For security reasons, this section requires you to explicitly <link/> to view these details.",
-          "decrypt-all": "decrypt all"
+          "message-start": "For security reasons, this section requires you to explicitly",
+          "decrypt-all": "decrypt all",
+          "message-end": "to view these details.",
+          "not-allowed": "You're not allowed to decrypt data"
         },
         "tags": {
           "verified": "Verified",
