@@ -1,12 +1,6 @@
+import { isEmail, isEmailDomain, isIpAddress, isPhoneCountryCode, isPhoneNumber, isSsn9 } from '@onefootprint/core';
 import { ListKind } from '@onefootprint/types';
-import { validate as isEmail } from 'isemail';
 import { useTranslation } from 'react-i18next';
-
-import isEmailDomain from './utils/is-email-domain';
-import isIpAddress from './utils/is-ip-address';
-import isPhoneCountryCode from './utils/is-phone-country-code';
-import isPhoneNumber from './utils/is-phone-number';
-import isSSN9 from './utils/is-ssn-9';
 
 const useValidateListEntries = () => {
   const { t } = useTranslation('lists', {
@@ -34,7 +28,7 @@ const useValidateListEntries = () => {
       return values.every(isEmailDomain) ? undefined : t('email-domain-invalid');
     }
     if (kind === ListKind.ssn9) {
-      return values.every(isSSN9) ? undefined : t('ssn9-invalid');
+      return values.every(isSsn9) ? undefined : t('ssn9-invalid');
     }
     if (kind === ListKind.phoneNumber) {
       return values.every(val => isPhoneNumber(val)) ? undefined : t('phone-number-invalid');

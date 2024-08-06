@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'bun:test';
+
 import isEmailDomain from './is-email-domain';
 
 describe('isEmailDomain', () => {

@@ -1,8 +1,9 @@
+import { describe, expect, it } from 'bun:test';
 import isIpAddress from './is-ip-address';
 
 describe('isIpAddress', () => {
   describe('valid ip addresses', () => {
-    test('should return true', () => {
+    it('should return true', () => {
       const ipv4 = [
         '192.168.0.1',
         '0.0.0.0',

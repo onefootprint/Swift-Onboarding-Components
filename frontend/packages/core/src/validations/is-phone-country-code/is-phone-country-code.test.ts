@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import isPhoneCountryCode from './is-phone-country-code';
 
 describe('isPhoneCountryCode', () => {

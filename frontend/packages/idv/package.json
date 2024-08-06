@@ -88,15 +88,11 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/i18next-test.ts"
-    ],
+    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"],
     "moduleNameMapper": {
       "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1",
       "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
     },
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/utils/tests/setupTests.js"
-    ]
+    "setupFilesAfterEnv": ["<rootDir>/src/utils/tests/setupTests.js"]
   }
 }

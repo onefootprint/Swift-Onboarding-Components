@@ -2,7 +2,7 @@
   "name": "@onefootprint/core",
   "private": false,
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./dist/footprint-core.cjs",
   "module": "./dist/footprint-core.js",
   "unpkg": "./dist/footprint-core.js",

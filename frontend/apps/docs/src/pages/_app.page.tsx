@@ -14,7 +14,7 @@ import {
   LOGIN_PATH,
   PHASED_OUT_API_REFERENCE_PATH,
 } from '../config/constants';
-import ApiReference from './api-reference';
+import ApiReference from './api-reference/index.page';
 import Auth from './auth';
 import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
