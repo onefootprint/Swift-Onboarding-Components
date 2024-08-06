@@ -2,7 +2,7 @@ import { IcoInfo24 } from '@onefootprint/icons';
 import { type DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
 import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../components';

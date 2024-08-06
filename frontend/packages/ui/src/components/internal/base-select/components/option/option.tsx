@@ -1,5 +1,4 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import React from 'react';
 import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';
 import styled, { css } from 'styled-components';

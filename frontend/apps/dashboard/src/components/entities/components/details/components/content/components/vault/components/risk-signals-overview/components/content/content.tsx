@@ -1,6 +1,5 @@
 import type { RiskSignal } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

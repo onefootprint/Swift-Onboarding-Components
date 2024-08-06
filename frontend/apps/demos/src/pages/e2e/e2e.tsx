@@ -3,7 +3,7 @@ import { FootprintButton } from '@onefootprint/footprint-react';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 const publicKeyEnv = process.env.NEXT_PUBLIC_E2E_TENANT_PK as string;

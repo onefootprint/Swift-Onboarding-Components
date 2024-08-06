@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { media } from '@onefootprint/ui';
 import Image from 'next/image';
 import styled, { css } from 'styled-components';

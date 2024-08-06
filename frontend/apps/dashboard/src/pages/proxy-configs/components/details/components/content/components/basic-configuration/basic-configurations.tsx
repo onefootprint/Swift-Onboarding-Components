@@ -1,5 +1,4 @@
 import type { ProxyConfigDetails } from '@onefootprint/types';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 

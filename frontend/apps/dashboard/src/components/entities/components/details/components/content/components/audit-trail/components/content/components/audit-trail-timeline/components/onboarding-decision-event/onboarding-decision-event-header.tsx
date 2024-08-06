@@ -3,7 +3,6 @@ import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { WorkflowKind } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import Actor from '../actor';

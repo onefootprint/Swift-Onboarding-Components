@@ -10,7 +10,6 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { BusinessAddressFormProps } from './business-address-form';
 import BusinessAddressForm from './business-address-form';

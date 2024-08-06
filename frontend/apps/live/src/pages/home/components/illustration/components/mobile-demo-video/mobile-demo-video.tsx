@@ -3,7 +3,7 @@ import { IcoCirclePlay24 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactPlayer from 'react-player';
 import styled, { css } from 'styled-components';
 

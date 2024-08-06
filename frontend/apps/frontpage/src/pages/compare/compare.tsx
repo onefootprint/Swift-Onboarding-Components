@@ -1,5 +1,4 @@
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Seo from 'src/components/seo';
 import CustomersLogos from './components/customers-logos';

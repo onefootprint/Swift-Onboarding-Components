@@ -1,5 +1,5 @@
 import { Box, Shimmer, Stack } from '@onefootprint/ui';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 
 const Loading = () => (
   <Box tag="section" testID="match-signal-loading">

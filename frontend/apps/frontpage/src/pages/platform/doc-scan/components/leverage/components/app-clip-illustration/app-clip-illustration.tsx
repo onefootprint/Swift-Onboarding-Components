@@ -1,8 +1,7 @@
 import { Stack } from '@onefootprint/ui';
 import { media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const AppClipIllustration = () => {
   return (

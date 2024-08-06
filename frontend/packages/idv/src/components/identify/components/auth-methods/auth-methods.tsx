@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react';
-import React from 'react';
 
 import AuthMethodsRouter from './components/router';
 import type { AuthMethodsMachineState } from './state';

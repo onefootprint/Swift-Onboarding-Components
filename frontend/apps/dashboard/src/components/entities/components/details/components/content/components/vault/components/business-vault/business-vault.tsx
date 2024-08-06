@@ -1,5 +1,4 @@
 import { Grid } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import useBusinessOwners from '@/entity/hooks/use-business-owners';

@@ -1,6 +1,6 @@
 import { IcoCheck24, IcoClose24, IcoCopy24, IcoInfo16, IcoPencil24 } from '@onefootprint/icons';
 import { Box, CopyButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import InlineButton from './components/inline-button';

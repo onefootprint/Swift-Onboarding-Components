@@ -1,6 +1,5 @@
 import type { RoleScope } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DecryptOptions from 'src/components/roles/roles-table/components/row/components/decrypt-options';
 import VaultProxyOptions from 'src/components/roles/roles-table/components/row/components/vault-proxy-options';

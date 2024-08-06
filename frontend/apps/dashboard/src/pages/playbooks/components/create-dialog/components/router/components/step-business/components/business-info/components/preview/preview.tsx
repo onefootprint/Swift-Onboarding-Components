@@ -1,5 +1,4 @@
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DataCollection from '../../../../../data-collection';
 import useBusinessValues from '../../../../hooks/use-business-values';

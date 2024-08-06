@@ -2,7 +2,6 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/footprint-react';
-import React from 'react';
 
 type DemoReactProps = {
   kind: 'auth' | 'verify';

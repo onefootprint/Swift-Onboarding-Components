@@ -1,5 +1,3 @@
-import React from 'react';
-
 import checkIsSocialMediaBrowser from '../../utils/check-is-social-media-browser';
 import { TransferMachineProvider } from './components/machine-provider.tsx';
 import Router from './pages/router';

@@ -1,6 +1,5 @@
 import type { RiskSignal } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

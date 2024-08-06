@@ -1,6 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import { CountryRestriction } from '@/playbooks/utils/machine/types';
 

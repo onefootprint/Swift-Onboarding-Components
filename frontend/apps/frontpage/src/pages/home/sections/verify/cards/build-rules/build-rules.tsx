@@ -1,6 +1,6 @@
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';

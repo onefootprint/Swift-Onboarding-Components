@@ -11,7 +11,6 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocOutcome, IdvBootstrapData, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useTimeout } from 'usehooks-ts';
 

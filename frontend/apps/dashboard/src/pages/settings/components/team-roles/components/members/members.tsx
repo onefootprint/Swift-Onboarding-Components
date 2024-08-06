@@ -1,5 +1,4 @@
 import { Box, Pagination, Portal } from '@onefootprint/ui';
-import React from 'react';
 
 import Invite from './components/invite';
 import MembersTable from './components/members-table';

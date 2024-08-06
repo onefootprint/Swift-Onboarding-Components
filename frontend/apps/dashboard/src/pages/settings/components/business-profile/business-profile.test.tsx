@@ -6,7 +6,6 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import BusinessProfile from './business-profile';

@@ -1,6 +1,5 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import * as DropdownPrimitive from '@radix-ui/react-dropdown-menu';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils';

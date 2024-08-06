@@ -11,7 +11,6 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse, PublicOnboardingConfig } from '@onefootprint/types';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
 const logContext = ({ meta }: GetD2PResponse) => {

@@ -1,7 +1,7 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Stack, Text, media } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useResizeObserver from 'use-resize-observer';

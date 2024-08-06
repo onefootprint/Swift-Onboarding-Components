@@ -1,6 +1,6 @@
 import { EntityKind } from '@onefootprint/types';
 import { Box, Divider } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import { createGlobalStyle, css } from 'styled-components';

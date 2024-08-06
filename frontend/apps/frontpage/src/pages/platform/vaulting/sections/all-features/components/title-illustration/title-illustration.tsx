@@ -1,4 +1,3 @@
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import IllustrationContainer from '../../../../components/illustration-section-title/container';

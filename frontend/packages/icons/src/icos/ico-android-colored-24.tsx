@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { IconProps } from '../types';
 
 const IcoAndroid24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (

@@ -1,6 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import type { Document } from '@onefootprint/types';
-import React from 'react';
 
 import ConfidenceScores from './confidence-scores';
 import documentFixture, {

@@ -1,6 +1,5 @@
 import type { ParentOrganization } from '@onefootprint/types/src/data/organization';
 import { CodeInline, Grid, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ParentProps = {

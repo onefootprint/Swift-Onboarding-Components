@@ -2,7 +2,7 @@ import { useRequestError } from '@onefootprint/request';
 import type { ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { Button, Text, media } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';

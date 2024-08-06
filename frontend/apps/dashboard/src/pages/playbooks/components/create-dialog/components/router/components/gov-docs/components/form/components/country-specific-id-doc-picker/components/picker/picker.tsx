@@ -5,7 +5,7 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoTrash16 } from '@onefootprint/icons';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { Button, CountrySelect, Divider, LinkButton, Stack } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

@@ -1,5 +1,4 @@
 import { IdDocImageTypes } from '@onefootprint/types';
-import React from 'react';
 
 import type { CaptureKind } from '../../../types';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';

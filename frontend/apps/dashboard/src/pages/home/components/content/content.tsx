@@ -1,8 +1,7 @@
 import { IcoStore24, IcoUsers24 } from '@onefootprint/icons';
 import { OrgMetricsResponse } from '@onefootprint/types/src/data';
-import { Box, Stack } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Section from './components/section';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ErrorComponent } from 'src/components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';

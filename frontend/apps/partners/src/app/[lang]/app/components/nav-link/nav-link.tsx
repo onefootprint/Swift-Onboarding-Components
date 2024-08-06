@@ -2,7 +2,7 @@ import type { Icon } from '@onefootprint/icons';
 import { Stack, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import type { Ref } from 'react';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 const BADGE_MAX_COUNT = 99;

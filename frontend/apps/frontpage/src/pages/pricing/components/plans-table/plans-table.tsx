@@ -1,5 +1,5 @@
 import { Stack, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import ContactDialog from '../../../../components/contact-dialog';

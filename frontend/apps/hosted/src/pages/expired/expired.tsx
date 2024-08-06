@@ -1,7 +1,6 @@
 import { HeaderTitle } from '@onefootprint/idv';
 import { HostedUrlType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled, { css } from 'styled-components';

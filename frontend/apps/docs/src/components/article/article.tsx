@@ -1,7 +1,6 @@
 import { createFontStyles } from '@onefootprint/ui';
 import type { MarkdownToJSX } from 'markdown-to-jsx';
 import Markdown from 'markdown-to-jsx';
-import React from 'react';
 import SEO from 'src/components/seo';
 import styled, { css } from 'styled-components';
 

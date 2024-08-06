@@ -1,6 +1,5 @@
 import { IcoSparkles40 } from '@onefootprint/icons';
 import { Container, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Logos from './logos';

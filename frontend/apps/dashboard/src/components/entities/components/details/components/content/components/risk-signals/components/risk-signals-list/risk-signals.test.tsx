@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import React from 'react';
 
 import RiskSignalsList from '.';
 import { withRiskSignals, withRiskSignalsError } from './risk-signals.test.config';

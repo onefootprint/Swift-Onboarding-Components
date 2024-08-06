@@ -9,7 +9,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import type { TimelineEvent } from '@onefootprint/types';
-import React from 'react';
 import { withEntity } from 'src/components/entities/components/details/details.test.config';
 import { asAdminUser } from 'src/config/tests';
 

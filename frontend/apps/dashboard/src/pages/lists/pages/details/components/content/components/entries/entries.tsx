@@ -2,7 +2,7 @@ import { type ListEntry, RoleScopeKind } from '@onefootprint/types';
 import { LinkButton, SearchInput, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorComponent } from 'src/components';
 import PermissionGate from 'src/components/permission-gate';

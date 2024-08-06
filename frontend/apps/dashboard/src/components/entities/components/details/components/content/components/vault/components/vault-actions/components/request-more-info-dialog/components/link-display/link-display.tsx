@@ -1,7 +1,6 @@
 import { IcoClock16 } from '@onefootprint/icons';
 import type { TriggerResponse } from '@onefootprint/types';
 import { Shimmer, Stack, Text, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type LinkDisplayProps = {

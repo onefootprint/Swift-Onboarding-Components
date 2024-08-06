@@ -1,6 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import React from 'react';
 
 import type { ExtractedDocumentDataProps } from './extracted-document-data';
 import ExtractedDocumentData from './extracted-document-data';

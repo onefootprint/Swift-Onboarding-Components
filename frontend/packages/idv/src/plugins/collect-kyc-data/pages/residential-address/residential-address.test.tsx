@@ -8,7 +8,6 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
-import React from 'react';
 
 import type { KycData } from '../../utils/data-types';
 import type { InitMachineArgs } from '../../utils/state-machine/machine';

@@ -1,5 +1,5 @@
 import { Form, TextArea, TextInput } from '@onefootprint/ui';
-import React, { useId } from 'react';
+import { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

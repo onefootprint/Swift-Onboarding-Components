@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 
 type SeoProps = {
   description?: string;

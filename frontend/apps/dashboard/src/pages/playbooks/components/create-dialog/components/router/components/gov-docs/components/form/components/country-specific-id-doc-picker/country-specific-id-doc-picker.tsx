@@ -4,7 +4,7 @@ import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

@@ -2,7 +2,7 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CodeInline, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css, useTheme } from 'styled-components';

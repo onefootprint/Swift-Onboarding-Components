@@ -1,6 +1,5 @@
 import { IcoWarning24 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const ErrorComponent = () => {

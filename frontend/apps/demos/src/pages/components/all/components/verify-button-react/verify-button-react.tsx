@@ -1,5 +1,4 @@
 import { FootprintButton } from '@onefootprint/footprint-react';
-import React from 'react';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 

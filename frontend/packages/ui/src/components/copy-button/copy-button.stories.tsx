@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 import styled from 'styled-components';
 
 import type { CopyButtonProps } from './copy-button';

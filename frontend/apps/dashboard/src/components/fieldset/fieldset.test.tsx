@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { FieldsetProps } from './fieldset';
 import Fieldset from './fieldset';

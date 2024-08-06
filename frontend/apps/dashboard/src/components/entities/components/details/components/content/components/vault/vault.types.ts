@@ -1,12 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import type {
-  DataIdentifier,
-  Entity,
-  SupportedIdDocTypes,
-  VaultEmptyData,
-  VaultEncryptedData,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, Entity, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
 
 /**
  * For legacy reasons, decryption controls expect fields to be registered as just the DI.

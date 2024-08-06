@@ -1,7 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

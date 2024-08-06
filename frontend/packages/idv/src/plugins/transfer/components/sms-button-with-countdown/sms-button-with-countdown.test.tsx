@@ -1,7 +1,6 @@
 import '../../../../config/initializers/i18next-test';
 
 import { customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { SmsButtonWithCountdownProps } from './sms-button-with-countdown';
 import SmsButtonWithCountdown from './sms-button-with-countdown';

@@ -1,5 +1,4 @@
 import { AnimatedLoadingSpinner, Drawer, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 import useTenant from '../../hooks/use-tenant';
 import Content from './components/content';

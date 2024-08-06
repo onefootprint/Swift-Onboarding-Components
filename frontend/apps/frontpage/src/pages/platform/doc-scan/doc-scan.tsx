@@ -1,5 +1,3 @@
-import React from 'react';
-
 import SEO from 'src/components/seo';
 
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,5 @@
 import Script from 'next/script';
 import type { ComponentProps } from 'react';
-import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import { L10nContextProvider } from './components/l10n-provider';

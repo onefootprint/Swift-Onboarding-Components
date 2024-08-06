@@ -11,7 +11,7 @@ import {
   TextInput,
   createFontStyles,
 } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';

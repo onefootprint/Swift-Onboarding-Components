@@ -3,7 +3,7 @@ import { IcoArrowUpRight16, IcoLightBulb16 } from '@onefootprint/icons';
 import { type OnboardingConfig } from '@onefootprint/types';
 import { Box, Stack, Text, Toggle, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

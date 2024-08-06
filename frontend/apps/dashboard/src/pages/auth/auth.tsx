@@ -3,7 +3,6 @@ import { OrgAuthLoginTarget } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import useSession from 'src/hooks/use-session';

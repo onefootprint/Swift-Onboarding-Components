@@ -1,6 +1,6 @@
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Drawer, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

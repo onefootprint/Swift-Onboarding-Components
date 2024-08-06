@@ -1,6 +1,5 @@
 import { Box } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { ErrorComponent } from 'src/components';
 
 import Content from './components/content';

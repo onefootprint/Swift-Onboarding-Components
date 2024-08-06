@@ -1,5 +1,4 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import ErrorComponent from './error';
 

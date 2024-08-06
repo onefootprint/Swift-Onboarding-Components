@@ -1,5 +1,4 @@
 import { Box, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Box testID="members-roles-loading" width="100%">

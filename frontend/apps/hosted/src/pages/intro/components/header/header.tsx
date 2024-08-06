@@ -1,6 +1,5 @@
 import { HeaderTitle } from '@onefootprint/idv';
 import { Avatar } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import useIsKyb from 'src/pages/intro/utils/is-kyb';

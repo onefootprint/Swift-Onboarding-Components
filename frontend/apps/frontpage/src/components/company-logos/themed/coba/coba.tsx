@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Logo } from '../logo.type';
 
 const CobaLogo = ({ color }: Logo) => (

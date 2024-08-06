@@ -2,7 +2,7 @@ import { IcoCheck24 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import Rive from '@rive-app/react-canvas';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';

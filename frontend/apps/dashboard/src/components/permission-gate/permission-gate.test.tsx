@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { RoleScopeKind } from '@onefootprint/types';
-import React from 'react';
 import { asUserWithScope } from 'src/config/tests';
 
 import PermissionGate from './permission-gate';

@@ -9,7 +9,6 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
 
 import type { FormBaseProps } from './form-base';

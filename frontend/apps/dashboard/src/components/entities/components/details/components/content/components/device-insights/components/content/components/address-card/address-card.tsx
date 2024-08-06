@@ -1,6 +1,5 @@
 import type { Entity } from '@onefootprint/types';
 import { AnimatedLoadingSpinner, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 

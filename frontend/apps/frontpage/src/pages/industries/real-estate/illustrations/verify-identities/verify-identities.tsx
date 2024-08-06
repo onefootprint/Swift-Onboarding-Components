@@ -1,6 +1,5 @@
 import { Box, Text } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const memojis = ['memoji-1', 'memoji-2', 'memoji-3', 'memoji-4', 'memoji-5'];

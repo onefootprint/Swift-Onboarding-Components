@@ -1,7 +1,6 @@
 import themes from '@onefootprint/design-tokens';
 import { IcoChevronDown16, icos } from '@onefootprint/icons';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
-import React from 'react';
 
 import Box from '../box';
 import Stack from '../stack';

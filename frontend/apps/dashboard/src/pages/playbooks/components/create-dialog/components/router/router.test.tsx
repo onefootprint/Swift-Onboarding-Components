@@ -1,9 +1,8 @@
 import { customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { RouterProps } from './router';
 import Router from './router';
-import { createPlaybook, enterName, moveBack, moveForward, withCreateOnboardingConfigs } from './router.test.config';
+import { createPlaybook, moveBack, moveForward, withCreateOnboardingConfigs } from './router.test.config';
 
 const renderRouter = (
   { onCreate }: RouterProps = {

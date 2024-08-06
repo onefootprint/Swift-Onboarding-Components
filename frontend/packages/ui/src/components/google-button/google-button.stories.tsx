@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { GoogleButtonProps } from './google-button';
 import GoogleButton from './google-button';

@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { OnboardingConfig } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 
 import Header from './header';

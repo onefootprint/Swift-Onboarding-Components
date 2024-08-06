@@ -1,7 +1,7 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { Logger } from '@onefootprint/idv';
 import type { GetServerSideProps } from 'next';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Content from './components/content';

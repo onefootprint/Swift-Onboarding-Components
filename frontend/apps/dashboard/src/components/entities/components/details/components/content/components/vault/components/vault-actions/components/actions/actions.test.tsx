@@ -10,7 +10,6 @@ import {
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
-import React from 'react';
 import {
   withFrequentNotes,
   withPlaybooks,

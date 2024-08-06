@@ -1,7 +1,6 @@
 import type { FontVariant, UIState } from '@onefootprint/design-tokens';
 import { BacktestingRuleAction } from '@onefootprint/types';
 import { Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

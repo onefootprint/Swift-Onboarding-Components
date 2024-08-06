@@ -1,6 +1,5 @@
 import { IcoRepeat40, IcoWarning16 } from '@onefootprint/icons';
 import { Box, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 

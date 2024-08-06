@@ -1,6 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import type { TFunction } from 'i18next';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { checkIsPhoneValid } from '../../../../utils';

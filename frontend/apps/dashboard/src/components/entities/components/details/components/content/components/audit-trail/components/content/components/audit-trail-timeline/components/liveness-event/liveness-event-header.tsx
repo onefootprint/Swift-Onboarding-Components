@@ -1,7 +1,6 @@
 import type { LivenessEventData } from '@onefootprint/types';
 import { LivenessSource } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type LivenessEventHeaderProps = {

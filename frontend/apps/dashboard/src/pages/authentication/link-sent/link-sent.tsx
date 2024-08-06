@@ -2,7 +2,6 @@ import { ThemedLogoFpCompact } from '@onefootprint/icons';
 import { Box, Stack, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

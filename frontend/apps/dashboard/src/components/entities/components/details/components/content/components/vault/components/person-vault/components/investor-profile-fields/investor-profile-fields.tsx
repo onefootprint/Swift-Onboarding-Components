@@ -1,6 +1,5 @@
 import { DocumentDI, InvestorProfileDI, isVaultDataEmpty } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import createStringList, { createCapitalStringList } from 'src/utils/create-string-list';

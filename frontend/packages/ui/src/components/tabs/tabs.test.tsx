@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { TabsProps } from './tabs';
 import Tabs from './tabs';

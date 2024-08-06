@@ -1,7 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoClose24 } from '@onefootprint/icons';
 import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderCloseButtonProps } from '../../types';

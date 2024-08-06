@@ -1,5 +1,4 @@
 import { Container, media } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import AppClip from '../sections/app-clip';

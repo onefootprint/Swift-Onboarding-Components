@@ -4,7 +4,7 @@ import { Dropdown, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

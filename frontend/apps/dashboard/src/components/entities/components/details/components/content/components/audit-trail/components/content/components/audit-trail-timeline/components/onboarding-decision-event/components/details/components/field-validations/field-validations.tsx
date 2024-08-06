@@ -1,5 +1,4 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';

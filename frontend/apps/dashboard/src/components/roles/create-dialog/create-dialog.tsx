@@ -1,6 +1,5 @@
 import type { CreateRoleRequest, RoleKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Form from './components/form';

@@ -1,7 +1,7 @@
 import { IcoForbid40 } from '@onefootprint/icons';
 import type { AuthEvent, Entity } from '@onefootprint/types';
 import { Divider, MultiSelect, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

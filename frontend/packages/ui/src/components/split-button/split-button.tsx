@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import { forwardRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ButtonSize, ButtonVariant } from '../button/button.types';

@@ -1,5 +1,4 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 
 type ErrorProps = {
   message: string;

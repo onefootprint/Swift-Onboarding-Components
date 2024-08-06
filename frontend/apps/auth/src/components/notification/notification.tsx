@@ -1,7 +1,6 @@
 import { IcoCheckCircle40, IcoWarning40 } from '@onefootprint/icons';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 type Variant = 'success' | 'error';

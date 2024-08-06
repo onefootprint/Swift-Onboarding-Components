@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { DEMO_FORM_AUTH_TOKEN } from '../../../../../config/constants';

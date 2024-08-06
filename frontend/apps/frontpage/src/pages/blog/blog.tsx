@@ -1,7 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
-import { Button, Container, Divider, createFontStyles, media } from '@onefootprint/ui';
+import { Container, Divider, createFontStyles, media } from '@onefootprint/ui';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';

@@ -1,6 +1,6 @@
 import * as RadixTabs from '@radix-ui/react-tabs';
 import { motion } from 'framer-motion';
-import React, { useId, useState } from 'react';
+import { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';

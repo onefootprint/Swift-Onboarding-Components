@@ -1,5 +1,3 @@
-import React from 'react';
-
 import SvgSafeAndPenguin from '../../../components/svg/svg-safe-penguin';
 
 const UserDonePage = () => (

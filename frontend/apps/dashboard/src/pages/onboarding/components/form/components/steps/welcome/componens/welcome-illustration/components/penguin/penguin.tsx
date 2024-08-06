@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Penguin = ({ bodyColorCenter = '#fff', bodyColorOutLine = '#000', accentColor = '#CFBFFE' }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={305} height={205} fill="none">
     <path

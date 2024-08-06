@@ -1,12 +1,9 @@
 import { Button, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { DECRYPT_VAULT_FORM_ID } from '@/entity/constants';
-
-import { DataIdentifier } from '@onefootprint/types';
 import { useDecryptControls } from '../../../vault/components/vault-actions';
 import ReasonDialog from '../../../vault/components/vault-actions/components/reason-dialog';
 

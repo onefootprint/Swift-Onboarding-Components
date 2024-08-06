@@ -1,5 +1,5 @@
 import { Box } from '@onefootprint/ui';
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LAYOUT_CONTAINER_ID } from '../../constants';

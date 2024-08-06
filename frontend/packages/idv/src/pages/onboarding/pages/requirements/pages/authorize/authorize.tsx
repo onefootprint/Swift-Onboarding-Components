@@ -7,7 +7,6 @@ import type {
 } from '@onefootprint/types';
 import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

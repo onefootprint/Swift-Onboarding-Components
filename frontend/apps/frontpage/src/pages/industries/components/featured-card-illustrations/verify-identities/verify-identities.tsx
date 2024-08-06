@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoBuilding16, IcoCake16, IcoCar16, IcoFileText16, IcoPhone16, IcoUserCircle16 } from '@onefootprint/icons';
 import { Box, Stack, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type ChipProps = {

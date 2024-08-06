@@ -1,6 +1,5 @@
 import { RoleKind } from '@onefootprint/types';
 import { Dialog, Grid, Select, TextInput, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles/use-roles';

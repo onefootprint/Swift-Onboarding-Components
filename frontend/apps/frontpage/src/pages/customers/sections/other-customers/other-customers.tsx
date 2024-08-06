@@ -1,5 +1,4 @@
 import { Container, Text, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApitureLogo, ComposerLogo, FindigsLogo, GridLogo, YieldStreet } from 'src/components/company-logos/themed';
 import TreasuryPrimeLogo from 'src/components/company-logos/themed/treasury-prime';

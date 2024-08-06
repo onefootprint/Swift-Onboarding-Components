@@ -1,7 +1,6 @@
 import '../../../../config/initializers/i18next-test';
 
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { HeaderTitleProps } from './header-title';
 import HeaderTitle from './header-title';

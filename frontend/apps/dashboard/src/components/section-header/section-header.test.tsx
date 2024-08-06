@@ -1,5 +1,4 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { SectionHeaderProps } from './section-header';
 import SectionHeader from './section-header';

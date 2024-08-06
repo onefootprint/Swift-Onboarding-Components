@@ -1,12 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  clickOnContinue,
-  clickOnVerifyWithSms,
-  selectOutcomeOptional,
-  verifyAppIframeClick,
-  verifyPhoneNumber,
-} from './utils/commands';
+import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_ID_PHONE_EMAIL || 'pb_test_s1295ljZR1lZ0ZZr42iDzO';

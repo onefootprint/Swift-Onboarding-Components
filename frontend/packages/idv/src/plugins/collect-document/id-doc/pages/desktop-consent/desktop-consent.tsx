@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { Button } from '@onefootprint/ui';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

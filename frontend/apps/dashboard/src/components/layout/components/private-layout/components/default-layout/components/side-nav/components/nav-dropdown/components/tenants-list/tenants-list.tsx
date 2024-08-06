@@ -1,6 +1,6 @@
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, LinkButton } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import TenantItem from './components/tenant-item';

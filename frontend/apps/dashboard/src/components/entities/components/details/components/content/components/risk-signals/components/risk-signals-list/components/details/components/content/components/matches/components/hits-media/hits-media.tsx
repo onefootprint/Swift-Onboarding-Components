@@ -3,7 +3,7 @@ import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import type { AmlHitMedia } from '@onefootprint/types';
 import { LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';

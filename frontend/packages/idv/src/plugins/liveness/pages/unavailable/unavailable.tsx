@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';

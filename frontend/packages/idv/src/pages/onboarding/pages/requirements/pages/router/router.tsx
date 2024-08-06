@@ -1,6 +1,6 @@
 import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
 import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { useLogStateMachine } from '../../../../../../hooks';
 import {

@@ -1,6 +1,5 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type NavigationHeaderTitleProps = {

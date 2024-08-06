@@ -1,7 +1,6 @@
 import { BusinessDetail, BusinessDetails } from '@onefootprint/types';
 import { Badge, Stack } from '@onefootprint/ui';
 import isNull from 'lodash/isNull';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useOtherDetailText from '../../hooks/use-other-detail-text';
 import LineItem from '../line-item';

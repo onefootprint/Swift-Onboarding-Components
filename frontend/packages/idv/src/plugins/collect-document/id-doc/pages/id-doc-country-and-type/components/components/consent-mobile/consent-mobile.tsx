@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import { useIdvRequestErrorToast } from '../../../../../../../../hooks';
 import { Logger } from '../../../../../../../../utils/logger';

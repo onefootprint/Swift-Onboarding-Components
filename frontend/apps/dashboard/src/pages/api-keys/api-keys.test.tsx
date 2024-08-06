@@ -7,7 +7,6 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import ApiKeys from './api-keys';

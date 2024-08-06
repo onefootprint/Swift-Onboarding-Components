@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ImgProcessorsContextProvider } from '../components/image-processors';
 import { MissingPermissionsSheetProvider } from '../components/missing-permissions-sheet';
 import { MachineProvider } from './components/machine-provider';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Logo } from '../logo.type';
 
 const Fractional = ({ color }: Logo) => (

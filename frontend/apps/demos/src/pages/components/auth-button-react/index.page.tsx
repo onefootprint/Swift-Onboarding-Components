@@ -1,7 +1,6 @@
 import { FootprintButton } from '@onefootprint/footprint-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type RouterReturn = ReturnType<typeof useRouter>;

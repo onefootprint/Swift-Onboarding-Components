@@ -2,7 +2,6 @@ import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { SelectOption } from '@onefootprint/ui';
 import { Dialog, Grid, LinkButton, Select, Stack, Text, TextInput } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React from 'react';
 import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

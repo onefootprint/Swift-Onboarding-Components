@@ -1,5 +1,4 @@
 import { Grid, Stack, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import AdditionalDocumentsCard from './cards/additional-documents-card';

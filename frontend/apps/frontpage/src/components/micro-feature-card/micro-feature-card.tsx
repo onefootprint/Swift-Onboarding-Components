@@ -1,7 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import { createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type MicroFeatureCardProps = {

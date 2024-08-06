@@ -4,7 +4,6 @@ import themes from '@onefootprint/design-tokens';
 import { createUseRouterSpy, render, screen, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
 import type { ProviderReturn } from 'src/components/footprint-provider';
 import FootprintProvider from 'src/components/footprint-provider';
 

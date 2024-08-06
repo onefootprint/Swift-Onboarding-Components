@@ -1,5 +1,4 @@
 import { Dialog } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import UploadDocForm from './components/upload-doc-form';

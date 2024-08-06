@@ -1,6 +1,5 @@
 import { IcoTrash24 } from '@onefootprint/icons';
 import { CountrySelect, IconButton } from '@onefootprint/ui';
-import React from 'react';
 import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

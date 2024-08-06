@@ -1,6 +1,6 @@
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import Breadcrumb from './components/breadcrumb';
 import Header from './components/header';

@@ -2,7 +2,6 @@ import { IS_CI, IS_E2E, IS_PROD, IS_SERVER, IS_TEST } from '@onefootprint/global
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import Script from 'next/script';
-import React from 'react';
 
 import { Logger } from '../../utils/logger';
 import nid from '../../utils/neuro-id';

@@ -1,6 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import { IdDI, SessionStatus } from '@onefootprint/types';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import GenericErrorPage from '../../../src/components/gerenic-error-page/generic-error-page';

@@ -1,7 +1,7 @@
 import { Fp } from '@onefootprint/footprint-react';
 import { Grid, Stack, Stepper } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import ContentLayout from './components/content-layout';
 import Header from './components/header';

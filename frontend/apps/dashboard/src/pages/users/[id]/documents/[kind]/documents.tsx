@@ -1,6 +1,5 @@
 import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import NotFound from 'src/components/404';
 

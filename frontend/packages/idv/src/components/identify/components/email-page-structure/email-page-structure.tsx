@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react';
-import React from 'react';
 
 import EmailForm from '../../../email-form';
 import type { HeaderProps } from '../../types';

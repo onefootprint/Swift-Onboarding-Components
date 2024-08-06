@@ -1,6 +1,5 @@
 import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { RoleScopeKind } from '@onefootprint/types';
-import React from 'react';
 import {
   asAdminUserFirmEmployee,
   asAdminUserInLive,

@@ -1,5 +1,4 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import React from 'react';
 
 import type { PillProps } from '../pill';
 import Pill from '../pill';

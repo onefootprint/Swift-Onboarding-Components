@@ -1,5 +1,3 @@
-import React from 'react';
-
 const BirdIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="60" height="48" viewBox="0 0 60 48" fill="none">
     <path

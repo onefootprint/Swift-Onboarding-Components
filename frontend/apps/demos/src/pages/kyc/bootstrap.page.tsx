@@ -1,7 +1,6 @@
 import footprint from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const publicKey = process.env.NEXT_PUBLIC_KYC_KEY as string;

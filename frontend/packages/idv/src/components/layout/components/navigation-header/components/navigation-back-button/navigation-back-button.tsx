@@ -1,7 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type NavigationBackButtonProps = {

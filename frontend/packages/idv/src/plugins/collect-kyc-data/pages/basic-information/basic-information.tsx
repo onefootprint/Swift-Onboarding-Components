@@ -1,6 +1,5 @@
 import { CollectedKycDataOption, IdDI, isCountryCode } from '@onefootprint/types';
 import { Grid, Stack } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

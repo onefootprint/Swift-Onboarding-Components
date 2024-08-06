@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { BreadcrumbProps } from './breadcrumb';
 import Breadcrumb from './breadcrumb';

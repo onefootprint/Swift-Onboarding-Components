@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { PinnedNoteProps } from './pinned-note';
 import PinnedNote from './pinned-note';

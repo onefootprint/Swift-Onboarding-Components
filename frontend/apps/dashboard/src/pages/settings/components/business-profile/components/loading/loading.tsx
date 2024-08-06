@@ -1,5 +1,4 @@
 import { Box, Grid, Shimmer } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Box testID="business-profile-loading">

@@ -1,6 +1,5 @@
 import { RoleKind } from '@onefootprint/types';
 import { Box, Pagination } from '@onefootprint/ui';
-import React from 'react';
 import useRoles from 'src/components/roles/hooks/use-roles';
 import RolesTable from 'src/components/roles/roles-table';
 

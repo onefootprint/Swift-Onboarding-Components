@@ -2,7 +2,7 @@ import { primitives } from '@onefootprint/design-tokens';
 import { IcoCheckSmall16, IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import { Button, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';

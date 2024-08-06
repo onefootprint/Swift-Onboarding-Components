@@ -13,7 +13,6 @@ import {
   IcoUser16,
   IcoUser24,
 } from '@onefootprint/icons';
-import React from 'react';
 import UAParser from 'ua-parser-js';
 
 const isBot = (userAgent: UAParser.IResult) => userAgent.ua?.toLowerCase().includes('python');

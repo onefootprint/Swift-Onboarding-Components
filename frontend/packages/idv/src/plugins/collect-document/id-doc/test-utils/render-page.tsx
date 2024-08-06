@@ -2,7 +2,6 @@ import '../../../../config/initializers/i18next-test';
 
 import { Wrapper, render } from '@onefootprint/test-utils';
 import type { ReactNode } from 'react';
-import React from 'react';
 
 import { Layout } from '../../../../components';
 import { MissingPermissionsSheetProvider } from '../../components/missing-permissions-sheet';

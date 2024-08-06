@@ -1,5 +1,4 @@
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 type HeaderProps = {
   title: string;

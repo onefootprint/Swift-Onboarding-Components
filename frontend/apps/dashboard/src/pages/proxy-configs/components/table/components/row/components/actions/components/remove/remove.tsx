@@ -1,6 +1,6 @@
 import type { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 import styled from 'styled-components';

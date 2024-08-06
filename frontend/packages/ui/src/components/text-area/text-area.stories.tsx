@@ -1,5 +1,5 @@
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import type { TextAreaProps } from './text-area';
 import TextArea from './text-area';

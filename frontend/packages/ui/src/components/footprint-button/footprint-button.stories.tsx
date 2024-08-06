@@ -1,6 +1,5 @@
 /* eslint-disable no-alert */
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { FootprintButtonProps } from './footprint-button';
 import FootprintButton from './footprint-button';

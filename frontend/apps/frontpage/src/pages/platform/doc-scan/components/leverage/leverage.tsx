@@ -7,7 +7,6 @@ import {
   IcoUserCircle16,
 } from '@onefootprint/icons';
 import { Box, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import AppClipIllustration from './components/app-clip-illustration';

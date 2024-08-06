@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import Passkeys from './passkeys';
 import {
   playbookWithPasskeysFixture,

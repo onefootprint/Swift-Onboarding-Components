@@ -1,5 +1,4 @@
 import { Stack, Text, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';

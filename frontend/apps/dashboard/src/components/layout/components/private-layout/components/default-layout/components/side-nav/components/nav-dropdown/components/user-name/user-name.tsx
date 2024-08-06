@@ -1,6 +1,5 @@
-import { Stack, Text } from '@onefootprint/ui';
+import { Text } from '@onefootprint/ui';
 import { Dropdown } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type UserNameProps = {

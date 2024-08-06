@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 import Router from './components/router';
 import SandboxFooter from './components/sandbox-footer';
 import { IdentifyMachineProvider } from './state';

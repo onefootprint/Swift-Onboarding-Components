@@ -1,5 +1,4 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { FieldTagListProps } from './field-tag-list';
 import FieldTagList from './field-tag-list';

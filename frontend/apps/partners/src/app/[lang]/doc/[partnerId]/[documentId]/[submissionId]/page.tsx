@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { LangProp } from '@/app/types';
 import { getPartnerPartnershipsDocuments, getPartnerPartnershipsSubmissions } from '@/queries';
 

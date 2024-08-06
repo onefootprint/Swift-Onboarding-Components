@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Stack, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import ContactDialog from '../contact-dialog';

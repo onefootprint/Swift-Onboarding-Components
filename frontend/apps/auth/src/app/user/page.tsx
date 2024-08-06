@@ -1,6 +1,5 @@
 import getCustomAppearance from '@onefootprint/appearance/src/utils/get-custom-appearance/get-custom-appearance'; /** Importing 'getCustomAppearance' from '@onefootprint/appearance' fails in server components */
 import dynamic from 'next/dynamic';
-import React from 'react';
 
 import ClientProviders from '../client-providers';
 import Loading from './loading';

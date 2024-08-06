@@ -2,7 +2,6 @@ import type { BusinessOwner, Entity } from '@onefootprint/types';
 import { BusinessDI, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';

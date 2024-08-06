@@ -1,5 +1,4 @@
 import * as Select from '@radix-ui/react-select';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Label from '../label';

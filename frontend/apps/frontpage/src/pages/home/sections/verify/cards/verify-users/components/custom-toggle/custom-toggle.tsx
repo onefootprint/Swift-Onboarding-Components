@@ -2,7 +2,6 @@ import type { Icon } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

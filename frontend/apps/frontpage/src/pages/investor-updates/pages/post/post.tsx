@@ -2,7 +2,6 @@ import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import { Box, Container, LinkButton, Stack, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PostContent from 'src/components/post-content';
 import WritingLayout from 'src/components/writing-layout';

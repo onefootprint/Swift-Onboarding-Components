@@ -2,7 +2,6 @@ import type { Color } from '@onefootprint/design-tokens';
 import { MatchLevel } from '@onefootprint/types/src/data/match-signal';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

@@ -1,6 +1,5 @@
 import { IcoForbid40 } from '@onefootprint/icons';
 import { IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Logger } from '../../../../utils/logger';

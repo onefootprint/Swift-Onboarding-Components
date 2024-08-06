@@ -1,5 +1,4 @@
 import { Shimmer, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import QRCode from 'react-qr-code';
 import { css, styled } from 'styled-components';
 

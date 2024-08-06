@@ -1,7 +1,7 @@
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Overlay, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 import styled, { css } from 'styled-components';

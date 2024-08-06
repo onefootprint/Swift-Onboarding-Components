@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Button from '../button';
 import type { TooltipProps } from './tooltip';

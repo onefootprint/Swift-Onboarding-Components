@@ -1,6 +1,5 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Divider, Stack, Table, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useGetPreviewInvoice, { InvoiceItem } from './hooks/use-get-preview-invoice';

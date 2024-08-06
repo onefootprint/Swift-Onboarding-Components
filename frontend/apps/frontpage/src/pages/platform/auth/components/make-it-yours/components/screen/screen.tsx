@@ -1,5 +1,4 @@
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import BifrostModals from '../desktop-banner/components/bifrost-modals';

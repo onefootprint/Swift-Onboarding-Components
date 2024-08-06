@@ -1,5 +1,5 @@
 import type { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import ManualReviewDialog from './components/manual-review-dialog';
 import ManualReviewTrigger from './components/manual-review-trigger';

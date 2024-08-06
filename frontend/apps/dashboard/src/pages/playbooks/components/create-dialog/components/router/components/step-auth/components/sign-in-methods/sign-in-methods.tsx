@@ -1,6 +1,5 @@
 import { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Box, Checkbox, InlineAlert, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

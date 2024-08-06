@@ -1,5 +1,4 @@
 import { Box, Divider, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Box tag="section" testID="entity-loading" paddingTop={7}>

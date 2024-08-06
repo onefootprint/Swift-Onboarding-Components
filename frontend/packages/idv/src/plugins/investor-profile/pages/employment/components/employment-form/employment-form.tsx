@@ -1,7 +1,6 @@
 import { InvestorProfileDI } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Select, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

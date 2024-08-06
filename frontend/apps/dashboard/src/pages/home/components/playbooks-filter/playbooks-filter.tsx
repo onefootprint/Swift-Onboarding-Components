@@ -1,5 +1,4 @@
 import { SelectNew, Shimmer } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ALL_PLAYBOOKS_ID from '../../constants';

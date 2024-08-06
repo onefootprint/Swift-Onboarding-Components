@@ -1,5 +1,4 @@
 import { screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import DesktopFrontPhoto from '.';
 import renderPage from '../../test-utils/render-page';

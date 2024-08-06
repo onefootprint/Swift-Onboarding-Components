@@ -4,7 +4,7 @@ import { Button, Container, Divider, PhoneInput, Text, TextInput, createFontStyl
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 

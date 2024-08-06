@@ -1,5 +1,4 @@
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import A from 'src/components/article/components/markdown-components/a';
 import styled, { css } from 'styled-components';
 

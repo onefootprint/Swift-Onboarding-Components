@@ -1,6 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Divider } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';

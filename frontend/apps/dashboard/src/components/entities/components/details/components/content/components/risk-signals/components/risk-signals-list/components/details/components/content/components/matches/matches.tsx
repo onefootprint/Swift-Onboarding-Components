@@ -1,7 +1,6 @@
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
 import { CopyButton, LinkButton, Stack, Text, createFontStyles, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

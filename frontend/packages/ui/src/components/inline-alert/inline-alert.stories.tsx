@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import LinkButton from '../link-button';
 import type { InlineAlertProps } from './inline-alert';

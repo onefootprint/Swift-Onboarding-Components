@@ -7,7 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
 import partition from 'lodash/partition';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import { MAIN_PAGE_ID } from 'src/config/constants';

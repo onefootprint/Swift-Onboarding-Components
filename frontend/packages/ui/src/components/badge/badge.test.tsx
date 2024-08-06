@@ -3,7 +3,6 @@ import '../../config/initializers/i18next-test';
 import type { UIState } from '@onefootprint/design-tokens';
 import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { BadgeProps } from './badge';
 import Badge from './badge';

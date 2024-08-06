@@ -1,5 +1,4 @@
 import { RoleKind } from '@onefootprint/types';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useOrg from 'src/hooks/use-org';
 import useRoles from 'src/hooks/use-roles';

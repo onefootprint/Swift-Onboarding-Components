@@ -1,6 +1,4 @@
-import { Elevation } from '@onefootprint/design-tokens';
 import Image from 'next/image';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type Position = {

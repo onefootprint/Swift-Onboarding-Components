@@ -1,5 +1,4 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 

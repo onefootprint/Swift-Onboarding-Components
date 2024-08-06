@@ -1,9 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
-import { Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useTimeout } from 'usehooks-ts';
 
 import {
   firstIconVariantTransition,

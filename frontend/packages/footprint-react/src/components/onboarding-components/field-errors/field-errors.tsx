@@ -2,7 +2,7 @@
 import cx from 'classnames';
 import get from 'lodash/get';
 import type { HTMLAttributes } from 'react';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { useFormContext } from 'react-hook-form';
 import fieldContext from '../field-context';

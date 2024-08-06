@@ -1,6 +1,5 @@
 import type { UIStates } from '@onefootprint/design-tokens';
 import { Text } from '@onefootprint/ui';
-import React, { Fragment } from 'react';
 import styled from 'styled-components';
 
 type ConfidenceScoreProps = {

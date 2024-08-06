@@ -1,6 +1,5 @@
 import { Entity } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import Tag from './components/tag';
 
 type TagsProps = {

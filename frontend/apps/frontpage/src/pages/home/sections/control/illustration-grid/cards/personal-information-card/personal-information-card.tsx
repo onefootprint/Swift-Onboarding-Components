@@ -1,6 +1,6 @@
 import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardAppearContent from '../../components/card-appear-content';

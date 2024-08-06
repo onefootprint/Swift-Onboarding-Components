@@ -3,7 +3,6 @@ import { WhatsThisContent } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IconButton, Stack, createFontStyles } from '@onefootprint/ui';
 import * as Popover from '@radix-ui/react-popover';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

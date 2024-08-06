@@ -1,6 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
 import type { ComponentMeta, Story } from '@storybook/react';
-import React from 'react';
 
 import Box from './box';
 import type { BoxProps } from './box.types';

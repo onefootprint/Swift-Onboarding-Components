@@ -1,6 +1,6 @@
 import { IcoUserCircle16 } from '@onefootprint/icons';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import HitItemRow from './components/hit-item-row';

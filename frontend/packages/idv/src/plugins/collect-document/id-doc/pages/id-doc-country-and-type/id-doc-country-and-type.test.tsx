@@ -3,7 +3,6 @@ import { fireEvent, screen, selectEvents, userEvent, waitFor } from '@onefootpri
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import noop from 'lodash/noop';
-import React from 'react';
 import { act } from 'react-dom/test-utils';
 
 import renderPage from '../../test-utils/render-page';

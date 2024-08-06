@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { CardHeaderProps } from './card-header';
 import { CardHeader } from './card-header';

@@ -1,6 +1,6 @@
 import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { ConfigRequestFailureReason } from '../../../src/utils/state-machine/types';
 import { InitShimmer } from '../../components';

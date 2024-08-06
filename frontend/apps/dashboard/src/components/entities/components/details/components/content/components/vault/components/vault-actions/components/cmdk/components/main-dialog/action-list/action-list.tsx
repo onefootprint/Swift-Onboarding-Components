@@ -1,6 +1,5 @@
 import { createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

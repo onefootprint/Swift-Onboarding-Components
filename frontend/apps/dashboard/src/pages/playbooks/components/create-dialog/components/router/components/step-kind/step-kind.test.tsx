@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUserWithOrg } from 'src/config/tests';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';

@@ -3,7 +3,7 @@ import type { DataIdentifier, ListKind } from '@onefootprint/types';
 import { createFontStyles, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { matchSorter } from 'match-sorter';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

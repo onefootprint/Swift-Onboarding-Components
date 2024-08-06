@@ -2,9 +2,7 @@ import { AppearanceProvider } from '@onefootprint/appearance';
 import { FootprintProvider, configureFootprint } from '@onefootprint/idv';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
-import React, { Fragment } from 'react';
-
-import { Box } from '@onefootprint/ui';
+import React from 'react';
 
 import configureI18n from '../../config/initializers/i18next';
 import queryClient from '../../config/initializers/react-query';

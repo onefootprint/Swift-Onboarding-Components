@@ -1,7 +1,6 @@
 import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import type { Tenant } from '@onefootprint/types';
 import { CodeInline, LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import Actions from './components/actions/actions';
 
 type TenantProps = {

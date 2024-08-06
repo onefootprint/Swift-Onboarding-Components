@@ -1,6 +1,5 @@
 import { IcoFootprint40 } from '@onefootprint/icons';
 import { useTheme } from 'next-themes';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Background from './components/background';

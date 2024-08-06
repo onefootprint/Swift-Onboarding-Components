@@ -1,6 +1,5 @@
 import { IS_SERVER } from '@onefootprint/global-constants';
 import Script from 'next/script';
-import React from 'react';
 
 import { Logger } from '../../../../utils/logger';
 import useTelemetryRequest from './hooks/use-send-telemetry';

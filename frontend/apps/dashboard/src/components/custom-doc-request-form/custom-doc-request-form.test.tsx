@@ -1,7 +1,6 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { CustomDI } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import CustomDocRequestForm from '.';

@@ -1,7 +1,6 @@
 import { IcoUser16, IcoWriting16, IcoWww16 } from '@onefootprint/icons';
 import { Box } from '@onefootprint/ui';
 import groupBy from 'lodash/groupBy';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useEntityOtherInsights from '@/entity/hooks/use-current-entity-other-insights';

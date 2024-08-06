@@ -1,6 +1,5 @@
 import { Dialog } from '@onefootprint/ui';
 import noop from 'lodash/noop';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useDecryptControls from '../../hooks/use-decrypt-controls';

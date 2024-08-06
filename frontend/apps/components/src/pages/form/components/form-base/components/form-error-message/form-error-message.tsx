@@ -1,6 +1,5 @@
 import { IcoWarning16 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type FormErrorMessageProps = {

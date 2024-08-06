@@ -2,7 +2,6 @@ import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import fakeSdk from '../../../helpers/fake-sdk';

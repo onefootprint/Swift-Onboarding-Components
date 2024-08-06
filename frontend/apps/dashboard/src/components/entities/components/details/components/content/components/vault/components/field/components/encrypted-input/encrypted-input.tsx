@@ -1,5 +1,4 @@
 import { TextInput, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const EncryptedInput = () => {

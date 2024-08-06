@@ -1,7 +1,7 @@
 import { useCountdown } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Button, Stack, Text, useToast } from '@onefootprint/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 

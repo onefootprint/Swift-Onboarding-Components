@@ -2,7 +2,6 @@ import '../../../../../../config/initializers/i18next-test';
 
 import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import { InvestorProfileDI } from '@onefootprint/types';
-import React from 'react';
 
 import type { EmploymentFormProps } from './employment-form';
 import EmploymentForm from './employment-form';

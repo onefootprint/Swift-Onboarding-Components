@@ -1,6 +1,5 @@
 import { Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import type { Article } from '../../media.types';

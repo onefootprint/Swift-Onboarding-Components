@@ -2,7 +2,6 @@ import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Dropdown, createOverlayBackground } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

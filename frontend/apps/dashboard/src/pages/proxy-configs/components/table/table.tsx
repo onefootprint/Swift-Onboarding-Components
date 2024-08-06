@@ -1,6 +1,5 @@
 import type { ProxyConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useFilters from '../../hooks/use-filters';

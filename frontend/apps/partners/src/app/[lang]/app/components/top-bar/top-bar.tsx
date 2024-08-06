@@ -1,7 +1,6 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
 import { Box, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_PRIVATE_ROUTE } from '@/config/constants';

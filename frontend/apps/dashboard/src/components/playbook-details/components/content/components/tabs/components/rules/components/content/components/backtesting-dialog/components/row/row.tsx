@@ -1,6 +1,5 @@
 import { type BacktestedOnboarding, BacktestingRuleAction, type EntityStatus } from '@onefootprint/types';
 import { Badge, CodeInline } from '@onefootprint/ui';
-import React from 'react';
 import { StatusBadge } from 'src/components';
 
 import getActionText from '../../utils/get-action-text';

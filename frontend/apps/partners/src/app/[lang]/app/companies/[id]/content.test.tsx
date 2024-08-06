@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, mock } from 'bun:test';
 import { cleanup, render, screen } from '@testing-library/react'; // eslint-disable-line testing-library/no-manual-cleanup
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import type { PartnerDocument } from '@/queries';
 import { nextNavigation, replaceMock } from '@/test/modules';

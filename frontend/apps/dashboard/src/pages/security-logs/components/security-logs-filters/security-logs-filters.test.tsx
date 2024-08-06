@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, filterEvents, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import SecurityLogsFilters from './security-logs-filters';
 

@@ -1,7 +1,5 @@
 import '@/static/server-shimmer.css';
 
-import React from 'react';
-
 const Loading = () => (
   <>
     <div className="server-shimmer block" style={{ height: '20px', marginTop: '5px', maxWidth: '124px' }} />

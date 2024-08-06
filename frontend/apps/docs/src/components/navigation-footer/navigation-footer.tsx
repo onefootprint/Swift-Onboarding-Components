@@ -1,7 +1,7 @@
 import { IcoArrowUpRight16, IcoHelp16 } from '@onefootprint/icons';
 import { Box, Button, LinkButton, Stack, ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 import styled, { css } from 'styled-components';

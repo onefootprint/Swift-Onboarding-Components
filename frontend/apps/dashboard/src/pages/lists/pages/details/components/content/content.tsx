@@ -1,5 +1,4 @@
 import { Box, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 import ActivityLog from './components/activity-log';
 import Breadcrumb from './components/breadcrumb';

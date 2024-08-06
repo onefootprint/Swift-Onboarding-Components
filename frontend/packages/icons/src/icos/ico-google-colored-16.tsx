@@ -1,4 +1,3 @@
-import React from 'react';
 import type { IconProps } from '../types';
 const IcoGoogle16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => {
   return (

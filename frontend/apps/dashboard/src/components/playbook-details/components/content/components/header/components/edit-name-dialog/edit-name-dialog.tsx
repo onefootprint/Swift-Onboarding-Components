@@ -1,6 +1,5 @@
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';

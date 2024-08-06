@@ -2,7 +2,7 @@ import { IcoArrowDown16, IcoPin24 } from '@onefootprint/icons';
 import { ActorKind } from '@onefootprint/types';
 import { Divider, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';

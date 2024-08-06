@@ -1,6 +1,5 @@
 import { Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import FeatureCard from 'src/components/feature-card';

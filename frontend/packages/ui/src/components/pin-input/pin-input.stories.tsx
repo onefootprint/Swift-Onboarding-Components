@@ -1,5 +1,5 @@
 import type { ComponentMeta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import Box from '../box';

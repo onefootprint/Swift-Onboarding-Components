@@ -1,6 +1,5 @@
 import { IcoCheck24 } from '@onefootprint/icons';
 import type { CountryCode } from '@onefootprint/types';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Box from '../../../box';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import DeviceSignals from '../../components/device-signals';
 import OnboardingMachineProvider from './components/machine-provider';
 import Router from './pages/router';

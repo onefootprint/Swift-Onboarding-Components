@@ -1,5 +1,4 @@
 import { CodeInline, Shimmer } from '@onefootprint/ui';
-import React from 'react';
 import { EncryptedCell } from 'src/components';
 
 type KeyCellProps = {

@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 

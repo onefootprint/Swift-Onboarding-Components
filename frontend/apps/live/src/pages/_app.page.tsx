@@ -1,10 +1,9 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
-import React from 'react';
 
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
-import { createGlobalStyle, css } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 import Providers from '../components/providers';
 import { FATHOM_TRACKING_CODE } from '../config/constants';
 

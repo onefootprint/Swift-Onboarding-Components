@@ -11,7 +11,6 @@ import {
   parse,
   startOfMonth,
 } from 'date-fns';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils';

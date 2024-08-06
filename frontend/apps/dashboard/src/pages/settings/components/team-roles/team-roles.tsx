@@ -1,6 +1,5 @@
 import { useQueryState } from '@onefootprint/hooks';
 import { Tabs } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import SectionHeader from 'src/components/section-header';

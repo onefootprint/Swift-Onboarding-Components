@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import { Children } from 'react';
 import type { MenuListProps } from 'react-select';
 import { FixedSizeList as List } from 'react-window';
 import styled, { css } from 'styled-components';

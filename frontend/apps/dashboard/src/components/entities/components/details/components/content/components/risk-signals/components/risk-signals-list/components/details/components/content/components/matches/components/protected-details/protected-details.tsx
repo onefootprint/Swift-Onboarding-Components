@@ -2,7 +2,6 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoShield40 } from '@onefootprint/icons';
 import { type Entity, IdDI } from '@onefootprint/types';
 import { Box, Button, LinkButton, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

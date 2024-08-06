@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { SessionSelectProps } from './session-select';
 import SessionSelect from './session-select';

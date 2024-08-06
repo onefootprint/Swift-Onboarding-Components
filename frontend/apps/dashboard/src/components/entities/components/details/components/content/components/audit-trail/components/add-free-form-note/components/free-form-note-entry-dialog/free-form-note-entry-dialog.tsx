@@ -1,7 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';

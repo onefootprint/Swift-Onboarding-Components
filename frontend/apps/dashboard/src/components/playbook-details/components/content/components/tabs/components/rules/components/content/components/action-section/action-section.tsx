@@ -6,7 +6,7 @@ import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import cloneDeep from 'lodash/cloneDeep';
 import kebabCase from 'lodash/kebabCase';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 import styled, { css } from 'styled-components';

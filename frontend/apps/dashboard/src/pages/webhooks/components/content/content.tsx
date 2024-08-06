@@ -1,6 +1,5 @@
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
-import React from 'react';
 
 import type { GetWebhooksPortalResponse } from '../../hooks/use-webhooks-portal';
 

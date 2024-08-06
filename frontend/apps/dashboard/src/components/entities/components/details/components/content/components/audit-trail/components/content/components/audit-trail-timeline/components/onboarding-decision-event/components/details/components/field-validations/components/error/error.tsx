@@ -1,7 +1,6 @@
 import { IcoWarning16 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 type ErrorProps = {
   error: unknown;

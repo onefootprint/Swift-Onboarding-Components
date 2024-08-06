@@ -1,6 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoBuilding16, IcoBuilding24, IcoHome16, IcoHome24 } from '@onefootprint/icons';
-import React from 'react';
 
 import AddressType from '../../types';
 

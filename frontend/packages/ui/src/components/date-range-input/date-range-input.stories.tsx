@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { DateRangeInputProps } from './date-range-input';
 import DateRangeInput from './date-range-input';

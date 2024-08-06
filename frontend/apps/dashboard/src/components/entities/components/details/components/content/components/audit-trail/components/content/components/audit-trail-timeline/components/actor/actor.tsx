@@ -1,8 +1,6 @@
-import { Theme } from '@onefootprint/design-tokens';
 import type { Actor as TActor } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

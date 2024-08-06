@@ -1,6 +1,5 @@
 import { IcoFileText224, IcoKey24 } from '@onefootprint/icons';
 import { Box, Divider, Text, TextArea } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';

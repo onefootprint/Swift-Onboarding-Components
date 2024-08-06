@@ -1,5 +1,4 @@
 import { Box, Text } from '@onefootprint/ui';
-import React from 'react';
 
 import H1 from '../markdown-components/h1';
 

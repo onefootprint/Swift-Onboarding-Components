@@ -1,6 +1,6 @@
 import type { TenantDetail } from '@onefootprint/types';
 import { Stack, Tabs } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import BillingProfile from '../billing-profile';
 import TenantInfo from '../tenant-info';

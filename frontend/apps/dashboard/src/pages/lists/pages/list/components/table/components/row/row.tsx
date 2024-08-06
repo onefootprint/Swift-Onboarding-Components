@@ -1,7 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { List } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type RowProps = {

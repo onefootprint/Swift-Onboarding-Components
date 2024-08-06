@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import Stack from '../stack';
 import type { SplitButtonProps } from './split-button';

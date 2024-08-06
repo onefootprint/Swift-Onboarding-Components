@@ -1,5 +1,4 @@
 import { Box, Container, media } from '@onefootprint/ui';
-import React from 'react';
 import { BloomLogo, CobaLogo, FlexcarLogo } from 'src/components/company-logos/themed';
 import styled, { css } from 'styled-components';
 

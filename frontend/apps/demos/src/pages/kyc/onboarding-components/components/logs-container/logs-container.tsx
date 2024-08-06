@@ -1,6 +1,6 @@
-import { Box, ScrollArea, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text } from '@onefootprint/ui';
 import uniqueId from 'lodash/uniqueId';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { EventLog } from '../../kyc.types';
 import Event from './components/event';
 

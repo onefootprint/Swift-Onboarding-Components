@@ -1,6 +1,5 @@
 import { IcoQuote40, icos } from '@onefootprint/icons';
 import type { ComponentMeta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { EmptyStateProps } from './empty-state';
 import EmptyState from './empty-state';

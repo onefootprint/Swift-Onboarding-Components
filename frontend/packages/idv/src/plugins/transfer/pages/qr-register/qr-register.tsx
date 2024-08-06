@@ -1,7 +1,6 @@
 import { IcoSmartphone40 } from '@onefootprint/icons';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';

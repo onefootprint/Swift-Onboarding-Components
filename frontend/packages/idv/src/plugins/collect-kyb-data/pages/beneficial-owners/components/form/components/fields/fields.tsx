@@ -1,7 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Grid, InlineAlert, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Email from './components/email';

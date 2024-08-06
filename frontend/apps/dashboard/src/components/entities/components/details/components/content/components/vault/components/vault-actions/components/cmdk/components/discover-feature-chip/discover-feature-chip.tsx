@@ -1,7 +1,6 @@
 import { IcoSparkles16 } from '@onefootprint/icons';
 import { Box, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type DiscoverFeatureChipProps = {

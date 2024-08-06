@@ -1,5 +1,5 @@
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { useLogStateMachine } from '../../../../hooks';
 import { useOnboardingMachine } from '../../components/machine-provider';

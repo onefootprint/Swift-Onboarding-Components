@@ -1,7 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { Document } from '@onefootprint/types';
 import { Box, Select, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

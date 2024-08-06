@@ -2,7 +2,6 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import { BusinessPerson } from '@onefootprint/types';
 import { Badge, Stack, Tag, Tooltip } from '@onefootprint/ui';
 import isNull from 'lodash/isNull';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type RowProps = {

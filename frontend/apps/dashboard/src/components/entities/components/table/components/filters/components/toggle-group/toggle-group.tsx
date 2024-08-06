@@ -1,7 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import { Stack, createFontStyles } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 export type ToggleGroupOption = {

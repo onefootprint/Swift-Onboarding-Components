@@ -1,7 +1,6 @@
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { isVaultDataDecrypted } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { EncryptedCell } from 'src/components';
 
 import Field from '../../../../../field';

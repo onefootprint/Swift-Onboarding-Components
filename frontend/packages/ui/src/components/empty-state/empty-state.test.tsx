@@ -2,7 +2,6 @@ import '../../config/initializers/i18next-test';
 
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { EmptyStateProps } from './empty-state';
 import EmptyState from './empty-state';

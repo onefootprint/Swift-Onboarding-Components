@@ -1,7 +1,6 @@
 import { IcoAppclip24, IcoCheckCircle16, IcoCloseSmall16, IcoLaptop16, IcoSmartphone216 } from '@onefootprint/icons';
 import { LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

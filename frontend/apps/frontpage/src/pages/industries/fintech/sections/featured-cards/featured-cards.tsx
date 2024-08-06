@@ -1,6 +1,5 @@
 import { Container } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import FeaturedCard from 'src/pages/industries/components/featured-card';
 import RequestMoreInfo from 'src/pages/industries/components/featured-card-illustrations/request-more-info';

@@ -8,7 +8,6 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { AddressInputProps } from './address-input';
 import AddressInput from './address-input';

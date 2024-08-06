@@ -1,5 +1,4 @@
 import uniqueId from 'lodash/uniqueId';
-import React from 'react';
 import styled from 'styled-components';
 import Word from './components/word';
 

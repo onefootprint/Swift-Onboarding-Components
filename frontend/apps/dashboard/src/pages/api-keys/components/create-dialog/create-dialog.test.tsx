@@ -1,5 +1,4 @@
 import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import CreateDialog from './create-dialog';
 import { withApiKeys, withCreateApiKeys, withRoles } from './create-dialog.test.config';

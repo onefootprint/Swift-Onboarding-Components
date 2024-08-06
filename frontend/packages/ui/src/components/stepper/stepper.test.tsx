@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { StepperOption, StepperProps } from './stepper';
 import Stepper from './stepper';

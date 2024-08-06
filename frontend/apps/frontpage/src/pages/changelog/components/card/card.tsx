@@ -3,7 +3,6 @@ import { CopyButton, Grid, Stack, Text, createFontStyles, media } from '@onefoot
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';

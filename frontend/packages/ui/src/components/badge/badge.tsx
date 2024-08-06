@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { UIState } from '@onefootprint/design-tokens';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';

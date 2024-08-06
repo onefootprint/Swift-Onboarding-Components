@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button, Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BottomSheet } from '@onefootprint/ui';
-import React from 'react';
 
 import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import WhatsThisContent from './components/whats-this-content';

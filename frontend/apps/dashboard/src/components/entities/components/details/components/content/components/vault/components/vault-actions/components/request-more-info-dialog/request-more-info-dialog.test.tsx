@@ -10,7 +10,6 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import { ContactInfoKind, OrgFrequentNoteKind } from '@onefootprint/types';
-import React from 'react';
 import {
   withFrequentNotes,
   withPlaybooks,

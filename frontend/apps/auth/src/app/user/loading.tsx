@@ -1,7 +1,5 @@
 import '../../static/server-loading.css';
 
-import React from 'react';
-
 type LoadingProps = { isRoot?: boolean };
 
 const Content = ({ isRoot = false }) => (

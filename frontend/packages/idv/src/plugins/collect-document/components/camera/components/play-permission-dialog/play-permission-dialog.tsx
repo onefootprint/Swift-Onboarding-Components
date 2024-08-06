@@ -1,5 +1,4 @@
 import { Dialog, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type PlayPermissionDialogProps = {

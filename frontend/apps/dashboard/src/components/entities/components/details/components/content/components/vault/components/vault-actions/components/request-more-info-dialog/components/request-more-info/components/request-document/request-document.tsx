@@ -1,5 +1,4 @@
 import { Checkbox, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container/animated-container';

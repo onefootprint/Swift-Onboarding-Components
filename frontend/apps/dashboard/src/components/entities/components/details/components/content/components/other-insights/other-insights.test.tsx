@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import OtherInsights from './other-insights';
 import { withOtherInsights, withOtherInsightsEmpty, withOtherInsightsError } from './other-insights.test.config';

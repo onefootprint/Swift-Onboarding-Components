@@ -1,6 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 export type SectionItemProps = {
   text: string;

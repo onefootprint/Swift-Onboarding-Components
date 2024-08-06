@@ -1,5 +1,4 @@
 import { Box, Text, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import AuthorImage from './components/author-image';

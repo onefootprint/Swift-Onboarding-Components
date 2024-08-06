@@ -2,7 +2,6 @@ import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoClose24, IcoMenu24, ThemedLogoFpCompact } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,6 +1,5 @@
 import { D2PStatus } from '@onefootprint/types';
 import { AnimatedLoadingSpinner, LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';

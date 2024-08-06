@@ -1,7 +1,6 @@
 import { Box, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

@@ -1,6 +1,6 @@
 import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Divider, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import EncryptedInput from '../../components/encrypted-input';
 import { FormStates, StepProps } from '../../kyc.types';
 

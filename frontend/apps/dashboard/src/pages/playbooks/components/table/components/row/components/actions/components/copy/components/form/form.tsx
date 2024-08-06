@@ -1,7 +1,6 @@
 import { IcoCode16, IcoUser16 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { NativeSelect, RadioSelect, Stack, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';

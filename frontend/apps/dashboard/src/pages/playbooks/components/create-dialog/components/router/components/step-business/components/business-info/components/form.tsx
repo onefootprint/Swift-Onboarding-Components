@@ -1,6 +1,6 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Button, Checkbox, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useBusinessValues from '../../../hooks/use-business-values';

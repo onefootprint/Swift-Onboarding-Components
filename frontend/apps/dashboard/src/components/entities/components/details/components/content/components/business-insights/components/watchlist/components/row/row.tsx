@@ -1,7 +1,6 @@
 import { IcoArrowTopRight16, IcoInfo16 } from '@onefootprint/icons';
 import { WatchlistHit } from '@onefootprint/types';
 import { LinkButton, Stack, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 
 type RowProps = {
   hit: WatchlistHit;

@@ -1,5 +1,4 @@
 import type { Color } from '@onefootprint/design-tokens';
-import React from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 
 import Stack from '../stack';

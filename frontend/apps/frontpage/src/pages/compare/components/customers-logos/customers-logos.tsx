@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Container, Stack, Text, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import { LINTRK_CONVERSION_ID } from 'src/config/constants';

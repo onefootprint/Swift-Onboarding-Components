@@ -3,7 +3,7 @@ import { IcoWand24 } from '@onefootprint/icons';
 import { AnimatedLoadingSpinner, Dialog, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

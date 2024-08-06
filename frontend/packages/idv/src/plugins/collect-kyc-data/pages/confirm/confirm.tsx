@@ -1,6 +1,6 @@
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';

@@ -1,6 +1,5 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
 import Image from 'next/image';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const IllustrationOnboard = () => {

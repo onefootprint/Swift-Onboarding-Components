@@ -1,5 +1,4 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const VerifySuccess = () => {

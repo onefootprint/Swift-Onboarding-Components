@@ -1,5 +1,4 @@
 import type { Timeline } from '@onefootprint/types';
-import React from 'react';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 

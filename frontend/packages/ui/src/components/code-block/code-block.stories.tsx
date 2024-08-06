@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { CodeBlockProps } from './code-block';
 import CodeBlock from './code-block';

@@ -1,6 +1,5 @@
 import { Breadcrumb as UIBreadcrumb } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Breadcrumb = () => {

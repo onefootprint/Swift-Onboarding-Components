@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
-import React from 'react';
 
 import DuplicateData from './duplicate-data';
 import {

@@ -2,7 +2,7 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ProxyConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 

@@ -1,5 +1,4 @@
 import { Shimmer } from '@onefootprint/ui';
-import React from 'react';
 
 type LoadingProps = {
   count: number;

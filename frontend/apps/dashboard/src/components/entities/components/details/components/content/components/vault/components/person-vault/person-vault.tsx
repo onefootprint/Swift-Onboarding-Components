@@ -6,7 +6,6 @@ import {
   hasEntityInvestorProfile,
   hasEntityUsLegalStatus,
 } from '@onefootprint/types';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';

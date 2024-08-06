@@ -1,6 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
 import { Container, Divider, Grid, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';

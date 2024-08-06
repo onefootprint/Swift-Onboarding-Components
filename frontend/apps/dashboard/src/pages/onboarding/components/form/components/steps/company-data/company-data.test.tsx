@@ -1,5 +1,4 @@
 import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { CompanyDataProps } from './company-data';
 import CompanyData from './company-data';

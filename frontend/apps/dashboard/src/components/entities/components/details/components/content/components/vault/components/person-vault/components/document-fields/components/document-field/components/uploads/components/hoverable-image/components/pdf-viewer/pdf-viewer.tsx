@@ -1,7 +1,6 @@
 import { IcoClose16 } from '@onefootprint/icons';
 import { Box, IconButton, LinkButton, Overlay, Stack, Text } from '@onefootprint/ui';
 import * as Dialog from '@radix-ui/react-dialog';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

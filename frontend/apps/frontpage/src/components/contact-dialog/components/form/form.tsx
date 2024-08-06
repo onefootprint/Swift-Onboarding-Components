@@ -1,5 +1,4 @@
-import { Grid, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
-import React from 'react';
+import { Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

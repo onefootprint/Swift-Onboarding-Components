@@ -1,4 +1,3 @@
-import React from 'react';
 const IcoArrowCustom = () => {
   return (
     <svg width="47" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">

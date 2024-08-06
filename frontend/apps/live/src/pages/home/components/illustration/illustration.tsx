@@ -1,6 +1,6 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
 import { motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import MobileDemoVideo from './components/mobile-demo-video';

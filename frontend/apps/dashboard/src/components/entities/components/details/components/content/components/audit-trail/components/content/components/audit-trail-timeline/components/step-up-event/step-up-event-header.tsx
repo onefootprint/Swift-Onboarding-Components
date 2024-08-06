@@ -1,6 +1,5 @@
 import { type StepUpEventData } from '@onefootprint/types';
 import { Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { Trans } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';

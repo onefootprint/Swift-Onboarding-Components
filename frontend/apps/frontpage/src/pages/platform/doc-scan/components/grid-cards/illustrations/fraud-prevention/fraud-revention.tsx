@@ -1,4 +1,3 @@
-import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 const SIZE = 200;

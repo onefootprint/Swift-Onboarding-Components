@@ -1,7 +1,7 @@
 import { IcoCheck16, IcoClock16, IcoRefresh16, IcoUpload16 } from '@onefootprint/icons';
 import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 type ItemProps = {

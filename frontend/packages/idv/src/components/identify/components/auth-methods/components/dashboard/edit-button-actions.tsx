@@ -1,6 +1,5 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 type EditButtonActionsProps = {
   isEmpty: boolean;

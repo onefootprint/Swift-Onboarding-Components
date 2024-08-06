@@ -1,5 +1,4 @@
 import type { Story } from '@storybook/react';
-import React from 'react';
 
 import Grid from './grid';
 import type { GridContainerProps, GridItemProps } from './grid.types';

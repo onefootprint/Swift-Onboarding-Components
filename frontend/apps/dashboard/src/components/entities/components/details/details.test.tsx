@@ -1,6 +1,5 @@
 import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
 import { BusinessDI, EntityKind } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { HEADER_ACTIONS_ID } from '@/entity/constants';

@@ -1,5 +1,4 @@
 import { Container, Text, createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Ctas from 'src/components/ctas';
 import styled, { css, keyframes } from 'styled-components';

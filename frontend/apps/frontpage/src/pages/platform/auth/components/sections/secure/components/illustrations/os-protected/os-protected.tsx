@@ -1,5 +1,5 @@
 import { useInView } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import MobileDemoVideo from 'src/components/mobile-demo-video';
 import styled from 'styled-components';
 

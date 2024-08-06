@@ -1,7 +1,6 @@
 import { Stack, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Footer from './components/footer';

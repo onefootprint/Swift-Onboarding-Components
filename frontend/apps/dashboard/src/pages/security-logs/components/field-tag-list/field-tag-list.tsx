@@ -1,6 +1,5 @@
 import { Tag } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getDI } from 'src/components/entities/utils/get-dis';
 

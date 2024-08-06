@@ -2,7 +2,6 @@ import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { isVaultDataDecrypted, isVaultDataText } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { EncryptedCell } from 'src/components';
 

@@ -1,6 +1,6 @@
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box } from '@onefootprint/ui';

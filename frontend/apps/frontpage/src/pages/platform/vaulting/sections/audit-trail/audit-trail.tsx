@@ -1,7 +1,6 @@
 import { Container, media } from '@onefootprint/ui';
 import uniqueId from 'lodash/uniqueId';
 import Image from 'next/image';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

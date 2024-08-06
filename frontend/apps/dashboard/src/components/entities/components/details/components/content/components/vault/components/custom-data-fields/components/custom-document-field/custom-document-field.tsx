@@ -1,7 +1,7 @@
 import type { Entity } from '@onefootprint/types';
 import { CodeInline, Dialog, LinkButton, useObjectUrl } from '@onefootprint/ui';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

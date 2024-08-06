@@ -1,5 +1,4 @@
 import { IcoGoogle24 } from '@onefootprint/icons';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ButtonProps } from '../button';

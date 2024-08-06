@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { LangProp } from '@/app/types';
 import { LangFallback } from '@/i18n';
 import { getPartner, getPartnerMembers, getPartnerRoles } from '@/queries';

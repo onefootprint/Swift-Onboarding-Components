@@ -1,5 +1,4 @@
 import { Portal, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Stack aria-busy data-testid="onboarding-invite-loading">

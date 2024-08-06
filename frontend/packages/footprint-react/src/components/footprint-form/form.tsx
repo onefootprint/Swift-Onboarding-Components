@@ -1,6 +1,6 @@
 import type { FootprintFormProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import useStableContainerId from '../../hooks/use-stable-container-id';
 

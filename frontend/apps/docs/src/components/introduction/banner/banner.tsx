@@ -2,7 +2,7 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoHelp24 } from '@onefootprint/icons';
 import { Button, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';

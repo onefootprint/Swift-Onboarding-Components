@@ -8,7 +8,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import { DocumentDI, IdDI, InvestorProfileDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Details from './details';

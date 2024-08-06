@@ -1,6 +1,5 @@
 import { IcoLock16 } from '@onefootprint/icons';
 import { Grid } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 type EncryptedCellProps = {

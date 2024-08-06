@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { MachineProvider } from './components/machine-provider';
 import Router from './pages/router';
 import type { CollectKycDataProps } from './types';

@@ -2,7 +2,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { RoleKind } from '@onefootprint/types';
 import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
 import { Box, Checkbox, MultiSelect, Text, createFontStyles } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useDecryptOptions, useVaultProxyOptions } from 'src/components/roles';

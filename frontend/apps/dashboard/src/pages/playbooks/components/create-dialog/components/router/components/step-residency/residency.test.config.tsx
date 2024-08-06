@@ -1,4 +1,3 @@
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { ResidencyFormData } from '@/playbooks/utils/machine/types';

@@ -2,7 +2,6 @@ import { IcoDotsHorizontal16, IcoLogOut24, IcoUserCircle16 } from '@onefootprint
 import { Divider, Dropdown, Stack, createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { useClientStore, useRoutes } from '@/hooks';

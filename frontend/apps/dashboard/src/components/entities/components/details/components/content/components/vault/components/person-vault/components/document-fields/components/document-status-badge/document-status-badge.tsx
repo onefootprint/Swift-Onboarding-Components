@@ -1,7 +1,6 @@
 import type { UIStates } from '@onefootprint/design-tokens';
 import type { Document, SupportedIdDocTypes } from '@onefootprint/types';
 import { Badge, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getDocumentStatus } from '../../utils';

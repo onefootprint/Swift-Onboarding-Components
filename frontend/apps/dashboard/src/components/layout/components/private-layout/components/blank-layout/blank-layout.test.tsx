@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import type { BlankLayoutProps } from './blank-layout';

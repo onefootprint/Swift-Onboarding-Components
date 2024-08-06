@@ -1,7 +1,7 @@
 import type { ChallengeKind as Kind } from '@onefootprint/types';
 import { AuthMethodKind } from '@onefootprint/types';
 import type { ComponentProps, FormEvent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

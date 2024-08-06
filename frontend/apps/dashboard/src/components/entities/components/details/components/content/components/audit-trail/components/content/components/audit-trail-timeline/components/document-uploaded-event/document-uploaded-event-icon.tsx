@@ -11,7 +11,6 @@ import {
 } from '@onefootprint/icons';
 import type { DocumentUploadedEventData } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import React from 'react';
 
 // modern doc type here
 const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {

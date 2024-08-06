@@ -1,6 +1,6 @@
 import type { Member } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles';
 

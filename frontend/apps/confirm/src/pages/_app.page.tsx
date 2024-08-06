@@ -1,5 +1,4 @@
 import type { AppProps } from 'next/app';
-import React from 'react';
 
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import { createGlobalStyle } from 'styled-components';

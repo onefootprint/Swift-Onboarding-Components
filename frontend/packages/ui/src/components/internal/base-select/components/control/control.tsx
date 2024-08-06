@@ -1,5 +1,4 @@
 import { IcoSearch16 } from '@onefootprint/icons';
-import React from 'react';
 import type { ControlProps } from 'react-select';
 import { components } from 'react-select';
 import styled, { css } from 'styled-components';

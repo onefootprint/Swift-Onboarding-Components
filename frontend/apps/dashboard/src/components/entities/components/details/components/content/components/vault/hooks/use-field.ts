@@ -1,5 +1,5 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { IdDI, SupportedIdDocTypes, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
+import { IdDI, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 

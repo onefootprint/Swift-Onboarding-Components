@@ -6,7 +6,7 @@ import {
   type VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 import { Button, Stack } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

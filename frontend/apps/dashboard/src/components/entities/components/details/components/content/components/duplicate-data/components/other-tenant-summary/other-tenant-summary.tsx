@@ -1,7 +1,6 @@
 import { IcoInfo16, IcoUsers16 } from '@onefootprint/icons';
 import type { OtherTenantsDuplicateDataSummary } from '@onefootprint/types';
 import { Box, Text, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,6 +1,5 @@
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
-import React from 'react';
 
 import AnnotationNote from '../annotation-note';
 

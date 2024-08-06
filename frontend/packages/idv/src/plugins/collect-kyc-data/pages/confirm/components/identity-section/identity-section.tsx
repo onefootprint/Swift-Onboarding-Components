@@ -3,7 +3,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { DecryptUserResponse } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TFunction } from 'i18next';

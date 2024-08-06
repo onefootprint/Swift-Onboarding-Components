@@ -1,6 +1,5 @@
 import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type SeverityBadgeProps = {

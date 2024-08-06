@@ -1,4 +1,3 @@
-import React from 'react';
 import { Logo } from 'src/components/company-logos/themed';
 
 const ComposerLogo = ({ color }: Logo) => (

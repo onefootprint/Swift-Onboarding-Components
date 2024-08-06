@@ -2,7 +2,6 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Dropdown, Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';

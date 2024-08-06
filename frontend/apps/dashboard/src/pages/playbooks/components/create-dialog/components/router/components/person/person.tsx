@@ -1,6 +1,6 @@
 import { type DataToCollectMeta, PlaybookKind } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Panel from '../panel';

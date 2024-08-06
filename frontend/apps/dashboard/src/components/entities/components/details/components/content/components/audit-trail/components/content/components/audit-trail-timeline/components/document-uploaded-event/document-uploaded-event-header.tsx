@@ -2,7 +2,6 @@ import type { DocumentUploadedEventData } from '@onefootprint/types';
 import { DocumentRequestKind, IdDocStatus } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type DocumentUploadedEventHeaderProps = {

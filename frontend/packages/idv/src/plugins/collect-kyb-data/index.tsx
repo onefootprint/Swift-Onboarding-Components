@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { CollectKybDataProps } from './collect-kyb-data.types';
 import { MachineProvider } from './components/machine-provider';
 import Router from './pages/router';

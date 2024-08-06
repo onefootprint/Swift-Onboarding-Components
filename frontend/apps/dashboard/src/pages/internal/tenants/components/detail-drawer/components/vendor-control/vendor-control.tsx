@@ -3,7 +3,7 @@ import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import type { TenantDetail } from '@onefootprint/types';
 import type { TenantVendorControl } from '@onefootprint/types/src/api/get-tenants';
 import { Checkbox, Stack, TextInput } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { EncryptedCell, Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';

@@ -1,6 +1,5 @@
 import { IcoAlpaca24, IcoApex24, IcoBuilding24, IcoCar24, IcoCreditcard24, IcoLayer0124 } from '@onefootprint/icons';
 import { Button, RadioSelect, Text } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

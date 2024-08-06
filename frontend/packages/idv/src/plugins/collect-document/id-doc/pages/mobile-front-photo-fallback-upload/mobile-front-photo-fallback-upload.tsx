@@ -1,6 +1,5 @@
 import { IcoClock40 } from '@onefootprint/icons';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

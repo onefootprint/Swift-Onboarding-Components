@@ -1,6 +1,6 @@
 import { IcoFilter16 } from '@onefootprint/icons';
 import { Button, Checkbox, Drawer, LinkButton, Stack, createFontStyles } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

@@ -1,6 +1,5 @@
 import { SOSFiling } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
-import React from 'react';
 import useFilingStatusText from '../../../../hooks/use-filing-status-text';
 import statusVariant from '../../constants';
 

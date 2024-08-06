@@ -3,7 +3,6 @@ import type { BusinessAddress } from '@onefootprint/types';
 import { Badge, Box, Stack, Text } from '@onefootprint/ui';
 import capitalize from 'lodash/capitalize';
 import isNull from 'lodash/isNull';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GOOGLE_MAPS_API_KEY } from 'src/config/constants';
 import type { DefaultTheme } from 'styled-components';

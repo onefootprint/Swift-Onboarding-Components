@@ -1,5 +1,3 @@
-import React from 'react';
-
 const PenguinWink = () => {
   const lineColor = '#000000';
   const bodyColor = '#FFFFFF';

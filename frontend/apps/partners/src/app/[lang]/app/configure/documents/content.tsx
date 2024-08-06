@@ -2,7 +2,7 @@
 
 import { Button, Divider, Stack, Text, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Lang } from '@/app/types';

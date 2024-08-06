@@ -1,7 +1,6 @@
 import { IcoCamera40, IcoClose24, IcoImages24 } from '@onefootprint/icons';
 import { Box, Button, IconButton, Text, media, useToast } from '@onefootprint/ui';
 import { TFunction } from 'i18next';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
 import { getLogger, trackAction } from '../../../../utils/logger';

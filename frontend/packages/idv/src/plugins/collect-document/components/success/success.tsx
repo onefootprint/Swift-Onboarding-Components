@@ -1,5 +1,5 @@
 import { Box, SuccessCheck, Text } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants';

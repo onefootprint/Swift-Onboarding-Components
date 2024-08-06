@@ -4,7 +4,7 @@ import { CodeBlock, Stack, Text } from '@onefootprint/ui';
 import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

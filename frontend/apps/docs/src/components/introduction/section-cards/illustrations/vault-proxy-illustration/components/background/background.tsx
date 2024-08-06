@@ -1,6 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { useTheme } from 'next-themes';
-import React from 'react';
 import styled from 'styled-components';
 
 import HorizontalBeam from '../../../components/horizontal-beam';

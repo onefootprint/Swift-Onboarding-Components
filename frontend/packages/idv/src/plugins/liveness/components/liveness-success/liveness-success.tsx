@@ -1,6 +1,5 @@
 import { Text } from '@onefootprint/ui';
 import AnimatedSuccessCheck from '@onefootprint/ui/src/components/animated-success-check';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

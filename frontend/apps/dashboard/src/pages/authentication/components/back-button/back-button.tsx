@@ -1,7 +1,6 @@
 import { IcoChevronLeft16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const BackButton = () => {

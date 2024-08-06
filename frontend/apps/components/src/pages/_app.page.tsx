@@ -1,7 +1,6 @@
 import { Logger } from '@onefootprint/idv';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
-import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';

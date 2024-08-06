@@ -3,7 +3,6 @@ import { SecuredByFootprint } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -3,7 +3,6 @@ import { Stack, Toggle, Tooltip } from '@onefootprint/ui';
 import omit from 'lodash/omit';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useOrgSession from 'src/hooks/use-org-session';

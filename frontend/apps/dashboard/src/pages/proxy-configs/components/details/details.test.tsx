@@ -7,7 +7,6 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Details from './details';
 import { proxyConfigDetailsFixture, withProxyConfigDetails, withProxyConfigDetailsError } from './details.test.config';

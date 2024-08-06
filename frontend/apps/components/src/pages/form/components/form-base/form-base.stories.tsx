@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { FormBaseProps } from './form-base';
 import FormBase from './form-base';

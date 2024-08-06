@@ -1,6 +1,6 @@
 import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import ReactCountryFlag from 'react-country-flag';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';

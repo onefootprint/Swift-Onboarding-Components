@@ -9,7 +9,6 @@ import {
 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Fieldset } from '../../../../vault.types';

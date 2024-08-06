@@ -1,6 +1,5 @@
 import { IdDocImageTypes } from '@onefootprint/types';
 import { OpenCvProvider } from 'opencv-react-ts';
-import React from 'react';
 
 import { useL10nContext } from '../../../components/l10n-provider';
 import { ImgProcessorsContextProvider } from '../components/image-processors';

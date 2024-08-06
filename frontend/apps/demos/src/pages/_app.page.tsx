@@ -2,7 +2,6 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import React from 'react';
 
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import { createGlobalStyle } from 'styled-components';

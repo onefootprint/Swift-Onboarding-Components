@@ -1,5 +1,4 @@
 import { AuthMethodKind } from '@onefootprint/types';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';

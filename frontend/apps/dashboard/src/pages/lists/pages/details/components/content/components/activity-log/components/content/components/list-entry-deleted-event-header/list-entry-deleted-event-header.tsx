@@ -1,6 +1,5 @@
 import type { ListEntryDeletedEvent } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Pill from '../components/pill';

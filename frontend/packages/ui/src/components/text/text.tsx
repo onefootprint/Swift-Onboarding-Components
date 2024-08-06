@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { FontVariant } from '@onefootprint/design-tokens';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { BoxPrimitives } from '../box';

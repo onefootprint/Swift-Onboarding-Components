@@ -1,5 +1,4 @@
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 
 import useUpdateAllowedDomains from '../../hooks/use-update-allowed-domains';
 import Domain from './components/domain';

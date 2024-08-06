@@ -11,7 +11,7 @@ import type {
 } from '@onefootprint/design-tokens';
 import toKebabCase from 'lodash/kebabCase';
 import type { HTMLAttributes } from 'react';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';

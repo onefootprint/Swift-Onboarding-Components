@@ -2,7 +2,6 @@ import type { Icon } from '@onefootprint/icons';
 import { IcoBuilding24, IcoFileText24, IcoPhone24, IcoUserCircle24 } from '@onefootprint/icons';
 import { CollectedKybDataOption } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { FieldProps } from '../field';

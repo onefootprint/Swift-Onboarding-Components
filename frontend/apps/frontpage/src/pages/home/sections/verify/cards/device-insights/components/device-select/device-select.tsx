@@ -1,6 +1,5 @@
 import { IcoLaptop16, IcoSmartphone216 } from '@onefootprint/icons';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type DeviceSelectProps = {

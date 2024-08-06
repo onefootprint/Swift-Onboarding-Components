@@ -9,7 +9,6 @@ import {
   CcUnionpay24,
   CcVisa24,
 } from '@onefootprint/icons';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type CardIconProps = {

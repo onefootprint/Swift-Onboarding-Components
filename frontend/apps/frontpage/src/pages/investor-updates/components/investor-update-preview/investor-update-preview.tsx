@@ -2,7 +2,6 @@ import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import { LinkButton, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -2,7 +2,7 @@ import { IcoCheckSmall16, IcoCloseSmall16, IcoMaximize24, IcoMinimize24 } from '
 import { Stack, useObjectUrl } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

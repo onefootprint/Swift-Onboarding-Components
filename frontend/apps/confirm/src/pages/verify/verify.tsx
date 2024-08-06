@@ -2,7 +2,7 @@ import { LogoFpDefault } from '@onefootprint/icons';
 import { Box } from '@onefootprint/ui';
 import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import VerifyError from './components/verify-error';

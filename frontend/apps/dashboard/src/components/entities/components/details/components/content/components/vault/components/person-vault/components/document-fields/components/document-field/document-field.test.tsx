@@ -1,6 +1,5 @@
 import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import React from 'react';
 
 import TestWrapper from '../../../../../utils/test-wrapper';
 import type { DocumentFieldProps } from './document-field';

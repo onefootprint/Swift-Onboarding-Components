@@ -7,7 +7,6 @@ import type {
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import type { ComponentProps } from 'react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';

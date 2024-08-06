@@ -1,5 +1,4 @@
 import { Box, Text } from '@onefootprint/ui';
-import React from 'react';
 
 const Success = () => (
   <Box>

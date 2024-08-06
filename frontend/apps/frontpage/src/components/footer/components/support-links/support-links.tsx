@@ -2,7 +2,6 @@ import { IcoLinkedin24, IcoX24, ThemedLogoFpCompact } from '@onefootprint/icons'
 import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -2,7 +2,6 @@ import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import { IcoShieldFlash24 } from '@onefootprint/icons';
 import { DocumentRequestKind, DocumentUploadSettings } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NavigationHeader } from '../../../../../components';

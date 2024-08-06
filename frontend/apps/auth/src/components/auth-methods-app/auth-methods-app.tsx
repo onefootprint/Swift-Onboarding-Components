@@ -7,7 +7,7 @@ import { AuthMethods, getLogger, getSdkArgsToken } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useEffectOnceStrict } from '@/src/hooks';

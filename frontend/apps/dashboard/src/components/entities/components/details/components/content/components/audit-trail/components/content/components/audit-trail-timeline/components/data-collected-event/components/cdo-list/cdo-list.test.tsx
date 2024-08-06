@@ -7,7 +7,6 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import React from 'react';
 
 import CdoList from './cdo-list';
 

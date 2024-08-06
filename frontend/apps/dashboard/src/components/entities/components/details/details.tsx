@@ -1,6 +1,5 @@
 import type { EntityKind } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 import { ErrorComponent } from 'src/components';
 
 import Content from './components/content';

@@ -1,6 +1,5 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
-import { Box, Checkbox, Text } from '@onefootprint/ui';
-import React from 'react';
+import { Checkbox, Text } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

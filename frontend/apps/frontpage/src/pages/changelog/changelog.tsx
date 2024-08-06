@@ -1,5 +1,5 @@
 import { Button, Container, Divider, Stack, Text, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PostType, getInitialPosts } from 'src/utils/ghost';
 import type { PostDetails } from 'src/utils/ghost/types';

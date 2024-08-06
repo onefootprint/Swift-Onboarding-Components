@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { CodeInlineProps } from './code-inline';
 import CodeInline from './code-inline';

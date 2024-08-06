@@ -1,6 +1,5 @@
 import { type WorkflowStartedEventData, WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PlaybookLink from '../playbook-link';

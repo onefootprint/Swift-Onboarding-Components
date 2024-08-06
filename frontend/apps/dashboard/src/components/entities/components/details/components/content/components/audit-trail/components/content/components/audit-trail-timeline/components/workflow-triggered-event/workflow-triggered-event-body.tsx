@@ -3,7 +3,7 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import type { Annotation, WorkflowTriggeredEventData } from '@onefootprint/types';
 import { RoleScopeKind, TokenKind } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 

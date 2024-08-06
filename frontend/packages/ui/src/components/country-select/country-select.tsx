@@ -1,7 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

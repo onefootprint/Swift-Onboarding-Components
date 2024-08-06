@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
 import type { LabelHTMLAttributes } from 'react';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import fieldContext from '../field-context';
 

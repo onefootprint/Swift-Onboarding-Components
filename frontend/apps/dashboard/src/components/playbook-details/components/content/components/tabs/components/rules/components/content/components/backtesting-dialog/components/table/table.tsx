@@ -1,7 +1,6 @@
 import type { BacktestedOnboarding } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';

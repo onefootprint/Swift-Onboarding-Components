@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, asUser, resetUser } from 'src/config/tests';
 
 import type { UserDataProps } from './user-data';

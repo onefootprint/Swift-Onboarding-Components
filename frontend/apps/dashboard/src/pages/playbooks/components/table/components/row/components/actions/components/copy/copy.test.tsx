@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, asAdminUserRestrictedToSandbox, resetUser } from 'src/config/tests';
 
 import { type CopyProps } from './copy';

@@ -2,7 +2,6 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import type { RiskSignal } from '@onefootprint/types';
 import { Badge, Tooltip } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';

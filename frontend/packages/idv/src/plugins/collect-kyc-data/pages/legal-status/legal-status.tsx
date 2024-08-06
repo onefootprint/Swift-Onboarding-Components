@@ -2,7 +2,6 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
 import { Divider, Grid } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

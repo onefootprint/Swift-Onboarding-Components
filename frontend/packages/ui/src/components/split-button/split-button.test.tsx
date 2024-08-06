@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { Option } from './components/dropdown-options';
 import type { SplitButtonProps } from './split-button';

@@ -1,5 +1,4 @@
 import { Button } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 import { CAPTURE_BTN_DEFAULT_INNER_RADIUS, CAPTURE_BTN_DEFAULT_OUTER_RADIUS } from '../../../../constants';
 

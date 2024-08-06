@@ -1,6 +1,5 @@
 import { TextInput } from '@onefootprint/ui';
 import Label from '@onefootprint/ui/src/components/label';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';

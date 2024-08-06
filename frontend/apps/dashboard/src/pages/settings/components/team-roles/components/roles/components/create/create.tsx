@@ -1,6 +1,6 @@
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import CreateDialog from 'src/components/roles/create-dialog';

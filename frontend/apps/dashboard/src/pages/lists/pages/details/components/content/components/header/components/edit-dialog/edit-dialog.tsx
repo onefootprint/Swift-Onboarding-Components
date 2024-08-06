@@ -1,6 +1,6 @@
 import { Dialog, Grid, TextInput, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';

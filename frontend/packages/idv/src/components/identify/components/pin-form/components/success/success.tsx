@@ -1,5 +1,4 @@
 import { SuccessCheck, Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Success = ({ text }: { text: string }) => (

@@ -1,6 +1,6 @@
 import type { Annotation } from '@onefootprint/types';
 import { Toggle } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';

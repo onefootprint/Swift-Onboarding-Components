@@ -1,6 +1,5 @@
 import { TextInput, media } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React from 'react';
 import type { FieldErrors, FieldValues, UseFormGetValues } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

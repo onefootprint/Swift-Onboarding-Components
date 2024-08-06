@@ -1,7 +1,7 @@
 import { useCountdown } from '@onefootprint/hooks';
 import { AnimatedLoadingSpinner, Box, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export type ResendButtonProps = {
   isResendLoading?: boolean;

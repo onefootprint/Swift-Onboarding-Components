@@ -1,7 +1,6 @@
 import { IcoArrowTopRight16 } from '@onefootprint/icons';
 import { SOSFiling } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useFilingStatusText from '../../hooks/use-filing-status-text';

@@ -1,4 +1,3 @@
-import React from 'react';
 import type { IconProps } from '../types';
 const IcoMapPinSelected = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => {
   return (

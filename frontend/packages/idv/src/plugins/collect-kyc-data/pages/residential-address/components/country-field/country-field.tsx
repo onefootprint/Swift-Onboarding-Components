@@ -1,6 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { CountrySelect } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

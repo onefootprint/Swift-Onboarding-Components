@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { MachineProvider } from './components/machine-provider';
 import type { InvestorProfileProps } from './investor-profile.types';
 import Router from './pages/router';

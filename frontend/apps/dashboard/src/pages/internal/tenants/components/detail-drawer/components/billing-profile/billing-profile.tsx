@@ -4,7 +4,7 @@ import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenan
 import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 import { Checkbox, Stack, Text, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';
 

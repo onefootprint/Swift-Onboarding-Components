@@ -1,6 +1,5 @@
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import { Badge, Box, Shimmer, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type HeaderProps = {

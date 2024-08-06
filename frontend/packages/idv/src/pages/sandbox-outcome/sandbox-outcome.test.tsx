@@ -3,7 +3,6 @@ import '../../config/initializers/i18next-test';
 import { customRender, fireEvent, screen, selectEvents, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OnboardingConfigStatus, OverallOutcome } from '@onefootprint/types';
-import React from 'react';
 
 import { Layout } from '../../components';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';

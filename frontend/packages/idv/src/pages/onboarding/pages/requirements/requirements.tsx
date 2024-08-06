@@ -1,5 +1,3 @@
-import React from 'react';
-
 import RequirementsMachineProvider from './components/machine-provider';
 import Loading from './pages/loading';
 import Router from './pages/router';

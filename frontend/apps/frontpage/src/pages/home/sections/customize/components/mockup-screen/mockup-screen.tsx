@@ -1,5 +1,4 @@
 import { Stack, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Form from './components/form';

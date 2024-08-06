@@ -1,7 +1,6 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import type { DuplicateDataItem } from '@onefootprint/types';
 import { DataKind, DupeKind, EntityStatus, IdDI } from '@onefootprint/types';
-import React from 'react';
 
 import type { RowProps } from './row';
 import Row from './row';

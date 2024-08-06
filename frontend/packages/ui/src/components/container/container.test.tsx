@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { ContainerProps } from './container';
 import Container from './container';

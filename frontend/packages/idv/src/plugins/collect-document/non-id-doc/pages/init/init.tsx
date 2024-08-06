@@ -1,7 +1,7 @@
 import { IcoWarning24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { AnimatedLoadingSpinner, Box, Button, Text } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,7 +1,6 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import { type CountryCode, DocumentTypesAndCountries, SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 

@@ -1,7 +1,7 @@
 import { IcoClose16, IcoCode216, IcoFlask16, IcoMenu16 } from '@onefootprint/icons';
 import { Divider, Stack, Text, ThemeToggle, Tooltip, createFontStyles, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';

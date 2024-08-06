@@ -1,5 +1,4 @@
 import { Box, Button, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 
 export type EmailFormData = { email: string };

@@ -1,7 +1,6 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { IdDI } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
-import React from 'react';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 

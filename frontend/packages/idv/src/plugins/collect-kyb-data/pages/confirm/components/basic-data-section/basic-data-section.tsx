@@ -1,6 +1,6 @@
 import { IcoFileText24 } from '@onefootprint/icons';
 import { BusinessDI, BusinessDIData } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, useToast } from '@onefootprint/ui';

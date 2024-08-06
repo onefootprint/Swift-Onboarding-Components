@@ -1,7 +1,6 @@
 import type { Organization } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Box, Button } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';

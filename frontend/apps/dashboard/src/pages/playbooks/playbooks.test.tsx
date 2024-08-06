@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Playbooks from './playbooks';
 import { withPlaybooks, withPlaybooksError } from './playbooks.test.config';

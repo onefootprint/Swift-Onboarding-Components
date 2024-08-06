@@ -1,6 +1,5 @@
 import type { CountryCode, DataIdentifier, Entity } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { EncryptedCell } from 'src/components';
 

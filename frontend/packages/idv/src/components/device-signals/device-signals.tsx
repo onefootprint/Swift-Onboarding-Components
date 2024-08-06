@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Stytch from './components/stytch';
 
 type DeviceSignalsProps = {

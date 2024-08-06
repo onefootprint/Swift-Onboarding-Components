@@ -1,6 +1,5 @@
 import { Box, Grid, Shimmer } from '@onefootprint/ui';
 import times from 'lodash/times';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Loading = () => (

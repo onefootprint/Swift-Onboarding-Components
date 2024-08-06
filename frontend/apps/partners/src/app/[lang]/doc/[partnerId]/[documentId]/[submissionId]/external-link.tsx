@@ -3,7 +3,6 @@
 import { IcoLink24 } from '@onefootprint/icons';
 import { Button, IconButton, Stack, Text } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ExternalLinkProps = { url: string };

@@ -1,6 +1,6 @@
 import type { AddedRule, EditedRule, RuleBacktestingData } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 

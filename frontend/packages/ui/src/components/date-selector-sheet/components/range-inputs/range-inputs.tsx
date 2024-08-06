@@ -1,6 +1,6 @@
 import { IcoArrowRightSmall16, IcoWarning16 } from '@onefootprint/icons';
 import { endOfDay, isAfter, isBefore, startOfDay, startOfToday } from 'date-fns';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

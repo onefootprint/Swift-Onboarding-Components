@@ -1,7 +1,7 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash24 } from '@onefootprint/icons';
 import { Button, Checkbox, Divider, LinkButton, Stack } from '@onefootprint/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';

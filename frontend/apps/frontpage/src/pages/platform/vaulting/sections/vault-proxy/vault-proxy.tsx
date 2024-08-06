@@ -2,7 +2,6 @@ import { IcoDollar16, IcoEye16, IcoShield16 } from '@onefootprint/icons';
 import { Container, Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import MicroFeatureCard from 'src/components/micro-feature-card';
 import styled, { css } from 'styled-components';

@@ -1,5 +1,4 @@
 import { CodeInline, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type IdProps = {

@@ -1,7 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';

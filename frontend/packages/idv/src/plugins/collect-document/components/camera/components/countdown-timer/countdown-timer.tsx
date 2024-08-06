@@ -1,5 +1,4 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 import { COUNTDOWN_TIMER_SIZE } from '../../../../constants';
 

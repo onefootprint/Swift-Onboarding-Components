@@ -1,4 +1,3 @@
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import getSchema from '@/api-reference/utils/get-schemas';

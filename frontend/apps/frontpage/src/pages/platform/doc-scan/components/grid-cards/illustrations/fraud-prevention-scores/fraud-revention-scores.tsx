@@ -1,7 +1,6 @@
 import { IcoSpeedometer24 } from '@onefootprint/icons';
-import { Box, Stack, Text, media } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const scoresContent = [

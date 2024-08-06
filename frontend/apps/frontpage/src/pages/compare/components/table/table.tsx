@@ -1,7 +1,7 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Container, createFontStyles } from '@onefootprint/ui';
 import { ParseKeys } from 'i18next';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import compareTableContent from './compare-table-content';

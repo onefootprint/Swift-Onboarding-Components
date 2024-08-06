@@ -11,7 +11,6 @@ import {
   IcoUsers16,
 } from '@onefootprint/icons';
 import { MatchSignalAttribute } from '@onefootprint/types/src/data/match-signal-attribute';
-import React from 'react';
 
 type ValidationTimelineItemIconProps = {
   attribute: string;

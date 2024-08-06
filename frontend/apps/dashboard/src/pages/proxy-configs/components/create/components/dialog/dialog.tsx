@@ -1,7 +1,7 @@
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import type { CreateProxyConfigRequest } from '@onefootprint/types';
 import { Dialog as FPDialog, useConfirmationDialog } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FormData } from 'src/pages/proxy-configs/proxy-configs.types';
 

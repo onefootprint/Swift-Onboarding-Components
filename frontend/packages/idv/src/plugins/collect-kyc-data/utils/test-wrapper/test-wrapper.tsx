@@ -2,7 +2,6 @@ import '../../../../config/initializers/i18next-test';
 
 import { ToastProvider } from '@onefootprint/ui';
 import type { ReactNode } from 'react';
-import React from 'react';
 import { MachineProvider } from 'src/plugins/collect-kyc-data/components/machine-provider';
 
 import { Layout } from '../../../../components';

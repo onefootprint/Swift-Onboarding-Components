@@ -1,7 +1,6 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome } from '@onefootprint/types';
 import { Button, Grid, InlineAlert, Text } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

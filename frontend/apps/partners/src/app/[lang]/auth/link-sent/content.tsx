@@ -3,7 +3,6 @@
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import { Button, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/navigation';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

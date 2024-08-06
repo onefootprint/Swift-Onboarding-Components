@@ -1,6 +1,5 @@
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../components/l10n-provider';

@@ -2,7 +2,7 @@ import { IcoFileText24, IcoInfo16 } from '@onefootprint/icons';
 import { Box, Divider, Grid, LinkButton, Shimmer, Text, media } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

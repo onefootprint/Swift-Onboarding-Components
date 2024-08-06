@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Header from './header';
 

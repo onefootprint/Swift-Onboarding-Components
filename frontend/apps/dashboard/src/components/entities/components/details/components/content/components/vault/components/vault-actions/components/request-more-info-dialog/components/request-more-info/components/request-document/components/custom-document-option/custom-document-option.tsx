@@ -1,7 +1,7 @@
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import { Checkbox, LinkButton, Stack } from '@onefootprint/ui';
 import type { ChangeEvent } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';

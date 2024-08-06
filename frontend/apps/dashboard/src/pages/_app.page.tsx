@@ -2,7 +2,7 @@ import type { AppProps } from 'next/app';
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 import Layout from '../components/layout';
 import Providers from '../components/providers';

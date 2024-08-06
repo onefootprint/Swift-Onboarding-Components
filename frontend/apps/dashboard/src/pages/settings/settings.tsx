@@ -1,7 +1,6 @@
-import { Box, Stack, Text, ThemeToggle } from '@onefootprint/ui';
+import { Stack, Text, ThemeToggle } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import Head from 'next/head';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import styled, { css } from 'styled-components';

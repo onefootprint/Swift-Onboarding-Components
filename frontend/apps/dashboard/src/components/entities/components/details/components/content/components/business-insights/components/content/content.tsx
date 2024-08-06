@@ -1,5 +1,4 @@
 import useCurrentEntityBusinessInsights from '@/entity/hooks/use-current-entity-business-insights';
-import React from 'react';
 import { ErrorComponent } from 'src/components';
 import DecryptedContent from '../decrypted-content';
 import Loading from '../loading';

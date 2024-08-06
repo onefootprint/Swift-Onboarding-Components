@@ -8,7 +8,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import { EntityKind } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Table from '../table';

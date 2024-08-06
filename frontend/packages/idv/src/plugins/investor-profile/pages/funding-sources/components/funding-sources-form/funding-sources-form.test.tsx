@@ -2,7 +2,6 @@ import '../../../../../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { InvestorProfileDI, InvestorProfileFundingSources } from '@onefootprint/types';
-import React from 'react';
 
 import ContinueButton from 'src/plugins/investor-profile/components/form-with-error-footer/components/continue-button';
 import type { FundingSourcesFormProps } from './funding-sources-form';

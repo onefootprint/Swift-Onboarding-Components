@@ -1,5 +1,4 @@
 import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
 import type { CreateDialogProps } from './create-dialog';

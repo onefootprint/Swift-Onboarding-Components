@@ -1,7 +1,7 @@
 import { IcoClose16, IcoPencil16, IcoUpload16, IcoUser16 } from '@onefootprint/icons';
 import { Drawer, LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

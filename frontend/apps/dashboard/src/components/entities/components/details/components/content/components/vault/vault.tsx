@@ -1,6 +1,5 @@
 import type { DataIdentifier, EntityVault, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
 import { EntityKind, IdDI } from '@onefootprint/types';
-import React from 'react';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';

@@ -2,7 +2,7 @@ import '../../../../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { Button } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import type { ImageConsentHandler } from '.';
 import ImageConsent from '.';

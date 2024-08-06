@@ -3,11 +3,10 @@ import { Grid, Tabs, Text, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import optionsByProduct from './examples.constants';
-import type { Item } from './examples.types';
 
 type ExamplesProps = {
   product: 'onboarding-components';

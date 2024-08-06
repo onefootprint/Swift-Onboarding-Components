@@ -1,5 +1,4 @@
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type DescriptionProps = {

@@ -1,6 +1,6 @@
 import { Drawer, SearchInput, Stack, Text } from '@onefootprint/ui';
 import type { ChangeEvent } from 'react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useRiskSignals from '../../hooks/use-risk-signals';

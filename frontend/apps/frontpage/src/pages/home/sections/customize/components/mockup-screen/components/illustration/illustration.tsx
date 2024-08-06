@@ -1,7 +1,7 @@
 import { Box, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import styled, { css } from 'styled-components';
 
 const rightFootVariants = {

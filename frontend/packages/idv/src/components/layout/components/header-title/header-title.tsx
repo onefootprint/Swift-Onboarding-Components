@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
-import React from 'react';
 
 type StackProps = ComponentProps<typeof Stack>;
 

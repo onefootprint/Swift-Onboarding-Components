@@ -2,7 +2,6 @@ import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { PhoneInput } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

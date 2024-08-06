@@ -1,6 +1,5 @@
 import { BacktestingRuleAction, RuleActionSection } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import getActionText from '../../utils/get-action-text';

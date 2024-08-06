@@ -2,7 +2,6 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
 import type { BoxStyleProps, LinkButtonVariant } from '@onefootprint/ui';
 import { LinkButton, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useTruncatedtext, { ShownTextState } from './hooks/use-truncated-text';

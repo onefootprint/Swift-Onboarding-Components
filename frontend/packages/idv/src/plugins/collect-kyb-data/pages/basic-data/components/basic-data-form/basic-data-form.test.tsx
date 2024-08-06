@@ -2,7 +2,6 @@ import '../../../../../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { BusinessDI } from '@onefootprint/types';
-import React from 'react';
 
 import type { BasicDataFormProps } from './basic-data-form';
 import BasicDataForm from './basic-data-form';

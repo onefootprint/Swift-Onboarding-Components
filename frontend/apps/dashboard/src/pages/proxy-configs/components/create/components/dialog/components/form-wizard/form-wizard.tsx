@@ -1,5 +1,5 @@
 import type { CreateProxyConfigRequest } from '@onefootprint/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import createPayload from './utils/create-payload';

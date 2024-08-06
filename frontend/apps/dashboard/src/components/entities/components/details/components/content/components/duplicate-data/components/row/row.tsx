@@ -1,7 +1,6 @@
 import type { DuplicateDataItem } from '@onefootprint/types';
 import { DupeKind } from '@onefootprint/types';
 import { Box, CodeInline, Tag, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import StatusBadge from 'src/components/status-badge';
 import getTruncatedName from 'src/utils/get-truncated-name';

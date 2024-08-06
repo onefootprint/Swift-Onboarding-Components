@@ -1,5 +1,4 @@
 import { CodeBlock, CodeInline } from '@onefootprint/ui';
-import React from 'react';
 
 type CodeProps = {
   children: string;

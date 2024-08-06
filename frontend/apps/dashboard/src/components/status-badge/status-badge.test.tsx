@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { EntityStatus } from '@onefootprint/types';
-import React from 'react';
 
 import type { StatusBadgeProps } from './status-badge';
 import StatusBadge from './status-badge';

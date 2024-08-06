@@ -10,7 +10,6 @@ import {
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
 import { getOrgMemberRequest } from '../use-get-org-member/use-get-org-member';
-import useLoggedOutStorage from '../use-logged-out-storage';
 import type {
   AuthHeaders,
   MetaSession,

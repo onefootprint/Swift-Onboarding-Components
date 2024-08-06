@@ -1,7 +1,5 @@
 import '@/static/server-shimmer.css';
 
-import React from 'react';
-
 const Loading = () => (
   <div
     style={{

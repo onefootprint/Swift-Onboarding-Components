@@ -1,5 +1,4 @@
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 
 import BifrostImage from '../bifrost-image';
 import animationVariants from './animation-variants';

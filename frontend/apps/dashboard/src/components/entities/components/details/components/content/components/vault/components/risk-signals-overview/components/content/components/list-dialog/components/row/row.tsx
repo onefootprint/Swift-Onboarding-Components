@@ -2,7 +2,6 @@ import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
 import type { RiskSignal } from '@onefootprint/types';
 import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

@@ -1,10 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoClose24, IcoMenu24, ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Container, Overlay, Stack, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import { Box, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import React, { useState, useRef, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';

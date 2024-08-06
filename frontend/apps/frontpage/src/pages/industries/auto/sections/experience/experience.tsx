@@ -1,6 +1,5 @@
 import { Box, Container, Stack, Text, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ProblemSolutionCard from 'src/pages/industries/components/problem-solution-card';
 import type { CustomIcons } from 'src/pages/industries/components/problem-solution-card/problem-solution-card';

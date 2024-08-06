@@ -1,5 +1,4 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import type { SegmentedControlOptionFields } from './components/segmented-control-option';

@@ -7,7 +7,6 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import React from 'react';
 
 import PlaybookDetails from './playbook-details';
 import {

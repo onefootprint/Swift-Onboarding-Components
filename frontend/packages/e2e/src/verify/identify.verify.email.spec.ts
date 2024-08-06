@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  clickOnVerifyWithSms,
   fillEmail,
   fillPhoneNumber,
   selectOutcomeOptional,

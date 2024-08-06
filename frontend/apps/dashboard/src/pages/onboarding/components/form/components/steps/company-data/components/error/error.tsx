@@ -1,7 +1,6 @@
 import { IcoForbid40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { EmptyState } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ErrorProps = {

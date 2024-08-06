@@ -1,5 +1,4 @@
 import type { ListCreatedEvent } from '@onefootprint/types';
-import React from 'react';
 
 type ListCreatedEventHeaderProps = {
   event: ListCreatedEvent;

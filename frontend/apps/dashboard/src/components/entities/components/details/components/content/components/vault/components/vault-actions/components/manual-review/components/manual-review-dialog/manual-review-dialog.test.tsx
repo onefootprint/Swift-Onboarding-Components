@@ -1,6 +1,5 @@
 import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
-import React from 'react';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewDialogProps } from './manual-review-dialog';

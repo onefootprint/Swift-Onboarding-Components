@@ -4,7 +4,7 @@ import type { TableRow } from '@onefootprint/ui';
 import { Stack, Table, Text } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { searchByPaths } from '@/helpers';

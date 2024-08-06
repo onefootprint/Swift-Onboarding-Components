@@ -1,6 +1,6 @@
 import { OrgFrequentNoteKind, WorkflowStatus } from '@onefootprint/types';
 import { Divider, Hint, Radio, Stack, Toggle, Tooltip } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';

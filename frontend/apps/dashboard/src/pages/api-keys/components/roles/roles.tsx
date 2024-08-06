@@ -1,7 +1,6 @@
 import { useToggle } from '@onefootprint/hooks';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Divider } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import CreateDialog from 'src/components/roles/create-dialog';

@@ -1,7 +1,6 @@
 import type { IdDocImageUploadError } from '@onefootprint/types';
 import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

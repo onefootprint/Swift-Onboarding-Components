@@ -1,6 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { Button, Checkbox, Divider, MultiSelect, Radio, Text } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

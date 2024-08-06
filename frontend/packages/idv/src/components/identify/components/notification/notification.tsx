@@ -1,6 +1,5 @@
 import { IcoCheckCircle40, IcoWarning40 } from '@onefootprint/icons';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import HeaderTitle from '../../../layout/components/header-title';

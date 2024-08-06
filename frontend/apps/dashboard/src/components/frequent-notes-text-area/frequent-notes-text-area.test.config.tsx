@@ -1,7 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { CreateOrgFrequentNoteResponse, GetOrgFrequentNotesResponse } from '@onefootprint/types';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import FrequentNotesTextArea from './frequent-notes-text-area';

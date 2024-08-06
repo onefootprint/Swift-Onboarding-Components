@@ -1,6 +1,5 @@
-import { Banner, Stack, Text } from '@onefootprint/ui';
+import { Banner, Stack } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactForm from 'src/components/contact-form';
 import useOrgSession from 'src/hooks/use-org-session';

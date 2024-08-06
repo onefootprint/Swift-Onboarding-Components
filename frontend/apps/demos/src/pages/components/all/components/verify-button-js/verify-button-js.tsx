@@ -1,5 +1,5 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
 

@@ -1,5 +1,4 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import React from 'react';
 import useSession from 'src/hooks/use-session';
 
 import Content from './components/content';

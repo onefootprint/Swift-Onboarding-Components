@@ -1,6 +1,5 @@
 import getCustomAppearance from '@onefootprint/appearance/src/utils/get-custom-appearance/get-custom-appearance'; /** Importing 'getCustomAppearance' from '@onefootprint/appearance' fails in server components */
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import React from 'react';
 
 import DrawerLoading from '@/src/components/client-loading/drawer-loading';
 import ModalLoading from '@/src/components/client-loading/modal-loading';

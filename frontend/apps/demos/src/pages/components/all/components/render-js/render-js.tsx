@@ -1,5 +1,4 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import React from 'react';
 import { DEMO_RENDER_AUTH_TOKEN } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';

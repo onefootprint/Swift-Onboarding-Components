@@ -2,7 +2,6 @@ import type { Color, FontFamily, FontVariant } from '@onefootprint/design-tokens
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import { Stack, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type NavigationLinkProps = {

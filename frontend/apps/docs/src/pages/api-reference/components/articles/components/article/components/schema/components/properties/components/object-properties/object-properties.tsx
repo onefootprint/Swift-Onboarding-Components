@@ -1,6 +1,6 @@
 import { IcoChevronRight16 } from '@onefootprint/icons';
 import { Box, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

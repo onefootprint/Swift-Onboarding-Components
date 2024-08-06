@@ -3,7 +3,6 @@ import type { Rule, RuleAction } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 import styled, { css } from 'styled-components';

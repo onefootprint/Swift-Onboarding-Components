@@ -1,5 +1,4 @@
 import { Stack, Text, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Ctas from 'src/components/ctas';

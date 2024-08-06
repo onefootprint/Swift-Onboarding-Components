@@ -1,5 +1,4 @@
 import { Box, Grid, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Box role="progressbar" aria-label="Loading details...">

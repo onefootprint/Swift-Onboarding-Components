@@ -1,7 +1,6 @@
 'use client';
 
 import { useObjectUrl } from '@onefootprint/ui';
-import React from 'react';
 
 type Props = {
   id: string;

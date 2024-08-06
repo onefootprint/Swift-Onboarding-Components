@@ -5,7 +5,7 @@ import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
 import type { CountrySelectOption, RadioSelectOptionFields } from '@onefootprint/ui';
 import { Button, CountrySelect, Divider, RadioSelect, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

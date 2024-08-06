@@ -1,6 +1,5 @@
 import { PinInput, Stack, Text } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { getLogger } from '../../../../utils/logger';

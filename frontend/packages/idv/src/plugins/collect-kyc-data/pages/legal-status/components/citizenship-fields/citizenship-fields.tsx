@@ -1,6 +1,5 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import type { ControllerRenderProps, FieldError, FieldValues } from 'react-hook-form';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

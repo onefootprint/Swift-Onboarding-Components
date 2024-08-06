@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;

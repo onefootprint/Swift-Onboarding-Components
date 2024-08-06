@@ -9,7 +9,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
-import React from 'react';
 
 import Members from './members';
 import {

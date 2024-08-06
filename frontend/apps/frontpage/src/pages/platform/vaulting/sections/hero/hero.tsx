@@ -1,7 +1,6 @@
 import { IcoCode24, IcoDatabase24, IcoKey24, IcoUsers24 } from '@onefootprint/icons';
 import { Container, Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

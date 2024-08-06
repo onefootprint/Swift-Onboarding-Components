@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { Grid, Text, media } from '@onefootprint/ui';
 import rgba from 'polished/lib/color/rgba';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type ValuesProps = {

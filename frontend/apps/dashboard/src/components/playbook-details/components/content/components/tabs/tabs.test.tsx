@@ -1,6 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import type { OnboardingConfig } from '@onefootprint/types';
-import React from 'react';
 
 import Tabs from './tabs';
 import playbookFixture from './tabs.test.config';

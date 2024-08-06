@@ -1,5 +1,4 @@
 import NextError from 'next/error';
-import React from 'react';
 
 const CustomErrorComponent = ({ statusCode }) => <NextError statusCode={statusCode} />;
 

@@ -1,7 +1,6 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { Dropdown, useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

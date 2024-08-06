@@ -1,5 +1,5 @@
 import { motion, useAnimationControls } from 'framer-motion';
-import React, { useEffect, useId } from 'react';
+import { useEffect, useId } from 'react';
 
 type HorizontalBeamProps = {
   width: number;

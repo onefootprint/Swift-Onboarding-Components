@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { useLogStateMachine } from '../../../../hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';

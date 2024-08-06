@@ -1,7 +1,7 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import { Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

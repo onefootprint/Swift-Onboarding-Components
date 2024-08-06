@@ -1,7 +1,6 @@
 import CollectedInformation from '@/playbooks/components/collected-information';
 import { AuthMethodKind, OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type AuthProps = Pick<OnboardingConfig, 'mustCollectData' | 'requiredAuthMethods' | 'allowUsTerritoryResidents'>;

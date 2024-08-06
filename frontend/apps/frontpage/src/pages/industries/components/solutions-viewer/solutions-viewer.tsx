@@ -2,7 +2,7 @@ import { Box, Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';

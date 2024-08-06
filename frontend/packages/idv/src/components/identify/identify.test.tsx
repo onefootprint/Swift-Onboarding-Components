@@ -2,7 +2,6 @@ import '../../config/initializers/i18next-test';
 
 import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, IdDI, UserTokenScope } from '@onefootprint/types';
-import * as React from 'react';
 
 import { Layout } from '../layout';
 import Identify from './identify';

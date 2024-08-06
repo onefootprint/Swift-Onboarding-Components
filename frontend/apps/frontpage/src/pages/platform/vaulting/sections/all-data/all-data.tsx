@@ -1,7 +1,7 @@
 import { Box } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
 import uniqueId from 'lodash/uniqueId';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

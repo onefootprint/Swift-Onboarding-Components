@@ -1,6 +1,6 @@
 import { IcoWarning16 } from '@onefootprint/icons';
 import { Checkbox, Divider, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

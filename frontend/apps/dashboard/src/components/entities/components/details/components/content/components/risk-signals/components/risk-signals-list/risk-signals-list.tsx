@@ -2,7 +2,6 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { RiskSignal } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
 import { Table } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

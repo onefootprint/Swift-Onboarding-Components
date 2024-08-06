@@ -28,7 +28,6 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isKycCdo } from '../../../../../../utils/cdo-utils';

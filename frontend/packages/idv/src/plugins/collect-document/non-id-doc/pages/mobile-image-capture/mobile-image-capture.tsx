@@ -1,5 +1,4 @@
 import { useToast } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import upperFirst from 'lodash/upperFirst';

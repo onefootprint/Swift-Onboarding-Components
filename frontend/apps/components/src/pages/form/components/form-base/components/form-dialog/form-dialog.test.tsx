@@ -1,5 +1,4 @@
 import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import { renderComponents } from '../../../../../../config/tests';
 import type { FormDialogProps } from './form-dialog';

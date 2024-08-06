@@ -1,7 +1,6 @@
 import type { Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import { CodeInline, Text } from '@onefootprint/ui';
-import React from 'react';
 import { FieldOrPlaceholder, StatusBadge } from 'src/components';
 
 import Tags from './components/tags';

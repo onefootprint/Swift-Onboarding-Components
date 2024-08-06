@@ -1,7 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { DataKind, isVaultDataDecrypted } from '@onefootprint/types';
 import { Box, CodeInline, Grid, LinkButton, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 import styled, { css } from 'styled-components';

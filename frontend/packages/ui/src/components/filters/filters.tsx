@@ -1,5 +1,4 @@
 import noop from 'lodash/noop';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

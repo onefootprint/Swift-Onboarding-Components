@@ -2,7 +2,7 @@ import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { DataIdentifier, List, ListKind, ListRuleField, RiskSignalRuleField } from '@onefootprint/types';
 import { IconButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

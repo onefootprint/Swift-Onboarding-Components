@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Documents from './documents';
 import { entityFixture, withDocuments } from './documents.test.config';

@@ -1,7 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
-import React from 'react';
 import { DEMO_FORM_AUTH_TOKEN } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';

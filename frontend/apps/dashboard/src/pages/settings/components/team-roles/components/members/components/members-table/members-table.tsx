@@ -1,6 +1,5 @@
 import type { Member } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useMembersFilters from '../../hooks/use-members-filters';

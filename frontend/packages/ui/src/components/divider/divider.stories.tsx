@@ -1,5 +1,4 @@
 import type { ComponentMeta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { DividerProps } from './divider';
 import Divider from './divider';

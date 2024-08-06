@@ -3,7 +3,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { PasskeyAttemptContext } from '@onefootprint/types/src/api/skip-liveness';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { BottomSheet, Box, Button, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

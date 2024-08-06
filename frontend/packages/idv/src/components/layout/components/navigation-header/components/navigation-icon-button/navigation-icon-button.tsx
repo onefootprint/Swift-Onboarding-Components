@@ -1,5 +1,4 @@
 import { IconButton } from '@onefootprint/ui';
-import React from 'react';
 
 import type { NavigationHeaderRightButtonProps } from '../../types';
 

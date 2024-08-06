@@ -2,7 +2,6 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { DuplicateDataItem } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useCurrentEntityDuplicateData from 'src/components/entities/components/details/hooks/use-current-entity-duplicate-data';
 import useSession from 'src/hooks/use-session';

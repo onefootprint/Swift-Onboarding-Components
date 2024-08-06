@@ -1,6 +1,5 @@
 import { Divider, LinkButton, Stack, createFontStyles } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

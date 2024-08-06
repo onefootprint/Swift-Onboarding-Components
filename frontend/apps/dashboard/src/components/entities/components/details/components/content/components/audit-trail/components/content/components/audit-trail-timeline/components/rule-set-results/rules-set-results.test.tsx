@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { RuleSetResultsProps } from './rule-set-results';
 import RuleSetResults from './rule-set-results';

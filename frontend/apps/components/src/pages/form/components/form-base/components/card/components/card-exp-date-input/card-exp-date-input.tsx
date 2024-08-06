@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { InputProps } from '@onefootprint/ui';
 import { InternalInput } from '@onefootprint/ui';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type CardExpDateInputProps = Omit<

@@ -2,7 +2,7 @@ import { ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit/react';
 import { ListRuleOp, RiskSignalRuleOp } from '@onefootprint/types';
 import { Text, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

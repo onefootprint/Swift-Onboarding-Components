@@ -1,5 +1,4 @@
 import { Button, Text } from '@onefootprint/ui';
-import React from 'react';
 import type { PermissionGateProps } from 'src/components/permission-gate';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';

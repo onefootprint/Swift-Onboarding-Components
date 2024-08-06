@@ -1,7 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Cloud1 from './components/cloud-1';

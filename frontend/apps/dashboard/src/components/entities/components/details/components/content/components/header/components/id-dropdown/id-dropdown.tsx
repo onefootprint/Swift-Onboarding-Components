@@ -1,10 +1,8 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import type { Entity } from '@onefootprint/types';
 import { CopyButton, Dropdown, Stack, Text, createFontStyles, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { keyframes } from 'styled-components';
 
 type IdDropdownProps = {
   entity: Entity;

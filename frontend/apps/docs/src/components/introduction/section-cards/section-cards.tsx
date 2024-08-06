@@ -7,7 +7,7 @@ import {
   IcoStore24,
 } from '@onefootprint/icons';
 import { media } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';

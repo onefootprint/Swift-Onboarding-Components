@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
-import React from 'react';
 
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';

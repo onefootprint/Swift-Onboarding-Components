@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { AUTOCAPTURE_TIMER_INTERVAL } from '../../../../constants';

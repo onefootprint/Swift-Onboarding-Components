@@ -2,7 +2,6 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import type { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
-import React from 'react';
 
 import { useIdDocMachine } from '../../components/machine-provider';
 import IdDocCountryAndTypeContainer from './components/id-doc-country-and-type-container';

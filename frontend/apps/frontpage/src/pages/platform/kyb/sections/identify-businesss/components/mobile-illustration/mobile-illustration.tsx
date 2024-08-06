@@ -1,6 +1,5 @@
 import { Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import styled from 'styled-components';
 
 const MobileIllustration = () => (

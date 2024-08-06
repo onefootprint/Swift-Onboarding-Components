@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { getPartnerPartnerships } from '@/queries';
 
 import CompaniesContent from './content';

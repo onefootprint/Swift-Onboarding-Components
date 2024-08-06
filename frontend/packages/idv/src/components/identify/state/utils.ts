@@ -5,7 +5,7 @@ import { AuthMethodKind } from '@onefootprint/types';
 import type { DeviceInfo as Device } from '../../../hooks';
 import { getRandomID } from '../../../utils';
 import validateBootstrapData from '../utils/validate-bootstrap-data';
-import type { IdentifyMachineContext as Context, IdentifyContext, NavigatedToPrevPage } from './types';
+import type { IdentifyMachineContext as Context, IdentifyContext } from './types';
 import { IdentifyMachineArgs, IdentifyVariant } from './types';
 
 type User = IdentifyContext['user'];

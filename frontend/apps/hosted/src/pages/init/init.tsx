@@ -4,7 +4,6 @@ import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import type { BusinessResponse } from '@onefootprint/types';
 import { Shimmer, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
-import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled, { css } from 'styled-components';
 

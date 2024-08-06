@@ -1,9 +1,8 @@
 import { useIntl } from '@onefootprint/hooks';
-import { IcoAppclip16, IcoBolt16, IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
+import { IcoAppclip16, IcoBolt16 } from '@onefootprint/icons';
 import type { AuthEvent } from '@onefootprint/types';
 import { AuthEventKind, EntityKind } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { displayForUserAgent } from 'src/utils/user-agent';
 

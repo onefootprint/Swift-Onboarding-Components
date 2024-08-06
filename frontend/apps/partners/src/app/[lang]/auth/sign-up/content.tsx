@@ -4,7 +4,6 @@ import { LogoFpCompact } from '@onefootprint/icons';
 import { Box, Button, Divider, GoogleButton, Stack, Text, TextInput } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

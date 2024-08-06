@@ -1,5 +1,4 @@
 import { Box, Text } from '@onefootprint/ui';
-import React from 'react';
 
 export type FieldsetProps = {
   label: string;

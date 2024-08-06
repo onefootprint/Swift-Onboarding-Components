@@ -1,7 +1,6 @@
 import { IcoBuilding16 } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type CompanyNameProps = {

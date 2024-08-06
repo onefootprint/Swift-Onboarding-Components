@@ -22,7 +22,6 @@ import type {
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
 import { LinkButton, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';

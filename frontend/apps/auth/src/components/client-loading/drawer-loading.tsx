@@ -3,7 +3,6 @@
 import { FullHeightContainer } from '@onefootprint/idv';
 import Loading from '@onefootprint/idv/src/components/identify/components/loading';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 
 const DrawerLoading = (): JSX.Element => (
   <FullHeightContainer variant="drawer" hasBorderRadius>

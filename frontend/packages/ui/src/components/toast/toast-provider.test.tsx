@@ -1,7 +1,7 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, waitForElementToBeRemoved } from '@onefootprint/test-utils';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import Button from '../button';
 import ToastProvider, { useToast } from './toast-provider';

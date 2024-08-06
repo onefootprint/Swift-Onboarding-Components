@@ -2,7 +2,6 @@ import '../../config/initializers/i18next-test';
 
 import { IcoClose24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { IconButtonProps } from './icon-button';
 import IconButton from './icon-button';

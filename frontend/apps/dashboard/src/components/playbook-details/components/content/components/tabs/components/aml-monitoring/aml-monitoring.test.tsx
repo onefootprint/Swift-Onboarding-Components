@@ -1,5 +1,4 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
-import React from 'react';
 
 import AmlMonitoring from './aml-monitoring';
 import onboardingConfigFixture from './aml-monitoring.test.config';

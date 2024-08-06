@@ -1,6 +1,6 @@
 import type { StepperOption } from '@onefootprint/ui';
 import { Stepper, media } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

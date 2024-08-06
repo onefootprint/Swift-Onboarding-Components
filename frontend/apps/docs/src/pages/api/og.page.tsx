@@ -1,7 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import Image from 'next/image';
 import type { NextRequest } from 'next/server';
-import React from 'react';
 
 export const config = {
   runtime: 'edge',

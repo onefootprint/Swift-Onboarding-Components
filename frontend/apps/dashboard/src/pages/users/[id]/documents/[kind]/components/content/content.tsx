@@ -1,6 +1,5 @@
 import type { Document } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
 
 import DecryptBanner from './components/decrypt-banner';
 import Navigation from './components/navigation';

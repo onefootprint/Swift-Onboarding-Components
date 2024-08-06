@@ -1,5 +1,5 @@
 import { CodeBlock, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Iframe from './components/iframe';

@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';

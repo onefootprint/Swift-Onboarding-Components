@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 
 import usePermissionsByRoute from './hooks/use-permissions';

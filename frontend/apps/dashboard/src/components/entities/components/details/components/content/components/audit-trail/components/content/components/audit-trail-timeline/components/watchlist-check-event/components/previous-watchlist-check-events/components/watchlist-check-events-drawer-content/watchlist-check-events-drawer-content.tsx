@@ -1,6 +1,5 @@
 import type { PreviousWatchlistChecksEventData, WatchlistCheckEventData } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 

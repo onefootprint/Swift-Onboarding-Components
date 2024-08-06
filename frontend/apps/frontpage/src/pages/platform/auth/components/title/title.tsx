@@ -1,6 +1,5 @@
 import { Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 
 type TitleProps = {
   iconSrc?: string;

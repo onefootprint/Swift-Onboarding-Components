@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Screen from './components/screen';
 
 const Phone = () => {

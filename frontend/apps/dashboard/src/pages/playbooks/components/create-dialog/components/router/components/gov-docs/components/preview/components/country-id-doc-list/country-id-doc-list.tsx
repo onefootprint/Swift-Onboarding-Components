@@ -1,7 +1,6 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { Flag, Text } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 import IdDocList from '../id-doc-list';
 

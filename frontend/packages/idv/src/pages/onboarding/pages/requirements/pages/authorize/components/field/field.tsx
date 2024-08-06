@@ -1,6 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
 import { createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 export type FieldProps = {

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type * as CSS from 'csstype';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 import type { BoxPrimitives } from '../box';
 import Box from '../box';

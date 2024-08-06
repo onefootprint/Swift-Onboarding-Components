@@ -1,7 +1,7 @@
 import type { CustomDoc, DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { Box, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import CustomDocsForm from './components/custom-docs-form';

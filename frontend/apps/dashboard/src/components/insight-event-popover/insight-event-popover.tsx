@@ -1,7 +1,7 @@
 import type { InsightEvent } from '@onefootprint/types';
 import { Box, Grid, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { displayForUserAgent } from 'src/utils/user-agent';
 import styled, { css, keyframes } from 'styled-components';

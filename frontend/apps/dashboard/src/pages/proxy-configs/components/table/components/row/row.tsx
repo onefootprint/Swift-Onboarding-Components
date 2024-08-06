@@ -1,7 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { ProxyConfig } from '@onefootprint/types';
 import { Badge, CodeInline } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Actions from './components/actions';

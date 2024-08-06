@@ -1,7 +1,7 @@
 import { EntityKind } from '@onefootprint/types';
 import { Box, Dialog, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';

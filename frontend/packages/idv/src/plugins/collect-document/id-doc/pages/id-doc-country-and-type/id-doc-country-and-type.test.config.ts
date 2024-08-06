@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
 import { initialContextDL } from '../../utils/state-machine/machine.test.config';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Penguin = () => (
   <svg width="124" height="78" viewBox="0 0 124 78" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path

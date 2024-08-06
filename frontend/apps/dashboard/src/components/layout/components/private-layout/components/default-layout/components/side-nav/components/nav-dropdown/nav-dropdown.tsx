@@ -4,14 +4,13 @@ import { IcoLogOut24 } from '@onefootprint/icons';
 import { Dropdown } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RiskSignalsGlossary from 'src/components/risk-signals-glossary';
 import styled, { css } from 'styled-components';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import PgpUploadTool from 'src/components/pgp-upload-tool';
-import useComposeDocsLoginUrl from 'src/hooks/use-compose-docs-login-url';
 import type { UserSession } from 'src/hooks/use-session';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';

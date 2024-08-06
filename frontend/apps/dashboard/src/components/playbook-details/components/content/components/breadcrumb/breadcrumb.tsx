@@ -1,7 +1,6 @@
 import { Breadcrumb as UIBreadcrumb } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

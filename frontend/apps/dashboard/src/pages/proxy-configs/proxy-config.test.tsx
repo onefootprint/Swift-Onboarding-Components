@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 import { clickOnAction } from 'src/config/tests';
 
 import {

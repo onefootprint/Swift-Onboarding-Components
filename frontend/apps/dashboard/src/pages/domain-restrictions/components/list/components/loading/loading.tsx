@@ -1,6 +1,5 @@
 import { Shimmer, Stack } from '@onefootprint/ui';
 import times from 'lodash/times';
-import React from 'react';
 
 const Loading = () => (
   <Stack direction="column" gap={5} aria-label="Loading domains restrictions..." role="progressbar">

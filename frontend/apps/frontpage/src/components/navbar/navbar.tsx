@@ -11,7 +11,7 @@ import {
   IcoUser24,
   IcoWriting24,
 } from '@onefootprint/icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';

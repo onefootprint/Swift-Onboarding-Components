@@ -1,5 +1,4 @@
 import { Hint, Radio, Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import TimelineItemTime from 'src/components/timeline-item-time';

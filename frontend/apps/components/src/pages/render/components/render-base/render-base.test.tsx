@@ -1,7 +1,6 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import { customRender, screen } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { RenderBaseProps } from './render-base';
 import RenderBase from './render-base';

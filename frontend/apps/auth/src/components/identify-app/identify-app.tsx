@@ -8,7 +8,7 @@ import { Identify, IdentifyVariant } from '@onefootprint/idv/src/components/iden
 import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
 import { CLIENT_PUBLIC_KEY_HEADER, type PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOnboardingValidate } from '@/src/queries';

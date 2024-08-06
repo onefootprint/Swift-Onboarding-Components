@@ -2,7 +2,6 @@ import type { Icon } from '@onefootprint/icons';
 import { IcoEmail16, IcoFaceid16, IcoSmartphone16 } from '@onefootprint/icons';
 import { ChallengeKind } from '@onefootprint/types';
 import type { TFunction } from 'i18next';
-import React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
 import { isBiometric } from '../../../../utils';

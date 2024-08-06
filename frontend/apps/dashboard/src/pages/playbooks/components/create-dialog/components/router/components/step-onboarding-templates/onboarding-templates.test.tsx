@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 import { OnboardingTemplate } from 'src/pages/playbooks/utils/machine/types';
 
 import OnboardingTemplates from '.';

@@ -1,7 +1,7 @@
 import { IcoLock16 } from '@onefootprint/icons';
 import { Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type EncryptedInputProps = {
   label: string;

@@ -3,7 +3,7 @@ import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import type { Organization } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import useUpdateOrg from 'src/hooks/use-update-org';

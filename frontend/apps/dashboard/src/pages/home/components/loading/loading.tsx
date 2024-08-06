@@ -1,5 +1,4 @@
 import { Grid, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => {
   const templateAreas = ['one', 'two', 'three', 'four', 'five', 'six'];

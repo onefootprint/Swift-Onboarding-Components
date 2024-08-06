@@ -1,5 +1,5 @@
 import type { ComponentMeta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import type { CountrySelectProps } from './country-select';
 import CountrySelect from './country-select';

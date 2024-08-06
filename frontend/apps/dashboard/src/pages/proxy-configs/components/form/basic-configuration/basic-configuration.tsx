@@ -1,5 +1,4 @@
 import { Box, Form, NativeSelect, Text, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';

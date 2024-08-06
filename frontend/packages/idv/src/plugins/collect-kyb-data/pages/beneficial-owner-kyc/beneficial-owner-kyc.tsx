@@ -1,5 +1,4 @@
 import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
-import React from 'react';
 
 import CollectKycData from '../../../collect-kyc-data';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';

@@ -1,6 +1,5 @@
 import { createUseRouterSpy, customRender, screen, userEvent, within } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
-import React from 'react';
 
 import type { ContentProps } from './content';
 import Content from './content';

@@ -1,7 +1,6 @@
 import type { Role } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useRolesFilters from '../hooks/use-roles-filters';

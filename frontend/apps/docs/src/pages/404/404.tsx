@@ -1,6 +1,5 @@
 import { Container, EmptyState } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

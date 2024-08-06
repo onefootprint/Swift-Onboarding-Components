@@ -1,5 +1,4 @@
 import { Button, Grid, InlineAlert, Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';

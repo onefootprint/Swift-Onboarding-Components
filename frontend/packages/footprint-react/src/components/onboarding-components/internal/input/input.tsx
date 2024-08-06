@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import type { InputHTMLAttributes } from 'react';
-import React, { forwardRef, useId } from 'react';
+import { forwardRef, useId } from 'react';
 
 import Label from '../../label';
 

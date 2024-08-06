@@ -1,8 +1,6 @@
 import { LinkButton, Text, useObjectUrl } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { EncryptedCell } from 'src/components';
 
 import { IcoDownload16 } from '@onefootprint/icons';
 

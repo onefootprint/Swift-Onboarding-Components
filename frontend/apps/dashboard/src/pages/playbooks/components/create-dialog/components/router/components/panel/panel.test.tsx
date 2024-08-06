@@ -1,5 +1,4 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
+import { customRender, screen } from '@onefootprint/test-utils';
 import Panel, { PanelProps } from './panel';
 
 const defaultProps: PanelProps = {

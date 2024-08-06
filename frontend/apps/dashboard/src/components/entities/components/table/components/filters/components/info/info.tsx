@@ -1,5 +1,4 @@
 import { InlineAlert } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useEntitiesContext } from '@/entities/components/list/hooks/use-entities-context';

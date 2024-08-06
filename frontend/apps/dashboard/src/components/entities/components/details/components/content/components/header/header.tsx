@@ -1,7 +1,6 @@
 import Labels from '@/entities/components/labels';
 import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import StatusBadge from 'src/components/status-badge';
 import styled, { css } from 'styled-components';

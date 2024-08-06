@@ -1,7 +1,6 @@
 import { AuthMethodAction, AuthMethodKind } from '@onefootprint/types';
 import type { AuthMethodUpdatedData } from '@onefootprint/types/src/data/timeline';
 import { Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import InsightEventPopover from 'src/components/insight-event-popover';
 import styled, { css } from 'styled-components';

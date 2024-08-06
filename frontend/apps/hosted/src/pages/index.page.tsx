@@ -4,7 +4,6 @@ import Idv, { AppErrorBoundary, Logger } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
-import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 import Layout from '../components/layout';

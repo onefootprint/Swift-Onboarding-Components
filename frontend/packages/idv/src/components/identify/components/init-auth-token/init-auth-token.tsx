@@ -1,5 +1,4 @@
 import { UserTokenScope } from '@onefootprint/types';
-import React from 'react';
 
 import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';

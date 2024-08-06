@@ -1,6 +1,5 @@
 import { IcoPencil16, IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type CardTitleProps = {

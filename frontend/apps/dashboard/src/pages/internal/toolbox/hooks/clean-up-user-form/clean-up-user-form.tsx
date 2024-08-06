@@ -1,5 +1,4 @@
 import { Select, Text, TextInput, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 

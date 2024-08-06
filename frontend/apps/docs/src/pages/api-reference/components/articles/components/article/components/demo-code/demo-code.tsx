@@ -1,5 +1,5 @@
 import { Box, CodeBlock, Text, media } from '@onefootprint/ui';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

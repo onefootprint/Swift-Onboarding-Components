@@ -1,6 +1,6 @@
 import { Box, Container, media } from '@onefootprint/ui';
 import { useInView } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import Phone from './components/phone';
 import Words from './components/words/words';

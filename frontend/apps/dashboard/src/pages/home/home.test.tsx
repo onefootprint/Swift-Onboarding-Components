@@ -6,7 +6,6 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
 import Home from './home';

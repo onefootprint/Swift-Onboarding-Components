@@ -1,7 +1,6 @@
 import { IcoStore24 } from '@onefootprint/icons';
 import { Box, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

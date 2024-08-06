@@ -1,6 +1,6 @@
 import { FootprintForm } from '@onefootprint/footprint-react';
 import { Button } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DEMO_FORM_AUTH_TOKEN } from 'src/config/constants';
 import styled from 'styled-components';
 

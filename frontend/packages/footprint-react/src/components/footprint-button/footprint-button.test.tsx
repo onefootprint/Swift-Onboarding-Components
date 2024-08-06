@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import FootprintButton from './footprint-button';
 

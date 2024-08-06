@@ -1,7 +1,6 @@
 import { Box, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React from 'react';
 import styled from 'styled-components';
 
 const containerVariants = {

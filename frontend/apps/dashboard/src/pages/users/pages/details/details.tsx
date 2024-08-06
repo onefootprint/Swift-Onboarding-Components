@@ -1,6 +1,5 @@
 import { EntityKind } from '@onefootprint/types';
 import Head from 'next/head';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { EntityDetails } from 'src/components/entities';
 

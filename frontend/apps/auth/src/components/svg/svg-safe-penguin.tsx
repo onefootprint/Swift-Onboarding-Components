@@ -1,5 +1,3 @@
-import React from 'react';
-
 const SafeAndPenguin = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="148" height="113" fill="none">
     <path

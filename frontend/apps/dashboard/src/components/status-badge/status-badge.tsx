@@ -1,7 +1,6 @@
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
 import type { EntityStatus } from '@onefootprint/types';
 import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import getBadgeVariantByStatus from '../entities/utils';

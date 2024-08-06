@@ -1,6 +1,6 @@
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Form from './components/form';

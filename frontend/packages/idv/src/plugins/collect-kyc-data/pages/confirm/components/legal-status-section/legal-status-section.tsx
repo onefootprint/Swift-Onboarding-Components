@@ -1,7 +1,7 @@
 import { IcoGlobe24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';

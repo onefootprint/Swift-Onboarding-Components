@@ -6,7 +6,7 @@ import type { AppProps } from 'next/app';
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';

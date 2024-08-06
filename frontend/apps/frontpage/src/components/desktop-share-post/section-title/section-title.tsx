@@ -1,5 +1,4 @@
 import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type SectionTitleProps = {

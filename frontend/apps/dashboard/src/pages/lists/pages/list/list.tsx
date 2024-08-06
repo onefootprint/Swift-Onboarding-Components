@@ -1,7 +1,7 @@
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';

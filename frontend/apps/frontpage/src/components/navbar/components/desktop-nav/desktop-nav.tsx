@@ -1,10 +1,9 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Box, Button, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useRouter } from 'next/router';
 import MessageBanner from 'src/components/layout/message-banner';

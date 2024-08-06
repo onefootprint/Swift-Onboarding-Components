@@ -1,4 +1,4 @@
-import type { Content, ContentSchema, ContentSchemaNoRef } from '../api-reference.types';
+import type { ContentSchemaNoRef } from '../api-reference.types';
 import staticApiData from '../assets/api-docs.json';
 import staticPreviewData from '../assets/api-preview-docs.json';
 import hostedApiData from '../assets/hosted-api-docs.json';

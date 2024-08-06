@@ -1,5 +1,5 @@
 import { Drawer, LinkButton, Stack, Tabs } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 

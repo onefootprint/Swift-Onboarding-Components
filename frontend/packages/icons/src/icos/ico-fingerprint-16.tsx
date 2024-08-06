@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme } from 'styled-components';
 import type { IconProps } from '../types';
 const IcoFingerprint16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {

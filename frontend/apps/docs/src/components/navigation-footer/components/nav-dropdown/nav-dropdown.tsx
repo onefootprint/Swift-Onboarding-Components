@@ -2,7 +2,7 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
 import { Dropdown, Text } from '@onefootprint/ui';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 import useSession, { User } from 'src/hooks/use-session';

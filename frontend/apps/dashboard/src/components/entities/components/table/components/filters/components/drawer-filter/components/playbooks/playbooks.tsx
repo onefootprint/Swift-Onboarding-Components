@@ -1,5 +1,5 @@
 import { Checkbox, LinkButton, Stack } from '@onefootprint/ui';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePlaybookOptions from 'src/pages/home/hooks/use-playbook-options';

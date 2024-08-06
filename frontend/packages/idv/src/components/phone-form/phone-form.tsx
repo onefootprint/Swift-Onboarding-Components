@@ -2,7 +2,6 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import type { L10n } from '@onefootprint/types';
 import { Button, Grid, PhoneInput } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 type PhoneFormData = { phoneNumber: string };

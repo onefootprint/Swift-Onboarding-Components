@@ -1,6 +1,5 @@
 import { IcoLink16 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import getSectionMeta from 'src/utils/section';
 import styled, { css } from 'styled-components';
 

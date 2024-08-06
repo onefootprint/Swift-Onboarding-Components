@@ -1,5 +1,4 @@
 import { Stack, Tag } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type TagsProps = {

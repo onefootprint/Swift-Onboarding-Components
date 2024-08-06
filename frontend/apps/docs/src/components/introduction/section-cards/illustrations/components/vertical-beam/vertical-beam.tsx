@@ -1,6 +1,6 @@
 import { motion, useAnimationControls } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useId } from 'react';
+import { useEffect, useId } from 'react';
 
 type VerticalBeamProps = {
   width: number;

@@ -1,6 +1,6 @@
 import { BusinessWatchlist, EntityKind } from '@onefootprint/types';
 import { SelectNew, Stack, Tag } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HitsList from './components/hits-list';
 

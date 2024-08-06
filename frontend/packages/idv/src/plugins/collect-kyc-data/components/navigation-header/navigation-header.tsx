@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { NavigationHeader as FootprintNavigationHeader } from '../../../../components';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 

@@ -1,7 +1,6 @@
 import type { CollectKycDataRequirement, InvestorProfileDI, VaultValue } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
-import type { AxiosError } from 'axios';
 import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 

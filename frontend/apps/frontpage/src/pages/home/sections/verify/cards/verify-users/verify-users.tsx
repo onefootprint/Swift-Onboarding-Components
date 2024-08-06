@@ -1,7 +1,7 @@
 import { IcoIdCard16, IcoUser16 } from '@onefootprint/icons';
 import { Stack, media } from '@onefootprint/ui';
 import { motion, useAnimation } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,9 +1,4 @@
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-  IdDocImageUploadError,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { IdDocImageProcessingError, IdDocImageUploadError, SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
 import { initialContextDL } from '../../utils/state-machine/machine.test.config';

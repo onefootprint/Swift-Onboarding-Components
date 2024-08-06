@@ -1,5 +1,4 @@
 import { CodeInline, Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 import styled, { css } from 'styled-components';

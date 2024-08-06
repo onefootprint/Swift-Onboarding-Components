@@ -1,5 +1,4 @@
-import React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import { LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
 import { useDecryptControls } from '../../../vault/components/vault-actions';

@@ -1,5 +1,4 @@
 import { AnimatedLoadingSpinner, Box, Shimmer, Stack } from '@onefootprint/ui';
-import React from 'react';
 
 const Loading = () => (
   <Box testID="onboarding-configs-details-loading" aria-busy>

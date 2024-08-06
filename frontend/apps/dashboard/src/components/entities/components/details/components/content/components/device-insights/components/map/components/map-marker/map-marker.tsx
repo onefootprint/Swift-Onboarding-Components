@@ -1,7 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoMapPinDefault, IcoMapPinSelected } from '@onefootprint/icons';
 import { useTheme } from 'next-themes';
-import React from 'react';
 import styled from 'styled-components';
 
 export type MapMarkerProps = {

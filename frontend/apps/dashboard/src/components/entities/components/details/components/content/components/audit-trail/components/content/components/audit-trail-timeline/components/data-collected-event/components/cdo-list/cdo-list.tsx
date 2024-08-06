@@ -8,7 +8,6 @@ import {
 } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import getCdos from './utils/get-cdos';

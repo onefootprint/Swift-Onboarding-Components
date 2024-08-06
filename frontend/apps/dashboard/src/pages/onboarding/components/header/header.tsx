@@ -1,6 +1,5 @@
 import { IcoLogOut16, LogoFpCompact } from '@onefootprint/icons';
 import { Container, Divider, LinkButton, createFontStyles, media } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

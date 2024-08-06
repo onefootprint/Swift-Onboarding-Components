@@ -2,7 +2,6 @@ import { primitives } from '@onefootprint/design-tokens';
 import { Text } from '@onefootprint/ui';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

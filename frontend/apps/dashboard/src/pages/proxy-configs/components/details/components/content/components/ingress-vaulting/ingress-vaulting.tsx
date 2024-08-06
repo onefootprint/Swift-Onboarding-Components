@@ -1,6 +1,6 @@
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { CodeInline, Text } from '@onefootprint/ui';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 

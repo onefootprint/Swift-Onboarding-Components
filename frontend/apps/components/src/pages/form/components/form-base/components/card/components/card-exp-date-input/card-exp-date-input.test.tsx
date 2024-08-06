@@ -1,5 +1,4 @@
 import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import { renderComponents } from '../../../../../../../../config/tests';
 import type { CardExpDateInputProps } from './card-exp-date-input';

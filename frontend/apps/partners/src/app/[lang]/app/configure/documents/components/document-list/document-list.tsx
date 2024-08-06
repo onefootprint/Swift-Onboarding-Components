@@ -3,7 +3,7 @@ import type { TableRow } from '@onefootprint/ui';
 import { Box, Dropdown, Table, useConfirmationDialog } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { SyntheticEvent } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Lang } from '@/app/types';

@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import ActivityLog from './activity-log';
 import { withListDetails, withListTimeline, withListTimelineError } from './activity-log.test.config';

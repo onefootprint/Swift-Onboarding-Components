@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useId, useState } from 'react';
+import { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import AnimatedLoadingSpinner from '../../../animated-loading-spinner';

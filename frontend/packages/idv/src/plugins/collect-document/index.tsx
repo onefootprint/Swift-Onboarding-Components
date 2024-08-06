@@ -1,5 +1,5 @@
 import { DocumentRequestKind, DocumentRequirement, IdDocRequirementConfig } from '@onefootprint/types';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { trackAction } from '../../utils/logger';
 import IdDoc from './id-doc';

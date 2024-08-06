@@ -1,5 +1,3 @@
-import React from 'react';
-
 import CompanyPhotosDesktop from './company-photos-desktop';
 import CompanyPhotosMobile from './company-photos-mobile';
 import type { CompanyPhoto } from './company-photos.types';

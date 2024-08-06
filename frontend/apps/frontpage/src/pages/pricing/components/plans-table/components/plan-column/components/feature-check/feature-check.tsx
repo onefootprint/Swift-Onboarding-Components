@@ -1,6 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
 import { Badge, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type FeatureCheckProps = {

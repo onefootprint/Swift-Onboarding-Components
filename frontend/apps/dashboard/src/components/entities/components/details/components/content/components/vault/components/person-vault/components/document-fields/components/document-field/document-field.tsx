@@ -2,7 +2,7 @@ import { useToggle } from '@onefootprint/hooks';
 import type { Document, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Drawer, LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

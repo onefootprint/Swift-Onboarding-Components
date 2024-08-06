@@ -1,6 +1,6 @@
 import { IcoClose24, icos } from '@onefootprint/icons';
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import Button from '../button';
 import Text from '../text';

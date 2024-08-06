@@ -1,7 +1,6 @@
 import { BusinessDI, IdDI } from '@onefootprint/types';
 import { Filters } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';

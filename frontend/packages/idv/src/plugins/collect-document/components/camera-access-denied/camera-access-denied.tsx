@@ -1,7 +1,6 @@
 import { IcoCamera40, IcoClose24 } from '@onefootprint/icons';
 import { Box, IconButton, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle, styled } from 'styled-components';
 import { DeviceInfo } from '../../../../hooks';

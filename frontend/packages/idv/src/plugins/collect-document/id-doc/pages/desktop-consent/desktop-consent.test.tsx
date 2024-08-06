@@ -1,5 +1,4 @@
 import { fireEvent, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import DesktopConsent from '.';
 import renderPage from '../../test-utils/render-page';

@@ -1,5 +1,5 @@
 import { Button, Stack, media } from '@onefootprint/ui';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GET_FORM_URL, LINTRK_CONVERSION_ID, SIGN_UP_URL } from 'src/config/constants';
 import styled, { css } from 'styled-components';

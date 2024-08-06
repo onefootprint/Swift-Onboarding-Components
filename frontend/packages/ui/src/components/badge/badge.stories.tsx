@@ -1,5 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { BadgeProps } from './badge';
 import Badge from './badge';

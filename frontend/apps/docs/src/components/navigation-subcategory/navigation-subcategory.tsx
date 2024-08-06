@@ -3,7 +3,7 @@ import { IcoChevronRight16 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { PageNavigationItem } from 'src/types/page';
 import styled, { css } from 'styled-components';
 

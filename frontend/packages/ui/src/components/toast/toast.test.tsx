@@ -2,7 +2,6 @@ import '../../config/initializers/i18next-test';
 
 import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import React from 'react';
 
 import Toast from './toast';
 import type { ToastProps } from './toast.types';

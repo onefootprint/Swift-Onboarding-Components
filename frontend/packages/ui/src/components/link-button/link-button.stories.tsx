@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import { IcoArrowRightSmall24, icos } from '@onefootprint/icons';
 import type { ComponentMeta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { LinkButtonProps } from './link-button';
 import LinkButton from './link-button';

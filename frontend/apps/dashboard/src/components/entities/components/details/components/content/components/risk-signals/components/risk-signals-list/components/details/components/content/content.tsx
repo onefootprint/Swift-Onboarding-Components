@@ -1,7 +1,6 @@
 import type { AmlHitMedia, RiskSignal } from '@onefootprint/types';
 import { Divider, Stack } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 
 import Matches from './components/matches';
 import HitsMedia from './components/matches/components/hits-media';

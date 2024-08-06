@@ -1,6 +1,5 @@
 import { Container, Grid, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactButtons from 'src/components/contact-buttons/contact-buttons';
 import SectionVerticalSpacer from 'src/components/section-vertical-spacer';

@@ -3,7 +3,6 @@ import { IcoEyeCrossed24, IcoFaceid24, IcoHelp24, IcoImages24 } from '@onefootpr
 import { Container } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

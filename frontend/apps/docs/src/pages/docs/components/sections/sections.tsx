@@ -1,7 +1,7 @@
 import { IcoFileText16 } from '@onefootprint/icons';
 import { Box, Stack, createFontStyles, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';

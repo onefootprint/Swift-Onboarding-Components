@@ -1,5 +1,4 @@
 import type { Entity } from '@onefootprint/types';
-import React from 'react';
 import { ErrorComponent } from 'src/components';
 
 import useBusinessOwners from '@/entity/hooks/use-business-owners';

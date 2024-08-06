@@ -1,6 +1,5 @@
 import request from '@onefootprint/request';
-import type { IdDI } from '@onefootprint/types';
-import { AUTH_HEADER } from '@onefootprint/types';
+import { AUTH_HEADER, IdDI } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 type PayloadPartial = 'authToken';

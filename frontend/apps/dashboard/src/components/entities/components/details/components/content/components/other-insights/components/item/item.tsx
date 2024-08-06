@@ -1,7 +1,6 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { UserInsightsUnit } from '@onefootprint/types';
 import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type ItemProps = {

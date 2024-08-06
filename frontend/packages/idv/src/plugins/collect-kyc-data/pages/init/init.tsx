@@ -1,5 +1,4 @@
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
-import React from 'react';
 import styled from 'styled-components';
 
 import { getLogger, trackAction } from '../../../../utils/logger';

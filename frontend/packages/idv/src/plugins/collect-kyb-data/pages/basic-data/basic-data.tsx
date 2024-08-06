@@ -5,7 +5,6 @@ import {
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TFunction } from 'i18next';

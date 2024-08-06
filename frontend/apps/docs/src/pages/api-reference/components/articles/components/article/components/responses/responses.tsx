@@ -1,5 +1,4 @@
 import { Box, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';

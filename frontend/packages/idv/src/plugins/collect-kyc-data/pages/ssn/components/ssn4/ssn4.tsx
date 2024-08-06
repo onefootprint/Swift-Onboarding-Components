@@ -1,7 +1,7 @@
 import { useInputMask } from '@onefootprint/hooks';
 import { TextInput, Toggle } from '@onefootprint/ui';
 import { TFunction } from 'i18next';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

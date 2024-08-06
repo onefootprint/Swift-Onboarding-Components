@@ -1,7 +1,6 @@
 import { Dialog, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
 import { InlineAlert } from '@onefootprint/ui/src/components';
 import type { FormEvent } from 'react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getFormElementValue } from '@/helpers';

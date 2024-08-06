@@ -1,7 +1,6 @@
-import { sendGTMEvent } from '@next/third-parties/google';
 import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';

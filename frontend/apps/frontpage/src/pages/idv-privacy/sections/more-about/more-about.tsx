@@ -1,6 +1,5 @@
 import { Container, Text, media } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,6 +1,5 @@
 import { WatchlistHit } from '@onefootprint/types';
 import { Table, TableRow } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Row from '../row';
 

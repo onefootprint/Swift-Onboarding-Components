@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { useForm } from 'react-hook-form';
 
 import Checkbox from '../../../../../checkbox';

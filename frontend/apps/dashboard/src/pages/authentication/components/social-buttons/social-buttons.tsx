@@ -1,5 +1,5 @@
 import { GoogleButton } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SocialButtons = () => {

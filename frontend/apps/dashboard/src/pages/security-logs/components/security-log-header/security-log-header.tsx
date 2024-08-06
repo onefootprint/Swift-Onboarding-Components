@@ -1,6 +1,5 @@
 import type { AccessEvent } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 
 import FieldTagList from '../field-tag-list';
 

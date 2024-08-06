@@ -2,7 +2,7 @@ import type { Tenant } from '@onefootprint/types';
 import { Pagination, Stack, Table, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAssumeTenant from 'src/hooks/use-assume-tenant';
 import useSession from 'src/hooks/use-session';

@@ -8,7 +8,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import { RiskSignalRuleOp } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUserFirmEmployee } from 'src/config/tests';
 
 import type { RulesProps } from './rules';

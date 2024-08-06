@@ -1,6 +1,6 @@
 import { IcoBook16, IcoBook24, IcoHelp16, IcoHelp24 } from '@onefootprint/icons';
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import type { RadioSelectProps } from './radio-select';
 import RadioSelect from './radio-select';

@@ -1,7 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import noop from 'lodash/fp/noop';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { checkIsPhoneValid, getLogger } from '../../../../utils';

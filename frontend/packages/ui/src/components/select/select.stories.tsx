@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import type { ComponentMeta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import Box from '../box';
 import type { SelectOption, SelectProps } from './select';

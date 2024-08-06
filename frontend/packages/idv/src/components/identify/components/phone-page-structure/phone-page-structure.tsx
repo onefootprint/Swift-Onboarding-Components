@@ -1,7 +1,6 @@
 import { Stack } from '@onefootprint/ui';
 import noop from 'lodash/fp/noop';
 import type { ComponentProps } from 'react';
-import React from 'react';
 
 import EmailPreview from '../../../email-preview';
 import PhoneForm from '../../../phone-form';

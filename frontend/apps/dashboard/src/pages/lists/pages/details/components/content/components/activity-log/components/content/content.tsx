@@ -6,7 +6,6 @@ import type {
 } from '@onefootprint/types';
 import { ListTimelineEventKind } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';

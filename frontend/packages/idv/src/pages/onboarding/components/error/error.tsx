@@ -1,6 +1,5 @@
 import { IcoForbid40 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,5 +1,4 @@
 import { Dialog, useToast } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useUpdateAllowedDomains from '../../hooks/use-update-allowed-domains';

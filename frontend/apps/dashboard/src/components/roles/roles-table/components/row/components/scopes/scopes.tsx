@@ -1,7 +1,6 @@
 import type { RoleScope } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import groupScopes from 'src/components/roles/utils/group-scopes';
 import styled, { css } from 'styled-components';

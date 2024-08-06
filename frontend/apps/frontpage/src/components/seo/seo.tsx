@@ -1,5 +1,4 @@
 import { NextSeo } from 'next-seo';
-import React from 'react';
 
 type SeoProps = {
   title: string;

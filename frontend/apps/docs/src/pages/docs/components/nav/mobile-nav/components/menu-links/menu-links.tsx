@@ -1,4 +1,3 @@
-import React from 'react';
 import AppNav from 'src/components/app-nav';
 import NavigationFooter from 'src/components/navigation-footer';
 import type { PageNavigation } from 'src/types/page';

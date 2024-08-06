@@ -1,6 +1,5 @@
 import { IcoCheck24, IcoClose24 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useDocs from '../../hooks/use-docs';

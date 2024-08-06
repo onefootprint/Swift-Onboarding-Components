@@ -1,6 +1,6 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import type { GetServerSideProps } from 'next';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 import Content from './components/content';
 import Loading from './components/loading';

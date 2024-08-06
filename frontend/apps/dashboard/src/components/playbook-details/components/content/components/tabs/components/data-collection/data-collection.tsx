@@ -1,7 +1,6 @@
 import CollectedInformation from '@/playbooks/components/collected-information';
 import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import AdditionalDocs from './components/additional-docs';
 import Auth from './components/auth';

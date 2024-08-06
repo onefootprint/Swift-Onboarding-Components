@@ -3,7 +3,6 @@ import { isVaultDataDocument, isVaultDataEmpty, isVaultDataEncrypted, isVaultDat
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { LinkButton, Text } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import EncryptedCell from '../encrypted-cell';

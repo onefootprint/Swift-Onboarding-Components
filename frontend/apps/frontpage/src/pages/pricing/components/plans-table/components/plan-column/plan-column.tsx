@@ -1,7 +1,6 @@
 import type { ButtonProps } from '@onefootprint/ui';
 import { Button, Stack } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Plans } from '../../plans-table-types';

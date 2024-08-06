@@ -3,7 +3,7 @@ import { FootprintPrivateEvent, FootprintPublicEvent } from '@onefootprint/footp
 import { getLogger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';

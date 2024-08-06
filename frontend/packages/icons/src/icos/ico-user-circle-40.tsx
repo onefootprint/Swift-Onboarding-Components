@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme } from 'styled-components';
 import type { IconProps } from '../types';
 const IcoUserCircle40 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {

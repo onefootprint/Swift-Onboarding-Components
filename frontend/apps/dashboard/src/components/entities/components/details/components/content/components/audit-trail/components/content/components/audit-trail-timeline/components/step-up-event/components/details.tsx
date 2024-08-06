@@ -1,5 +1,5 @@
 import { Drawer, LinkButton, Stack } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useEntityId from '@/entity/hooks/use-entity-id';

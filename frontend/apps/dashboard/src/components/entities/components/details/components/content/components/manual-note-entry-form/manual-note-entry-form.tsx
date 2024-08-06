@@ -1,6 +1,5 @@
 import type { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Divider, Text, Toggle } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';

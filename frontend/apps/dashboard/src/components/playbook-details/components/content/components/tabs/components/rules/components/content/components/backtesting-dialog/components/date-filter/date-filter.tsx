@@ -1,6 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import { DateSelectorSheet, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { DateFilterRange } from '../../backtesting-dialog.types';

@@ -1,6 +1,5 @@
 import themes from '@onefootprint/design-tokens';
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
 
 import type { TextProps } from './text';
 import Text from './text';

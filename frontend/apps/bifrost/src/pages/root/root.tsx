@@ -10,7 +10,7 @@ import { type ComponentsSdkContext, ComponentsSdkTypes } from '@onefootprint/idv
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import Layout from '../../components/layout';

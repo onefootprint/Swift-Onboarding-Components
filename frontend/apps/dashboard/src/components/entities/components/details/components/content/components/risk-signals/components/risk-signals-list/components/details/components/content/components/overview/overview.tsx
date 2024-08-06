@@ -1,7 +1,7 @@
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';

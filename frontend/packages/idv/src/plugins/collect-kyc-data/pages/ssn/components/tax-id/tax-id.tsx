@@ -1,7 +1,7 @@
 import { useInputMask } from '@onefootprint/hooks';
 import { IcoShield24 } from '@onefootprint/icons';
 import { TextInput, Toggle } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { getTaxIdInputPattern } from '../../../../utils/ssn-utils/ssn-utils';

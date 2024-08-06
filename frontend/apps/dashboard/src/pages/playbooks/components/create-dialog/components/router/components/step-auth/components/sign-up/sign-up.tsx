@@ -1,6 +1,5 @@
 import { IcoEmail16, IcoSmartphone216 } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SignUp = () => {

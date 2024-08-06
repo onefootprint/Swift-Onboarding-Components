@@ -2,7 +2,7 @@ import type { CustomDoc, DataToCollectFormData } from '@/playbooks/utils/machine
 import { IcoTrash16 } from '@onefootprint/icons';
 import { Button, Form, LinkButton, Stack, TextArea, TextInput } from '@onefootprint/ui';
 import get from 'lodash/get';
-import React, { useId, useState } from 'react';
+import { useId, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

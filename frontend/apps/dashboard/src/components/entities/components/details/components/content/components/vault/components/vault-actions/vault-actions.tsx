@@ -1,6 +1,6 @@
 import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import { useEventListener } from 'usehooks-ts';

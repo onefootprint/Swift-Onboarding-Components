@@ -1,6 +1,5 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Radio, Select, Tooltip } from '@onefootprint/ui';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

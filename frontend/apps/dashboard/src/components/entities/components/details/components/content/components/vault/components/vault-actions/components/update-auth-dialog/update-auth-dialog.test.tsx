@@ -8,7 +8,6 @@ import {
   waitFor,
 } from '@onefootprint/test-utils';
 import { ContactInfoKind } from '@onefootprint/types';
-import React from 'react';
 
 import type { UpdateAuthDialogProps } from './update-auth-dialog';
 import UpdateAuthDialog from './update-auth-dialog';

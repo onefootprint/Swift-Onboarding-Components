@@ -1,5 +1,4 @@
 import { TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 
 type State = { input: string };

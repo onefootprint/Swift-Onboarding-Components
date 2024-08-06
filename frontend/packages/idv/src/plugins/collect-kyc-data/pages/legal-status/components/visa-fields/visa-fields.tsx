@@ -2,7 +2,6 @@ import { useInputMask } from '@onefootprint/hooks';
 import { VisaKind } from '@onefootprint/types';
 import { Select, TextInput } from '@onefootprint/ui';
 import { isValid } from 'date-fns';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

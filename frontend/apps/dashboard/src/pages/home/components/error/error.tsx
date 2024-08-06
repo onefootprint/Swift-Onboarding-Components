@@ -1,7 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
-import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

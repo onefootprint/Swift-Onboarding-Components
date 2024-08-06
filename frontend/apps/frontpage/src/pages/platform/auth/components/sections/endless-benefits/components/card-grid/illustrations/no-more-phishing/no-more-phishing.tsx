@@ -1,5 +1,4 @@
 import { Grid, Stack } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import IllustrationContainer from '../illustration-container';

@@ -1,7 +1,7 @@
 import { OnboardingConfigKind } from '@onefootprint/types';
 import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import { Select, Shimmer } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';

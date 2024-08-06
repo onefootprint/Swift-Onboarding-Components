@@ -1,7 +1,6 @@
 import { IcoCheckCircle24, IcoDatabase24, IcoEye24, IcoLock24, IcoShield40 } from '@onefootprint/icons';
 import { Box, Container, Grid, Stack, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

@@ -1,6 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
 
 type ErrorProps = {
   error: unknown;

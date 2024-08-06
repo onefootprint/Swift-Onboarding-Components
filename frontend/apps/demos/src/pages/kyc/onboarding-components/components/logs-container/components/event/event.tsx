@@ -1,7 +1,6 @@
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { EventLog } from 'src/pages/kyc/onboarding-components/kyc.types';
 import styled, { css } from 'styled-components';
 

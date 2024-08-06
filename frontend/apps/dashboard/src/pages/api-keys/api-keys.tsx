@@ -2,7 +2,6 @@ import { useToggle } from '@onefootprint/hooks';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 

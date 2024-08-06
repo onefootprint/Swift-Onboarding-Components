@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Cloud1 = ({ fill = '#fff' }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={113} height={47} fill="none">
     <path

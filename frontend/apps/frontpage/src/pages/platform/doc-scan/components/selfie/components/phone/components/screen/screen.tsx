@@ -1,7 +1,7 @@
 import { IcoCheckCircle24 } from '@onefootprint/icons';
 import { Box, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { keyframes } from 'styled-components';
 

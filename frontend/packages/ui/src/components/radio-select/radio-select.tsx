@@ -1,5 +1,4 @@
 import noop from 'lodash/noop';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Label from '../label';

@@ -1,6 +1,4 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import { CollectedKybDataOption } from '@onefootprint/types';
-import React from 'react';
 
 import VerificationChecks from '.';
 import type { VerificationChecksProps } from './verification-checks';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { LangProp } from '@/app/types';
 import { LangFallback, initTranslations } from '@/i18n';
 import {

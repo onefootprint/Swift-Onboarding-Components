@@ -3,7 +3,6 @@ import { HeaderTitle, Logger, NavigationHeader, useFootprintProvider } from '@on
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import checkIsMobile from '@onefootprint/idv/src/utils/check-is-mobile';
 import { Box, Button, LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import styled from 'styled-components';

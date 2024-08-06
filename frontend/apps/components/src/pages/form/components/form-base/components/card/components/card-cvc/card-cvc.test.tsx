@@ -1,6 +1,6 @@
 import themes from '@onefootprint/design-tokens';
 import { screen, userEvent } from '@onefootprint/test-utils';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { renderComponents } from '../../../../../../../../config/tests';
 import type { CardCvcProps } from './card-cvc';

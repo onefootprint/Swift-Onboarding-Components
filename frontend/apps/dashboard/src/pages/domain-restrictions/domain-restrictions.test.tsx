@@ -1,5 +1,4 @@
 import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
-import React from 'react';
 
 import {
   withAllowedDomains,

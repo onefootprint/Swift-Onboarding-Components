@@ -2,7 +2,6 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Divider, Stack, createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useRouter } from 'next/router';
-import React from 'react';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useAuthRoles from 'src/hooks/use-auth-roles';
 import useSession from 'src/hooks/use-session';

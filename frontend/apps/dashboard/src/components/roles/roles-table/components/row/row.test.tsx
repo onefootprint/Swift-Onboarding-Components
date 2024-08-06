@@ -1,6 +1,5 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { CollectedKycDataOption, RoleKind, RoleScopeKind } from '@onefootprint/types';
-import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 import { withProxyConfigs } from 'src/pages/proxy-configs/proxy-config.test.config';
 

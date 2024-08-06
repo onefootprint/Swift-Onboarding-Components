@@ -1,7 +1,6 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { SelectProps } from './select';
 import Select from './select';

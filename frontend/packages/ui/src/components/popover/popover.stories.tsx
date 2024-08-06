@@ -1,6 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-import React from 'react';
-import Button from '../button';
 import Stack from '../stack';
 import Text from '../text';
 import Popover from './popover';

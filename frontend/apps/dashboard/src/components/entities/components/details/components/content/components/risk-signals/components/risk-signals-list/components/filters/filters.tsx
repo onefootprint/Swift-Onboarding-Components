@@ -1,6 +1,5 @@
 import { RiskSignalAttribute } from '@onefootprint/types';
 import { Filters } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';

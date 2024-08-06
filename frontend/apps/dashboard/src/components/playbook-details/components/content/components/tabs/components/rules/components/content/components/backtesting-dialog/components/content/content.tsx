@@ -1,7 +1,7 @@
 import type { BacktestingRuleAction, RuleBacktestingData } from '@onefootprint/types';
 import { Divider, Pagination, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

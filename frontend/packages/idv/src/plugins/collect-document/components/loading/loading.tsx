@@ -1,5 +1,4 @@
 import { AnimatedLoadingSpinner, Box, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Step = 'process' | 'upload' | 'analyze';

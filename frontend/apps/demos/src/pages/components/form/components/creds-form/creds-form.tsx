@@ -1,5 +1,4 @@
 import { Button, Checkbox, Text, TextInput } from '@onefootprint/ui';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import type { ClientTokenResponse } from 'src/hooks/use-client-token';
 import useClientToken from 'src/hooks/use-client-token';

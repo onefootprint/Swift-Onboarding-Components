@@ -1,7 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { SelectOption } from '@onefootprint/ui';
 import { Box, Checkbox } from '@onefootprint/ui';
-import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';

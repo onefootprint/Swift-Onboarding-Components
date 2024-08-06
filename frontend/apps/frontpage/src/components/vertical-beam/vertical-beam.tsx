@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useId } from 'react';
+import { useId } from 'react';
 
 type VerticalBeamProps = {
   width: number;

@@ -4,7 +4,6 @@ import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
 import styled from 'styled-components';

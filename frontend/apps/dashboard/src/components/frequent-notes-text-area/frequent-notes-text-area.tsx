@@ -4,7 +4,7 @@ import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, LinkButton, Stack, TextArea as UnstyledTextArea, createText, useToast } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';

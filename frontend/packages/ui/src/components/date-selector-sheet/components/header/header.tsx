@@ -1,7 +1,6 @@
 import { IcoChevronLeft24, IcoChevronRight24 } from '@onefootprint/icons';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 import IconButton from '../../../icon-button';

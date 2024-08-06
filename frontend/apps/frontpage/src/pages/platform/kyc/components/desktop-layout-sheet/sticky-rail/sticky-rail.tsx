@@ -1,5 +1,5 @@
 import { useScroll } from 'framer-motion';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import IllustrationAppClip from './illustrations/illustration-app-clip';

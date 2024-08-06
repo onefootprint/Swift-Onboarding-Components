@@ -1,5 +1,4 @@
 import { Grid } from '@onefootprint/ui';
-import React from 'react';
 
 import type { FieldProps } from '../field';
 import Field from '../field';

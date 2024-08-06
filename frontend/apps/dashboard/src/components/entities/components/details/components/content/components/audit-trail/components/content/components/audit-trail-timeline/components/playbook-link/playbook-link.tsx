@@ -1,7 +1,6 @@
 import type { TimelinePlaybook } from '@onefootprint/types/src/data/onboarding-decision';
 import { LinkButton } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 import useSession from 'src/hooks/use-session';
 

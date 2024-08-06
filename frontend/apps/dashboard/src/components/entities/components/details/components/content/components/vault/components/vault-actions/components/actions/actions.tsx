@@ -1,7 +1,7 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';

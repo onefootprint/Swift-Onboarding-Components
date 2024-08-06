@@ -1,5 +1,4 @@
 import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
-import React from 'react';
 
 import type { BusinessOwnersProps } from './business-owners';
 import BusinessOwners from './business-owners';

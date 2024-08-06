@@ -1,7 +1,7 @@
 import { IcoChevronLeft24, IcoClose24 } from '@onefootprint/icons';
 import type { AmlHitMedia } from '@onefootprint/types';
 import { Drawer } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorComponent } from 'src/components';
 import { createCapitalStringList } from 'src/utils/create-string-list';

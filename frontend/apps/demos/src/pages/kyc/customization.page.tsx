@@ -1,7 +1,6 @@
 import footprint from '@onefootprint/footprint-react';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 const publicKey = 'pb_test_4wW7n1nEK3cHYcJSZw1CjH';

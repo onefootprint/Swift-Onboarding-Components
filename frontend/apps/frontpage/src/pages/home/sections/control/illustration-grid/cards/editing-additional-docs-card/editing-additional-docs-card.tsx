@@ -1,5 +1,5 @@
 import { Checkbox, Stack, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardAppearContent from '../../components/card-appear-content';

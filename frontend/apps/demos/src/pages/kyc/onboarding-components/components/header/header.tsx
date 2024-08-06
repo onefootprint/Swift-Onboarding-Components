@@ -1,6 +1,4 @@
-import { IcoClose16, IcoCode16 } from '@onefootprint/icons';
-import { Box, IconButton, Stack, Text, Toggle } from '@onefootprint/ui';
-import React from 'react';
+import { Box, Stack, Text, Toggle } from '@onefootprint/ui';
 
 type HeaderProps = {
   children: string;

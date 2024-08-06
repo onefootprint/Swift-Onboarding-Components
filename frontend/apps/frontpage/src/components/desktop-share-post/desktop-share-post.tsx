@@ -1,6 +1,5 @@
 import { IcoFacebook24, IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
 import { media } from '@onefootprint/ui';
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type DesktopSharePostProps = {

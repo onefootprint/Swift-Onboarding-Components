@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 

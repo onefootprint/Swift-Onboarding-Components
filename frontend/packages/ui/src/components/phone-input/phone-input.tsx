@@ -3,7 +3,7 @@
 import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
-import React, { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import mergeRefs from 'react-merge-refs';
 import { useUpdateEffect } from 'usehooks-ts';
