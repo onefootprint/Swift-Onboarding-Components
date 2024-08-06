@@ -1,4 +1,3 @@
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoHelp16 } from '@onefootprint/icons';
 import { Box, Button, LinkButton, Stack, ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
@@ -9,6 +8,7 @@ import styled, { css } from 'styled-components';
 
 import { useRouter } from 'next/router';
 import useSession from 'src/hooks/use-session';
+import { useEffectOnce } from 'usehooks-ts';
 import CompanyName from './components/company-name';
 import LinkItem from './components/link-item/link-item';
 import NavDropdown from './components/nav-dropdown/nav-dropdown';
@@ -28,7 +28,15 @@ const NavigationFooter = () => {
   const [showSupportDialog, setShowSupportDialog] = useState(false);
   const {
     data: { user },
+    refreshPermissions,
   } = useSession();
+
+  useEffectOnce(() => {
+    refreshPermissions().catch(() => {
+      // No-op on error
+      return;
+    });
+  });
 
   const handleOpenSupportDialog = () => {
     setShowSupportDialog(true);
