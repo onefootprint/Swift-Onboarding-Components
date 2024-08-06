@@ -31,10 +31,6 @@
     "tsup": "^6.5.0",
     "typescript": "^5.5.2"
   },
-  "dependencies": {
-    "@types/validator": "^13.11.9",
-    "validator": "^13.11.0"
-  },
   "publishConfig": {
     "access": "public"
   }

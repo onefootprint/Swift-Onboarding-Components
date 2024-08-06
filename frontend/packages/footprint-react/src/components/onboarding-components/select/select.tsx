@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
-import Cleave from 'cleave.js';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useFormContext } from 'react-hook-form';
 import useFieldProps, { FormSelectProps } from '../hooks/use-field-props';

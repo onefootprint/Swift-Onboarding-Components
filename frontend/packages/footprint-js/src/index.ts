@@ -34,6 +34,7 @@ export type {
   VerifyPublicKey as FootprintVerifyPublicKey,
   L10n,
   SupportedLocale,
+  SandboxOutcome,
 } from './types/components';
 export { ComponentKind as FootprintComponentKind } from './types/components';
 export {

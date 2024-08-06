@@ -1,6 +1,5 @@
-import type { Component, SandboxOutcome } from '@onefootprint/footprint-js/src/types/components';
+import type { FootprintComponent, SandboxOutcome } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
@@ -10,7 +9,7 @@ import getOnboardingConfigReq from '../queries/get-onboarding-config';
 export type ContextData = {
   appearance?: FootprintAppearance;
   authToken?: string;
-  fpInstance: Component | null;
+  fpInstance: FootprintComponent | null;
   handoffCallbacks?: {
     onCancel?: () => void;
     onClose?: () => void;
@@ -79,11 +78,7 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
     getOnboardingConfig(publicKey);
   }, [publicKey]);
 
-  return (
-    <Context.Provider value={value}>
-      <Box height="100%">{children}</Box>
-    </Context.Provider>
-  );
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default Provider;
