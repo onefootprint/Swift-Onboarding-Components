@@ -37,6 +37,8 @@ use db::DbError;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::CollectedDataOption;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
@@ -99,6 +101,14 @@ pub async fn post(
     if !uvw.vault.is_created_via_api {
         return Err(TenantError::CannotRunKycForPortable.into());
     }
+
+    // fetch country code and validate is US or US territory.
+    let is_us_country_code = uvw
+        .decrypt_unchecked_single(&state.enclave_client, IDK::Country.into())
+        .await?
+        .and_then(|country_code_str| country_code_str.parse_into::<Iso3166TwoDigitCountryCode>().ok())
+        .map(|country_code| country_code.is_us_including_territories())
+        .unwrap_or(false);
 
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
@@ -193,6 +203,13 @@ pub async fn post(
                 );
                 return Err(err.into());
             }
+
+            if !is_us_country_code {
+                return Err(
+                    TenantError::ValidationError("Cannot trigger KYC on non-US addresses".into()).into(),
+                );
+            }
+
             Ok((wf, obc))
         })
         .await?;

@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, post, get, patch
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS
+from tests.utils import create_ob_config, post, get, patch
 
 MUST_COLLECT_DATA = ["business_name", "business_tin", "business_address"]
 
@@ -71,6 +71,22 @@ def test_kyb_missing_req(obc, sandbox_tenant):
     assert (
         kyb["message"]
         == "Cannot run kyb playbook due to unmet requirements. Missing business_name. At a minimum, the following vault data must be provided: business.name"
+    )
+
+
+def test_kyb_non_us_country_code(obc, sandbox_tenant):
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in MUST_COLLECT_DATA for di in CDO_TO_DIS[cdo]
+    }
+    vault_data["business.country"] = "CA"
+    vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
+    fp_id = vault["id"]
+
+    data = dict(key=obc.key.value, fixture_result="pass")
+    kyb = post(f"businesses/{fp_id}/kyb", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+        kyb["message"]
+        == "Validation error: Cannot trigger KYB for businesses with non-US addresses"
     )
 
 

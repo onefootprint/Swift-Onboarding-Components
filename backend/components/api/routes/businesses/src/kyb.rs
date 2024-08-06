@@ -29,6 +29,8 @@ use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::DbError;
 use itertools::Itertools;
+use newtypes::BusinessDataKind;
+use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
@@ -92,8 +94,15 @@ pub async fn post(
         return Err(TenantError::CannotRunKybForPortable.into());
     }
 
-    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
+    // fetch country code and validate is US or US territory.
+    let is_us_country_code = bvw
+        .decrypt_unchecked_single(&state.enclave_client, BusinessDataKind::Country.into())
+        .await?
+        .and_then(|country_code_str| country_code_str.parse_into::<Iso3166TwoDigitCountryCode>().ok())
+        .map(|country_code| country_code.is_us_including_territories())
+        .unwrap_or(false);
 
+    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
         .db_pool
@@ -151,6 +160,13 @@ pub async fn post(
                     UnmetRequirements(unmet_reqs),
                 );
                 return Err(err.into());
+            }
+
+            if !is_us_country_code {
+                return Err(TenantError::ValidationError(
+                    "Cannot trigger KYB for businesses with non-US addresses".into(),
+                )
+                .into());
             }
 
             Ok((biz_wf, obc))

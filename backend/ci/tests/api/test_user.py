@@ -1,4 +1,5 @@
 import pytest
+from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA
 from tests.headers import ExternalId, IdempotencyId
 from tests.utils import (
     _gen_random_sandbox_id,
@@ -8,7 +9,6 @@ from tests.utils import (
     create_ob_config,
     _gen_random_ssn,
 )
-from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA
 
 
 @pytest.fixture(scope="session")
@@ -175,10 +175,30 @@ def test_kyc_missing_requirement(sandbox_tenant, obc):
     data = dict(key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-        body["message"]
-        == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
+            body["message"]
+            == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
     )
     assert body["code"] == "T121"
+
+
+def test_kyc_non_us_country_code(sandbox_tenant, obc):
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+
+    vault_data["id.country"] = "CA"
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+            body["message"]
+            == "Validation error: Cannot trigger KYC on non-US addresses"
+    )
 
 
 def test_kyc_missing_derypt_perms(sandbox_tenant):
@@ -195,8 +215,8 @@ def test_kyc_missing_derypt_perms(sandbox_tenant):
     data = dict(key=sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-        body["message"]
-        == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
+            body["message"]
+            == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
     )
 
 
