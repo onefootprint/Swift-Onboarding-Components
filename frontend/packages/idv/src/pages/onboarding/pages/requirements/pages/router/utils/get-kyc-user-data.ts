@@ -1,5 +1,5 @@
 import { BusinessDI, IdDI } from '@onefootprint/types';
-import { pickBy } from 'lodash';
+import pickBy from 'lodash/pickBy';
 
 import type { BusinessData, UserData } from '../../../../../../../types';
 import { isObject } from '../../../../../../../utils';

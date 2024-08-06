@@ -34,7 +34,7 @@ import {
   type WorkflowStartedEventData,
   WorkflowStartedEventKind,
 } from '@onefootprint/types/src/data/timeline';
-import { startCase } from 'lodash';
+import startCase from 'lodash/startCase';
 import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 
 import getActorText from '../get-actor-text';

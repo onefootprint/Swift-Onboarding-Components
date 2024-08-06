@@ -1,5 +1,5 @@
 import { Container, media } from '@onefootprint/ui';
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +30,7 @@ const AuditTrail = () => {
       <Title>
         <IllustrationContainer>
           {rectangles.map(rect => (
-            <Rectangle key={_.uniqueId()} top={rect.top} left={rect.left} width={rect.width} height={rect.height} />
+            <Rectangle key={uniqueId()} top={rect.top} left={rect.left} width={rect.width} height={rect.height} />
           ))}
         </IllustrationContainer>
         <TitleContainer>

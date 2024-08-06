@@ -1,4 +1,4 @@
-import { kebabCase } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 
 /**
  * Extract the annotated section ID from the markdown string.

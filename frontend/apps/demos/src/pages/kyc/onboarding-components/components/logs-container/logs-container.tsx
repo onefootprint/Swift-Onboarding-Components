@@ -1,5 +1,5 @@
 import { Box, ScrollArea, Stack, Text } from '@onefootprint/ui';
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import React, { useEffect, useRef } from 'react';
 import { EventLog } from '../../kyc.types';
 import Event from './components/event';
@@ -32,7 +32,7 @@ const LogsContainer = ({ eventLog }: LogsContainerProps) => {
       </Stack>
       <Box ref={scrollRef} maxHeight="100%" overflow="auto" padding={4}>
         {eventLog.map(event => (
-          <Event key={_.uniqueId()} event={event} />
+          <Event key={uniqueId()} event={event} />
         ))}
       </Box>
     </Box>

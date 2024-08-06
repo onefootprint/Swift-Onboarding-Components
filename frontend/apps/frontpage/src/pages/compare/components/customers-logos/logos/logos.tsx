@@ -1,6 +1,6 @@
 import { Box, media } from '@onefootprint/ui';
 import { motion, useAnimation } from 'framer-motion';
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import React, { useState, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -90,7 +90,7 @@ const Logos = () => {
       {currentLogos.map(logo => {
         const RenderedLogo = logo;
         return (
-          <MarqueeItem variants={marqueeItemVariants} key={_.uniqueId()}>
+          <MarqueeItem variants={marqueeItemVariants} key={uniqueId()}>
             <RenderedLogo color={theme.color.tertiary} />
           </MarqueeItem>
         );

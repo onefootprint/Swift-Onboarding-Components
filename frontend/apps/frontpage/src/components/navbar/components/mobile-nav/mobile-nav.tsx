@@ -10,7 +10,7 @@ import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import { LINTRK_CONVERSION_ID } from 'src/config/constants';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
@@ -107,7 +107,7 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
                   <LinkList>
                     {entries.map(entry => {
                       if (isNavLink(entry)) {
-                        return <MobileNavLink key={_.uniqueId()} link={entry} />;
+                        return <MobileNavLink key={uniqueId()} link={entry} />;
                       }
                       if (isNavMenu(entry)) {
                         return <MobileNavMenu menu={entry} key={entry.text} />;

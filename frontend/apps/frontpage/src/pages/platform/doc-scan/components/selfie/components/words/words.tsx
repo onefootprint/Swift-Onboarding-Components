@@ -1,6 +1,5 @@
-import { Container } from '@onefootprint/ui';
-import _ from 'lodash';
-import React, { useEffect } from 'react';
+import uniqueId from 'lodash/uniqueId';
+import React from 'react';
 import styled from 'styled-components';
 import Word from './components/word';
 
@@ -16,7 +15,7 @@ const Words = ({ phrase, shouldAnimate, delay, duration }: WordsProps) => {
     <WordsContainer>
       {phrase.split(' ').map((word, index) => {
         return (
-          <Word key={_.uniqueId()} index={index} shouldAnimate={shouldAnimate} delay={delay} duration={duration}>
+          <Word key={uniqueId()} index={index} shouldAnimate={shouldAnimate} delay={delay} duration={duration}>
             {word}
           </Word>
         );

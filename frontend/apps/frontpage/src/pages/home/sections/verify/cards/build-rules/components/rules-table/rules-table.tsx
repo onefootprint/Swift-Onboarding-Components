@@ -1,5 +1,5 @@
 import { Stack, Text } from '@onefootprint/ui';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

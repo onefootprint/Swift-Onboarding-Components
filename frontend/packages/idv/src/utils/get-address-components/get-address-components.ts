@@ -1,6 +1,6 @@
 import { COUNTRIES_WITH_PROVINCES, COUNTRIES_WITH_STATES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { getDetails } from 'use-places-autocomplete';
 
 type AddressComponent = google.maps.GeocoderAddressComponent;

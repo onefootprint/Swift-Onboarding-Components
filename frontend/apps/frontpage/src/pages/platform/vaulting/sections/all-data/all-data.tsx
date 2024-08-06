@@ -1,6 +1,6 @@
 import { Box } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
-import _ from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -33,7 +33,7 @@ const AllData = () => {
         <IllustrationContainer>
           {rectangles.map(rect => (
             <Rectangle
-              key={_.uniqueId('rectangle_')}
+              key={uniqueId('rectangle_')}
               top={rect.top}
               left={rect.left}
               width={rect.width}

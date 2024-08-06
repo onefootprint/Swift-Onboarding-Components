@@ -1,4 +1,4 @@
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import { useCallback, useEffect, useState } from 'react';
 
 const useContainerHasScroll = (containerId: string) => {

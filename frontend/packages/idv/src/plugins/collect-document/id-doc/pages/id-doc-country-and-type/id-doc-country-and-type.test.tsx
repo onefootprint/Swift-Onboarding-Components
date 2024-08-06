@@ -2,7 +2,7 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { fireEvent, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 

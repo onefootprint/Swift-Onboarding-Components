@@ -4,7 +4,7 @@ import type { EditedRule, Rule } from '@onefootprint/types';
 import { RuleAction } from '@onefootprint/types';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import kebabCase from 'lodash/kebabCase';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

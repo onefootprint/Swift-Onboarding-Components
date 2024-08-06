@@ -15,7 +15,7 @@ import {
   type Rule,
 } from '@onefootprint/types';
 import { Button, IconButton, Stack, Text, Tooltip, createFontStyles, useToast } from '@onefootprint/ui';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

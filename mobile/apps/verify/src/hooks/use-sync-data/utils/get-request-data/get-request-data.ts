@@ -1,6 +1,6 @@
 import type { CollectKycDataRequirement, CollectedKycDataOption } from '@onefootprint/types';
 import { CdoToAllDisMap, CollectedKycDataOptionToRequiredAttributes, IdDI } from '@onefootprint/types';
-import { pickBy } from 'lodash';
+import pickBy from 'lodash/pickBy';
 
 import type { KycData } from '@/types';
 import allAttributes from '@/utils/all-attributes';
