@@ -101,7 +101,7 @@ jobs:
     needs: [detect_ephemeral_stack]
     uses: ./.github/workflows/backend_deploy.yml
     # don't run for bot changes and only run when labeled ephemeral or infra changes detected
-    if: !endsWith(github.actor, '[bot]') && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.detect_ephemeral_stack.outputs.hasInfraChanges == 'true')
+    if: (!endsWith(github.actor, '[bot]')) && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.detect_ephemeral_stack.outputs.hasInfraChanges == 'true')
     permissions:
       contents: write
       pull-requests: write

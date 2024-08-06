@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     # don't run for bot changes and PRs that don't label ephemeral
-    if: !endsWith(github.actor, '[bot]') && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FastEphemeral')) || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FullEphemeral')))
+    if: (!endsWith(github.actor, '[bot]')) && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FastEphemeral')) || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FullEphemeral')))
 
     steps:
       - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # ratchet:actions/checkout@v2
