@@ -1,14 +1,4 @@
-use serde::Serialize;
 use strum::EnumString;
-
-#[derive(Serialize, Debug, Clone, Copy)]
-#[serde(rename_all = "snake_case")]
-pub enum LegacyDocumentUploadMode {
-    Default,
-    AllowUpload,
-    CaptureOnly,
-}
-
 
 #[derive(
     Debug,
@@ -36,16 +26,4 @@ pub enum DocumentUploadSettings {
     /// On mobile, only allows capturing without the option to upload.
     /// On desktop though, we will allow uploading if the user didn't hand off
     CaptureOnlyOnMobile,
-}
-
-impl From<DocumentUploadSettings> for LegacyDocumentUploadMode {
-    fn from(value: DocumentUploadSettings) -> Self {
-        // These enums represent the same settings, but the old LegacyDocumentUploadMode just had
-        // confusing names. Renaming these to be easier to understand
-        match value {
-            DocumentUploadSettings::PreferCapture => Self::Default,
-            DocumentUploadSettings::PreferUpload => Self::AllowUpload,
-            DocumentUploadSettings::CaptureOnlyOnMobile => Self::CaptureOnly,
-        }
-    }
 }

@@ -559,7 +559,6 @@ fn get_requirement_inner(
                     let req = OnboardingRequirement::CollectDocument {
                         document_request_id: dr.id.clone(),
                         upload_settings,
-                        upload_mode: upload_settings.into(),
                         config,
                     };
 

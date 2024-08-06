@@ -78,8 +78,8 @@ pub use onboarding_requirement::*;
 
 pub mod integrity_signing_key;
 pub use integrity_signing_key::*;
-pub mod document_upload_mode;
-pub use document_upload_mode::*;
+pub mod document_upload_settings;
+pub use document_upload_settings::*;
 
 pub mod fingerprint_salt;
 
