@@ -14,14 +14,22 @@ const IcoMinimize16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M6.542 13.208v-3.75m0 0-4.584 4.584m4.584-4.584H2.759M9.457 2.79v3.75m0 0 4.583-4.583M9.457 6.54h3.782"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M9.167 2.5v4.333m0 0H13.5m-4.333 0L13.5 2.5m-6.667 11V9.167m0 0H2.5m4.333 0L2.5 13.5"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

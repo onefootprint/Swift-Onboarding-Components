@@ -14,13 +14,15 @@ const IcoPlusBig16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M8.85 1.75a.85.85 0 0 0-1.7 0v5.4h-5.4a.85.85 0 0 0 0 1.7h5.4v5.4a.85.85 0 0 0 1.7 0v-5.4h5.4a.85.85 0 0 0 0-1.7h-5.4v-5.4Z"
-          fill={theme.color[color]}
+          d="M8 2.5V8m0 0v5.5M8 8H2.5M8 8h5.5"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

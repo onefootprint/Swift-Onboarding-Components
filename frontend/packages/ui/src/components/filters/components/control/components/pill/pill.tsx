@@ -23,7 +23,7 @@ const Pill = styled.button<PillProps>`
     display: flex;
     display: flex;
     gap: ${theme.spacing[2]};
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[3]} ${theme.spacing[3]};
     white-space: nowrap;
     height: 32px;
 

@@ -14,14 +14,22 @@ const IcoSmartphone216 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path d="M7.773 11.527a.75.75 0 0 0 0 1.5h.45a.75.75 0 1 0 0-1.5h-.45Z" fill={theme.color[color]} />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.071.77A2.501 2.501 0 0 0 2.57 3.271v9.457a2.501 2.501 0 0 0 2.501 2.501h5.854a2.501 2.501 0 0 0 2.502-2.501V3.27A2.501 2.501 0 0 0 10.925.77H5.071ZM3.97 3.271c0-.608.493-1.101 1.101-1.101h5.854c.608 0 1.101.493 1.101 1.101v9.457c0 .608-.492 1.101-1.1 1.101H5.07a1.101 1.101 0 0 1-1.101-1.101V3.27Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M7.167 3.5h1.667M4.5 14.833h7a.667.667 0 0 0 .667-.666V1.833a.667.667 0 0 0-.667-.666h-7a.667.667 0 0 0-.667.666v12.334c0 .368.299.666.667.666Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

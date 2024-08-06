@@ -14,14 +14,16 @@ const IcoInfo16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <g clipPath="url(#prefix__a)">
+      <g clipPath="url(#prefix__a)" stroke={theme.color[color]}>
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M2.35 7.994a5.644 5.644 0 1 1 11.288 0 5.644 5.644 0 0 1-11.288 0ZM7.994.95a7.044 7.044 0 1 0 0 14.088 7.044 7.044 0 0 0 0-14.088ZM8.9 5.375a.875.875 0 1 1-1.75 0 .875.875 0 0 1 1.75 0ZM7.994 8.15c.47 0 .85.38.85.85v1.7a.85.85 0 1 1-1.7 0V9c0-.47.38-.85.85-.85Z"
-          fill={theme.color[color]}
+          d="M7.167 7.333H8v3.5M14.167 8A6.167 6.167 0 1 1 1.833 8a6.167 6.167 0 0 1 12.334 0Z"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
+        <path d="M8 4.5a.417.417 0 1 0 0 .833.417.417 0 0 0 0-.833Z" fill={theme.color[color]} strokeWidth={0.7} />
       </g>
       <defs>
         <clipPath id="prefix__a">

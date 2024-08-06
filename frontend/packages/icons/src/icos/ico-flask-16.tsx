@@ -14,14 +14,22 @@ const IcoFlask16 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M5.5 1.5h5m-6.812 8h8.624M6.5 1.5v2.921c0 .378-.107.749-.309 1.068l-3.903 6.183c-.775 1.227.107 2.828 1.558 2.828h8.308c1.451 0 2.334-1.6 1.558-2.828L9.808 5.489A2.003 2.003 0 0 1 9.5 4.421V1.5"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeMiterlimit={10}
-        strokeLinecap="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m8.834 2.5.666.667m0 0L12.834 6.5M9.5 3.167l-7 7A2.357 2.357 0 1 0 5.834 13.5l7-7m0 0 .666.667M4.493 8.5h5.997M13.334 4v-.007m-.5-2.326a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM13.5 4a.167.167 0 1 1-.333 0 .167.167 0 0 1 .333 0Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

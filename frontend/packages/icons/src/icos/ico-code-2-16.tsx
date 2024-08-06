@@ -14,13 +14,22 @@ const IcoCode216 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.223 5.7a.75.75 0 1 0-1.02-1.1L1.14 7.444a.75.75 0 0 0 0 1.1l3.062 2.843a.75.75 0 0 0 1.02-1.1l-2.47-2.293L5.222 5.7Zm6.562-1.1a.75.75 0 1 0-1.02 1.1l2.47 2.294-2.47 2.294a.75.75 0 1 0 1.02 1.1l3.063-2.845a.75.75 0 0 0 0-1.099L11.785 4.6Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m6.5 13.5 3-11m2.667 2.667 2.236 2.376a.667.667 0 0 1 0 .914l-2.236 2.376m-8.334 0L1.597 8.457a.667.667 0 0 1 0-.914l2.236-2.376"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

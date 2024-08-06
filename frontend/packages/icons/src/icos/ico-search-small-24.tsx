@@ -14,13 +14,13 @@ const IcoSearchSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="m18 18-3.103-3.103M6 11.172a5.172 5.172 0 1 1 10.345 0 5.172 5.172 0 0 1-10.345 0Z"
+        d="m17 17-2.469-2.469m1.219-3.156a4.375 4.375 0 1 1-8.75 0 4.375 4.375 0 0 1 8.75 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.4}
+        strokeWidth={1.25}
         strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );

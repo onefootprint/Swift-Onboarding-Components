@@ -14,12 +14,13 @@ const IcoBank24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M11.5 4.192a.75.75 0 0 1 1 0l7.25 6.5a.75.75 0 0 1-.5 1.308H19v6.5h.25a.75.75 0 0 1 0 1.5H4.75a.75.75 0 0 1 0-1.5H5V12h-.25a.75.75 0 0 1-.5-1.308l7.25-6.5ZM6.5 18.5H9V12H6.5v6.5Zm4 0h3V12h-3v6.5Zm4.5 0h2.5V12H15v6.5Zm2.29-8L12 5.757 6.71 10.5h10.58Z"
-        fill={theme.color[color]}
+        d="M17.833 9.5v6.667m-3.333 0V9.5m-8.333 0v6.667m3.333 0V9.5M4.96 7.603l6.667-3.333a.833.833 0 0 1 .746 0l6.666 3.333c.283.141.461.43.461.745v.319c0 .46-.373.833-.833.833H5.333a.833.833 0 0 1-.833-.833v-.319c0-.315.178-.604.46-.745Zm.696 11.064h12.688c.569 0 .97-.558.79-1.097l-.277-.834a.833.833 0 0 0-.791-.57H5.934a.833.833 0 0 0-.79.57l-.278.834a.833.833 0 0 0 .79 1.097Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="square"
       />
     </svg>
   );

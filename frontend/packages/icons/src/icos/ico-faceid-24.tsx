@@ -14,30 +14,14 @@ const IcoFaceid24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M9.06 4.25h-.534A4.276 4.276 0 0 0 4.25 8.526v.534m4.81 10.69h-.534a4.276 4.276 0 0 1-4.276-4.276v-.534M14.94 4.25h.534a4.276 4.276 0 0 1 4.276 4.276v.534m-4.81 10.69h.534a4.276 4.276 0 0 0 4.276-4.276v-.534M8.526 12.802s.267 2.672 3.474 2.672c3.207 0 3.474-2.672 3.474-2.672"
+        d="M8.875 5.125H5.958a.833.833 0 0 0-.833.833v2.917m0 6.25v2.917c0 .46.373.833.833.833h2.917m6.25-13.75h2.917c.46 0 .833.373.833.833v2.917m0 6.25v2.917c0 .46-.373.833-.833.833h-2.917m-2.917-9.583v1.875c0 .85-.636 1.55-1.458 1.653M8.458 9.292v1.25m7.084-1.25v1.25M9.5 15.082c.735.425 1.59.668 2.5.668.91 0 1.765-.243 2.5-.669"
         stroke={theme.color[color]}
-        strokeWidth={1.736}
+        strokeWidth={1.25}
         strokeLinecap="round"
-      />
-      <rect
-        x={9.344}
-        y={9.398}
-        width={0.992}
-        height={0.992}
-        rx={0.496}
-        stroke={theme.color[color]}
-        strokeWidth={0.992}
-      />
-      <rect
-        x={13.56}
-        y={9.398}
-        width={0.992}
-        height={0.992}
-        rx={0.496}
-        stroke={theme.color[color]}
-        strokeWidth={0.992}
+        strokeLinejoin="round"
       />
     </svg>
   );

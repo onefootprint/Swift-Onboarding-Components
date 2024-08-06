@@ -14,14 +14,22 @@ const IcoIncognito16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M9.034 11.931H6.966M2 8.621s.338-.293 1.034-.633m0 0C3.994 7.522 5.632 6.966 8 6.966c2.368 0 4.005.556 4.966 1.022m-9.932 0 .467-4.503A1.655 1.655 0 0 1 5.148 2h5.705a1.655 1.655 0 0 1 1.646 1.485l.466 4.503m0 0c.697.34 1.035.633 1.035.633m-7.448 3.517a1.862 1.862 0 1 1-3.724 0 1.862 1.862 0 0 1 3.724 0Zm6.62 0a1.862 1.862 0 1 1-3.724 0 1.862 1.862 0 0 1 3.724 0Z"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M2.5 8.68c3.194 3.396 7.806 3.396 11 0m-11-3.598C4.097 3.384 6.048 2.535 8 2.535s3.903.849 5.5 2.547M8 11.333V13.5M5.5 11l-1 1.655M10.333 11l1.167 1.655"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

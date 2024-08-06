@@ -14,12 +14,14 @@ const IcoBuilding24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5 6.75A2.75 2.75 0 0 1 7.75 4h8.5A2.75 2.75 0 0 1 19 6.75V18.5h.25a.75.75 0 0 1 0 1.5H4.75a.75.75 0 0 1 0-1.5H5V6.75Zm5.5 11.75h3v-2.75c0-.69-.56-1.25-1.25-1.25h-.5c-.69 0-1.25.56-1.25 1.25v2.75Zm4.5 0v-2.75A2.75 2.75 0 0 0 12.25 13h-.5A2.75 2.75 0 0 0 9 15.75v2.75H6.5V6.75c0-.69.56-1.25 1.25-1.25h8.5c.69 0 1.25.56 1.25 1.25V18.5H15ZM9 10a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm5-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"
-        fill={theme.color[color]}
+        d="M6.167 18.667v-12.5c0-.46.373-.834.833-.834h10c.46 0 .833.373.833.834v12.5m-11.666 0h11.666m-11.666 0H4.5m13.333 0H19.5m-10-10h.833m3.334 0h.833M9.5 12h.833m3.334 0h.833m-5 3.333h.833m3.334 0h.833"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

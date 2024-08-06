@@ -14,11 +14,12 @@ const IcoSmartphone24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M10.15 16.75h-.5m9-2.5s.5-.906.5-2.25c0-1.344-.5-2.25-.5-2.25m-12 9.5h6.5a2 2 0 0 0 2-2V6.75a2 2 0 0 0-2-2h-6.5a2 2 0 0 0-2 2v10.5a2 2 0 0 0 2 2Z"
+        d="M10.125 18.042h3.75m-6.25 2.5h8.75c.46 0 .833-.373.833-.834V4.292a.833.833 0 0 0-.833-.834h-8.75a.833.833 0 0 0-.833.834v15.416c0 .46.373.834.833.834Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -14,8 +14,16 @@ const IcoMinusXSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path d="M11 7.75H5" stroke={theme.color[color]} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+      <g clipPath="url(#prefix__a)">
+        <path d="M11 8H5" stroke={theme.color[color]} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

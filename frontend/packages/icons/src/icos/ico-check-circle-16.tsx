@@ -14,13 +14,15 @@ const IcoCheckCircle16 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M.4 8.1a7.6 7.6 0 1 1 15.199 0A7.6 7.6 0 0 1 .4 8.1ZM8 1.9a6.2 6.2 0 1 0 0 12.399A6.2 6.2 0 0 0 8 1.9Zm2.489 3.451a.7.7 0 0 1 .259.955L8.565 10.11c-.665 1.16-2.36 1.09-2.928-.12l-.413-.88a.7.7 0 1 1 1.268-.594l.413.88a.252.252 0 0 0 .446.018L9.533 5.61a.7.7 0 0 1 .956-.26Z"
-          fill={theme.color[color]}
+          d="M10 6.333 7 10 5.667 8.667m8.5-.667A6.167 6.167 0 1 1 1.834 8a6.167 6.167 0 0 1 12.333 0Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

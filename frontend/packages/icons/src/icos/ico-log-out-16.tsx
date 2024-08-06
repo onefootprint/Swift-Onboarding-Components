@@ -14,13 +14,15 @@ const IcoLogOut16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M3.322.84A2.482 2.482 0 0 0 .84 3.322v9.357a2.482 2.482 0 0 0 2.482 2.483h7.575a.7.7 0 1 0 0-1.4H3.322a1.082 1.082 0 0 1-1.082-1.083V3.322c0-.597.485-1.082 1.082-1.082h7.575a.7.7 0 1 0 0-1.4H3.322Zm7.508 3.788a.7.7 0 0 1 .989-.036l3.119 2.896a.7.7 0 0 1 0 1.026l-3.12 2.896a.7.7 0 0 1-.952-1.026l1.813-1.683H6.887a.7.7 0 1 1 0-1.4h5.792l-1.813-1.683a.7.7 0 0 1-.036-.99Z"
-          fill={theme.color[color]}
+          d="M13.5 8H6m7.5 0-3 3m3-3-3-3m-3 8.5H3.167a.667.667 0 0 1-.667-.667V3.167c0-.369.298-.667.667-.667H7.5"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

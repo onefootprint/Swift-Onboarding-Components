@@ -14,11 +14,12 @@ const IcoMaximize24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M4.75 14.785v4.465m0 0 5.457-5.457M4.75 19.25h4.504M19.25 9.215V4.75m0 0-5.457 5.457M19.25 4.75h-4.504"
+        d="M13.667 5.333h5v5m-5 0 4.375-4.375m-7.709 7.709-4.375 4.375m-.625-4.375v5h5"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

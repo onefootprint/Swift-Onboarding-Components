@@ -14,14 +14,22 @@ const IcoSearchSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="m13.5 13.5-2.845-2.845M2.5 7.241a4.741 4.741 0 1 1 9.483 0 4.741 4.741 0 0 1-9.483 0Z"
-        stroke={theme.color[color]}
-        strokeWidth={1.3}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m12.416 12.417-2.145-2.146m0 0a4.015 4.015 0 1 0-5.679-5.678 4.015 4.015 0 0 0 5.68 5.678Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

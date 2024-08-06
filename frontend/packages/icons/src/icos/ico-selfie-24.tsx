@@ -14,16 +14,22 @@ const IcoSelfie24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
-      <circle cx={10} cy={9.625} fill={theme.color[color]} r={1} />
-      <circle cx={14} cy={9.625} fill={theme.color[color]} r={1} />
       <path
-        d="M9 13.875s.75 1.5 3 1.5 3-1.5 3-1.5"
+        d="M8.875 18.875H5.958a.833.833 0 0 1-.833-.833v-2.917m10 3.75h2.917c.46 0 .833-.373.833-.833v-2.917m-13.75-6.25V5.958c0-.46.373-.833.833-.833h2.917m6.25 0h2.917c.46 0 .833.373.833.833v2.917M8.459 13.875v-3.75c0-.46.373-.833.833-.833h.488a.833.833 0 0 0 .59-.244l.344-.346a.833.833 0 0 1 .59-.244h1.393c.22 0 .433.088.589.244l.345.346a.833.833 0 0 0 .59.244h.488c.46 0 .833.373.833.833v3.75c0 .46-.373.833-.833.833H9.292a.833.833 0 0 1-.833-.833Z"
         stroke={theme.color[color]}
-        strokeWidth={1.4}
+        strokeWidth={1.25}
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <rect x={5.5} y={4} width={13} height={16} rx={3} stroke={theme.color[color]} strokeWidth={1.5} />
+      <path
+        d="M12 11.875v-.012m.625.012a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 };

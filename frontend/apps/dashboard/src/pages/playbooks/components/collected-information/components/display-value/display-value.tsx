@@ -1,4 +1,4 @@
-import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
+import { IcoCheckSmall24, IcoCloseSmall24 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -15,7 +15,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.collected-data' });
 
   if (typeof value === 'boolean') {
-    return value ? <IcoCheck24 aria-label={t('enabled')} /> : <IcoCloseSmall24 aria-label={t('disabled')} />;
+    return value ? <IcoCheckSmall24 aria-label={t('enabled')} /> : <IcoCloseSmall24 aria-label={t('disabled')} />;
   }
 
   if (name === 'ssn') {

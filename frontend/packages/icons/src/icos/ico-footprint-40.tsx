@@ -14,9 +14,10 @@ const IcoFootprint40 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
       <path
-        d="M25 23.75h5v-4.425a4.967 4.967 0 0 1-2.5.675 5 5 0 0 1 0-10c.911 0 1.764.248 2.5.674V5H10v30h8.75v-5A6.25 6.25 0 0 1 25 23.75Z"
+        d="M24.25 23.188h4.25v-3.761a4.223 4.223 0 0 1-2.125.573 4.25 4.25 0 0 1 0-8.5c.775 0 1.5.21 2.125.573V7.25h-17v25.5h7.437V28.5a5.313 5.313 0 0 1 5.313-5.312Z"
         fill={theme.color[color]}
       />
     </svg>

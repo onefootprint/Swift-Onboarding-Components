@@ -14,14 +14,23 @@ const IcoClock40 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <rect width={40} height={40} rx={2.5} fill="#fff" />
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.625 20c0-6.282 5.093-11.375 11.375-11.375S31.375 13.718 31.375 20 26.282 31.375 20 31.375 8.625 26.282 8.625 20ZM20 6C12.268 6 6 12.268 6 20s6.268 14 14 14 14-6.268 14-14S27.732 6 20 6Zm-1.313 7V20.544l.385.384 3.5 3.5 1.856-1.856-3.116-3.116V13h-2.625Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <rect width={40} height={40} rx={2.5} fill="#fff" />
+        <path
+          d="M20 13.333V20l4.167 4.167M35 20c0 8.284-6.716 15-15 15-8.284 0-15-6.716-15-15 0-8.284 6.716-15 15-15 8.284 0 15 6.716 15 15Z"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <rect width={40} height={40} rx={2.5} fill="#fff" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

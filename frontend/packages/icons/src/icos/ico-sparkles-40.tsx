@@ -14,14 +14,22 @@ const IcoSparkles40 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        d="M25 7.917c0 4.602-2.481 8.75-7.083 8.75 4.602 0 7.083 4.147 7.083 8.75 0-4.603 2.481-8.75 7.083-8.75-4.602 0-7.083-4.148-7.083-8.75ZM13.333 21.25c0 2.762-2.655 5.417-5.416 5.417 2.761 0 5.416 2.655 5.416 5.416 0-2.761 2.656-5.416 5.417-5.416-2.761 0-5.417-2.655-5.417-5.417Z"
+      <g
+        clipPath="url(#prefix__a)"
+        clipRule="evenodd"
         stroke={theme.color[color]}
-        strokeWidth={2.5}
-        strokeLinecap="round"
+        strokeWidth={3.333}
         strokeLinejoin="round"
-      />
+      >
+        <path d="M36.667 25C28.565 25 25 28.565 25 36.667 25 28.565 21.435 25 13.334 25 21.434 25 25 21.435 25 13.333 25 21.435 28.565 25 36.667 25ZM18.334 10.833c-5.209 0-7.5 2.292-7.5 7.5 0-5.208-2.292-7.5-7.5-7.5 5.208 0 7.5-2.291 7.5-7.5 0 5.209 2.291 7.5 7.5 7.5Z" />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,18 +14,26 @@ const IcoIdFront40 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <ellipse cx={13.454} cy={13.455} rx={1.455} ry={1.454} fill={theme.color[color]} />
-      <ellipse cx={18.545} cy={13.455} rx={1.455} ry={1.454} fill={theme.color[color]} />
-      <path
-        d="M12 18.789s1 1.94 4 1.94 4-1.94 4-1.94"
-        stroke={theme.color[color]}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-      />
-      <rect x={24.286} y={24.286} width={5.714} height={1.905} rx={0.952} fill={theme.color[color]} />
-      <rect x={20.476} y={28.095} width={9.524} height={1.905} rx={0.952} fill={theme.color[color]} />
-      <rect x={5} y={5} width={30} height={30} rx={5} stroke={theme.color[color]} strokeWidth={3} />
+      <g clipPath="url(#prefix__a)">
+        <circle cx={11.667} cy={11.667} fill={theme.color[color]} r={1.667} />
+        <circle cx={16.667} cy={11.667} fill={theme.color[color]} r={1.667} />
+        <path
+          d="M10 15.833s1.042 1.94 4.167 1.94 4.166-1.94 4.166-1.94"
+          stroke={theme.color[color]}
+          strokeWidth={2.5}
+          strokeLinecap="round"
+        />
+        <rect x={24.286} y={24.286} width={5.714} height={2.5} rx={1.25} fill={theme.color[color]} />
+        <rect x={20.477} y={28.095} width={9.524} height={2.5} rx={1.25} fill={theme.color[color]} />
+        <rect x={5} y={5} width={30} height={30} rx={3.333} stroke={theme.color[color]} strokeWidth={3.333} />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <rect width={40} height={40} rx={6} fill="#fff" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

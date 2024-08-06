@@ -14,13 +14,21 @@ const IcoPlusSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.55 2.75a.8.8 0 1 0-1.6 0v4.2h-4.2a.8.8 0 1 0 0 1.6h4.2v4.2a.8.8 0 0 0 1.6 0v-4.2h4.2a.8.8 0 0 0 0-1.6h-4.2v-4.2Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M8 4.5V8m0 0v3.5M8 8H4.5M8 8h3.5"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

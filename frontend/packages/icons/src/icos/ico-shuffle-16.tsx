@@ -14,14 +14,22 @@ const IcoShuffle16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M13.25 9.75 15 11.5l-1.75 1.75m0-10.5L15 4.5l-1.75 1.75M1 11.5h3.106a2.916 2.916 0 0 0 2.427-1.299L8 8M1 4.5h3.106a2.917 2.917 0 0 1 2.427 1.299L9.467 10.2a2.916 2.916 0 0 0 2.427 1.299h1.94m0-7h-1.94a2.916 2.916 0 0 0-2.427 1.299l-.3.451"
-        stroke={theme.color[color]}
-        strokeWidth={1.167}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M2 12h1.057c.177 0 .347-.07.472-.195l6.942-6.943a.667.667 0 0 1 .472-.195h1.724M2 4h1.057c.177 0 .347.07.472.195L5.333 6m7.334 5.333h-1.724a.667.667 0 0 1-.472-.195L9.333 10M12 2.667l2 2-2 2m0 2.666 2 2-2 2"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

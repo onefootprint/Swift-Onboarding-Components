@@ -14,14 +14,22 @@ const IcoScroll16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M6.06 5.198h3.018M6.06 7.784h3.018m3.771-6.034c-.774 0-1.185.868-1.185 1.94v.215m1.185-2.155c.774 0 1.401.868 1.401 1.94v.215h-2.586m1.185-2.155H5.2c-.953 0-1.725.772-1.725 1.724v8.62m8.19-8.189v8.405c0 1.072-.843 1.94-1.617 1.94m-6.573-2.155h5.173v.215c0 1.072.627 1.94 1.4 1.94m-6.573-2.155H1.75v.43c0 .953.772 1.725 1.724 1.725h6.573"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M5.833 14.167h-2a.667.667 0 0 1-.667-.667v-11c0-.368.299-.667.667-.667h4.39c.177 0 .347.07.472.196l3.943 3.942a.667.667 0 0 1 .195.472V13.5a.667.667 0 0 1-.667.667h-2m-1.666-12V5.5c0 .368.298.667.666.667H12.5m-4.5 3v4.166m0 0 1.666-1.666M8 13.333l-1.667-1.666"
+          stroke={theme.color[color]}
+          strokeWidth={1.3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

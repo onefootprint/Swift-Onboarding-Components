@@ -14,13 +14,20 @@ const IcoWallet16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M2.55 3.335c0-.434.351-.785.785-.785h7.424c.55 0 .997.446.997.997v.573H3.335a.785.785 0 0 1-.785-.785Zm10.606.212v.573h.997a.7.7 0 0 1 .7.7v7.636a2.397 2.397 0 0 1-2.397 2.397H3.547a2.397 2.397 0 0 1-2.397-2.397V3.547c0-.026.001-.051.004-.077a2.185 2.185 0 0 1 2.18-2.32h7.425a2.397 2.397 0 0 1 2.397 2.397ZM2.55 5.375v7.081c0 .55.446.997.997.997h8.91c.55 0 .996-.446.996-.997V5.52H3.335a2.18 2.18 0 0 1-.785-.145Zm8.846 3.55a.076.076 0 1 0 0-.15.076.076 0 0 0 0 .15Zm-.925-.075a.924.924 0 1 1 1.849 0 .924.924 0 0 1-1.849 0Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)" stroke={theme.color[color]} strokeWidth={1.5} strokeLinejoin="round">
+        <path
+          d="M2.5 4.333V11.5a2 2 0 0 0 2 2h8.333a.667.667 0 0 0 .667-.667V6.5a.667.667 0 0 0-.667-.667h-2M2.5 4.333a1.5 1.5 0 0 0 1.5 1.5h6.833M2.5 4.333c0-1.012.82-1.833 1.833-1.833h5.98a.52.52 0 0 1 .52.52v2.813"
+          strokeLinecap="square"
+        />
+        <path d="M10.334 10.167a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Z" fill={theme.color[color]} />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,11 +14,12 @@ const IcoScroll24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M9.75 8.75h3.5m-3.5 3h3.5m4.375-7c-.898 0-1.375 1.007-1.375 2.25v.25m1.375-2.5c.898 0 1.625 1.007 1.625 2.25v.25h-3m1.375-2.5H8.75a2 2 0 0 0-2 2v10m9.5-9.5V17c0 1.243-.977 2.25-1.875 2.25m-7.625-2.5h6V17c0 1.243.727 2.25 1.625 2.25m-7.625-2.5h-2v.5a2 2 0 0 0 2 2h7.625"
+        d="M12.833 4.5H7a.833.833 0 0 0-.833.833v13.334c0 .46.373.833.833.833h1.25m4.583-15 5 5m-5-5v4.167c0 .46.373.833.833.833h4.167m0 0v9.167c0 .46-.373.833-.833.833h-1.25M12 13.667v5m0 0 2.083-2.084M12 18.667l-2.083-2.084"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

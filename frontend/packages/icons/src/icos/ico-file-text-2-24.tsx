@@ -14,12 +14,14 @@ const IcoFileText224 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6.5 6.75c0-.69.56-1.25 1.25-1.25H13v3.75c0 .414.336.75.75.75h3.75v7.25c0 .69-.56 1.25-1.25 1.25h-8.5c-.69 0-1.25-.56-1.25-1.25V6.75ZM16.69 8.5 14.5 6.31V8.5h2.19ZM7.75 4A2.75 2.75 0 0 0 5 6.75v10.5A2.75 2.75 0 0 0 7.75 20h8.5A2.75 2.75 0 0 0 19 17.25V9a.75.75 0 0 0-.22-.53l-4.25-4.25A.75.75 0 0 0 14 4H7.75ZM9 15.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Zm.75-3.75a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z"
-        fill={theme.color[color]}
+        d="M12.625 4.708v4.167c0 .46.373.833.834.833h4.166M6.792 4.292h5.488c.221 0 .433.087.59.244l4.928 4.928a.833.833 0 0 1 .244.59v8.821c0 .46-.373.833-.834.833H6.793a.833.833 0 0 1-.833-.833V5.125c0-.46.373-.833.833-.833Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

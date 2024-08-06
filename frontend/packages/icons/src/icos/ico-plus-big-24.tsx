@@ -14,12 +14,13 @@ const IcoPlusBig24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M13.1 5.75a.9.9 0 0 0-1.8 0v5.35H5.95a.9.9 0 1 0 0 1.8h5.35v5.35a.9.9 0 1 0 1.8 0V12.9h5.35a.9.9 0 0 0 0-1.8H13.1V5.75Z"
-        fill={theme.color[color]}
+        d="M12 5.333V12m0 0v6.667M12 12H5.333M12 12h6.667"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
       />
     </svg>
   );

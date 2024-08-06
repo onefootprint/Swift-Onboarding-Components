@@ -14,8 +14,21 @@ const IcoSpinner40 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path d="M20 4a16 16 0 0 1 16 16h-3.2A12.8 12.8 0 0 0 20 7.2V4Z" fill={theme.color[color]} />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M35.417 20c0-8.514-6.903-15.417-15.417-15.417"
+          stroke={theme.color[color]}
+          strokeWidth={3.75}
+          strokeLinecap="square"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

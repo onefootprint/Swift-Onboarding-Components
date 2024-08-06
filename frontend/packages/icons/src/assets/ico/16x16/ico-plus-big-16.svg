@@ -1,6 +1,6 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_10_69)">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M8.85 1.75C8.85 1.28056 8.46944 0.9 8 0.9C7.53056 0.9 7.15 1.28056 7.15 1.75V7.15H1.75C1.28056 7.15 0.9 7.53056 0.9 8C0.9 8.46944 1.28056 8.85 1.75 8.85H7.15V14.25C7.15 14.7194 7.53056 15.1 8 15.1C8.46944 15.1 8.85 14.7194 8.85 14.25V8.85H14.25C14.7194 8.85 15.1 8.46944 15.1 8C15.1 7.53056 14.7194 7.15 14.25 7.15H8.85V1.75Z" fill="black"/>
+<path d="M8 2.5V8M8 8V13.5M8 8H2.5M8 8H13.5" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
 <defs>
 <clipPath id="clip0_10_69">

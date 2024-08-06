@@ -14,12 +14,21 @@ const IcoVisaPassport24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5 4.75A.75.75 0 0 1 5.75 4h10.5A2.75 2.75 0 0 1 19 6.75v6.974a3.98 3.98 0 0 0-1.5-.33V6.75c0-.69-.56-1.25-1.25-1.25H6.5v13h7.062c.16.56.44 1.07.81 1.5H5.75a.75.75 0 0 1-.75-.75V4.75Zm9.572 9.822c-.4.402-.715.887-.916 1.428H9.75a.75.75 0 0 1 0-1.5h4.5c.115 0 .224.026.322.072ZM12 8.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM9 10a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm10.824 6.487a.59.59 0 1 0-.835-.835l-2.231 2.231-.934-.933a.59.59 0 1 0-.835.835l1.351 1.351a.591.591 0 0 0 .835 0l2.65-2.649Z"
-        fill={theme.color[color]}
+        d="M9.917 15.333h4.166m-7.5 3.75h10.834c.46 0 .833-.373.833-.833V5.75a.833.833 0 0 0-.833-.833H6.583a.833.833 0 0 0-.833.833v12.5c0 .46.373.833.833.833Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m12.092 7.759.586.904 1.041-.28-.131 1.07.976.455-.788.735.456.976-1.076.056-.279 1.041-.86-.649-.883.619-.242-1.05-1.073-.094.49-.96-.763-.762.992-.42-.094-1.074 1.03.316.618-.883Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

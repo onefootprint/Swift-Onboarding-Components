@@ -14,21 +14,22 @@ const IcoBankCheck40 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <rect x={7} y={15.4} width={20} height={2.4} rx={1.2} fill={theme.color[color]} />
-      <rect x={7} y={11} width={14} height={2.4} rx={1.2} fill={theme.color[color]} />
-      <rect x={7} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
-      <rect x={11} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
-      <rect x={15} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
-      <rect x={19} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
-      <rect
-        width={36}
-        height={28}
-        rx={5}
-        transform="matrix(1 0 0 -1 2 34)"
-        stroke={theme.color[color]}
-        strokeWidth={3}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M8.334 13.333H10m20 13.334h1.667M3.333 30V10c0-.92.747-1.667 1.667-1.667h30c.92 0 1.667.747 1.667 1.667v20c0 .92-.746 1.667-1.667 1.667H5c-.92 0-1.667-.747-1.667-1.667Zm20-10a3.333 3.333 0 1 1-6.666 0 3.333 3.333 0 0 1 6.666 0Z"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <rect width={40} height={40} rx={6} fill="#fff" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

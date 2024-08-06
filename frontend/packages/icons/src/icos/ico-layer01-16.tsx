@@ -14,13 +14,22 @@ const IcoLayer0116 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.38 1.103a.75.75 0 0 0-.76 0L.37 5.353a.75.75 0 0 0 0 1.294L2.68 8 .37 9.353a.75.75 0 0 0 0 1.294l7.25 4.25a.75.75 0 0 0 .758 0l7.25-4.25a.75.75 0 0 0 0-1.294L13.321 8l2.308-1.353a.75.75 0 0 0 0-1.294l-7.25-4.25Zm3.458 7.766L8.38 10.897a.75.75 0 0 1-.758 0L4.16 8.869 2.234 10 8 13.38 13.767 10l-1.929-1.13ZM8 9.381 2.233 6 8 2.62 13.767 6 8 9.38Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M5.198 8 2.205 9.49a.674.674 0 0 0 0 1.204l5.5 2.736a.663.663 0 0 0 .59 0l5.5-2.736a.674.674 0 0 0 0-1.205L10.803 8M5.197 8 2.205 6.51a.674.674 0 0 1 0-1.204l5.5-2.736a.663.663 0 0 1 .59 0l5.5 2.736a.674.674 0 0 1 0 1.205L10.803 8M5.197 8l2.507 1.247a.663.663 0 0 0 .59 0L10.804 8"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="square"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

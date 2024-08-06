@@ -14,14 +14,22 @@ const IcoMaximize16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M1.958 10.292v3.75m0 0 4.584-4.584m-4.584 4.584h3.783M14.04 5.707v-3.75m0 0L9.457 6.54m4.583-4.583h-3.782"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M9.167 2.5H13.5v4.333m-4.333 0 3.817-3.817m-6.15 6.15-3.818 3.818M2.5 9.167V13.5h4.333"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

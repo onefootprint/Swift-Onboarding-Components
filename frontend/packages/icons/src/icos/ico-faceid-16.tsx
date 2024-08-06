@@ -14,15 +14,22 @@ const IcoFaceid16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M5.63 1.75h-.432A3.448 3.448 0 0 0 1.75 5.198v.431m3.88 8.621h-.432a3.448 3.448 0 0 1-3.448-3.448v-.431m8.62-8.621h.432a3.448 3.448 0 0 1 3.448 3.448v.431m-3.88 8.621h.432a3.448 3.448 0 0 0 3.448-3.448v-.431M5.198 8.647S5.414 10.802 8 10.802s2.802-2.155 2.802-2.155"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-      />
-      <rect x={5.858} y={5.902} width={0.8} height={0.8} rx={0.4} stroke={theme.color[color]} strokeWidth={0.8} />
-      <rect x={9.258} y={5.902} width={0.8} height={0.8} rx={0.4} stroke={theme.color[color]} strokeWidth={0.8} />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M5.5 2.5H3.167a.667.667 0 0 0-.667.667V5.5m0 5v2.333c0 .368.298.667.667.667H5.5m5-11h2.333c.368 0 .667.298.667.667V5.5m0 5v2.333a.667.667 0 0 1-.667.667H10.5M8.167 5.833v1.5c0 .68-.51 1.241-1.167 1.323M5.167 5.833v1m5.666-1v1M6 10.465c.588.34 1.271.535 2 .535.729 0 1.412-.195 2-.535"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,13 +14,22 @@ const IcoArrowRightSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', clas
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10.26 4.2a.75.75 0 1 0-1.02 1.1l2.1 1.95H2.75a.75.75 0 0 0 0 1.5h8.59l-2.1 1.95a.75.75 0 0 0 1.02 1.1l3.498-3.249a.748.748 0 0 0 0-1.102L10.26 4.2Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M9.333 3.833 13.5 8l-4.167 4.167M13 8H2.5"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

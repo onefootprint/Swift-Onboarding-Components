@@ -14,12 +14,14 @@ const IcoChevronLeftBig24 = ({ 'aria-label': ariaLabel, color = 'primary', class
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M14.983 6.138a.9.9 0 0 1-.047 1.271L9.993 12l4.943 4.59a.9.9 0 1 1-1.225 1.32l-5.653-5.25a.9.9 0 0 1 0-1.32l5.653-5.25a.9.9 0 0 1 1.272.048Z"
-        fill={theme.color[color]}
+        d="m14.5 18.667-6.078-6.078a.833.833 0 0 1 0-1.178L14.5 5.333"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

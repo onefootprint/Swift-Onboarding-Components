@@ -14,12 +14,14 @@ const IcoBook24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6.5 6.75c0-.69.56-1.25 1.25-1.25H9v12H7.75c-.69 0-1.25-.56-1.25-1.25v-9.5ZM9 19v.25a.75.75 0 0 0 1.5 0V19h5.75A2.75 2.75 0 0 0 19 16.25v-9.5A2.75 2.75 0 0 0 16.25 4h-8.5A2.75 2.75 0 0 0 5 6.75v9.5A2.75 2.75 0 0 0 7.75 19H9Zm1.5-13.5h5.75c.69 0 1.25.56 1.25 1.25v9.5c0 .69-.56 1.25-1.25 1.25H10.5v-12ZM13.75 8a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5ZM13 11.75a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1-.75-.75Z"
-        fill={theme.color[color]}
+        d="M9.5 4.917H6.583a.833.833 0 0 0-.833.833v12.5c0 .46.373.833.833.833H9.5m0-14.166h7.917c.46 0 .833.373.833.833v12.5c0 .46-.373.833-.833.833H9.5m0-14.166v14.166m3.333-10.416h2.084M12.833 12h2.084"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

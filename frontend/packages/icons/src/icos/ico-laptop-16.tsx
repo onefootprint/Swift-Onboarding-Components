@@ -14,13 +14,22 @@ const IcoLaptop16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.407.95c-.87 0-1.575.705-1.575 1.575v7.438c0 .036.003.072.008.107l-.646 3.068c-.206.979.541 1.9 1.542 1.9h10.53c1 0 1.748-.921 1.541-1.9l-.645-3.068a.714.714 0 0 0 .008-.107V2.525c0-.87-.705-1.575-1.575-1.575H3.407Zm9.449 9.713h-9.71l-.582 2.764a.175.175 0 0 0 .172.21h10.53a.175.175 0 0 0 .172-.21l-.582-2.764ZM3.232 2.524c0-.097.079-.175.175-.175h9.188c.096 0 .175.078.175.175v6.738H3.232V2.525Z"
-        fill={theme.color[color]}
-      />
+      <g
+        clipPath="url(#prefix__a)"
+        stroke={theme.color[color]}
+        strokeWidth={1.5}
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      >
+        <path d="M2.5 3.167c0-.369.298-.667.667-.667h9.666c.368 0 .667.298.667.667v8h-11v-8ZM1.167 11.167h13.666v1.666a.667.667 0 0 1-.667.667H1.833a.667.667 0 0 1-.666-.667v-1.666Z" />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

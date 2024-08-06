@@ -14,13 +14,12 @@ const IcoHeart24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        clipRule="evenodd"
-        d="M11.995 7.233c-1.45-1.623-3.867-2.06-5.683-.573-1.816 1.486-2.072 3.971-.645 5.73l6.328 5.86 6.329-5.86c1.426-1.759 1.201-4.26-.646-5.73-1.848-1.471-4.233-1.05-5.683.573Z"
+        d="M12 6.643c5.277-5.366 14.325 4.6 0 12.649-14.325-8.049-5.278-18.015 0-12.649Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
+        strokeWidth={1.25}
         strokeLinejoin="round"
       />
     </svg>

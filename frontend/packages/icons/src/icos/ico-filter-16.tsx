@@ -14,14 +14,21 @@ const IcoFilter16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M14.25 1.75H1.75l3.933 4.916c.244.305.377.685.377 1.077v5.645c0 .476.386.862.862.862h2.156a.862.862 0 0 0 .862-.862V7.743c0-.392.133-.772.378-1.077L14.25 1.75Z"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M12.833 2.5H3.167a.667.667 0 0 0-.667.667v1.89c0 .177.07.347.195.472l3.61 3.61a.667.667 0 0 1 .195.47v4.558l3-.834V9.61c0-.176.07-.346.195-.47l3.61-3.61a.667.667 0 0 0 .195-.472v-1.89a.667.667 0 0 0-.667-.667Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

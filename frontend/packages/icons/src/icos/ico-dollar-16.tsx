@@ -14,13 +14,15 @@ const IcoDollar16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M1.86 7.994a6.134 6.134 0 1 1 12.269 0 6.134 6.134 0 0 1-12.269 0ZM7.994.46a7.534 7.534 0 1 0 0 15.069 7.534 7.534 0 0 0 0-15.069Zm.7 3.528v.243h1.421a.7.7 0 1 1 0 1.4h-2.71a.832.832 0 1 0 0 1.663h1.179a2.232 2.232 0 0 1 .11 4.462V12a.7.7 0 1 1-1.4 0v-.243h-1.42a.7.7 0 1 1 0-1.4h2.71a.832.832 0 0 0 0-1.664H7.405a2.232 2.232 0 0 1-.11-4.46v-.246a.7.7 0 1 1 1.4 0Z"
-          fill={theme.color[color]}
+          d="M8 4.917V4.23m0 6.852v.685m1.484-5.824c-.296-.41-.85-.685-1.484-.685h-.19c-.841 0-1.523.546-1.523 1.218v.053c0 .48.34.92.878 1.136l1.67.668c.538.215.878.655.878 1.136 0 .702-.71 1.27-1.588 1.27H8c-.634 0-1.187-.275-1.484-.684M14.166 8A6.167 6.167 0 1 1 1.834 8a6.167 6.167 0 0 1 12.334 0Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

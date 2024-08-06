@@ -1,4 +1,4 @@
-import { IcoMountain24 } from '@onefootprint/icons';
+import { IcoCrosshair24 } from '@onefootprint/icons';
 import { Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -13,7 +13,7 @@ export type ChallengeProps = {
 const ChallengeSolution = ({ children, type }: ChallengeProps) => (
   <Container backgroundColor="secondary" direction="column" borderRadius="default" data-type={type}>
     <Stack gap={3} direction="column">
-      <IconTitle icon={IcoMountain24}>Challenge</IconTitle>
+      <IconTitle icon={IcoCrosshair24}>Challenge</IconTitle>
       {children}
     </Stack>
   </Container>

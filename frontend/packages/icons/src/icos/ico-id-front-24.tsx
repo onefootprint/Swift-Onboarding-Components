@@ -14,18 +14,19 @@ const IcoIdFront24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
-      <circle cx={8.509} cy={8.509} fill={theme.color[color]} r={0.776} />
-      <circle cx={11.224} cy={8.509} fill={theme.color[color]} r={0.776} />
+      <circle cx={7.833} cy={7.833} fill={theme.color[color]} r={0.833} />
+      <circle cx={10.333} cy={7.833} fill={theme.color[color]} r={0.833} />
       <path
-        d="M7.733 11.354s.534 1.034 2.134 1.034c1.6 0 2.133-1.034 2.133-1.034"
+        d="M7 9.917s.52.97 2.083.97c1.563 0 2.084-.97 2.084-.97"
         stroke={theme.color[color]}
-        strokeWidth={1.2}
+        strokeWidth={1.25}
         strokeLinecap="round"
       />
-      <rect x={14.286} y={14.286} width={3.048} height={1.016} rx={0.508} fill={theme.color[color]} />
-      <rect x={12.254} y={16.317} width={5.079} height={1.016} rx={0.508} fill={theme.color[color]} />
-      <rect x={4} y={4} width={16} height={16} rx={2} stroke={theme.color[color]} strokeWidth={1.5} />
+      <rect x={14.143} y={14.143} width={2.857} height={1.25} rx={0.625} fill={theme.color[color]} />
+      <rect x={12.238} y={16.048} width={4.762} height={1.25} rx={0.625} fill={theme.color[color]} />
+      <rect x={4.5} y={4.5} width={15} height={15} rx={1.667} stroke={theme.color[color]} strokeWidth={1.25} />
     </svg>
   );
 };

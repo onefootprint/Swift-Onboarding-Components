@@ -14,13 +14,21 @@ const IcoClose40 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M31.04 10.531a1.6 1.6 0 0 0-2.263-2.262l-9.123 9.123-9.123-9.123A1.6 1.6 0 0 0 8.27 10.53l9.123 9.123-9.123 9.123a1.6 1.6 0 1 0 2.262 2.263l9.123-9.123 9.123 9.123a1.6 1.6 0 0 0 2.263-2.263l-9.123-9.123 9.123-9.123Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m8.334 8.333 23.333 23.334m0-23.334L8.333 31.667"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinecap="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

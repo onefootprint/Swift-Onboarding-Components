@@ -14,24 +14,25 @@ const IcoApex24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
-      <circle cx={17.748} cy={17.511} r={1.838} fill={theme.color[color]} />
+      <circle cx={16.959} cy={16.592} r={1.532} fill={theme.color[color]} />
       <rect
-        x={14.07}
-        y={9.698}
-        width={3.676}
-        height={9.65}
-        rx={1.838}
-        transform="rotate(27 14.07 9.698)"
+        x={13.894}
+        y={10.082}
+        width={3.064}
+        height={8.042}
+        rx={1.532}
+        transform="rotate(27 13.894 10.082)"
         fill={theme.color[color]}
       />
       <rect
-        x={11.1}
-        y={4}
-        width={3.676}
-        height={16.084}
-        rx={1.838}
-        transform="rotate(27 11.1 4)"
+        x={11.418}
+        y={5.333}
+        width={3.064}
+        height={13.403}
+        rx={1.532}
+        transform="rotate(27 11.418 5.333)"
         fill={theme.color[color]}
       />
     </svg>

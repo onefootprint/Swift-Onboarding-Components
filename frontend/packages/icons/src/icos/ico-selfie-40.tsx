@@ -6,7 +6,7 @@ const IcoSelfie40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
   return (
     <svg
       width={40}
-      height={41}
+      height={40}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
@@ -14,23 +14,21 @@ const IcoSelfie40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <circle cx={16.5} cy={17} r={2} fill={theme.color[color]} />
-      <circle cx={23.5} cy={17} r={2} fill={theme.color[color]} />
       <path
-        d="M14.5 24.333S15.875 27 20 27s5.5-2.667 5.5-2.667"
+        d="M13.333 33.333h-5c-.92 0-1.667-.746-1.667-1.666v-5m20 6.666h5c.921 0 1.667-.746 1.667-1.666v-5M6.667 13.333v-5c0-.92.746-1.666 1.666-1.666h5m13.333 0h5c.921 0 1.667.746 1.667 1.666v5M13.334 23.333v-6.666c0-.92.746-1.667 1.666-1.667h.976c.443 0 .867-.176 1.179-.488l.69-.69a1.667 1.667 0 0 1 1.179-.489h1.953c.442 0 .866.176 1.178.489l.69.69c.313.312.737.488 1.179.488H25c.92 0 1.667.746 1.667 1.667v6.666c0 .92-.746 1.667-1.667 1.667H15c-.92 0-1.666-.746-1.666-1.667Z"
         stroke={theme.color[color]}
-        strokeWidth={2.4}
+        strokeWidth={3.333}
         strokeLinecap="round"
-      />
-      <rect x={8} y={6} width={24} height={30} rx={5} stroke={theme.color[color]} strokeWidth={3} />
-      <path
-        d="M33.879 8.99a.696.696 0 0 0-.08.635l2.282 6.168c.247.669-.55 1.232-1.098.776l-5.074-4.227a.696.696 0 0 0-.582-.148l-4.827.967a.696.696 0 0 1-.69-1.103l2.77-3.646a.696.696 0 0 0 .098-.662L24.404 1.6c-.247-.668.55-1.232 1.098-.776l5.054 4.211a.696.696 0 0 0 .623.138l4.687-1.232c.624-.164 1.116.535.75 1.067l-2.737 3.98Z"
-        fill="#fff"
+        strokeLinejoin="round"
       />
       <path
-        d="M31.972 8.882a.221.221 0 0 0-.037.218l1.258 3.4c.078.213-.176.393-.35.248l-2.787-2.322a.221.221 0 0 0-.216-.038l-3.3 1.186c-.21.076-.388-.174-.246-.348l2.22-2.714a.222.222 0 0 0 .036-.217l-1.258-3.402c-.079-.212.175-.392.35-.247l2.785 2.32c.06.052.144.066.218.038l3.401-1.257c.213-.08.392.175.247.349l-2.32 2.786Z"
-        fill={theme.color[color]}
+        d="M20 19.75v-.017m.833.017a.833.833 0 1 1-1.667 0 .833.833 0 0 1 1.667 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={3.333}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

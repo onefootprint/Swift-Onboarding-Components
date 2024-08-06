@@ -14,13 +14,27 @@ const IcoSun16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.001 1.1a.65.65 0 0 1 .65.65v1.014a.65.65 0 1 1-1.3 0V1.75a.65.65 0 0 1 .65-.65Zm0 5.355a1.546 1.546 0 1 0 0 3.093 1.546 1.546 0 0 0 0-3.093ZM5.155 8a2.846 2.846 0 1 1 5.693 0 2.846 2.846 0 0 1-5.693 0Zm6.854-3.088a.65.65 0 0 0-.92-.92l-.8.8a.65.65 0 0 0 .92.92l.8-.8ZM12.589 8a.65.65 0 0 1 .65-.65h1.013a.65.65 0 1 1 0 1.3H13.24a.65.65 0 0 1-.65-.65Zm-1.38 2.288a.65.65 0 1 0-.92.92l.8.8a.65.65 0 1 0 .92-.92l-.8-.8ZM8 12.59a.65.65 0 0 1 .65.65v1.013a.65.65 0 1 1-1.3 0V13.24a.65.65 0 0 1 .65-.65Zm-2.288-1.38a.65.65 0 0 0-.92-.92l-.8.8a.65.65 0 1 0 .92.92l.8-.8ZM1.1 8a.65.65 0 0 1 .65-.65h1.014a.65.65 0 0 1 0 1.3H1.75a.65.65 0 0 1-.65-.65Zm3.813-4.007a.65.65 0 1 0-.92.919l.8.8a.65.65 0 0 0 .92-.92l-.8-.8Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <g clipPath="url(#prefix__b)">
+          <path
+            d="M7.999 2.194V1.178M3.893 12.106l-.718.718M8 14.822v-1.016m4.823-10.63-.718.719M13.804 8h1.016m-2.716 4.106.718.718M1.177 8h1.016m.982-4.824.718.718m6.58 1.631a3.5 3.5 0 1 1-4.949 4.95 3.5 3.5 0 0 1 4.95-4.95Z"
+            stroke={theme.color[color]}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+        <clipPath id="prefix__b">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

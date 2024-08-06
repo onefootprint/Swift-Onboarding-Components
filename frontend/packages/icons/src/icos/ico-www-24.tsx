@@ -14,12 +14,18 @@ const IcoWww24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M20 12a8 8 0 0 0-8-8m8 8H4m16 0c0 .766-.107 1.506-.309 2.207M12 4a8 8 0 0 0-8 8m8-8c-1.372 0-3.586 3.034-3.586 8 0 .786.055 1.523.154 2.207M12 4c1.372 0 3.586 3.034 3.586 8 0 .786-.055 1.523-.154 2.207M4 12c0 .766.107 1.506.309 2.207m.243 3.034L5.103 20l1.38-1.655L7.863 20l.55-2.759m1.656 0L10.621 20 12 18.345 13.38 20l.551-2.759m1.655 0L16.138 20l1.38-1.655L18.896 20l.551-2.759"
+        d="M19.708 12a7.708 7.708 0 1 1-15.417 0 7.708 7.708 0 0 1 15.417 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
+        strokeWidth={1.25}
+        strokeLinejoin="round"
+      />
+      <path
+        d="m14.213 9.275-3.42.933a.833.833 0 0 0-.585.585l-.933 3.42c-.084.311.201.597.512.512l3.42-.933a.834.834 0 0 0 .585-.585l.933-3.42a.417.417 0 0 0-.512-.512Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
         strokeLinejoin="round"
       />
     </svg>

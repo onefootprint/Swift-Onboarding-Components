@@ -14,12 +14,14 @@ const IcoDownload16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8 1.5a.7.7 0 0 1 .7.7v5.816l1.386-1.493a.7.7 0 0 1 1.026.953l-2.594 2.793a.698.698 0 0 1-1.036.002L4.887 7.476a.7.7 0 1 1 1.025-.953L7.3 8.016V2.2a.7.7 0 0 1 .7-.7ZM2.2 9.499a.7.7 0 0 1 .7.7v1.2a1.7 1.7 0 0 0 1.7 1.7h6.799a1.7 1.7 0 0 0 1.7-1.7v-1.2a.7.7 0 1 1 1.4 0v1.2a3.1 3.1 0 0 1-3.1 3.1h-6.8a3.1 3.1 0 0 1-3.099-3.1v-1.2a.7.7 0 0 1 .7-.7Z"
-        fill={theme.color[color]}
+        d="M13.5 9.833v3a.667.667 0 0 1-.667.667H3.167a.667.667 0 0 1-.667-.667v-3M8 10V2.5M8 10 5.667 7.667M8 10l2.333-2.333"
+        stroke={theme.color[color]}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

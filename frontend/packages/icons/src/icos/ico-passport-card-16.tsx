@@ -14,13 +14,23 @@ const IcoPassportCard16 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M1.45 3.773c0-.157.13-.293.3-.293h12.5c.17 0 .3.136.3.293v8.444c0 .157-.13.293-.3.293H1.75c-.17 0-.3-.136-.3-.293V3.773Zm.3-1.693c-.934 0-1.7.754-1.7 1.693v8.444c0 .94.766 1.693 1.7 1.693h12.5c.934 0 1.7-.754 1.7-1.693V3.773c0-.94-.766-1.693-1.7-1.693H1.75Zm4.981 4.607a1.269 1.269 0 1 1 2.538 0 1.269 1.269 0 0 1-2.538 0ZM8 4.02a2.669 2.669 0 1 0 0 5.337A2.669 2.669 0 0 0 8 4.02ZM6.031 10a.7.7 0 1 0 0 1.4H9.97a.7.7 0 0 0 0-1.4H6.03Z"
-        fill={theme.color[color]}
-      />
+      <g
+        clipPath="url(#prefix__a)"
+        stroke={theme.color[color]}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M13.667 3.667v8.666A.667.667 0 0 1 13 13H3a.667.667 0 0 1-.667-.667V3.667C2.333 3.298 2.632 3 3 3h10c.368 0 .667.298.667.667Z" />
+        <path d="M6.333 10.667h3.334m0-3.667a1.667 1.667 0 1 1-3.334 0 1.667 1.667 0 0 1 3.334 0Z" />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

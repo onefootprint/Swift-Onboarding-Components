@@ -14,13 +14,15 @@ const IcoPencil16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M12.978 1.412a1.576 1.576 0 0 0-2.229 0l-8.718 8.717a.7.7 0 0 0-.186.335l-.876 3.724a.7.7 0 0 0 .841.842l3.724-.876a.7.7 0 0 0 .335-.187l8.718-8.718a1.576 1.576 0 0 0 0-2.229l-1.609-1.608Zm-1.239.99a.176.176 0 0 1 .25 0l1.608 1.608a.176.176 0 0 1 0 .25l-1.11 1.11-1.858-1.858 1.11-1.11Zm-2.1 2.1-6.477 6.477-.572 2.43 2.43-.573 6.477-6.476-1.858-1.858Z"
-          fill={theme.color[color]}
+          d="m8.834 4.167 2.028-2.029c.26-.26.683-.26.943 0l2.057 2.057c.26.26.26.683 0 .943l-2.028 2.029m-3-3L2.029 10.97a.667.667 0 0 0-.196.472v2.724h2.724c.177 0 .347-.07.472-.196l6.805-6.804m-3-3 3 3"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

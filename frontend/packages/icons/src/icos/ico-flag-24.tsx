@@ -14,11 +14,12 @@ const IcoFlag24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M5.75 19.25v-6m0 0v-7.5S8.5 3.5 12 5.75s6.25 0 6.25 0v7.5s-2.75 2.25-6.25 0-6.25 0-6.25 0Z"
+        d="M5.958 14.57V5.665a.77.77 0 0 1 .475-.724c.632-.254 1.808-.65 2.978-.65 1.719 0 3.46 1.713 5.178 1.713.787 0 1.578-.18 2.203-.375.59-.183 1.25.242 1.25.86v7.562a.77.77 0 0 1-.474.724c-.633.253-1.81.65-2.979.65-1.718 0-3.46-1.713-5.178-1.713-1.719 0-3.452.856-3.452.856Zm0 0v5.138"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

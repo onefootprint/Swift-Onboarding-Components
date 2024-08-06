@@ -14,19 +14,23 @@ const IcoHome16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <g
-        clipPath="url(#prefix__a)"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M3.4 14.338h9.188a1.75 1.75 0 0 0 1.75-1.75V6.025L7.994 1.65 1.65 6.025v6.563c0 .966.784 1.75 1.75 1.75Z" />
-        <path d="M6.024 11.274c0-.966.784-1.75 1.75-1.75h.438c.966 0 1.75.784 1.75 1.75v3.063H6.024v-3.063Z" />
+      <g clipPath="url(#prefix__a)">
+        <g clipPath="url(#prefix__b)">
+          <path
+            d="M2.5 5.81c0-.185 0-.278.023-.364a.667.667 0 0 1 .1-.212c.053-.072.124-.131.268-.249l4.434-3.627c.24-.197.36-.295.494-.333a.667.667 0 0 1 .362 0c.133.038.254.136.494.333l4.434 3.627c.143.118.215.177.267.25a.67.67 0 0 1 .1.211c.024.086.024.179.024.365v6.261c0 .373 0 .56-.073.703a.667.667 0 0 1-.291.291c-.143.073-.33.073-.703.073H3.567c-.374 0-.56 0-.703-.073a.667.667 0 0 1-.291-.291c-.073-.143-.073-.33-.073-.703V5.811Z"
+            stroke={theme.color[color]}
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+          />
+        </g>
       </g>
       <defs>
         <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+        <clipPath id="prefix__b">
           <path fill="#fff" d="M0 0h16v16H0z" />
         </clipPath>
       </defs>

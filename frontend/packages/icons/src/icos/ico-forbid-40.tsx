@@ -14,13 +14,22 @@ const IcoForbid40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12.535 10.414A12.098 12.098 0 0 1 20 7.85c6.711 0 12.15 5.44 12.15 12.15 0 2.815-.956 5.406-2.563 7.466L12.535 10.414Zm-2.121 2.12A12.098 12.098 0 0 0 7.85 20c0 6.711 5.44 12.15 12.15 12.15 2.815 0 5.406-.956 7.466-2.563L10.414 12.535ZM20 4.85C11.633 4.85 4.85 11.633 4.85 20c0 8.368 6.783 15.15 15.15 15.15 8.368 0 15.15-6.782 15.15-15.15 0-8.367-6.782-15.15-15.15-15.15Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M25 15 15 25m10 0L15 15m20 5c0 8.284-6.716 15-15 15-8.284 0-15-6.716-15-15 0-8.284 6.716-15 15-15 8.284 0 15 6.716 15 15Z"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

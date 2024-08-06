@@ -12,6 +12,7 @@ const CcMastercard24 = ({ 'aria-label': ariaLabel, className, testID }: IconProp
       className={className}
       role="img"
       data-colored={true}
+      viewBox="0 0 24 24"
     >
       <g clipPath="url(#prefix__a)">
         <path

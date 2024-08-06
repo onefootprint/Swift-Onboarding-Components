@@ -14,13 +14,20 @@ const IcoWarningSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.584 4.42a.652.652 0 0 0-1.166 0l-3.296 6.574a.653.653 0 0 0 .583.945h6.589c.485 0 .8-.511.583-.945L8.584 4.42Zm-2.24-.538c.684-1.363 2.63-1.363 3.313 0l3.293 6.574a1.853 1.853 0 0 1-1.656 2.683H4.705a1.853 1.853 0 0 1-1.656-2.683l3.296-6.574ZM8 6.046a.7.7 0 0 1 .7.7v1.252a.7.7 0 1 1-1.4 0V6.746a.7.7 0 0 1 .7-.7ZM8 11.2a.7.7 0 1 0 0-1.4.7.7 0 0 0 0 1.4Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M8 6.75v1.5m0 1.312v-.004m-.36-5.215-3.543 6.05a.417.417 0 0 0 .36.628h7.087c.322 0 .522-.35.36-.627L8.36 4.343a.417.417 0 0 0-.72 0Zm.464 5.22a.104.104 0 1 1-.208 0 .104.104 0 0 1 .208 0Z"
+          stroke={theme.color[color]}
+          strokeLinecap="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,12 +14,14 @@ const IcoUpload24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12.55 4.24a.75.75 0 0 0-1.1 0L8.2 7.74a.75.75 0 1 0 1.1 1.02l1.95-2.1v7.59a.75.75 0 0 0 1.5 0V6.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5ZM4.75 14a.75.75 0 0 1 .75.75v1.5a2.25 2.25 0 0 0 2.25 2.25h8.5a2.25 2.25 0 0 0 2.25-2.25v-1.5a.75.75 0 0 1 1.5 0v1.5A3.75 3.75 0 0 1 16.25 20h-8.5A3.75 3.75 0 0 1 4 16.25v-1.5a.75.75 0 0 1 .75-.75Z"
-        fill={theme.color[color]}
+        d="M12 5.125V14.5m0-9.375 3.75 3.75M12 5.125l-3.75 3.75m10.625 3.75v5.417c0 .46-.373.833-.833.833H5.958a.833.833 0 0 1-.833-.833v-5.417"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

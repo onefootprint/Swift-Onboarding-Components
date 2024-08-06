@@ -14,12 +14,14 @@ const IcoActivity24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M10.265 4a.75.75 0 0 1 .714.574l2.807 11.63 1.24-4.647A.75.75 0 0 1 15.75 11h3.5a.75.75 0 0 1 0 1.5h-2.924l-1.851 6.943a.75.75 0 0 1-1.454-.017L10.189 7.694l-1.218 4.262a.75.75 0 0 1-.721.544h-3.5a.75.75 0 0 1 0-1.5h2.934L9.53 4.544A.75.75 0 0 1 10.265 4Z"
-        fill={theme.color[color]}
+        d="M3.667 11.933h2.722a.833.833 0 0 0 .795-.582L9.3 4.646a.208.208 0 0 1 .397 0l4.603 14.575a.208.208 0 0 0 .397 0l2.118-6.706a.833.833 0 0 1 .795-.582h2.722"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

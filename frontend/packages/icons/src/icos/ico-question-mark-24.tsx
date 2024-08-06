@@ -14,11 +14,12 @@ const IcoQuestionMark24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M10.234 9.25a2.248 2.248 0 0 1 4.098.147 2.25 2.25 0 0 1-.503 2.456c-.5.493-1.108 1.025-1.402 1.65M12.25 16.5v.01m0 2.99a7.25 7.25 0 1 1 0-14.498 7.25 7.25 0 0 1 0 14.498Z"
+        d="M10.333 9.917V9.5c0-.46.373-.833.834-.833h1.666c.46 0 .834.373.834.833v.833c0 .263-.124.51-.334.667l-1 .75a.833.833 0 0 0-.333.667v.416m0 2.5v.009M19.5 12a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

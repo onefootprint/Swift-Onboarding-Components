@@ -14,12 +14,21 @@ const IcoPassportCard24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.688 6.688a.5.5 0 0 1 .5-.5h15.625a.5.5 0 0 1 .5.5v10.625a.5.5 0 0 1-.5.5H4.188a.5.5 0 0 1-.5-.5V6.688Zm.5-2a2 2 0 0 0-2 2v10.625a2 2 0 0 0 2 2h15.625a2 2 0 0 0 2-2V6.688a2 2 0 0 0-2-2H4.188Zm6.326 5.821a1.486 1.486 0 1 1 2.972 0 1.486 1.486 0 0 1-2.972 0ZM12 7.523a2.986 2.986 0 1 0 0 5.972 2.986 2.986 0 0 0 0-5.972Zm-2.236 7.454a.75.75 0 0 0 0 1.5h4.472a.75.75 0 0 0 0-1.5H9.764Z"
-        fill={theme.color[color]}
+        d="M19.083 6.583v10.834c0 .46-.373.833-.833.833H5.75a.833.833 0 0 1-.833-.833V6.583c0-.46.373-.833.833-.833h12.5c.46 0 .833.373.833.833Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.916 15.333h4.167m0-4.583a2.083 2.083 0 1 1-4.167 0 2.083 2.083 0 0 1 4.167 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

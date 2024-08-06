@@ -14,12 +14,14 @@ const IcoCheckCircle24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm-6.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0Zm9.4-1.877a.75.75 0 1 0-1.3-.746l-2.294 3.997a.25.25 0 0 1-.443-.018l-.434-.925a.75.75 0 0 0-1.358.638l.434.924c.601 1.282 2.397 1.356 3.102.128l2.293-3.998Z"
-        fill={theme.color[color]}
+        d="M14.5 9.917 10.75 14.5l-1.667-1.667M19.5 12a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

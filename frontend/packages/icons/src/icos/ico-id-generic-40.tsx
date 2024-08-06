@@ -14,13 +14,22 @@ const IcoIdGeneric40 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <rect x={5} y={5} width={30} height={30} rx={5} stroke={theme.color[color]} strokeWidth={3} />
-      <path
-        d="M10 12.429c0-.79.995-1.429 2.222-1.429h15.556c1.227 0 2.222.64 2.222 1.429v2.142c0 .79-.995 1.429-2.222 1.429H12.222C10.995 16 10 15.36 10 14.571V12.43Z"
-        fill={theme.color[color]}
-      />
-      <rect x={17} y={19} width={12} height={2.4} rx={1.2} fill={theme.color[color]} />
+      <g clipPath="url(#prefix__a)">
+        <rect x={5} y={5} width={30} height={30} rx={3.75} stroke={theme.color[color]} strokeWidth={3.333} />
+        <path
+          d="M11.111 11.524c0-.842.885-1.524 1.976-1.524h13.827c1.09 0 1.975.682 1.975 1.524v2.286c0 .841-.884 1.523-1.975 1.523H13.087c-1.091 0-1.976-.682-1.976-1.524v-2.285Z"
+          fill={theme.color[color]}
+        />
+        <rect x={11.111} y={23.056} width={17.778} height={2.5} rx={1.25} fill={theme.color[color]} />
+        <rect x={16.444} y={27.5} width={12.444} height={2.5} rx={1.25} fill={theme.color[color]} />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <rect width={40} height={40} rx={6} fill="#fff" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

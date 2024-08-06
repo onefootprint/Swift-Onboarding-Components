@@ -14,12 +14,13 @@ const IcoSearch16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path
-          d="m14.5 14.5-3.362-3.362M1.5 7.103a5.603 5.603 0 1 1 11.207 0 5.603 5.603 0 0 1-11.207 0Z"
+          d="m13.5 13.5-2.749-2.749m0 0a4.833 4.833 0 1 0-6.835-6.835 4.833 4.833 0 0 0 6.835 6.835Z"
           stroke={theme.color[color]}
-          strokeWidth={1.4}
+          strokeWidth={1.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />

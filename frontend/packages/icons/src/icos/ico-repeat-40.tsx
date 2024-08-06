@@ -14,14 +14,22 @@ const IcoRepeat40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        d="m25 9.375 3.75 3.75-3.75 3.75m2.5-3.75H11.25A6.269 6.269 0 0 0 5 19.375v1.25m10 10-3.75-3.75 3.75-3.75m-2.5 3.75h16.25a6.269 6.269 0 0 0 6.25-6.25v-1.25"
-        stroke={theme.color[color]}
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m28.75 35 4.41-4.41a.834.834 0 0 0 0-1.18L28.75 25M11.25 5 6.84 9.41a.833.833 0 0 0 0 1.18L11.25 15m-2.917-5h23.334c.92 0 1.666.746 1.666 1.667v6.666M6.667 21.667v6.666c0 .92.746 1.667 1.666 1.667h23.334"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

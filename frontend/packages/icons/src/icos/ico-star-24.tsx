@@ -14,11 +14,12 @@ const IcoStar24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="m12 4.75 1.75 5.5h5.5l-4.5 3.5 1.5 5.5-4.25-3.5-4.25 3.5 1.5-5.5-4.5-3.5h5.5L12 4.75Z"
+        d="M11.625 3.694c.15-.314.6-.314.75 0l2.14 4.462c.061.127.182.214.322.232l4.926.646a.414.414 0 0 1 .232.713l-3.603 3.4a.414.414 0 0 0-.123.378l.905 4.859a.416.416 0 0 1-.607.44l-4.369-2.359a.417.417 0 0 0-.396 0l-4.369 2.359a.416.416 0 0 1-.607-.44l.905-4.86a.414.414 0 0 0-.123-.376L4.005 9.747a.414.414 0 0 1 .232-.713l4.926-.646a.416.416 0 0 0 .321-.232l2.14-4.462Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

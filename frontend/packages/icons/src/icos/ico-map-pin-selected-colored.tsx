@@ -12,6 +12,7 @@ const IcoMapPinSelected = ({ 'aria-label': ariaLabel, className, testID }: IconP
       className={className}
       role="img"
       data-colored={true}
+      viewBox="0 0 24 24"
     >
       <path d="M18 0C8 0 0 8 0 18s8 18 18 30c10-12 18-20 18-30S28 0 18 0Z" fill="#4A24DB" />
     </svg>

@@ -14,13 +14,23 @@ const IcoBroadcast16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.809 2.815a.7.7 0 0 1 0 .99 5.937 5.937 0 0 0 0 8.396.7.7 0 1 1-.99.99 7.337 7.337 0 0 1 0-10.376.7.7 0 0 1 .99 0Zm8.395 0a.7.7 0 0 1 .99 0 7.336 7.336 0 0 1 0 10.375.7.7 0 1 1-.99-.99 5.937 5.937 0 0 0 0-8.395.7.7 0 0 1 0-.99Zm-.951 1.942a.7.7 0 0 0-.99.99 3.19 3.19 0 0 1 0 4.512.7.7 0 0 0 .99.99 4.59 4.59 0 0 0 0-6.492Zm-5.502 0a.7.7 0 0 1 0 .99 3.19 3.19 0 0 0 0 4.512.7.7 0 0 1-.99.99 4.59 4.59 0 0 1 0-6.492.7.7 0 0 1 .99 0Zm2.298 3.246a.042.042 0 1 1-.085 0 .042.042 0 0 1 .085 0Zm-.042-.958a.958.958 0 1 0 0 1.916.958.958 0 0 0 0-1.916Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M3.64 3.64A6.147 6.147 0 0 0 1.833 8c0 1.703.69 3.245 1.807 4.36m1.938-6.782A3.415 3.415 0 0 0 4.574 8c0 .947.384 1.803 1.004 2.423m4.845 0A3.415 3.415 0 0 0 11.426 8c0-.946-.383-1.802-1.003-2.422m1.938 6.783A6.147 6.147 0 0 0 14.167 8c0-1.703-.69-3.245-1.806-4.361M8.5 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx={8} cy={8} r={0.5} fill={theme.color[color]} />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,6 +14,7 @@ const IcoFootprintShield40 = ({ 'aria-label': ariaLabel, color = 'primary', clas
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
       <path
         fillRule="evenodd"

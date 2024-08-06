@@ -14,11 +14,22 @@ const IcoCheck16 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M12.831 3.8a.646.646 0 0 0-.444.196l-6.645 6.646-2.126-2.127a.646.646 0 1 0-.913.913l2.582 2.583a.646.646 0 0 0 .913 0L13.3 4.909a.646.646 0 0 0-.469-1.109Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M1.833 10.063 6 13.5l8.167-11"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

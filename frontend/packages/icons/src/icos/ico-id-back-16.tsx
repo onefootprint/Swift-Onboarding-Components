@@ -14,6 +14,7 @@ const IcoIdBack16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <rect
@@ -27,7 +28,7 @@ const IcoIdBack16 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
         <rect x={3.667} y={3.883} width={8.667} height={1.04} rx={0.52} fill={theme.color[color]} />
         <rect x={6.267} y={6.05} width={6.067} height={1.04} rx={0.52} fill={theme.color[color]} />
         <path
-          d="M3.667 10.476c0-.41.43-.743.963-.743h6.74c.532 0 .963.333.963.743v1.114c0 .41-.43.743-.963.743H4.63c-.532 0-.963-.332-.963-.743v-1.114Z"
+          d="M3.667 10.476c0-.41.43-.743.962-.743h6.741c.532 0 .963.333.963.743v1.114c0 .41-.431.743-.963.743H4.63c-.532 0-.963-.332-.963-.742v-1.115Z"
           fill={theme.color[color]}
         />
       </g>

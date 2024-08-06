@@ -14,17 +14,22 @@ const IcoSsnCard16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M.1 3.693C.1 2.758.858 2 1.793 2h12.414c.935 0 1.693.758 1.693 1.693v8.442c0 .935-.758 1.693-1.693 1.693H1.793A1.693 1.693 0 0 1 .1 12.135V3.693ZM1.793 3.4a.293.293 0 0 0-.293.293v8.442c0 .162.131.293.293.293h12.414a.293.293 0 0 0 .293-.293V3.693a.293.293 0 0 0-.293-.293H1.793Z"
-        fill={theme.color[color]}
-      />
-      <rect x={2.5} y={8.25} width={2} height={1.5} rx={0.75} fill={theme.color[color]} />
-      <rect x={5.5} y={8.25} width={2} height={1.5} rx={0.75} fill={theme.color[color]} />
-      <rect x={8.5} y={8.25} width={2} height={1.5} rx={0.75} fill={theme.color[color]} />
-      <rect x={11.5} y={8.25} width={2} height={1.5} rx={0.75} fill={theme.color[color]} />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M4.667 6.667h2.666M4.667 9H6m4-2.333h1.333v2H10v-2Zm-7.333 6h10.666A.667.667 0 0 0 14 12V4a.667.667 0 0 0-.667-.667H2.667A.667.667 0 0 0 2 4v8c0 .368.298.667.667.667Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

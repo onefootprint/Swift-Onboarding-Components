@@ -14,13 +14,22 @@ const IcoCopy16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M2.4 3.438c0-.573.465-1.038 1.038-1.038h5.865a.82.82 0 0 1 .82.82.7.7 0 1 0 1.4 0A2.22 2.22 0 0 0 9.304 1H3.438A2.438 2.438 0 0 0 1 3.438v5.865a2.22 2.22 0 0 0 2.22 2.22.7.7 0 1 0 0-1.4.82.82 0 0 1-.82-.82V3.438Zm3.476 3.475c0-.573.464-1.037 1.037-1.037h5.648c.574 0 1.038.464 1.038 1.037v5.648c0 .574-.464 1.038-1.038 1.038H6.913a1.038 1.038 0 0 1-1.037-1.038V6.913Zm1.037-2.437a2.438 2.438 0 0 0-2.437 2.437v5.648A2.438 2.438 0 0 0 6.913 15h5.648A2.438 2.438 0 0 0 15 12.561V6.913a2.438 2.438 0 0 0-2.438-2.437H6.913Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M10.167 5.833V2.167a.333.333 0 0 0-.333-.334H2.167a.333.333 0 0 0-.333.334v7.666c0 .184.149.334.333.334h3.667m.333-4.334h7.667c.184 0 .333.15.333.334v7.666c0 .184-.15.334-.333.334H6.167a.333.333 0 0 1-.333-.334V6.167c0-.184.149-.334.333-.334Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

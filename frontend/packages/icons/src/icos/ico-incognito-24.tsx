@@ -14,11 +14,12 @@ const IcoIncognito24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M13.25 16.75h-2.5m-6-4s.409-.354 1.25-.764m0 0c1.16-.564 3.139-1.236 6-1.236s4.84.672 6 1.236m-12 0 .564-5.442a2 2 0 0 1 1.99-1.794h6.893a2 2 0 0 1 1.989 1.794L18 11.986m0 0c.841.41 1.25.764 1.25.764m-9 4.25a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm8 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+        d="M5.125 12.85c3.992 4.244 9.758 4.244 13.75 0M5.125 8.352C7.121 6.23 9.56 5.17 12 5.17c2.44 0 4.88 1.06 6.875 3.183M12 16.167v2.708M8.875 15.75l-1.25 2.068m7.292-2.068 1.458 2.068"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

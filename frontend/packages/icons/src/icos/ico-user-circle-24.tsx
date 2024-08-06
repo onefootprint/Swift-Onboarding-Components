@@ -14,12 +14,13 @@ const IcoUserCircle24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 5.5a6.5 6.5 0 0 0-5.024 10.625A6.981 6.981 0 0 1 12 14c1.971 0 3.752.815 5.023 2.125A6.5 6.5 0 0 0 12 5.5Zm3.944 11.667A5.482 5.482 0 0 0 12 15.5a5.482 5.482 0 0 0-3.944 1.667A6.472 6.472 0 0 0 12 18.5c1.483 0 2.85-.497 3.944-1.333ZM4 12a8 8 0 1 1 16 0 8 8 0 0 1-16 0Zm8-3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM9 10a3 3 0 1 1 6 0 3 3 0 0 1-6 0Z"
-        fill={theme.color[color]}
+        d="M6.88 17.763c1.095-1.599 2.897-2.638 5.12-2.638 2.223 0 4.024 1.039 5.119 2.638m-10.238 0A7.68 7.68 0 0 0 12 19.708a7.679 7.679 0 0 0 5.119-1.945m-10.238 0a7.708 7.708 0 1 1 10.238 0m-2.41-7.43a2.708 2.708 0 1 1-5.418 0 2.708 2.708 0 0 1 5.417 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinejoin="round"
       />
     </svg>
   );

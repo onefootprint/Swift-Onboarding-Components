@@ -14,12 +14,21 @@ const IcoLaptop24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M6.748 4a1.75 1.75 0 0 0-1.75 1.75v8.5c0 .042.004.083.01.124l-.74 3.516A1.75 1.75 0 0 0 5.981 20h12.035a1.75 1.75 0 0 0 1.712-2.11l-.74-3.516a.763.763 0 0 0 .01-.124v-8.5A1.75 1.75 0 0 0 17.248 4h-10.5Zm10.839 11H6.409l-.673 3.198a.25.25 0 0 0 .245.302h12.035a.25.25 0 0 0 .244-.302L17.587 15ZM6.498 5.75a.25.25 0 0 1 .25-.25h10.5a.25.25 0 0 1 .25.25v7.75h-11V5.75Z"
-        fill={theme.color[color]}
+        d="M5.333 6.167c0-.46.374-.834.834-.834h11.666c.46 0 .834.373.834.834V14.5c0 .46-.373.833-.834.833H6.168a.833.833 0 0 1-.833-.833V6.167Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3.667 15.333h16.666v2.5c0 .46-.373.834-.833.834h-15a.833.833 0 0 1-.833-.834v-2.5Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="square"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -14,13 +14,26 @@ const IcoRefresh16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.823 2.27a.7.7 0 1 0-.937-1.04L4.731 3.17a.7.7 0 0 0 0 1.04l2.155 1.94a.7.7 0 1 0 .937-1.04l-.8-.72H9.08a4.473 4.473 0 0 1 4.473 4.473v.216a.7.7 0 1 0 1.4 0v-.216A5.873 5.873 0 0 0 9.08 2.99H7.023l.8-.72Zm1.293 7.582a.7.7 0 1 0-.937 1.04l.8.72H6.923A4.473 4.473 0 0 1 2.45 7.14v-.216a.7.7 0 1 0-1.4 0v.216a5.873 5.873 0 0 0 5.873 5.873H8.98l-.8.72a.7.7 0 0 0 .937 1.04l2.155-1.94a.7.7 0 0 0 0-1.04l-2.155-1.94Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M8.667 14a.667.667 0 1 0 0-1.333.667.667 0 0 0 0 1.333ZM14 7.333a.667.667 0 1 0-1.333 0 .667.667 0 0 0 1.333 0ZM13.286 9.512a.667.667 0 1 1-.667 1.155.667.667 0 0 1 .667-1.155ZM11.578 12.863a.667.667 0 1 0-.666-1.155.667.667 0 0 0 .666 1.155ZM12.618 5.333a.667.667 0 1 1-.667-1.154.667.667 0 0 1 .667 1.154Z"
+          fill={theme.color[color]}
+        />
+        <path
+          d="M6.167 9.833V13.5H2.5m3.5-.375a5.502 5.502 0 1 1 4.166-10.182"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,11 +14,19 @@ const IcoFacebook16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M8.006 1A7.036 7.036 0 0 0 .97 8.036c0 3.528 2.599 6.44 5.984 6.949V9.901h-1.74V8.05h1.74v-1.23c0-2.038.993-2.932 2.687-2.932.81 0 1.24.06 1.443.087v1.615H9.928c-.719 0-.97.681-.97 1.45v1.01h2.107l-.286 1.85H8.96V15c3.434-.466 6.083-3.402 6.083-6.964A7.036 7.036 0 0 0 8.006 1Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M6.39 14.47v-4.433H5.014V8H6.39v-.878c0-2.269 1.026-3.32 3.253-3.32.421 0 1.15.083 1.448.165v1.846a8.912 8.912 0 0 0-.77-.024c-1.094 0-1.516.413-1.516 1.49V8h2.18l-.374 2.037H8.808v4.581a6.667 6.667 0 1 0-2.419-.148Z"
+          fill={theme.color[color]}
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

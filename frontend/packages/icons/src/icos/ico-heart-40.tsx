@@ -14,15 +14,21 @@ const IcoHeart40 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        clipRule="evenodd"
-        d="M19.99 10.139c-3-3.359-8-4.262-11.758-1.187-3.758 3.075-4.287 8.217-1.336 11.854L19.99 32.932l13.093-12.126c2.951-3.637 2.487-8.81-1.336-11.854C27.925 5.91 22.99 6.78 19.99 10.14Z"
-        stroke={theme.color[color]}
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M20 9.614c10.27-10.417 27.875 8.929 0 24.553C-7.875 18.543 9.73-.803 20 9.614Z"
+          stroke={theme.color[color]}
+          strokeWidth={3.333}
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

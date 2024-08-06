@@ -14,12 +14,21 @@ const IcoWallet24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.5 6.5a1 1 0 0 1 1-1h8.75c.69 0 1.25.56 1.25 1.25v.75h-10a1 1 0 0 1-1-1Zm12.5.25v.75h1.25a.75.75 0 0 1 .75.75v9A2.75 2.75 0 0 1 17.25 20H6.75A2.75 2.75 0 0 1 4 17.25V6.75c0-.03.002-.06.005-.088A2.5 2.5 0 0 1 6.5 4h8.75A2.75 2.75 0 0 1 18 6.75ZM5.5 8.792v8.458c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25V9h-12c-.356 0-.694-.074-1-.208ZM15 13a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
+        d="M5.125 7.417v8.958a2.5 2.5 0 0 0 2.5 2.5h10.417c.46 0 .833-.373.833-.833v-7.917a.833.833 0 0 0-.833-.833h-2.5M5.125 7.417c0 1.035.84 1.875 1.875 1.875h8.542M5.125 7.417a2.292 2.292 0 0 1 2.292-2.292h7.474c.36 0 .65.291.65.651v3.516"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.916 14.708a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25Z"
         fill={theme.color[color]}
+        stroke={theme.color[color]}
+        strokeWidth={0.417}
+        strokeLinejoin="round"
       />
     </svg>
   );

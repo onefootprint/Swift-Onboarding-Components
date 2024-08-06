@@ -14,13 +14,27 @@ const IcoCrosshair16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.004 1.05a.65.65 0 0 1 .65.65v.254a6.087 6.087 0 0 1 5.4 5.4h.255a.65.65 0 1 1 0 1.3h-.254a6.087 6.087 0 0 1-5.4 5.4v.255a.65.65 0 1 1-1.3 0v-.254a6.087 6.087 0 0 1-5.401-5.4H1.7a.65.65 0 1 1 0-1.3h.254a6.087 6.087 0 0 1 5.4-5.401V1.7a.65.65 0 0 1 .65-.65Zm-4.74 7.604h2.349a.65.65 0 0 0 0-1.3h-2.35a4.788 4.788 0 0 1 4.091-4.09v2.35a.65.65 0 0 0 1.3 0v-2.35a4.788 4.788 0 0 1 4.091 4.09h-2.35a.65.65 0 1 0 0 1.3h2.35a4.788 4.788 0 0 1-4.09 4.091v-2.35a.65.65 0 1 0-1.3 0v2.35a4.788 4.788 0 0 1-4.092-4.09Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <g clipPath="url(#prefix__b)">
+          <path
+            d="M7.833 1v4.333m6.834 2.5h-4.334m-2.5 2.5v4.334m-2.5-6.834H1m6.833 4.834a4.833 4.833 0 1 1 0-9.667 4.833 4.833 0 0 1 0 9.667Z"
+            stroke={theme.color[color]}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+        <clipPath id="prefix__b">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

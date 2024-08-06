@@ -14,12 +14,14 @@ const IcoDollar24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.5 12a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0ZM12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm.75 3.75V8h1.5a.75.75 0 0 1 0 1.5h-2.875a.875.875 0 0 0 0 1.75h1.25a2.375 2.375 0 0 1 .125 4.747v.253a.75.75 0 0 1-1.5 0V16h-1.5a.75.75 0 0 1 0-1.5h2.875a.875.875 0 0 0 0-1.75h-1.25a2.375 2.375 0 0 1-.125-4.747V7.75a.75.75 0 0 1 1.5 0Z"
-        fill={theme.color[color]}
+        d="M12 8.146v-.857m0 8.565v.857m1.855-7.28c-.37-.512-1.063-.857-1.855-.857h-.238c-1.051 0-1.903.682-1.903 1.523v.065c0 .602.424 1.151 1.097 1.42l2.088.836c.672.269 1.097.818 1.097 1.42 0 .877-.889 1.588-1.985 1.588H12c-.793 0-1.485-.345-1.855-.857M19.708 12a7.708 7.708 0 1 1-15.417 0 7.708 7.708 0 0 1 15.417 0Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -14,12 +14,14 @@ const IcoDotsHorizontal24 = ({ 'aria-label': ariaLabel, color = 'primary', class
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm6 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm4.5 1.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
-        fill={theme.color[color]}
+        d="M12 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25ZM16.583 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25ZM7.417 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.111}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

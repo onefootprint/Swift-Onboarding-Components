@@ -14,12 +14,14 @@ const IcoArrowUpRight24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.75 4a.75.75 0 0 0 0 1.5h6.69l-9.22 9.22a.75.75 0 1 0 1.06 1.06l9.22-9.22v6.69a.75.75 0 0 0 1.5 0v-8.5a.75.75 0 0 0-.75-.75h-8.5Z"
-        fill={theme.color[color]}
+        d="M17 14.5V7m0 0H9.5M17 7 7.21 16.792"
+        stroke={theme.color[color]}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

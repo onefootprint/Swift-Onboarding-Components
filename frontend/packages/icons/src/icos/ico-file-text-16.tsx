@@ -14,13 +14,21 @@ const IcoFileText16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.988 1.85c-.656 0-1.188.532-1.188 1.188v9.913c0 .656.532 1.188 1.188 1.188h8.025c.656 0 1.188-.531 1.188-1.188V7.043h-2.604a2.588 2.588 0 0 1-2.588-2.589V1.85h-4.02Zm5.42.99 2.803 2.803h-1.614a1.188 1.188 0 0 1-1.188-1.189V2.84ZM1.4 3.038A2.588 2.588 0 0 1 3.988.45h4.72a.7.7 0 0 1 .496.205l5.192 5.193a.7.7 0 0 1 .205.495v6.608a2.588 2.588 0 0 1-2.588 2.588H3.988A2.588 2.588 0 0 1 1.4 12.951V3.038Zm2.832 8.497a.7.7 0 0 1 .7-.7h6.137a.7.7 0 1 1 0 1.4H4.932a.7.7 0 0 1-.7-.7Zm.7-3.532a.7.7 0 1 0 0 1.4h2.36a.7.7 0 1 0 0-1.4h-2.36Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M8.5 2.167V5.5c0 .368.298.667.666.667H12.5M5.833 8.833h2.333M5.833 11.5h4.333M3.833 1.833h4.39c.177 0 .347.07.472.196l3.943 3.942a.667.667 0 0 1 .195.472V13.5a.667.667 0 0 1-.667.667H3.833a.667.667 0 0 1-.667-.667v-11c0-.368.299-.667.667-.667Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,13 +14,23 @@ const IcoLaptop40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.652 2.58A3.912 3.912 0 0 0 4.74 6.491v18.373c0 .09.007.179.02.265l-1.595 7.576a3.912 3.912 0 0 0 3.828 4.717h26.014a3.912 3.912 0 0 0 3.828-4.717l-1.595-7.577c.013-.086.02-.174.02-.264V6.491a3.912 3.912 0 0 0-3.912-3.911H8.652Zm23.324 24.035H8.024l-1.434 6.81a.412.412 0 0 0 .403.497h26.014c.262 0 .457-.24.403-.496l-1.434-6.812ZM8.24 6.49c0-.227.185-.411.412-.411h22.696c.227 0 .412.184.412.411v16.623H8.24V6.491Z"
-        fill={theme.color[color]}
-      />
+      <g
+        clipPath="url(#prefix__a)"
+        stroke={theme.color[color]}
+        strokeWidth={3.333}
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      >
+        <path d="M6.667 8.333c0-.92.746-1.666 1.666-1.666h23.333c.921 0 1.667.746 1.667 1.666V25c0 .92-.746 1.667-1.666 1.667H8.332c-.92 0-1.667-.747-1.667-1.667V8.333Z" />
+        <path d="M3.333 26.667h33.334v5c0 .92-.746 1.666-1.667 1.666H5c-.92 0-1.667-.746-1.667-1.666v-5Z" />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h40v40H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

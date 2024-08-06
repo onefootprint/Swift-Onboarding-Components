@@ -14,14 +14,22 @@ const IcoFingerprint16 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        d="M14 14V8c0-2.144-1.164-4.17-2.894-5.172M2.01 10.276V14M2.01 8.207C1.803 4.276 4.808 2 8.005 2M8.005 5.31c1.484 0 2.687 1.035 2.687 2.897M10.692 10.276v1.241M5.318 11.104v1.24C5.318 13.38 4.49 14 4.49 14M7.798 8.62v2.897c0 1.449.662 2.483 2.48 2.483M5.62 6.759A2.68 2.68 0 0 0 5.318 8v1.034"
-        stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M4.156 12.87c.127-.304.243-.614.349-.93m5.11 2.061a19.778 19.778 0 0 0 .816-3.054m2.695.555c.25-1.35.382-2.744.382-4.167a5.502 5.502 0 0 0-7.91-4.948m-3.424 7.716c.216-.887.33-1.814.33-2.768 0-1.197.382-2.304 1.031-3.207m4.471 3.207a17.177 17.177 0 0 1-1.365 6.727m-1.586-4.32c.131-.783.2-1.587.2-2.407a2.75 2.75 0 0 1 5.502 0c0 .424-.014.845-.04 1.263"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

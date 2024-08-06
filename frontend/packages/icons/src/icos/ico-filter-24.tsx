@@ -14,12 +14,12 @@ const IcoFilter24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M19.25 4.75H4.75l4.562 5.702a2 2 0 0 1 .438 1.25v6.548a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-6.548a2 2 0 0 1 .438-1.25L19.25 4.75Z"
+        d="M18.042 5.125H5.958a.833.833 0 0 0-.833.833v2.363c0 .222.088.433.244.59l4.512 4.512a.833.833 0 0 1 .244.589v5.696l3.75-1.041v-4.655c0-.221.088-.433.244-.59l4.512-4.511a.833.833 0 0 0 .244-.59V5.958a.833.833 0 0 0-.833-.833Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
+        strokeWidth={1.25}
         strokeLinejoin="round"
       />
     </svg>

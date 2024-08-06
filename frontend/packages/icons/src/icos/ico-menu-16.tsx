@@ -14,13 +14,22 @@ const IcoMenu16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M.9 2.54a.75.75 0 0 1 .75-.75h12.688a.75.75 0 0 1 0 1.5H1.65a.75.75 0 0 1-.75-.75Zm0 10.937a.75.75 0 0 1 .75-.75h12.688a.75.75 0 0 1 0 1.5H1.65a.75.75 0 0 1-.75-.75Zm.75-6.218a.75.75 0 1 0 0 1.5h12.688a.75.75 0 0 0 0-1.5H1.65Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M1.833 8h12.334M1.834 3.833h12.333M1.833 12.167h12.334"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

@@ -14,11 +14,12 @@ const IcoMoon24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <path
-        d="M8.942 8.178c0-.975.144-1.962.51-2.803-2.435 1.06-4.077 3.546-4.077 6.37 0 3.8 3.08 6.88 6.88 6.88 2.824 0 5.31-1.643 6.37-4.077-.84.366-1.828.51-2.803.51a6.88 6.88 0 0 1-6.88-6.88Z"
+        d="M19.47 12.64a5.833 5.833 0 0 1-8.113-8.113 7.5 7.5 0 1 0 8.113 8.112Z"
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

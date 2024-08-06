@@ -14,19 +14,22 @@ const IcoIdBack24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 24 24"
     >
       <rect
-        width={16}
-        height={16}
-        rx={2}
-        transform="matrix(1 0 0 -1 4 20)"
+        x={4.5}
+        y={4.5}
+        width={15}
+        height={15}
+        rx={1.667}
         stroke={theme.color[color]}
-        strokeWidth={1.5}
+        strokeWidth={1.25}
+        strokeLinejoin="round"
       />
-      <rect x={6.667} y={6.933} width={10.667} height={1.28} rx={0.64} fill={theme.color[color]} />
-      <rect x={9.867} y={9.6} width={7.467} height={1.28} rx={0.64} fill={theme.color[color]} />
+      <rect x={7.556} y={7} width={8.889} height={1.25} rx={0.625} fill={theme.color[color]} />
+      <rect x={10.223} y={9.222} width={6.222} height={1.25} rx={0.625} fill={theme.color[color]} />
       <path
-        d="M6.667 15.048c0-.505.53-.915 1.185-.915h8.296c.655 0 1.185.41 1.185.915v1.371c0 .505-.53.914-1.185.914H7.852c-.655 0-1.185-.409-1.185-.914v-1.371Z"
+        d="M7.556 15.095c0-.42.442-.762.987-.762h6.914c.545 0 .988.341.988.762v1.143c0 .42-.443.762-.988.762H8.543c-.545 0-.987-.341-.987-.762v-1.143Z"
         fill={theme.color[color]}
       />
     </svg>

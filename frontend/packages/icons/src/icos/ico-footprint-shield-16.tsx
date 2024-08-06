@@ -14,13 +14,21 @@ const IcoFootprintShield16 = ({ 'aria-label': ariaLabel, color = 'primary', clas
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.799 1.046a.464.464 0 0 1 .402 0l6.528 3.137c.175.084.28.264.255.457C14.758 6.41 13.382 15 8 15S1.243 6.41 1.016 4.64a.443.443 0 0 1 .255-.457L7.8 1.046Zm2.68 7.861H9.346c-.782 0-1.415.634-1.415 1.416v1.132h-1.98V4.661h4.526v1.285a1.132 1.132 0 1 0 0 1.96v1.001Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M7.786 1.046a.464.464 0 0 1 .403 0l6.527 3.137c.176.084.28.264.255.457C14.745 6.41 13.37 15 7.987 15 2.606 15 1.23 6.41 1.004 4.64a.443.443 0 0 1 .255-.457l6.527-3.137Zm2.68 7.861H9.334c-.781 0-1.415.634-1.415 1.416v1.132H5.94V4.661h4.527v1.285a1.132 1.132 0 1 0 0 1.96v1.001Z"
+          fill={theme.color[color]}
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

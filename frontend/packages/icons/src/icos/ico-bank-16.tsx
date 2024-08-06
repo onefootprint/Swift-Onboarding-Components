@@ -14,13 +14,22 @@ const IcoBank16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.53 2.039a.7.7 0 0 1 .935 0l5.437 4.875a.7.7 0 0 1-.467 1.221h-.05v4.6h.05a.7.7 0 1 1 0 1.4H2.56a.7.7 0 0 1 0-1.4h.05v-4.6h-.05a.7.7 0 0 1-.467-1.221L7.53 2.039ZM4.01 12.735h1.6v-4.6h-1.6v4.6Zm3 0h1.975v-4.6H7.01v4.6Zm3.375 0h1.6v-4.6h-1.6v4.6Zm1.22-6L7.998 3.5 4.39 6.735h7.217Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M12.834 6.167V11.5m-2.667 0V6.167m-7 0V11.5m2.667 0V6.167M13.02 11.5H2.98a.667.667 0 0 0-.632.456l-.222.667a.667.667 0 0 0 .632.877h10.484a.667.667 0 0 0 .632-.877l-.222-.667a.667.667 0 0 0-.632-.456Zm.48-5.333h-11a.667.667 0 0 1-.667-.667v-.308c0-.251.142-.481.367-.595L7.7 1.82a.667.667 0 0 1 .6 0l5.5 2.778a.667.667 0 0 1 .367.595V5.5a.667.667 0 0 1-.667.667Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.3}
+          strokeLinecap="square"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

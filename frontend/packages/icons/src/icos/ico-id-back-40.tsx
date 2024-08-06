@@ -14,21 +14,22 @@ const IcoIdBack40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 40 40"
     >
-      <rect
-        width={30}
-        height={30}
-        rx={5}
-        transform="matrix(1 0 0 -1 5 35)"
-        stroke={theme.color[color]}
-        strokeWidth={3}
-      />
-      <rect x={10} y={10.5} width={20} height={2.4} rx={1.2} fill={theme.color[color]} />
-      <rect x={16} y={15.5} width={14} height={2.4} rx={1.2} fill={theme.color[color]} />
-      <path
-        d="M10 25.714c0-.947.995-1.714 2.222-1.714h15.556c1.227 0 2.222.767 2.222 1.714v2.572c0 .947-.995 1.714-2.222 1.714H12.222C10.995 30 10 29.233 10 28.286v-2.572Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <rect x={5} y={5} width={30} height={30} rx={3.75} stroke={theme.color[color]} strokeWidth={3.333} />
+        <rect x={11.111} y={10} width={17.778} height={2.5} rx={1.25} fill={theme.color[color]} />
+        <rect x={16.444} y={14.444} width={12.444} height={2.5} rx={1.25} fill={theme.color[color]} />
+        <path
+          d="M11.111 26.19c0-.841.885-1.523 1.976-1.523h13.827c1.09 0 1.975.682 1.975 1.523v2.286c0 .842-.884 1.524-1.975 1.524H13.087c-1.091 0-1.976-.682-1.976-1.524V26.19Z"
+          fill={theme.color[color]}
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <rect width={40} height={40} rx={6} fill="#fff" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

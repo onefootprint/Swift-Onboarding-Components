@@ -14,13 +14,22 @@ const IcoBook16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M2.88 3.112c0-.642.52-1.162 1.162-1.162h1.162v11.168H4.042c-.642 0-1.162-.52-1.162-1.162V3.112Zm2.324 11.406v.231a.7.7 0 1 0 1.4 0v-.23h5.351a2.562 2.562 0 0 0 2.562-2.563V3.112A2.562 2.562 0 0 0 11.955.55H4.042A2.562 2.562 0 0 0 1.48 3.112v8.844a2.562 2.562 0 0 0 2.562 2.562h1.162Zm1.4-12.568h5.351c.642 0 1.162.52 1.162 1.162v8.844c0 .642-.52 1.162-1.162 1.162H6.604V1.95Zm3.024 2.274a.75.75 0 1 0 0 1.5h.465a.75.75 0 0 0 0-1.5h-.465Zm-.75 3.543a.75.75 0 0 1 .75-.75h.465a.75.75 0 0 1 0 1.5h-.465a.75.75 0 0 1-.75-.75Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M5.833 2.167H3.5a.667.667 0 0 0-.667.666v10.334c0 .368.299.666.667.666h2.333m0-11.666H12.5c.368 0 .667.298.667.666v10.334a.667.667 0 0 1-.667.666H5.833m0-11.666v11.666M8.5 5.167h2m-2 2.666h2"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

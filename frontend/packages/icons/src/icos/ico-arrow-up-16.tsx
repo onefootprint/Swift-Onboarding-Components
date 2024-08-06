@@ -14,13 +14,22 @@ const IcoArrowUp16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.255 13.001a.75.75 0 0 0 1.5 0v-8.49l2.593 2.717a.75.75 0 1 0 1.085-1.035l-3.885-4.07a.75.75 0 0 0-1.085 0l-3.886 4.07a.75.75 0 1 0 1.086 1.035l2.592-2.716v8.49Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="M12.333 6.167 8.167 2 4 6.167M8.167 2.5V13"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

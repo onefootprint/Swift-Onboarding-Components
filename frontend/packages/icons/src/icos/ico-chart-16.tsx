@@ -14,13 +14,22 @@ const IcoChart16 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
+      viewBox="0 0 16 16"
     >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M3.26 4.06a.8.8 0 0 1 .8-.8h7.875a.8.8 0 0 1 .8.8v7.875a.8.8 0 0 1-.8.8H4.06a.8.8 0 0 1-.8-.8V4.06Zm.8-2.2a2.2 2.2 0 0 0-2.2 2.2v7.875a2.2 2.2 0 0 0 2.2 2.2h7.875a2.2 2.2 0 0 0 2.2-2.2V4.06a2.2 2.2 0 0 0-2.2-2.2H4.06Zm2.1 4.45a.6.6 0 1 0-1.2 0v4.125a.6.6 0 1 0 1.2 0V6.31Zm4.275-.6a.6.6 0 0 1 .6.6v4.125a.6.6 0 1 1-1.2 0V6.31a.6.6 0 0 1 .6-.6ZM8.597 8.56a.6.6 0 1 0-1.2 0v1.875a.6.6 0 1 0 1.2 0V8.56Z"
-        fill={theme.color[color]}
-      />
+      <g clipPath="url(#prefix__a)">
+        <path
+          d="m10.667 14.5-.571-2m-4.763 2 .572-2m-.738-4v1M8 5.167V9.5m2.834-2.333V9.5m-9-6.333V11.5c0 .368.298.667.666.667h11a.667.667 0 0 0 .667-.667V3.167A.667.667 0 0 0 13.5 2.5h-11a.667.667 0 0 0-.667.667Z"
+          stroke={theme.color[color]}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="prefix__a">
+          <path fill="#fff" d="M0 0h16v16H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 };
