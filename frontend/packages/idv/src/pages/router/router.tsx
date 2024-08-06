@@ -51,7 +51,6 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     deviceResponseJson,
     retries,
   } = state.context;
-  console.log('idv state.context', state.context);
   const isDone = state.matches('complete');
   const retryLimitExceeded = retries > IDV_SESSION_RETRY_LIMIT;
 
