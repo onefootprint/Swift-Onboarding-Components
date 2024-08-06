@@ -14,7 +14,6 @@ const IcoCloseSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m8.666 8.667 6.667 6.666m0-6.666-6.667 6.666"

@@ -14,7 +14,6 @@ const IcoClock24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 8.667V12l2.083 2.083M19.5 12a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"

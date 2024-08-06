@@ -14,7 +14,6 @@ const IcoMenu24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M4.292 12h15.416M4.292 6.792h15.416M4.292 17.208h15.416"

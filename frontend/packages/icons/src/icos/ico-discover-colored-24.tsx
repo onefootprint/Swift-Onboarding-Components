@@ -12,7 +12,6 @@ const IcoDiscover24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 24 24"
     >
       <path
         fillRule="evenodd"

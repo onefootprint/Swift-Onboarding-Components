@@ -14,7 +14,6 @@ const IcoPin24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m5.333 18.667 3.334-3.334m-3.174-4.007 7.18 7.181a.833.833 0 0 0 1.39-.354l1.595-5.424a.833.833 0 0 1 .37-.48l2.973-1.783a.833.833 0 0 0 .16-1.304l-4.323-4.324a.833.833 0 0 0-1.304.16l-1.783 2.973a.833.833 0 0 1-.48.37L5.847 9.938a.833.833 0 0 0-.354 1.389Z"

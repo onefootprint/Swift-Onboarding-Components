@@ -14,7 +14,6 @@ const IcoEnter24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M18.875 5.958v7.917c0 .46-.373.833-.833.833H5.958m2.5-3.333-3.333 3.333 3.333 3.334"

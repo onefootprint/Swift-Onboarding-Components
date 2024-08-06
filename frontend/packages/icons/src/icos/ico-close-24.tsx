@@ -14,7 +14,6 @@ const IcoClose24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path d="m7 7 10 10m0-10L7 17" stroke={theme.color[color]} strokeWidth={1.5} strokeLinecap="round" />
     </svg>

@@ -14,7 +14,6 @@ const IcoSun24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <g clipPath="url(#prefix__a)">
         <path

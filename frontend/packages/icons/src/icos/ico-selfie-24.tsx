@@ -14,7 +14,6 @@ const IcoSelfie24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M8.875 18.875H5.958a.833.833 0 0 1-.833-.833v-2.917m10 3.75h2.917c.46 0 .833-.373.833-.833v-2.917m-13.75-6.25V5.958c0-.46.373-.833.833-.833h2.917m6.25 0h2.917c.46 0 .833.373.833.833v2.917"

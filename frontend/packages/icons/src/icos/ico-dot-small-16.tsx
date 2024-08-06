@@ -14,7 +14,6 @@ const IcoDotSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <circle cx={8} cy={8} r={3} fill={theme.color[color]} />

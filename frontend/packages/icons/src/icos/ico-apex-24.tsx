@@ -14,7 +14,6 @@ const IcoApex24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <circle cx={16.959} cy={16.592} r={1.532} fill={theme.color[color]} />
       <rect

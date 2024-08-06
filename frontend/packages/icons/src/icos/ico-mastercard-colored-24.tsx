@@ -12,7 +12,6 @@ const IcoMastercard24 = ({ 'aria-label': ariaLabel, className, testID }: IconPro
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 24 24"
     >
       <path d="M14.704 7.488H9.296v9.718h5.409V7.488Z" fill="#FF5F00" />
       <path

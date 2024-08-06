@@ -14,7 +14,6 @@ const IcoIdFront40 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 40 40"
     >
       <g clipPath="url(#prefix__a)">
         <circle cx={11.667} cy={11.667} fill={theme.color[color]} r={1.667} />

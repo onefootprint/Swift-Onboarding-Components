@@ -14,7 +14,6 @@ const IcoLogOut24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M11.375 18.667H6.167a.833.833 0 0 1-.833-.834V6.167c0-.46.373-.834.833-.834h5.208M18.667 12H9.292m9.375 0-3.75 3.75m3.75-3.75-3.75-3.75"

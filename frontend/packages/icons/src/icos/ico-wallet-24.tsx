@@ -14,7 +14,6 @@ const IcoWallet24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M5.125 7.417v8.958a2.5 2.5 0 0 0 2.5 2.5h10.417c.46 0 .833-.373.833-.833v-7.917a.833.833 0 0 0-.833-.833h-2.5M5.125 7.417c0 1.035.84 1.875 1.875 1.875h8.542M5.125 7.417a2.292 2.292 0 0 1 2.292-2.292h7.474c.36 0 .65.291.65.651v3.516"

@@ -14,7 +14,6 @@ const IcoPlusBig24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 5.333V12m0 0v6.667M12 12H5.333M12 12h6.667"

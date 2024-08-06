@@ -14,7 +14,6 @@ const IcoFootprint16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path d="M10 9.5h2V7.73a2 2 0 1 1 0-3.46V2H4v12h3.5v-2A2.5 2.5 0 0 1 10 9.5Z" fill={theme.color[color]} />

@@ -14,7 +14,6 @@ const IcoLaptop24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M5.333 6.167c0-.46.374-.834.834-.834h11.666c.46 0 .834.373.834.834V14.5c0 .46-.373.833-.834.833H6.168a.833.833 0 0 1-.833-.833V6.167Z"

@@ -14,7 +14,6 @@ const IcoSpinner24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M19.708 12A7.708 7.708 0 0 0 12 4.292"

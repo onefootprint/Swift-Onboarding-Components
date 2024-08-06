@@ -14,7 +14,6 @@ const IcoVisaPassport24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M9.917 15.333h4.166m-7.5 3.75h10.834c.46 0 .833-.373.833-.833V5.75a.833.833 0 0 0-.833-.833H6.583a.833.833 0 0 0-.833.833v12.5c0 .46.373.833.833.833Z"

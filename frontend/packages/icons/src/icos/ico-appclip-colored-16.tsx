@@ -12,7 +12,6 @@ const IcoAppclip16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps)
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 16 16"
     >
       <path
         d="M6.53 1h3.344c.154 0 .248.006.284.016.32.087.33.567.003.668a.695.695 0 0 1-.185.017c-.864-.001-1.728 0-2.592.002H6.81c-.294-.002-.589-.003-.883 0a.552.552 0 0 1-.136-.04c-.27-.12-.25-.526.012-.633a.542.542 0 0 1 .189-.027C6.17 1 6.35.999 6.53 1Z"

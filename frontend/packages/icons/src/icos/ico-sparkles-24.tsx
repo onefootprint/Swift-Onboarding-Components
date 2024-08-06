@@ -14,7 +14,6 @@ const IcoSparkles24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M18.041 12.833c-4.212.365-6.51 2.663-6.875 6.875-.38-4.277-2.666-6.398-6.875-6.875 4.276-.493 6.382-2.6 6.875-6.875.477 4.209 2.598 6.495 6.875 6.875Z"

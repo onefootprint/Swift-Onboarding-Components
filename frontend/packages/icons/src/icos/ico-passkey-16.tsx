@@ -14,7 +14,6 @@ const IcoPasskey16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <path
         d="M8 8.667c-2.531 0-4.378 1.682-4.886 3.944-.087.383.225.722.617.722h5.601m1-9a2.333 2.333 0 1 1-4.666 0 2.333 2.333 0 0 1 4.666 0Z"

@@ -14,7 +14,6 @@ const IcoIdFront24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <circle cx={7.833} cy={7.833} fill={theme.color[color]} r={0.833} />
       <circle cx={10.333} cy={7.833} fill={theme.color[color]} r={0.833} />

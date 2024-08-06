@@ -14,7 +14,6 @@ const IcoCompass24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M15.721 16.294a.833.833 0 0 0 .572-.572l3-10.5a.417.417 0 0 0-.515-.516l-10.5 3a.833.833 0 0 0-.572.572l-3 10.5c-.09.315.2.606.515.516l10.5-3Z"

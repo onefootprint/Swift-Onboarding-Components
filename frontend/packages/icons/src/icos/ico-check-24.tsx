@@ -14,7 +14,6 @@ const IcoCheck24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m6.792 13.042 3.125 3.125 7.291-8.334"

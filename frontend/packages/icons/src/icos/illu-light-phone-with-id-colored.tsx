@@ -12,7 +12,6 @@ const IlluLightPhoneWithId = ({ 'aria-label': ariaLabel, className, testID }: Ic
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 24 24"
     >
       <path
         fillRule="evenodd"

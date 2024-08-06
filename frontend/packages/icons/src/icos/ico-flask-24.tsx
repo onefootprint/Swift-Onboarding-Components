@@ -14,7 +14,6 @@ const IcoFlask24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m13.042 5.125.833.833m0 0 4.167 4.167m-4.167-4.167-8.75 8.75a2.946 2.946 0 0 0 4.167 4.167l8.75-8.75m0 0 .833.833m-11.26 1.667h7.497M18.666 7v-.008m-.624-2.909a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0ZM18.875 7a.208.208 0 1 1-.417 0 .208.208 0 0 1 .417 0Z"

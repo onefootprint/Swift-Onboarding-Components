@@ -14,7 +14,6 @@ const IcoMoon24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M19.47 12.64a5.833 5.833 0 0 1-8.113-8.113 7.5 7.5 0 1 0 8.113 8.112Z"

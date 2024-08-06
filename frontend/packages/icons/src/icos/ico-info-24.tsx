@@ -14,7 +14,6 @@ const IcoInfo24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M10.958 11.167H12v4.375M19.708 12a7.708 7.708 0 1 1-15.417 0 7.708 7.708 0 0 1 15.417 0Z"

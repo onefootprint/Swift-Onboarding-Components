@@ -14,7 +14,6 @@ const IcoShieldFlash24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M18.667 7.386v4.54c0 4.11-3.278 5.877-6.582 7.66l-.085.046-.084-.046c-3.305-1.783-6.583-3.55-6.583-7.66v-4.54c0-.355.226-.672.563-.788l5.833-2.005a.834.834 0 0 1 .542 0l5.833 2.005a.833.833 0 0 1 .563.788Z"

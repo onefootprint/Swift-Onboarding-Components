@@ -14,7 +14,6 @@ const IcoDotsVertical24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 5.958a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12 12.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12 19.708a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666Z"

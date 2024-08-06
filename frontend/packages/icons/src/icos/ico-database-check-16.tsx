@@ -14,7 +14,6 @@ const IcoDatabaseCheck16 = ({ 'aria-label': ariaLabel, color = 'primary', classN
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <path
         fillRule="evenodd"

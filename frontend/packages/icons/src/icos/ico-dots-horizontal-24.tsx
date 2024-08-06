@@ -14,7 +14,6 @@ const IcoDotsHorizontal24 = ({ 'aria-label': ariaLabel, color = 'primary', class
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25ZM16.583 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25ZM7.417 12.625a.625.625 0 1 0 0-1.25.625.625 0 0 0 0 1.25Z"

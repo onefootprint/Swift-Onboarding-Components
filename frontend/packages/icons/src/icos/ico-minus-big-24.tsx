@@ -14,7 +14,6 @@ const IcoMinusBig24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path d="M5.333 12h13.334" stroke={theme.color[color]} strokeWidth={1.5} strokeLinecap="round" />
     </svg>

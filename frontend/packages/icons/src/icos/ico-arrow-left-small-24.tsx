@@ -14,7 +14,6 @@ const IcoArrowLeftSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', class
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M10.854 8.563 7.417 12l3.437 3.438M7.989 12h8.594"

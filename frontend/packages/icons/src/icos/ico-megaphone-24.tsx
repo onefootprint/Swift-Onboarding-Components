@@ -14,7 +14,6 @@ const IcoMegaphone24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M17.205 13.667a2.5 2.5 0 0 0 0-5m-4.725 8.541a2.501 2.501 0 0 1-4.858-.833v-1.25m.002-7.917v7.917m9.581-9.704v11.491a.833.833 0 0 1-1.079.796l-11.25-3.473a.833.833 0 0 1-.587-.796V8.895c0-.366.238-.689.587-.797l11.25-3.473a.833.833 0 0 1 1.08.796Z"

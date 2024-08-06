@@ -14,7 +14,6 @@ const IcoWww16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" stroke={theme.color[color]} strokeWidth={1.5} strokeLinejoin="round">
         <path d="M14.167 8A6.167 6.167 0 1 1 1.833 8a6.167 6.167 0 0 1 12.334 0Z" />

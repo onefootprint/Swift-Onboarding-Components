@@ -14,7 +14,6 @@ const IcoVisaPassport16 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" stroke={theme.color[color]} strokeLinecap="round" strokeLinejoin="round">
         <path

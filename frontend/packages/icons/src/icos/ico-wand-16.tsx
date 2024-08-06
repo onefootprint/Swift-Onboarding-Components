@@ -14,7 +14,6 @@ const IcoWand16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" fill={theme.color[color]}>
         <path

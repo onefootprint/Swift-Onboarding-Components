@@ -14,7 +14,6 @@ const IcoWebhook24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <mask id="prefix__a" maskUnits="userSpaceOnUse" x={3.5} y={3.5} width={17} height={16} fill={theme.color[color]}>
         <path fill="#fff" d="M3.5 3.5h17v16h-17z" />

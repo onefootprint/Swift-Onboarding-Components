@@ -12,7 +12,6 @@ const IcoAmex16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) =>
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path

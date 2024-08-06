@@ -14,7 +14,6 @@ const IcoLang24 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M5.125 6.847h7.083M8.666 6.792V5.125M12 13.875C8.612 12.999 6.87 10.845 6.375 7"

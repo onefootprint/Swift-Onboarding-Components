@@ -14,7 +14,6 @@ const IcoVoter24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M7.625 10.125h1.25m-3.75-4.167h13.75c.46 0 .833.373.833.834v10.416c0 .46-.373.834-.833.834H5.125a.833.833 0 0 1-.833-.834V6.792c0-.46.373-.834.833-.834Z"

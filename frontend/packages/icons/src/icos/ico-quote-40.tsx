@@ -14,7 +14,6 @@ const IcoQuote40 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 40 40"
     >
       <path
         d="M13.501 7c-5.574 0-10.11 4.537-10.11 10.111V33h14.444V18.556H9.89V17.11c0-2.787 1.62-5.055 3.611-5.055h.723V7H13.5ZM32.28 7c-5.575 0-10.111 4.537-10.111 10.111V33h14.444V18.556h-7.944V17.11c0-2.787 1.62-5.055 3.611-5.055h.722V7h-.722Z"

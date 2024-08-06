@@ -12,7 +12,6 @@ const IcoJcb24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => 
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 24 24"
     >
       <path
         d="M21.167 16.607a2.85 2.85 0 0 1-2.847 2.846H2.834V8.18A2.85 2.85 0 0 1 5.68 5.333h15.487v11.274Z"

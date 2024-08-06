@@ -14,7 +14,6 @@ const IcoWebhook16 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" fill={theme.color[color]}>
         <mask id="prefix__b" maskUnits="userSpaceOnUse" x={0} y={0} width={17} height={15}>

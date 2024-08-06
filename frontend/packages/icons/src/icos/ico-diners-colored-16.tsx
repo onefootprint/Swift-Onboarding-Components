@@ -12,7 +12,6 @@ const IcoDiners16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) 
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" fillRule="evenodd" clipRule="evenodd">
         <path d="M.29 8.035a6.677 6.677 0 1 1 13.353 0 6.677 6.677 0 0 1-13.353 0Z" fill="#FFFFFE" />

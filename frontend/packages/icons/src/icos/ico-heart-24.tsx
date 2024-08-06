@@ -14,7 +14,6 @@ const IcoHeart24 = ({ 'aria-label': ariaLabel, color = 'primary', className, tes
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 6.643c5.277-5.366 14.325 4.6 0 12.649-14.325-8.049-5.278-18.015 0-12.649Z"

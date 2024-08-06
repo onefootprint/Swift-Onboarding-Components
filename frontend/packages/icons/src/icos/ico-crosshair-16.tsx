@@ -14,7 +14,6 @@ const IcoCrosshair16 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <g clipPath="url(#prefix__b)">

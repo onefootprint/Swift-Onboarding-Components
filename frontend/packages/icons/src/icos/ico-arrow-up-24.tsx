@@ -14,7 +14,6 @@ const IcoArrowUp24 = ({ 'aria-label': ariaLabel, color = 'primary', className, t
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m7 10.333 5-5 5 5m-5-4.166v12.5"

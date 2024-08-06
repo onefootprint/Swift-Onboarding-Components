@@ -14,7 +14,6 @@ const IcoUser16 = ({ 'aria-label': ariaLabel, color = 'primary', className, test
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)" stroke={theme.color[color]} strokeWidth={1.5} strokeLinejoin="round">
         <path d="M10.499 4.333a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM8 8.833c-2.531 0-4.378 1.683-4.886 3.944-.087.383.225.723.617.723h8.536c.393 0 .704-.34.618-.723-.508-2.261-2.355-3.944-4.886-3.944Z" />

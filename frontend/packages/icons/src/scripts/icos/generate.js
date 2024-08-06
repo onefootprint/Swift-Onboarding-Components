@@ -17,21 +17,11 @@ const getComponentName = fileName =>
     .split(' ')
     .join('');
 
-const getViewBox = fileName => {
-  const sizeMatch = fileName.match(/-(\d+)\.svg$/);
-  if (sizeMatch) {
-    const size = sizeMatch[1];
-    return `0 0 ${size} ${size}`;
-  }
-  return '0 0 24 24';
-};
-
 const createIcoComponent = async icoPath => {
   const svgSource = await fs.promises.readFile(icoPath);
   const fileName = getFileName(icoPath);
   const isColored = fileName.includes(FIXED_COLOR_ALIAS);
   const componentName = getComponentName(fileName);
-  const viewBox = getViewBox(fileName);
   const SvgComponent = await transform(
     svgSource,
     {
@@ -49,7 +39,6 @@ const createIcoComponent = async icoPath => {
         className: '{className}',
         role: 'img',
         'data-colored': isColored,
-        viewBox: viewBox,
       },
       plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx', '@svgr/plugin-prettier'],
     },

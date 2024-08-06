@@ -14,7 +14,6 @@ const IcoKey16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <path
         d="M10.333 9.5a3.833 3.833 0 1 0-3.719-2.902l-3.919 3.919a.667.667 0 0 0-.195.471v1.845c0 .368.298.667.667.667h1.845c.177 0 .346-.07.471-.195l.684-.684v-1.788h1.788l1.447-1.447c.298.074.61.114.931.114Z"

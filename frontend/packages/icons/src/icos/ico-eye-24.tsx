@@ -14,7 +14,6 @@ const IcoEye24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testI
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M14.77 12a2.77 2.77 0 1 1-5.54 0 2.77 2.77 0 0 1 5.54 0Z"

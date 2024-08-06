@@ -14,7 +14,6 @@ const IcoSearchSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m17 17-2.469-2.469m1.219-3.156a4.375 4.375 0 1 1-8.75 0 4.375 4.375 0 0 1 8.75 0Z"

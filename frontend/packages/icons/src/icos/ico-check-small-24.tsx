@@ -14,7 +14,6 @@ const IcoCheckSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', className
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m8.666 12.667 2 2 4.667-5.334"

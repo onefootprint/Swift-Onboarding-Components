@@ -12,7 +12,6 @@ const IcoMastercard16 = ({ 'aria-label': ariaLabel, className, testID }: IconPro
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path d="M10.163 4.057H5.837v7.775h4.326V4.057Z" fill="#FF5F00" />

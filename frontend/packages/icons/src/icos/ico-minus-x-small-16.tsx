@@ -14,7 +14,6 @@ const IcoMinusXSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path d="M11 8H5" stroke={theme.color[color]} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />

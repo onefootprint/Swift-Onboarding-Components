@@ -14,7 +14,6 @@ const IcoPencil24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m13.25 7 1.91-1.91a.833.833 0 0 1 1.18 0l2.57 2.57a.833.833 0 0 1 0 1.18L17 10.75M13.25 7l-8.506 8.506a.833.833 0 0 0-.244.59v2.57c0 .46.373.834.833.834h2.572a.833.833 0 0 0 .59-.244L17 10.75M13.25 7 17 10.75"

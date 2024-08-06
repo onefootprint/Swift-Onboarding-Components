@@ -14,7 +14,6 @@ const IcoIdBack40 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 40 40"
     >
       <g clipPath="url(#prefix__a)">
         <rect x={5} y={5} width={30} height={30} rx={3.75} stroke={theme.color[color]} strokeWidth={3.333} />

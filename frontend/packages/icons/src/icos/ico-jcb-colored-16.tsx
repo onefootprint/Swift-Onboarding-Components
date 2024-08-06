@@ -12,7 +12,6 @@ const IcoJcb16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => 
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 16 16"
     >
       <g clipPath="url(#prefix__a)">
         <path d="M16 11.839a2.488 2.488 0 0 1-2.484 2.484H0V4.484A2.488 2.488 0 0 1 2.484 2H16v9.839Z" fill="#fff" />

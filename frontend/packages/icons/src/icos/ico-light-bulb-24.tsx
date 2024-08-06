@@ -14,7 +14,6 @@ const IcoLightBulb24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M14.5 17v-.868c0-.322.188-.61.465-.774l.041-.025a5.833 5.833 0 1 0-5.971.025.912.912 0 0 1 .465.774V17m5 0v.833a2.5 2.5 0 1 1-5 0V17m5 0h-5"

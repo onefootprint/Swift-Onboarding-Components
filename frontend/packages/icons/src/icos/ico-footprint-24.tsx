@@ -14,7 +14,6 @@ const IcoFootprint24 = ({ 'aria-label': ariaLabel, color = 'primary', className,
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M14.5 13.667h2.222V11.7a2.222 2.222 0 1 1 0-3.845V5.333H7.833v13.334h3.89v-2.223a2.778 2.778 0 0 1 2.777-2.777Z"

@@ -14,7 +14,6 @@ const IcoChevronRight24 = ({ 'aria-label': ariaLabel, color = 'primary', classNa
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="m10.334 15.333 2.89-2.891a.625.625 0 0 0 0-.884l-2.89-2.891"

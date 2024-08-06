@@ -14,7 +14,6 @@ const IcoLockOpen24 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <path
         d="M12 13.667v2.5m-3.334-5.834v-2.5A3.333 3.333 0 0 1 15.229 7M7 19.5h10c.46 0 .833-.373.833-.833v-7.5a.833.833 0 0 0-.833-.834H7a.833.833 0 0 0-.833.834v7.5c0 .46.373.833.833.833Z"

@@ -14,7 +14,6 @@ const IcoDownload16 = ({ 'aria-label': ariaLabel, color = 'primary', className, 
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 16 16"
     >
       <path
         d="M13.5 9.833v3a.667.667 0 0 1-.667.667H3.167a.667.667 0 0 1-.667-.667v-3M8 10V2.5M8 10 5.667 7.667M8 10l2.333-2.333"

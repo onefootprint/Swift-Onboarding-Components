@@ -14,7 +14,6 @@ const IcoIdBack24 = ({ 'aria-label': ariaLabel, color = 'primary', className, te
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 24 24"
     >
       <rect
         x={4.5}

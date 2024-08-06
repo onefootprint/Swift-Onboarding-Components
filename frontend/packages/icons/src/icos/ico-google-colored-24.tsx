@@ -12,7 +12,6 @@ const IcoGoogle24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) 
       className={className}
       role="img"
       data-colored={true}
-      viewBox="0 0 24 24"
     >
       <path
         d="M18.537 10.694H18v-.027h-6v2.666h3.768A3.998 3.998 0 0 1 8 12a4 4 0 0 1 4-4c1.02 0 1.947.385 2.654 1.013l1.886-1.886A6.636 6.636 0 0 0 12 5.333a6.667 6.667 0 1 0 6.537 5.361Z"

@@ -14,7 +14,6 @@ const IcoShieldFlash40 = ({ 'aria-label': ariaLabel, color = 'primary', classNam
       className={className}
       role="img"
       data-colored={false}
-      viewBox="0 0 40 40"
     >
       <g clipPath="url(#prefix__a)">
         <rect width={40} height={40} rx={2.5} fill="#fff" />
