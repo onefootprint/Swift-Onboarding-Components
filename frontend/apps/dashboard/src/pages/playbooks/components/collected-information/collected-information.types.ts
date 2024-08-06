@@ -35,4 +35,9 @@ export type Option = Partial<{
   ofac: boolean;
   pep: boolean;
   adverseMedia: boolean;
+
+  // Auth
+  phoneOTP: boolean;
+  emailOTP: boolean;
+  emailAddress: boolean;
 }>;

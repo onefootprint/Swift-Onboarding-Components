@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { OnboardingConfig, RuleBacktestingData } from '@onefootprint/types';
+import { AuthMethodKind, OnboardingConfig, RuleBacktestingData } from '@onefootprint/types';
 import { OnboardingConfigKind, OnboardingConfigStatus, OnboardingStatus } from '@onefootprint/types';
 import { OnboardingDecisionRuleAction } from '@onefootprint/types/src/data/rule';
 
@@ -55,6 +55,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export const backtestedRulesFixture: RuleBacktestingData = {

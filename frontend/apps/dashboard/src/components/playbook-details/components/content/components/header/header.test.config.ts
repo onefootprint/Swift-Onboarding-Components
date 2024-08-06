@@ -1,4 +1,4 @@
-import type { OnboardingConfig } from '@onefootprint/types';
+import { AuthMethodKind, OnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
@@ -37,6 +37,7 @@ const onboardingConfigFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export default onboardingConfigFixture;

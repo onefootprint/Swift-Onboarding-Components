@@ -85,6 +85,7 @@ export type OnboardingConfig = {
   };
   isRulesEnabled?: boolean;
   skipConfirm?: boolean;
+  requiredAuthMethods: AuthMethodKind[] | null;
   documentTypesAndCountries?: DocumentTypesAndCountries;
   documentsToCollect: DocumentRequestConfig[] | null;
   businessDocumentsToCollect: DocumentRequestConfig[] | null;

@@ -1,11 +1,12 @@
-import { type OnboardingConfig } from '@onefootprint/types';
+import CollectedInformation from '@/playbooks/components/collected-information';
+import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-import CollectedInformation from '@/playbooks/components/collected-information';
 import AdditionalDocs from './components/additional-docs';
+import Auth from './components/auth';
 import GovDocs from './components/gov-docs';
+import Section from './components/section';
 
 export type DataCollectionProps = {
   playbook: OnboardingConfig;
@@ -24,47 +25,52 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
     optionalData = [],
     documentsToCollect = [],
     businessDocumentsToCollect = [],
+    requiredAuthMethods,
   } = playbook;
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = kind === 'kyb';
 
+  const isAuth = kind === 'auth';
+
+  const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods?.length > 0;
+
+  if (isAuth) {
+    return (
+      <Auth
+        requiredAuthMethods={requiredAuthMethods}
+        mustCollectData={mustCollectData}
+        allowUsTerritoryResidents={allowUsTerritoryResidents}
+      />
+    );
+  }
+
   return (
-    <Stack direction="column">
+    <Stack direction="column" gap={5}>
       {isKYB && (
-        <Stack direction="column" gap={7}>
-          <Text variant="label-3" color="secondary">
-            {t('kyb.business')}
-          </Text>
-          <Stack direction="column" gap={7}>
-            <CollectedInformation
-              title={t('kyb.basic_information')}
-              options={{
-                businessName: mustCollectData.includes('business_name'),
-                businessAddress: mustCollectData.includes('business_address'),
-                businessBeneficialOwners: mustCollectData.includes('business_beneficial_owners'),
-                businessTin: mustCollectData.includes('business_tin'),
-              }}
-            />
-            <CollectedInformation
-              title={t('kyb.other')}
-              options={{
-                businessPhoneNumber: mustCollectData.includes('business_phone_number'),
-                businessWebsite: mustCollectData.includes('business_website'),
-                businessType: mustCollectData.includes('business_corporation_type'),
-              }}
-            />
-            <AdditionalDocs docs={businessDocumentsToCollect || []} />
-          </Stack>
-        </Stack>
+        <Section title={t('kyb.business')} type="withBorders">
+          <CollectedInformation
+            title={t('kyb.basic_information')}
+            options={{
+              businessName: mustCollectData.includes('business_name'),
+              businessAddress: mustCollectData.includes('business_address'),
+              businessBeneficialOwners: mustCollectData.includes('business_beneficial_owners'),
+              businessTin: mustCollectData.includes('business_tin'),
+            }}
+          />
+          <CollectedInformation
+            title={t('kyb.other')}
+            options={{
+              businessPhoneNumber: mustCollectData.includes('business_phone_number'),
+              businessWebsite: mustCollectData.includes('business_website'),
+              businessType: mustCollectData.includes('business_corporation_type'),
+            }}
+          />
+          <AdditionalDocs docs={businessDocumentsToCollect || []} />
+        </Section>
       )}
-      <Stack direction="column" gap={7}>
-        {isKYB && (
-          <Text variant="label-3" color="secondary" marginTop={9}>
-            {t('kyb.business_beneficial_owners')}
-          </Text>
-        )}
+      <Section title={isKYB ? t('kyb.business_beneficial_owners') : undefined} type={isKYB ? 'withBorders' : 'default'}>
         <Stack direction="column" gap={7}>
           <CollectedInformation
             title={t('basic-information')}
@@ -76,6 +82,15 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
               fullAddress: mustCollectData.includes('full_address'),
             }}
           />
+          {hasAnyRequiredAuthMethods && (
+            <CollectedInformation
+              title={t('otp')}
+              options={{
+                phoneNumber: requiredAuthMethods?.includes(AuthMethodKind.phone),
+                email: requiredAuthMethods?.includes(AuthMethodKind.email),
+              }}
+            />
+          )}
           {allowUsResidents ? (
             <CollectedInformation
               title={t('us-residents.title')}
@@ -114,7 +129,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
           />
           <AdditionalDocs docs={documentsToCollect || []} />
         </Stack>
-      </Stack>
+      </Section>
       {allowUsTerritoryResidents && (
         <footer>
           <Box marginTop={5} marginBottom={5}>

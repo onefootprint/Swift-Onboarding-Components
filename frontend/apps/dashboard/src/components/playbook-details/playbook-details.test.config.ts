@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { OnboardingConfig } from '@onefootprint/types';
+import { AuthMethodKind, OnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
@@ -40,6 +40,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>

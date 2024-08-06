@@ -1,9 +1,12 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { GetAuthRoleResponse, OnboardingConfig, OrgAssumeRoleResponse } from '@onefootprint/types';
 import {
+  AuthMethodKind,
   CollectedKycDataOption,
+  GetAuthRoleResponse,
+  OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
+  OrgAssumeRoleResponse,
   RoleKind,
   RoleScopeKind,
 } from '@onefootprint/types';
@@ -46,6 +49,7 @@ export const playbookFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export const authRolesFixture: GetAuthRoleResponse = [

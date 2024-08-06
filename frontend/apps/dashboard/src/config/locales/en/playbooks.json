@@ -458,6 +458,9 @@
     },
     "data-collection": {
       "basic-information": "Basic information",
+      "otp": "OTP (One Time Password) verifications",
+      "sign-up": "Sign up information",
+      "sign-in": "Sign in methods",
       "us-residents": {
         "title": "U.S. residents",
         "empty": "U.S. residents aren't allowed to be onboarded."
@@ -480,7 +483,7 @@
         "subtitle": "Investor profiling questions will be part of the onboarding process."
       },
       "kyb": {
-        "business": "Business",
+        "business": "Business information",
         "basic_information": "Basic information",
         "other": "Other",
         "business_beneficial_owners": "Beneficial owners",

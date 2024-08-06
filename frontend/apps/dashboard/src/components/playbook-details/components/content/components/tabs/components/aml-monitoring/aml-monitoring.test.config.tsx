@@ -1,4 +1,9 @@
-import { type OnboardingConfig, OnboardingConfigKind, OnboardingConfigStatus } from '@onefootprint/types';
+import {
+  AuthMethodKind,
+  type OnboardingConfig,
+  OnboardingConfigKind,
+  OnboardingConfigStatus,
+} from '@onefootprint/types';
 
 const onboardingConfig: OnboardingConfig = {
   id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
@@ -56,6 +61,7 @@ const onboardingConfig: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export default onboardingConfig;

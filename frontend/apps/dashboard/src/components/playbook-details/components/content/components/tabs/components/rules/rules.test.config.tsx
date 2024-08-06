@@ -1,5 +1,5 @@
 import { fireEvent, mockRequest, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import type { OnboardingConfig, Rule, RuleBacktestingData } from '@onefootprint/types';
+import { AuthMethodKind, OnboardingConfig, Rule, RuleBacktestingData } from '@onefootprint/types';
 import {
   ActorKind,
   IdDI,
@@ -63,6 +63,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export const kybPlaybookFixture: OnboardingConfig = {
@@ -121,6 +122,7 @@ export const kybPlaybookFixture: OnboardingConfig = {
   documentsToCollect: null,
   promptForPasskey: true,
   businessDocumentsToCollect: [],
+  requiredAuthMethods: [AuthMethodKind.phone],
 };
 
 export const failMultiFieldRuleFixture = {

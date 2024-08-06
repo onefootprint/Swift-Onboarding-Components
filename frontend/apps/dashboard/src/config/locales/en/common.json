@@ -2850,7 +2850,10 @@
         "business-website": "Business website",
         "business-phone-number": "Business phone",
         "country-specific-docs": "Country-specific documents",
-        "us-tax-id-acceptable": "Accept ITIN"
+        "us-tax-id-acceptable": "Accept ITIN",
+        "email-address": "Email Address",
+        "email-otp": "Email OTP",
+        "phone-otp": "Phone OTP"
       }
     },
     "api-keys": {

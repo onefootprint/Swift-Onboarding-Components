@@ -1,6 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { OnboardingConfig } from '@onefootprint/types';
-import { OnboardingConfigKind, OnboardingConfigStatus } from '@onefootprint/types';
+import { AuthMethodKind, OnboardingConfig, OnboardingConfigKind, OnboardingConfigStatus } from '@onefootprint/types';
 
 export const playbooksFixture: OnboardingConfig[] = [
   {
@@ -55,6 +54,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     documentsToCollect: null,
     promptForPasskey: true,
     businessDocumentsToCollect: [],
+    requiredAuthMethods: [AuthMethodKind.phone],
   },
   {
     id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
@@ -90,6 +90,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     documentsToCollect: null,
     promptForPasskey: true,
     businessDocumentsToCollect: [],
+    requiredAuthMethods: [AuthMethodKind.phone],
   },
   {
     id: 'ob_config_id_m35ER0O2UEaAOHyZa0oAKR',
@@ -125,6 +126,7 @@ export const playbooksFixture: OnboardingConfig[] = [
     documentsToCollect: null,
     promptForPasskey: true,
     businessDocumentsToCollect: [],
+    requiredAuthMethods: [AuthMethodKind.phone],
   },
 ];
 

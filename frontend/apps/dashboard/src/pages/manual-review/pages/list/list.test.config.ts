@@ -1,10 +1,12 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Entity, GetOnboardingConfigsResponse } from '@onefootprint/types';
 import {
+  AuthMethodKind,
   BusinessDI,
   CollectedKycDataOption,
+  Entity,
   EntityKind,
   EntityStatus,
+  GetOnboardingConfigsResponse,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
@@ -120,6 +122,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     documentsToCollect: null,
     promptForPasskey: true,
     businessDocumentsToCollect: [],
+    requiredAuthMethods: [AuthMethodKind.phone],
   },
 ];
 
