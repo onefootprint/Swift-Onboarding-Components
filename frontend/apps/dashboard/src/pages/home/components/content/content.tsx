@@ -15,7 +15,7 @@ const Content = ({ metrics }: ContentProps) => {
   return (
     <Stack direction="column" gap={9}>
       <Stack direction="column" gap={5} aria-label={t('users')} role="group">
-        <Stack gap={2}>
+        <Stack gap={2} align="center">
           <IcoUsers24 />
           <Text variant="label-2">{t('users')}</Text>
         </Stack>
@@ -23,7 +23,7 @@ const Content = ({ metrics }: ContentProps) => {
       </Stack>
       {metrics.business.newVaults ? (
         <Stack direction="column" gap={5} aria-label={t('businesses')} role="group">
-          <Stack gap={2}>
+          <Stack gap={2} align="center">
             <IcoStore24 />
             <Text variant="label-2">{t('businesses')}</Text>
           </Stack>
