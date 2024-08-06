@@ -1038,9 +1038,8 @@
               "front": "FRONT",
               "back": "BACK",
               "selfie": "Selfie",
-              "pdf-viewer": {
-                "expand": "View in full screen",
-                "page": "Page"
+              "doc-viewer": {
+                "expand": "View in full screen"
               },
               "success": "successfully uploaded",
               "failed": "upload failed",

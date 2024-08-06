@@ -7,7 +7,7 @@ import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import HoverableImage from './components/hoverable-image';
+import DocumentUploaded from './components/document-uploaded';
 
 export type UploadsProps = {
   vault: EntityVault;
@@ -114,10 +114,10 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
                 </Tooltip>
               )}
             </Title>
-            <HoverableImage
-              isSuccess={upload.failureReasons.length === 0}
+            <DocumentUploaded
               base64Data={getImgBase64Data(upload)}
               documentName={t(`document-types.${currentDocument.kind}` as ParseKeys<'common'>)}
+              isSuccess={upload.failureReasons.length === 0}
             />
           </Content>
         </Row>
@@ -204,7 +204,7 @@ const Content = styled.div`
     justify-content: flex-start;
     width: 100%;
     gap: ${theme.spacing[6]};
-    margin-bottom: ${theme.spacing[9]};
+    margin-bottom: ${theme.spacing[6]};
     white-space: pre-line;
   `}
 `;

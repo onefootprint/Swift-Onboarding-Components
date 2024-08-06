@@ -4,16 +4,19 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import Image from 'next/image';
 import PdfThumbnail from './components/pdf-thumbnail';
 
-type PdfViewerProps = {
-  src: string;
+type DocViewerProps = {
+  children?: React.ReactNode;
   documentName: string;
+  mimeType: string | null;
+  src: string;
 };
 
-const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
+const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads.pdf-viewer',
+    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads.doc-viewer',
   });
 
   return (
@@ -21,7 +24,7 @@ const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
       <Stack>
         <Dialog.Trigger asChild>
           <Stack direction="column" gap={5}>
-            <PdfThumbnail src={src} />
+            {children || <PdfThumbnail src={src} />}
             <LinkButton>{t('expand')}</LinkButton>
           </Stack>
         </Dialog.Trigger>
@@ -40,7 +43,11 @@ const PdfViewer = ({ src, documentName }: PdfViewerProps) => {
             </Dialog.Title>
             <Box width="24px" height="24px" />
           </Header>
-          <iframe title="pdf" src={src} width="100%" height="100%" />
+          {mimeType === 'application/pdf' ? (
+            <iframe title={documentName} src={src} width="100%" height="100%" />
+          ) : (
+            <StyledImage src={src} width={0} height={0} alt={documentName} />
+          )}
         </Container>
       </Dialog.Portal>
     </Dialog.Root>
@@ -76,4 +83,10 @@ const Header = styled(Stack)`
   `}
 `;
 
-export default PdfViewer;
+const StyledImage = styled(Image)`
+  width: 100%;
+  height: calc(100% - 56px);
+  object-fit: contain;
+`;
+
+export default DocViewer;
