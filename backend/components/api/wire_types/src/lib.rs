@@ -15,6 +15,7 @@ mod patch;
 pub use patch::*;
 
 #[derive(Apiv2Response, macros::JsonResponder)]
+/// Empty JSON.
 pub struct Empty;
 
 impl serde::Serialize for Empty {

@@ -898,7 +898,7 @@
                         "application/json": {
                             "schema": {
                                 "example": "raw data",
-                                "description": "Raw body",
+                                "description": "Raw data.",
                                 "type": "string"
                             }
                         }
@@ -1781,7 +1781,7 @@
                         "application/json": {
                             "schema": {
                                 "example": "raw data",
-                                "description": "Raw body",
+                                "description": "Raw data.",
                                 "type": "string"
                             }
                         }
@@ -1924,7 +1924,7 @@
                         "application/json": {
                             "schema": {
                                 "example": "raw data",
-                                "description": "Raw body",
+                                "description": "Raw data.",
                                 "type": "string"
                             }
                         }
@@ -1974,7 +1974,7 @@
                         "application/json": {
                             "schema": {
                                 "example": "raw data",
-                                "description": "Raw body",
+                                "description": "Raw data.",
                                 "type": "string"
                             }
                         }
@@ -2103,7 +2103,7 @@
                         "application/json": {
                             "schema": {
                                 "example": "raw data",
-                                "description": "Raw body",
+                                "description": "Raw data.",
                                 "type": "string"
                             }
                         }
@@ -3456,6 +3456,7 @@
                 }
             },
             "Empty": {
+                "description": "Empty JSON.",
                 "type": "object"
             },
             "GetBusinessVaultResponse": {

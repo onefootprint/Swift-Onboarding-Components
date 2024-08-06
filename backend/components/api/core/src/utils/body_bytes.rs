@@ -179,14 +179,14 @@ impl<const L: usize> Apiv2Schema for BodyBytes<L> {
     }
 
     fn description() -> &'static str {
-        "Raw body"
+        "Raw data."
     }
 
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
         let mut schema = Bytes::raw_schema();
         schema.data_type = Some(DataType::String);
         schema.example = Some(serde_json::Value::String("raw data".to_string()));
-        schema.description = Some("Raw body".to_owned());
+        schema.description = Some("Raw data.".to_owned());
         schema
     }
 }

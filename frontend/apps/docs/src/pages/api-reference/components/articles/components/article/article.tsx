@@ -1,5 +1,5 @@
-import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Stack, Text, media } from '@onefootprint/ui';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';
@@ -37,51 +37,42 @@ const Article = ({ article }: ArticleProps) => {
     <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
         <HeaderContainer>
-          <MethodContainer>
+          <Stack gap={2}>
             <TypeBadge type={method} />
             <Stack direction="row" gap={1}>
-              <BaseUrl>{API_BASE_URL}</BaseUrl>
-              <Text variant="label-2" tag="h3">
+              <BaseUrlContainer>
+                <Text variant="heading-3" color="tertiary" tag="span">
+                  {API_BASE_URL}
+                </Text>
+              </BaseUrlContainer>
+              <Text variant="heading-3" tag="h3">
                 {path}
               </Text>
             </Stack>
-          </MethodContainer>
+          </Stack>
           <Tags article={article} />
         </HeaderContainer>
-        {description && (
-          <Box marginBottom={7}>
-            <Description>{description}</Description>
-          </Box>
-        )}
-        {security && (
-          <Requests>
-            <Text variant="label-1" marginTop={3}>
-              {t('request')}
-            </Text>
-            {security.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
-            <Box marginTop={2} marginBottom={2} />
-            <Schema>
-              {parameters && <Parameters parameters={parameters} />}
-              {requestBody && <RequestBody requestBody={requestBody} />}
-              {responses && <Responses responses={responses} />}
-            </Schema>
-          </Requests>
-        )}
+        {description && <Description>{description}</Description>}
+        <Stack direction="column" gap={8} marginTop={8}>
+          <Stack direction="column" gap={5}>
+            <Text variant="heading-3">{t('request')}</Text>
+            {/* TODO remove this for normal auth, put this in headers for other auth */}
+            {security?.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
+            {parameters && <Parameters parameters={parameters} />}
+            {requestBody && <RequestBody requestBody={requestBody} />}
+          </Stack>
+          {responses && <Responses responses={responses} />}
+        </Stack>
       </ContentColumn>
       <CodeColumn>{responses && <DemoCode article={article} />}</CodeColumn>
     </ArticleContainer>
   );
 };
 
-const BaseUrl = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('label-2')}
-    color: ${theme.color.tertiary};
-    display: none;
-
-    ${media.greaterThan('md')`
-      display: block;
-    `}
+const BaseUrlContainer = styled.div`
+  display: none;
+  ${media.greaterThan('md')`
+    display: block;
   `}
 `;
 
@@ -93,14 +84,6 @@ const HeaderContainer = styled.div`
     padding-top: ${theme.spacing[8]};
     padding-bottom: ${theme.spacing[7]};
     background-color: ${theme.backgroundColor.primary};
-  `}
-`;
-
-const MethodContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[2]};
   `}
 `;
 
@@ -127,22 +110,6 @@ const ContentColumn = styled.div`
     max-width: ${CONTENT_WIDTH}px;
     width: 100%;
     margin: 0 auto;
-  `}
-`;
-
-const Requests = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `}
-`;
-
-const Schema = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
   `}
 `;
 

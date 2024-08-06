@@ -1,10 +1,10 @@
-import { Badge, Text, createFontStyles } from '@onefootprint/ui';
+import { Box, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';
 
+import Description from '../description';
 import Schema from '../schema';
 
 export type ResponsesProps = {
@@ -20,39 +20,20 @@ const Responses = ({ responses }: ResponsesProps) => {
     // We have an assertion in update_open_api.py that we only have one response per API
     console.error('Multiple responses for API');
   }
-  const [code, schema] = Object.entries(responses)[0];
+  const [_, schema] = Object.entries(responses)[0];
 
+  if (!schema) {
+    return;
+  }
   return (
-    <Container>
-      <ResponsesTitle>{t('response')}</ResponsesTitle>
-      <ResponseContainer key={code}>{schema && <Schema schema={schema} isInBrackets />}</ResponseContainer>
-    </Container>
+    <Stack direction="column" gap={3}>
+      <Text variant="heading-3">{t('response')}</Text>
+      {schema.description && <Description>{schema.description}</Description>}
+      <Box marginLeft={3}>
+        <Schema schema={schema} isInBrackets />
+      </Box>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[4]};
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const ResponsesTitle = styled.h3`
-  ${({ theme }) => css`
-    ${createFontStyles('label-1')}
-    display: flex;
-    color: ${theme.color.primary};
-    margin-bottom: ${theme.spacing[3]};
-  `}
-`;
-
-const ResponseContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-    margin: ${theme.spacing[4]} 0 0 ${theme.spacing[3]};
-  `}
-`;
 
 export default Responses;

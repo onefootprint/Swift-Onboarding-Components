@@ -2022,6 +2022,7 @@
                 ]
             },
             "Empty": {
+                "description": "Empty JSON.",
                 "type": "object"
             },
             "EntityValidateResponse": {

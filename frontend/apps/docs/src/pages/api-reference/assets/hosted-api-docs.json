@@ -3275,6 +3275,7 @@
                 ]
             },
             "Empty": {
+                "description": "Empty JSON.",
                 "type": "object"
             },
             "FingerprintVisitRequest": {

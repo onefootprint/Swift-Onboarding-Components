@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 
 import type { ContentSchemaNoRef } from '@/api-reference/api-reference.types';
 
+import { Stack } from '@onefootprint/ui';
 import Description from '../description';
 import Header from './components/header';
 import Properties from './components/properties/properties';
@@ -23,38 +24,39 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
 
   // Render object by rendering each of its fields
   const { properties, required = [] } = schema;
-  if (properties) {
-    return (
-      <Container>
-        {schema.description && <Description>{schema.description}</Description>}
-        {Object.entries(properties).map(([title, property]) => (
-          <BracketContainer
-            isInBrackets={isInBrackets}
-            key={title}
-            data-last-child={Object.keys(properties).indexOf(title) === Object.keys(properties).length - 1}
-            data-first-child={Object.keys(properties).indexOf(title) === 0}
-          >
-            <Grid>
-              <Header
-                title={title}
-                schema={property}
-                isRequired={required.length > 0 && required.includes(title)}
-                isInBrackets={isInBrackets}
-              />
-              {property.description && <Description>{property.description}</Description>}
-              <Properties schema={property} />
-            </Grid>
-          </BracketContainer>
-        ))}
-      </Container>
-    );
-  }
 
   // We don't yet have any other top-level schema types (like an HTTP response that's just an enum)
   if (schema.type !== 'object') {
     console.warn('Cannot render schema', schema);
   }
-  return null;
+
+  if (!properties) {
+    return null;
+  }
+
+  return (
+    <Stack direction="column" gap={2}>
+      {Object.entries(properties).map(([title, property]) => (
+        <BracketContainer
+          isInBrackets={isInBrackets}
+          key={title}
+          data-last-child={Object.keys(properties).indexOf(title) === Object.keys(properties).length - 1}
+          data-first-child={Object.keys(properties).indexOf(title) === 0}
+        >
+          <Grid>
+            <Header
+              title={title}
+              schema={property}
+              isRequired={required.length > 0 && required.includes(title)}
+              isInBrackets={isInBrackets}
+            />
+            {property.description && <Description>{property.description}</Description>}
+            <Properties schema={property} />
+          </Grid>
+        </BracketContainer>
+      ))}
+    </Stack>
+  );
 };
 
 const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
@@ -93,15 +95,6 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
       }
     `
     }
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-    position: relative;
   `}
 `;
 

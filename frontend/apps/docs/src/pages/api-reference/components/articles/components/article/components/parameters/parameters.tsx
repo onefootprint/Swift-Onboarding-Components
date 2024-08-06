@@ -1,4 +1,4 @@
-import { createFontStyles } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,38 +14,17 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
   const sections = useParametersGroupBySections(parameters);
 
   return (
-    <Container>
+    <Stack direction="column" gap={4}>
       {sections.map(section => (
-        <Parameter key={section.title}>
-          <Title>{t(section.title as ParseKeys<'common'>)}</Title>
+        <Stack direction="column" gap={2} key={section.title}>
+          <Text variant="label-1" color="secondary">
+            {t(section.title as ParseKeys<'common'>)}
+          </Text>
           <Schema schema={section.parameters} />
-        </Parameter>
+        </Stack>
       ))}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `}
-`;
-
-const Parameter = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-  `}
-`;
-
-const Title = styled.h3`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')}
-    color: ${theme.color.primary};
-  `}
-`;
 
 export default Parameters;
