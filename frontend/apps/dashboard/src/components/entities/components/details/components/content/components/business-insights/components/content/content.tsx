@@ -2,13 +2,15 @@ import useCurrentEntityBusinessInsights from '@/entity/hooks/use-current-entity-
 import React from 'react';
 import { ErrorComponent } from 'src/components';
 import DecryptedContent from '../decrypted-content';
+import Loading from '../loading';
 
 const Content = () => {
-  const { data, error } = useCurrentEntityBusinessInsights();
+  const { error, isLoading, data } = useCurrentEntityBusinessInsights();
 
   return (
     <>
       {error && <ErrorComponent error={error} />}
+      {isLoading && <Loading />}
       {data && <DecryptedContent insights={data} />}
     </>
   );
