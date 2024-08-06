@@ -20,7 +20,7 @@
   "dependencies": {
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
-    "@onefootprint/footprint-react": "7.0.0-beta.9",
+    "@onefootprint/footprint-react": "7.0.0-beta.10",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
