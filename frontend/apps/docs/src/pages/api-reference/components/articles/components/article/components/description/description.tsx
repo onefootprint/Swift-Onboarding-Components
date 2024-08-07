@@ -1,5 +1,5 @@
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
-import A from 'src/components/article/components/markdown-components/a';
+import A from 'src/components/markdown/components/a';
 import styled, { css } from 'styled-components';
 
 type DescriptionProps = {
@@ -8,6 +8,7 @@ type DescriptionProps = {
 
 const Description = ({ children }: DescriptionProps) => <Content>{parseElements(children)}</Content>;
 
+// TODO can we just use our generic markdown parser for the description here?
 /**
  * The descriptions of fields may include markdown-esque syntax for a few common elements,
  * like `monospace` and [link](href).

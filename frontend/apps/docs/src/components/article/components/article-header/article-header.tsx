@@ -1,6 +1,6 @@
 import { Box, Text } from '@onefootprint/ui';
 
-import H1 from '../markdown-components/h1';
+import H1 from '../../../markdown/components/h1';
 
 type ArticleHeaderProps = {
   title: string;
