@@ -6,6 +6,7 @@ import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
+import Stack from '../stack';
 import type { LinkButtonVariant } from './link-button.types';
 
 type IconPosition = 'left' | 'right';
@@ -124,7 +125,9 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         $paddingBlock={$paddingBlock}
       >
         {iconPosition === 'left' && renderedIcon}
-        {children}
+        <Stack tag="span" height="100%" display="flex" alignItems="center">
+          {children}
+        </Stack>
         {iconPosition === 'right' && renderedIcon}
       </LinkButtonStyled>
     );
@@ -184,9 +187,8 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       text-decoration: none;
       width: fit-content;
       gap: ${smallSizes.includes($variant) ? theme.spacing[1] : theme.spacing[2]};
-      stroke: ${linkButton[styleVariant].color.text.initial};
       fill: ${linkButton[styleVariant].color.text.initial};
-      stroke: ${linkButton[styleVariant].color.text.initial};
+      vertical-align: middle;
 
       svg {
         path {
@@ -197,24 +199,21 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       }
 
       &:hover,
-      &:hover svg path {
+      &:hover svg {
         color: ${linkButton[styleVariant].color.text.hover};
         fill: ${linkButton[styleVariant].color.text.hover};
-        stroke: ${linkButton[styleVariant].color.text.hover};
       }
 
       &:active,
-      &:active svg path {
+      &:active svg {
         color: ${linkButton[styleVariant].color.text.active};
         fill: ${linkButton[styleVariant].color.text.active};
-        stroke: ${linkButton[styleVariant].color.text.active};
       }
 
       &:disabled,
-      &:disabled svg path {
+      &:disabled svg {
         color: ${linkButton[styleVariant].color.text.disabled};
         fill: ${linkButton[styleVariant].color.text.disabled};
-        stroke: ${linkButton[styleVariant].color.text.disabled};
       }
     `;
   }}

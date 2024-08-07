@@ -2,6 +2,7 @@ const { transform } = require('@svgr/core');
 const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
+const SVGFixer = require('oslllo-svg-fixer');
 const { last, startCase } = require('lodash');
 const defaultTemplate = require('./templates/default-template');
 const coloredTemplate = require('./templates/colored-template');
@@ -28,7 +29,7 @@ const createIcoComponent = async icoPath => {
       typescript: true,
       expandProps: false,
       template: isColored ? coloredTemplate : defaultTemplate,
-      replaceAttrValues: !isColored && {
+      replaceAttrValues: {
         '#000': '{theme.color[color]}',
         '#000000': '{theme.color[color]}',
         black: '{theme.color[color]}',
@@ -39,8 +40,9 @@ const createIcoComponent = async icoPath => {
         className: '{className}',
         role: 'img',
         'data-colored': isColored,
+        ...(!isColored && { fill: '{theme.color[color]}' }),
       },
-      plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx', '@svgr/plugin-prettier'],
+      plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
     },
     { componentName },
   );
@@ -57,10 +59,21 @@ const createTypesFile = async icoNames => {
     `,
   );
 };
-
 glob(INPUT_SVG_PATH, (err, icoPaths) => {
   if (err) throw Error('Icon generation error', err);
-  icoPaths.forEach(createIcoComponent);
+  icoPaths.forEach(icoPath => {
+    const fileName = getFileName(icoPath);
+    const isColored = fileName.includes(FIXED_COLOR_ALIAS);
+    if (!isColored) {
+      SVGFixer(icoPath, path.dirname(icoPath))
+        .fix()
+        .then(() => {
+          createIcoComponent(icoPath);
+        });
+    } else {
+      createIcoComponent(icoPath);
+    }
+  });
   const svgNames = icoPaths.map(icoPath => getFileName(icoPath).replace('.svg', ''));
   createTypesFile(svgNames);
 });

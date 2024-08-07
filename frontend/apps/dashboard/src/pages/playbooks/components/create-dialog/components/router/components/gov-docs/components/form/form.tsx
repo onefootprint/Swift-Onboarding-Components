@@ -1,5 +1,5 @@
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
-import { IcoTrash24 } from '@onefootprint/icons';
+import { IcoTrash16 } from '@onefootprint/icons';
 import { Button, LinkButton, Stack } from '@onefootprint/ui';
 import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -71,7 +71,7 @@ const Form = ({ onClose }: FormProps) => {
         <Stack justifyContent="center">
           <LinkButton
             destructive
-            iconComponent={IcoTrash24}
+            iconComponent={IcoTrash16}
             iconPosition="left"
             onClick={handleRemoveAll}
             variant="label-4"

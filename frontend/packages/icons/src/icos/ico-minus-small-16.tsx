@@ -6,7 +6,7 @@ const IcoMinusSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', className
     <svg
       width={16}
       height={16}
-      fill="none"
+      fill={theme.color[color]}
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       aria-label={ariaLabel}
@@ -14,14 +14,11 @@ const IcoMinusSmall16 = ({ 'aria-label': ariaLabel, color = 'primary', className
       role="img"
       data-colored={false}
     >
-      <g clipPath="url(#prefix__a)">
-        <path d="M4.5 8h7" stroke={theme.color[color]} strokeWidth={1.5} strokeLinecap="round" />
-      </g>
-      <defs>
-        <clipPath id="prefix__a">
-          <path fill="#fff" d="M0 0h16v16H0z" />
-        </clipPath>
-      </defs>
+      <path
+        d="M4.24 7.434a.63.63 0 0 0-.348.691.656.656 0 0 0 .334.434l.133.068h7.282l.133-.068c.374-.193.465-.694.177-.981-.208-.208.142-.191-3.955-.191-3.409.001-3.669.004-3.756.047"
+        fillRule="evenodd"
+        fill={theme.color[color]}
+      />
     </svg>
   );
 };

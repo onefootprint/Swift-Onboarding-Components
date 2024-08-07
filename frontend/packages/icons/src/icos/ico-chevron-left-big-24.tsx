@@ -6,7 +6,7 @@ const IcoChevronLeftBig24 = ({ 'aria-label': ariaLabel, color = 'primary', class
     <svg
       width={24}
       height={24}
-      fill="none"
+      fill={theme.color[color]}
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       aria-label={ariaLabel}
@@ -15,11 +15,9 @@ const IcoChevronLeftBig24 = ({ 'aria-label': ariaLabel, color = 'primary', class
       data-colored={false}
     >
       <path
-        d="m14.5 18.667-6.078-6.078a.833.833 0 0 1 0-1.178L14.5 5.333"
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M14.178 4.662c-.067.033-1.563 1.504-3.324 3.269C7.198 11.596 7.46 11.281 7.46 12c0 .719-.265.401 3.415 4.09 2.357 2.362 3.26 3.242 3.359 3.275.466.153.952-.139.996-.599.039-.406.176-.251-3.204-3.636L8.901 12l3.125-3.13c2.536-2.54 3.135-3.159 3.174-3.285.159-.501-.186-.986-.699-.984a.889.889 0 0 0-.323.061"
+        fillRule="evenodd"
+        fill={theme.color[color]}
       />
     </svg>
   );
