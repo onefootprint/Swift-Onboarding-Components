@@ -7,19 +7,12 @@ import { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import Providers from '../components/providers';
-import {
-  API_REFERENCE_PATH,
-  AUTH_PATH,
-  INTERNAL_API_REFERENCE_PATH,
-  LOGIN_PATH,
-  PHASED_OUT_API_REFERENCE_PATH,
-} from '../config/constants';
+import { API_REFERENCE_PATH, AUTH_PATH, INTERNAL_API_REFERENCE_PATH, LOGIN_PATH } from '../config/constants';
 import ApiReference from './api-reference/index.page';
 import Auth from './auth';
 import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
 import Login from './login';
-import PhasedOutApiReference from './phased-out-api-reference';
 
 const defaultFont = DM_Sans({
   display: 'swap',
@@ -41,11 +34,9 @@ const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
   const isInternalApiReference = router.asPath.startsWith(INTERNAL_API_REFERENCE_PATH);
-  const isPhasedOutApiReference = router.asPath.startsWith(PHASED_OUT_API_REFERENCE_PATH);
   const isAuthPath = router.asPath.startsWith(AUTH_PATH);
   const isLoginPath = router.asPath.startsWith(LOGIN_PATH);
-  const isDocsSite =
-    !isApiReference && !isInternalApiReference && !isPhasedOutApiReference && !isAuthPath && !isLoginPath;
+  const isDocsSite = !isApiReference && !isInternalApiReference && !isAuthPath && !isLoginPath;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -62,7 +53,6 @@ const App = ({ Component, pageProps }: AppProps) => {
         <GlobalStyle />
         {isApiReference && <ApiReference />}
         {isInternalApiReference && <InternalApiReference />}
-        {isPhasedOutApiReference && <PhasedOutApiReference />}
         {isAuthPath && <Auth />}
         {isLoginPath && <Login />}
         {isDocsSite && (

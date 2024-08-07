@@ -2,7 +2,6 @@ import type { ContentSchemaNoRef } from '../api-reference.types';
 import staticApiData from '../assets/api-docs.json';
 import staticPreviewData from '../assets/api-preview-docs.json';
 import hostedApiData from '../assets/hosted-api-docs.json';
-import phasedOutApiData from '../assets/phased-out-api-docs.json';
 import privateApiData from '../assets/private-api-docs.json';
 
 export const evaluateSchemaRef = (ref: string) => {
@@ -18,9 +17,6 @@ const getSchema = (schemaKey: string) => {
   const previewSchema = staticPreviewData.components.schemas[
     schemaKey as keyof typeof staticPreviewData.components.schemas
   ] as ContentSchemaNoRef | undefined;
-  const phasedOutSchema = phasedOutApiData.components.schemas[
-    schemaKey as keyof typeof phasedOutApiData.components.schemas
-  ] as ContentSchemaNoRef | undefined;
   // TODO this logic is pretty messy... we shouldn't do this with globals
   const hostedSchemas = hostedApiData.components.schemas[schemaKey as keyof typeof hostedApiData.components.schemas] as
     | ContentSchemaNoRef
@@ -29,7 +25,7 @@ const getSchema = (schemaKey: string) => {
     schemaKey as keyof typeof privateApiData.components.schemas
   ] as ContentSchemaNoRef | undefined;
 
-  return schema || previewSchema || phasedOutSchema || hostedSchemas || privateSchema || undefined;
+  return schema || previewSchema || hostedSchemas || privateSchema || undefined;
 };
 
 // Open API allows us to use "format"s other than the default ones. We should eventually have the
