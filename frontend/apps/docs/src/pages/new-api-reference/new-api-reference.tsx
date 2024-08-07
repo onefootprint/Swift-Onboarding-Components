@@ -12,6 +12,7 @@ import useHydrateArticles from '../api-reference/hooks';
 import getArticles from '../api-reference/utils/get-articles';
 import Articles from './components/articles';
 import { ApiArticleProps, ApiReferenceArticle } from './index.page';
+import getSectionMeta from 'src/utils/section';
 
 const staticApiArticles = getArticles(staticApiData);
 
@@ -39,7 +40,7 @@ export const NewApiReference = ({ articles }: NewApiReferenceProps) => {
   const sections = articles.map(article => ({
     content: article.content,
     title: article.data.title,
-    // TODO need to also provide a link to the header section
+    id: getSectionMeta(article.data.title).id,
     apiArticles: article.data.apis.map(api => {
       const article = findArticle(api);
       if (!article) {

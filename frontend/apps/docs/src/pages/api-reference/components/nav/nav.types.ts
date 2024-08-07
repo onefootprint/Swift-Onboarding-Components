@@ -31,6 +31,7 @@ export type PageNavProps = {
 
 export type SubSection = {
   title: string;
+  id?: string;
   apiArticles: HydratedArticle[];
 };
 

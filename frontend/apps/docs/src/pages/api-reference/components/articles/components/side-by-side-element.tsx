@@ -14,16 +14,17 @@ type SideBySideProps = {
 /** Creates a two-column view with the provided content. When the viewport is too small, rearranges to a one-column view. */
 const SideBySideElement = ({ left, right, id }: SideBySideProps) => {
   return (
-    <Container key={id}>
-      <ElementContainer id={id} name={id}>
+    // The id here is used to make sure the `spy` property works on react-scroll's Links
+    <ElementContainer name={id} id={id} key={id}>
+      <Container>
         <LeftColumn>{left}</LeftColumn>
         <RightColumn>{right}</RightColumn>
-      </ElementContainer>
-    </Container>
+      </Container>
+    </ElementContainer>
   );
 };
 
-const Container = styled.div`
+const ElementContainer = styled(Element)<{ name: string }>`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
@@ -31,7 +32,7 @@ const Container = styled.div`
   `}
 `;
 
-const ElementContainer = styled(Element)<{ name: string }>`
+const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

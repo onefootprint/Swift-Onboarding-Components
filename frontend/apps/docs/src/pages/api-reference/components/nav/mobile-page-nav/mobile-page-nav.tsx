@@ -61,9 +61,15 @@ const PageNav = ({ sections }: PageNavProps) => {
                 </SectionTitle>
                 {s.subsections
                   .filter(s => s.apiArticles.some(a => !a.isHidden))
-                  .map(({ title, apiArticles }) => (
+                  .map(({ title, id, apiArticles }) => (
                     <Group key={title}>
-                      <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                      {id ? (
+                        <NavigationScrollLink id={id} onClick={handleLinkClick}>
+                          <Text variant="body-3">{title}</Text>
+                        </NavigationScrollLink>
+                      ) : (
+                        <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                      )}
                       {apiArticles
                         .filter(a => !a.isHidden)
                         .map(({ method, path, id }) => (

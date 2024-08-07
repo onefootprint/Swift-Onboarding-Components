@@ -1,5 +1,5 @@
 import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
-import { Divider, Stack, ThemeToggle, createFontStyles, media } from '@onefootprint/ui';
+import { Divider, Stack, Text, ThemeToggle, createFontStyles, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
@@ -44,9 +44,15 @@ const PageNav = ({ sections }: PageNavProps) => {
             </SectionTitle>
             {s.subsections
               .filter(s => s.apiArticles.some(a => !a.isHidden))
-              .map(({ title, apiArticles }) => (
+              .map(({ title, id, apiArticles }) => (
                 <Group key={title}>
-                  <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                  {id ? (
+                    <NavigationScrollLink id={id}>
+                      <Text variant="body-3">{title}</Text>
+                    </NavigationScrollLink>
+                  ) : (
+                    <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                  )}
                   {apiArticles
                     .filter(a => !a.isHidden)
                     .map(({ method, path, id }) => (

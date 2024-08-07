@@ -10,6 +10,7 @@ import EndpointsOverview from './endpoints-overview';
 
 export type SubSection = {
   title: string;
+  id: string;
   content: string;
   apiArticles: HydratedArticle[];
 };
