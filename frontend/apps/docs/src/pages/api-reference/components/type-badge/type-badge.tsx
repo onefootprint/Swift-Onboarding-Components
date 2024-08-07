@@ -1,28 +1,27 @@
+import { UIStates } from '@onefootprint/design-tokens';
 import { Badge, createFontStyles } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
+import { HttpMethod } from '../../api-reference.types';
 
 type TypeBadgeProps = {
-  type: string;
+  type: HttpMethod;
   skinny?: boolean;
 };
 
+export const COLOR_FOR_METHOD: Record<HttpMethod, keyof UIStates> = {
+  post: 'success',
+  get: 'neutral',
+  delete: 'error',
+  patch: 'warning',
+  put: 'warning',
+  options: 'neutral',
+  head: 'neutral',
+  trace: 'neutral',
+};
+
 const TypeBadge = ({ type, skinny = false }: TypeBadgeProps) => {
-  const assignVariant = () => {
-    switch (type) {
-      case 'post':
-        return 'success';
-      case 'get':
-        return 'neutral';
-      case 'delete':
-        return 'error';
-      case 'patch':
-        return 'warning';
-      default:
-        return 'neutral';
-    }
-  };
   return (
-    <StyledBadge variant={assignVariant()} skinny={skinny}>
+    <StyledBadge variant={COLOR_FOR_METHOD[type]} skinny={skinny}>
       {type}
     </StyledBadge>
   );

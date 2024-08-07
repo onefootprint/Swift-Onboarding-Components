@@ -224,6 +224,7 @@
       "optional": "optional",
       "array": "array",
       "of": "of",
+      "endpoints": "Endpoints",
       "sections": {
         "footprint-api": "Footprint API",
         "footprint-api-preview": "Footprint API (Preview)"

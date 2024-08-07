@@ -30,6 +30,8 @@ export type ParameterProps = {
   style: string;
 };
 
+export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
+
 /***
  * Information from the open API spec about a single backend API: its method, path, and request / response types.
  */
@@ -42,7 +44,7 @@ export type ApiArticle<TContent = Content> = {
   tags?: string[];
   // These are added on top of the open API spec
   id: string;
-  method: 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
+  method: HttpMethod;
   path: string;
   section: string;
 };
