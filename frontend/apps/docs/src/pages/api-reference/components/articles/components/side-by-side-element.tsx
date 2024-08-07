@@ -14,7 +14,7 @@ type SideBySideProps = {
 /** Creates a two-column view with the provided content. When the viewport is too small, rearranges to a one-column view. */
 const SideBySideElement = ({ left, right, id }: SideBySideProps) => {
   return (
-    <Container>
+    <Container key={id}>
       <ElementContainer id={id} name={id}>
         <LeftColumn>{left}</LeftColumn>
         <RightColumn>{right}</RightColumn>

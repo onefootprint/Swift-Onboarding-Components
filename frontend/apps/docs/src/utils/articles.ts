@@ -8,17 +8,6 @@ import type { Article } from '../types/article';
 import type { PageNavigation, PageNavigationCategory, PageNavigationItem } from '../types/page';
 import getSectionMeta from './section';
 
-const getFilesPath = (filesPath: string): Promise<string[]> =>
-  new Promise((resolve, reject) => {
-    glob(filesPath, (err, contentPaths) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(contentPaths);
-      }
-    });
-  });
-
 const getSections = (content: string) => {
   const regXCode = /```[a-zA-Z0-9]+?\n([\s\S]+?)\n```\n/gi;
   const contentWithoutCode = content.replace(regXCode, '');
@@ -28,17 +17,18 @@ const getSections = (content: string) => {
 };
 
 const replaceContent = (content: string) => {
-  const outputLines: string[] = [];
   let isInCodeBlock = false;
   const headerRegex = /#{1,6}\s([^\n[\]`]+)/g;
   const parentSections: { level: number; id: string }[] = [];
   const lines = content.split('\n');
 
-  for (const line of lines) {
+  const outputLines = lines.map(line => {
     if (line.startsWith('```')) {
       isInCodeBlock = !isInCodeBlock;
     }
     if (!isInCodeBlock && !!line.match(headerRegex)) {
+      // Generate an ID for the header elements that is prefixed by all parent sections' IDs.
+      // This allows us to generate url hashes that uniquely identify a section header.
       const label = line.split('#').join('').trim();
       const id = kebabCase(label);
       const level = line.split('#').length - 1;
@@ -50,22 +40,41 @@ const replaceContent = (content: string) => {
         .filter(s => s.level <= level)
         .map(s => s.id)
         .join('-');
-      outputLines.push(`${line} [[id=${nestedId}]]`);
+      return `${line} [[id=${nestedId}]]`;
     } else {
-      outputLines.push(line);
+      return line;
     }
-  }
+  });
   return outputLines.join('\n');
 };
 
-const getAllMarkdownFiles = (contentPaths: string[]): Promise<Article[]> =>
-  Promise.all(
+const getFilesPath = (filesPath: string): Promise<string[]> =>
+  new Promise((resolve, reject) => {
+    glob(filesPath, (err, contentPaths) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(contentPaths);
+      }
+    });
+  });
+
+type BasicArticle = {
+  content: string;
+  data: {
+    title: string;
+  };
+};
+
+export const getAllMarkdownFiles = async <TArticle extends BasicArticle>(relativePath: string): Promise<TArticle[]> => {
+  const contentPaths = await getFilesPath(relativePath);
+  return Promise.all(
     contentPaths.map(async contentPath => {
       try {
         const fileContent = await fs.promises.readFile(contentPath, {
           encoding: 'utf8',
         });
-        const matterFile = matter(fileContent) as unknown as Article;
+        const matterFile = matter(fileContent) as unknown as TArticle;
         const content = replaceContent(matterFile.content);
         return {
           ...matterFile,
@@ -82,15 +91,14 @@ const getAllMarkdownFiles = (contentPaths: string[]): Promise<Article[]> =>
       }
     }),
   );
+};
 
 export const getAllArticles = async (): Promise<Article[]> => {
-  const filesPath = await getFilesPath('src/content/**/**.mdx');
-  return getAllMarkdownFiles(filesPath);
+  return getAllMarkdownFiles<Article>('src/content/default/**/**.mdx');
 };
 
 export const getArticlesByPage = async (page: string): Promise<Article[]> => {
-  const filesPath = await getFilesPath('src/content/**/**.mdx');
-  const articles = await getAllMarkdownFiles(filesPath);
+  const articles = await getAllMarkdownFiles<Article>('src/content/default/**/**.mdx');
   return articles.filter(article => article.data.page === page);
 };
 

@@ -17,14 +17,15 @@ type DocsProps = {
   navigation: PageNavigation;
 };
 
-const Docs = ({ children, navigation, article }: DocsProps) =>
-  article ? (
+const Docs = ({ children, navigation, article }: DocsProps) => {
+  return article ? (
     <>
       <AppHeader>
         <MobileNav navigation={navigation} />
       </AppHeader>
       <Main>
         <DesktopNav navigation={navigation} />
+        {/* Content here is the ArticlePage from [title].page.tsx */}
         <Content>{children}</Content>
         <GridAssigner>
           <Sections sections={article.data.sections} />
@@ -35,6 +36,7 @@ const Docs = ({ children, navigation, article }: DocsProps) =>
   ) : (
     <Page404 />
   );
+};
 
 const Content = styled.article`
   ${({ theme }) => css`
