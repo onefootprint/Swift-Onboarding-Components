@@ -77,14 +77,6 @@ const StyledLink = styled(NavigationMenuLink)`
     > svg {
       align-self: flex-start;
     }
-
-    && {
-      svg {
-        path {
-          fill: ${theme.color.primary};
-        }
-      }
-    }
   `}
 `;
 

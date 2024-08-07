@@ -184,23 +184,29 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       text-decoration: none;
       width: fit-content;
       gap: ${smallSizes.includes($variant) ? theme.spacing[1] : theme.spacing[2]};
+      stroke: ${linkButton[styleVariant].color.text.initial};
+      fill: ${linkButton[styleVariant].color.text.initial};
+      stroke: ${linkButton[styleVariant].color.text.initial};
 
       &:hover,
       &:hover path {
         color: ${linkButton[styleVariant].color.text.hover};
         fill: ${linkButton[styleVariant].color.text.hover};
+        stroke: ${linkButton[styleVariant].color.text.hover};
       }
 
       &:active,
       &:active path {
         color: ${linkButton[styleVariant].color.text.active};
         fill: ${linkButton[styleVariant].color.text.active};
+        stroke: ${linkButton[styleVariant].color.text.active};
       }
 
       &:disabled,
       &:disabled path {
         color: ${linkButton[styleVariant].color.text.disabled};
         fill: ${linkButton[styleVariant].color.text.disabled};
+        stroke: ${linkButton[styleVariant].color.text.disabled};
       }
     `;
   }}
