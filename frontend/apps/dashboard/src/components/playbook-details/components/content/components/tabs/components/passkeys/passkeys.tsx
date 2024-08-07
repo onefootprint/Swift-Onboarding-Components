@@ -1,11 +1,9 @@
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 import { IcoArrowUpRight16, IcoLightBulb16 } from '@onefootprint/icons';
 import { type OnboardingConfig } from '@onefootprint/types';
-import { Box, Stack, Text, Toggle, createFontStyles } from '@onefootprint/ui';
-import Link from 'next/link';
+import { Box, LinkButton, Stack, Text, Toggle } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 export type PasskeysProps = {
   playbook: OnboardingConfig;
@@ -56,38 +54,20 @@ const Passkeys = ({ playbook }: PasskeysProps) => {
           </Text>
         </Stack>
         <Stack flexDirection="column" gap={3}>
-          <StyledLink href="https://developer.apple.com/passkeys/" target="_blank">
+          <LinkButton href="https://developer.apple.com/passkeys/" target="_blank" iconComponent={IcoArrowUpRight16}>
             {t('about.ios')}
-            <IcoArrowUpRight16 />
-          </StyledLink>
-          <StyledLink href="https://developer.android.com/design/ui/mobile/guides/patterns/passkeys" target="_blank">
+          </LinkButton>
+          <LinkButton
+            href="https://developer.android.com/design/ui/mobile/guides/patterns/passkeys"
+            target="_blank"
+            iconComponent={IcoArrowUpRight16}
+          >
             {t('about.android')}
-            <IcoArrowUpRight16 />
-          </StyledLink>
+          </LinkButton>
         </Stack>
       </Stack>
     </Stack>
   );
 };
-
-const StyledLink = styled(Link)`
-  ${({ theme }) => css`
-    ${createFontStyles('label-4')}
-    align-items: center;
-    color: ${theme.color.accent};
-    display: flex;
-    gap: ${theme.spacing[2]};
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    svg path {
-      fill: ${theme.color.accent};
-    }
-  `}
-
-`;
 
 export default Passkeys;
