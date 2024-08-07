@@ -377,11 +377,13 @@ footprint_reason_code_enum! {
 
 
         // ~~~~~~~~~~~~ SSN ~~~~~~~~~~~~
-
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
         #[note = "SSN not available", severity = SignalSeverity::High,  description = "No SSN information located. "]
         SsnNotAvailable,
 
+        #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "SSN was not found on file", severity = SignalSeverity::High,  description = "No SSN was located for the individual."]
+        SsnNotOnFile,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
         #[note = "SSN9 partial match", severity = SignalSeverity::Medium,  description = "SSN 9 partially located matches SSN 9 input."]
@@ -419,11 +421,11 @@ footprint_reason_code_enum! {
         #[note = "SSN not provided", severity = SignalSeverity::High,  description = "The user indicated they do not have an SSN."]
         SsnNotProvided,
 
+        // ~~~~~~~~~~~~ ITIN ~~~~~~~~~~~~
         #[scope = SignalScope::Itin, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
         #[note = "US Tax ID is ITIN", severity = SignalSeverity::Low,  description = "The user provided an ITIN as their US Tax ID."]
         UsTaxIdIsItin,
 
-        // ~~~~~~~~~~~~ ITIN ~~~~~~~~~~~~
         #[scope = SignalScope::Itin, additional_scopes = vec![], match_level = None]
         #[note = "ITIN expired", severity = SignalSeverity::Medium,  description = "The input ITIN is potentially expired."]
         ItinIsExpired,
@@ -448,7 +450,7 @@ footprint_reason_code_enum! {
         #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
         NamePartiallyMatches,
 
- // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
+        // ~~~~~~~~~~~~ IP Address ~~~~~~~~~~~~
         // TODO: we aren't currently sending ip_address to Idology so these are unused. We possibly want to just remove these and just use Stytch
         // to replace these. Alternatively, we could still get these from Idology but then we need to think about how to combine those vs Stytch
 
@@ -627,6 +629,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Address associated with the phone number does not match input address", severity = SignalSeverity::Low,  description = "The address associated with the phone number does not match the address provided"]
         PhoneLocatedAddressDoesNotMatch,
+
+        #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Phone number provided associated with different name and address", severity = SignalSeverity::Low,  description = "The phone number provided is associated with a different name and address than the one provided"]
+        PhoneInputLikelyBelongsToAnother,
 
         #[scope = SignalScope::PhoneNumber, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
         #[note = "Phone not provided", severity = SignalSeverity::Medium,  description = "The user indicated they do not have a phone."]

@@ -322,55 +322,57 @@ mod tests {
         true,
         true,
         vec![
-            PhoneLocatedDoesNotMatch,
             NameFirstMatches,
             NameLastMatches,
             NameMatches,
             AddressMatches,
             SsnDoesNotMatch,
+            PhoneLocatedDoesNotMatch,
             DobPartialMatch,
             DobYobDoesNotMatch,
             SsnInputIsInvalid,
+            DriversLicenseNumberNotValid,
             IdFlagged,
             PhoneNumberInputInvalid,
-            DriversLicenseNumberNotValid,
             EmailNotFoundOnFile
         ])
     ]
     #[test_case(
-      example1(),
-      false,
-      true,
-      vec![
-          PhoneLocatedDoesNotMatch,
-          NameFirstMatches,
-          NameLastMatches,
-          NameMatches,
-          AddressMatches,
-          DobPartialMatch,
-          DobYobDoesNotMatch,
-          IdFlagged,
-          PhoneNumberInputInvalid,
-          DriversLicenseNumberNotValid,
-          EmailNotFoundOnFile
-      ])
+        example1(),
+        false,
+        true,
+        vec![
+            NameFirstMatches,
+            NameLastMatches,
+            NameMatches,
+            AddressMatches,
+            PhoneLocatedDoesNotMatch,
+            DobPartialMatch,
+            DobYobDoesNotMatch,
+            DriversLicenseNumberNotValid,
+            IdFlagged,
+            PhoneNumberInputInvalid,
+            EmailNotFoundOnFile
+        ])
   ]
     #[test_case(
         example2(),
         true,
         true,
         vec![
-            PhoneLocatedDoesNotMatch,
             NameFirstDoesNotMatch,
             NameLastDoesNotMatch,
             NameDoesNotMatch,
             AddressDoesNotMatch,
             SsnDoesNotMatch,
+            PhoneLocatedDoesNotMatch,
             DobCouldNotMatch,
             SsnInputIsInvalid,
-            IdFlagged,
-            PhoneNumberInputInvalid,
             DriversLicenseNumberIsValid,
+            IdFlagged,
+            DobNotOnFile,
+            PhoneNumberInputInvalid,
+            PhoneLocatedAddressDoesNotMatch,
             EmailNotFoundOnFile
         ])
     ]

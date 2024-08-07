@@ -160,7 +160,7 @@ vendor_reason_code_enum! {
         R57,
 
         #[ser = "64", description = "The input address returns a different phone number"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(PhoneLocatedAddressDoesNotMatch)]
         R64,
 
         #[ser = "66", description = "The input SSN is associated with a different last name, same first name"]
@@ -168,7 +168,7 @@ vendor_reason_code_enum! {
         R66,
 
         #[ser = "71", description = "The input SSN is not found in the public record"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(SsnNotOnFile)]
         R71,
 
         #[ser = "72", description = "The input SSN is associated with a different name and address"]
@@ -176,7 +176,7 @@ vendor_reason_code_enum! {
         R72,
 
         #[ser = "74", description = "The input phone number is associated with a different name and address"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(PhoneInputLikelyBelongsToAnother)]
         R74,
 
         #[ser = "75", description = "The input name and address are associated with an unlisted/non-published phone number"]
@@ -209,7 +209,7 @@ vendor_reason_code_enum! {
         R81,
 
         #[ser = "82", description = "The input name and address return a different phone number"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(PhoneLocatedDoesNotMatch)]
         R82,
 
         #[ser = "83", description = "The input date-of-birth may have been miskeyed"]
@@ -294,7 +294,7 @@ vendor_reason_code_enum! {
         MS,
 
         #[ser = "NB", description = "No date-of-birth reported for the input identity"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(DobNotOnFile)]
         NB,
 
         #[ser = "NF", description = "The input first name and last name may have been flipped"]

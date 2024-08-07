@@ -24,7 +24,7 @@ pub mod idology_match_codes {
     ];
     pub const SSN_DOES_NOT_MATCH_CODES: [FootprintReasonCode; 5] = [
         FootprintReasonCode::SsnDoesNotMatch,
-        FootprintReasonCode::SsnNotAvailable,
+        FootprintReasonCode::SsnNotOnFile,
         FootprintReasonCode::SsnInputIsItin,
         FootprintReasonCode::SsnLocatedIsInvalid,
         FootprintReasonCode::SsnLocatedIsItin,
@@ -138,7 +138,7 @@ vendor_reason_code_enum! {
         NoDobAvailable,
 
         #[ser = "resultcode.ssn.not.available", description = "The individual was identified, but SSN information was not available. This does not mean the search failed. Numerous public-record data sources do not include SSN information in their records."]
-        #[footprint_reason_code = Some(FootprintReasonCode::SsnNotAvailable)]
+        #[footprint_reason_code = Some(FootprintReasonCode::SsnNotOnFile)]
         SsnNotAvailable,
 
         #[ser = "resultcode.ssn.does.not.match", description = "SSN found does not match SSN submitted. This does not necessarily mean the ID Located is invalid, especially when the MOB+YOB or YOB was provided as well. There can be errors in the located SSN data."]
