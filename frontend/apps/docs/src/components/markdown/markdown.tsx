@@ -22,7 +22,7 @@ import NavigationLink from './components/navigation-link';
 import Strong from './components/strong';
 import Table from './components/table';
 
-const overrides: MarkdownToJSX.Overrides = {
+const OVERRIDES: MarkdownToJSX.Overrides = {
   a: {
     component: A,
   },
@@ -82,11 +82,16 @@ const overrides: MarkdownToJSX.Overrides = {
 type MarkdownProps = {
   id?: string;
   children: string;
+  overrides?: MarkdownToJSX.Overrides;
 };
 
-const Markdown = ({ children, id }: MarkdownProps) => {
+const Markdown = ({ children, id, overrides }: MarkdownProps) => {
+  const allOverrides = {
+    ...OVERRIDES,
+    ...overrides,
+  };
   return (
-    <StyledMarkdown options={{ overrides }} id={id}>
+    <StyledMarkdown options={{ overrides: allOverrides }} id={id}>
       {children}
     </StyledMarkdown>
   );
