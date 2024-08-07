@@ -73,7 +73,6 @@ const Container = styled.div`
     padding-top: ${theme.spacing[8]};
     padding-bottom: ${theme.spacing[8]};
     width: 100%;
-    max-width: 720px;
 
     ${media.greaterThan('md')`
       position: sticky;
