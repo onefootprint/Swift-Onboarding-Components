@@ -39,11 +39,11 @@ const Banner = ({ title, imgSrc }: BannerProps) => {
             {title}
           </Text>
           <ButtonContainer>
-            <Button variant="primary" size="large" onClick={handleSignUpClick}>
-              {t('get-started')}
-            </Button>
-            <Button variant="secondary" size="large" onClick={handleBookCall}>
+            <Button variant="primary" size="large" onClick={handleBookCall}>
               {t('book-a-demo')}
+            </Button>
+            <Button variant="secondary" size="large" onClick={handleSignUpClick}>
+              {t('sign-up-for-free')}
             </Button>
           </ButtonContainer>
         </TextContainer>

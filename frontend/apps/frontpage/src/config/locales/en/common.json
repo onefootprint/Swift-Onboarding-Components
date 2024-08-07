@@ -4,8 +4,8 @@
   },
   "components": {
     "ctas": {
-      "book-a-call": "Book a call",
-      "get-started": "Get started"
+      "book-a-call": "Book a demo",
+      "sign-up-for-free": "Sign up for free"
     },
     "developer-experience": {
       "title": "Developer experience like no other",
@@ -234,7 +234,8 @@
         "title": "Onboard users in a unified platform",
         "subtitle": "Verify your customers while blocking fraud, ensuring compliance, and driving revenue.",
         "get-started": "Get started",
-        "book-a-call": "Book a call"
+        "sign-up-for-free": "Sign up for free",
+        "book-a-call": "Book a demo"
       },
       "logos-section": {
         "title": "World-class teams are onboarding more users and trusting Footprint with their data"
@@ -486,7 +487,7 @@
       },
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind.",
-        "get-started": "Get started",
+        "sign-up-for-free": "Sign up for free",
         "book-a-demo": "Book a demo"
       }
     },
@@ -632,8 +633,8 @@
         "banner": {
           "alt-img": "A penguin fishing in the north pole",
           "title": "Start onboarding customers safely and seamlessly now",
-          "primary-button": "Sign up for free",
-          "secondary-button": "Book a call"
+          "primary-button": "Book a demo",
+          "secondary-button": "Sign up for free"
         }
       },
       "fintech": {
@@ -721,7 +722,7 @@
           "alt-img": "A penguin fishing in the north pole",
           "title": "Start onboarding your applicants safely and seamlessly now",
           "primary-button": "Sign up for free",
-          "secondary-button": "Book a call"
+          "secondary-button": "Book a demo"
         }
       },
       "auto": {
@@ -802,7 +803,7 @@
           "alt-img": "A penguin fishing in the north pole",
           "title": "Start onboarding your drivers safely and seamlessly now",
           "primary-button": "Sign up for free",
-          "secondary-button": "Book a call"
+          "secondary-button": "Book a demo"
         }
       },
       "real-estate": {
@@ -891,7 +892,7 @@
           "alt-img": "A penguin fishing in the north pole",
           "title": "Enhance your screening experience today",
           "primary-button": "Sign up for free",
-          "secondary-button": "Book a call"
+          "secondary-button": "Book a demo"
         }
       }
     },
@@ -1534,7 +1535,7 @@
       "banner": {
         "title": "Not sure what plan you need?",
         "subtitle": "Reach out to us and we'll be happy to guide you through the available options.",
-        "schedule-call": "Schedule a call",
+        "schedule-call": "Book a demo",
         "get-started": "Sign up for free"
       }
     },

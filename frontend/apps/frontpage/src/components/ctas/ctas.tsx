@@ -38,11 +38,11 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
   return (
     <>
       <ButtonsContainer flexDirection={direction} align={align}>
-        <Button variant="primary" size="large" onClick={handleSignUpClick}>
-          {labels?.primary || t('get-started')}
+        <Button variant="primary" size="large" onClick={handleBookCall}>
+          {labels?.primary || t('book-a-call')}
         </Button>
-        <Button variant="secondary" size="large" onClick={handleBookCall}>
-          {labels?.secondary || t('book-a-call')}
+        <Button variant="secondary" size="large" onClick={handleSignUpClick}>
+          {labels?.secondary || t('sign-up-for-free')}
         </Button>
       </ButtonsContainer>
       <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
