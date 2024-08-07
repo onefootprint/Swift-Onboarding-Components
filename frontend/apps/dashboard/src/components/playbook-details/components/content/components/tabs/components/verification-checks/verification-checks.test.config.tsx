@@ -62,6 +62,7 @@ const onboardingConfig: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export default onboardingConfig;

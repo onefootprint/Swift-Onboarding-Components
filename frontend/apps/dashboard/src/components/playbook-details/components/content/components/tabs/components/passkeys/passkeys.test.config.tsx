@@ -43,6 +43,7 @@ export const playbookWithPasskeysFixture: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export const playbookWithoutPasskeysFixture: OnboardingConfig = {

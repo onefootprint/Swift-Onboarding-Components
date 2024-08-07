@@ -1,12 +1,8 @@
 import '@testing-library/jest-dom';
+import * as React from 'react';
 
-import {
-  QueryClient,
-  QueryClientProvider,
-  QueryCache,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { render, renderHook } from '@testing-library/react';
-import React from 'react';
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 
@@ -40,9 +36,7 @@ export const Wrapper = ({ children }: WrapperProps) => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <DesignSystemProvider theme={themes.light}>
-          {children}
-        </DesignSystemProvider>
+        <DesignSystemProvider theme={themes.light}>{children}</DesignSystemProvider>
       </QueryClientProvider>
     </React.StrictMode>
   );
@@ -72,3 +66,5 @@ export {
   fireEvent,
 } from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
+
+global.React = React;

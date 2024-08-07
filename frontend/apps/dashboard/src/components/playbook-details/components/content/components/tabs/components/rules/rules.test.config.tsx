@@ -64,6 +64,7 @@ export const kycPlaybookFixture: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export const kybPlaybookFixture: OnboardingConfig = {
@@ -123,6 +124,7 @@ export const kybPlaybookFixture: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export const failMultiFieldRuleFixture = {

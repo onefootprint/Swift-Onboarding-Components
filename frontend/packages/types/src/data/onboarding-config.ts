@@ -22,6 +22,18 @@ export type DocumentTypesAndCountries = {
   global?: SupportedIdDocTypes[];
 };
 
+export type Aml = {
+  kind: 'aml';
+  data: {
+    continuousMonitoring: boolean;
+    adverseMedia: boolean;
+    ofac: boolean;
+    pep: boolean;
+  };
+};
+
+export type VerificationCheck = Aml;
+
 // Used in the IDV context
 export type PublicOnboardingConfig = {
   name: string;
@@ -93,4 +105,5 @@ export type OnboardingConfig = {
   ruleSet: {
     version: number;
   };
+  verificationChecks: VerificationCheck[];
 };

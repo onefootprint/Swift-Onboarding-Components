@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import AmlMonitoring from './components/aml-monitoring';
 import DataCollection from './components/data-collection';
 import Passkeys from './components/passkeys';
 import Rules from './components/rules';
+import VerificationChecks from './components/verification-checks';
 
 export type TabsProps = {
   playbook: OnboardingConfig;
@@ -19,7 +19,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
   const { t } = useTranslation('playbooks', { keyPrefix: 'details' });
   const options = [
     { value: 'data', label: t('tabs.data-collection') },
-    { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
+    { value: 'verification-checks', label: t('tabs.verification-checks') },
     { value: 'passkeys', label: t('tabs.passkeys') },
     ...(playbook.kind !== OnboardingConfigKind.auth ? [{ value: 'rules', label: t('tabs.rules') }] : []),
   ];
@@ -33,7 +33,7 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
     <Container>
       <UITabs options={options} onChange={handleChange} disabled={isTabsDisabled} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
-      {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
+      {tab === 'verification-checks' && <VerificationChecks playbook={playbook} />}
       {tab === 'passkeys' && <Passkeys playbook={playbook} />}
       {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
     </Container>

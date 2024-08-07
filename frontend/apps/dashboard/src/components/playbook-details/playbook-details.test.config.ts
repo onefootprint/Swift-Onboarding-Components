@@ -41,6 +41,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>

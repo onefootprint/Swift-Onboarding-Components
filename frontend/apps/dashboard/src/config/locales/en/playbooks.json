@@ -452,7 +452,7 @@
     },
     "tabs": {
       "data-collection": "Data collection",
-      "aml-monitoring": "AML monitoring",
+      "verification-checks": "Verification checks",
       "passkeys": "Passkeys",
       "rules": "Rules"
     },
@@ -517,13 +517,6 @@
         },
         "requires-manual-review": "After upload, user will be marked for manual review.",
         "more-details": "More details"
-      }
-    },
-    "aml-monitoring": {
-      "title": "AML checks",
-      "footer": {
-        "label": "Note:",
-        "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
       }
     },
     "passkeys": {
@@ -680,6 +673,15 @@
           "same": "Still evaluate to <color>{{action}}</color>",
           "changed": "Evaluate to <color>{{action}}</color> instead"
         }
+      }
+    },
+    "verification-checks": {
+      "aml": {
+        "title": "Anti-Money Laundering (AML)",
+        "empty": "AML checks are not enabled.",
+        "ofac": "Office of Foreign Assets Control (OFAC)",
+        "pep": "Politically Exposed Person (PEP)",
+        "adverse-media": "Adverse media"
       }
     }
   }

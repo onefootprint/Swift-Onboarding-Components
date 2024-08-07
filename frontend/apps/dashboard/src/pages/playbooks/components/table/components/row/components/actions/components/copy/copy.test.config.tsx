@@ -50,6 +50,7 @@ export const playbookFixture: OnboardingConfig = {
   promptForPasskey: true,
   businessDocumentsToCollect: [],
   requiredAuthMethods: [AuthMethodKind.phone],
+  verificationChecks: [],
 };
 
 export const authRolesFixture: GetAuthRoleResponse = [
