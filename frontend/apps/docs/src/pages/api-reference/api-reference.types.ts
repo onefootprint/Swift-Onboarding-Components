@@ -30,7 +30,10 @@ export type ParameterProps = {
   style: string;
 };
 
-export type Article<TContent = Content> = {
+/***
+ * Information from the open API spec about a single backend API: its method, path, and request / response types.
+ */
+export type ApiArticle<TContent = Content> = {
   description?: string;
   parameters?: ParameterProps[];
   responses?: Record<string, TContent>;

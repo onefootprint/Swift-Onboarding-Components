@@ -1,6 +1,6 @@
 import sortBy from 'lodash/sortBy';
 
-import type { Article } from '../api-reference.types';
+import type { ApiArticle } from '../api-reference.types';
 
 export const isClientApi = (path: string) => path.startsWith('/users/vault');
 
@@ -51,7 +51,7 @@ const methodPriority = (method: string) => {
 const sectionPriority = (section: string) => section.toLowerCase().replace(' ', '-');
 
 // TODO: FP-6527 add openapi-typescript for TS generation
-const getArticles = (data: Record<string, unknown>): Article[] =>
+const getArticles = (data: Record<string, unknown>): ApiArticle[] =>
   sortBy(
     // @ts-expect-error: fix-me
     Object.entries(data.paths).flatMap(([path, methods]) =>
