@@ -2,7 +2,7 @@ import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
 type AProps = {
-  children: string;
+  children: React.ReactNode;
   href: string;
 };
 
