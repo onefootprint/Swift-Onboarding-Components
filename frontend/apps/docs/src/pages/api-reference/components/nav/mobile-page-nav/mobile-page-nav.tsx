@@ -11,7 +11,6 @@ import { useRouter } from 'next/router';
 import TypeBadge from '../../type-badge';
 import NavigationScrollLink from '../components/navigation-scroll-link';
 import { PageNavProps } from '../nav.types';
-import groupBySection from '../utils/group-by-section';
 
 const CHARACTER_LIMIT_FOR_TOOLTIP = 35;
 
@@ -73,10 +72,10 @@ const PageNav = ({ sections }: PageNavProps) => {
                   {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
                   {s.title}
                 </SectionTitle>
-                {groupBySection(s.articles).map(({ title, subsections }) => (
+                {s.subsections.map(({ title, apiArticles }) => (
                   <Group key={title}>
                     <NavigationSectionTitle>{title}</NavigationSectionTitle>
-                    {subsections.map(({ method, path, id }) => (
+                    {apiArticles.map(({ method, path, id }) => (
                       <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
                         <NavigationScrollLink id={id} onClick={() => handleLinkClick(path)}>
                           <Stack justify="center">

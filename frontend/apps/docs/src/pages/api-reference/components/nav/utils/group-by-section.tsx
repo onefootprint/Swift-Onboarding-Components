@@ -1,31 +1,27 @@
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
-
-type Section = {
-  title: string;
-  subsections: HydratedArticle[];
-};
+import { SubSection } from '../nav.types';
 
 /**
- * A stable operation that groups _adjacent_ articles that have the same section name.
- * This preserves the order of the input articles so they are displayed in navigation in the same
+ * A stable operation that groups _adjacent_ apiArticles that have the same section name.
+ * This preserves the order of the input apiArticles so they are displayed in navigation in the same
  * order in which they are displayed in the site body
  */
-const groupBySection = (articles: HydratedArticle[]) => {
-  const sections: Section[] = [];
-  articles
+const groupBySubsection = (apiArticles: HydratedArticle[]) => {
+  const sections: SubSection[] = [];
+  apiArticles
     .filter(a => !a.isHidden)
     .forEach(a => {
       const currentSection = sections.length ? sections[sections.length - 1] : undefined;
       if (currentSection?.title === a.section) {
-        currentSection.subsections.push(a);
+        currentSection.apiArticles.push(a);
       } else {
         sections.push({
           title: a.section,
-          subsections: [a],
+          apiArticles: [a],
         });
       }
     });
   return sections;
 };
 
-export default groupBySection;
+export default groupBySubsection;

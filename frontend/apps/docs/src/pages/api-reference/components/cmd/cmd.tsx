@@ -57,34 +57,38 @@ const Cmd = ({ sections }: PageNavProps) => {
         <List>
           <EmptyState>{t('no-results')}</EmptyState>
           {sections &&
-            sections.map(({ title, isPreview, articles }) => (
+            sections.map(({ title, isPreview, subsections }) => (
               <Group heading={title} key={title} data-preview={isPreview}>
-                {articles.map(({ id, method, path }) => (
-                  <Option key={id} onSelect={() => handleScroll(id)}>
-                    <Grid.Container columns={['56px', '1fr']}>
-                      <Grid.Item justify="start">
-                        <TypeBadge skinny type={method} />
-                      </Grid.Item>
-                      <Grid.Item>{path}</Grid.Item>
-                    </Grid.Container>
-                  </Option>
-                ))}
+                {subsections
+                  .flatMap(s => s.apiArticles)
+                  .map(({ id, method, path }) => (
+                    <Option key={id} onSelect={() => handleScroll(id)}>
+                      <Grid.Container columns={['56px', '1fr']}>
+                        <Grid.Item justify="start">
+                          <TypeBadge skinny type={method} />
+                        </Grid.Item>
+                        <Grid.Item>{path}</Grid.Item>
+                      </Grid.Container>
+                    </Option>
+                  ))}
               </Group>
             ))}
           <Group>
-            {sections.flatMap(({ articles }) =>
-              articles.flatMap(({ parameters = [], id }) =>
-                parameters.map(parameter => (
-                  <Option onSelect={() => handleScroll(id)} key={id}>
-                    <Stack direction="row" gap={3}>
-                      <Text variant="label-2">{parameter.name}</Text>
-                      <Text variant="body-2" color="tertiary">
-                        {id}
-                      </Text>
-                    </Stack>
-                  </Option>
-                )),
-              ),
+            {sections.flatMap(({ subsections }) =>
+              subsections
+                .flatMap(s => s.apiArticles)
+                .flatMap(({ parameters = [], id }) =>
+                  parameters.map(parameter => (
+                    <Option onSelect={() => handleScroll(id)} key={id}>
+                      <Stack direction="row" gap={3}>
+                        <Text variant="label-2">{parameter.name}</Text>
+                        <Text variant="body-2" color="tertiary">
+                          {id}
+                        </Text>
+                      </Stack>
+                    </Option>
+                  )),
+                ),
             )}
           </Group>
         </List>

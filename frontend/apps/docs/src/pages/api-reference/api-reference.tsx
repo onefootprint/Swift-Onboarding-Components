@@ -9,6 +9,7 @@ import Articles from './components/articles/articles';
 import Cmd from './components/cmd';
 import DesktopPageNav from './components/nav/desktop-page-nav';
 import MobilePageNav from './components/nav/mobile-page-nav';
+import groupBySubsection from './components/nav/utils/group-by-section';
 import useHydrateArticles from './hooks/use-hydrate-articles';
 import getArticles from './utils/get-articles';
 
@@ -24,12 +25,12 @@ const ApiReference = () => {
     {
       title: t('sections.footprint-api'),
       isPreview: false,
-      articles,
+      subsections: groupBySubsection(articles),
     },
     {
       title: t('sections.footprint-api-preview'),
       isPreview: true,
-      articles: previewArticles,
+      subsections: groupBySubsection(previewArticles),
     },
   ];
 

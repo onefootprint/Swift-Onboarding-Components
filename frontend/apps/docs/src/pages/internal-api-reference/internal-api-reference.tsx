@@ -6,6 +6,7 @@ import hostedApiData from '../api-reference/assets/hosted-api-docs.json';
 import privateApiData from '../api-reference/assets/private-api-docs.json';
 import Articles from '../api-reference/components/articles/articles';
 import PageNav from '../api-reference/components/nav/desktop-page-nav';
+import groupBySubsection from '../api-reference/components/nav/utils/group-by-section';
 import useHydrateArticles from '../api-reference/hooks/use-hydrate-articles';
 import getArticles from '../api-reference/utils/get-articles';
 
@@ -22,12 +23,12 @@ const ApiReference = () => {
     {
       title: t('sections.hosted'),
       isPreview: true,
-      articles: hostedArticles,
+      subsections: groupBySubsection(hostedArticles),
     },
     {
       title: t('sections.private'),
       isPreview: true,
-      articles: privateArticles,
+      subsections: groupBySubsection(privateArticles),
     },
   ];
   return (

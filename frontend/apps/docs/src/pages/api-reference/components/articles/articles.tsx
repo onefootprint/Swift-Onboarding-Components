@@ -8,11 +8,16 @@ export type ArticlesProps = {
   sections: PageNavSection[];
 };
 
-const Articles = ({ sections }: ArticlesProps) => (
-  <ArticleList id="articles-container">
-    {sections.map(s => s.articles.map(article => <Article key={article.id} article={article} />))}
-  </ArticleList>
-);
+const Articles = ({ sections }: ArticlesProps) => {
+  const articles = sections.flatMap(s => s.subsections).flatMap(s => s.apiArticles);
+  return (
+    <ArticleList id="articles-container">
+      {articles.map(article => (
+        <Article key={article.id} article={article} />
+      ))}
+    </ArticleList>
+  );
+};
 
 const ArticleList = styled.section`
   ${({ theme }) => css`

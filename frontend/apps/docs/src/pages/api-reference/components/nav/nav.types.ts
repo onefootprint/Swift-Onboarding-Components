@@ -29,8 +29,13 @@ export type PageNavProps = {
   sections: PageNavSection[];
 };
 
+export type SubSection = {
+  title: string;
+  apiArticles: HydratedArticle[];
+};
+
 export type PageNavSection = {
   title: string;
   isPreview: boolean;
-  articles: HydratedArticle[];
+  subsections: SubSection[];
 };
