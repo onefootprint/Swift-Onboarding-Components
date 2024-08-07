@@ -42,19 +42,23 @@ const PageNav = ({ sections }: PageNavProps) => {
               {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
               {s.title}
             </SectionTitle>
-            {s.subsections.map(({ title, apiArticles }) => (
-              <Group key={title}>
-                <NavigationSectionTitle>{title}</NavigationSectionTitle>
-                {apiArticles.map(({ method, path, id }) => (
-                  <NavigationScrollLink id={id}>
-                    <Stack justify="center">
-                      <TypeBadge skinny type={method} />
-                    </Stack>
-                    <PathLabel ref={overflowRef}>{path}</PathLabel>
-                  </NavigationScrollLink>
-                ))}
-              </Group>
-            ))}
+            {s.subsections
+              .filter(s => s.apiArticles.some(a => !a.isHidden))
+              .map(({ title, apiArticles }) => (
+                <Group key={title}>
+                  <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                  {apiArticles
+                    .filter(a => !a.isHidden)
+                    .map(({ method, path, id }) => (
+                      <NavigationScrollLink id={id}>
+                        <Stack justify="center">
+                          <TypeBadge skinny type={method} />
+                        </Stack>
+                        <PathLabel ref={overflowRef}>{path}</PathLabel>
+                      </NavigationScrollLink>
+                    ))}
+                </Group>
+              ))}
             {i !== sections.length - 1 && <Divider />}
           </React.Fragment>
         ))}

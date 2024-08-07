@@ -77,6 +77,7 @@ const Cmd = ({ sections }: PageNavProps) => {
             {sections.flatMap(({ subsections }) =>
               subsections
                 .flatMap(s => s.apiArticles)
+                .filter(a => !a.isHidden)
                 .flatMap(({ parameters = [], id }) =>
                   parameters.map(parameter => (
                     <Option onSelect={() => handleScroll(id)} key={id}>

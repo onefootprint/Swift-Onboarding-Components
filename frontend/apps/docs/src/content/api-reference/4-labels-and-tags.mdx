@@ -1,16 +1,19 @@
 ---
-page: api-reference
-title: Users
+title: Labels and tags
 apis:
 - method: post
-  path: /users
-- method: post
-  path: /users/search
+  path: /users/{fp_id}/tags
 - method: get
-  path: /users/{fp_id}
+  path: /users/{fp_id}/tags
+- method: delete
+  path: /users/{fp_id}/tags/{tag_id}
+- method: post
+  path: /users/{fp_id}/label
+- method: get
+  path: /users/{fp_id}/label
 ---
 
-## Users
+# Labels and tags
 
 TODO lots of fun content about users here.
 

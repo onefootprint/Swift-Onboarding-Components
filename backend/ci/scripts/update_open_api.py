@@ -198,6 +198,7 @@ if __name__ == "__main__":
     specs = [
         (["PublicApi"], "api-docs.json"),
         (["Preview", "PhasedOut"], "api-preview-docs.json"),
+        (["PublicApi", "Preview", "PhasedOut"], "public-api-docs.json"),
         (["Hosted"], "hosted-api-docs.json"),
         (["Private"], "private-api-docs.json"),
     ]

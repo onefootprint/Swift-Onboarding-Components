@@ -8,19 +8,17 @@ import { SubSection } from '../nav.types';
  */
 const groupBySubsection = (apiArticles: HydratedArticle[]) => {
   const sections: SubSection[] = [];
-  apiArticles
-    .filter(a => !a.isHidden)
-    .forEach(a => {
-      const currentSection = sections.length ? sections[sections.length - 1] : undefined;
-      if (currentSection?.title === a.section) {
-        currentSection.apiArticles.push(a);
-      } else {
-        sections.push({
-          title: a.section,
-          apiArticles: [a],
-        });
-      }
-    });
+  apiArticles.forEach(a => {
+    const currentSection = sections.length ? sections[sections.length - 1] : undefined;
+    if (currentSection?.title === a.section) {
+      currentSection.apiArticles.push(a);
+    } else {
+      sections.push({
+        title: a.section,
+        apiArticles: [a],
+      });
+    }
+  });
   return sections;
 };
 
