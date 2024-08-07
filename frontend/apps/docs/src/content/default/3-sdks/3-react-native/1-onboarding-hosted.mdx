@@ -6,14 +6,14 @@ subcategory: React Native
 title: Onboarding (Hosted flow)
 meta:
   {
-    title: 'Footprint React Native Integration',
-    description: 'Discover how to integrate Footprint with a React Native Codebase',
+    title: "Footprint React Native Integration",
+    description: "Discover how to integrate Footprint with a React Native Codebase",
   }
 ---
 
 ## Getting started
 
-This guide explains how to integrate the Footprint onboarding flow for KYC (Know Your Customer) and KYB (Know Your Business) into your React Native applications. This is our *Hosted* integration, meaning that Footprint's flow will 
+This guide explains how to integrate the Footprint onboarding flow for KYC (Know Your Customer) and KYB (Know Your Business) into your React Native applications. This is our _Hosted_ integration, meaning that Footprint's flow will
 be executed in a Webview, and hence, it's our most simple and quick integration.
 
 1. **Access Your Dashboard**:
@@ -62,21 +62,21 @@ Footprint provides some events based on some actions performed by the user. To l
 
 ```typescript
 const component = footprint.init({
-  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-  onComplete: validationToken => {
+  publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+  onComplete: (validationToken) => {
     console.log(validationToken);
   },
-  onError: error => {
+  onError: (error) => {
     console.log(error);
   },
-  onAuth: validationToken => {
+  onAuth: (validationToken) => {
     console.log(validationToken);
   },
   onCancel: () => {
-    console.log('User canceled the flow');
+    console.log("User canceled the flow");
   },
   onClose: () => {
-    console.log('User closed the flow');
+    console.log("User closed the flow");
   },
 });
 
@@ -129,16 +129,16 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 
 ```typescript
 const component = footprint.init({
-  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-  onComplete: validationToken => {
+  publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+  onComplete: (validationToken) => {
     console.log(validationToken);
   },
   appearance: {
     variables: {
-      borderRadius: '8px',
-      colorSuccess: '#10b981',
-      colorError: '#F87171',
-      buttonPrimaryBg: '#5550e9',
+      borderRadius: "8px",
+      colorSuccess: "#10b981",
+      colorError: "#F87171",
+      buttonPrimaryBg: "#5550e9",
     },
   },
 });
@@ -154,11 +154,12 @@ For more information, including a list of available variables, check out the [cu
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
 | `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
-| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
+| `redirectUrl`   | Required. The deep link so that the user can go back to your app after finishing the flow. E.g: footprint://callback/                                                                                                           |
+| `onComplete`    | Optional. Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                 |
 | `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
-| `onCancel`      | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                     |
-| `onClose`       | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                         |
-| `bootstrapData` | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](/integrate/bootstrap-data).                                       |
-| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/integrate/customization#available-options)                         |
-| `appearance`    | Optional. An object that customizes the look of your integration. More info [here](/integrate/customization)                                                                                       |
-| `l10n`          | Optional. Specifies the desired localization. More information [here](/integrate/customization#localization-configuration).                                                                        |
+| `onCancel`      | Optional. Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                           |
+| `onClose`       | Optional. Triggered when the user closes the flow (either completed or canceled).                                                                                                                                               |
+| `bootstrapData` | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](/integrate/bootstrap-data).                                                                    |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/integrate/customization#available-options)                                                      |
+| `appearance`    | Optional. An object that customizes the look of your integration. More info [here](/integrate/customization)                                                                                                                    |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](/integrate/customization#localization-configuration).                                                                                                     |

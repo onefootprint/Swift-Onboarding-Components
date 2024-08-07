@@ -21,6 +21,7 @@ export type WithPublicKey = { publicKey: string; authToken?: never };
 
 export type VerifyProps = BaseComponentProps & {
   readonly bootstrapData?: BootstrapData;
+  readonly redirectUrl: string;
   readonly onAuth?: (validationToken: string) => void;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;

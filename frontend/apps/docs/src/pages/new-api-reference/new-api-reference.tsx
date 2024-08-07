@@ -7,12 +7,12 @@ import Cmd from '../api-reference/components/cmd';
 import DesktopPageNav from '../api-reference/components/nav/desktop-page-nav';
 import MobilePageNav from '../api-reference/components/nav/mobile-page-nav';
 
+import getSectionMeta from 'src/utils/section';
 import staticApiData from '../api-reference/assets/public-api-docs.json';
 import useHydrateArticles from '../api-reference/hooks';
 import getArticles from '../api-reference/utils/get-articles';
 import Articles from './components/articles';
 import { ApiArticleProps, ApiReferenceArticle } from './index.page';
-import getSectionMeta from 'src/utils/section';
 
 const staticApiArticles = getArticles(staticApiData);
 

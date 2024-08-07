@@ -11,13 +11,17 @@ export type ContextData = {
   locale?: SupportedLocale;
   onboardingConfig?: PublicOnboardingConfig;
   publicKey: string;
+  redirectUrl?: string;
   sandboxId?: string;
   sandboxOutcome: SandboxOutcome;
   step: OnboardingStep;
   vaultingToken?: string;
 };
 
-export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxId'> & {
+export type ProviderProps = Pick<
+  ContextData,
+  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxId' | 'redirectUrl'
+> & {
   children?: React.ReactNode;
   sandboxOutcome?: SandboxOutcome;
 };

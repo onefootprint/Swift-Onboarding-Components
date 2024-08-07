@@ -27,9 +27,19 @@ const useOtp = () => {
       onCancel?: () => void;
     } = {},
   ) => {
+    const { appearance, publicKey, redirectUrl } = context;
+
+    if (!publicKey) {
+      throw new Error('No publicKey found. Please make sure to set the publicKey first');
+    }
+    if (!redirectUrl) {
+      throw new Error('No redirectUrl found. Please make sure to set the redirectUrl first');
+    }
+
     const component = fp.init({
-      appearance: context.appearance,
-      publicKey: context.publicKey,
+      appearance,
+      publicKey,
+      redirectUrl,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,

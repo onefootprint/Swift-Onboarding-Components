@@ -38,14 +38,20 @@ const useFootprint = () => {
     onError?: (error: unknown) => void;
     onCancel?: () => void;
   } = {}) => {
-    const { authToken, appearance } = context;
+    const { authToken, appearance, redirectUrl } = context;
     if (!authToken) {
       onError?.(new Error('No authToken found. Please authenticate first'));
       return;
     }
+    if (!redirectUrl) {
+      onError?.(new Error('No redirectUrl found. Please make sure to set the redirectUrl first'));
+      return;
+    }
+
     const component = fp.init({
       appearance,
       authToken,
+      redirectUrl,
       onComplete: (validationToken: string) => {
         onComplete?.(validationToken);
       },
