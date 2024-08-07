@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 import type { SecurityTypes } from '@/api-reference/api-reference.types';
 
+import HeadingAnchor from 'src/components/markdown/components/heading-anchor';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
 import TypeBadge from '../../../type-badge/type-badge';
 import SideBySideElement from '../side-by-side-element';
@@ -33,19 +34,21 @@ const Article = ({ article }: ArticleProps) => {
   const contentColumn = (
     <>
       <HeaderContainer>
-        <Stack gap={2}>
-          <TypeBadge type={method} />
-          <Stack direction="row" gap={1}>
-            <BaseUrlContainer>
-              <Text variant="heading-3" color="tertiary" tag="span">
-                {API_BASE_URL}
+        <HeadingAnchor id={article.id} variant="heading-3" tag="h3">
+          <Stack gap={2}>
+            <TypeBadge type={method} />
+            <Stack direction="row" gap={1}>
+              <BaseUrlContainer>
+                <Text variant="heading-3" color="tertiary" tag="span">
+                  {API_BASE_URL}
+                </Text>
+              </BaseUrlContainer>
+              <Text variant="heading-3" tag="h3">
+                {path}
               </Text>
-            </BaseUrlContainer>
-            <Text variant="heading-3" tag="h3">
-              {path}
-            </Text>
+            </Stack>
           </Stack>
-        </Stack>
+        </HeadingAnchor>
         <Tags article={article} />
       </HeaderContainer>
       {description && <Description>{description}</Description>}

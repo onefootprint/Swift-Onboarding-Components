@@ -2,6 +2,7 @@ import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { Link } from 'react-scroll';
 import styled, { css } from 'styled-components';
+import { ARTICLES_CONTAINER_ID } from '../../../articles/articles';
 
 type NavigationScrollLinkProps = {
   id: string;
@@ -12,12 +13,12 @@ type NavigationScrollLinkProps = {
 const NavigationScrollLink = ({ id, children, onClick }: NavigationScrollLinkProps) => (
   <StyledLink
     activeClass="active"
-    containerId="articles-container"
+    containerId={ARTICLES_CONTAINER_ID}
     hashSpy
     spy
     data-id={id}
-    to={encodeURIComponent(id)}
-    smooth
+    to={id}
+    href={`#${id}`}
     onClick={onClick}
   >
     {children}

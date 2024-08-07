@@ -7,7 +7,6 @@ import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 import styled, { css } from 'styled-components';
 
-import { useRouter } from 'next/router';
 import TypeBadge from '../../type-badge';
 import NavigationScrollLink from '../components/navigation-scroll-link';
 import { PageNavProps } from '../nav.types';
@@ -19,7 +18,6 @@ const PageNav = ({ sections }: PageNavProps) => {
   const navInnerScrollRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
 
   const handleToggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
@@ -45,10 +43,8 @@ const PageNav = ({ sections }: PageNavProps) => {
     setIsOpen(!isOpen);
   };
 
-  const handleLinkClick = (path: string) => {
+  const handleLinkClick = () => {
     handleToggleMenu();
-    const sectionId = path.split('#')[1];
-    router.push(`/api-reference#${sectionId}`);
   };
 
   return (
@@ -77,7 +73,7 @@ const PageNav = ({ sections }: PageNavProps) => {
                     <NavigationSectionTitle>{title}</NavigationSectionTitle>
                     {apiArticles.map(({ method, path, id }) => (
                       <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
-                        <NavigationScrollLink id={id} onClick={() => handleLinkClick(path)}>
+                        <NavigationScrollLink id={id} onClick={handleLinkClick}>
                           <Stack justify="center">
                             <TypeBadge skinny type={method} />
                           </Stack>

@@ -8,10 +8,12 @@ export type ArticlesProps = {
   sections: PageNavSection[];
 };
 
+export const ARTICLES_CONTAINER_ID = 'articles-container';
+
 const Articles = ({ sections }: ArticlesProps) => {
   const articles = sections.flatMap(s => s.subsections).flatMap(s => s.apiArticles);
   return (
-    <ArticleList id="articles-container">
+    <ArticleList id={ARTICLES_CONTAINER_ID}>
       {articles.map(article => (
         <Article key={article.id} article={article} />
       ))}
