@@ -1,5 +1,5 @@
 import { IcoClose16, IcoCode216, IcoFlask16, IcoMenu16 } from '@onefootprint/icons';
-import { Divider, Stack, Text, ThemeToggle, Tooltip, createFontStyles, media } from '@onefootprint/ui';
+import { Divider, Stack, Text, ThemeToggle, createFontStyles, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
@@ -10,8 +10,6 @@ import styled, { css } from 'styled-components';
 import TypeBadge from '../../type-badge';
 import NavigationScrollLink from '../components/navigation-scroll-link';
 import { PageNavProps } from '../nav.types';
-
-const CHARACTER_LIMIT_FOR_TOOLTIP = 35;
 
 const PageNav = ({ sections }: PageNavProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,13 +29,6 @@ const PageNav = ({ sections }: PageNavProps) => {
   };
 
   const overflowRef = useRef<HTMLSpanElement>(null);
-
-  const analyzeLength = (path: string) => {
-    if (path.length > CHARACTER_LIMIT_FOR_TOOLTIP) {
-      return false;
-    }
-    return true;
-  };
 
   const handleToggleMenu = () => {
     setIsOpen(!isOpen);
@@ -72,14 +63,12 @@ const PageNav = ({ sections }: PageNavProps) => {
                   <Group key={title}>
                     <NavigationSectionTitle>{title}</NavigationSectionTitle>
                     {apiArticles.map(({ method, path, id }) => (
-                      <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
-                        <NavigationScrollLink id={id} onClick={handleLinkClick}>
-                          <Stack justify="center">
-                            <TypeBadge skinny type={method} />
-                          </Stack>
-                          <PathLabel ref={overflowRef}>{path}</PathLabel>
-                        </NavigationScrollLink>
-                      </Tooltip>
+                      <NavigationScrollLink id={id} onClick={handleLinkClick}>
+                        <Stack justify="center">
+                          <TypeBadge skinny type={method} />
+                        </Stack>
+                        <PathLabel ref={overflowRef}>{path}</PathLabel>
+                      </NavigationScrollLink>
                     ))}
                   </Group>
                 ))}
