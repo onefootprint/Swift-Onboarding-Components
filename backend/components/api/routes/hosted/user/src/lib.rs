@@ -22,7 +22,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(vault::patch::post_validate)
         .service(vault::decrypt::post)
         .service(auth_requirements::get)
-        .service(access_events::get)
         .service(authorized_orgs::get)
         .service(token::get)
         .service(token::post)
