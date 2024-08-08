@@ -41,9 +41,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
-        <Dropdown.Trigger aria-label="Account">
+        <StyledTrigger aria-label="Account">
           <IcoDotsHorizontal16 testID="nav-dropdown-button" />
-        </Dropdown.Trigger>
+        </StyledTrigger>
         {isOpen && (
           <NavDropdownContent sideOffset={8} $noPadding>
             <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
@@ -112,6 +112,13 @@ const StyledLink = styled(Dropdown.Item)`
 
 const LogoutIcon = styled(IcoLogOut24)`
   margin-left: -3px;
+`;
+
+const StyledTrigger = styled(Dropdown.Trigger)`
+  ${({ theme }) => css`
+    width: ${theme.spacing[7]};
+    height: ${theme.spacing[7]};
+  `}
 `;
 
 export default NavDropdown;

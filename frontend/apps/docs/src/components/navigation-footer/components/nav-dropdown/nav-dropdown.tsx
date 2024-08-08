@@ -34,9 +34,9 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
-        <Dropdown.Trigger aria-label="Account">
+        <StyledTrigger aria-label="Account">
           <IcoDotsHorizontal16 testID="nav-dropdown-button" />
-        </Dropdown.Trigger>
+        </StyledTrigger>
         {isOpen && (
           <NavDropdownContent sideOffset={8} $noPadding>
             <UserDropdownItem>
@@ -118,6 +118,13 @@ const LogoutIcon = styled(IcoLogOut24)`
 const LogoutContainer = styled(Dropdown.Item)`
   ${({ theme }) => css`
     gap: ${theme.spacing[2]};
+  `}
+`;
+
+const StyledTrigger = styled(Dropdown.Trigger)`
+  ${({ theme }) => css`
+    width: ${theme.spacing[7]};
+    height: ${theme.spacing[7]};
   `}
 `;
 

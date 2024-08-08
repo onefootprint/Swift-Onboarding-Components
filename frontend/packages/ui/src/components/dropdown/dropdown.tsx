@@ -12,6 +12,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
 
     if ($asButton) {
       return css`
+        all: unset;
         align-items: center;
         background-color: ${button.variant.secondary.bg};
         border-color: ${button.variant.secondary.borderColor};
@@ -20,8 +21,11 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
         border-width: ${button.borderWidth};
         cursor: pointer;
         display: flex;
-        height: 32px;
-        padding: 0 ${theme.spacing[2]};
+        align-items: center;
+        justify-content: center;
+        height: ${button.size.default.height};
+        width: ${button.size.default.height};
+        border-radius: ${button.borderRadius};
         user-select: none;
 
         &:hover:enabled {
@@ -50,17 +54,14 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
     }
 
     return css`
+      all: unset;
       align-items: center;
       background: none;
       border-radius: ${theme.borderRadius.sm};
       border: none;
       cursor: pointer;
       display: flex;
-      height: 24px;
       justify-content: center;
-      margin: 0;
-      padding: 0;
-      width: 24px;
 
       &[data-state='open'] {
         background-color: ${theme.backgroundColor.senary};
