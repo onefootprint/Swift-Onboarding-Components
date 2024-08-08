@@ -1,4 +1,3 @@
-mod access_event;
 mod actor;
 mod annotation;
 mod audit_event;

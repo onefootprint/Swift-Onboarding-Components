@@ -1,6 +1,5 @@
 use paperclip::actix::web;
 
-mod access_events;
 mod attest_device;
 mod auth_methods;
 mod auth_requirements;

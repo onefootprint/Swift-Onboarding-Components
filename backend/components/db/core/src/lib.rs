@@ -31,7 +31,6 @@ use diesel::prelude::*;
 use errors::TransactionError;
 use std::time::Duration;
 
-pub mod access_event;
 pub mod actor;
 mod has_lifetime;
 pub mod scoped_vault;

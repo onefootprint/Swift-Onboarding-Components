@@ -1,4 +1,3 @@
-mod access_events;
 mod api_keys;
 mod app_meta;
 mod audit_events;
