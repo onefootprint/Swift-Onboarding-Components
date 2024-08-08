@@ -50,6 +50,8 @@ export const isGranted = (x?: string): boolean => x === 'granted';
 export const isDesktop = (x: unknown): x is 'desktop' => x === 'desktop';
 export const isDocument = (x: unknown): x is 'document' => x !== 'face';
 export const isFace = (x: unknown): x is 'face' => x === 'face';
+export const isFront = (x: unknown): x is 'front' => x === 'front';
+export const isSelfie = (x: unknown): x is 'selfie' => x === 'selfie';
 
 export const isIOS = (x?: string): boolean => !!x && /iOS/i.test(x);
 export const isSafari = (x?: string): boolean => !!x && /Safari/i.test(x);

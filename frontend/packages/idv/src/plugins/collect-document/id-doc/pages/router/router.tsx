@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useLogStateMachine } from '../../../../../hooks';
 import CameraAccessDenied from '../../../components/camera-access-denied';
 import CameraAccessRequest from '../../../components/camera-access-request';
+import CaptureRetryPrompt from '../../components/capture-retry-prompt';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import BackPhotoCapture from '../back-photo-capture';
 import DesktopBackPhoto from '../desktop-back-photo';
@@ -15,15 +16,12 @@ import DesktopSelfie from '../desktop-selfie';
 import DesktopSelfieFallbackUpload from '../desktop-selfie-fallback-upload';
 import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
-import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
-import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
 import MobileBackPhotoFallbackUpload from '../mobile-back-photo-fallback-upload';
 import MobileFrontPhotoFallbackUpload from '../mobile-front-photo-fallback-upload';
 import MobileSelfieFallbackUpload from '../mobile-selfie-fallback-upload';
 import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
-import SelfieRetryPrompt from '../selfie-retry-prompt';
 
 type RouterProps = {
   onDone: () => void;
@@ -71,7 +69,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileFrontImageRetry')) {
-    return <IdDocFrontPhotoRetry />;
+    return <CaptureRetryPrompt imageType="front" onComplete={payload => send({ type: 'receivedImage', payload })} />;
   }
 
   if (state.matches('desktopFrontImage')) {
@@ -91,7 +89,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileBackImageRetry')) {
-    return <IdDocBackPhotoRetry />;
+    return <CaptureRetryPrompt imageType="back" onComplete={payload => send({ type: 'receivedImage', payload })} />;
   }
 
   if (state.matches('desktopBackImage')) {
@@ -111,7 +109,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileSelfieImageRetry')) {
-    return <SelfieRetryPrompt />;
+    return <CaptureRetryPrompt imageType="selfie" onComplete={payload => send({ type: 'receivedImage', payload })} />;
   }
 
   if (state.matches('desktopSelfieImage')) {

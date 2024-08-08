@@ -12,4 +12,9 @@ const contextWithErrors: MachineContext = {
   ],
 };
 
+export const contextWithSelfieErrors: MachineContext = {
+  ...initialContextDL,
+  errors: [{ errorType: IdDocImageProcessingError.selfieGlare }],
+};
+
 export default contextWithErrors;

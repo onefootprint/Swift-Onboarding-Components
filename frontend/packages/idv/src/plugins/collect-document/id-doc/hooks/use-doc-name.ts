@@ -1,16 +1,13 @@
 import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
-const useDocName = ({
-  docType,
-  imageType,
-}: {
-  docType?: SupportedIdDocTypes;
-  imageType?: IdDocImageTypes;
-}) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'document-flow.id-doc.global',
-  });
+type UseDocNameProps = {
+  docType?: `${SupportedIdDocTypes}`;
+  imageType?: `${IdDocImageTypes}`;
+};
+
+const useDocName = ({ docType, imageType }: UseDocNameProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'document-flow.id-doc.global' });
 
   const getDocName = () => {
     switch (docType) {

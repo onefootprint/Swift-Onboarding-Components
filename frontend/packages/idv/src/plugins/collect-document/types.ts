@@ -36,3 +36,9 @@ type Heic2any = {
   gifInterval?: number | undefined;
 };
 export type Heic2AnyModule = (mod: Heic2any) => Promise<Blob | Blob[]>;
+
+export type ReceivedImagePayload = {
+  captureKind: CaptureKind;
+  extraCompressed: boolean;
+  imageFile: File | Blob;
+};
