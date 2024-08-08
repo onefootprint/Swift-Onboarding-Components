@@ -85,7 +85,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/getting-started/introduction',
+        destination: '/articles/getting-started/introduction',
         permanent: true,
       },
     ];

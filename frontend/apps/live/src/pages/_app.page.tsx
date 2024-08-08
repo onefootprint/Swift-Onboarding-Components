@@ -55,6 +55,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: ${defaultFont.style.fontFamily};
     --font-family-default: ${defaultFont.style.fontFamily};
     --font-family-code: ${codeFont.style.fontFamily};
+   }
 `;
 
 export default App;

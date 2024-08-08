@@ -1,7 +1,7 @@
 import type { ParsedUrlQuery } from 'querystring';
 import type { GetStaticProps } from 'next';
 
-import { getAllArticles, getArticleBySlug, getNavigationByPage } from '../../utils/articles';
+import { getAllArticles, getArticleBySlug, getNavigationByPage } from '../../../utils/articles';
 
 export async function getStaticPaths() {
   const pages = await getAllArticles();
@@ -14,12 +14,12 @@ type Params = ParsedUrlQuery & {
 };
 
 export const getStaticProps: GetStaticProps<Record<string, unknown>, Params> = async context => {
-  const { page, title } = context.params!;
-  if (!page || !title) {
+  const { category, title } = context.params!;
+  if (!category || !title) {
     return { notFound: true };
   }
 
-  const slug = `/${page}/${title}`;
+  const slug = `/articles/${category}/${title}`;
   const article = await getArticleBySlug(slug);
   if (!article) {
     return { notFound: true };
@@ -44,4 +44,4 @@ export const getStaticProps: GetStaticProps<Record<string, unknown>, Params> = a
   };
 };
 
-export { default } from 'src/components/article';
+export { default } from '../articles';

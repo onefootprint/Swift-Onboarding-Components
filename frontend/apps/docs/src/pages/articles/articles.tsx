@@ -1,23 +1,21 @@
 import { media } from '@onefootprint/ui';
-import React from 'react';
-import Cmd from 'src/pages/docs/components/cmd/cmd';
+import ArticleContent from 'src/components/article';
 import type { Article } from 'src/types/article';
-import type { PageNavigation } from 'src/types/page';
+import type { Page } from 'src/types/page';
 import styled, { css } from 'styled-components';
-
 import Page404 from '../404/404';
 import AppHeader from './components/app-header';
+import Cmd from './components/cmd';
 import DesktopNav from './components/nav/desktop-nav';
 import MobileNav from './components/nav/mobile-nav';
 import Sections from './components/sections';
 
-type DocsProps = {
-  children: React.ReactNode;
+type ArticlesProps = {
   article: Article;
-  navigation: PageNavigation;
+  page: Page;
 };
 
-const Docs = ({ children, navigation, article }: DocsProps) => {
+const Articles = ({ article, page: { navigation } }: ArticlesProps) => {
   return article ? (
     <>
       <AppHeader>
@@ -25,8 +23,9 @@ const Docs = ({ children, navigation, article }: DocsProps) => {
       </AppHeader>
       <Main>
         <DesktopNav navigation={navigation} />
-        {/* Content here is the ArticlePage from [title].page.tsx */}
-        <Content>{children}</Content>
+        <Content>
+          <ArticleContent article={article} />
+        </Content>
         <GridAssigner>
           <Sections sections={article.data.sections} />
         </GridAssigner>
@@ -77,4 +76,4 @@ const GridAssigner = styled.div`
   grid-area: sections;
 `;
 
-export default Docs;
+export default Articles;
