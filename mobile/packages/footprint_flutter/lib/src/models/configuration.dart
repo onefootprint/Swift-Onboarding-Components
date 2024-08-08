@@ -10,6 +10,9 @@ class FootprintConfiguration {
   final FootprintOptions? options;
   final FootprintBootstrapData? bootstrapData;
   final Function(String)? onComplete;
+  final Function({required String authToken, required String vaultingToken})?
+      onAuthComplete;
+  final Function(Object)? onError;
   final String? authToken;
   final String? publicKey;
   final String redirectUrl;
@@ -21,6 +24,8 @@ class FootprintConfiguration {
     this.l10n,
     this.onCancel,
     this.onComplete,
+    this.onAuthComplete,
+    this.onError,
     this.options,
     this.publicKey,
     required this.redirectUrl,
