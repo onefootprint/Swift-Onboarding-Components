@@ -131,6 +131,63 @@ class FootprintBootstrapData {
     map.removeWhere((key, value) => value == null);
     return map;
   }
+
+  FootprintBootstrapData setField(String key, dynamic value) {
+    return FootprintBootstrapData(
+      email: key == 'id.email' ? value : email,
+      phoneNumber: key == 'id.phone_number' ? value : phoneNumber,
+      firstName: key == 'id.first_name' ? value : firstName,
+      middleName: key == 'id.middle_name' ? value : middleName,
+      lastName: key == 'id.last_name' ? value : lastName,
+      dob: key == 'id.dob' ? value : dob,
+      addressLine1: key == 'id.address_line1' ? value : addressLine1,
+      addressLine2: key == 'id.address_line2' ? value : addressLine2,
+      city: key == 'id.city' ? value : city,
+      state: key == 'id.state' ? value : state,
+      country: key == 'id.country' ? value : country,
+      zip: key == 'id.zip' ? value : zip,
+      ssn9: key == 'id.ssn9' ? value : ssn9,
+      ssn4: key == 'id.ssn4' ? value : ssn4,
+      nationality: key == 'id.nationality' ? value : nationality,
+      usLegalStatus: key == 'id.us_legal_status' ? value : usLegalStatus,
+      citizenships: key == 'id.citizenships' ? value : citizenships,
+      visaKind: key == 'id.visa_kind' ? value : visaKind,
+      visaExpirationDate:
+          key == 'id.visa_expiration_date' ? value : visaExpirationDate,
+      itin: key == 'id.itin' ? value : itin,
+      usTaxId: key == 'id.us_tax_id' ? value : usTaxId,
+      driversLicenseNumber:
+          key == 'id.drivers_license_number' ? value : driversLicenseNumber,
+      driversLicenseState:
+          key == 'id.drivers_license_state' ? value : driversLicenseState,
+      businessAddressLine1:
+          key == 'business.address_line1' ? value : businessAddressLine1,
+      businessAddressLine2:
+          key == 'business.address_line2' ? value : businessAddressLine2,
+      businessBeneficialOwners: key == 'business.beneficial_owners'
+          ? value
+          : businessBeneficialOwners,
+      businessCity: key == 'business.city' ? value : businessCity,
+      businessCorporationType:
+          key == 'business.corporation_type' ? value : businessCorporationType,
+      businessCountry: key == 'business.country' ? value : businessCountry,
+      businessDba: key == 'business.dba' ? value : businessDba,
+      businessFormationDate:
+          key == 'business.formation_date' ? value : businessFormationDate,
+      businessFormationState:
+          key == 'business.formation_state' ? value : businessFormationState,
+      businessKycedBeneficialOwners: key == 'business.kyced_beneficial_owners'
+          ? value
+          : businessKycedBeneficialOwners,
+      businessName: key == 'business.name' ? value : businessName,
+      businessPhoneNumber:
+          key == 'business.phone_number' ? value : businessPhoneNumber,
+      businessState: key == 'business.state' ? value : businessState,
+      businessTin: key == 'business.tin' ? value : businessTin,
+      businessWebsite: key == 'business.website' ? value : businessWebsite,
+      businessZip: key == 'business.zip' ? value : businessZip,
+    );
+  }
 }
 
 class BusinessBeneficialOwners {

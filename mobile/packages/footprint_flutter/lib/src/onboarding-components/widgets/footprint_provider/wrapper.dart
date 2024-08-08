@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
-import 'package:footprint_flutter/src/onboarding-components/provider/provider_notifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 
 class Wrapper extends ConsumerStatefulWidget {
   final Widget child;

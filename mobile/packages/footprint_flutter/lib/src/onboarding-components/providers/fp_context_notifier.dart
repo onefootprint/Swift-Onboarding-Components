@@ -3,7 +3,7 @@ import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'provider_notifier.g.dart';
+part 'fp_context_notifier.g.dart';
 
 @riverpod
 class FpContextNotifier extends _$FpContextNotifier {
