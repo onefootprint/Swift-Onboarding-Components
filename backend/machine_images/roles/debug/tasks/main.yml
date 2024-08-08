@@ -1,0 +1,5 @@
+- name: Install debugging tools
+  dnf:
+    name: nc
+    state: present
+

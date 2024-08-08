@@ -1,0 +1,13 @@
+[Unit]
+Description=enclave-runner
+Wants=fetch-enclave-binaries.service cloud-final.service
+After=fetch-enclave-binaries.service cloud-final.service
+
+[Service]
+User=root
+ExecStart="/usr/local/bin/enclave-runner.sh"
+Restart=always
+SyslogIdentifier=enclave-runner
+
+[Install]
+WantedBy=multi-user.target

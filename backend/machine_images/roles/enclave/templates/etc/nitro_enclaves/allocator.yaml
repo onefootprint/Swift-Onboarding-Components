@@ -1,0 +1,3 @@
+---
+memory_mib: {{ enclave_allocator_memory_mib }}
+cpu_count: {{ enclave_cpu_count }}

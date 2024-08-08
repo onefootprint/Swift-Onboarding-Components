@@ -71,6 +71,7 @@ export interface StaticSecrets {
   neuroIdApiKeyTest: aws.ssm.Parameter;
   openaiApiKey: aws.ssm.Parameter;
   datadogApiKey: aws.secretsmanager.Secret;
+  datadogApiKeySecretName: string;
   sambaSafetyApiKey: aws.ssm.Parameter;
   sambaSafetyBaseUrl: aws.ssm.Parameter;
   sambaSafetyAuthUsername: aws.ssm.Parameter;
@@ -282,6 +283,7 @@ export async function LoadSecrets(
   const enclaveProxySecretName = `enclaveProxySecret-${stack}`;
 
   const datadogApiKey = config.requireSecret('datadogApiKey');
+  const datadogApiKeySecretName = `datadog-api-key-${stack}`;
 
   return {
     secretsPolicyArn: secretsPolicy.arn,
@@ -517,9 +519,10 @@ export async function LoadSecrets(
     ),
     // Datadog Forwarder Lambda needs a Secrets Manager secret.
     datadogApiKey: createSecretsManagerSecret(
-      `datadog-api-key2-${stack}`,
+      datadogApiKeySecretName,
       datadogApiKey,
     ),
+    datadogApiKeySecretName,
     sambaSafetyApiKey: createSecretParameter(
       `sambaSafetyApiKey-${stack}`,
       secretConstants.samba.apiKey,
@@ -547,6 +550,7 @@ function createSecretParameter(
     type: 'SecureString',
     value: secretVal,
     name: `/static_secrets/${name}`,
+    overwrite: true,
     description: name,
   });
 

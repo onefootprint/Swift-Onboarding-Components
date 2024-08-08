@@ -1,0 +1,41 @@
+- name: Add Tailscale repo
+  copy:
+    src: etc/yum.repos.d/tailscale.repo
+    dest: /etc/yum.repos.d/tailscale.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Tailscale
+  dnf:
+    name: tailscale
+    state: present
+    update_cache: yes
+
+- name: Enable Tailscale on startup
+  systemd:
+    name: tailscaled
+    enabled: yes
+    state: stopped
+
+- name: Install tailscale-connect script
+  copy:
+    src: usr/local/bin/tailscale-connect.sh
+    dest: /usr/local/bin/tailscale-connect.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install tailscale-connect systemd service
+  copy:
+    src: etc/systemd/system/tailscale-connect.service
+    dest: /etc/systemd/system/tailscale-connect.service
+    owner: root
+    group: root
+
+- name: Enable tailscale-connect systemd service
+  systemd:
+    name: tailscale-connect
+    enabled: yes
+    state: stopped
+

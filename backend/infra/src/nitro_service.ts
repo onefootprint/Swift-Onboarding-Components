@@ -131,6 +131,7 @@ export async function CreateNitroService(
     provider,
     `/static_secrets/${g.secretsStore.enclaveProxySecretName}`,
     tsKeySecretName,
+    `static_secrets/${g.secretsStore.datadogApiKeySecretName}`,
   );
 
   const launchTemplate = new aws.ec2.LaunchTemplate(
@@ -149,9 +150,7 @@ export async function CreateNitroService(
       enclaveOptions: {
         enabled: true,
       },
-      // TODO: build our own AMI with pre-installed dependencies
-      // to optimize startup!
-      imageId: 'ami-0fec9863172e50c93',
+      imageId: 'ami-0c9be5c48757e9518',
       iamInstanceProfile: {
         arn: instanceProfile.arn,
       },
@@ -168,6 +167,14 @@ export async function CreateNitroService(
       ],
 
       vpcSecurityGroupIds: [instanceSecurityGroup.id],
+      tagSpecifications: [
+        {
+          resourceType: 'instance',
+          tags: {
+            'env': pulumi.getStack(),
+          },
+        },
+      ],
       tags: {
         name: serviceName,
       },
@@ -320,6 +327,7 @@ function createInstanceRole(
   provider: pulumi.ProviderResource,
   enclaveProxySecretName: string,
   tailscaleSecretName: string,
+  datadogApiKeySecretName: string,
 ): aws.iam.InstanceProfile {
   const instanceRole = new aws.iam.Role(`nitro-instance-role-${region}`, {
     assumeRolePolicy: {
@@ -390,6 +398,11 @@ function createInstanceRole(
               Effect: 'Allow',
               Resource: `arn:aws:ssm:*:*:parameter${tailscaleSecretName}`,
             },
+            {
+              Action: ['secretsmanager:GetSecretValue'],
+              Effect: 'Allow',
+              Resource: `arn:aws:secretsmanager:*:*:secret:${datadogApiKeySecretName}-*`,
+            },
           ],
         }),
       },
@@ -406,7 +419,7 @@ function createInstanceRole(
 }
 
 /**
- * This is the "user_data" for booting up an EC2 machine to run our Nitro Enclave + P
+ * This is the cloud-init script for injecting secrets and other runtime config into nitro EC2 instances.
  */
 async function userData(
   constants: Config,
@@ -422,222 +435,30 @@ async function userData(
   const hostName = `enclavebox-${stack.shortStackName}`;
   const resources = constants.enclave.resources;
 
-  // nitro-cli doesn't let you take all the RAM you ask for from the allocator - I guess it also counts
-  // the size of the binary and other things that the enclave needs against you. So, we subtract
-  // a fixed amount of memory out of what you requested
-  const BUFFER_FOR_ENCLAVE = 256;
-
-  const actualEnclaveMemory = resources.memory - BUFFER_FOR_ENCLAVE;
-  if (actualEnclaveMemory < 256) {
-    throw `${BUFFER_FOR_ENCLAVE} MiB of memory are reserved for the enclave, so your provided enclave memory is too low. Please make sure your requested enclave memory - ${BUFFER_FOR_ENCLAVE} >= 256`;
-  }
-
   // TODO: if enclave unhealthy after restart fail health check on ASG.
-  return `
-#!/bin/bash
+  return `#!/bin/bash
+
 set -euxo pipefail
 
-sudo yum update -y
-sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
-sudo yum install aws-nitro-enclaves-cli-devel -y
-sudo yum install -y aws-cli
-sudo yum install -y jq yum-utils httpd-tools
+sed -i "s/api_key:.*/api_key: $(aws secretsmanager get-secret-value --secret-id static_secrets/${secretsStore.datadogApiKeySecretName} --query SecretString --output text)/" /etc/datadog-agent/datadog.yaml
 
-# install log agent on ec2 instance
-sudo yum install -y awslogs
-sudo mkdir -p /var/lib/awslogs/state/
+touch /etc/tailscale-connect.env
+chown root:root /etc/tailscale-connect.env
+chmod 640 /etc/tailscale-connect.env
+echo "TAILSCALE_AUTH_KEY_SSM_PARAM=${tailscaleSecretName}" >> /etc/tailscale-connect.env
+echo "TAILSCALE_HOSTNAME_PREFIX=${hostName}" >> /etc/tailscale-connect.env
 
-# Define our log conf files
-# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AgentReference.html
-cat <<'EOF' > /etc/awslogs/awslogs.conf
-[general]
-state_file=/var/lib/awslogs/state/agent-state
+touch /etc/fetch-enclave-binaries.env
+chown root:root /etc/fetch-enclave-binaries.env
+chmod 640 /etc/fetch-enclave-binaries.env
+echo "ECR_ENDPOINT=${ecrEndpoint}" >> /etc/fetch-enclave-binaries.env
+echo "ENCLAVE_IMAGE=${enclaveImage}" >> /etc/fetch-enclave-binaries.env
+echo "ENCLAVE_PROXY_IMAGE=${enclaveProxyImage}" >> /etc/fetch-enclave-binaries.env
 
-[/var/log/awslogs]
-log_group_name=/ec2/${hostName}/awslogs
-log_stream_name={instance_id}
-time_zone=UTC
-file=/var/log/awslogs*
-initial_position=start_of_file
+touch /etc/enclave-proxy.env
+chown root:root /etc/enclave-proxy.env
+chmod 640 /etc/enclave-proxy.env
+echo "ENCLAVE_PROXY_SECRET=$(aws ssm get-parameter --name "/static_secrets/${secretsStore.enclaveProxySecretName}" --with-decryption | jq -r ".Parameter.Value")" >> /etc/enclave-proxy.env
+`;
 
-[/var/log/boot]
-log_group_name=/ec2/${hostName}/boot
-log_stream_name={instance_id}
-time_zone=UTC
-file=/var/log/boot*
-initial_position=start_of_file
-
-[/var/log/nitro_enclaves]
-log_group_name=/ec2/${hostName}/nitro_enclave
-log_stream_name={instance_id}
-time_zone=UTC
-file=/var/log/nitro_enclaves/*
-initial_position=start_of_file
-
-[/var/log/enclave_proxy]
-log_group_name=/ec2/${hostName}/enclave_proxy
-log_stream_name={instance_id}
-time_zone=UTC
-file=/var/log/enclave_proxy.log
-initial_position=start_of_file
-
-[/var/log/cloud-init]
-log_group_name=/ec2/${hostName}/cloud_init
-log_stream_name={instance_id}
-time_zone=UTC
-file=/var/log/cloud-init*.log
-initial_position=start_of_file
-EOF
-
-# start logging daemon
-sudo systemctl start awslogsd
-
-### BEGIN SETUP TAILSCALE ###
-sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
-sudo yum install tailscale nc -y
-sudo systemctl enable --now tailscaled
-
-cat <<'EOF' > /tmp/tailscale_connect.sh
-#!/bin/sh
-tsKey="$(aws --region us-east-1 ssm get-parameter --name '${tailscaleSecretName}' --with-decryption | jq -r '.Parameter.Value')"
-instanceId=$(cat /run/cloud-init/instance-data.json | jq -r '.ds["meta-data"]["instance-id"]')
-
-sudo tailscale up --authkey "$tsKey" --ssh --hostname "${hostName}-$instanceId" --accept-dns=false
-EOF
-
-sudo mv /tmp/tailscale_connect.sh /usr/local/bin/tailscale_connect.sh
-sudo chown root:root /usr/local/bin/tailscale_connect.sh
-sudo chmod +x /usr/local/bin/tailscale_connect.sh
-
-# TODO: Fix systemd dependencies and make this a oneshot service.
-cat <<'EOF' > /tmp/tailscale_connect.service
-[Unit]
-Description=tailscale_connect
-
-[Service]
-User=root
-WorkingDirectory=/
-ExecStart="/usr/local/bin/tailscale_connect.sh"
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo mv /tmp/tailscale_connect.service /etc/systemd/system/tailscale_connect.service
-sudo chown root:root /etc/systemd/system/tailscale_connect.service
-sudo systemctl start tailscale_connect.service && sudo systemctl enable tailscale_connect.service
-
-echo "Starting tailscale"
-/usr/local/bin/tailscale_connect.sh
-sudo tailscale status
-
-### END SETUP TAILSCALE ###
-
-
-# setup enclave
-
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}
-
-# Copy the enclave EIF and proxy binary to the host.
-mkdir /tmp/artifacts
-
-docker run --rm -v /tmp/artifacts:/tmp/artifacts --entrypoint "sh" ${enclaveImage} -c "cp /usr/local/share/enclave.eif /tmp/artifacts/enclave.eif"
-sudo mv /tmp/artifacts/enclave.eif /usr/local/share/enclave.eif
-sudo chown root:root /usr/local/share/enclave.eif
-
-docker run --rm -v /tmp/artifacts:/tmp/artifacts --entrypoint "sh" ${enclaveProxyImage} -c "cp /usr/local/bin/enclave_proxy /tmp/artifacts/enclave_proxy"
-sudo mv /tmp/artifacts/enclave_proxy /usr/local/bin/enclave_proxy
-sudo chown root:root /usr/local/bin/enclave_proxy
-sudo chmod +x /usr/local/bin/enclave_proxy
-
-# Edit the allocator.yaml to support our desired amount of resources
-sudo cat <<'EOF' > /etc/nitro_enclaves/allocator.yaml
----
-memory_mib: ${resources.memory}
-cpu_count: ${resources.cpus}
-EOF
-
-sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service
-sudo systemctl status nitro-enclaves-allocator.service
-sudo systemctl start nitro-enclaves-vsock-proxy.service && sudo systemctl enable nitro-enclaves-vsock-proxy.service
-sudo systemctl status nitro-enclaves-vsock-proxy.service
-
-# setup enclave runner
-cat <<'EOF' > /tmp/enclave_runner.sh
-#!/bin/sh
-RUNNING="RUNNING"
-while :
-do
-	STATUS=$(nitro-cli describe-enclaves | jq -r '.[0]["State"]')
-    if [ "$RUNNING" = "$STATUS" ]; then
-        sleep 1
-    else
-        echo "restarting enclave"
-        sudo nitro-cli run-enclave --eif-path /usr/local/share/enclave.eif --cpu-count ${resources.cpus} --memory ${actualEnclaveMemory} --enclave-cid ${resources.cid}
-        sleep 5
-    fi
-done
-EOF
-
-sudo mv /tmp/enclave_runner.sh /usr/local/bin/enclave_runner.sh
-sudo chown root:root /usr/local/bin/enclave_runner.sh
-sudo chmod +x /usr/local/bin/enclave_runner.sh
-
-cat <<'EOF' > /tmp/enclave_runner.service
-[Unit]
-Description=enclave_runner
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-User=root
-WorkingDirectory=/
-ExecStart="/usr/local/bin/enclave_runner.sh"
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo mv /tmp/enclave_runner.service /etc/systemd/system/enclave_runner.service
-sudo chown root:root /etc/systemd/system/enclave_runner.service
-sudo systemctl start enclave_runner.service && sudo systemctl enable enclave_runner.service
-
-# setup enclave_proxy
-
-sudo echo "ENCLAVE_PROXY_SECRET=$(aws --region us-east-1 ssm get-parameter --name "/static_secrets/${secretsStore.enclaveProxySecretName}" --with-decryption | jq -r ".Parameter.Value")" > /etc/enclave_proxy_environment
-
-sudo echo "RUST_LOG=info" >> /etc/enclave_proxy_environment
-touch /var/log/enclave_proxy.log
-
-cat <<'EOF' > /etc/rsyslog.d/enclave_proxy.conf
-if $programname == 'enclave_proxy' then /var/log/enclave_proxy.log
-& stop
-EOF
-
-sudo systemctl restart rsyslog
-
-cat <<'EOF' > /tmp/enclave_proxy.service
-[Unit]
-Description=enclave_proxy
-
-[Service]
-User=root
-WorkingDirectory=/
-EnvironmentFile=/etc/enclave_proxy_environment
-ExecStart="/usr/local/bin/enclave_proxy"
-Restart=always
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=enclave_proxy
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-
-sudo mv /tmp/enclave_proxy.service /etc/systemd/system/enclave_proxy.service
-sudo chown root:root /etc/systemd/system/enclave_proxy.service
-sudo systemctl start enclave_proxy.service && sudo systemctl enable enclave_proxy.service`;
 }

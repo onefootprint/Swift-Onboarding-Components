@@ -1,0 +1,15 @@
+[Unit]
+Description=enclave-proxy
+Wants=fetch-enclave-binaries.service cloud-final.service
+After=fetch-enclave-binaries.service cloud-final.service
+
+[Service]
+User=root
+ExecStart="/usr/local/bin/enclave_proxy"
+Environment="RUST_LOG=info"
+EnvironmentFile=/etc/enclave-proxy.env
+Restart=always
+SyslogIdentifier=enclave-proxy
+
+[Install]
+WantedBy=multi-user.target

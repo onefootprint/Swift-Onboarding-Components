@@ -1,0 +1,78 @@
+- name: Install nitro-cli
+  dnf:
+    name: aws-nitro-enclaves-cli
+    state: present
+
+- name: Install fetch-enclave-binaries script
+  copy:
+    src: usr/local/bin/fetch-enclave-binaries.sh
+    dest: /usr/local/bin/fetch-enclave-binaries.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install fetch-enclave-binaries systemd service
+  copy:
+    src: etc/systemd/system/fetch-enclave-binaries.service
+    dest: /etc/systemd/system/fetch-enclave-binaries.service
+    owner: root
+    group: root
+
+- name: Enable fetch-enclave-binaries systemd service
+  systemd:
+    name: fetch-enclave-binaries
+    enabled: yes
+    state: stopped
+
+- name: Install nitro-enclaves-allocator config
+  template:
+    src: etc/nitro_enclaves/allocator.yaml
+    dest: /etc/nitro_enclaves/allocator.yaml
+    owner: root
+    group: root
+
+- name: Enable nitro-enclaves-allocator
+  systemd:
+    name: nitro-enclaves-allocator
+    enabled: yes
+    state: started
+
+- name: Enable nitro-enclaves-vsock-proxy
+  systemd:
+    name: nitro-enclaves-vsock-proxy
+    enabled: yes
+    state: started
+
+- name: Install enclave runner script
+  template:
+    src: usr/local/bin/enclave-runner.sh
+    dest: /usr/local/bin/enclave-runner.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install enclave-runner systemd service
+  copy:
+    src: etc/systemd/system/enclave-runner.service
+    dest: /etc/systemd/system/enclave-runner.service
+    owner: root
+    group: root
+
+- name: Enable enclave-runner systemd service
+  systemd:
+    name: enclave-runner
+    enabled: yes
+    state: stopped
+
+- name: Install enclave-proxy systemd service
+  copy:
+    src: etc/systemd/system/enclave-proxy.service
+    dest: /etc/systemd/system/enclave-proxy.service
+    owner: root
+    group: root
+
+- name: Enable enclave-proxy systemd service
+  systemd:
+    name: enclave-proxy
+    enabled: yes
+    state: stopped

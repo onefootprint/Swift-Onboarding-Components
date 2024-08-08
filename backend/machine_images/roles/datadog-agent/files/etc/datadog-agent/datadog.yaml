@@ -1,0 +1,14 @@
+# Available config: https://github.com/DataDog/datadog-agent/blob/main/pkg/config/config_template.yaml
+
+api_key: POPULATED_BY_CLOUD_INIT
+site: datadoghq.com
+
+ec2_prefer_imdsv2: true
+
+logs_enabled: true
+
+otlp_config:
+  receiver:
+    protocols:
+      grpc:
+        endpoint: "127.0.0.1:4317"

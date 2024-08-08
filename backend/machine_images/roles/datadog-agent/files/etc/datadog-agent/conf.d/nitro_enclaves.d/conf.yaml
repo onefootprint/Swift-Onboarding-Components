@@ -1,0 +1,10 @@
+logs:
+  - type: file
+    path: /var/log/nitro_enclaves/*.log
+    service: nitro-enclaves
+    source: nitro-enclaves
+    log_processing_rules:
+      - type: exclude_at_match
+        name: exclude_info_logs
+        pattern: \[[^\]]+\]\[INFO\]
+
