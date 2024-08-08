@@ -6,7 +6,7 @@ part of 'fp_context_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fpContextNotifierHash() => r'21ea833fa1dce7d62800f917003ee4f5a1115e00';
+String _$fpContextNotifierHash() => r'84661c03849c49ee145509bf8e64ec1a5f4d4653';
 
 /// See also [FpContextNotifier].
 @ProviderFor(FpContextNotifier)

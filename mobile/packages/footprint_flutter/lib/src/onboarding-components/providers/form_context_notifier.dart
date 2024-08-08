@@ -1,4 +1,5 @@
 import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'form_context_notifier.g.dart';
 
@@ -13,8 +14,8 @@ class FormContextNotifier extends _$FormContextNotifier {
     state = data;
   }
 
-  void setValue(String key, dynamic value) {
-    state = state.setField(key, value);
+  void setValue(DataIdentifier key, dynamic value) {
+    state = state.setField(key.name, value);
   }
 
   void reset() {
