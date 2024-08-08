@@ -39,9 +39,14 @@ Future<SdkArgsResponse> _sendSdkArgsRecursive(
   }
 }
 
-Future<SdkArgsResponse> sendSdkArgs(FootprintConfiguration data) async {
+Future<SdkArgsResponse> sendSdkArgs(FootprintConfiguration data,
+    {bool? isComponentSdk}) async {
+  final dataJson = data.toJson();
+  if (isComponentSdk != null) {
+    dataJson['is_components_sdk'] = isComponentSdk;
+  }
   return await _sendSdkArgsRecursive({
     'kind': sdkKind,
-    'data': data.toJson(),
+    'data': dataJson,
   }, numRetries);
 }

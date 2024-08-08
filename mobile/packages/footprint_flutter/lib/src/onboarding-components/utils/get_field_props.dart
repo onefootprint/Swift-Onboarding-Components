@@ -35,8 +35,8 @@ FieldProps getFieldProps(WidgetRef ref, String name, String? id) {
 
 Map<String, InputProps> getPersonProps(FootprintSupportedLocale? locale) {
   InputProps phoneNumberInputProps = (
-    keyboardType: TextInputType.number,
-    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    keyboardType: TextInputType.phone,
+    inputFormatters: null,
     maxLength: null,
     validator: null
   );

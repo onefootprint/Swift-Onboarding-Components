@@ -10,10 +10,12 @@ class ProviderContext {
   final FootprintAppearance? appearance;
   final FootprintSupportedLocale? locale;
   final OnboardingConfig? onboardingConfig;
+  final String redirectUrl;
 
   ProviderContext({
     required this.publicKey,
     required this.step,
+    required this.redirectUrl,
     this.authToken,
     this.vaultingToken,
     this.appearance,
@@ -29,6 +31,7 @@ class ProviderContext {
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
     OnboardingConfig? onboardingConfig,
+    String? redirectUrl,
   }) {
     return ProviderContext(
       publicKey: publicKey ?? this.publicKey,
@@ -38,6 +41,7 @@ class ProviderContext {
       appearance: appearance ?? this.appearance,
       locale: locale ?? this.locale,
       onboardingConfig: onboardingConfig ?? this.onboardingConfig,
+      redirectUrl: redirectUrl ?? this.redirectUrl,
     );
   }
 }

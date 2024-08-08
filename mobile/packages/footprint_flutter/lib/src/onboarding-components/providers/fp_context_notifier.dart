@@ -17,6 +17,7 @@ class FpContextNotifier extends _$FpContextNotifier {
       onboardingConfig: null,
       authToken: null,
       vaultingToken: null,
+      redirectUrl: '',
     );
   }
 
@@ -53,6 +54,10 @@ class FpContextNotifier extends _$FpContextNotifier {
 
   void updatePublicKey(String publicKey) {
     state = state.copyWith(publicKey: publicKey);
+  }
+
+  void updateRedirectUrl(String redirectUrl) {
+    state = state.copyWith(redirectUrl: redirectUrl);
   }
 
   void reset() {

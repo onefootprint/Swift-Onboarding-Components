@@ -24,7 +24,7 @@ class Browser {
   void Function(Object)? _handleErrorCallback;
   void Function({required String authToken, required String vaultingToken})?
       _handAuthComplete;
-  late final OnboardingStep _step;
+  late OnboardingStep _step;
   _ResultType? _result;
 
   Browser() {
@@ -54,17 +54,18 @@ class Browser {
       _result = null; // reset result
       _latestUri = null; // reset latestUri
     });
-
-    var response = await sendSdkArgs(config);
+    var response = await sendSdkArgs(config, isComponentSdk: true);
 
     if (response.failed) {
       logError(response.error);
+      _handleError("Sdk args failed - please check your public key");
       return;
     }
 
     var token = response.data;
     if (token == null) {
       logError('Token is null');
+      _handleError("Could not fetch sdk args");
       return;
     }
 

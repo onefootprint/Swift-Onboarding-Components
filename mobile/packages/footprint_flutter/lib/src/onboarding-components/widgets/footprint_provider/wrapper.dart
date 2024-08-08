@@ -4,6 +4,7 @@ import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
 
 class Wrapper extends ConsumerStatefulWidget {
   final Widget child;
@@ -11,11 +12,13 @@ class Wrapper extends ConsumerStatefulWidget {
   final String? authToken;
   final String publicKey;
   final FootprintSupportedLocale? locale;
+  final String redirectUrl;
 
   const Wrapper({
     super.key,
     required this.child,
     required this.publicKey,
+    required this.redirectUrl,
     this.appearance,
     this.authToken,
     this.locale,
@@ -42,6 +45,7 @@ class _WrapperState extends ConsumerState<Wrapper> {
               onboardingConfig: null,
               authToken: widget.authToken,
               vaultingToken: null,
+              redirectUrl: widget.redirectUrl,
             ),
           );
     });
@@ -49,11 +53,9 @@ class _WrapperState extends ConsumerState<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final fpProvider = ref.watch(fpContextNotifierProvider);
+    final (:launchIdentify) = getFootprintService(context, ref);
     return FootprintService(
-      printContext: () {
-        print(fpProvider.publicKey); // TODO: remove
-      },
+      launchIdentify: launchIdentify,
       child: widget.child,
     );
   }

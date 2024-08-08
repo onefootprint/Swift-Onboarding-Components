@@ -9,11 +9,13 @@ class FootprintProvider extends StatelessWidget {
   final FootprintAppearance? appearance;
   final String? authToken;
   final FootprintSupportedLocale? locale;
+  final String redirectUrl;
 
   const FootprintProvider({
     super.key,
     required this.child,
     required this.publicKey,
+    required this.redirectUrl,
     this.appearance,
     this.authToken,
     this.locale,
@@ -27,6 +29,7 @@ class FootprintProvider extends StatelessWidget {
       appearance: appearance,
       authToken: authToken,
       locale: locale,
+      redirectUrl: redirectUrl,
       child: child,
     ));
   }

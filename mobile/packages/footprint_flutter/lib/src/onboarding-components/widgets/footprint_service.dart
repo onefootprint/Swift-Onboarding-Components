@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
 
 class FootprintService extends InheritedWidget {
-  final void Function() printContext;
+  final IdentifyLauncher launchIdentify;
 
-  const FootprintService(
-      {required this.printContext, required Widget child, super.key})
-      : super(child: child);
+  const FootprintService({
+    required this.launchIdentify,
+    required Widget child,
+    Key? key,
+  }) : super(key: key, child: child);
 
   static FootprintService? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<FootprintService>();
 
   @override
   bool updateShouldNotify(FootprintService oldWidget) {
-    return printContext != oldWidget.printContext;
+    return launchIdentify != oldWidget.launchIdentify;
   }
 }
