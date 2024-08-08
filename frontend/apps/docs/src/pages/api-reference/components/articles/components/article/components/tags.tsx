@@ -20,7 +20,7 @@ const Tags = ({ article }: TagsProps) => {
   const identifyingTag = getIdentifyingTag(article, user);
 
   return (
-    <Stack direction="row" gap={2}>
+    <Stack direction="row" gap={2} flexShrink={0}>
       {article.hideWhenLocked && user?.isFirmEmployee && (
         <Tooltip text={t('hide-when-locked-tooltip')}>
           <Badge variant="warning">{t('hide-when-locked')}</Badge>

@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-scroll';
 import { HttpMethod } from 'src/pages/api-reference/api-reference.types';
 import { ARTICLES_CONTAINER_ID } from 'src/pages/api-reference/components/articles/articles';
+import { ApiArticle } from 'src/pages/api-reference/components/nav/nav.types';
 import { COLOR_FOR_METHOD } from 'src/pages/api-reference/components/type-badge/type-badge';
-import { HydratedArticle } from 'src/pages/api-reference/hooks';
 import styled, { css } from 'styled-components';
 
 type EndpointsOverviewProps = {
-  apiArticles: HydratedArticle[];
+  apiArticles: ApiArticle[];
 };
 
 const Method = ({ method }: { method: HttpMethod }) => {
@@ -31,10 +31,15 @@ const EndpointsOverview = ({ apiArticles }: EndpointsOverviewProps) => {
           </Text>
         </Header>
         <Content>
-          {apiArticles.map(api => (
-            <Link id={api.id} to={api.id} containerId={ARTICLES_CONTAINER_ID} href={`#${api.id}`}>
-              <Method method={api.method} />
-              <td>{api.path}</td>
+          {apiArticles.map(article => (
+            <Link
+              id={article.api.id}
+              to={article.api.id}
+              containerId={ARTICLES_CONTAINER_ID}
+              href={`#${article.api.id}`}
+            >
+              <Method method={article.api.method} />
+              <td>{article.api.path}</td>
             </Link>
           ))}
         </Content>

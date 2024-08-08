@@ -4,11 +4,9 @@ import { useTheme } from 'next-themes';
 import React, { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
-import NavigationSectionTitle from 'src/components/navigation-section-title';
 import styled, { css } from 'styled-components';
 
-import TypeBadge from '../../type-badge';
-import NavigationScrollLink from '../components/navigation-scroll-link';
+import SubsectionNav from '../components/subsection-nav';
 import { PageNavProps } from '../nav.types';
 
 const PageNav = ({ sections }: PageNavProps) => {
@@ -27,8 +25,6 @@ const PageNav = ({ sections }: PageNavProps) => {
       setIsScrolled(scrollTop > 0);
     }
   };
-
-  const overflowRef = useRef<HTMLSpanElement>(null);
 
   const handleToggleMenu = () => {
     setIsOpen(!isOpen);
@@ -53,34 +49,16 @@ const PageNav = ({ sections }: PageNavProps) => {
       {isOpen && (
         <InnerContainer>
           <NavContainer ref={navInnerScrollRef} onScroll={handleNavInnerScroll} id="nav-container">
-            {sections.map((s, i) => (
-              <React.Fragment key={s.title}>
+            {sections.map((section, i) => (
+              <React.Fragment key={section.title}>
                 <SectionTitle>
-                  {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
-                  {s.title}
+                  {section.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
+                  {section.title}
                 </SectionTitle>
-                {s.subsections
-                  .filter(s => s.apiArticles.some(a => !a.isHidden))
-                  .map(({ title, id, apiArticles }) => (
-                    <Group key={title}>
-                      {id ? (
-                        <NavigationScrollLink id={id} onClick={handleLinkClick}>
-                          <Text variant="body-3">{title}</Text>
-                        </NavigationScrollLink>
-                      ) : (
-                        <NavigationSectionTitle>{title}</NavigationSectionTitle>
-                      )}
-                      {apiArticles
-                        .filter(a => !a.isHidden)
-                        .map(({ method, path, id }) => (
-                          <NavigationScrollLink id={id} onClick={handleLinkClick}>
-                            <Stack justify="center">
-                              <TypeBadge skinny type={method} />
-                            </Stack>
-                            <PathLabel ref={overflowRef}>{path}</PathLabel>
-                          </NavigationScrollLink>
-                        ))}
-                    </Group>
+                {section.subsections
+                  .filter(subsection => subsection.apiArticles.some(article => !article.api.isHidden))
+                  .map(subsection => (
+                    <SubsectionNav subsection={subsection} onLinkClick={handleLinkClick} />
                   ))}
                 {i !== sections.length - 1 && <Divider />}
               </React.Fragment>
@@ -130,22 +108,6 @@ const PageNavContainer = styled.div<{ $isOpen: boolean }>`
       display: none;
     `};
   `}
-`;
-
-const PathLabel = styled.span`
-  text-transform: lowercase;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width: 100%;
-  display: block;
-  overflow: hidden;
-  max-width: 100%;
-`;
-
-const Group = styled.div`
-  & > span {
-    width: 100%;
-  }
 `;
 
 const SectionTitle = styled.h3`

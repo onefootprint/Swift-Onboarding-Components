@@ -29,10 +29,15 @@ export type PageNavProps = {
   sections: PageNavSection[];
 };
 
+export type ApiArticle = {
+  title?: string;
+  api: HydratedArticle;
+};
+
 export type SubSection = {
   title: string;
   id?: string;
-  apiArticles: HydratedArticle[];
+  apiArticles: ApiArticle[];
 };
 
 export type PageNavSection = {

@@ -15,7 +15,7 @@ const Articles = ({ sections }: ArticlesProps) => {
   return (
     <ArticleList id={ARTICLES_CONTAINER_ID}>
       {articles.map(article => (
-        <Article key={article.id} article={article} />
+        <Article key={article.api.id} article={article} />
       ))}
     </ArticleList>
   );

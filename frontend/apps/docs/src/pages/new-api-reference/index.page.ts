@@ -6,6 +6,7 @@ import { NewApiReferenceProps } from './new-api-reference';
 export type ApiArticleProps = {
   method: string;
   path: string;
+  title?: string;
 };
 
 export type ApiReferenceArticle = {

@@ -59,26 +59,36 @@ const Cmd = ({ sections }: PageNavProps) => {
           {sections &&
             sections.map(({ title, isPreview, subsections }) => (
               <Group heading={title} key={title} data-preview={isPreview}>
-                {subsections
-                  .flatMap(s => s.apiArticles)
-                  .map(({ id, method, path }) => (
-                    <Option key={id} onSelect={() => handleScroll(id)}>
-                      <Grid.Container columns={['56px', '1fr']}>
-                        <Grid.Item justify="start">
-                          <TypeBadge skinny type={method} />
-                        </Grid.Item>
-                        <Grid.Item>{path}</Grid.Item>
-                      </Grid.Container>
-                    </Option>
-                  ))}
+                {subsections.flatMap(subsection =>
+                  subsection.apiArticles
+                    .filter(a => !a.api.isHidden)
+                    .map(({ api: { id, method, path }, title }) => (
+                      <Option key={id} onSelect={() => handleScroll(id)}>
+                        {title ? (
+                          <Stack direction="row" gap={4} alignItems="center">
+                            <Text variant="label-4">{title}</Text>
+                            <Text variant="body-4">-</Text>
+                            <Text variant="body-4">{subsection.title}</Text>
+                          </Stack>
+                        ) : (
+                          <Grid.Container columns={['56px', '1fr']}>
+                            <Grid.Item justify="start">
+                              <TypeBadge skinny type={method} />
+                            </Grid.Item>
+                            <Grid.Item>{path}</Grid.Item>
+                          </Grid.Container>
+                        )}
+                      </Option>
+                    )),
+                )}
               </Group>
             ))}
           <Group>
             {sections.flatMap(({ subsections }) =>
               subsections
                 .flatMap(s => s.apiArticles)
-                .filter(a => !a.isHidden)
-                .flatMap(({ parameters = [], id }) =>
+                .filter(a => !a.api.isHidden)
+                .flatMap(({ api: { parameters = [], id } }) =>
                   parameters.map(parameter => (
                     <Option onSelect={() => handleScroll(id)} key={id}>
                       <Stack direction="row" gap={3}>

@@ -1,4 +1,3 @@
-import { FontVariant } from '@onefootprint/design-tokens';
 import { IcoLink16 } from '@onefootprint/icons';
 import { Link } from 'react-scroll';
 import styled, { css } from 'styled-components';
@@ -7,14 +6,13 @@ import { ARTICLES_CONTAINER_ID } from '../../../articles';
 type HeadingAnchorProps = {
   id: string;
   children: React.ReactNode;
-  variant: FontVariant;
 };
 
 const HeadingAnchor = ({ id, children }: HeadingAnchorProps) => {
   return (
     <Anchor id={id} to={id} containerId={ARTICLES_CONTAINER_ID} href={`#${id}`} rel="noopener noreferrer">
       {children}
-      <IcoLink16 />
+      <StyledIcoLink />
     </Anchor>
   );
 };
@@ -26,6 +24,9 @@ const Anchor = styled(Link)`
     display: flex;
     flex-direction: row;
     align-items: center;
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
 
     @media (hover: hover) {
       &:hover svg {
@@ -48,6 +49,12 @@ const Anchor = styled(Link)`
       visibility: hidden;
     }
   `};
+`;
+
+const StyledIcoLink = styled(IcoLink16)`
+  ${({ theme }) => css`
+    margin-right: ${theme.spacing[3]};
+  `}
 `;
 
 export default HeadingAnchor;

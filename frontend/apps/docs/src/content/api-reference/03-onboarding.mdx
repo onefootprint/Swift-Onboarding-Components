@@ -3,28 +3,39 @@ title: User onboarding
 apis:
 - method: post
   path: /onboarding/session/validate
+  title: Validate a user's onboarding session
 - method: post
   path: /users/{fp_id}/kyc
+  title: Create a headless onboarding session
 - method: post
   path: /users/{fp_id}/decisions
+  title: Create a manual decision for a user
 - method: get
   path: /users/{fp_id}/decisions
+  title: List all decisions for a user
 - method: get
   path: /users/{fp_id}/onboardings
+  title: List all onboardings for a user
 - method: get
   path: /users/{fp_id}/risk_signals
+  title: List all risk signals for a user
 
 # These will all be hidden for non-legacy tenants
 - method: post
   path: /onboarding/session
+  title: Create a short-lived onboarding token
 - method: get
   path: /users/{fp_id}/auth_events
+  title: List the auth events for a user
 - method: get
   path: /users/{fp_id}/documents
+  title: List the documents for a user
 - method: get
   path: /users/{fp_id}/liveness
+  title: List liveness for a user
 - method: get
   path: /users/{fp_id}/match_signals
+  title: List match signals for a user
 ---
 
 # User onboarding

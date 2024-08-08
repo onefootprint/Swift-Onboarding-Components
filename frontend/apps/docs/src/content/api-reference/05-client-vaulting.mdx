@@ -3,16 +3,22 @@ title: Client vaulting
 apis:
 - method: post
   path: /users/{fp_id}/client_token
+  title: Create a client vaulting token
 - method: patch
   path: /users/vault
+  title: Update the vault
 - method: post
   path: /users/vault/validate
+  title: Validate a vault data update
 - method: post
   path: /users/vault/decrypt
+  title: Decrypt data from the vault
 - method: get
   path: /users/vault/decrypt/{token}
+  title: Check presence of data in the vault
 - method: post
   path: /users/vault/{identifier}/upload
+  title: Upload a large file to the vault
 ---
 
 # Client vaulting

@@ -8,11 +8,16 @@ import SideBySideElement from 'src/pages/api-reference/components/articles/compo
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
 import EndpointsOverview from './endpoints-overview';
 
+export type ApiArticle = {
+  title?: string;
+  api: HydratedArticle;
+};
+
 export type SubSection = {
   title: string;
   id: string;
   content: string;
-  apiArticles: HydratedArticle[];
+  apiArticles: ApiArticle[];
 };
 
 export type PageNavSection = {
@@ -33,7 +38,7 @@ const Articles = ({ sections }: ArticlesProps) => {
         return (
           <>
             <SideBySideElement
-              id={subsection.title}
+              id={subsection.id}
               left={
                 <Box marginTop={8}>
                   <Markdown>{subsection.content}</Markdown>
@@ -41,8 +46,8 @@ const Articles = ({ sections }: ArticlesProps) => {
               }
               right={<EndpointsOverview apiArticles={subsection.apiArticles} />}
             />
-            {subsection.apiArticles.map(api => (
-              <Article key={api.id} article={api} />
+            {subsection.apiArticles.map(article => (
+              <Article key={article.api.id} article={article} />
             ))}
           </>
         );

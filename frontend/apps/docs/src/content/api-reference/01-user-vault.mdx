@@ -3,18 +3,25 @@ title: User vault
 apis:
 - method: patch
   path: /users/{fp_id}/vault
+  title: Update a user's vault
 - method: post
   path: /users/{fp_id}/vault/validate
+  title: Validate a vault data update
 - method: post
   path: /users/{fp_id}/vault/decrypt
+  title: Decrypt data from a user's vault
 - method: get
   path: /users/{fp_id}/vault
+  title: Check presence of data in a user's vault
 - method: delete
   path: /users/{fp_id}/vault
+  title: Delete data from a user's vault
 - method: post
   path: /users/{fp_id}/vault/{identifier}/upload
+  title: Upload a large file to a user's vault
 - method: post
   path: /users/{fp_id}/vault/integrity
+  title: Compute hash of data in a user's vault
 ---
 
 # User vault

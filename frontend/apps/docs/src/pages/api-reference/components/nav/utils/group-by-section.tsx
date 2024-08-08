@@ -8,14 +8,20 @@ import { SubSection } from '../nav.types';
  */
 const groupBySubsection = (apiArticles: HydratedArticle[]) => {
   const sections: SubSection[] = [];
-  apiArticles.forEach(a => {
+  apiArticles.forEach(api => {
     const currentSection = sections.length ? sections[sections.length - 1] : undefined;
-    if (currentSection?.title === a.section) {
-      currentSection.apiArticles.push(a);
+    if (currentSection?.title === api.section) {
+      currentSection.apiArticles.push({
+        api,
+      });
     } else {
       sections.push({
-        title: a.section,
-        apiArticles: [a],
+        title: api.section,
+        apiArticles: [
+          {
+            api,
+          },
+        ],
       });
     }
   });

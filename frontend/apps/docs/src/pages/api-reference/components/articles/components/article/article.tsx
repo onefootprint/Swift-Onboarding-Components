@@ -4,12 +4,12 @@ import styled, { css } from 'styled-components';
 
 import type { SecurityTypes } from '@/api-reference/api-reference.types';
 
-import HeadingAnchor from 'src/components/markdown/components/heading-anchor';
-import { HydratedArticle } from 'src/pages/api-reference/hooks';
+import { ApiArticle } from '../../../nav/nav.types';
 import TypeBadge from '../../../type-badge/type-badge';
 import SideBySideElement from '../side-by-side-element';
 import DemoCode from './components/demo-code';
 import Description from './components/description';
+import HeadingAnchor from './components/heading-anchor';
 import Parameters from './components/parameters';
 import RequestBody from './components/request-body';
 import Responses from './components/responses';
@@ -19,37 +19,44 @@ import Tags from './components/tags';
 const API_BASE_URL = 'api.onefootprint.com';
 
 type ArticleProps = {
-  article: HydratedArticle;
+  article: ApiArticle;
 };
 
 const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const { id, parameters, description, method, path, security, responses, requestBody } = article;
+  const { title, api } = article;
+  const { id, parameters, description, method, path, security, responses, requestBody } = api;
   const encodedId = encodeURIComponent(id);
 
-  if (article.isHidden) {
+  if (api.isHidden) {
     return null;
   }
 
   const contentColumn = (
     <>
       <HeaderContainer>
-        <HeadingAnchor id={article.id} variant="heading-3" tag="h3">
-          <Stack gap={2}>
-            <TypeBadge type={method} />
-            <Stack direction="row" gap={1}>
-              <BaseUrlContainer>
-                <Text variant="heading-3" color="tertiary" tag="span">
-                  {API_BASE_URL}
+        <HeadingAnchor id={api.id}>
+          {title ? (
+            // Show the title for the API if it's explicitly set in markdown
+            <Text variant="heading-2">{title}</Text>
+          ) : (
+            // For APIs that don't have an explicit title (mostly on our internal API reference), show the method and path
+            <Stack gap={2}>
+              <TypeBadge type={method} />
+              <Stack direction="row" gap={1}>
+                <BaseUrlContainer>
+                  <Text variant="heading-3" color="tertiary" tag="span">
+                    {API_BASE_URL}
+                  </Text>
+                </BaseUrlContainer>
+                <Text variant="heading-3" tag="h3">
+                  {path}
                 </Text>
-              </BaseUrlContainer>
-              <Text variant="heading-3" tag="h3">
-                {path}
-              </Text>
+              </Stack>
             </Stack>
-          </Stack>
+          )}
         </HeadingAnchor>
-        <Tags article={article} />
+        <Tags article={api} />
       </HeaderContainer>
       {description && <Description>{description}</Description>}
       <Stack direction="column" gap={8} marginTop={8}>
@@ -64,7 +71,7 @@ const Article = ({ article }: ArticleProps) => {
       </Stack>
     </>
   );
-  const codeColumn = responses && <DemoCode article={article} />;
+  const codeColumn = responses && <DemoCode article={api} />;
   return <SideBySideElement id={encodedId} left={contentColumn} right={codeColumn} />;
 };
 

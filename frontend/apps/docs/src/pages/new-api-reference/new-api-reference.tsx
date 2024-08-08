@@ -62,7 +62,13 @@ export const NewApiReference = ({ articles }: NewApiReferenceProps) => {
       if (!article) {
         throw Error(`No article found for ${api.method} ${api.path}`);
       }
-      return article;
+      if (!api.title) {
+        throw Error(`No title found for ${api.method} ${api.path}`);
+      }
+      return {
+        title: api.title,
+        api: article,
+      };
     }),
   }));
 

@@ -3,10 +3,13 @@ title: Vault proxy
 apis:
 - method: post
   path: /vault_proxy/jit
-- method: post
-  path: /vault_proxy/reflect
+  title: Issue a just-in-time request
 - method: post
   path: /vault_proxy/{id}
+  title: Issue a request to a predefined proxy
+- method: post
+  path: /vault_proxy/reflect
+  title: Reflect raw decrypted data
 ---
 
 # Vault proxy
