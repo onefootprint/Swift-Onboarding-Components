@@ -1,7 +1,8 @@
 ---
 title: User onboarding
 apis:
-# TODO should this be its own section?
+- method: post
+  path: /onboarding/session/validate
 - method: post
   path: /users/{fp_id}/kyc
 - method: post
@@ -12,6 +13,18 @@ apis:
   path: /users/{fp_id}/onboardings
 - method: get
   path: /users/{fp_id}/risk_signals
+
+# These will all be hidden for non-legacy tenants
+- method: post
+  path: /onboarding/session
+- method: get
+  path: /users/{fp_id}/auth_events
+- method: get
+  path: /users/{fp_id}/documents
+- method: get
+  path: /users/{fp_id}/liveness
+- method: get
+  path: /users/{fp_id}/match_signals
 ---
 
 # User onboarding

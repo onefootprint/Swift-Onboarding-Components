@@ -133,10 +133,6 @@ const NavContainer = styled.nav`
     flex-grow: 1;
     padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[7]}
       ${theme.spacing[3]};
-
-    a {
-      text-transform: capitalize;
-    }
   `}
 `;
 

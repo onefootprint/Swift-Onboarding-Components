@@ -7,6 +7,7 @@ import Cmd from '../api-reference/components/cmd';
 import DesktopPageNav from '../api-reference/components/nav/desktop-page-nav';
 import MobilePageNav from '../api-reference/components/nav/mobile-page-nav';
 
+import { useEffect } from 'react';
 import getSectionMeta from 'src/utils/section';
 import staticApiData from '../api-reference/assets/public-api-docs.json';
 import useHydrateArticles from '../api-reference/hooks';
@@ -33,9 +34,24 @@ export type NewApiReferenceProps = {
  */
 export const NewApiReference = ({ articles }: NewApiReferenceProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const hydratedApiArticles = useHydrateArticles(staticApiArticles);
+  const publicApiArticles = useHydrateArticles(staticApiArticles);
+  useEffect(() => {
+    // Alert if there's a new public API that isn't visible
+    const allDocumentedApis = articles.flatMap(article => article.data.apis);
+    const undocumentedApis = publicApiArticles.filter(
+      api => !allDocumentedApis.some(docApi => docApi.method === api.method && docApi.path === api.path),
+    );
+    if (undocumentedApis.length) {
+      const undocumentedApisList = undocumentedApis.map(api => ({
+        method: api.method,
+        path: api.path,
+      }));
+      console.error(`Found undocumented APIs: ${JSON.stringify(undocumentedApisList)}`);
+    }
+  }, [articles, publicApiArticles]);
+
   const findArticle = ({ method, path }: ApiArticleProps) =>
-    hydratedApiArticles.find(a => a.method === method && a.path === path);
+    publicApiArticles.find(api => api.method === method && api.path === path);
 
   const sections = articles.map(article => ({
     content: article.content,
@@ -49,6 +65,7 @@ export const NewApiReference = ({ articles }: NewApiReferenceProps) => {
       return article;
     }),
   }));
+
   // Nav was built for multiple larger sections, but we only have one. Can probably remove this
   const section = {
     title: t('sections.footprint-api'),

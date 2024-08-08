@@ -10,7 +10,7 @@ type TypeBadgeProps = {
 
 export const COLOR_FOR_METHOD: Record<HttpMethod, keyof UIStates> = {
   post: 'success',
-  get: 'neutral',
+  get: 'info',
   delete: 'error',
   patch: 'warning',
   put: 'warning',

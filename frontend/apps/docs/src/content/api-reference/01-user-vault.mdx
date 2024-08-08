@@ -1,13 +1,15 @@
 ---
 title: User vault
 apis:
-- method: post
-  path: /users/{fp_id}/vault/decrypt
 - method: patch
   path: /users/{fp_id}/vault
 - method: post
   path: /users/{fp_id}/vault/validate
+- method: post
+  path: /users/{fp_id}/vault/decrypt
 - method: get
+  path: /users/{fp_id}/vault
+- method: delete
   path: /users/{fp_id}/vault
 - method: post
   path: /users/{fp_id}/vault/{identifier}/upload

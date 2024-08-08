@@ -170,10 +170,6 @@ const NavContainer = styled.div`
     background: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[7]} ${theme.spacing[3]};
     gap: ${theme.spacing[6]};
-
-    a {
-      text-transform: capitalize;
-    }
   `}
 `;
 

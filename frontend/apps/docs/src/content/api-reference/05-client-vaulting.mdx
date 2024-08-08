@@ -1,15 +1,21 @@
 ---
-title: Users
+title: Client vaulting
 apis:
 - method: post
-  path: /users
+  path: /users/{fp_id}/client_token
+- method: patch
+  path: /users/vault
 - method: post
-  path: /users/search
+  path: /users/vault/validate
+- method: post
+  path: /users/vault/decrypt
 - method: get
-  path: /users/{fp_id}
+  path: /users/vault/decrypt/{token}
+- method: post
+  path: /users/vault/{identifier}/upload
 ---
 
-# Users
+# Client vaulting
 
 TODO lots of fun content about users here.
 
