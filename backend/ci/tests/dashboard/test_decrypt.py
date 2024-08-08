@@ -1,4 +1,4 @@
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import (
     get,
@@ -25,8 +25,9 @@ def test_tenant_decrypt(sandbox_user):
         for di, value in attributes.items():
             assert sandbox_user.client.decrypted_data[di] == value
 
-        access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
-        assert set(access_event["targets"]) == set(attributes)
+        audit_event = latest_audit_event_for(sandbox_user.fp_id, tenant)
+        assert audit_event["name"] == "decrypt_user_data"
+        assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(attributes)
 
 
 # Note: `sandbox_user` was onboarded onto `sandbox_user.tenant` with an ob configuration
@@ -101,8 +102,9 @@ def test_tenant_image_decrypt(
 
     assert resp["document.drivers_license.front.mime_type"] == "image/png"
 
-    access_event = latest_access_event_for(user.fp_id, sandbox_tenant)
-    assert set(access_event["targets"]) == {
+    audit_event = latest_audit_event_for(user.fp_id, sandbox_tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == {
         "document.drivers_license.front.image",
         "document.drivers_license.back.image",
         "document.drivers_license.selfie.image",

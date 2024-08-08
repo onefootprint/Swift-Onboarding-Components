@@ -3,7 +3,7 @@ from tests.utils import _make_request
 from tests.headers import BaseAuth
 from tests.utils import post, get, patch
 from tests.constants import ID_DATA
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 import requests
 import urllib.parse
 
@@ -640,12 +640,12 @@ class TestVaultProxy:
         assert response["flerp"] == "flerp"
         assert response["office_location"] == "Hayes Valley"
 
-        access_event = latest_access_event_for(fp_id, sandbox_tenant)
-        assert access_event["kind"] == "decrypt"
-        assert set(access_event["targets"]) == set(user1_data)
-        access_event = latest_access_event_for(fp_id2, sandbox_tenant)
-        assert access_event["kind"] == "decrypt"
-        assert set(access_event["targets"]) == set(user2_data)
+        audit_event = latest_audit_event_for(fp_id, sandbox_tenant)
+        assert audit_event["name"] == "decrypt_user_data"
+        assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(user1_data)
+        audit_event = latest_audit_event_for(fp_id2, sandbox_tenant)
+        assert audit_event["name"] == "decrypt_user_data"
+        assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(user2_data)
 
     # test that we error if the proxy token is valid
     def test_proxy_error(self, sandbox_tenant):

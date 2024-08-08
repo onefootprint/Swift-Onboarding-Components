@@ -232,9 +232,9 @@ def test_delete_and_update(tenant):
     patch(f"users/{fp_id}/vault", data, tenant.sk.key)
     post(f"users/{fp_id}/vault/validate", data, tenant.sk.key)
 
-    body = get("org/access_events", dict(fp_id=fp_id), *tenant.db_auths)
+    body = get("org/audit_events", dict(fp_id=fp_id), *tenant.db_auths)
     assert any(
-        i["kind"] == "update" and set(i["targets"]) == {"id.first_name", "id.last_name"}
+        i["name"] == "update_user_data" and set(i["detail"]["data"]["updated_fields"]) == {"id.first_name", "id.last_name"}
         for i in body["data"]
     )
 
@@ -243,11 +243,12 @@ def test_delete_and_update(tenant):
     patch(f"users/{fp_id}/vault", data, tenant.sk.key)
     post(f"users/{fp_id}/vault/validate", data, tenant.sk.key)
 
-    body = get("org/access_events", dict(fp_id=fp_id), *tenant.db_auths)
+    body = get("org/audit_events", dict(fp_id=fp_id), *tenant.db_auths)
     assert any(
-        i["kind"] == "update" and set(i["targets"]) == {"id.dob"} for i in body["data"]
+        i["name"] == "update_user_data" and set(i["detail"]["data"]["updated_fields"]) == {"id.dob"}
+        for i in body["data"]
     )
     assert any(
-        i["kind"] == "delete" and set(i["targets"]) == {"id.first_name"}
+        i["name"] == "delete_user_data" and set(i["detail"]["data"]["deleted_fields"]) == {"id.first_name"}
         for i in body["data"]
     )

@@ -1,10 +1,10 @@
 from tests.utils import get, patch
 
 
-def latest_access_event_for(fp_id, tenant):
-    body = get("org/access_events", dict(search=fp_id), *tenant.db_auths)
-    access_events = body["data"]
-    return access_events[0]
+def latest_audit_event_for(fp_id, tenant):
+    body = get("org/audit_events", dict(search=fp_id), *tenant.db_auths)
+    audit_events = body["data"]
+    return audit_events[0]
 
 
 def update_rules(

@@ -1,5 +1,5 @@
 import pytest
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post
 from tests.constants import IP_DATA
@@ -57,8 +57,9 @@ def test_decrypt(sandbox_tenant, sb_user_with_investor_profile, fields_to_decryp
     for field in fields_to_decrypt:
         assert body[field] == sb_user_with_investor_profile.client.decrypted_data[field]
 
-    access_event = latest_access_event_for(
+    audit_event = latest_audit_event_for(
         sb_user_with_investor_profile.fp_id, sandbox_tenant
     )
+    assert audit_event["name"] == "decrypt_user_data"
     populated_keys = set(sb_user_with_investor_profile.client.data)
-    assert set(access_event["targets"]) == set(fields_to_decrypt) & populated_keys
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(fields_to_decrypt) & populated_keys

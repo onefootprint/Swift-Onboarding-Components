@@ -32,17 +32,15 @@ def test_aml(sandbox_tenant, must_collect_data):
                 *sandbox_tenant.db_auths,
             )
 
-            access_events = get(
-                "org/access_events",
+            audit_events = get(
+                "org/audit_events",
                 dict(search=user.fp_id),
                 *sandbox_tenant.db_auths,
             )
-            access_event = access_events["data"][0]
-            assert "Reviewing AML information" == access_event["reason"]
-            assert "decrypt" == access_event["kind"]
-            assert ["id.first_name", "id.last_name", "id.dob"] == access_event[
-                "targets"
-            ]
+            audit_event = audit_events["data"][0]
+            assert audit_event["name"] == "decrypt_user_data"
+            assert audit_event["detail"]["data"]["reason"] == "Reviewing AML information"
+            assert audit_event["detail"]["data"]["decrypted_fields"] == ["id.first_name", "id.last_name", "id.dob"]
 
             assert (
                 aml["share_url"]

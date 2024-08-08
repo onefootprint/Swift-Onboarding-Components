@@ -62,7 +62,7 @@ def assumed_token(tenant, sandbox_tenant_data):
         "org/members",
         "org/roles",
         "org/onboarding_configs",
-        "org/access_events",
+        "org/audit_events",
     ],
 )
 def test_read_allowed(assumed_token, path):

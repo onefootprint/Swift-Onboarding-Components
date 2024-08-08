@@ -1,7 +1,7 @@
 import pytest
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import post, patch, get_raw, get
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 from tests.headers import ClientTokenAuth
 
 
@@ -42,8 +42,9 @@ def test_decrypt(sandbox_user, attrs_to_decrypt):
     for di, value in body.items():
         assert sandbox_user.client.decrypted_data[di] == value
 
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
-    assert set(access_event["targets"]) == set(body)
+    audit_event = latest_audit_event_for(sandbox_user.fp_id, tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(body)
 
 
 def test_decrypt_reason(sandbox_user):
@@ -63,8 +64,9 @@ def test_decrypt_reason(sandbox_user):
         decrypt_reason="Hayes valley",
     )
     post(f"entities/vault/decrypt", data, auth_token)
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
-    assert access_event["reason"] == "Hayes valley"
+    audit_event = latest_audit_event_for(sandbox_user.fp_id, tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert audit_event["detail"]["data"]["reason"] == "Hayes valley"
 
     # And should be able to override the reason
     data = dict(
@@ -72,8 +74,9 @@ def test_decrypt_reason(sandbox_user):
         reason="Hayes valley2",
     )
     post(f"entities/vault/decrypt", data, auth_token)
-    access_event = latest_access_event_for(sandbox_user.fp_id, tenant)
-    assert access_event["reason"] == "Hayes valley2"
+    audit_event = latest_audit_event_for(sandbox_user.fp_id, tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert audit_event["detail"]["data"]["reason"] == "Hayes valley2"
 
 
 def test_vault(sandbox_user, sandbox_tenant):

@@ -192,8 +192,8 @@ def test_timeline(sandbox_user):
     assert body[0] == decision_event
 
 
-def test_access_events_list(sandbox_user):
-    # Make some decryptions to make access events
+def test_audit_events_list(sandbox_user):
+    # Make some decryptions to make audit events
     tenant = sandbox_user.tenant
     for attributes in FIELDS_TO_DECRYPT:
         data = {
@@ -206,18 +206,20 @@ def test_access_events_list(sandbox_user):
             *tenant.db_auths,
         )
 
-    # Then check the access event list
+    # Then check the audit event list
     body = get(
-        "org/access_events",
+        "org/audit_events",
         dict(search=sandbox_user.fp_id),
         *tenant.db_auths,
     )
-    access_events = body["data"]
-    assert len(access_events) == len(FIELDS_TO_DECRYPT)
-    for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
-        expected_targets = [f"id.{k}" for k in expected_fields]
-        access_events[i]["kind"] == "decrypt"
-        assert set(access_events[i]["targets"]) == set(expected_targets)
+    audit_events = body["data"]
+    assert len(audit_events) == len(FIELDS_TO_DECRYPT)
+    for expected_fields in FIELDS_TO_DECRYPT:
+        assert any(
+            event["name"] == "decrypt_user_data"
+            and set(event["detail"]["data"]["decrypted_fields"]) == set(expected_fields)
+            for event in audit_events
+        )
 
     # Test filtering on kinds. We provide two different kinds, and we should get all access events
     # that contain at least one of these fields
@@ -226,16 +228,16 @@ def test_access_events_list(sandbox_user):
         targets=",".join(["id.email", "id.address_line1"]),
         kind="decrypt",
     )
-    body = get("org/access_events", params, *tenant.db_auths)
-    access_events = body["data"]
-    assert len(access_events) == 2
-    assert "id.email" in set(access_events[0]["targets"])
-    assert "id.address_line1" in set(access_events[1]["targets"])
+    body = get("org/audit_events", params, *tenant.db_auths)
+    audit_events = body["data"]
+    assert len(audit_events) == 2
+    assert "id.email" in set(audit_events[0]["detail"]["data"]["decrypted_fields"])
+    assert "id.address_line1" in set(audit_events[1]["detail"]["data"]["decrypted_fields"])
 
     # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
     params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
-    body = get("org/access_events", params, *tenant.db_auths)
-    assert not body["data"]
+    body = get("org/audit_events", params, *tenant.db_auths)
+    assert len(body["data"]) == 0
 
 
 def test_update_data_for_portable_user(sandbox_user):

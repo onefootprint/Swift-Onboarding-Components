@@ -82,18 +82,18 @@ def test_vault_create_write_decrypt(tenant):
     for k in expected_deleted_fields:
         assert body[k] == True
 
-    # check the access events made by the two delete operations and the decrypt operation
-    body = get("org/access_events", dict(search=fp_id), *tenant.db_auths)
-    access_events = body["data"]
+    # check the audit events made by the two delete operations and the decrypt operation
+    body = get("org/audit_events", dict(search=fp_id), *tenant.db_auths)
+    audit_events = body["data"]
 
-    assert set(access_events[0]["targets"]) == set(expected_deleted_fields)
-    assert access_events[0]["kind"] == "delete"
+    assert audit_events[0]["name"] == "delete_user_data"
+    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == set(expected_deleted_fields)
 
-    assert set(access_events[1]["targets"]) == set(fields_to_delete)
-    assert access_events[1]["kind"] == "delete"
+    assert audit_events[1]["name"] == "delete_user_data"
+    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == set(fields_to_delete)
 
-    assert access_events[2]["kind"] == "decrypt"
-    assert set(access_events[2]["targets"]) == set(fields_to_decrypt)
+    assert audit_events[2]["name"] == "decrypt_user_data"
+    assert set(audit_events[2]["detail"]["data"]["decrypted_fields"]) == set(fields_to_decrypt)
 
     data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
@@ -224,14 +224,14 @@ def test_delete(sandbox_tenant):
     assert body["id.email"] == True
     assert body["custom.test_field"] == True
 
-    # Verify access events
-    body = get("org/access_events", dict(search=fp_id), *sandbox_tenant.db_auths)
-    access_events = body["data"]
+    # Verify audit events
+    body = get("org/audit_events", dict(search=fp_id), *sandbox_tenant.db_auths)
+    audit_events = body["data"]
 
-    assert set(access_events[0]["targets"]) == {"id.email", "custom.test_field"}
-    assert access_events[0]["kind"] == "delete"
-    assert set(access_events[1]["targets"]) == {"id.phone_number"}
-    assert access_events[1]["kind"] == "delete"
+    assert audit_events[0]["name"] == "delete_user_data"
+    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == {"id.email", "custom.test_field"}
+    assert audit_events[1]["name"] == "delete_user_data"
+    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == {"id.phone_number"}
 
 
 def test_card_expiration_transform(tenant):

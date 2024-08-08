@@ -1,5 +1,5 @@
 import pytest
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 from tests.utils import (
     create_ob_config,
     get,
@@ -80,8 +80,9 @@ def test_tenant_document_decrypt(user_with_documents):
     # by default, we put the id.dob into the OCR response in sandbox
     assert resp["document.drivers_license.dob"] == "1995-12-25"
 
-    access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
-    assert set(access_event["targets"]) == set(fields)
+    audit_event = latest_audit_event_for(user_with_documents.fp_id, tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(fields)
 
 
 def test_tenant_document_decrypt_download(user_with_documents):
@@ -104,8 +105,9 @@ def test_tenant_document_decrypt_download(user_with_documents):
     assert response.headers.get("content-type") == "image/png"
     assert compare_contents(response.content, "drivers_license.front.png")
 
-    access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
-    assert set(access_event["targets"]) == set(fields)
+    audit_event = latest_audit_event_for(user_with_documents.fp_id, tenant)
+    assert audit_event["name"] == "decrypt_user_data"
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(fields)
 
 
 def test_get_entity_documents(user_with_documents):
@@ -267,12 +269,13 @@ def test_decrypt_historical(user_with_documents):
     )
 
     body = get(
-        "org/access_events",
+        "org/audit_events",
         dict(search=fp_id),
         *tenant.db_auths,
     )
-    access_event = body["data"][0]
-    assert set(access_event["targets"]) == set(
+    audit_event = body["data"][0]
+    assert audit_event["name"] == "decrypt_user_data"
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(
         [
             "id.first_name",
             "document.drivers_license.front.latest_upload",

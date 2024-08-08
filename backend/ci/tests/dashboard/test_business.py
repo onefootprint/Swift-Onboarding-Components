@@ -1,6 +1,6 @@
 import pytest
 import typing
-from tests.dashboard.utils import latest_access_event_for
+from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS, BUSINESS_VAULT_DERIVED_DATA
@@ -107,11 +107,12 @@ def test_decrypt(sandbox_tenant, primary_bo, fields_to_decrypt):
     for field in fields_to_decrypt:
         assert body[field] == primary_bo.client.decrypted_data.get(field)
 
-    # Check the access event - but never expect business.name since it's stored in plaintext, or
+    # Check the audit event - but never expect business.name since it's stored in plaintext, or
     # other attributes that don't exist
-    access_event = latest_access_event_for(primary_bo.fp_bid, sandbox_tenant)
+    audit_event = latest_audit_event_for(primary_bo.fp_bid, sandbox_tenant)
+    assert audit_event["name"] == "decrypt_user_data"
     populated_keys = set(primary_bo.client.data)
-    expected_access_event_fields = (
+    expected_audit_event_fields = (
         set(fields_to_decrypt) - {"business.name"}
     ) & populated_keys
-    assert set(access_event["targets"]) == expected_access_event_fields
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == expected_audit_event_fields
