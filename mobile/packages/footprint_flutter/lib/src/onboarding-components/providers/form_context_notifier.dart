@@ -1,4 +1,4 @@
-import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'form_context_notifier.g.dart';
 

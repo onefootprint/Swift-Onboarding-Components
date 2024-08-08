@@ -1,4 +1,4 @@
-import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/auth_method.dart';
 
 enum OnboardingConfigStatus { enabled, disabled }

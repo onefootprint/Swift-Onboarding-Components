@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/models/appearance.dart';
+import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_provider/wrapper.dart';
 
 class FootprintProvider extends StatelessWidget {

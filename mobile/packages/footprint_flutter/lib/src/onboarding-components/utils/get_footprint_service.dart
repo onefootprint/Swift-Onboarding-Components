@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/models/bootstrap_data.dart';
+import 'package:footprint_flutter/src/models/configuration.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
+import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
@@ -17,14 +19,14 @@ typedef IdentifyLauncher = void Function({
   void Function()? onCancel,
 });
 
-typedef SaveFunc = Future<void> Function(FootprintBootstrapData data);
-typedef HandoffFunc = void Function({
+typedef SaveHandler = Future<void> Function(FootprintBootstrapData data);
+typedef HandoffHandler = void Function({
   void Function(String validationToken)? onComplete,
   void Function(Object err)? onError,
   void Function()? onCancel,
 });
 
-({IdentifyLauncher launchIdentify, SaveFunc save, HandoffFunc handoff})
+({IdentifyLauncher launchIdentify, SaveHandler save, HandoffHandler handoff})
     getFootprintService(BuildContext context, WidgetRef ref) {
   final fpWebview = Browser();
 
