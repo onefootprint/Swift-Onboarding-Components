@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/bootstrap_data.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/form_context_notifier.dart';
 
 class FootprintForm extends ConsumerStatefulWidget {
@@ -8,7 +9,10 @@ class FootprintForm extends ConsumerStatefulWidget {
       {super.key, required this.onSubmit, required this.createForm});
 
   final void Function(FootprintBootstrapData formData) onSubmit;
-  final Widget Function(void Function() handleSubmit) createForm;
+  final Widget Function(
+    void Function() handleSubmit, {
+    FormErrors? formErrors,
+  }) createForm;
 
   @override
   ConsumerState<FootprintForm> createState() => _FootprintFormState();
@@ -19,19 +23,27 @@ class _FootprintFormState extends ConsumerState<FootprintForm> {
 
   @override
   Widget build(BuildContext context) {
+    final formErrors = ref.watch(formContextNotifierProvider).formErrors;
     void handleSubmit() {
-      if (!_formKey.currentState!.validate()) {
+      final updatedFormContext =
+          ref.read(formContextNotifierProvider); // Get the most recent data
+      final newFormErrors = FormErrors.build(_formKey);
+      ref
+          .read(formContextNotifierProvider.notifier)
+          .updateFormErrors(newFormErrors); // Update the form errors
+      if (newFormErrors.errors.isNotEmpty) {
         return;
       }
       _formKey.currentState!.save();
-      final updatedFormData =
-          ref.read(formContextNotifierProvider); // Get the most recent data
-      widget.onSubmit(updatedFormData);
+      widget.onSubmit(updatedFormContext.formData);
     }
 
     return Form(
       key: _formKey,
-      child: widget.createForm(handleSubmit),
+      child: widget.createForm(
+        handleSubmit,
+        formErrors: formErrors,
+      ),
     );
   }
 }

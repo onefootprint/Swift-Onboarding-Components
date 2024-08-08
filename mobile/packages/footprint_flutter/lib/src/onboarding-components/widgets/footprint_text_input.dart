@@ -96,6 +96,7 @@ class FootprintTextInput extends ConsumerWidget {
         );
 
     return TextFormField(
+      key: ValueKey(name),
       controller: controller,
       focusNode: focusNode,
       initialValue: initialValue,
