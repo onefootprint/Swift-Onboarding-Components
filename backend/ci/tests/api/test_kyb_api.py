@@ -1,6 +1,8 @@
 import pytest
+from tests.headers import FpAuth
+from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
-from tests.constants import BUSINESS_DATA, CDO_TO_DIS
+from tests.constants import BUSINESS_DATA, CDO_TO_DIS, FIXTURE_PHONE_NUMBER
 from tests.utils import create_ob_config, post, get, patch
 
 MUST_COLLECT_DATA = ["business_name", "business_tin", "business_address"]
@@ -269,3 +271,36 @@ def test_cannot_vault_kyced_bos(sandbox_tenant):
     data = {bo_di: BUSINESS_DATA[bo_di]}
     body = post("businesses", data, sandbox_tenant.sk.key, status_code=400)
     assert body["context"][bo_di] == "Not allowed to add this piece of data here"
+
+
+def test_onboard_kyb_bos_linked_via_api(sandbox_tenant, kyb_sandbox_ob_config):
+    """
+    Verify that the onboarding requirement to provide beneficial owners is satisfied by owners linked via API.
+    """
+    data = {"id.phone_number": FIXTURE_PHONE_NUMBER}
+    user = post("users", data, sandbox_tenant.s_sk)
+    fp_id = user["id"]
+    sandbox_id = user["sandbox_id"]
+
+    data = {"business.name": "printfoot"}
+    business = post("businesses", data, sandbox_tenant.s_sk)
+    fp_bid = business["id"]
+
+    data = dict(fp_id=fp_id, ownership_stake=25)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.s_sk)
+
+    # Try to make a token using an fp_bid for a different user
+    data = dict(kind="onboard", key=kyb_sandbox_ob_config.key.value, fp_bid=fp_bid)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.s_sk)
+    auth_token = FpAuth(body["token"])
+
+    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    bifrost = BifrostClient.raw_auth(kyb_sandbox_ob_config, auth_token, sandbox_id)
+    body = bifrost.get_status()
+    r = next(
+        r for r in body["all_requirements"] if r["kind"] == "collect_business_data"
+    )
+
+    # Business beneficial owners should already be populated from the BO linked via API
+    assert "business_beneficial_owners" in r["populated_attributes"]
+    bifrost.run()

@@ -27,6 +27,7 @@ use newtypes::AuthEventKind;
 use newtypes::AuthorizeFields;
 use newtypes::BusinessOwnerSource;
 use newtypes::CollectDocumentConfig;
+use newtypes::CollectedData;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::Declaration;
@@ -472,11 +473,16 @@ fn get_requirement_inner(
                 let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
                 let bos = BusinessOwner::list_all(conn, &vw.vault.id, &sv.tenant_id)?;
                 let has_tenant_linked_bos = bos.iter().any(|bo| bo.0.source == BusinessOwnerSource::Tenant);
-                if has_tenant_linked_bos && missing_attributes.contains(&CDO::BusinessBeneficialOwners) {
-                    // BOs linked manually via API meet the CDO::BeneficialOwners requirement
-                    missing_attributes.retain(|cdo| cdo != &CDO::BusinessBeneficialOwners);
-                    populated_attributes.push(CDO::BusinessBeneficialOwners);
-                }
+                CollectedData::BusinessBeneficialOwners
+                    .options()
+                    .into_iter()
+                    .for_each(|cdo| {
+                        if has_tenant_linked_bos && missing_attributes.contains(&cdo) {
+                            // BOs linked manually via API meet the BeneficialOwners requirement
+                            missing_attributes.retain(|missing_cdo| missing_cdo != &cdo);
+                            populated_attributes.push(cdo);
+                        }
+                    });
                 Ok(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
