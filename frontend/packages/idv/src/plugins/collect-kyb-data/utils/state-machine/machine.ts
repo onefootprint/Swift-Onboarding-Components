@@ -25,21 +25,12 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         events: {} as MachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0,
-      initial: 'init',
+      initial: 'loadFromVault',
       context: {
         ...initialContext,
         data: getBusinessDataFromContext(initialContext),
       },
       states: {
-        init: {
-          always: [
-            { target: 'loadFromVault', cond: isMissingRequiredData },
-            { target: 'loadFromVault', cond: isMissingBasicData },
-            { target: 'loadFromVault', cond: isMissingAddressData },
-            { target: 'loadFromVault', cond: isMissingBeneficialOwnersData },
-            { target: 'confirm' },
-          ],
-        },
         loadFromVault: {
           on: {
             businessDataLoadSuccess: [

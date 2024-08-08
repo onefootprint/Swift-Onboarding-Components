@@ -2,11 +2,6 @@ import type { BeneficialOwner, BusinessDIData } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import type { MachineContext } from '../state-machine/types';
 
-const getRequiredAttributes = (ctx: MachineContext): CollectedKybDataOption[] => {
-  const { missingAttributes, populatedAttributes } = ctx.kybRequirement || {};
-  return (missingAttributes || []).concat(populatedAttributes || []);
-};
-
 const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
   return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
     if (typeof value === 'string' || typeof value === 'number') {
@@ -43,24 +38,24 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
   };
 };
 
-const isMissingDataFromCollection = (ctx: MachineContext, list?: CollectedKybDataOption[]): boolean => {
+const isMissingDataFromCollection = (ctx: MachineContext, cdos?: CollectedKybDataOption[]): boolean => {
   const data = getBusinessDataFromContext(ctx);
-  return !Array.isArray(list)
-    ? false
-    : list.some(reqId => {
-        const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
-        return requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
-      });
+  if (!Array.isArray(cdos)) return false;
+  return cdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]).some(di => !data[di]);
 };
 
 export const isMissingRequiredData = (ctx: MachineContext): boolean => {
-  return !ctx.kybRequirement ? false : isMissingDataFromCollection(ctx, getRequiredAttributes(ctx));
+  return !ctx.kybRequirement ? false : isMissingDataFromCollection(ctx, ctx.kybRequirement.missingAttributes);
 };
 
+/**
+ * Determines the intersection of the provided CDOs and the missing attributes from the KYB requirement.
+ */
+const missingAttributes = (ctx: MachineContext, cdos: CollectedKybDataOption[]) =>
+  ctx.kybRequirement.missingAttributes.filter(cdo => cdos.includes(cdo));
+
 export const isMissingBasicData = (ctx: MachineContext): boolean => {
-  const attrs = getRequiredAttributes(ctx);
-  const data = getBusinessDataFromContext(ctx);
-  const basic = [
+  const basicCdos = [
     CollectedKybDataOption.name,
     CollectedKybDataOption.tin,
     CollectedKybDataOption.corporationType,
@@ -68,47 +63,30 @@ export const isMissingBasicData = (ctx: MachineContext): boolean => {
     CollectedKybDataOption.website,
   ];
   if (!ctx.kybRequirement) return false;
-
-  return attrs.some(reqId => {
-    const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
-    return basic.includes(reqId) && requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
-  });
+  const missingCdos = missingAttributes(ctx, basicCdos);
+  return isMissingDataFromCollection(ctx, missingCdos);
 };
 
 export const isMissingAddressData = (ctx: MachineContext): boolean => {
-  const attrs = getRequiredAttributes(ctx);
-  const data = getBusinessDataFromContext(ctx);
-  const address = [CollectedKybDataOption.address];
-
   if (!ctx.kybRequirement) return false;
-
-  return attrs.some(reqId => {
-    const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
-    return address.includes(reqId) && requiredAttributes && requiredAttributes.some(vaultId => !data[vaultId]);
-  });
+  const missingCdos = missingAttributes(ctx, [CollectedKybDataOption.address]);
+  return isMissingDataFromCollection(ctx, missingCdos);
 };
 
 export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
-  const attrs = getRequiredAttributes(ctx);
-  const data = getBusinessDataFromContext(ctx);
-  const propList = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
-
   if (!ctx.kybRequirement) return false;
+  const data = getBusinessDataFromContext(ctx);
+  const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
+  const missingCdos = missingAttributes(ctx, boCdos);
 
-  return attrs.some(reqId => {
-    const requiredAttributes = CollectedKybDataOptionToRequiredAttributes[reqId];
+  const requiredDis = missingCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]);
+  return requiredDis.some(di => {
+    const collectedData = data[di];
     return (
-      propList.includes(reqId) &&
-      requiredAttributes &&
-      requiredAttributes.some(vaultId => {
-        const bOwners = data[vaultId];
-        return (
-          !bOwners ||
-          !Array.isArray(bOwners) ||
-          bOwners.length === 0 ||
-          bOwners.some(bOwner => !bOwner.first_name || !bOwner.last_name || !bOwner.ownership_stake)
-        );
-      })
+      !collectedData ||
+      !Array.isArray(collectedData) ||
+      collectedData.length === 0 ||
+      collectedData.some(bOwner => !bOwner.first_name || !bOwner.last_name || !bOwner.ownership_stake)
     );
   });
 };
