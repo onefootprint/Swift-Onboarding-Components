@@ -1410,6 +1410,24 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    tenant_tag (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        created_by_actor -> Jsonb,
+        kind -> Text,
+        tag -> Text,
+        is_live -> Bool,
+        deactivated_at -> Nullable<Timestamptz>,
+        deactivated_by_actor -> Nullable<Jsonb>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     tenant_user (id) {
         id -> Text,
         email -> Text,
@@ -1881,6 +1899,7 @@ diesel::joinable!(tenant_rolebinding -> partner_tenant (partner_tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 diesel::joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
+diesel::joinable!(tenant_tag -> tenant (tenant_id));
 diesel::joinable!(tenant_vendor_control -> tenant (tenant_id));
 diesel::joinable!(user_consent -> insight_event (insight_event_id));
 diesel::joinable!(user_consent -> workflow (workflow_id));
@@ -1992,6 +2011,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     tenant_ios_app_meta,
     tenant_role,
     tenant_rolebinding,
+    tenant_tag,
     tenant_user,
     tenant_vendor_control,
     user_consent,
