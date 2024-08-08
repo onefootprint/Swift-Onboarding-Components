@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_field_props.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
 
-class FootprintField extends StatelessWidget {
+class FootprintField extends ConsumerWidget {
   final String name;
   final String id;
   final Widget child;
@@ -14,10 +16,10 @@ class FootprintField extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final props = getFieldProps(ref, name, id);
     return FieldContext(
-      name: name,
-      id: id,
+      props: props,
       child: child,
     );
   }

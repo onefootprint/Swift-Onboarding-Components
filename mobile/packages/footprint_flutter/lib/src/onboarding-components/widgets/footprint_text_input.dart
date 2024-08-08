@@ -14,7 +14,6 @@ class FootprintTextInput extends ConsumerWidget {
     this.hintText,
     this.obscureText = false,
     this.obscuringCharacter = '•',
-    this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.textAlign = TextAlign.start,
@@ -23,9 +22,7 @@ class FootprintTextInput extends ConsumerWidget {
     this.enabled = true,
     this.maxLines,
     this.minLines,
-    this.maxLength,
     this.maxLengthEnforcement,
-    this.inputFormatters,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.selectionControls,
     this.autovalidateMode = AutovalidateMode.disabled,
@@ -42,7 +39,6 @@ class FootprintTextInput extends ConsumerWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onFieldSubmitted,
-    this.validator,
     this.decoration,
   });
 
@@ -53,7 +49,6 @@ class FootprintTextInput extends ConsumerWidget {
   final String? hintText;
   final bool obscureText;
   final String obscuringCharacter;
-  final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final TextCapitalization textCapitalization;
   final TextAlign textAlign;
@@ -62,9 +57,7 @@ class FootprintTextInput extends ConsumerWidget {
   final bool enabled;
   final int? maxLines;
   final int? minLines;
-  final int? maxLength;
   final MaxLengthEnforcement? maxLengthEnforcement;
-  final List<TextInputFormatter>? inputFormatters;
   final EdgeInsets scrollPadding;
   final TextSelectionControls? selectionControls;
   final AutovalidateMode autovalidateMode;
@@ -81,12 +74,24 @@ class FootprintTextInput extends ConsumerWidget {
   final ValueChanged<String>? onChanged;
   final VoidCallback? onEditingComplete;
   final ValueChanged<String>? onFieldSubmitted;
-  final FormFieldValidator<String>? validator;
   final InputDecoration? decoration;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name = FieldContext.of(context)!.name;
+    final fieldProps = FieldContext.of(context)!.props;
+    final (:name, :inputProps) = fieldProps;
+    final (
+      :validator,
+      :keyboardType,
+      :inputFormatters,
+      :maxLength,
+    ) = inputProps ??
+        (
+          validator: null,
+          keyboardType: null,
+          inputFormatters: null,
+          maxLength: null
+        );
 
     return TextFormField(
       controller: controller,

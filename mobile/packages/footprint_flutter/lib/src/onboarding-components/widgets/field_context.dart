@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_field_props.dart';
 
 class FieldContext extends InheritedWidget {
-  final String name;
-  final String id;
+  final FieldProps props;
 
   const FieldContext({
-    required this.name,
-    required this.id,
+    required this.props,
     required Widget child,
     Key? key,
   }) : super(key: key, child: child);
@@ -16,6 +15,6 @@ class FieldContext extends InheritedWidget {
 
   @override
   bool updateShouldNotify(FieldContext oldWidget) {
-    return name != oldWidget.name || id != oldWidget.id;
+    return props != oldWidget.props;
   }
 }
