@@ -28,9 +28,6 @@ export const getStaticProps: GetStaticProps<NewApiReferenceProps, Params> = asyn
   };
 };
 
-// This is rendered at build time. Since the content on this page is user-specific, we don't want to compile
-// anything here.
-// We only use this paradigm to fetch the markdown from the server
-export default () => null;
+export { default } from './new-api-reference';
 
 export { type NewApiReferenceProps, NewApiReference } from './new-api-reference';

@@ -111,3 +111,5 @@ const Layout = styled.div`
     `}
   `}
 `;
+
+export default NewApiReference;
