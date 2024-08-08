@@ -6297,6 +6297,133 @@
                 ]
             }
         },
+        "/org/tags": {
+            "get": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a list of Tags for the organization.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kind",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "person",
+                                "business"
+                            ]
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrgTenantTag"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a new Tag for the organization.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOrgTenantTagRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrgTenantTag"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
+        "/org/tags/{tag_id}": {
+            "delete": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Delete a tag for the organization.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "tag_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/vault_dr/aws_pre_enrollment": {
             "get": {
                 "tags": [
@@ -10255,6 +10382,25 @@
                 "required": [
                     "content",
                     "kind"
+                ]
+            },
+            "CreateOrgTenantTagRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "person",
+                            "business"
+                        ]
+                    },
+                    "tag": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "kind",
+                    "tag"
                 ]
             },
             "CreateProxyConfigRequest": {
@@ -24376,6 +24522,30 @@
                 "required": [
                     "business",
                     "user"
+                ]
+            },
+            "OrgTenantTag": {
+                "description": "Tags for an Org",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "person",
+                            "business"
+                        ]
+                    },
+                    "tag": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "kind",
+                    "tag"
                 ]
             },
             "Organization": {
