@@ -9,13 +9,16 @@ import { createGlobalStyle, css } from 'styled-components';
 import Providers from '../components/providers';
 import {
   API_REFERENCE_PATH,
-  AUTH_PATH,
+  // omitting auth for now because of a bug https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1723130324224179
+  // AUTH_PATH,
   INTERNAL_API_REFERENCE_PATH,
   LOGIN_PATH,
   NEW_API_REFERENCE_PATH,
 } from '../config/constants';
 import ApiReference from './api-reference/index.page';
-import Auth from './auth';
+
+// omitting auth for now because of a bug https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1723130324224179
+// import Auth from './auth';
 import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
 import Login from './login';
@@ -43,9 +46,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
   const isNewApiReference = router.asPath.startsWith(NEW_API_REFERENCE_PATH);
   const isInternalApiReference = router.asPath.startsWith(INTERNAL_API_REFERENCE_PATH);
-  const isAuthPath = router.asPath.startsWith(AUTH_PATH);
+  // omitting auth for now because of a bug https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1723130324224179
+  // const isAuthPath = router.asPath.startsWith(AUTH_PATH);
   const isLoginPath = router.asPath.startsWith(LOGIN_PATH);
-  const isDocsSite = !isApiReference && !isNewApiReference && !isInternalApiReference && !isAuthPath && !isLoginPath;
+  const isDocsSite = !isApiReference && !isNewApiReference && !isInternalApiReference && !isLoginPath;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -63,7 +67,8 @@ const App = ({ Component, pageProps }: AppProps) => {
         {isApiReference && <ApiReference />}
         {isNewApiReference && <NewApiReference articles={pageProps.articles as ApiReferenceArticle[]} />}
         {isInternalApiReference && <InternalApiReference />}
-        {isAuthPath && <Auth />}
+        {/* remove auth for now because of a bug https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1723130324224179 */}
+        {/* {isAuthPath && <Auth />} */}
         {isLoginPath && <Login />}
         {isDocsSite && (
           <Docs article={pageProps.article} navigation={pageProps.page?.navigation}>
