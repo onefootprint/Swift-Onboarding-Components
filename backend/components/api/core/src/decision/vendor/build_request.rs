@@ -1,5 +1,4 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::TenantVw;
@@ -227,21 +226,22 @@ pub async fn build_business_data_from_verification_request(
         })
         .await?;
 
-    // Get FirstName + LastName for all BOs
-    let dbos = bvw.decrypt_business_owners(state, &sv.tenant_id).await?;
-    let business_owners = dbos
+    // Unfortunately we have no way of ensuring whether or not we BO first name + last name is present
+    // so we just opportunistically send if we have both fn/ln
+    let business_owners = bvw
+        .decrypt_business_owners(state, &sv.tenant_id)
+        .await?
         .into_iter()
-        .map(|bo| -> FpResult<_> {
-            let Some((first_name, last_name)) = bo.first_name.zip(bo.last_name) else {
-                // The BO exists, but it doesn't have a name - means we haven't yet collected the BO's info
-                return ValidationError("BO is missing name").into();
-            };
-            Ok(BoData {
-                first_name,
-                last_name,
+        .filter_map(|bo| {
+            bo.first_name.and_then(|first_name| {
+                bo.last_name.map(|last_name| BoData {
+                    first_name,
+                    last_name,
+                })
             })
         })
-        .collect::<FpResult<Vec<_>>>()?;
+        .collect();
+
 
     // Get remaining Business vault data
     let all_bdks: Vec<_> = BDK::iter()

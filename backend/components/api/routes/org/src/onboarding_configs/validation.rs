@@ -327,7 +327,10 @@ impl ObConfigurationArgsToValidate {
                 .iter()
                 .any(|cdo| cdo.parent().data_identifier_kind() == DID::Id);
             if has_bo_cdo != collecting_kyc_data {
-                return ValidationError("Must collect identity data if and only if collecting BOs").into();
+                return Err(TenantError::ValidationError(
+                    "Must collect identity data if and only if collecting BOs".to_string(),
+                )
+                .into());
             }
 
             if !has_bo_cdo && !self.verification_checks.skip_kyc() {

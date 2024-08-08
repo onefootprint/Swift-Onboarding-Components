@@ -139,6 +139,46 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     assert body["status"] == "pass"
 
 
+def test_kyb_with_no_bo_collection_but_bos_linked(sandbox_tenant):
+    """
+    For a playbook that does NOT require collection of business owners via `business_beneficial_owners`, tenants can still link BOs via API
+    """
+    business_cdos = ["business_name", "business_tin", "business_address"]
+    must_collect_data = business_cdos
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Business-only config",
+        must_collect_data,
+        must_collect_data,
+        kind="kyb",
+        skip_kyc=True,
+    )
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in business_cdos for di in CDO_TO_DIS[cdo]
+    }
+    body = post("businesses", vault_data, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+
+    # Link the BO, then should be able to KYB, we just ignore the BO data
+    data = {"id.first_name": "Piip", "id.ssn9": "123456789"}
+    body = post("users", data, sandbox_tenant.sk.key)
+    api_linked_bo_fp_id = body["id"]
+    data = dict(fp_id=body["id"], ownership_stake=50)
+    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+
+    # Run KYB
+    data = dict(key=obc.key.value, fixture_result="pass")
+    body = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
+    assert body["requires_manual_review"] == False
+    assert body["status"] == "pass"
+    fp_bid = body["fp_id"]
+
+    # Can retrieve BO
+    body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
+    assert len(body["data"]) == 1
+    assert body["data"][0]["fp_id"] == api_linked_bo_fp_id
+
+
 def test_public_bos(sandbox_tenant, kyb_sandbox_ob_config):
     # Cannot link a BO when the business was created via bifrost
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
