@@ -43,7 +43,7 @@ const SectionCards = () => {
       <SectionCard
         title={t('kyc.title')}
         subtitle={t('kyc.description')}
-        href="/kyc/getting-started"
+        href="/articles/kyc/getting-started"
         icon={IcoIdCard24}
         gridArea="kyc"
         ref={kycHover}
@@ -54,7 +54,7 @@ const SectionCards = () => {
       <SectionCard
         title={t('kyb.title')}
         subtitle={t('kyb.description')}
-        href="/kyb/getting-started"
+        href="/articles/kyb/getting-started"
         icon={IcoStore24}
         gridArea="kyb"
         ref={kybHover}
@@ -65,7 +65,7 @@ const SectionCards = () => {
       <SectionCard
         title={t('vaulting.title')}
         subtitle={t('vaulting.description')}
-        href="https://docs.onefootprint.com/vault/fields"
+        href="/articles/vault/fields"
         icon={IcoDatabase24}
         gridArea="vaulting"
         ref={vaultingHover}
@@ -76,7 +76,7 @@ const SectionCards = () => {
       <SectionCard
         title={t('vault-proxy.title')}
         subtitle={t('vault-proxy.description')}
-        href="/vault/proxy"
+        href="/articles/vault/proxy"
         icon={IcoLayer0124}
         gridArea="vault-proxy"
         ref={vaultProxyHover}
@@ -87,7 +87,7 @@ const SectionCards = () => {
       <SectionCard
         title={t('embedded-components.title')}
         subtitle={t('embedded-components.description')}
-        href="/embedded-components/getting-started"
+        href="/articles/embedded-components/getting-started"
         icon={IcoGridMasonry24}
         gridArea="components"
         ref={otherComponentsHover}

@@ -17,11 +17,11 @@ This guide explains how to integrate the Footprint Form component into your Java
 
 1. **Before starting**:
 
-- We recommend you reading our [quick-start guide](/embedded-components/getting-started), which explains a bit more about this product.
+- We recommend you reading our [quick-start guide](/articles/embedded-components/getting-started), which explains a bit more about this product.
 
 2. **Obtain an `authToken`**:
 
-- Perform steps 1-5 from [here](/embedded-components/getting-started#add-footprint-js-to-your-app).
+- Perform steps 1-5 from [here](/articles/embedded-components/getting-started#add-footprint-js-to-your-app).
 
 3. **Initialize the Footprint Flow**:
 
@@ -47,7 +47,7 @@ const renderForm = () => {
 
 4. **Handle Completion:**
 
-- When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](/vault/apis#decrypt-data-from-a-users-vault).
+- When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](/articles/vault/apis#decrypt-data-from-a-users-vault).
 
 Click [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js) to check out a full example.
 
@@ -99,14 +99,14 @@ const component = footprint.init({
 component.render();
 ```
 
-For more information, including a list of available variables, check out the [customization guide](/integrate/customization).
+For more information, including a list of available variables, check out the [customization guide](/articles/integrate/customization).
 
 ## Available Props
 
 | Variable      | Description                                                                                                                                                                                                                                                           |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
 | `title`       | Optional. A form header.                                                                                                                                                                                                                                              |
-| `authToken`   | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/integrate/user-specific-sessions).                                                                                       |
+| `authToken`   | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/articles/integrate/user-specific-sessions).                                                                                       |
 | `onComplete`  | Triggered after user completes the form and data is saved to the user vault.                                                                                                                                                                                          |
 | `onError`     | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                                  |
 | `onCancel`    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |

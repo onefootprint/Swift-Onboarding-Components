@@ -14,7 +14,7 @@ Footprint's unified onboarding and vaulting platform makes it simple to vault se
 
 ## Prequisites
 
-Please read our [Server-side API Authentication guide](/integrate/api-authentication).
+Please read our [Server-side API Authentication guide](/articles/integrate/api-authentication).
 
 ## Step 1: Use an existing vault or create a new one (server-side)
 
@@ -36,7 +36,7 @@ curl https://api.onefootprint.com/users \
 }
 ```
 
-If you're migrating other sensitive data, [read our guide here](/integrate/migrate-existing-data)
+If you're migrating other sensitive data, [read our guide here](/articles/integrate/migrate-existing-data)
 Make sure to store the `fp_id` on your user record to access and vault data.
 
 ## Step 2: Create a client token (server-side)
@@ -45,7 +45,7 @@ In order to vault data directly from client code, you need to generate a short-l
 
 Footprint's vault supports several types of structured data like identity data, card-holder data, and custom data for arbitrary key-value records. For structured data Footprint can validate that data is in the right format to ensure that you can reliably use this data in various applications and reporting/compliance needs. For unstructured data, you can store any other sensitive user data that may not fit the mold.
 
-[Learn more about how to namespace and vault identity, card, and custom data](https://docs.onefootprint.com/vault/apis#payment-cards). Note that card objects can be named, i.e. `card.primary` or `card.secondary`. This lets you store arbitrarily many cards in a user vault and control the naming scheme for each card.
+[Learn more about how to namespace and vault identity, card, and custom data](/articles/vault/apis#payment-cards). Note that card objects can be named, i.e. `card.primary` or `card.secondary`. This lets you store arbitrarily many cards in a user vault and control the naming scheme for each card.
 
 ### Example request
 

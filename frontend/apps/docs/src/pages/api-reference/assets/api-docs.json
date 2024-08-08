@@ -38,7 +38,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -426,7 +426,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -969,7 +969,7 @@
                     "ClientVaulting",
                     "PublicApi"
                 ],
-                "description": "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](https://docs.onefootprint.com/embedded-components/getting-started).",
+                "description": "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](/articles/embedded-components/getting-started).",
                 "parameters": [
                     {
                         "in": "path",
@@ -1016,7 +1016,7 @@
                     "Users",
                     "PublicApi"
                 ],
-                "description": "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
+                "description": "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](/articles/integrate/user-specific-sessions).",
                 "parameters": [
                     {
                         "in": "path",
@@ -1947,7 +1947,7 @@
                     "VaultProxy",
                     "PublicApi"
                 ],
-                "description": "Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy. Tokens use the same syntax as the vault proxy. More information on vault proxy tokens can be found [here](https://docs.onefootprint.com/vault/proxy#basics-token-body-template-format).",
+                "description": "Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy. Tokens use the same syntax as the vault proxy. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).",
                 "parameters": [
                     {
                         "in": "header",
@@ -2212,7 +2212,7 @@
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms.\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
-                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/articles/vault/proxy#filter-functions",
                             "type": "string",
                             "enum": [
                                 "to_lowercase",
@@ -2589,7 +2589,7 @@
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
-                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/articles/vault/proxy#filter-functions",
                             "type": "string",
                             "enum": [
                                 "to_lowercase",
@@ -3113,7 +3113,7 @@
                         "type": "string"
                     },
                     "kind": {
-                        "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `reonboard` creates a token that reonboards the user onto the last playbook that they\n   onboarded onto.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
+                        "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `reonboard` creates a token that reonboards the user onto the last playbook that they\n   onboarded onto.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
                         "type": "string",
                         "enum": [
                             "onboard",
@@ -4338,7 +4338,7 @@
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms.\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
-                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/articles/vault/proxy#filter-functions",
                             "type": "string",
                             "enum": [
                                 "to_lowercase",
