@@ -1434,6 +1434,10 @@
         "mobile-front-photo-fallback-upload": {
           "title": "Tiempo excedido",
           "subtitle": {
+            "bankStatement": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu estado de cuenta.",
+            "custom": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de {{custom}}.",
+            "utilityBill": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu recibo de luz o agua.",
+            "lease": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu alquiler.",
             "driversLicense": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu licencia de conducir.",
             "idCard": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta de identidad.",
             "passport": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu pasaporte.",
@@ -1454,6 +1458,10 @@
         "mobile-back-photo-fallback-upload": {
           "title": "Tiempo excedido",
           "subtitle": {
+            "bankStatement": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu estado de cuenta.",
+            "custom": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de {{custom}}.",
+            "utilityBill": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu recibo de luz o agua.",
+            "lease": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu alquiler.",
             "driversLicense": "No podemos acceder a tu cámara en este momento. Sube manualmente una imagen del lado posterior de tu licencia de conducir.",
             "idCard": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta de identidad.",
             "passport": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu pasaporte.",

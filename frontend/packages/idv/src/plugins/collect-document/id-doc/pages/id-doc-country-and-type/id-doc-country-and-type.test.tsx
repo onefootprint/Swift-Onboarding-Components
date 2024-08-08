@@ -21,13 +21,13 @@ import {
 let submittedData: {
   id: string;
   country: CountryRecord;
-  docType: SupportedIdDocTypes;
+  docType: `${SupportedIdDocTypes}`;
 };
 
 const handleSubmitDocTypeSuccess = (
   data: SubmitDocTypeResponse,
   country: CountryRecord,
-  docType: SupportedIdDocTypes,
+  docType: `${SupportedIdDocTypes}`,
 ) => {
   const { id } = data;
   submittedData = { id, country, docType };

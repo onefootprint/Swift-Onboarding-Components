@@ -13,9 +13,7 @@ import DesktopSelfie from '../desktop-selfie';
 import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
 import IdDocCountryAndType from '../id-doc-country-and-type';
-import MobileBackPhotoFallbackUpload from '../mobile-back-photo-fallback-upload';
-import MobileFrontPhotoFallbackUpload from '../mobile-front-photo-fallback-upload';
-import MobileSelfieFallbackUpload from '../mobile-selfie-fallback-upload';
+import MobileFallbackUpload from '../mobile-fallback-upload';
 import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
 
@@ -61,7 +59,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileFrontPhotoFallback')) {
-    return <MobileFrontPhotoFallbackUpload />;
+    return <MobileFallbackUpload imageType="front" onTakePhotoClick={() => send({ type: 'startImageCapture' })} />;
   }
 
   if (state.matches('mobileFrontImageRetry')) {
@@ -94,7 +92,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileBackPhotoFallback')) {
-    return <MobileBackPhotoFallbackUpload />;
+    return <MobileFallbackUpload imageType="back" />;
   }
 
   if (state.matches('mobileBackImageRetry')) {
@@ -127,7 +125,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileSelfieFallback')) {
-    return <MobileSelfieFallbackUpload />;
+    return <MobileFallbackUpload imageType="selfie" />;
   }
 
   if (state.matches('mobileSelfieImageRetry')) {

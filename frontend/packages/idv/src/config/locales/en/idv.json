@@ -1433,6 +1433,10 @@
         "mobile-front-photo-fallback-upload": {
           "title": "Time exceeded",
           "subtitle": {
+            "bankStatement": "We're unable to access your camera at this time. Please manually upload the front side of your bank statement",
+            "custom": "We're unable to access your camera at this time. Please manually upload the front side of your {{custom}}",
+            "utilityBill": "We're unable to access your camera at this time. Please manually upload the front side of your utility bill",
+            "lease": "We're unable to access your camera at this time. Please manually upload the front side of your lease",
             "driversLicense": "We're unable to access your camera at this time. Please manually upload the front side of your driver's license",
             "idCard": "We're unable to access your camera at this time. Please manually upload the front side of your ID card",
             "passport": "We're unable to access your camera at this time. Please manually upload the front side of your passport",
@@ -1453,6 +1457,10 @@
         "mobile-back-photo-fallback-upload": {
           "title": "Time exceeded",
           "subtitle": {
+            "bankStatement": "We're unable to access your camera at this time. Please manually upload the front side of your bank statement",
+            "custom": "We're unable to access your camera at this time. Please manually upload the front side of your {{custom}}",
+            "utilityBill": "We're unable to access your camera at this time. Please manually upload the front side of your utility bill",
+            "lease": "We're unable to access your camera at this time. Please manually upload the front side of your lease",
             "driversLicense": "We're unable to access your camera at this time. Please manually upload the back side of your driver's license",
             "idCard": "We're unable to access your camera at this time. Please manually upload the back side of your ID card",
             "passport": "We're unable to access your camera at this time. Please manually upload the back side of your passport",

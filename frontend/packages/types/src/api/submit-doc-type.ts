@@ -2,7 +2,7 @@ import type { CountryCode, DocumentRequestKind, IdDocOutcome, SupportedIdDocType
 
 export type SubmitDocTypeRequest = {
   authToken: string;
-  documentType: SupportedIdDocTypes | DocumentRequestKind;
+  documentType: `${SupportedIdDocTypes}` | `${DocumentRequestKind}`;
   requestId: string;
   fixtureResult?: IdDocOutcome;
   countryCode?: CountryCode;

@@ -26,7 +26,7 @@ export type MachineContext = {
   };
   currSide?: IdDocImageTypes;
   idDoc: {
-    type?: SupportedIdDocTypes;
+    type?: `${SupportedIdDocTypes}`;
     country?: CountryCode;
   };
   id?: string;
@@ -51,7 +51,7 @@ export type MachineEvents =
   | { type: 'navigatedToPrev' }
   | { type: 'nextSide'; payload: { nextSideToCollect: string } }
   | { type: 'processingErrored'; payload: { errors: { errorType: IdDocImageProcessingError; errorInfo?: string }[] } }
-  | { type: 'receivedCountryAndType'; payload: { type?: SupportedIdDocTypes; country?: CountryCode; id: string } }
+  | { type: 'receivedCountryAndType'; payload: { type?: `${SupportedIdDocTypes}`; country?: CountryCode; id: string } }
   | { type: 'receivedImage'; payload: { imageFile: File | Blob; captureKind: CaptureKind; extraCompressed?: boolean } }
   | { type: 'retryLimitExceeded' }
   | { type: 'startImageCapture' }

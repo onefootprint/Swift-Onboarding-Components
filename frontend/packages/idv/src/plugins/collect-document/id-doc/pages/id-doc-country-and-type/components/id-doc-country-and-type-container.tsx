@@ -24,7 +24,11 @@ import useOptionsByDocType from '../hooks/use-options-by-doc-type';
 import ConsentMobile from './components/consent-mobile';
 
 type IdDocCountryAndTypeContainerProps = {
-  onSubmitDocTypeSuccess: (data: SubmitDocTypeResponse, country: CountryRecord, docType: SupportedIdDocTypes) => void;
+  onSubmitDocTypeSuccess: (
+    data: SubmitDocTypeResponse,
+    country: CountryRecord,
+    docType: `${SupportedIdDocTypes}`,
+  ) => void;
   onConsentSubmit: () => void;
 };
 
@@ -57,7 +61,7 @@ const IdDocCountryAndTypeContainer = ({
 
   const types: SupportedIdDocTypes[] = supportedCountryAndDocTypes[country.value] ?? [];
   const firstTypeFromOptions = types.length ? types[0] : SupportedIdDocTypes.passport;
-  const [docType, setDocType] = useState<SupportedIdDocTypes>(defaultType ?? firstTypeFromOptions);
+  const [docType, setDocType] = useState<`${SupportedIdDocTypes}`>(defaultType ?? firstTypeFromOptions);
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);

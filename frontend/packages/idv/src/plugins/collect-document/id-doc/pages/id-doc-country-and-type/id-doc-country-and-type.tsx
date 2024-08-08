@@ -11,7 +11,7 @@ const IdDocCountryAndType = () => {
   const handleSubmitDocTypeSuccess = (
     data: SubmitDocTypeResponse,
     country: CountryRecord,
-    docType: SupportedIdDocTypes,
+    docType: `${SupportedIdDocTypes}`,
   ) => {
     const { id } = data;
     send({
