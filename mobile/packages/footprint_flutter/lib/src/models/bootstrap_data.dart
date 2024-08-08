@@ -41,6 +41,7 @@ class FootprintBootstrapData {
   final String? businessTin;
   final String? businessWebsite;
   final String? businessZip;
+  final CustomField? custom;
 
   FootprintBootstrapData(
       {this.email,
@@ -81,6 +82,7 @@ class FootprintBootstrapData {
       this.businessState,
       this.businessTin,
       this.businessWebsite,
+      this.custom,
       this.businessZip});
 
   @internal
@@ -126,10 +128,95 @@ class FootprintBootstrapData {
       'business.state': businessState,
       'business.tin': businessTin,
       'business.website': businessWebsite,
-      'business.zip': businessZip
+      'business.zip': businessZip,
+      ...custom?.toJson() ?? {},
     };
     map.removeWhere((key, value) => value == null);
     return map;
+  }
+
+  bool _isKycedBoKey(String key) {
+    // Starts with business.kyced_beneficial_owners
+    // Has index in the middle inside []
+    // Ends with .first_name or .last_name or .middle_name or .ownership_stake or .email or .phone_number
+    // use regex to match
+    return RegExp(
+            r'^business\.kyced_beneficial_owners\[\d+\]\.(first_name|last_name|middle_name|ownership_stake|email|phone_number)$')
+        .hasMatch(key);
+  }
+
+  bool _isBoKey(String key) {
+    // Starts with business.beneficial_owners
+    // Has index in the middle inside []
+    // Ends with .first_name or .last_name or .middle_name or .ownership_stake or .email or .phone_number
+    // use regex to match
+    return RegExp(
+            r'^business\.beneficial_owners\[\d+\]\.(first_name|last_name|middle_name|ownership_stake|email|phone_number)$')
+        .hasMatch(key);
+  }
+
+  int _getBoIndex(String key) {
+    return int.parse(key.split('[')[1].split(']')[0]);
+  }
+
+  String _getBoField(String key) {
+    return key.split('.')[2];
+  }
+
+  List<BusinessBeneficialOwners> _updateBoField(
+      List<BusinessBeneficialOwners> boList, int index, String field, value) {
+    if (index > boList.length) {
+      throw Exception('Request beneficial owner field index out of bounds');
+    }
+    if (index == boList.length) {
+      return boList +
+          [
+            BusinessBeneficialOwners(
+              boEmail: field == 'email' ? value : null,
+              boFirstName: field == 'first_name' ? value : null,
+              boLastName: field == 'last_name' ? value : null,
+              boMiddleName: field == 'middle_name' ? value : null,
+              boOwnershipStack:
+                  field == 'ownership_stake' ? int.tryParse(value) : null,
+              boPhoneNumber: field == 'phone_number' ? value : null,
+            )
+          ];
+    }
+    return boList.map((bo) {
+      if (boList.indexOf(bo) == index) {
+        return BusinessBeneficialOwners(
+          boEmail: field == 'email' ? value : bo.boEmail,
+          boFirstName: field == 'first_name' ? value : bo.boFirstName,
+          boLastName: field == 'last_name' ? value : bo.boLastName,
+          boMiddleName: field == 'middle_name' ? value : bo.boMiddleName,
+          boOwnershipStack: field == 'ownership_stake'
+              ? int.tryParse(value)
+              : bo.boOwnershipStack,
+          boPhoneNumber: field == 'phone_number' ? value : bo.boPhoneNumber,
+        );
+      }
+      return bo;
+    }).toList();
+  }
+
+  List<BusinessBeneficialOwners>? _getUpdatedBoList(
+    List<BusinessBeneficialOwners>? boList,
+    String key,
+    dynamic value,
+    bool isKyced,
+  ) {
+    if (isKyced) {
+      if (!_isKycedBoKey(key)) {
+        return boList;
+      }
+    } else {
+      if (!_isBoKey(key)) {
+        return boList;
+      }
+    }
+    int index = _getBoIndex(key);
+    String field = _getBoField(key);
+    return _updateBoField(boList ?? [], index, field, value);
   }
 
   FootprintBootstrapData setField(String key, dynamic value) {
@@ -164,9 +251,8 @@ class FootprintBootstrapData {
           key == 'business.address_line1' ? value : businessAddressLine1,
       businessAddressLine2:
           key == 'business.address_line2' ? value : businessAddressLine2,
-      businessBeneficialOwners: key == 'business.beneficial_owners'
-          ? value
-          : businessBeneficialOwners,
+      businessBeneficialOwners:
+          _getUpdatedBoList(businessBeneficialOwners, key, value, false),
       businessCity: key == 'business.city' ? value : businessCity,
       businessCorporationType:
           key == 'business.corporation_type' ? value : businessCorporationType,
@@ -176,9 +262,8 @@ class FootprintBootstrapData {
           key == 'business.formation_date' ? value : businessFormationDate,
       businessFormationState:
           key == 'business.formation_state' ? value : businessFormationState,
-      businessKycedBeneficialOwners: key == 'business.kyced_beneficial_owners'
-          ? value
-          : businessKycedBeneficialOwners,
+      businessKycedBeneficialOwners:
+          _getUpdatedBoList(businessKycedBeneficialOwners, key, value, true),
       businessName: key == 'business.name' ? value : businessName,
       businessPhoneNumber:
           key == 'business.phone_number' ? value : businessPhoneNumber,
@@ -186,6 +271,9 @@ class FootprintBootstrapData {
       businessTin: key == 'business.tin' ? value : businessTin,
       businessWebsite: key == 'business.website' ? value : businessWebsite,
       businessZip: key == 'business.zip' ? value : businessZip,
+      custom: key.startsWith("custom.")
+          ? CustomField(key: key, value: value)
+          : custom,
     );
   }
 }
@@ -219,5 +307,19 @@ class BusinessBeneficialOwners {
     };
     map.removeWhere((key, value) => value == null);
     return map;
+  }
+}
+
+class CustomField {
+  final String key;
+  final String value;
+
+  CustomField({required this.key, required this.value});
+
+  @internal
+  Map<String, dynamic> toJson() {
+    return {
+      key: value,
+    };
   }
 }

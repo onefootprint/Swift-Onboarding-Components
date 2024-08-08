@@ -14,7 +14,6 @@ class FootprintTextInput extends ConsumerWidget {
     this.hintText,
     this.obscureText = false,
     this.obscuringCharacter = '•',
-    this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.textAlign = TextAlign.start,
     this.textAlignVertical,
@@ -49,7 +48,6 @@ class FootprintTextInput extends ConsumerWidget {
   final String? hintText;
   final bool obscureText;
   final String obscuringCharacter;
-  final TextInputAction? textInputAction;
   final TextCapitalization textCapitalization;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
@@ -83,14 +81,18 @@ class FootprintTextInput extends ConsumerWidget {
     final (
       :validator,
       :keyboardType,
+      :textInputAction,
       :inputFormatters,
+      :autofillHints,
       :maxLength,
     ) = inputProps ??
         (
           validator: null,
           keyboardType: null,
           inputFormatters: null,
-          maxLength: null
+          textInputAction: null,
+          maxLength: null,
+          autofillHints: null,
         );
 
     return TextFormField(
@@ -132,6 +134,7 @@ class FootprintTextInput extends ConsumerWidget {
       onChanged: onChanged,
       onEditingComplete: onEditingComplete,
       onFieldSubmitted: onFieldSubmitted,
+      autofillHints: autofillHints,
       onSaved: (value) {
         ref.read(formContextNotifierProvider.notifier).setValue(name, value);
       },

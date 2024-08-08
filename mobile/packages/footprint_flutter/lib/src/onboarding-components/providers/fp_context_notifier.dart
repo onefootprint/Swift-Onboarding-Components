@@ -13,7 +13,7 @@ class FpContextNotifier extends _$FpContextNotifier {
       publicKey: '',
       step: OnboardingStep.auth,
       appearance: null,
-      locale: null,
+      locale: FootprintSupportedLocale.enUS,
       onboardingConfig: null,
       authToken: null,
       vaultingToken: null,

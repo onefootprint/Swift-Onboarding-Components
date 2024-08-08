@@ -34,16 +34,17 @@ class _WrapperState extends ConsumerState<Wrapper> {
     super.initState();
     // we initialize the provider with the context after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentProvider = ref.read(fpContextNotifierProvider);
       ref.read(fpContextNotifierProvider.notifier).init(
             ProviderContext(
               publicKey: widget.publicKey,
               step: widget.authToken != null
                   ? OnboardingStep.onboard
                   : OnboardingStep.auth,
-              appearance: widget.appearance,
-              locale: widget.locale,
+              appearance: widget.appearance ?? currentProvider.appearance,
+              locale: widget.locale ?? currentProvider.locale,
               onboardingConfig: null,
-              authToken: widget.authToken,
+              authToken: widget.authToken ?? currentProvider.authToken,
               vaultingToken: null,
               redirectUrl: widget.redirectUrl,
             ),
