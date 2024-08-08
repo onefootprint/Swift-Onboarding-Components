@@ -3,9 +3,13 @@ import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_
 
 class FootprintService extends InheritedWidget {
   final IdentifyLauncher launchIdentify;
+  final SaveFunc save;
+  final HandoffFunc handoff;
 
   const FootprintService({
     required this.launchIdentify,
+    required this.save,
+    required this.handoff,
     required Widget child,
     Key? key,
   }) : super(key: key, child: child);

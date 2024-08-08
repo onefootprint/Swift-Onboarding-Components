@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/save.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/browser.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/save_utils.dart';
 
 typedef IdentifyLauncher = void Function({
   String? email,
@@ -13,8 +17,15 @@ typedef IdentifyLauncher = void Function({
   void Function()? onCancel,
 });
 
-({IdentifyLauncher launchIdentify}) getFootprintService(
-    BuildContext context, WidgetRef ref) {
+typedef SaveFunc = Future<void> Function(FootprintBootstrapData data);
+typedef HandoffFunc = void Function({
+  void Function(String validationToken)? onComplete,
+  void Function(Object err)? onError,
+  void Function()? onCancel,
+});
+
+({IdentifyLauncher launchIdentify, SaveFunc save, HandoffFunc handoff})
+    getFootprintService(BuildContext context, WidgetRef ref) {
   final fpWebview = Browser();
 
   void launchIdentify({
@@ -57,5 +68,66 @@ typedef IdentifyLauncher = void Function({
     fpWebview.init(config, OnboardingStep.auth, context);
   }
 
-  return (launchIdentify: launchIdentify);
+  Future<void> vault(FootprintBootstrapData data) async {
+    final fpContext = ref.read(fpContextNotifierProvider);
+    final vaultToken = fpContext.vaultingToken;
+    final onboardingConfig = fpContext.onboardingConfig;
+    final locale = fpContext.locale;
+
+    if (vaultToken == null) {
+      throw Exception('No auth token found. Please authenticate first.');
+    }
+
+    if (onboardingConfig == null) {
+      throw Exception(
+          'No onboarding config found. Please make sure that the publicKey is correct.');
+    }
+
+    if (onboardingConfig.kind != OnboardingConfigKind.kyc &&
+        onboardingConfig.kind != OnboardingConfigKind.kyb) {
+      throw Exception(
+          'Unsupported onboarding config kind. Please make sure that the kind is either "kyc" or "kyb".');
+    }
+
+    final formattedData = formatBeforeSave(
+        data.toJson(), locale ?? FootprintSupportedLocale.enUS);
+
+    await save(SaveDataRequest(
+        data: formattedData, bootstrapDis: [], authToken: vaultToken));
+  }
+
+  void handoff({
+    void Function(String validationToken)? onComplete,
+    void Function(Object err)? onError,
+    void Function()? onCancel,
+  }) {
+    final fpContext = ref.read(fpContextNotifierProvider);
+    final authToken = fpContext.authToken;
+    final appearance = fpContext.appearance;
+    final redirectUrl = fpContext.redirectUrl;
+
+    if (authToken == null) {
+      onError
+          ?.call(Exception('No auth token found. Please authenticate first.'));
+      return;
+    }
+
+    final config = FootprintConfiguration(
+        authToken: authToken,
+        appearance: appearance,
+        redirectUrl: redirectUrl,
+        onComplete: (validationToken) {
+          onComplete?.call(validationToken);
+        },
+        onError: (err) {
+          onError?.call(err);
+        },
+        onCancel: () {
+          onCancel?.call();
+        });
+
+    fpWebview.init(config, OnboardingStep.onboard, context);
+  }
+
+  return (launchIdentify: launchIdentify, save: vault, handoff: handoff);
 }

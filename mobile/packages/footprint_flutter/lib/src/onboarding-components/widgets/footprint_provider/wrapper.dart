@@ -4,6 +4,7 @@ import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
 
 class Wrapper extends ConsumerStatefulWidget {
@@ -49,14 +50,22 @@ class _WrapperState extends ConsumerState<Wrapper> {
               redirectUrl: widget.redirectUrl,
             ),
           );
+      getOnboardingConfig(widget.publicKey).then((config) {
+        ref
+            .read(fpContextNotifierProvider.notifier)
+            .updateOnboardingConfig(config);
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final (:launchIdentify) = getFootprintService(context, ref);
+    final (:launchIdentify, :save, :handoff) =
+        getFootprintService(context, ref);
     return FootprintService(
       launchIdentify: launchIdentify,
+      save: save,
+      handoff: handoff,
       child: widget.child,
     );
   }
