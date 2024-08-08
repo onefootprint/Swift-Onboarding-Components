@@ -6,14 +6,10 @@ import CameraAccessRequest from '../../../components/camera-access-request';
 import CaptureRetryPrompt from '../../components/capture-retry-prompt';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import BackPhotoCapture from '../back-photo-capture';
-import DesktopBackPhoto from '../desktop-back-photo';
-import DesktopBackPhotoRetry from '../desktop-back-photo-retry';
+import DesktopCapture from '../desktop-capture';
 import DesktopConsent from '../desktop-consent';
-import DesktopFrontPhoto from '../desktop-front-photo';
-import DesktopFrontPhotoRetry from '../desktop-front-photo-retry';
 import DesktopProcessing from '../desktop-processing';
 import DesktopSelfie from '../desktop-selfie';
-import DesktopSelfieFallbackUpload from '../desktop-selfie-fallback-upload';
 import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
 import IdDocCountryAndType from '../id-doc-country-and-type';
@@ -73,11 +69,24 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('desktopFrontImage')) {
-    return <DesktopFrontPhoto />;
+    return (
+      <DesktopCapture
+        imageType="front"
+        onBack={() => send({ type: 'navigatedToCountryDoc' })}
+        onComplete={payload => send({ type: 'receivedImage', payload })}
+      />
+    );
   }
 
   if (state.matches('desktopFrontImageRetry')) {
-    return <DesktopFrontPhotoRetry />;
+    return (
+      <DesktopCapture
+        imageType="front"
+        isRetry
+        onBack={() => send({ type: 'navigatedToCountryDoc' })}
+        onComplete={payload => send({ type: 'receivedImage', payload })}
+      />
+    );
   }
 
   if (state.matches('mobileBackImageCapture')) {
@@ -93,11 +102,24 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('desktopBackImage')) {
-    return <DesktopBackPhoto />;
+    return (
+      <DesktopCapture
+        imageType="back"
+        onBack={() => send({ type: 'navigatedToCountryDoc' })}
+        onComplete={payload => send({ type: 'receivedImage', payload })}
+      />
+    );
   }
 
   if (state.matches('desktopBackImageRetry')) {
-    return <DesktopBackPhotoRetry />;
+    return (
+      <DesktopCapture
+        imageType="back"
+        isRetry
+        onBack={() => send({ type: 'navigatedToCountryDoc' })}
+        onComplete={payload => send({ type: 'receivedImage', payload })}
+      />
+    );
   }
 
   if (state.matches('mobileSelfieImage')) {
@@ -117,7 +139,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('desktopSelfieFallback')) {
-    return <DesktopSelfieFallbackUpload />;
+    return <DesktopCapture imageType="selfie" onComplete={payload => send({ type: 'receivedImage', payload })} />;
   }
 
   if (state.matches('desktopSelfieImageRetry')) {
