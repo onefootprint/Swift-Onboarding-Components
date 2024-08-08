@@ -190,29 +190,31 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       fill: ${linkButton[styleVariant].color.text.initial};
       vertical-align: middle;
 
-      svg {
-        path {
-          color: ${linkButton[styleVariant].color.text.initial};
-          fill: ${linkButton[styleVariant].color.text.initial};
-          stroke: ${linkButton[styleVariant].color.text.initial};
-        }
+      &:hover {
+        color: ${linkButton[styleVariant].color.text.hover};
       }
 
-      &:hover,
-      &:hover svg {
-        color: ${linkButton[styleVariant].color.text.hover};
+      &:active {
+        color: ${linkButton[styleVariant].color.text.active};
+      }
+    
+      &:disabled {
+        color: ${linkButton[styleVariant].color.text.disabled};
+      }
+
+      svg {
+        fill: ${linkButton[styleVariant].color.text.initial};
+      }
+
+      &:hover svg path {
         fill: ${linkButton[styleVariant].color.text.hover};
       }
 
-      &:active,
-      &:active svg {
-        color: ${linkButton[styleVariant].color.text.active};
+      &:active svg path {
         fill: ${linkButton[styleVariant].color.text.active};
       }
 
-      &:disabled,
-      &:disabled svg {
-        color: ${linkButton[styleVariant].color.text.disabled};
+      &:disabled svg path {
         fill: ${linkButton[styleVariant].color.text.disabled};
       }
     `;
