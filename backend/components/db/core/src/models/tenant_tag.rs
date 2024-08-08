@@ -88,7 +88,7 @@ impl TenantTag {
         tenant_id: &TenantId,
         kind: Option<VaultKind>,
         is_live: bool,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<Vec<TenantTag>> {
         let mut query = tenant_tag::table
             .filter(tenant_tag::tenant_id.eq(tenant_id))
             .filter(tenant_tag::deactivated_at.is_null())

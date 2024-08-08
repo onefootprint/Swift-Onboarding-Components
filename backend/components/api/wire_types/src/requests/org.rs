@@ -5,6 +5,7 @@ use newtypes::CompanySize;
 use newtypes::TenantFrequentNoteKind;
 use newtypes::TenantRoleId;
 use newtypes::TenantRoleKindDiscriminant;
+use newtypes::VaultKind;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UpdateTenantRequest {
@@ -46,6 +47,17 @@ pub struct GetOrgFrequentNotes {
 pub struct CreateOrgFrequentNoteRequest {
     pub kind: TenantFrequentNoteKind,
     pub content: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct GetOrgTenantTag {
+    pub kind: VaultKind,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct CreateOrgTenantTagRequest {
+    pub kind: VaultKind,
+    pub tag: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]

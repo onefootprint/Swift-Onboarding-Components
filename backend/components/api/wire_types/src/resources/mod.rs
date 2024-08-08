@@ -162,3 +162,6 @@ pub use tenant_business_info::*;
 
 mod onboarding;
 pub use self::onboarding::*;
+
+mod org_tenant_tag;
+pub use org_tenant_tag::*;

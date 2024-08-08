@@ -23,6 +23,7 @@ mod organization_frequent_note;
 mod organization_member;
 mod organization_role;
 mod organization_rolebinding;
+mod organization_tenant_tag;
 mod partner_organization;
 mod private_tenant;
 mod proxy_config;

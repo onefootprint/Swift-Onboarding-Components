@@ -21,6 +21,7 @@ mod roles;
 mod rules;
 mod sdk_args;
 mod sdk_telemetry;
+mod tenant_tag;
 mod vault_dr;
 mod webhook_portal;
 
@@ -53,7 +54,10 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(client_security_config::patch)
         .service(frequent_notes::get)
         .service(frequent_notes::post)
-        .service(frequent_notes::delete);
+        .service(frequent_notes::delete)
+        .service(tenant_tag::get)
+        .service(tenant_tag::post)
+        .service(tenant_tag::delete);
 
     onboarding_configs::routes(config);
     authn::routes(config);
