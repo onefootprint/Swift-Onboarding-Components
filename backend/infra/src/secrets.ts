@@ -283,7 +283,7 @@ export async function LoadSecrets(
   const enclaveProxySecretName = `enclaveProxySecret-${stack}`;
 
   const datadogApiKey = config.requireSecret('datadogApiKey');
-  const datadogApiKeySecretName = `datadog-api-key-${stack}`;
+  const datadogApiKeySecretName = `datadog-api-key2-${stack}`;
 
   return {
     secretsPolicyArn: secretsPolicy.arn,
