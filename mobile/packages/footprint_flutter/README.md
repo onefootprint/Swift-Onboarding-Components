@@ -43,13 +43,13 @@ var config = FootprintConfiguration(
 footprint.init(config, context);
 ```
 
-Instead of a `publicKey`, you can also use an `authToken` that you generate for a specific playbook and user. You can find more instructions on how to do this [here](https://docs.onefootprint.com/integrate/user-specific-onboarding).
+Instead of a `publicKey`, you can also use an `authToken` that you generate for a specific playbook and user. You can find more instructions on how to do this [here](https://docs.onefootprint.com/articles/integrate/user-specific-onboarding).
 
 For a complete example, click here.
 
 ### Bootstraping user data
 
-Utilize the `bootstrapData` field in `FootprintConfiguration` to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/integrate/user-data) to find out more about the formatting and validation requirements we have for these inputs.
+Utilize the `bootstrapData` field in `FootprintConfiguration` to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/articles/integrate/user-data) to find out more about the formatting and validation requirements we have for these inputs.
 
 ```dart
 var config = FootprintConfiguration(
@@ -151,10 +151,10 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 | `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                          |
 | `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.                              |
 | `redirectUrl`   | Required. A deep link that will be navigated to when the web browser is closed.                                                                                                                         |
-| `bootstrapData` | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                    |
-| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options) |
+| `bootstrapData` | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/articles/integrate/user-data).                    |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/articles/integrate/customization#available-options) |
 | `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                   |
-| `l10n`          | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/articles/integrate/customization#localization-configuration).                                                |
 | `onComplete`    | Optional. A function that is called when the onboarding flow is completed by the user.                                                                                                                  |
 | `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                   |
 | `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                    |

@@ -42,7 +42,7 @@ const Seo = ({
     <meta property="og:title" content={og.title || title} />
     <meta property="og:description" content={og.description || description} />
     {og.author && <meta name="author" property="og:author" content={og.author} />}
-    <meta property="og:url" content={`https://docs.onefootprint.com/api-reference/"`} />
+    <meta property="og:url" content={`https://docs.onefootprint.com/api-reference/`} />
     <meta property="og:image" content={og.image || image} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={twitter.title || title} />

@@ -163,7 +163,7 @@
   });
   ```
 
-  For more details, check out our [docs page article](https://docs.onefootprint.com/integrate/customization#customizing-the-user-flow).
+  For more details, check out our [docs page article](https://docs.onefootprint.com/articles/integrate/customization#customizing-the-user-flow).
 
   ### Bootstrap
 
@@ -180,7 +180,7 @@
   };
   ```
 
-  For more details, check out our [docs page article](https://docs.onefootprint.com/integrate/user-data#bootstrap-user-data)
+  For more details, check out our [docs page article](https://docs.onefootprint.com/articles/integrate/user-data#bootstrap-user-data)
 
 ## 2.0.1
 
@@ -229,7 +229,7 @@
 
   Now, before you panic about reworking your current implementation, put your coding fingers at ease! 🖖 The new prefix is totally optional and our API remains backward compatible. We're still buddies with your old data format, and we're not ready to break up just yet.
 
-  For a more in-depth explanation, don't forget to check our [documentation](https://docs.onefootprint.com/integrate/user-data).📚
+  For a more in-depth explanation, don't forget to check our [documentation](https://docs.onefootprint.com/articles/integrate/user-data).📚
 
   That's all folks! We can't wait for you to try out these updates and enjoy the enhanced KYC experience with @onefootprint/footprint-js. As always, thank you for being a part of our journey. 🌍
 

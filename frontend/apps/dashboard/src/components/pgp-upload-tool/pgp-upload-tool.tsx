@@ -45,14 +45,14 @@ const PgpUploadTool = ({ open, onClose }: PgpUploadToolProps) => {
         <Stack direction="row" align="stretch" justify="space-between">
           <LinkButton
             variant="caption-2"
-            href="https://docs.onefootprint.com/integrate/migrate-existing-data#manual-migration-assistance-footprint-pgp-instructions"
+            href="https://docs.onefootprint.com/articles/integrate/migrate-existing-data#manual-migration-assistance-footprint-pgp-instructions"
             target="_blank"
           >
             {t('manual-pgp-instructions-link-title')}
           </LinkButton>
           <LinkButton
             variant="caption-2"
-            href="https://docs.onefootprint.com/integrate/migrate-existing-data#manual-migration-assistance-footprint-pgp-public-key"
+            href="https://docs.onefootprint.com/articles/integrate/migrate-existing-data#manual-migration-assistance-footprint-pgp-public-key"
             target="_blank"
           >
             {t('public-key-link-title')}

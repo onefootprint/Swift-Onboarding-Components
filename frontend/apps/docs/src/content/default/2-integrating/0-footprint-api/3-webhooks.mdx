@@ -34,7 +34,7 @@ When integrating with Footprint's frontend SDKs for collecting and verifying use
 
 We recommend subscribing to the <navigation-link fontFamily="code" href="https://www.svix.com/event-types/us/org_2LbAthqjvv71cc7eYpwvHoeuuEw/#footprint.onboarding.completed">footprint.onboarding.completed</navigation-link> event, which will fire when a user's onboarding has reached a terminal status.
 
-In most cases, the [status received synchronously](/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status) at the end of Footprint's onboarding flow will be a terminal `pass`, `fail`, or `none`. In some cases where identity verifications vendors take longer to verify a user, you will synchronously receive a `pending` status in your integration with the frontend SDK. In these cases, you will receive the final decision for an onboarding through the `footprint.onboarding.completed` event.
+In most cases, the [status received synchronously](/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status) at the end of Footprint's onboarding flow will be a terminal `pass`, `fail`, or `none`. In some cases where identity verifications vendors take longer to verify a user, you will synchronously receive a `pending` status in your integration with the frontend SDK. In these cases, you will receive the final decision for an onboarding through the `footprint.onboarding.completed` event.
 
 ## Manual review
 
