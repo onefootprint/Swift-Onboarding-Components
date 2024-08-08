@@ -16,14 +16,16 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data):
         sandbox_tenant,
         "Alpaca",
         must_collect_data,
-        must_collect_data,
-        "alpaca",
+        can_access_data=must_collect_data,
+        cip_kind="alpaca",
         enhanced_aml={
             "enhanced_aml": True,
             "ofac": True,
             "pep": True,
             "adverse_media": True,
         },
+        allow_us_residents=True,
+        allow_us_territories=True,
     )
 
 
@@ -53,7 +55,7 @@ def cdos_for_nationality_config(nationality_config):
         return []
 
 
-@pytest.skip(allow_module_level=True)
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "nationality_config",
     [
