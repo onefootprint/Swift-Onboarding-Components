@@ -43,7 +43,7 @@ Map<String, InputProps> getPersonProps(FootprintSupportedLocale? locale) {
       filter: {"#": RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
   InputProps phoneNumberInputProps = (
-    keyboardType: TextInputType.phone,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [phoneMaskFormatter],
     textInputAction: TextInputAction.done,
     maxLength: null,
@@ -82,7 +82,7 @@ Map<String, InputProps> getPersonProps(FootprintSupportedLocale? locale) {
     type: MaskAutoCompletionType.lazy,
   );
   InputProps dobInputProps = (
-    keyboardType: TextInputType.number,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [dobMaskFormatter],
     textInputAction: TextInputAction.done,
     maxLength: null,
@@ -96,7 +96,7 @@ Map<String, InputProps> getPersonProps(FootprintSupportedLocale? locale) {
   );
 
   InputProps ssn4InputProps = (
-    keyboardType: TextInputType.number,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [
       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
     ],
@@ -120,7 +120,7 @@ Map<String, InputProps> getPersonProps(FootprintSupportedLocale? locale) {
     type: MaskAutoCompletionType.lazy,
   );
   InputProps ssn9InputProps = (
-    keyboardType: TextInputType.number,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [
       ssn9MaskFormatter,
     ],
@@ -333,7 +333,7 @@ Map<String, InputProps> getBusinessProps() {
     type: MaskAutoCompletionType.lazy,
   );
   InputProps businessTinProps = (
-    keyboardType: TextInputType.number,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [
       businessTinyMaskFormatter,
     ],
@@ -368,7 +368,7 @@ Map<String, InputProps> getBusinessProps() {
     type: MaskAutoCompletionType.lazy,
   );
   InputProps businessPhoneNumberProps = (
-    keyboardType: TextInputType.phone,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: [businessPhoneMaskFormatter],
     textInputAction: TextInputAction.done,
     maxLength: null,
@@ -410,7 +410,7 @@ Map<String, InputProps> getBusinessProps() {
 
 Map<String, InputProps> getBoProps() {
   InputProps ownershipStakeProps = (
-    keyboardType: TextInputType.number,
+    keyboardType: const TextInputType.numberWithOptions(signed: true),
     inputFormatters: null,
     textInputAction: TextInputAction.done,
     maxLength: 50,
