@@ -24,7 +24,7 @@ class Browser {
   void Function(Object)? _handleErrorCallback;
   void Function({required String authToken, required String vaultingToken})?
       _handAuthComplete;
-  late OnboardingStep _step;
+  OnboardingStep? _step;
   _ResultType? _result;
 
   Browser() {
@@ -101,8 +101,8 @@ class Browser {
     }
   }
 
-  void _processUri(Uri? uri, OnboardingStep step) {
-    if (uri == null || uri == _latestUri) return;
+  void _processUri(Uri? uri, OnboardingStep? step) {
+    if (uri == null || uri == _latestUri || step == null) return;
     _latestUri = uri;
     final queryParameters = uri.queryParameters;
     if (_step == OnboardingStep.auth) {
