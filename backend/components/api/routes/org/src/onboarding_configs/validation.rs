@@ -590,6 +590,17 @@ impl ObConfigurationArgsToValidate {
                             Ok(())
                         }
                     }
+                    VerificationCheck::Phone {attributes} => {
+                        if attributes.is_empty() {
+                            Err(TenantError::ValidationError(
+                                "Must provide `attributes` if enabling a phone verification check".to_owned(),
+                            )
+                            .into())
+                        } else {
+                            Ok(())
+                        }
+                    }
+
                     _ => Ok(()),
                 }
             })?;

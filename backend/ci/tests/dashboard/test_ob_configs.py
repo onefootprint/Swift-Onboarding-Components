@@ -139,6 +139,26 @@ def test_config_create(sandbox_tenant):
             dict(
                 must_collect_data=[
                     "ssn4",
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                allow_international_residents=False,
+                international_country_restrictions=None,
+                verification_checks=[
+                    {"kind": "kyc", "data": {}},
+                    {"kind": "phone", "data": {"attributes": []}},
+                ],
+            ),
+            "Validation error: Must provide `attributes` if enabling a phone verification check",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "ssn4",
                     "ssn9",
                     "name",
                     "full_address",
