@@ -10,3 +10,7 @@
 
 - Remove theme variable from appearance
 - Fix a bug that prevented the users to initialize the flow with auth token
+
+## 2.0.0-beta
+
+- Introduction of onboarding components

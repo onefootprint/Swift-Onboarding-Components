@@ -1,11 +1,11 @@
 name: footprint_flutter
-description: 'A Flutter plugin for Footprint SDK.'
-version: 1.0.2
-homepage: https://docs.onefootprint.com/articles/sdks/flutter
+description: "A Flutter plugin for Footprint SDK."
+version: 2.0.0-beta
+homepage: https://docs.onefootprint.com/sdks/flutter
 
 environment:
-  sdk: '>=3.2.5 <4.0.0'
-  flutter: '>=3.3.0'
+  sdk: ">=3.2.5 <4.0.0"
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
