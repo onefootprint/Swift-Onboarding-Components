@@ -289,8 +289,11 @@ const createIsDocFirstFlowPayload = (formData: DataToCollectFormData, kind: Play
 };
 
 const createShouldSkipKyc = (skipKyc: boolean, formData: DataToCollectFormData) => {
-  // If we are not collecting beneficial owners, we should skip KYC by default
-  return collectsBOInfo(formData) ? true : skipKyc;
+  if (isKyb(formData.kind)) {
+    // If we are not collecting beneficial owners, we should skip KYC by default
+    return !collectsBOInfo(formData);
+  }
+  return skipKyc;
 };
 
 const createNamePayload = (nameForm: NameFormData) => {
