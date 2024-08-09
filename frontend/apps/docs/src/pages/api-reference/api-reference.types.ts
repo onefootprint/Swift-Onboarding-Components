@@ -16,7 +16,9 @@ export type PathProps = {
 
 export enum SecurityTypes {
   apiKey = 'Secret API Key',
-  clientToken = 'Client Token',
+  dashboard = 'Dashboard Token',
+  user = 'User Token',
+  userOnboarding = 'User Onboarding Token',
 }
 
 export type ParameterProps = {

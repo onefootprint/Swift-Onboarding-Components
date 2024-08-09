@@ -21,7 +21,6 @@ use newtypes::DataLifetimeSource;
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::Apiv2Security;
 use paperclip::v2::models::DataType;
 use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::Parameter;
@@ -40,15 +39,41 @@ pub struct ClientTenantData {
     pub decrypt_reason: Option<String>,
 }
 
-#[derive(Debug, Clone, Apiv2Security)]
-#[openapi(
-    apiKey,
-    alias = "Client Token",
-    in = "header",
-    name = "X-Fp-Authorization",
-    description = "Short-lived client token to perform actions for a given user."
-)]
+#[derive(Debug, Clone)]
 pub struct ParsedClientTenantData(ClientTenantData);
+
+impl paperclip::v2::schema::Apiv2Schema for ParsedClientTenantData {
+    fn name() -> Option<String> {
+        Some("x-fp-authorization".to_string())
+    }
+
+    fn required() -> bool {
+        true
+    }
+
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        vec![Parameter {
+            name: "x-fp-authorization".to_owned(),
+            in_: ParameterIn::Header,
+            required: true,
+            data_type: Some(DataType::String),
+            description: Some(
+                "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.".to_string(),
+            ),
+            // Need to provide the schema again in order to provide an example
+            schema: Some(paperclip::v2::models::DefaultSchemaRaw {
+                name: Some("x-fp-authorization".to_owned()),
+                data_type: Some(paperclip::v2::models::DataType::String),
+                example: Some(serde_json::Value::String(
+                    "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH".to_owned(),
+                )),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }]
+    }
+}
+impl paperclip::actix::OperationModifier for ParsedClientTenantData {}
 
 /// A shorthand for the extractor for a firm employee auth session
 pub type ClientTenantAuthContext = SessionContext<ParsedClientTenantData>;

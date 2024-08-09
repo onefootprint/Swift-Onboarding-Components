@@ -341,6 +341,20 @@
                     "Private"
                 ],
                 "description": "Returns information about the provided client auth token.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -353,11 +367,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/entities/search": {
@@ -409,6 +419,20 @@
                     "Private"
                 ],
                 "description": "Works for either person or business entities. Updates data in a vault given a short-lived, entity-scoped client token.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -431,11 +455,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/entities/vault/decrypt": {
@@ -447,6 +467,20 @@
                     "Private"
                 ],
                 "description": "Works for either person or business entities. Decrypts the specified list of fields given a short-lived, entity-scoped client token",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -469,11 +503,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/entities/vault/decrypt/{token}": {
@@ -510,6 +540,20 @@
                     "Private"
                 ],
                 "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -532,11 +576,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/entities/vault/{identifier}/upload": {
@@ -789,6 +829,18 @@
                     },
                     {
                         "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
                         "name": "content-type",
                         "description": "Specify the content type of the object like `application/json` or `image/png`",
                         "schema": {
@@ -822,11 +874,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/entities/{fp_bid}/business_insights": {
@@ -7584,12 +7632,6 @@
     },
     "components": {
         "securitySchemes": {
-            "Client Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Authorization",
-                "description": "Short-lived client token to perform actions for a given user."
-            },
             "Custodian API Key": {
                 "type": "apiKey",
                 "in": "header",

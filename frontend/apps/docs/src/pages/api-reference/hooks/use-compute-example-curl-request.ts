@@ -19,9 +19,14 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
     security?.forEach(s => {
       const ExampleHeaderForSecurity: Record<SecurityTypes, string> = {
         'Secret API Key': '-u sk_test_xxxxx:',
-        'Client Token': "-H 'X-Fp-Authorization: cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
+        'Dashboard Token': "-H 'X-Fp-Authorization: dbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
+        'User Token': "-H 'X-Fp-Authorization: utok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
+        'User Onboarding Token': "-H 'X-Fp-Authorization: utok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
       };
-      lines.push(ExampleHeaderForSecurity[s as SecurityTypes]);
+      const example = ExampleHeaderForSecurity[s as SecurityTypes];
+      if (example) {
+        lines.push(ExampleHeaderForSecurity[s as SecurityTypes]);
+      }
     });
 
     if (article.security?.flatMap(s => Object.keys(s)).includes('')) {

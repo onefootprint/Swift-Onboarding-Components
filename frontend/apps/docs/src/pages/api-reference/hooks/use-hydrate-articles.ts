@@ -49,8 +49,7 @@ const useHydrateArticles = (articles: ApiArticle[]): HydratedApiArticle[] => {
     const requiredPreviewGate: TenantPreviewApi | undefined = requiredPreviewGates[0];
     let canAccessApi = !requiredPreviewGate || canAccessPreviewApi(requiredPreviewGate);
 
-    const isClientVaultingApi = article.security?.some(s => Object.keys(s).includes(SecurityTypes.clientToken));
-    if (isClientVaultingApi) {
+    if (hasTag('ClientVaulting')) {
       // Client-vaulting APIs have some custom visibility logic.
       // We don't actually impose a preview API guard on the client vaulting APIs aside from generating the
       // client_token. But we want to hide all client vaulting APIs if the tenant doesn't have access to

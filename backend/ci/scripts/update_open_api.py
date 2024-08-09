@@ -81,6 +81,7 @@ class Endpoint:
             public_security_schemes
             # This one is weird
             or self.url == "/users/vault/decrypt/{token}"
+            or "ClientVaulting" in self._path_info.get("tags")
         ), f"API auth not found in schemes for {self.method.upper()} {self.url}. No reason to document if the API is not accesible via an accessible auth method"
         assert not any(
             "firm" in k.lower() for s in public_security_schemes for k in s

@@ -2,7 +2,7 @@ import { Stack, Text, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
+import { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 
 import { ApiArticleContent } from '../articles';
 import SideBySideElement from '../side-by-side-element';
@@ -64,7 +64,6 @@ const Article = ({ article }: ArticleProps) => {
       <Stack direction="column" gap={8} marginTop={8}>
         <Stack direction="column" gap={5}>
           <Text variant="heading-3">{t('request')}</Text>
-          {/* TODO remove this for normal auth, put this in headers for other auth */}
           {security?.map(s => Object.keys(s).map(s => <Security key={s} type={s as SecurityTypes} />))}
           {parameters && <Parameters parameters={parameters} />}
           {requestBody && <RequestBody requestBody={requestBody} />}

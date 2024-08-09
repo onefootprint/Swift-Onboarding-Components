@@ -984,6 +984,20 @@
                     "HideWhenLocked"
                 ],
                 "description": "Updates data in a vault given a short-lived, entity-scoped client token.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1006,11 +1020,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/users/vault/decrypt": {
@@ -1023,6 +1033,20 @@
                     "HideWhenLocked"
                 ],
                 "description": "Decrypts the specified list of fields given a short-lived, entity-scoped client token",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1045,11 +1069,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/users/vault/decrypt/{token}": {
@@ -1088,6 +1108,20 @@
                     "HideWhenLocked"
                 ],
                 "description": "Checks if provided data is valid before adding it to the vault given a short-lived, user-scoped client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1110,11 +1144,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/users/vault/{identifier}/upload": {
@@ -1368,6 +1398,18 @@
                     },
                     {
                         "in": "header",
+                        "name": "x-fp-authorization",
+                        "description": "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.",
+                        "required": true,
+                        "schema": {
+                            "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                            "type": "string"
+                        },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
                         "name": "content-type",
                         "description": "Specify the content type of the object like `application/json` or `image/png`",
                         "schema": {
@@ -1401,11 +1443,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "Client Token": []
-                    }
-                ]
+                "security": []
             }
         },
         "/users/{fp_id:fp_[_A-Za-z0-9]*}": {
@@ -1558,7 +1596,6 @@
             "post": {
                 "tags": [
                     "Users",
-                    "ClientVaulting",
                     "PublicApi"
                 ],
                 "description": "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](https://docs.onefootprint.com/embedded-components/getting-started).",
@@ -3470,12 +3507,6 @@
     },
     "components": {
         "securitySchemes": {
-            "Client Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Authorization",
-                "description": "Short-lived client token to perform actions for a given user."
-            },
             "Secret API Key": {
                 "type": "apiKey",
                 "in": "header",

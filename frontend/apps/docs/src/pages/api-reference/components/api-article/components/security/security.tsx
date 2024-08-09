@@ -4,18 +4,28 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import staticData from '@/api-reference/assets/public-api-docs.json';
+import dashboardApiDocs from '@/api-reference/assets/dashboard-api-docs.json';
+import hostedApiDocs from '@/api-reference/assets/hosted-api-docs.json';
+import publicApiDocs from '@/api-reference/assets/public-api-docs.json';
 import { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 
 export type SecurityProps = {
   type: SecurityTypes;
 };
 
-const securityComponentContent = staticData?.components?.securitySchemes;
+const securityComponentContent = {
+  ...publicApiDocs?.components?.securitySchemes,
+  ...hostedApiDocs?.components?.securitySchemes,
+  ...dashboardApiDocs?.components?.securitySchemes,
+};
 
 const Security = ({ type }: SecurityProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const [isExpanded, setIsExpanded] = useState(false);
+  if (type === SecurityTypes.apiKey) {
+    // We don't need to display any information for API key auth on the public docs site.
+    return null;
+  }
   return (
     <Container>
       <Title onClick={() => setIsExpanded(!isExpanded)}>
