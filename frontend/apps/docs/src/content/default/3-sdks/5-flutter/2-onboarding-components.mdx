@@ -1,0 +1,1206 @@
+---
+page: default
+slug: /articles/sdks/flutter-onboarding-components
+category: SDKs
+subcategory: Flutter
+title: Onboarding Components
+meta:
+  {
+    title: "Footprint Flutter Onboarding Components Integration",
+    description: "How to integrate flutter onboarding components",
+  }
+---
+
+<inline-alert variant="warning">
+  Onboarding Components is currently in beta. If you have any feedback, please
+  reach out using the "Need help" button at the bottom left of the page.
+</inline-alert>
+
+## 1. What are onboarding components
+
+Our [Flutter hosted flow](/articles/sdks/flutter-hosted) provides a handy way to pass pre-existing bootstrap data and appearance styling to open the verification/onboarding flow on a web view. However, many developers prefer to incorporate data collection forms directly within their apps, customized to their specific design needs. To address this, our Flutter Onboarding Components SDK provides a suite of versatile UI widgets that can be seamlessly embedded into apps. These widgets are designed to handle essential data collection and validation logic for the Footprint onboarding flow internally while giving developers full control over the appearance and user experience. The SDK also provides a set of necessary utility functions to identify users, save data into Footprint vault, etc.
+
+## 2. Installation
+
+Please follow `footprint_flutter` installation instructions [here](/articles/sdks/flutter-introduction#installation).
+
+## 3. Getting started
+
+### 3.1 Get a public key
+
+- Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
+- Use an existing playbook or create a new one.
+- Obtain the Publishable Key, e.g., `pb_test_GfF2M0HxXQwrcB3ETl0yhe`.
+  <br />
+  <br />
+
+### 3.2 Add Footprint Provider
+
+To use Onboarding Components, you need to start by wrapping all of you onboarding-related widgets with the `FootprintProvider` widget. This widget provides the necessary context for the Footprint components to work. `FootprintProvider` constructor has three required arguments that you must pass - `String publicKey` , `String redirectUrl` , `Widget child` .
+
+```dart highlight="2,24,25,26,27,28"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: 'YOUR_PUBLIC_KEY',
+            redirectUrl: 'YOUR_REDIRECT_URL',
+            child: Text("A widget containing the onboarding components."),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+List of all of the arguments to `FootprintProvider`
+
+| Variable Name | Type                        |
+| ------------- | --------------------------- |
+| `child`       | `Widget`                    |
+| `publicKey`   | `String`                    |
+| `appearance`  | `FootprintAppearance?`      |
+| `authToken`   | `String?`                   |
+| `locale`      | `FootprintSupportedLocale?` |
+| `redirectUrl` | `String`                    |
+
+## 4. Identify your user
+
+### 4.1 Create a form
+
+With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number. Our components are raw, meaning that you have to provide necessary styles to match your application's design.
+
+```dart highlight="36, 37, 38, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            child: Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Identify(
+                      handleAuthenticated: () {},
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration inputDecoration(String hintText, {String? errorText}) {
+  return InputDecoration(
+      hintText: hintText,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black38, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.all(12),
+      counterText: "",
+      errorText: errorText);
+}
+
+class Identify extends StatelessWidget {
+  const Identify({super.key, required this.handleAuthenticated});
+
+  final void Function() handleAuthenticated;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    print(formData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text("Identification",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              FootprintField(
+                name: "id.email",
+                createField: ({error}) {
+                  return FootprintTextInput(
+                    labelText: "Email",
+                    decoration:
+                        inputDecoration("Email", errorText: error?.message),
+                  );
+                },
+                // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+              ),
+              const SizedBox(height: 12),
+              FootprintField(
+                name: "id.phone_number",
+                child: FootprintTextInput(
+                  labelText: "Phone Number",
+                  decoration: inputDecoration("Phone Number"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  handleSubmit();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+```
+
+### 4.2 OTP
+
+Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP. Because this part is more complex, we delegate this part to Footprint: you just need to call the `launchIdentify` function which can be accessed by calling `footprintUtils` function.
+
+```dart highlight="38, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            child: Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Identify(
+                      handleAuthenticated: () {
+                        print("Authenticated");
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration inputDecoration(String hintText, {String? errorText}) {
+  return InputDecoration(
+      hintText: hintText,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black38, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.all(12),
+      counterText: "",
+      errorText: errorText);
+}
+
+class Identify extends StatelessWidget {
+  const Identify({super.key, required this.handleAuthenticated});
+
+  final void Function() handleAuthenticated;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    footprintUtils(context).launchIdentify(
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        onAuthenticated: () {
+          handleAuthenticated();
+        },
+        onError: (err) {
+          print("onError $err");
+        },
+        onCancel: () {
+          print("onCancel");
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text("Identification",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              FootprintField(
+                name: "id.email",
+                createField: ({error}) {
+                  return FootprintTextInput(
+                    labelText: "Email",
+                    decoration:
+                        inputDecoration("Email", errorText: error?.message),
+                  );
+                },
+                // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+              ),
+              const SizedBox(height: 12),
+              FootprintField(
+                name: "id.phone_number",
+                child: FootprintTextInput(
+                  labelText: "Phone Number",
+                  decoration: inputDecoration("Phone Number"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  handleSubmit();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+```
+
+## 5. Collecting user’s data
+
+Once the authentication is completed, you can start collecting user data.
+
+### 5.1 Data collection form
+
+The data collection form is constructed similarly to the identification form.
+
+```dart highlight="4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+enum Steps {
+  identify,
+  dataCollection,
+  complete;
+
+  Steps getNextStep() {
+    switch (this) {
+      case Steps.identify:
+        return Steps.dataCollection;
+      case Steps.dataCollection:
+        return Steps.complete;
+      case Steps.complete:
+        return Steps.complete;
+    }
+  }
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            child: Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (currentStep == Steps.identify)
+                      Identify(
+                        handleAuthenticated: () {
+                          handleComplete();
+                        },
+                      ),
+                    if (currentStep == Steps.dataCollection)
+                      DataCollection(
+                        onCompleted: () {
+                          handleComplete();
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration inputDecoration(String hintText, {String? errorText}) {
+  return InputDecoration(
+      hintText: hintText,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black38, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.all(12),
+      counterText: "",
+      errorText: errorText);
+}
+
+class Identify extends StatelessWidget {
+  const Identify({super.key, required this.handleAuthenticated});
+
+  final void Function() handleAuthenticated;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    footprintUtils(context).launchIdentify(
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        onAuthenticated: () {
+          handleAuthenticated();
+        },
+        onError: (err) {
+          print("onError $err");
+        },
+        onCancel: () {
+          print("onCancel");
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text("Identification",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              FootprintField(
+                name: "id.email",
+                createField: ({error}) {
+                  return FootprintTextInput(
+                    labelText: "Email",
+                    decoration:
+                        inputDecoration("Email", errorText: error?.message),
+                  );
+                },
+                // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+              ),
+              const SizedBox(height: 12),
+              FootprintField(
+                name: "id.phone_number",
+                child: FootprintTextInput(
+                  labelText: "Phone Number",
+                  decoration: inputDecoration("Phone Number"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  handleSubmit();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+
+class DataCollection extends StatelessWidget {
+  const DataCollection({super.key, required this.onCompleted});
+
+  final void Function() onCompleted;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    onCompleted();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Text("Basic Information",
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                FootprintField(
+                  name: "id.first_name",
+                  child: FootprintTextInput(
+                    labelText: "First Name",
+                    decoration: inputDecoration("First Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.middle_name",
+                  child: FootprintTextInput(
+                    labelText: "Middle Name (Optional)",
+                    decoration: inputDecoration("Middle Name (Optional)"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.last_name",
+                  child: FootprintTextInput(
+                    labelText: "Last Name",
+                    decoration: inputDecoration("Last Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.dob",
+                  child: FootprintTextInput(
+                    labelText: "Date of Birth",
+                    decoration: inputDecoration("Date of Birth"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    handleSubmit();
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+```
+
+### 5.2 Saving data
+
+You can save the collected calling the `save` function which can be accessed by calling `footprintUtils` function.
+
+```dart highlight="185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+enum Steps {
+  identify,
+  dataCollection,
+  complete;
+
+  Steps getNextStep() {
+    switch (this) {
+      case Steps.identify:
+        return Steps.dataCollection;
+      case Steps.dataCollection:
+        return Steps.complete;
+      case Steps.complete:
+        return Steps.complete;
+    }
+  }
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            child: Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (currentStep == Steps.identify)
+                      Identify(
+                        handleAuthenticated: () {
+                          handleComplete();
+                        },
+                      ),
+                    if (currentStep == Steps.dataCollection)
+                      DataCollection(
+                        onCompleted: () {
+                          handleComplete();
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration inputDecoration(String hintText, {String? errorText}) {
+  return InputDecoration(
+      hintText: hintText,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black38, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.all(12),
+      counterText: "",
+      errorText: errorText);
+}
+
+class Identify extends StatelessWidget {
+  const Identify({super.key, required this.handleAuthenticated});
+
+  final void Function() handleAuthenticated;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    footprintUtils(context).launchIdentify(
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        onAuthenticated: () {
+          handleAuthenticated();
+        },
+        onError: (err) {
+          print("onError $err");
+        },
+        onCancel: () {
+          print("onCancel");
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text("Identification",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              FootprintField(
+                name: "id.email",
+                createField: ({error}) {
+                  return FootprintTextInput(
+                    labelText: "Email",
+                    decoration:
+                        inputDecoration("Email", errorText: error?.message),
+                  );
+                },
+                // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+              ),
+              const SizedBox(height: 12),
+              FootprintField(
+                name: "id.phone_number",
+                child: FootprintTextInput(
+                  labelText: "Phone Number",
+                  decoration: inputDecoration("Phone Number"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  handleSubmit();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+
+class DataCollection extends StatelessWidget {
+  const DataCollection({super.key, required this.onCompleted});
+
+  final void Function() onCompleted;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    footprintUtils(context)
+        .save(
+      formData,
+    )
+        .then(
+      (_) {
+        onCompleted();
+      },
+    ).catchError(
+      (err) {
+        print("Save Error $err");
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Text("Basic Information",
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                FootprintField(
+                  name: "id.first_name",
+                  child: FootprintTextInput(
+                    labelText: "First Name",
+                    decoration: inputDecoration("First Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.middle_name",
+                  child: FootprintTextInput(
+                    labelText: "Middle Name (Optional)",
+                    decoration: inputDecoration("Middle Name (Optional)"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.last_name",
+                  child: FootprintTextInput(
+                    labelText: "Last Name",
+                    decoration: inputDecoration("Last Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.dob",
+                  child: FootprintTextInput(
+                    labelText: "Date of Birth",
+                    decoration: inputDecoration("Date of Birth"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    handleSubmit();
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+```
+
+The `save` function can be called with one or more data fields meaning you can create as many data collection forms as you need and separately save each form.
+
+## 6. Finalizing the onboarding
+
+With all the data collected, we need to now handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `handoff` function which can be accessed by calling `footprintUtils` function.
+
+```dart highlight="71, 72, 73, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 196, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+enum Steps {
+  identify,
+  dataCollection,
+  complete;
+
+  Steps getNextStep() {
+    switch (this) {
+      case Steps.identify:
+        return Steps.dataCollection;
+      case Steps.dataCollection:
+        return Steps.complete;
+      case Steps.complete:
+        return Steps.complete;
+    }
+  }
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            child: Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (currentStep == Steps.identify)
+                      Identify(
+                        handleAuthenticated: () {
+                          handleComplete();
+                        },
+                      ),
+                    if (currentStep == Steps.dataCollection)
+                      DataCollection(
+                        onCompleted: (String token) {
+                          handleComplete(token: token);
+                        },
+                      ),
+                    if (currentStep == Steps.complete)
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: [
+                            const Text("KYC Complete"),
+                            const SizedBox(height: 12),
+                            const Text("Validation Token:"),
+                            const SizedBox(height: 8),
+                            Text(validationToken),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration inputDecoration(String hintText, {String? errorText}) {
+  return InputDecoration(
+      hintText: hintText,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.black38, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.all(12),
+      counterText: "",
+      errorText: errorText);
+}
+
+class Identify extends StatelessWidget {
+  const Identify({super.key, required this.handleAuthenticated});
+
+  final void Function() handleAuthenticated;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    footprintUtils(context).launchIdentify(
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        onAuthenticated: () {
+          handleAuthenticated();
+        },
+        onError: (err) {
+          print("onError $err");
+        },
+        onCancel: () {
+          print("onCancel");
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text("Identification",
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              FootprintField(
+                name: "id.email",
+                createField: ({error}) {
+                  return FootprintTextInput(
+                    labelText: "Email",
+                    decoration:
+                        inputDecoration("Email", errorText: error?.message),
+                  );
+                },
+                // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+              ),
+              const SizedBox(height: 12),
+              FootprintField(
+                name: "id.phone_number",
+                child: FootprintTextInput(
+                  labelText: "Phone Number",
+                  decoration: inputDecoration("Phone Number"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  handleSubmit();
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+
+class DataCollection extends StatelessWidget {
+  const DataCollection({super.key, required this.onCompleted});
+
+  final void Function(String token) onCompleted;
+
+  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+    var utilMethods = footprintUtils(context);
+    utilMethods
+        .save(
+      formData,
+    )
+        .then(
+      (_) {
+        utilMethods.handoff(
+          onComplete: (token) {
+            onCompleted(token);
+          },
+          onError: (err) {
+            print("Handoff error $err");
+          },
+          onCancel: () {
+            print("Handoff canceled");
+          },
+        );
+      },
+    ).catchError(
+      (err) {
+        print("Save Error $err");
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      createForm: (handleSubmit, props) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Text("Basic Information",
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                FootprintField(
+                  name: "id.first_name",
+                  child: FootprintTextInput(
+                    labelText: "First Name",
+                    decoration: inputDecoration("First Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.middle_name",
+                  child: FootprintTextInput(
+                    labelText: "Middle Name (Optional)",
+                    decoration: inputDecoration("Middle Name (Optional)"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.last_name",
+                  child: FootprintTextInput(
+                    labelText: "Last Name",
+                    decoration: inputDecoration("Last Name"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: "id.dob",
+                  child: FootprintTextInput(
+                    labelText: "Date of Birth",
+                    decoration: inputDecoration("Date of Birth"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    handleSubmit();
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+```
+
+## 7. Examples
+
+- Example of a complete **KYC** flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/blob/master/idv/mobile-flutter/lib/widgets/onboarding_components/widgets/kyc.dart).
+- Example of a complete **KYB** flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/blob/master/idv/mobile-flutter/lib/widgets/onboarding_components/widgets/kyb.dart).

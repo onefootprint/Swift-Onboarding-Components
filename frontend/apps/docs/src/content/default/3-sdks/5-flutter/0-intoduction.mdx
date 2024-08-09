@@ -1,0 +1,62 @@
+---
+page: default
+slug: /articles/sdks/flutter-introduction
+category: SDKs
+subcategory: Flutter
+title: Introduction
+meta:
+  {
+    title: "Footprint Flutter Integration",
+    description: "Discover how to integrate Footprint with a Flutter Codebase",
+  }
+---
+
+## Package oveview
+
+Flutter is a powerful open-source framework to develop cross-platform applications from a single codebase. The Flutter plugin allows you to integrate Footprint onboarding flow into your Flutter Android/iOS apps. The plugin utilizes a secure in-app browser to run the onboarding flow.
+
+## Available Components
+
+| Dependency            | Minimum Version |
+| --------------------- | --------------- |
+| Onboarding (Hosted)   | Available       |
+| Onboarding Components | Available       |
+| Auth (Hosted)         | Not available   |
+| Auth (Components)     | Not available   |
+| Secure form           | Not available   |
+
+## Support
+
+Before proceeding with the installation, make sure your environment meets the minimum version requirements:
+
+| Dependency | Minimum Version |
+| ---------- | --------------- |
+| Dart       | 3.2.5           |
+| Flutter    | 3.3.0           |
+
+## Installation
+
+From the terminal, run the following command:
+
+```bash
+flutter pub add footprint_flutter
+```
+
+This will add the `footprint_flutter` dependency to your project’s `pubspec.yaml` as follows:
+
+```yaml
+dependencies:
+  footprint_flutter: ^1.0.2
+```
+
+Alternatively, you can manually edit the `pubspec.yaml` file to add the dependency and run `flutter pub get` from the terminal to install the dependency.
+
+After the installation, you need to link the InAppBrowser dependency. For iOS, make sure to run:
+
+```bash
+cd ios && pod install && cd ..
+```
+
+<inline-alert variant="info">
+  To use onboarding components, please install version 2.0.0-beta
+</inline-alert>

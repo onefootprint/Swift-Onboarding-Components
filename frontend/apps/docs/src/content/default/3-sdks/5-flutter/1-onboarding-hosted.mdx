@@ -1,41 +1,19 @@
 ---
 page: default
-slug: /articles/sdks/flutter
+slug: /articles/sdks/flutter-hosted
 category: SDKs
-title: Flutter
+subcategory: Flutter
+title: Onboarding (Hosted flow)
 meta:
   {
-    title: "Footprint Flutter Integration",
-    description: "Discover how to integrate Footprint with a Flutter Codebase",
+    title: "Footprint Flutter Hosted Flow Integration",
+    description: "Discover how to integrate Footprint hosted flow with a Flutter Codebase",
   }
 ---
 
-## Package oveview
-
-Flutter is a powerful open-source framework to develop cross-platform applications from a single codebase. The Flutter plugin allows you to integrate Footprint onboarding flow into your Flutter Android/iOS apps. The plugin utilizes a secure in-app browser to run the onboarding flow.
-
 ## Installation
 
-From the terminal, run the following command:
-
-```bash
-flutter pub add footprint_flutter
-```
-
-This will add the `footprint_flutter` dependency to your project’s `pubspec.yaml` as follows:
-
-```yaml
-dependencies:
-  footprint_flutter: ^1.0.0
-```
-
-Alternatively, you can manually edit the `pubspec.yaml` file to add the dependency and run `flutter pub get` from the terminal to install the dependency.
-
-After the installation, you need to link the InAppBrowser dependency. For iOS, make sure to run:
-
-```bash
-cd ios && pod install && cd ..
-```
+Please follow `footprint_flutter` installation instructions [here](/articles/sdks/flutter-introduction#installation).
 
 ## Integration
 
@@ -232,15 +210,15 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 
 ### Available Props
 
-| Variable        | Description                                                                                                                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
+| Variable        | Description                                                                                                                                                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                           |
 | `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/articles/integrate/user-specific-sessions). |
-| `redirectUrl`   | Required. A deep link that will be navigated to when the web browser is closed.                                                                                                                                                 |
-| `bootstrapData` | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](/articles/integrate/bootstrap-data).                                            |
-| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                         |
-| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
-| `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                        |
-| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
-| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
-| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
+| `redirectUrl`   | Required. A deep link that will be navigated to when the web browser is closed.                                                                                                                                                          |
+| `bootstrapData` | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](/articles/integrate/bootstrap-data).                                                                         |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                                                      |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                    |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                                                     |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                    |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                                    |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                     |
