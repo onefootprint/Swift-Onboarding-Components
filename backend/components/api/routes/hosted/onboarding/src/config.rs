@@ -7,9 +7,16 @@ use api_core::auth::Any;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::types::ApiResponse;
 use db::models::appearance::Appearance;
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::DbResult;
+use db::PgConn;
 use macros::route_alias;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKind;
+use newtypes::RuleAction;
+use newtypes::TenantId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -48,9 +55,11 @@ pub fn get(
     let tenant_id = tenant.id.clone();
     let appearance_id = ob_config.appearance_id.clone();
     let is_live = ob_config.is_live;
+    let obc_id = ob_config.id.clone();
+    let obc_kind = ob_config.kind;
 
     // get other properties of our configuration relevant to rendering it
-    let (appearance, client_config) = state
+    let (appearance, client_config, sandbox_stepup_outcome_enabled) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
             let appearance = if let Some(appearance_id) = appearance_id {
@@ -60,11 +69,20 @@ pub fn get(
             };
             let client_config = TenantClientConfig::get(conn, &tenant_id, is_live)?;
 
-            Ok((appearance, client_config))
+            // Allow users to choose `Stepup` as a sandbox outcome
+            let sandbox_stepup_outcome_enabled = if !is_live && matches!(obc_kind, ObConfigurationKind::Kyc) {
+                is_sandbox_stepup_outcome_enabled(conn, &tenant_id, &obc_id)?
+            } else {
+                false
+            };
+
+
+            Ok((appearance, client_config, sandbox_stepup_outcome_enabled))
         })
         .await?;
 
     let ff_client = state.ff_client.clone();
+
 
     Ok(api_wire_types::PublicOnboardingConfiguration::from_db((
         ob_config,
@@ -72,5 +90,19 @@ pub fn get(
         client_config,
         appearance,
         ff_client,
+        Some(sandbox_stepup_outcome_enabled),
     )))
+}
+
+
+fn is_sandbox_stepup_outcome_enabled(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    obc_id: &ObConfigurationId,
+) -> DbResult<bool> {
+    let res = RuleInstance::list(conn, tenant_id, false, obc_id, IncludeRules::All)?
+        .iter()
+        .any(|ri| matches!(ri.action, RuleAction::StepUp(_)));
+
+    Ok(res)
 }

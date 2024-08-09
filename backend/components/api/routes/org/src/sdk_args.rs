@@ -111,7 +111,7 @@ async fn get(
     }
 
     let ob_config = obc.map(|(obc, t, tcc, a)| {
-        PublicOnboardingConfiguration::from_db((obc, t, tcc, a, state.ff_client.clone()))
+        PublicOnboardingConfiguration::from_db((obc, t, tcc, a, state.ff_client.clone(), None))
     });
     let result = GetSdkArgsTokenResponse { args, ob_config };
     Ok(result)

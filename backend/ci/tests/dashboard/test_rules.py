@@ -772,3 +772,67 @@ def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
         status_code=400,
     )
     assert body["message"] == "Proceeding would remove all rules on your playbook"
+
+
+def test_stepup_sandbox_outcome(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
+    )
+    user = BifrostClient.new_user(obc)
+    obc = get(
+        f"org/onboarding_configs/{obc.id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    body = get(
+        "/hosted/onboarding/config",
+        None,
+        user.auth_token,
+    )
+
+    # Add a manual review rule
+    manual_review_rule = dict(
+        name="My awesome rule",
+        rule_expression=[{"field": "dob_does_not_match", "op": "eq", "value": True}],
+        rule_action="manual_review",
+    )
+    update_rules(
+        obc["id"],
+        obc["rule_set"]["version"],
+        *sandbox_tenant.db_auths,
+        add=[manual_review_rule],
+        status_code=200,
+    )
+    body = get(
+        "/hosted/onboarding/config",
+        None,
+        user.auth_token,
+    )
+    assert not body["is_stepup_enabled"]
+
+    # Now add a stepup rule
+    obc_id = obc["id"]
+    obc = get(
+        f"org/onboarding_configs/{obc_id}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    step_up_rule = dict(
+        name="My awesome rule",
+        rule_expression=[{"field": "name_does_not_match", "op": "eq", "value": True}],
+        rule_action="step_up.identity",
+    )
+    update_rules(
+        obc["id"],
+        obc["rule_set"]["version"],
+        *sandbox_tenant.db_auths,
+        add=[step_up_rule],
+        status_code=200,
+    )
+    body = get(
+        "/hosted/onboarding/config",
+        None,
+        user.auth_token,
+    )
+    assert body["is_stepup_enabled"]

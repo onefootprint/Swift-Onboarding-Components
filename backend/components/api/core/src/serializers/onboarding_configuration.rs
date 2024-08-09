@@ -12,20 +12,23 @@ use newtypes::DataIdentifierDiscriminant;
 use newtypes::VerificationCheckKind;
 use std::sync::Arc;
 
+type StepupEnabledInSandboxOutcomes = bool;
 pub type ObConfigInfo = (
     ObConfiguration,
     Tenant,
     Option<TenantClientConfig>,
     Option<Appearance>,
     Arc<dyn FeatureFlagClient>,
+    Option<StepupEnabledInSandboxOutcomes>,
 );
 
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
-    fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
+    fn from_db(
+        (ob_config, tenant, tenant_client_config, appearance, ff_client, stepup_sandbox_outcome_enabled): ObConfigInfo,
+    ) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
-        let is_stepup_enabled = ob_config.is_stepup_enabled();
+        let is_stepup_enabled = stepup_sandbox_outcome_enabled.unwrap_or(false);
         let required_auth_methods = ob_config.required_auth_methods.clone();
-        // just hide neuro id as much as possible. total overkill
         let nid_enabled = ob_config
             .verification_checks()
             .get(VerificationCheckKind::NeuroId)

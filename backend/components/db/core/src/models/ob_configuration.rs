@@ -267,11 +267,6 @@ impl ObConfiguration {
         self.document_cdo_for_optional_ssn().is_some()
     }
 
-    pub fn is_stepup_enabled(&self) -> bool {
-        // TODO this is kind of incorrect now - should check for rules with a stepup outcome
-        matches!(self.cip_kind, Some(CipKind::Alpaca))
-    }
-
     pub fn enhanced_aml_for_test(&self) -> EnhancedAmlOption {
         self.enhanced_aml.clone()
     }

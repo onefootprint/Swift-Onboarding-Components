@@ -138,8 +138,9 @@ pub async fn post(
         .await?;
 
     let ff_client = state.ff_client.clone();
-    let onboarding_config =
-        api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
+    let onboarding_config = api_wire_types::PublicOnboardingConfiguration::from_db((
+        ob_config, tenant, None, None, ff_client, None,
+    ));
     Ok(OnboardingResponse {
         // Omit appearance serialization here
         onboarding_config,
