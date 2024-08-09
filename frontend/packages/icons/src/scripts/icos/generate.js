@@ -59,20 +59,24 @@ const createTypesFile = async icoNames => {
     `,
   );
 };
+
+const processIcoPath = async icoPath => {
+  const fileName = getFileName(icoPath);
+  const isColored = fileName.includes(FIXED_COLOR_ALIAS);
+  try {
+    if (!isColored) {
+      await SVGFixer(icoPath, path.dirname(icoPath)).fix();
+    }
+    await createIcoComponent(icoPath);
+  } catch (error) {
+    console.error(`Error processing ${icoPath}:`, error);
+  }
+};
+
 glob(INPUT_SVG_PATH, (err, icoPaths) => {
   if (err) throw Error('Icon generation error', err);
-  icoPaths.forEach(icoPath => {
-    const fileName = getFileName(icoPath);
-    const isColored = fileName.includes(FIXED_COLOR_ALIAS);
-    if (!isColored) {
-      SVGFixer(icoPath, path.dirname(icoPath))
-        .fix()
-        .then(() => {
-          createIcoComponent(icoPath);
-        });
-    } else {
-      createIcoComponent(icoPath);
-    }
+  icoPaths.forEach(async icoPath => {
+    await processIcoPath(icoPath);
   });
   const svgNames = icoPaths.map(icoPath => getFileName(icoPath).replace('.svg', ''));
   createTypesFile(svgNames);

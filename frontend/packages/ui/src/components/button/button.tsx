@@ -46,18 +46,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }: ButtonProps,
     ref,
   ) => {
+    const defaultIconColor = variant === 'primary' ? 'quinary' : 'primary';
     const getContent = () => (
-      <IconContainer
-        $variant={variant}
-        align="center"
-        gap={3}
-        justify="center"
-        tag="span"
-        visibility={loading ? 'hidden' : 'visible'}
-      >
-        {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
+      <Stack align="center" gap={3} justify="center" tag="span" visibility={loading ? 'hidden' : 'visible'}>
+        {PrefixIcon && <PrefixIcon color={iconColor || defaultIconColor} />}
         <LabelContainer>{children}</LabelContainer>
-      </IconContainer>
+      </Stack>
     );
 
     return (
@@ -91,25 +85,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
-
-const IconContainer = styled(Stack)<{
-  $variant: ButtonVariant;
-}>`
-  ${({ theme, $variant }) => {
-    const { button } = theme.components;
-
-    return css`
-      svg[data-colored='false'] {
-        path {
-          stroke: ${button.variant[$variant].color};
-        }
-        rect {
-          stroke: ${button.variant[$variant].color};
-        }
-      }
-    `;
-  }}
-`;
 
 const ButtonContainer = styled.button<{
   size: ButtonSize;

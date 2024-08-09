@@ -1,6 +1,0 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-<rect width="30" height="30" rx="5" transform="matrix(1 0 0 -1 5 35)" stroke="black" stroke-width="3.5"/>
-<rect x="10" y="10.5" width="20" height="2.4" rx="1.2" fill="black"/>
-<rect x="16" y="15.5" width="14" height="2.4" rx="1.2" fill="black"/>
-<path d="M10 25.7143C10 24.7675 10.9949 24 12.2222 24H27.7778C29.0051 24 30 24.7675 30 25.7143V28.2857C30 29.2325 29.0051 30 27.7778 30H12.2222C10.9949 30 10 29.2325 10 28.2857V25.7143Z" fill="black"/>
-</svg>
