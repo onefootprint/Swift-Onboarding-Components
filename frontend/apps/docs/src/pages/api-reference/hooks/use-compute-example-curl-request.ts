@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import type { SecurityTypes } from '@/api-reference/api-reference.types';
 import { getExample } from '@/api-reference/utils/get-schemas';
+import type { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;

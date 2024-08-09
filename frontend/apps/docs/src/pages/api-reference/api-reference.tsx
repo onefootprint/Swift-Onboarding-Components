@@ -3,46 +3,51 @@ import { useTranslation } from 'react-i18next';
 import Seo from 'src/components/seo/seo';
 import styled, { css } from 'styled-components';
 
-import staticAPIData from './assets/api-docs.json';
-import staticPreviewAPIData from './assets/api-preview-docs.json';
-import Articles from './components/articles/articles';
 import Cmd from './components/cmd';
 import DesktopPageNav from './components/nav/desktop-page-nav';
 import MobilePageNav from './components/nav/mobile-page-nav';
-import groupBySubsection from './components/nav/utils/group-by-section';
-import useHydrateArticles from './hooks/use-hydrate-articles';
-import getArticles from './utils/get-articles';
 
-const staticArticles = getArticles(staticAPIData);
-const staticPreviewArticles = getArticles(staticPreviewAPIData);
+import Articles from './components/articles';
+import useParseApiSections from './hooks/use-parse-api-sections';
+import { ApiReferenceArticle } from './index.page';
 
-const ApiReference = () => {
+export type ApiReferenceProps = {
+  articles: ApiReferenceArticle[];
+};
+
+/**
+ * Renders documentation for public facing APIs.
+ * The documentation is composed from two different sources:
+ * - The markdown files in src/content/api-reference
+ * - The open API specs generated from the backend
+ *
+ * Each markdown file defines a "section" on the docs site and has generalized information on the section of
+ * APIs. The markdown file also specifies the list of APIs that should be included in the section.
+ * We then join the markdown files with the open API specs for the listed APIs and render documentation for
+ * each API within the section.
+ */
+export const ApiReference = ({ articles }: ApiReferenceProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const articles = useHydrateArticles(staticArticles);
-  const previewArticles = useHydrateArticles(staticPreviewArticles);
 
-  const sections = [
-    {
-      title: t('sections.footprint-api'),
-      isPreview: false,
-      subsections: groupBySubsection(articles),
-    },
-    {
-      title: t('sections.footprint-api-preview'),
-      isPreview: true,
-      subsections: groupBySubsection(previewArticles),
-    },
-  ];
+  const parsedApiSections = useParseApiSections(articles);
+
+  // Nav was built for multiple larger sections, but we only have one. Can probably remove this
+  const section = {
+    title: t('sections.footprint-api'),
+    isPreview: false,
+    subsections: parsedApiSections,
+  };
+  const navSections = [section];
 
   return (
     <Box>
       <Seo title={t('html-title')} slug="/api-reference" />
       <Layout>
-        <MobilePageNav sections={sections} />
-        <DesktopPageNav sections={sections} />
-        <Articles sections={sections} />
+        <MobilePageNav sections={navSections} />
+        <DesktopPageNav sections={navSections} />
+        <Articles sections={navSections} />
       </Layout>
-      <Cmd sections={sections} />
+      <Cmd sections={navSections} />
     </Box>
   );
 };

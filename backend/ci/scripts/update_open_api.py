@@ -196,8 +196,6 @@ if __name__ == "__main__":
     open_api_spec = requests.get(f"{BASE_URL}/docs-spec-v3").json()
 
     specs = [
-        (["PublicApi"], "api-docs.json"),
-        (["Preview", "PhasedOut"], "api-preview-docs.json"),
         (["PublicApi", "Preview", "PhasedOut"], "public-api-docs.json"),
         (["Hosted"], "hosted-api-docs.json"),
         (["Private"], "private-api-docs.json"),

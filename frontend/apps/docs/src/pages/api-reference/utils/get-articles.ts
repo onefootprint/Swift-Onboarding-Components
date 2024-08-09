@@ -1,6 +1,6 @@
 import sortBy from 'lodash/sortBy';
 
-import type { ApiArticle } from '../api-reference.types';
+import type { ApiArticle } from '../../api-reference/api-reference.types';
 
 export const isClientApi = (path: string) => path.startsWith('/users/vault');
 
