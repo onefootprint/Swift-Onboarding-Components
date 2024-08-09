@@ -13,7 +13,7 @@ use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::AccessEventPurpose;
+use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::ProxyToken;
@@ -33,7 +33,7 @@ pub async fn detokenize(
     tokens: Vec<ProxyToken>,
     reason: Option<String>,
     insight: InsightHeaders,
-    purpose: AccessEventPurpose,
+    purpose: DecryptionContext,
 ) -> FpResult<HashMap<ProxyToken, PiiString>> {
     // split tokens by fp_id
     let tokens = tokens

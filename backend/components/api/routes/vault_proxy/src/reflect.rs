@@ -10,7 +10,7 @@ use api_core::auth::CanDecrypt;
 use api_core::telemetry::RootSpan;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiCoreError;
-use newtypes::AccessEventPurpose;
+use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::PiiString;
 use paperclip::actix::api_v2_operation;
@@ -68,7 +68,7 @@ pub async fn post(
         tokens,
         params.access_reason,
         insight.clone(),
-        AccessEventPurpose::Reflect,
+        DecryptionContext::Reflect,
     )
     .await?;
 

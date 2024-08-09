@@ -38,11 +38,11 @@ use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
 use newtypes::vendor_api_struct::IncodeWatchlistCheck;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::FootprintReasonCode;
 use newtypes::FpId;
@@ -242,7 +242,7 @@ pub async fn decrypt_aml_hits(
                 insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Decrypt,
                 targets: dis_searched.clone(),
-                purpose: AccessEventPurpose::Api,
+                purpose: DecryptionContext::Api,
             }
             .create(conn)?;
 

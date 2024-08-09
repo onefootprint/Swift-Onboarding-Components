@@ -18,7 +18,7 @@ use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiCoreError;
 use api_core::FpError;
 use newtypes::preview_api;
-use newtypes::AccessEventPurpose;
+use newtypes::DecryptionContext;
 use newtypes::InvokeVaultProxyPermission;
 use newtypes::ProxyConfigId;
 use paperclip::actix::api_v2_operation;
@@ -130,7 +130,7 @@ async fn invoke_vault_proxy(
         tokens,
         config.access_reason.clone(),
         insight.clone(),
-        AccessEventPurpose::VaultProxy,
+        DecryptionContext::VaultProxy,
     )
     .await?;
 

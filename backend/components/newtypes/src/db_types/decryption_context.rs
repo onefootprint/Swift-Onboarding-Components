@@ -26,7 +26,7 @@ use strum_macros::EnumString;
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum AccessEventPurpose {
+pub enum DecryptionContext {
     /// Access for the vault proxy
     VaultProxy,
     /// Decryption for the reflect endpoint
@@ -36,4 +36,4 @@ pub enum AccessEventPurpose {
     /// Just for events that aren't backfilled
     Unknown,
 }
-crate::util::impl_enum_string_diesel!(AccessEventPurpose);
+crate::util::impl_enum_string_diesel!(DecryptionContext);

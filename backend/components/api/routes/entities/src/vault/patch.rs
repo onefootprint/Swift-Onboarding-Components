@@ -28,10 +28,10 @@ use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
@@ -202,7 +202,7 @@ async fn patch_inner(
                     insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
                     targets: updated_dis.clone(),
-                    purpose: AccessEventPurpose::Api,
+                    purpose: DecryptionContext::Api,
                 }
                 .create(conn)?;
 
@@ -231,7 +231,7 @@ async fn patch_inner(
                     insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Delete,
                     targets: deleted_dis.clone(),
-                    purpose: AccessEventPurpose::Api,
+                    purpose: DecryptionContext::Api,
                 }
                 .create(conn)?;
 

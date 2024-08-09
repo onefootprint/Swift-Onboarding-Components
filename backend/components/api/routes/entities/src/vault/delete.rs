@@ -18,12 +18,12 @@ use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -160,7 +160,7 @@ async fn delete_inner(
                 insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Delete,
                 targets: deleted_dis.clone(),
-                purpose: AccessEventPurpose::Api,
+                purpose: DecryptionContext::Api,
             }
             .create(conn)?;
 

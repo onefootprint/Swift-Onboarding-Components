@@ -20,10 +20,10 @@ use db::models::vault_dr::VaultDrConfig;
 use itertools::Itertools;
 use newtypes::preview_api;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use paperclip::actix;
 use paperclip::actix::api_v2_operation;
 
@@ -103,7 +103,7 @@ pub async fn post(
                     insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Decrypt,
                     targets: dis.clone(),
-                    purpose: AccessEventPurpose::Api,
+                    purpose: DecryptionContext::Api,
                 };
                 access_events.push(access_event);
 

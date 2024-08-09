@@ -13,9 +13,9 @@ use diesel::RunQueryDsl;
 use itertools::Itertools;
 use newtypes::AccessEventId;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::InsightEventId;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -41,7 +41,7 @@ pub struct AccessEvent {
     /// Denormalized from scoped_vault for faster querying
     pub is_live: bool,
     /// The machine-readable reason for the access event
-    pub purpose: AccessEventPurpose,
+    pub purpose: DecryptionContext,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -56,7 +56,7 @@ pub struct NewAccessEventRow {
     pub targets: Vec<DataIdentifier>,
     pub tenant_id: TenantId,
     pub is_live: bool,
-    pub purpose: AccessEventPurpose,
+    pub purpose: DecryptionContext,
 }
 
 impl NewAccessEventRow {
@@ -83,7 +83,7 @@ impl AccessEvent {
         t_id: &TenantId,
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
-        purposes: Vec<AccessEventPurpose>,
+        purposes: Vec<DecryptionContext>,
     ) -> DbResult<i64> {
         let count = access_event::table
             // Cookie-cutter filters for all billable events

@@ -1,7 +1,7 @@
 mod access_event_kind;
 pub use access_event_kind::*;
-mod access_event_purpose;
-pub use access_event_purpose::*;
+mod decryption_context;
+pub use decryption_context::*;
 mod actor;
 pub use actor::*;
 mod android_verdict_types;

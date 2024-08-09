@@ -11,7 +11,7 @@ use db::models::watchlist_check::WatchlistCheck;
 use db::DbResult;
 use db::PgConn;
 use itertools::chain;
-use newtypes::AccessEventPurpose;
+use newtypes::DecryptionContext;
 use newtypes::Product;
 use newtypes::TenantId;
 use rust_decimal::prelude::FromPrimitive;
@@ -126,13 +126,13 @@ impl BillingCounts {
 
         // These billing schemes are only used by some tenants, so only count them conditionally
         let hot_vaults = if bp.and_then(|p| p.prices.get(&Product::HotVaults)).is_some() {
-            let p = AccessEventPurpose::iter().collect(); // Any access is billable
+            let p = DecryptionContext::iter().collect(); // Any access is billable
             Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None
         };
         let hot_proxy_vaults = if bp.and_then(|p| p.prices.get(&Product::HotProxyVaults)).is_some() {
-            let p = vec![AccessEventPurpose::VaultProxy];
+            let p = vec![DecryptionContext::VaultProxy];
             Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None

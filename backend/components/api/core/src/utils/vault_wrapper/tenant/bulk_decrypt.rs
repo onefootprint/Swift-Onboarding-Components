@@ -22,12 +22,12 @@ use db::HasLifetime;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -50,7 +50,7 @@ pub enum DecryptAccessEventInfo {
         insight: CreateInsightEvent,
         reason: String,
         principal: DbActor,
-        purpose: AccessEventPurpose,
+        purpose: DecryptionContext,
     },
     NoAccessEvent,
 }

@@ -25,11 +25,11 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::DocumentDiKind;
 use newtypes::FpId;
 use newtypes::PiiBytes;
@@ -197,7 +197,7 @@ async fn post_upload_inner(
                 insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Update,
                 targets: vec![di.clone()],
-                purpose: AccessEventPurpose::Api,
+                purpose: DecryptionContext::Api,
             }
             .create(conn)?;
 

@@ -31,9 +31,9 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::output::Csv;
-use newtypes::AccessEventPurpose;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DecryptionContext;
 use newtypes::FilterFunction;
 use newtypes::FpId;
 use newtypes::UserDataIdentifier;
@@ -303,7 +303,7 @@ pub(super) async fn post_inner(
         .collect::<FpResult<_>>()?;
     let insight = CreateInsightEvent::from(insights);
     let actor = auth.actor().into();
-    let purpose = AccessEventPurpose::Api;
+    let purpose = DecryptionContext::Api;
     let access_event = DecryptAccessEventInfo::AccessEvent {
         insight,
         reason,

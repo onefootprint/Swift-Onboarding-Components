@@ -8,11 +8,11 @@ use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
@@ -39,7 +39,7 @@ impl<Type> TenantVw<Type> {
         principal: DbActor,
         insight: CreateInsightEvent,
         targets: Vec<EnclaveDecryptOperation>,
-        purpose: AccessEventPurpose,
+        purpose: DecryptionContext,
     ) -> FpResult<HashMap<EnclaveDecryptOperation, Pii>> {
         let targets = self.check_ob_config_access(targets)?;
         let results = self

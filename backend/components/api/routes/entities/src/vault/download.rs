@@ -18,7 +18,7 @@ use api_core::FpResult;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::AccessEventPurpose;
+use newtypes::DecryptionContext;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -75,7 +75,7 @@ pub async fn get(
         transforms: vec![],
     };
     let insight = CreateInsightEvent::from(insights);
-    let purpose = AccessEventPurpose::Api;
+    let purpose = DecryptionContext::Api;
     let result = vw
         .fn_decrypt_raw(&state, reason, principal, insight, vec![op.clone()], purpose)
         .await?

@@ -24,11 +24,11 @@ use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::PiiJsonValue;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
@@ -131,7 +131,7 @@ pub async fn create_non_portable_vault(
                     insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
                     targets: targets.clone(),
-                    purpose: AccessEventPurpose::Api,
+                    purpose: DecryptionContext::Api,
                 }
                 .create(conn)?;
 

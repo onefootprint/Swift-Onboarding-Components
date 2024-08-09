@@ -24,12 +24,12 @@ use enclave_proxy::DataTransforms;
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::DocumentDiKind;
 use newtypes::FpId;
 use newtypes::PiiBytes;
@@ -177,7 +177,7 @@ pub async fn vault_pii(
                     insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
                     targets: targets.clone(),
-                    purpose: AccessEventPurpose::VaultProxy,
+                    purpose: DecryptionContext::VaultProxy,
                 }
                 .create(conn)?;
 
