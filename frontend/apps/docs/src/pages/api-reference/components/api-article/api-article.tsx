@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import type { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 
-import { ApiArticle } from '../nav/nav.types';
+import { ApiArticleContent } from '../articles';
 import SideBySideElement from '../side-by-side-element';
 import TypeBadge from '../type-badge/type-badge';
 import DemoCode from './components/demo-code';
@@ -19,7 +19,7 @@ import Tags from './components/tags';
 const API_BASE_URL = 'api.onefootprint.com';
 
 type ArticleProps = {
-  article: ApiArticle;
+  article: ApiArticleContent;
 };
 
 const Article = ({ article }: ArticleProps) => {

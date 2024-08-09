@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 
 import { Box, media } from '@onefootprint/ui';
 import Markdown from 'src/components/markdown';
-import Article from 'src/pages/api-reference/components/article';
+import ApiArticle from 'src/pages/api-reference/components/api-article';
 import ScrollLink from 'src/pages/api-reference/components/scroll-link';
 import SideBySideElement from 'src/pages/api-reference/components/side-by-side-element';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
@@ -10,8 +10,9 @@ import EndpointsOverview from './endpoints-overview';
 
 export const ARTICLES_CONTAINER_ID = 'articles-container';
 
-export type ApiArticle = {
+export type ApiArticleContent = {
   title?: string;
+  description?: string;
   api: HydratedArticle;
 };
 
@@ -19,7 +20,7 @@ export type SubSection = {
   title: string;
   id: string;
   content: string;
-  apiArticles: ApiArticle[];
+  apiArticles: ApiArticleContent[];
 };
 
 export type PageNavSection = {
@@ -52,7 +53,7 @@ const Articles = ({ sections }: ArticlesProps) => {
               right={<EndpointsOverview apiArticles={subsection.apiArticles} />}
             />
             {subsection.apiArticles.map(article => (
-              <Article key={article.api.id} article={article} />
+              <ApiArticle key={article.api.id} article={article} />
             ))}
           </>
         );

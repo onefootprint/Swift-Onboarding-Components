@@ -1,7 +1,7 @@
 import { Box, media } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
-import Article from 'src/pages/api-reference/components/article';
+import ApiArticle from 'src/pages/api-reference/components/api-article';
 import { HydratedApiArticle } from 'src/pages/api-reference/hooks/use-hydrate-articles';
 import { ARTICLES_CONTAINER_ID } from '../../api-reference/components/articles';
 import PageNav from '../../api-reference/components/nav/desktop-page-nav';
@@ -28,7 +28,7 @@ const InternalApiDocsPage = ({ title, apis }: InternalApiDocsPageProps) => {
         <PageNav sections={sections} />
         <ArticleList id={ARTICLES_CONTAINER_ID}>
           {apiArticles.map(article => (
-            <Article key={article.api.id} article={article} />
+            <ApiArticle key={article.api.id} article={article} />
           ))}
         </ArticleList>
       </Layout>
