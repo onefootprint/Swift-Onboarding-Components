@@ -32,12 +32,11 @@ export type ArticlesProps = {
   sections: PageNavSection[];
 };
 
-const MARKDOWN_OVERRIDES = {
-  ScrollLink,
-};
-
 const Articles = ({ sections }: ArticlesProps) => {
   const subsections = sections.flatMap(s => s.subsections);
+  const MARKDOWN_OVERRIDES = {
+    ScrollLink,
+  };
   return (
     <ArticleList id={ARTICLES_CONTAINER_ID}>
       {subsections.map(subsection => {

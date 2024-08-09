@@ -6,12 +6,13 @@ type DescriptionProps = {
   children: string;
 };
 
-const OVERRIDES = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  code: (props: any) => <CodeInline disabled size="compact" {...props} />,
-  ScrollLink,
+const Description = ({ children }: DescriptionProps) => {
+  const OVERRIDES = {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    code: (props: any) => <CodeInline disabled size="compact" {...props} />,
+    ScrollLink,
+  };
+  return <Markdown overrides={OVERRIDES}>{children}</Markdown>;
 };
-
-const Description = ({ children }: DescriptionProps) => <Markdown overrides={OVERRIDES}>{children}</Markdown>;
 
 export default Description;
