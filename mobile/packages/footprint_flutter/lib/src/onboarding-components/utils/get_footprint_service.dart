@@ -40,6 +40,7 @@ typedef HandoffHandler = void Function({
     if (email == null || phoneNumber == null) {
       onError?.call(
           'Email and Phone Number are required. Email: $email, Phone Number: $phoneNumber');
+      return;
     }
     final publicKey = ref.read(fpContextNotifierProvider).publicKey;
     final redirectUrl = ref.read(fpContextNotifierProvider).redirectUrl;

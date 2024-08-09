@@ -42,6 +42,12 @@ Future<SaveDataResponse> save(SaveDataRequest payload) async {
       throw Exception('Failed to save data. Error: ${response.body}');
     }
   } catch (e) {
-    throw Exception('Could not save data.');
+    var errorMsg = 'Could not save data.';
+    try {
+      errorMsg = e.toString();
+    } catch (e) {
+      //
+    }
+    throw Exception(errorMsg);
   }
 }

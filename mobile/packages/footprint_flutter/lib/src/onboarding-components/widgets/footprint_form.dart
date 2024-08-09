@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/form_context_notifier.dart';
 
 typedef FormProps = ({
@@ -9,8 +10,42 @@ typedef FormProps = ({
   void Function(String key, dynamic value) setValue
 });
 
-class FootprintForm extends ConsumerStatefulWidget {
-  const FootprintForm(
+final formContextNotifierProvider =
+    NotifierProvider<FormContextNotifier, FormContext>(
+        () => FormContextNotifier());
+
+class FootprintForm extends StatelessWidget {
+  final void Function(FootprintBootstrapData formData) onSubmit;
+  final Widget Function(void Function() handleSubmit, FormProps props)
+      createForm;
+  final Map<String, dynamic>? initialData;
+
+  const FootprintForm({
+    required this.onSubmit,
+    required this.createForm,
+    this.initialData,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      overrides: [
+        formContextNotifierProvider.overrideWith(
+          () => FormContextNotifier(),
+        ),
+      ],
+      child: FormWrapper(
+        onSubmit: onSubmit,
+        createForm: createForm,
+        initialData: initialData,
+      ),
+    );
+  }
+}
+
+class FormWrapper extends ConsumerStatefulWidget {
+  const FormWrapper(
       {super.key,
       required this.onSubmit,
       required this.createForm,
@@ -22,10 +57,10 @@ class FootprintForm extends ConsumerStatefulWidget {
   final Map<String, dynamic>? initialData;
 
   @override
-  ConsumerState<FootprintForm> createState() => _FootprintFormState();
+  ConsumerState<FormWrapper> createState() => _FootprintFormState();
 }
 
-class _FootprintFormState extends ConsumerState<FootprintForm> {
+class _FootprintFormState extends ConsumerState<FormWrapper> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -43,8 +78,6 @@ class _FootprintFormState extends ConsumerState<FootprintForm> {
   Widget build(BuildContext context) {
     final formErrors = ref.watch(formContextNotifierProvider).formErrors;
     void handleSubmit() {
-      final updatedFormContext =
-          ref.read(formContextNotifierProvider); // Get the most recent data
       final newFormErrors = FormErrors.build(_formKey);
       ref
           .read(formContextNotifierProvider.notifier)
@@ -53,6 +86,8 @@ class _FootprintFormState extends ConsumerState<FootprintForm> {
         return;
       }
       _formKey.currentState!.save();
+      final updatedFormContext =
+          ref.read(formContextNotifierProvider); // Get the most recent data
       widget.onSubmit(updatedFormContext.formData);
     }
 

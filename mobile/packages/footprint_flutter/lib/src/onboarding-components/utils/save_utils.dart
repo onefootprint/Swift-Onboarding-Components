@@ -3,7 +3,7 @@ import 'package:footprint_flutter/src/onboarding-components/utils/date_formatter
 
 Map<String, dynamic> removeEmpty(Map<String, dynamic> obj) {
   return obj.entries.fold({}, (acc, e) {
-    if (e.value != null) {
+    if (e.value != null && e.value != '') {
       acc[e.key] = e.value;
     }
     return acc;

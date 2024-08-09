@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
-import 'package:footprint_flutter/src/onboarding-components/providers/form_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_field_props.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
 

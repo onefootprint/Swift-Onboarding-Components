@@ -2,10 +2,8 @@ import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'form_context_notifier.g.dart';
 
-@riverpod
-class FormContextNotifier extends _$FormContextNotifier {
+class FormContextNotifier extends Notifier<FormContext> {
   @override
   FormContext build() {
     return FormContext(
