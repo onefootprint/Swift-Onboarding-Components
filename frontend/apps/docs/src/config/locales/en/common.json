@@ -256,6 +256,9 @@
     "404": {
       "title": "Oops! Page couldn't be found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",
+      "cta": {
+        "label": "Go to the home page"
+      },
       "image": {
         "alt": "An image of a penguin using a smartphone"
       }
