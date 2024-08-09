@@ -4,10 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/form_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
 
-class FootprintTextInput extends ConsumerWidget {
+class FootprintTextInput extends ConsumerStatefulWidget {
   const FootprintTextInput({
     super.key,
-    this.controller,
     this.focusNode,
     this.initialValue,
     this.labelText,
@@ -41,7 +40,6 @@ class FootprintTextInput extends ConsumerWidget {
     this.decoration,
   });
 
-  final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? initialValue;
   final String? labelText;
@@ -75,9 +73,34 @@ class FootprintTextInput extends ConsumerWidget {
   final InputDecoration? decoration;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FootprintTextInput> createState() => _FootprintTextInputState();
+}
+
+class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final fieldProps = FieldContext.of(context)!.props;
     final (:name, :inputProps) = fieldProps;
+
+    // Listen to form context changes and update the text field value
+    // Used in case the form context is updated calling setValue in tenant code
+    // or when tenant provides initial data to the form
+    ref.listen(formContextNotifierProvider, (prevContext, newContext) {
+      final prevValue = prevContext?.formData.toJson()[name];
+      final newValue = newContext.formData.toJson()[name];
+      if (prevValue != newValue && newValue is String) {
+        _controller.text = newValue;
+      }
+    });
+
     final (
       :validator,
       :keyboardType,
@@ -97,44 +120,44 @@ class FootprintTextInput extends ConsumerWidget {
 
     return TextFormField(
       key: ValueKey(name),
-      controller: controller,
-      focusNode: focusNode,
-      initialValue: initialValue,
-      decoration: decoration ??
+      controller: _controller,
+      focusNode: widget.focusNode,
+      initialValue: widget.initialValue,
+      decoration: widget.decoration ??
           InputDecoration(
-            labelText: labelText,
-            hintText: hintText,
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon,
-            prefix: prefix,
-            suffix: suffix,
+            labelText: widget.labelText,
+            hintText: widget.hintText,
+            prefixIcon: widget.prefixIcon,
+            suffixIcon: widget.suffixIcon,
+            prefix: widget.prefix,
+            suffix: widget.suffix,
           ),
-      obscureText: obscureText,
-      obscuringCharacter: obscuringCharacter,
+      obscureText: widget.obscureText,
+      obscuringCharacter: widget.obscuringCharacter,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
-      textCapitalization: textCapitalization,
-      textAlign: textAlign,
-      textAlignVertical: textAlignVertical,
-      readOnly: readOnly,
-      enabled: enabled,
-      maxLines: maxLines,
-      minLines: minLines,
+      textCapitalization: widget.textCapitalization,
+      textAlign: widget.textAlign,
+      textAlignVertical: widget.textAlignVertical,
+      readOnly: widget.readOnly,
+      enabled: widget.enabled,
+      maxLines: widget.maxLines,
+      minLines: widget.minLines,
       maxLength: maxLength,
-      maxLengthEnforcement: maxLengthEnforcement,
+      maxLengthEnforcement: widget.maxLengthEnforcement,
       inputFormatters: inputFormatters,
-      scrollPadding: scrollPadding,
-      selectionControls: selectionControls,
-      autovalidateMode: autovalidateMode,
-      autofocus: autofocus,
-      style: style,
-      cursorColor: cursorColor,
-      cursorWidth: cursorWidth,
-      cursorHeight: cursorHeight,
-      cursorRadius: cursorRadius,
-      onChanged: onChanged,
-      onEditingComplete: onEditingComplete,
-      onFieldSubmitted: onFieldSubmitted,
+      scrollPadding: widget.scrollPadding,
+      selectionControls: widget.selectionControls,
+      autovalidateMode: widget.autovalidateMode,
+      autofocus: widget.autofocus,
+      style: widget.style,
+      cursorColor: widget.cursorColor,
+      cursorWidth: widget.cursorWidth,
+      cursorHeight: widget.cursorHeight,
+      cursorRadius: widget.cursorRadius,
+      onChanged: widget.onChanged,
+      onEditingComplete: widget.onEditingComplete,
+      onFieldSubmitted: widget.onFieldSubmitted,
       autofillHints: autofillHints,
       onSaved: (value) {
         ref.read(formContextNotifierProvider.notifier).setValue(name, value);

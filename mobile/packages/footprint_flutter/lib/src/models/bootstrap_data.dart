@@ -85,6 +85,56 @@ class FootprintBootstrapData {
       this.custom,
       this.businessZip});
 
+  FootprintBootstrapData.fromJson(Map<String, dynamic> json)
+      : email = json['id.email'],
+        phoneNumber = json['id.phone_number'],
+        firstName = json['id.first_name'],
+        lastName = json['id.last_name'],
+        dob = json['id.dob'],
+        addressLine1 = json['id.address_line1'],
+        addressLine2 = json['id.address_line2'],
+        city = json['id.city'],
+        state = json['id.state'],
+        country = json['id.country'],
+        zip = json['id.zip'],
+        ssn9 = json['id.ssn9'],
+        ssn4 = json['id.ssn4'],
+        nationality = json['id.nationality'],
+        usLegalStatus = json['id.us_legal_status'],
+        citizenships = json['id.citizenships']?.cast<String>(),
+        visaKind = json['id.visa_kind'],
+        visaExpirationDate = json['id.visa_expiration_date'],
+        itin = json['id.itin'],
+        usTaxId = json['id.us_tax_id'],
+        driversLicenseNumber = json['id.drivers_license_number'],
+        driversLicenseState = json['id.drivers_license_state'],
+        middleName = json['id.middle_name'],
+        businessAddressLine1 = json['business.address_line1'],
+        businessAddressLine2 = json['business.address_line2'],
+        businessBeneficialOwners = (json['business.beneficial_owners'] as List?)
+            ?.map((e) => BusinessBeneficialOwners.fromJson(e))
+            .toList(),
+        businessCity = json['business.city'],
+        businessCorporationType = json['business.corporation_type'],
+        businessCountry = json['business.country'],
+        businessDba = json['business.dba'],
+        businessFormationDate = json['business.formation_date'],
+        businessFormationState = json['business.formation_state'],
+        businessKycedBeneficialOwners =
+            (json['business.kyced_beneficial_owners'] as List?)
+                ?.map((e) => BusinessBeneficialOwners.fromJson(e))
+                .toList(),
+        businessName = json['business.name'],
+        businessPhoneNumber = json['business.phone_number'],
+        businessState = json['business.state'],
+        businessTin = json['business.tin'],
+        businessWebsite = json['business.website'],
+        businessZip = json['business.zip'],
+        custom = json.entries
+            .where((element) => element.key.startsWith("custom."))
+            .map((e) => CustomField(key: e.key, value: e.value))
+            .firstOrNull;
+
   @internal
   Map<String, dynamic> toJson() {
     var map = {
@@ -219,6 +269,7 @@ class FootprintBootstrapData {
     return _updateBoField(boList ?? [], index, field, value);
   }
 
+  @internal
   FootprintBootstrapData setField(String key, dynamic value) {
     return FootprintBootstrapData(
       email: key == 'id.email' ? value : email,
@@ -294,6 +345,14 @@ class BusinessBeneficialOwners {
     this.boOwnershipStack,
     this.boPhoneNumber,
   });
+
+  BusinessBeneficialOwners.fromJson(Map<String, dynamic> json)
+      : boEmail = json['email'],
+        boFirstName = json['first_name'],
+        boLastName = json['last_name'],
+        boMiddleName = json['middle_name'],
+        boOwnershipStack = json['ownership_stake'],
+        boPhoneNumber = json['phone_number'];
 
   @internal
   Map<String, dynamic> toJson() {
