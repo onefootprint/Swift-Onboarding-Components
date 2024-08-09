@@ -7,15 +7,9 @@ import Cmd from '../api-reference/components/cmd';
 import DesktopPageNav from '../api-reference/components/nav/desktop-page-nav';
 import MobilePageNav from '../api-reference/components/nav/mobile-page-nav';
 
-import { useEffect } from 'react';
-import getSectionMeta from 'src/utils/section';
-import staticApiData from '../api-reference/assets/public-api-docs.json';
-import useHydrateArticles from '../api-reference/hooks';
-import getArticles from '../api-reference/utils/get-articles';
 import Articles from './components/articles';
-import { ApiArticleProps, ApiReferenceArticle } from './index.page';
-
-const staticApiArticles = getArticles(staticApiData);
+import useParseApiSections from './hooks/use-parse-api-sections';
+import { ApiReferenceArticle } from './index.page';
 
 export type NewApiReferenceProps = {
   articles: ApiReferenceArticle[];
@@ -34,49 +28,14 @@ export type NewApiReferenceProps = {
  */
 export const NewApiReference = ({ articles }: NewApiReferenceProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const publicApiArticles = useHydrateArticles(staticApiArticles);
-  useEffect(() => {
-    // Alert if there's a new public API that isn't visible
-    const allDocumentedApis = articles.flatMap(article => article.data.apis);
-    const undocumentedApis = publicApiArticles.filter(
-      api => !allDocumentedApis.some(docApi => docApi.method === api.method && docApi.path === api.path),
-    );
-    if (undocumentedApis.length) {
-      const undocumentedApisList = undocumentedApis.map(api => ({
-        method: api.method,
-        path: api.path,
-      }));
-      console.error(`Found undocumented APIs: ${JSON.stringify(undocumentedApisList)}`);
-    }
-  }, [articles, publicApiArticles]);
 
-  const findArticle = ({ method, path }: ApiArticleProps) =>
-    publicApiArticles.find(api => api.method === method && api.path === path);
-
-  const sections = articles.map(article => ({
-    content: article.content,
-    title: article.data.title,
-    id: getSectionMeta(article.data.title).id,
-    apiArticles: article.data.apis.map(api => {
-      const article = findArticle(api);
-      if (!article) {
-        throw Error(`No article found for ${api.method} ${api.path}`);
-      }
-      if (!api.title) {
-        throw Error(`No title found for ${api.method} ${api.path}`);
-      }
-      return {
-        title: api.title,
-        api: article,
-      };
-    }),
-  }));
+  const parsedApiSections = useParseApiSections(articles);
 
   // Nav was built for multiple larger sections, but we only have one. Can probably remove this
   const section = {
     title: t('sections.footprint-api'),
     isPreview: false,
-    subsections: sections,
+    subsections: parsedApiSections,
   };
   const navSections = [section];
 
