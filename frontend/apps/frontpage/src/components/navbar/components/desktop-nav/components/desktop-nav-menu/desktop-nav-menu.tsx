@@ -19,9 +19,7 @@ const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
     <ItemContainer>
       <StyledTrigger>
         <Title>{menu.text}</Title>
-        <div className="chevron-icon">
-          <IcoChevronDown16 />
-        </div>
+        <IcoChevronDown16 className="chevron-icon" />
       </StyledTrigger>
       <Content>{items}</Content>
     </ItemContainer>
@@ -48,16 +46,12 @@ const StyledTrigger = styled(NavigationMenuTrigger)`
     all: unset;
     display: flex;
     cursor: pointer;
+    align-items: center;
+    gap: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]}
       ${theme.spacing[4]};
 
     .chevron-icon {
-      min-width: 16px;
-      height: 20px;
-      flex: 0;
-      display: flex;
-      align-items: center;
-      margin-left: ${theme.spacing[2]};
       transition: transform 0.08s ease-out;
     }
 
@@ -76,7 +70,7 @@ const Content = styled(NavigationMenuContent)`
   ${({ theme }) => css`
     position: absolute;
     left: 0;
-    top: 100%;
+    top: 80%;
     min-width: 380px;
     margin-top: ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.default};

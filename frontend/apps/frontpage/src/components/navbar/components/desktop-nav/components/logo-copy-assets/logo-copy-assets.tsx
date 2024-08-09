@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Dropdown, Text } from '@onefootprint/ui';
+import { Dropdown, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
@@ -70,13 +70,15 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
       </Dropdown.Trigger>
       <Dropdown.Content
         align="start"
-        sideOffset={8}
+        sideOffset={-8}
         onEscapeKeyDown={() => setShowOptions(false)}
         onPointerDownOutside={() => setShowOptions(false)}
       >
         {assetsToCopy.map(asset => (
           <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
-            <IcoDownload16 color="tertiary" />
+            <Stack align="center" justify="center" paddingBottom={1}>
+              <IcoDownload16 />
+            </Stack>
             <Text variant="body-2"> {t(asset.label as ParseKeys<'common'>)} </Text>
           </StyledItem>
         ))}
@@ -87,35 +89,16 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
 
 const Trigger = styled.button`
   ${({ theme }) => css`
+    all: unset;
     display: flex;
     align-items: center;
     min-width: fit-content;
     height: 100%;
-    background-color: ${theme.backgroundColor.transparent};
     margin-right: ${theme.spacing[3]};
 
-    &:hover {
-      && {
-        background: ${theme.backgroundColor.transparent};
-      }
-    }
-
-    &[data-state='open'] {
-      && {
-        background: ${theme.backgroundColor.transparent};
-      }
-    }
-
-    & {
-      svg {
-        transform: scale(0.95);
-        margin-bottom: 3px;
-        path {
-           {
-            fill: ${theme.color.primary};
-          }
-        }
-      }
+    &&,
+    &&:hover {
+      background-color: ${theme.backgroundColor.transparent};
     }
   `}
 `;
@@ -124,6 +107,7 @@ const StyledItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: ${theme.spacing[3]};
   `}
 `;

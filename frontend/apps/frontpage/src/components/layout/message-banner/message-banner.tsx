@@ -41,13 +41,13 @@ const MessageBanner = ({ onClose, articleUrl, text, cta, showBanner }: MessageBa
   return (
     <AnimatePresence>
       {showBanner && (
-        <Container variants={containerVariants} initial="initial" animate="animate" exit="exit">
-          <motion.p variants={textVariants} initial="initial" animate="animate">
+        <Container tag="span" variants={containerVariants} initial="initial" animate="animate" exit="exit">
+          <TextContainer variants={textVariants} initial="initial" animate="animate">
             {text}.{' '}
             <LinkButton href={articleUrl} target="_blank" variant="label-3">
               {cta}
             </LinkButton>
-          </motion.p>
+          </TextContainer>
           <CloseButtonContainer onClick={onClose}>
             <IcoCloseSmall16 />
           </CloseButtonContainer>
@@ -56,6 +56,14 @@ const MessageBanner = ({ onClose, articleUrl, text, cta, showBanner }: MessageBa
     </AnimatePresence>
   );
 };
+
+const TextContainer = styled(motion(Stack))`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    gap: ${theme.spacing[2]};
+    color: ${theme.color.primary};
+  `}
+`;
 
 const Container = styled(motion(Stack))`
   ${({ theme }) => css`
@@ -73,7 +81,6 @@ const Container = styled(motion(Stack))`
 
     ${media.greaterThan('md')`
       padding: 0;
-      flex-direction: row;
       min-height: 40px;
     `}
   `}
