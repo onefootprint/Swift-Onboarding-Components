@@ -2,6 +2,12 @@
 title: Labels and tags
 apis:
 - method: post
+  path: /users/{fp_id}/label
+  title: Set the label for a user
+- method: get
+  path: /users/{fp_id}/label
+  title: Get the label for a user
+- method: post
   path: /users/{fp_id}/tags
   title: Add a tag for a user
 - method: get
@@ -10,16 +16,10 @@ apis:
 - method: delete
   path: /users/{fp_id}/tags/{tag_id}
   title: Delete a tag for a user
-- method: post
-  path: /users/{fp_id}/label
-  title: Set the label for a user
-- method: get
-  path: /users/{fp_id}/label
-  title: Get the label for a user
 ---
 
 # Labels and tags
 
-TODO lots of fun content about users here.
-
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+In order to help you visualize your user base and improve the verification decisions that Footprint makes for your users, we support a set of interactive APIs to deliver feedback on users onboarded through Footprint based on context specific to your application. We support this feedback in two ways:
+- Labels are a way to provide a high-level determination about a user, and to give feedback to Footprint to improve risk systems and detection. You can have 1 active Label per user
+- Tags are an unstructure way for you to organize, categorize and add metadata about your users. A user can have multiple tags

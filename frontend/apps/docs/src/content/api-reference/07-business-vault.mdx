@@ -20,6 +20,10 @@ apis:
 
 # Business vault
 
-TODO lots of fun content about users here.
+The Footprint business vault is structured as a key-value store. The keys may only be a set of pre-defined "Data Identifiers," though there are many wildcard Data Identifiers.
 
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+Using predefined Data Identifiers allows Footprint to automatically validate and clean certain strongly-typed data. For example, Footprint will always validate and guarantee that `business.tin` is a nine-digit number representing a US Taxpayer Identification Number.
+
+If you would like to vault information under your own application-defined keys, you may use the `custom.*` Data Identifiers. These have no validation and can be any JSON value: string, number, list, or object.
+
+You can find more information on the set of supported Data Identifiers and their validators [here](/articles/vault/fields).

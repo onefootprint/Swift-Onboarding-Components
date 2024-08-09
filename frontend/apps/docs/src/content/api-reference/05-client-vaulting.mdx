@@ -15,7 +15,7 @@ apis:
   title: Decrypt data from the vault
 - method: get
   path: /users/vault/decrypt/{token}
-  title: Check presence of data in the vault
+  title: Download a file stored in the vault
 - method: post
   path: /users/vault/{identifier}/upload
   title: Upload a large file to the vault
@@ -23,9 +23,6 @@ apis:
 
 # Client vaulting
 
-TODO lots of fun content about users here.
+In combination with Footprint's [Form SDK](/articles/embedded-components/getting-started), you can both render and collect additional information from your users securely and compliantly.
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+You can create a short-lived token from your backend that gives temporary permission to vault and/or decrypt data from your client. Simply pass this token into the Footprint Form SDK and it takes care of the rest.

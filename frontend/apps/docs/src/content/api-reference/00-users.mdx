@@ -17,9 +17,12 @@ apis:
 
 # Users
 
-TODO lots of fun content about users here.
+Footprint makes it easy to onboard customers by unifying identity verification and data vaulting. A user in Footprint stores all PII for that user and all history of identity verification.
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+Users can be created in two ways:
 
+- First, they can onboard through [Footprint's interactive onboarding product](/articles/kyc/getting-started) using a Playbook configured in the [Footprint dashboard](https://dashboard.onefootprint.com/playbooks).
+- Or, they can be create directly via the <ScrollLink id="post-users">POST /users</ScrollLink> API below.
 
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+We recommend creating one Footprint user for each user you have in your database and storing the user's `fp_id` in your database table of users. Footprint is meant to act as the source of truth for your users' PII and other sensitive information, so you may often need your user's corresponding `fp_id`.
+

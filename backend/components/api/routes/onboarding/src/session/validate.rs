@@ -31,7 +31,7 @@ use paperclip::actix::post;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "Validate a short-lived onboarding session token and exchange it for a long-lived fp_id",
+    description = "After a user finishes an interactive Footprint onboarding flow through one of our SDKs, your application will be given a validation token. This API allows you to exchange that short-lived validation token for the long-lived `fp_id` of the user who finished the flow. This also returns some information about the flow that the user has completed.",
     tags(Onboarding, PublicApi)
 )]
 #[post("/onboarding/session/validate")]

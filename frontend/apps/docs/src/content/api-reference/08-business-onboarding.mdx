@@ -23,6 +23,6 @@ apis:
 
 # Business onboarding
 
-TODO lots of fun content about users here.
+After businesses have been created, these APIs allow you to interact with the business verification results and trigger new business verification sessions.
 
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+Note, businesses created through the interactive business onboarding product will always be associated with an `fp_id` that created the business as the business's owner. Businesses created via API may optionally have their owners linked using the <ScrollLink id="post-businesses-fp-bid-owners">POST /businesses/{fp_bid}/owners</ScrollLink> API below.

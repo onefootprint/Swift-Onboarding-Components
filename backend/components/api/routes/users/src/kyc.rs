@@ -47,7 +47,10 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
 
-#[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Users, Preview))]
+#[api_v2_operation(
+    description = "For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
+    tags(Users, Preview)
+)]
 #[post("/users/{fp_id}/kyc")]
 pub async fn post(
     state: web::Data<State>,

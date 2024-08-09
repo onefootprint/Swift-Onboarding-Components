@@ -138,6 +138,7 @@ const StyledMarkdown = styled(BaseMarkdown)`
     ul {
       list-style: disc;
       padding-left: ${theme.spacing[7]};
+      margin-bottom: ${theme.spacing[7]};
     }
 
     pre > div {

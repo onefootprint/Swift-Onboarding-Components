@@ -6,6 +6,7 @@ import { ARTICLES_CONTAINER_ID } from 'src/pages/api-reference/components/articl
 import Article from 'src/pages/api-reference/components/articles/components/article';
 import SideBySideElement from 'src/pages/api-reference/components/articles/components/side-by-side-element';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
+import ScrollLink from 'src/pages/new-api-reference/components/scroll-link';
 import EndpointsOverview from './endpoints-overview';
 
 export type ApiArticle = {
@@ -30,6 +31,10 @@ export type ArticlesProps = {
   sections: PageNavSection[];
 };
 
+const MARKDOWN_OVERRIDES = {
+  ScrollLink,
+};
+
 const Articles = ({ sections }: ArticlesProps) => {
   const subsections = sections.flatMap(s => s.subsections);
   return (
@@ -41,7 +46,7 @@ const Articles = ({ sections }: ArticlesProps) => {
               id={subsection.id}
               left={
                 <Box marginTop={8}>
-                  <Markdown>{subsection.content}</Markdown>
+                  <Markdown overrides={MARKDOWN_OVERRIDES}>{subsection.content}</Markdown>
                 </Box>
               }
               right={<EndpointsOverview apiArticles={subsection.apiArticles} />}

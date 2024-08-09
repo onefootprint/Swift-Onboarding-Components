@@ -41,7 +41,7 @@ use paperclip::actix::post;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "Triggers KYB on the provided business.",
+    description = "For a user and business whose information have already been collected, runs the verification checks of the provided playbook. This will contact the identity and business verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
     tags(Businesses, Preview)
 )]
 #[post("/businesses/{fp_bid}/kyb")]

@@ -39,7 +39,7 @@ impl Apiv2Schema for ExternalId {
             paperclip::v2::models::Parameter::<DefaultSchemaRaw>{
                 name: "x-external-id".to_owned(),
                 in_: paperclip::v2::models::ParameterIn::Header,
-                description: Some("To support attaching external identifiers (like a foreign user id) to this request, provide a client-generated `x-external-id`. Requests made with the same `x-external-id` value will no-op and return the same result. `x-external-id` must be globally unique to your organization. Note, if `x-external-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
+                description: Some("Optionally, this user's identifier in your own database. This will be associated with the user as their `external_id`, which is may be used in the future to look up a user in Footprint using your own user identifier. `x-external-id` must be globally unique to your organization. Note, if `x-external-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
                 data_type: Some(newtypes::ExternalId::data_type()),
                 format: newtypes::ExternalId::format(),
                 required: Self::required(),

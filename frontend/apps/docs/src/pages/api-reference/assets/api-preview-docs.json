@@ -129,7 +129,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nFor a user and business whose information have already been collected, runs the verification checks of the provided playbook. This will contact the identity and business verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
                 "parameters": [
                     {
                         "in": "path",
@@ -902,7 +902,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTrigger KYC on the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nFor a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
                 "parameters": [
                     {
                         "in": "path",

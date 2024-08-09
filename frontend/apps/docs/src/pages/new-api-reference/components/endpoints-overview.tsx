@@ -31,17 +31,19 @@ const EndpointsOverview = ({ apiArticles }: EndpointsOverviewProps) => {
           </Text>
         </Header>
         <Content>
-          {apiArticles.map(article => (
-            <Link
-              id={article.api.id}
-              to={article.api.id}
-              containerId={ARTICLES_CONTAINER_ID}
-              href={`#${article.api.id}`}
-            >
-              <Method method={article.api.method} />
-              <td>{article.api.path}</td>
-            </Link>
-          ))}
+          {apiArticles
+            .filter(article => !article.api.isHidden)
+            .map(article => (
+              <Link
+                id={article.api.id}
+                to={article.api.id}
+                containerId={ARTICLES_CONTAINER_ID}
+                href={`#${article.api.id}`}
+              >
+                <Method method={article.api.method} />
+                <td>{article.api.path}</td>
+              </Link>
+            ))}
         </Content>
       </Container>
     </StickyContainer>

@@ -14,9 +14,10 @@ apis:
 
 # Businesses
 
-TODO lots of fun content about users here.
+In addition to verifying the identity of users, Footprint also supports KYB, verifying the legitimacy of businesses. Businesses are treated very similarly to users in Footprint's ecosystem, but they are verified using a different set of business verification vendors.
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+Businesses can similarly be onboarded to Footprint in two ways:
+- First, they can onboard through [Footprint's interactive business onboarding product](/articles/kyb/getting-started) using a Playbook configured in the [Footprint dashboard](https://dashboard.onefootprint.com/playbooks).
+- Or, they can be create directly via the <ScrollLink id="post-businesses">POST /businesses</ScrollLink> API below.
 
-
-Footprint unifies onboarding, identity verification, and data security. Onboard your customers without worrying about storing their sensitive data afterwards.
+Businesses also have their own identifier in Footprint, called an `fp_bid`. We recommend storing the `fp_bid` in your database associated with the `fp_id`(s) of the owners of the business. Note that it is possible for one user to own multiple businesses. The relationships between owners and businesses are also shown on the user and business detail pages of the Footprint dashboard.
