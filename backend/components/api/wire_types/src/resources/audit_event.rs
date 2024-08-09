@@ -2,6 +2,7 @@ use crate::*;
 use newtypes::AuditEventId;
 use newtypes::AuditEventName;
 use newtypes::DataIdentifier;
+use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::ListEntryCreationId;
 use newtypes::ListEntryId;
@@ -51,6 +52,7 @@ pub enum AuditEventDetail {
     DecryptUserData {
         fp_id: FpId,
         reason: String,
+        context: Option<DecryptionContext>,
         decrypted_fields: Vec<DataIdentifier>,
     },
     DeleteUser {

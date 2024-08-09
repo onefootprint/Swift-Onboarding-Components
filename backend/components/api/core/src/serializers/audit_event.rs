@@ -51,11 +51,16 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     .fp_id,
                 deleted_fields: fields,
             },
-            AuditEventMetadata::DecryptUserData { reason, fields } => AuditEventDetail::DecryptUserData {
+            AuditEventMetadata::DecryptUserData {
+                reason,
+                context,
+                fields,
+            } => AuditEventDetail::DecryptUserData {
                 fp_id: scoped_vault
                     .ok_or(AssertionError("scoped vault is not available for this event"))?
                     .fp_id,
                 reason,
+                context,
                 decrypted_fields: fields,
             },
             AuditEventMetadata::DeleteUser => AuditEventDetail::DeleteUser {

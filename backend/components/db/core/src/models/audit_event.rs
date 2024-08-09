@@ -372,6 +372,7 @@ mod tests {
     use itertools::Itertools;
     use macros::db_test;
     use newtypes::DataIdentifier;
+    use newtypes::DecryptionContext;
 
     #[db_test]
     fn test_create_audit_event(conn: &mut TestPgConn) {
@@ -489,6 +490,7 @@ mod tests {
                         is_live: true,
                         scoped_vault_id: scoped_vault_2.id.clone(),
                         reason: "investigating something".to_owned(),
+                        context: Some(DecryptionContext::Api),
                         decrypted_fields: vec![
                             DataIdentifier::Id(newtypes::IdentityDataKind::Zip),
                             DataIdentifier::Id(newtypes::IdentityDataKind::Email),

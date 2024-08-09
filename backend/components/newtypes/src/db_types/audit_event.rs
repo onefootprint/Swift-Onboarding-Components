@@ -1,3 +1,4 @@
+use super::DecryptionContext;
 use crate::util::impl_enum_str_diesel;
 use crate::DataIdentifier;
 use crate::DocumentDataId;
@@ -46,6 +47,7 @@ pub enum AuditEventDetail {
         is_live: bool,
         scoped_vault_id: ScopedVaultId,
         reason: String,
+        context: Option<DecryptionContext>,
         decrypted_fields: Vec<DataIdentifier>,
     },
     DeleteUser {
@@ -164,10 +166,12 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live,
                 scoped_vault_id,
                 reason,
+                context,
                 decrypted_fields,
             } => Self {
                 metadata: AuditEventMetadata::DecryptUserData {
                     reason,
+                    context,
                     fields: decrypted_fields,
                 },
                 scoped_vault_id: Some(scoped_vault_id),
@@ -304,6 +308,7 @@ pub enum AuditEventMetadata {
     },
     DecryptUserData {
         reason: String,
+        context: Option<DecryptionContext>,
         fields: Vec<DataIdentifier>,
     },
     DeleteUser,
@@ -342,6 +347,7 @@ mod tests {
             "kind": "decrypt_user_data",
             "data": {
                 "reason": "an example reason",
+                "context": "api",
                 "fields": ["id.phone_number", "id.last_name"]
             }
         }"#;
@@ -351,6 +357,7 @@ mod tests {
             meta,
             AuditEventMetadata::DecryptUserData {
                 reason: "an example reason".to_owned(),
+                context: Some(DecryptionContext::Api),
                 fields: vec![
                     DataIdentifier::Id(IdentityDataKind::PhoneNumber),
                     DataIdentifier::Id(IdentityDataKind::LastName),

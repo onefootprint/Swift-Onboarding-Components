@@ -116,6 +116,7 @@ pub async fn post(
                         is_live,
                         scoped_vault_id: sv_id,
                         reason,
+                        context: Some(DecryptionContext::Api),
                         decrypted_fields: dis.clone(),
                     },
                 };

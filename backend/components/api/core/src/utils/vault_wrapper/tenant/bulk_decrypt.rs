@@ -123,7 +123,7 @@ where
     if let DecryptAccessEventInfo::AccessEvent {
         reason,
         principal,
-        purpose,
+        purpose: context,
         insight,
     } = access_event
     {
@@ -154,7 +154,7 @@ where
                             reason: Some(reason.clone()),
                             principal: principal.clone(),
                             kind: AccessEventKind::Decrypt,
-                            purpose,
+                            purpose: context,
                         };
 
                         let audit_event = NewAuditEvent {
@@ -166,6 +166,7 @@ where
                                 is_live: sv.is_live,
                                 scoped_vault_id: sv.id,
                                 reason: reason.clone(),
+                                context: Some(context),
                                 decrypted_fields: targets,
                             },
                         };

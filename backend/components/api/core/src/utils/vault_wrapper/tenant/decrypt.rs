@@ -39,7 +39,7 @@ impl<Type> TenantVw<Type> {
         principal: DbActor,
         insight: CreateInsightEvent,
         targets: Vec<EnclaveDecryptOperation>,
-        purpose: DecryptionContext,
+        context: DecryptionContext,
     ) -> FpResult<HashMap<EnclaveDecryptOperation, Pii>> {
         let targets = self.check_ob_config_access(targets)?;
         let results = self
@@ -70,7 +70,7 @@ impl<Type> TenantVw<Type> {
                     kind: AccessEventKind::Decrypt,
                     // TODO: also store the transforms!
                     targets: targets.clone(),
-                    purpose,
+                    purpose: context,
                 }
                 .create(conn)?;
 
@@ -83,6 +83,7 @@ impl<Type> TenantVw<Type> {
                         is_live,
                         scoped_vault_id,
                         reason,
+                        context: Some(context),
                         decrypted_fields: targets,
                     },
                 }
