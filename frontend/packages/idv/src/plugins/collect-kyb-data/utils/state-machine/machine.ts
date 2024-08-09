@@ -7,13 +7,12 @@ import {
   isMissingBeneficialOwnersData,
   isMissingRequiredData,
 } from '../attributes';
-import type { MachineContext, MachineEvents } from './types';
+import type { LoadSuccessEvent, MachineContext, MachineEvents } from './types';
 
 type PredicateFn = (ctx: MachineContext) => boolean;
-type LoadSuccessEvent = { type: 'businessDataLoadSuccess'; payload: MachineContext['data'] };
 
 const fromLoad = (predicate: PredicateFn) => (context: MachineContext, event: LoadSuccessEvent) =>
-  predicate({ ...context, data: { ...context.data, ...event.payload } });
+  predicate({ ...context, data: { ...context.data, ...event.payload.data } });
 
 const createCollectKybDataMachine = (initialContext: MachineContext) =>
   createMachine(
@@ -29,16 +28,17 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       context: {
         ...initialContext,
         data: getBusinessDataFromContext(initialContext),
+        vaultBusinessData: {},
       },
       states: {
         loadFromVault: {
           on: {
             businessDataLoadSuccess: [
-              { target: 'introduction', cond: fromLoad(isMissingRequiredData), actions: 'assignData' },
-              { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignData' },
-              { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignData' },
-              { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignData' },
-              { target: 'confirm', actions: 'assignData' },
+              { target: 'introduction', cond: fromLoad(isMissingRequiredData), actions: 'assignVaultData' },
+              { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignVaultData' },
+              { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignVaultData' },
+              { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignVaultData' },
+              { target: 'confirm', actions: 'assignVaultData' },
             ],
             businessDataLoadError: [
               { target: 'introduction', cond: isMissingRequiredData },
@@ -134,6 +134,17 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
           ctx.data = {
             ...ctx.data,
             ...event.payload,
+          };
+          return ctx;
+        }),
+        assignVaultData: assign((ctx, { payload }) => {
+          ctx.vaultBusinessData = {
+            ...ctx.vaultBusinessData,
+            ...payload.vaultBusinessData,
+          };
+          ctx.data = {
+            ...ctx.data,
+            ...payload.data,
           };
           return ctx;
         }),

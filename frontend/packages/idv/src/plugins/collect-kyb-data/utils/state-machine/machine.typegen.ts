@@ -18,8 +18,8 @@ export interface Typegen0 {
       | 'basicDataSubmitted'
       | 'beneficialOwnersSubmitted'
       | 'businessAddressSubmitted'
-      | 'businessDataLoadSuccess'
       | 'stepUpDecryptionCompleted';
+    assignVaultData: 'businessDataLoadSuccess';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -31,7 +31,6 @@ export interface Typegen0 {
     | 'businessAddress'
     | 'completed'
     | 'confirm'
-    | 'init'
     | 'introduction'
     | 'loadFromVault';
   tags: never;

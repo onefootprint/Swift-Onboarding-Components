@@ -6,4 +6,4 @@ export type BusinessDataRequest = {
   speculative?: boolean;
 };
 
-export type BusinessDataResponse = { data: string };
+export type BusinessDataResponse = { data: BusinessDIData };

@@ -1,62 +1,84 @@
-import { BusinessDI, BusinessDIData, CollectedKybDataOption } from '@onefootprint/types';
+import { BusinessDIData, CollectedKybDataOption, DecryptUserResponse } from '@onefootprint/types';
 import React from 'react';
 import useEffectOnceStrict from '../../../../components/identify/hooks/use-effect-once-strict';
-import { useDecryptBusiness } from '../../../../queries';
+import { useDecryptBusiness, useDecryptUser } from '../../../../queries';
+import type { UserData } from '../../../../types';
+import { isObject, isStringValid } from '../../../../utils';
+import { BeneficialOwnerIdFields, BusinessFields } from '../../utils/constants';
+import { buildBeneficialOwner, getBoDi, omitNullAndUndefined } from '../../utils/utils';
 
-type InitProps = {
+type BusinessFieldsLoaderProps = {
   authToken?: string;
+  bootstrapUserData?: UserData;
   children: React.ReactNode;
+  missingAttributes?: CollectedKybDataOption[];
   onError: (error?: unknown) => void;
-  onSuccess: (data: BusinessDIData) => void;
+  onSuccess: (payload: { data: BusinessDIData; vaultBusinessData: BusinessDIData }) => void;
   populatedAttributes?: CollectedKybDataOption[];
 };
 
-const businessFields: `${BusinessDI}`[] = [
-  'business.address_line1',
-  'business.address_line2',
-  'business.beneficial_owners',
-  'business.city',
-  'business.corporation_type',
-  'business.country',
-  'business.dba',
-  'business.formation_date',
-  'business.formation_state',
-  'business.kyced_beneficial_owners',
-  'business.name',
-  'business.phone_number',
-  'business.state',
-  'business.website',
-  'business.zip',
-  // 'business.tin', Requires an auth token with mobile access scope
-];
+const hasUserDataBootstrapped = (userData?: UserData | undefined): boolean =>
+  isObject(userData) &&
+  Object.keys(userData).length > 0 &&
+  BeneficialOwnerIdFields.some(
+    idKey => Boolean(userData?.[idKey]?.isBootstrap) && isStringValid(userData?.[idKey]?.value),
+  );
 
-const omitNullAndUndefined = (data: BusinessDIData): BusinessDIData =>
-  Object.entries(data).reduce((response, [key, value]) => {
-    if (value != null) response[key] = value;
-    return response;
-  }, Object.create(null));
-
-const BusinessFieldsLoader = ({ authToken, children, onError, onSuccess, populatedAttributes }: InitProps) => {
+const BusinessFieldsLoader = ({
+  authToken,
+  bootstrapUserData,
+  children,
+  missingAttributes,
+  onError,
+  onSuccess,
+  populatedAttributes,
+}: BusinessFieldsLoaderProps) => {
   const mutDecryptBusiness = useDecryptBusiness();
+  const mutDecryptUser = useDecryptUser();
 
-  const fetchBusinessDIData = (authToken: string) => {
-    mutDecryptBusiness.mutate(
-      { authToken, fields: businessFields },
-      {
-        onError,
-        onSuccess: (response: BusinessDIData) => {
-          const res = omitNullAndUndefined(response);
-          return populatedAttributes?.includes(CollectedKybDataOption.tin)
-            ? onSuccess({ ...res, 'business.tin': 'decrypted' })
-            : onSuccess(res);
-        },
-      },
-    );
+  const fetchDecryptedData = (authToken: string): Promise<[BusinessDIData, DecryptUserResponse]> => {
+    const decryptBusiness: Promise<BusinessDIData> = new Promise<BusinessDIData>((resolve, reject) => {
+      mutDecryptBusiness.mutate({ authToken, fields: BusinessFields }, { onError: reject, onSuccess: resolve });
+    });
+
+    const decryptUser: Promise<DecryptUserResponse> = hasUserDataBootstrapped(bootstrapUserData)
+      ? Promise.resolve({})
+      : new Promise<DecryptUserResponse>((resolve, reject) => {
+          mutDecryptUser.mutate(
+            { authToken, fields: BeneficialOwnerIdFields },
+            { onError: reject, onSuccess: resolve },
+          );
+        });
+
+    return Promise.all([decryptBusiness, decryptUser]);
   };
 
   useEffectOnceStrict(() => {
     if (authToken) {
-      fetchBusinessDIData(authToken);
+      fetchDecryptedData(authToken)
+        .then(([businessData, userData]) => {
+          const userCleanObj = omitNullAndUndefined(userData);
+          const vaultBusinessData: Readonly<BusinessDIData> = omitNullAndUndefined(businessData);
+          const payload = { ...vaultBusinessData };
+
+          if (populatedAttributes?.includes(CollectedKybDataOption.tin)) {
+            payload['business.tin'] = 'decrypted';
+          }
+
+          const allAttributes = (missingAttributes || []).concat(populatedAttributes || []);
+          const boDi = getBoDi(allAttributes);
+          const businessOwnerObj = boDi && !payload[boDi] ? buildBeneficialOwner(userCleanObj, boDi) : {};
+
+          if (boDi && Object.keys(businessOwnerObj).length > 0) {
+            payload[boDi] = [businessOwnerObj];
+          }
+
+          return onSuccess({
+            data: payload,
+            vaultBusinessData,
+          });
+        })
+        .catch(onError);
     }
   });
 

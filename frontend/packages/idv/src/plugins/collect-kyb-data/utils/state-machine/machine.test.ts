@@ -176,9 +176,21 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('completed');
   });
 
-  it('when there are no missing attributes', () => {
+  it('when there are no missing attributes with success load', () => {
     const machine = createMachine([], []);
-    const { state } = machine;
+    let { state } = machine;
+    expect(state.value).toEqual('loadFromVault');
+
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
+    expect(state.value).toEqual('confirm');
+  });
+
+  it('when there are no missing attributes with failure load', () => {
+    const machine = createMachine([], []);
+    let { state } = machine;
+    expect(state.value).toEqual('loadFromVault');
+
+    state = machine.send({ type: 'businessDataLoadError' });
     expect(state.value).toEqual('confirm');
   });
 
@@ -187,7 +199,7 @@ describe('Collect KYB Data Machine Tests', () => {
 
     let { state } = machine;
     expect(state.value).toEqual('loadFromVault');
-    state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
+    state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
 
     expect(state.value).toEqual('introduction');
 
@@ -247,7 +259,7 @@ describe('Collect KYB Data Machine Tests', () => {
       let { state } = machine;
 
       expect(state.value).toEqual('loadFromVault');
-      state = machine.send({ type: 'businessDataLoadSuccess', payload: {} });
+      state = machine.send({ type: 'businessDataLoadSuccess', payload: { data: {}, vaultBusinessData: {} } });
 
       // Collect all fields first
       state = machine.send('introductionCompleted');

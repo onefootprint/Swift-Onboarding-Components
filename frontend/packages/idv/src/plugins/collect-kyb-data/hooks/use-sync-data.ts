@@ -3,7 +3,10 @@ import type { BusinessDIData, BusinessDataResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import { useL10nContext } from '../../../components/l10n-provider';
 import { useBusinessData } from '../../../queries';
+import { formatPayload, omitEqualData } from '../utils/utils';
+import useCollectKybDataMachine from './use-collect-kyb-data-machine';
 
 type SyncDataArgs = {
   authToken?: string;
@@ -16,7 +19,10 @@ type SyncDataArgs = {
 const useSyncData = () => {
   const businessDataMutation = useBusinessData();
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.components.sync-data-error' });
+  const [state] = useCollectKybDataMachine();
   const toast = useToast();
+  const locale = useL10nContext()?.locale || 'en-US';
+  const { vaultBusinessData } = state.context;
 
   const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
@@ -33,8 +39,19 @@ const useSyncData = () => {
       return;
     }
 
+    const filteredData = omitEqualData(vaultBusinessData, data);
+    const payload = formatPayload(locale, filteredData);
+    if (Object.keys(payload).length === 0) {
+      onSuccess?.({ data: filteredData });
+      return;
+    }
+
     businessDataMutation.mutate(
-      { authToken, data, speculative },
+      {
+        authToken,
+        data: payload,
+        speculative,
+      },
       {
         onSuccess,
         onError: (error: unknown) => {

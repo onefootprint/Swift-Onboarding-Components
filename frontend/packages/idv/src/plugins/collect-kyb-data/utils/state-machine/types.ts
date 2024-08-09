@@ -35,12 +35,21 @@ export type MachineContext = {
   // Plugin context
   kybRequirement: CollectKybDataRequirement;
   kycRequirement?: CollectKycDataRequirement;
-  bootstrapUserData: UserData;
-  bootstrapBusinessData: BusinessData;
+  /** Readonly object with bootstrapped ``id.*`` data */
+  bootstrapUserData: Readonly<UserData>;
+  /** Readonly object with bootstrapped ``business.*`` data */
+  bootstrapBusinessData: Readonly<BusinessData>;
   idvContext: CommonIdvContext;
   config?: PublicOnboardingConfig;
-  // Machine generated
+  /** Object with ``business.*`` form data */
   data: BusinessDIData;
+  /** Readonly object with decrypted ``business.*`` data */
+  vaultBusinessData?: Readonly<BusinessDIData>;
+};
+
+export type LoadSuccessEvent = {
+  type: 'businessDataLoadSuccess';
+  payload: { data: BusinessDIData; vaultBusinessData: BusinessDIData };
 };
 
 export type MachineEvents =
@@ -49,7 +58,6 @@ export type MachineEvents =
   | { type: 'beneficialOwnersSubmitted'; payload: BeneficialOwnersData }
   | { type: 'businessAddressSubmitted'; payload: BusinessAddressData }
   | { type: 'businessDataLoadError' }
-  | { type: 'businessDataLoadSuccess'; payload: Partial<Omit<BasicData, BusinessDI.tin>> }
   | { type: 'confirmed' }
   | { type: 'editBasicData' }
   | { type: 'editBeneficialOwners' }
@@ -58,4 +66,5 @@ export type MachineEvents =
   | { type: 'navigatedToPrevPage' }
   | { type: 'returnToSummary' }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
-  | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData };
+  | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }
+  | LoadSuccessEvent;

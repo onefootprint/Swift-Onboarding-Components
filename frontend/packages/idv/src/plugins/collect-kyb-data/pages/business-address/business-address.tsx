@@ -30,19 +30,12 @@ const BusinessAddress = ({ ctaLabel, onComplete, onCancel, hideHeader }: Busines
 
   const handleSubmit = (businessAddress: BusinessAddressData) => {
     const handleSuccess = () => {
-      send({
-        type: 'businessAddressSubmitted',
-        payload: {
-          ...businessAddress,
-        },
-      });
+      send({ type: 'businessAddressSubmitted', payload: businessAddress });
       onComplete?.();
     };
 
     const handleError = (error: string) => {
-      Logger.error(`Speculatively vaulting data failed in kyb business-address page: ${error}`, {
-        location: 'kyb-business-address',
-      });
+      Logger.error(`Error vaulting kyb business-address data: ${error}`, { location: 'kyb-business-address' });
     };
 
     syncData({

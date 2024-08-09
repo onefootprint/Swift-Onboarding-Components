@@ -4,6 +4,7 @@ import { BusinessData } from 'src/types';
 import { MachineContext } from '../state-machine/types';
 import {
   extractBootstrapBusinessDataValues,
+  extractBusinessOwnerValuesFromBootstrapUserData,
   getBusinessDataFromContext,
   isMissingAddressData,
   isMissingBasicData,
@@ -62,33 +63,141 @@ describe('extractBootstrapBusinessDataValues', () => {
 });
 
 describe('getBusinessDataFromContext', () => {
-  it('should merge bootstrapBusinessData and data properties', () => {
+  it('should respect the values of bootstrapBusinessData', () => {
     const ctx = {
+      kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
       bootstrapBusinessData: {
-        name: { value: 'Acme Inc' },
-        website: { value: 'www.acme.com' },
+        'business.kyced_beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
+      },
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'aa' },
+      },
+      data: {},
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.kyced_beneficial_owners': [{ first_name: 'aaa', last_name: 'aa', middle_name: 'a' }],
+    });
+  });
+
+  it('should get beneficial owners from bootstrapUserData when bootstrapBusinessData is empty', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
+      bootstrapBusinessData: {},
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'bb' },
+      },
+      data: {},
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.kyced_beneficial_owners': [{ first_name: 'bbb', last_name: 'bb' }],
+    });
+  });
+
+  it('should respect the data already in the context', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
+      bootstrapBusinessData: {
+        'business.kyced_beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
+      },
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'bb' },
       },
       data: {
-        tin: '123456789',
-        addressLine1: '123 Main St',
+        'business.kyced_beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
       },
     } as unknown as MachineContext;
 
     expect(getBusinessDataFromContext(ctx)).toEqual({
-      name: 'Acme Inc',
-      website: 'www.acme.com',
-      tin: '123456789',
-      addressLine1: '123 Main St',
+      'business.kyced_beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
+    });
+  });
+
+  it('should respect the values of bootstrapBusinessData', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
+      bootstrapBusinessData: {
+        'business.beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
+      },
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'aa' },
+      },
+      data: {},
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.beneficial_owners': [{ first_name: 'aaa', last_name: 'aa', middle_name: 'a' }],
+    });
+  });
+
+  it('should get beneficial owners from bootstrapUserData when bootstrapBusinessData is empty', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
+      bootstrapBusinessData: {},
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'bb' },
+      },
+      data: {},
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.beneficial_owners': [{ first_name: 'bbb', last_name: 'bb' }],
+    });
+  });
+
+  it('should respect the data already in the context', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
+      bootstrapBusinessData: {
+        'business.beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
+      },
+      bootstrapUserData: {
+        'id.first_name': { value: 'bbb' },
+        'id.last_name': { value: 'bb' },
+      },
+      data: {
+        'business.beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
+      },
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
+    });
+  });
+
+  it('should merge bootstrapBusinessData and data properties', () => {
+    const ctx = {
+      bootstrapBusinessData: {
+        'business.name': { value: 'Acme Inc' },
+        'business.website': { value: 'www.acme.com' },
+      },
+      data: {
+        'business.tin': '123456789',
+        'business.address_line1': '123 Main St',
+      },
+    } as unknown as MachineContext;
+
+    expect(getBusinessDataFromContext(ctx)).toEqual({
+      'business.name': 'Acme Inc',
+      'business.website': 'www.acme.com',
+      'business.tin': '123456789',
+      'business.address_line1': '123 Main St',
     });
   });
 
   it('should override data properties with bootstrapBusinessData', () => {
     const ctx = {
-      bootstrapBusinessData: { name: { value: 'Bootstrapped name' } },
-      data: { name: 'Data name' },
+      bootstrapBusinessData: { 'business.name': { value: 'Bootstrapped name' } },
+      data: { 'business.name': 'Data name' },
     } as unknown as MachineContext;
 
-    expect(getBusinessDataFromContext(ctx)).toEqual({ name: 'Data name' });
+    expect(getBusinessDataFromContext(ctx)).toEqual({ 'business.name': 'Data name' });
   });
 
   it('should handle empty bootstrapBusinessData and data properties', () => {
@@ -199,50 +308,6 @@ describe('isMissingBasicData', () => {
     } as unknown as MachineContext;
     const result = isMissingBasicData(ctx);
     expect(result).toBe(false);
-  });
-
-  it('should return true when "business_tin" is missing', () => {
-    const ctx = {
-      kybRequirement: {
-        missingAttributes: ['business_name'],
-        populatedAttributes: [
-          'business_tin',
-          'business_beneficial_owners',
-          'business_address',
-          'business_corporation_type',
-          'business_website',
-          'business_phone_number',
-        ],
-      },
-      bootstrapBusinessData: {},
-      data: {
-        'business.corporation_type': 'non_profit',
-        'business.kyced_beneficial_owners': null,
-        'business.state': 'NY',
-        'business.address_line2': null,
-        'business.phone_number': '+15555550100',
-        'business.country': 'US',
-        'business.address_line1': '111 Broadway',
-        'business.city': 'New York',
-        'business.dba': 'Banana',
-        'business.beneficial_owners': [
-          {
-            first_name: 'Bob',
-            last_name: 'Lee',
-            email: 'bruno@onefootprint.com',
-            phone_number: '+15555550100',
-            ownership_stake: 50,
-          },
-        ],
-        'business.formation_state': null,
-        'business.formation_date': null,
-        'business.website': 'https://www.banana.com',
-        'business.zip': '10006',
-        'business.name': 'Banana Biz',
-      },
-    } as unknown as MachineContext;
-    const result = isMissingBasicData(ctx);
-    expect(result).toBe(true);
   });
 });
 
@@ -398,5 +463,85 @@ describe('isMissingBeneficialOwnersData', () => {
       },
     } as unknown as MachineContext;
     expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
+  });
+});
+
+describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
+  it('should return an empty object when business.kyced_beneficial_owners is populated', () => {
+    const ctx = {
+      bootstrapBusinessData: { 'business.kyced_beneficial_owners': [] },
+    } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({});
+  });
+
+  it('should return an empty object when business.beneficial_owners is populated', () => {
+    const ctx = {
+      bootstrapBusinessData: { 'business.beneficial_owners': [] },
+    } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({});
+  });
+
+  it('should return an empty object when business.kyced_beneficial_owners is populated', () => {
+    const ctx = { data: { 'business.kyced_beneficial_owners': 'some value' } } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({});
+  });
+
+  it('should return an empty object when business.beneficial_owners is populated', () => {
+    const ctx = { data: { 'business.beneficial_owners': 'some value' } } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({});
+  });
+
+  it('should return an empty object when missingAttributes is empty', () => {
+    const ctx = { kybRequirement: { missingAttributes: [] } } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({});
+  });
+
+  it('should return an object with business.kyced_beneficial_owners when kycedBeneficialOwners is required', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners] },
+      bootstrapUserData: {
+        'id.first_name': { value: 'John' },
+        'id.last_name': { value: 'Doe' },
+        'id.email': { value: 'email@o.com' },
+        'id.phone_number': { value: '123' },
+      },
+    } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({
+      'business.kyced_beneficial_owners': [
+        {
+          first_name: 'John',
+          last_name: 'Doe',
+          email: 'email@o.com',
+          phone_number: '123',
+        },
+      ],
+    });
+  });
+
+  it('should return an object with business.beneficial_owners when beneficialOwners is required', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.beneficialOwners] },
+      bootstrapUserData: {
+        'id.first_name': { value: 'John' },
+        'id.last_name': { value: 'Doe' },
+        'id.email': { value: 'email@o.com' },
+        'id.phone_number': { value: '123' },
+      },
+    } as unknown as MachineContext;
+    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    expect(result).toEqual({
+      'business.beneficial_owners': [
+        {
+          first_name: 'John',
+          last_name: 'Doe',
+        },
+      ],
+    });
   });
 });

@@ -25,7 +25,7 @@ type BasicDataProps = {
 
 const { logError } = getLogger({ location: 'kyb-basic-data' });
 
-function getDefaultValues(t: TFunction<'idv', undefined>, data: BusinessDIData) {
+const getDefaultValues = (t: TFunction<'idv', undefined>, data: BusinessDIData) => {
   const corporationTypeValue = data?.[BusinessDI.corporationType];
   const tinValue = data?.[BusinessDI.tin];
 
@@ -44,7 +44,7 @@ function getDefaultValues(t: TFunction<'idv', undefined>, data: BusinessDIData) 
     phoneNumber: data?.[BusinessDI.phoneNumber],
     website: data?.[BusinessDI.website],
   };
-}
+};
 
 const BasicData = ({ ctaLabel, hideHeader, onCancel, onComplete }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
@@ -69,7 +69,7 @@ const BasicData = ({ ctaLabel, hideHeader, onCancel, onComplete }: BasicDataProp
         onComplete?.();
       },
       onError: (error: string) => {
-        logError(`Speculatively vaulting data failed in kyb basic-data page: ${error}`, error);
+        logError(`Error vaulting kyb basic-data: ${error}`, error);
       },
     });
   };

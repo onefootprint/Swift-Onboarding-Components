@@ -15,6 +15,7 @@ const BeneficialOwnersSection = () => {
   const {
     data,
     kybRequirement: { missingAttributes, populatedAttributes },
+    vaultBusinessData,
   } = state.context;
   const [isEditing, setIsEditing] = useState(false);
   const isKycBoMissing = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
@@ -27,6 +28,8 @@ const BeneficialOwnersSection = () => {
   if (!beneficialOwners.length) {
     return null;
   }
+
+  const shouldHideEditButton = !!vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
 
   const sections: SectionProps[] = [];
   beneficialOwners.forEach((beneficialOwner, index) => {
@@ -83,7 +86,7 @@ const BeneficialOwnersSection = () => {
   ) : (
     <MultiSection
       title={t('beneficial-owners.title')}
-      editLabel={isKycBoPopulated ? '' : t('summary.edit')}
+      editLabel={isKycBoPopulated || shouldHideEditButton ? '' : t('summary.edit')}
       onEdit={startEditing}
       IconComponent={IcoUserCircle24}
       sections={sections}

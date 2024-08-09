@@ -42,7 +42,8 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         return;
       }
     }
-    const submittedData = requireMultiKyc
+
+    const payload = requireMultiKyc
       ? { [BusinessDI.kycedBeneficialOwners]: beneficialOwners }
       : { [BusinessDI.beneficialOwners]: beneficialOwners };
 
@@ -52,14 +53,14 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
 
     syncData({
       authToken,
-      data: submittedData,
+      data: payload,
       speculative: true,
       onSuccess: () => {
-        send({ type: 'beneficialOwnersSubmitted', payload: submittedData });
+        send({ type: 'beneficialOwnersSubmitted', payload });
         onComplete?.();
       },
       onError: (error: string) => {
-        logError(`Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`, error);
+        logError(`Error vaulting kyb beneficial-owners data: ${error}}`, error);
       },
     });
   };

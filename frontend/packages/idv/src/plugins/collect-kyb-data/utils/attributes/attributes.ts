@@ -1,6 +1,15 @@
-import type { BeneficialOwner, BusinessDIData } from '@onefootprint/types';
+import type { BeneficialOwner, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
+import { isStringValid } from '../../../../utils';
+import { BeneficialOwnerIdFields } from '../constants';
 import type { MachineContext } from '../state-machine/types';
+import { buildBeneficialOwner, getBoDi } from '../utils';
+
+const isBoField = (x: unknown): x is 'business.beneficial_owners' => x === 'business.beneficial_owners';
+
+const isKycBoField = (x: unknown): x is 'business.kyced_beneficial_owners' => x === 'business.kyced_beneficial_owners';
+
+const isBoFieldKey = (x: unknown) => isBoField(x) || isKycBoField(x);
 
 const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
   return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
@@ -19,8 +28,7 @@ const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwne
 export const extractBootstrapBusinessDataValues = (obj: MachineContext['bootstrapBusinessData']): BusinessDIData => {
   return Object.entries(obj).reduce<BusinessDIData>((output, [k, v]): BusinessDIData => {
     if (v.value != null) {
-      if (Array.isArray(v.value)) {
-        /** @ts-expect-error: k is a string */
+      if (isBoFieldKey(k) && Array.isArray(v.value) && v.value.length > 0) {
         output[k] = v.value.map(beneficialOwnerMapper);
         return output;
       }
@@ -31,9 +39,32 @@ export const extractBootstrapBusinessDataValues = (obj: MachineContext['bootstra
   }, Object.create(null));
 };
 
+export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineContext): BusinessDIData => {
+  /* Ignore when business owners kind are not missing */
+  const boDi = getBoDi(ctx?.kybRequirement?.missingAttributes);
+  if (!boDi) return {};
+
+  /* Ignore when business owners kind are populated */
+  if (ctx?.bootstrapBusinessData?.[boDi] != null) return {};
+  if (ctx?.data?.[boDi] != null) return {};
+
+  const userData: DecryptUserResponse = Object.fromEntries(
+    Object.entries(ctx?.bootstrapUserData || {})
+      .filter(([k, _v]) => BeneficialOwnerIdFields.includes(k as (typeof BeneficialOwnerIdFields)[0]))
+      .map(([k, v]) => [k, v.value])
+      .filter(([_k, v]) => isStringValid(v)),
+  );
+
+  /* Ignore when there is no relevant business data in the user data */
+  if (Object.keys(userData).length === 0) return {};
+
+  return { [boDi]: [buildBeneficialOwner(userData, boDi)] };
+};
+
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
-  return {
+  return /** This order is important */ {
     ...extractBootstrapBusinessDataValues(ctx.bootstrapBusinessData),
+    ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
     ...ctx.data,
   };
 };
