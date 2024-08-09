@@ -233,7 +233,7 @@
         "phased-out": "Phased out",
         "phased-out-tooltip": "This API is being phased out and should not be granted to future customers. You are only seeing this message as an employee.",
         "preview": "Preview",
-        "preview-tooltip": "This is a preview API and may actively change.",
+        "preview-tooltip": "This is a preview API. It may actively change, but we will give notice before making any backwards-incompatible change.",
         "hide-when-locked": "Hidden",
         "hide-when-locked-tooltip": "This API is hidden on the docs site when the tenant does not have access to it. You are only seeing this message as an employee.",
         "locked": "Locked",

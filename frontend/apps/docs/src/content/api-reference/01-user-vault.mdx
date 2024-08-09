@@ -4,24 +4,31 @@ apis:
 - method: patch
   path: /users/{fp_id}/vault
   title: Update a user's vault
+  description: Updates data in a user's vault.
 - method: post
   path: /users/{fp_id}/vault/validate
   title: Validate a vault data update
+  description: Check if the provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.
 - method: post
   path: /users/{fp_id}/vault/decrypt
   title: Decrypt data from a user's vault
+  description: Decrypts the specified list of Data Identifiers from the provided user's vault.
 - method: get
   path: /users/{fp_id}/vault
   title: Check presence of data in a user's vault
+  description: Retrieve information on which Data Identifiers are present in the user's vault.
 - method: delete
   path: /users/{fp_id}/vault
   title: Delete data from a user's vault
+  description: Delete the provided Data Identifiers from the user's vault.
 - method: post
   path: /users/{fp_id}/vault/{identifier}/upload
   title: Upload a large file to a user's vault
+  description: Upload a large file to the user's vault. The contents of the provided Data Identifier will be set to the contents of the provided HTTP request body.
 - method: post
   path: /users/{fp_id}/vault/integrity
   title: Compute hash of data in a user's vault
+  description: Verify the hash of data in the vault without decrypting entirely. This API is being phased out. You should use the `transforms` in <ScrollLink id="post-users-fp-id-vault-decrypt">POST /users/{fp_id}/vault/decrypt</ScrollLink> API instead.
 ---
 
 # User vault

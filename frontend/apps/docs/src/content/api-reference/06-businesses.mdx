@@ -4,12 +4,15 @@ apis:
 - method: post
   path: /businesses
   title: Create a business
+  description: Creates a new business, optionally initializing with the provided vault data.
 - method: get
   path: /businesses/{fp_bid}
   title: Retrieve a business
+  description: View basic details for a business. See the APIs under the <ScrollLink id="business-vault">Buiness vault</ScrollLink> section for information on reading vault data.
 - method: get
   path: /businesses
   title: List businesses
+  description: Look up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.
 ---
 
 # Businesses

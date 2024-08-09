@@ -4,6 +4,7 @@ apis:
 - method: post
   path: /users/{fp_id}/token
   title: Create a user-specific session token
+  description: Create a user-specific session token for the provided `fp_id`. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](/articles/integrate/user-specific-sessions).
 ---
 
 # User-specific sessions

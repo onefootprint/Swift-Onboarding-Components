@@ -24,9 +24,11 @@ type ArticleProps = {
 
 const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const { title, api } = article;
-  const { id, parameters, description, method, path, security, responses, requestBody } = api;
+  const { title, description: mdDescription, api } = article;
+  const { id, parameters, description: openApiDescription, method, path, security, responses, requestBody } = api;
   const encodedId = encodeURIComponent(id);
+  // Use the API's description written in markdown if any. Otherwise, use the description from the open API spec.
+  const description = mdDescription || openApiDescription;
 
   if (api.isHidden) {
     return null;

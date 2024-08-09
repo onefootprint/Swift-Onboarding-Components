@@ -6,7 +6,8 @@ import { ApiReferenceProps } from './api-reference';
 export type ApiArticleProps = {
   method: string;
   path: string;
-  title?: string;
+  title: string;
+  description?: string;
 };
 
 export type ApiReferenceArticle = {

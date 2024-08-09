@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import getSectionMeta from 'src/utils/section';
 import useHydrateArticles from '.';
-import { ApiArticleProps, ApiReferenceArticle } from '../../api-reference/index.page';
+import { ApiReferenceArticle } from '../../api-reference/index.page';
 import getArticles from '../../api-reference/utils/get-articles';
 import staticApiData from '../assets/public-api-docs.json';
 
@@ -30,7 +30,7 @@ const useParseApiSections = (apiSections: ApiReferenceArticle[]) => {
     }
   }, [apiSections, publicApiArticles]);
 
-  const findArticle = ({ method, path }: ApiArticleProps) =>
+  const findArticle = ({ method, path }: { method: string; path: string }) =>
     publicApiArticles.find(api => api.method === method && api.path === path);
 
   const sections = apiSections.map(article => ({
@@ -40,18 +40,15 @@ const useParseApiSections = (apiSections: ApiReferenceArticle[]) => {
     // Each markdown file also includes a YAML list of the apis to be included in this section, specified
     // by the method and path. Use these to look up the open API reference for this API that is exported
     // by the backend.
-    apiArticles: article.data.apis.map(api => {
-      const article = findArticle(api);
-      if (!article) {
-        throw Error(`No article found for ${api.method} ${api.path}`);
+    apiArticles: article.data.apis.map(({ method, path, title, description }) => {
+      const api = findArticle({ method, path });
+      if (!api) {
+        throw Error(`No article found for ${method} ${path}`);
       }
-      if (!api.title) {
-        throw Error(`No title found for ${api.method} ${api.path}`);
+      if (!title) {
+        throw Error(`No title found for ${method} ${path}`);
       }
-      return {
-        title: api.title,
-        api: article,
-      };
+      return { title, description, api };
     }),
   }));
 

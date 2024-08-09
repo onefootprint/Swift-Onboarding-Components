@@ -20,6 +20,8 @@ const NavigationScrollLink = ({ id, children, onClick }: NavigationScrollLinkPro
     to={id}
     href={`#${id}`}
     onClick={onClick}
+    smooth
+    duration={500}
   >
     {children}
   </StyledLink>

@@ -31,6 +31,7 @@ export type PageNavProps = {
 
 export type ApiArticle = {
   title?: string;
+  description?: string;
   api: HydratedArticle;
 };
 

@@ -20,6 +20,8 @@ const ScrollLink = ({ id, children, onClick }: ScrollLinkProps) => (
     href={`#${id}`}
     onClick={onClick}
     LinkElement={Link}
+    smooth
+    duration={500}
   >
     {children}
   </NavigationLink>
