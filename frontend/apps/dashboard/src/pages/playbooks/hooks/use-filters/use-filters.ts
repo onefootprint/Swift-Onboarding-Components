@@ -1,12 +1,5 @@
-import type { OnboardingConfigStatus } from '@onefootprint/types';
 import useBaseFilters from 'src/hooks/use-filters';
-
-export type PlaybooksConfigQuery = {
-  onboarding_config_id?: string;
-  onboarding_configs_page?: string;
-  onboarding_configs_search?: string;
-  onboarding_configs_status?: OnboardingConfigStatus;
-};
+import { PlaybooksConfigQuery } from '../../utils/schema/schema';
 
 const defaultQueryParams: PlaybooksConfigQuery = {
   onboarding_config_id: undefined,

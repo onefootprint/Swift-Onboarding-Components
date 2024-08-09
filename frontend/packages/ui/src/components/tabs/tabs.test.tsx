@@ -2,6 +2,7 @@ import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 
+import noop from 'lodash/noop';
 import type { TabsProps } from './tabs';
 import Tabs from './tabs';
 
@@ -31,6 +32,13 @@ describe('<Tabs />', () => {
     it('first tab should have a `data-selected` attribute', () => {
       renderTab(value => console.log(value));
       const selectedTab = screen.getByRole('tab', { name: 'Users' });
+      expect(selectedTab.getAttribute('data-state')).toEqual('active');
+    });
+
+    it('the tab with the initialTab value should have the `data-selected` attribute', () => {
+      const { label, value } = options[1];
+      customRender(<Tabs options={options} onChange={noop} defaultValue={value} />);
+      const selectedTab = screen.getByRole('tab', { name: label });
       expect(selectedTab.getAttribute('data-state')).toEqual('active');
     });
   });

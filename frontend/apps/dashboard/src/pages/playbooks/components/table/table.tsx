@@ -1,8 +1,9 @@
+import { tabsRouterSchema } from '@/playbooks/utils/schema';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-
+import { z } from 'zod';
 import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
 
@@ -26,9 +27,11 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
   ];
 
   const handleRowClick = (config: OnboardingConfig) => {
+    const query: z.infer<typeof tabsRouterSchema> = { ...filters.query, tab: 'data' };
+
     router.push({
       pathname: `/playbooks/${config.id}`,
-      query: { ...filters.query },
+      query,
     });
   };
 

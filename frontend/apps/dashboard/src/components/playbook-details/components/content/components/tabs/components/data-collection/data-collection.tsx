@@ -30,9 +30,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = kind === 'kyb';
-
   const isAuth = kind === 'auth';
-
   const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods?.length > 0;
 
   if (isAuth) {

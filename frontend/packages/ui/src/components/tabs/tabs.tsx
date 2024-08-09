@@ -8,24 +8,25 @@ import Box from '../box';
 
 const { Tabs: TabsRoot, TabsList, TabsTrigger } = RadixTabs;
 
-export type TabOption = {
+export type TabOption<T extends string = string> = {
   label: string;
-  value: string;
+  value: T;
 };
 
-export type TabsProps = {
-  onChange: (value: string) => void;
-  options: TabOption[];
+export type TabsProps<T extends string = string> = {
+  onChange: (value: T) => void;
+  options: TabOption<T>[];
   disabled?: boolean;
+  defaultValue?: T;
 };
 
-const Tabs = ({ onChange, options, disabled }: TabsProps) => {
-  const firstOptionValue = options[0].value;
-  const [activeTab, setActiveTab] = useState(firstOptionValue);
+const Tabs = <T extends string = string>({ onChange, options, disabled, defaultValue }: TabsProps<T>) => {
+  const firstOptionValue = defaultValue ?? options[0].value;
+  const [activeTab, setActiveTab] = useState<T>(firstOptionValue);
   const id = useId();
   const handleChange = (value: string) => {
-    setActiveTab(value);
-    onChange(value);
+    setActiveTab(value as T);
+    onChange(value as T);
   };
   return (
     <TabsRoot onValueChange={handleChange} defaultValue={firstOptionValue}>

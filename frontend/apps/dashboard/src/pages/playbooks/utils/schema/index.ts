@@ -1,0 +1,1 @@
+export { tabsRouterSchema } from './schema';
