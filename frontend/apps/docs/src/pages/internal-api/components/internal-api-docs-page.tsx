@@ -2,6 +2,7 @@ import { Box, media } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 import ApiArticle from 'src/pages/api-reference/components/api-article';
+import Cmd from 'src/pages/api-reference/components/cmd';
 import { HydratedApiArticle } from 'src/pages/api-reference/hooks/use-hydrate-articles';
 import { ARTICLES_CONTAINER_ID } from '../../api-reference/components/articles';
 import PageNav from '../../api-reference/components/nav/desktop-page-nav';
@@ -32,6 +33,7 @@ const InternalApiDocsPage = ({ title, apis }: InternalApiDocsPageProps) => {
           ))}
         </ArticleList>
       </Layout>
+      <Cmd sections={sections} />
     </Box>
   );
 };
