@@ -3213,7 +3213,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-rule",
-                        "description": "Configure one more ingress rules.  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "description": "Configure one more ingress rules. For example: `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number` or `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration`",
                         "schema": {
                             "type": "string"
                         },
@@ -3257,12 +3257,15 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Raw body",
+                    "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "example": "raw data",
-                                "description": "Raw data.",
+                                "example": {
+                                    "name": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.first_name | to_uppercase }} {{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.last_name | to_uppercase }}",
+                                    "dob": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.dob }}"
+                                },
+                                "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                                 "type": "string"
                             }
                         }
@@ -3307,12 +3310,15 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Raw body",
+                    "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "example": "raw data",
-                                "description": "Raw data.",
+                                "example": {
+                                    "name": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.first_name | to_uppercase }} {{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.last_name | to_uppercase }}",
+                                    "dob": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.dob }}"
+                                },
+                                "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                                 "type": "string"
                             }
                         }
@@ -3392,7 +3398,7 @@
                     {
                         "in": "header",
                         "name": "x-fp-proxy-ingress-rule",
-                        "description": "Configure one more ingress rules.  x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code",
+                        "description": "Configure one more ingress rules. For example: `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number` or `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration`",
                         "schema": {
                             "type": "string"
                         },
@@ -3436,12 +3442,15 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Raw body",
+                    "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "example": "raw data",
-                                "description": "Raw data.",
+                                "example": {
+                                    "name": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.first_name | to_uppercase }} {{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.last_name | to_uppercase }}",
+                                    "dob": "{{ fp_id_Ih14yI0tMugEe5kdpnC0cl.id.dob }}"
+                                },
+                                "description": "Request body to be used in the vault proxy. The body may contain any number of \"vault proxy tokens,\", which are hydrated with the decrypted data from provided users' vaults.",
                                 "type": "string"
                             }
                         }

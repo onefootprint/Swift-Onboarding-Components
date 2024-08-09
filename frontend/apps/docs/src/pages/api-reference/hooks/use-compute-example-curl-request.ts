@@ -46,7 +46,7 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
     } else {
       // Add data fields to curl request
       httpMethodArgs = `-X ${article.method.toUpperCase()}`;
-      if (requestSchema?.type === 'object' || requestSchema?.type === 'array') {
+      if (requestSchema?.type === 'object' || requestSchema?.type === 'array' || typeof exampleRequest === 'object') {
         const exampleRequestJson = JSON.stringify(exampleRequest, null, 2);
         lines.push(`-d '${exampleRequestJson}'`);
       } else if (article.requestBody) {

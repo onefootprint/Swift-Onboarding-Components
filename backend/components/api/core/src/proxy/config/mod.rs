@@ -65,11 +65,7 @@ api_headers_schema! {
             #[alias = "x-fp-proxy-footprint-token"]
             user_token_assignment: FpId = "x-fp-id";
 
-            /// Configure one more ingress rules.
-            ///
-            /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number
-            /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration
-            /// x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_cvc=$.data.card.security_code
+            /// Configure one more ingress rules. For example: `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_number=$.data.card.number` or `x-fp-proxy-ingress-rule: fp_id_abc.custom.credit_card_exp=$.data.card.expiration`
             ingress_rule: String = "x-fp-proxy-ingress-rule";
 
             /// Headers with this `x-fp-proxy-fwd-*` prefix are forwarded to the proxy egress, with the prefix stripped.

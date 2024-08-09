@@ -5,10 +5,10 @@ use crate::proxy::token_parser::ProxyTokenParser;
 use crate::utils::headers::InsightHeaders;
 use crate::ApiResponse;
 use crate::State;
+use crate::VaultProxyBodyBytes;
 use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
 use api_core::telemetry::RootSpan;
-use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiCoreError;
 use newtypes::DecryptionContext;
 use newtypes::FpId;
@@ -42,7 +42,7 @@ api_headers_schema! {
 pub async fn post(
     state: web::Data<State>,
     auth: TenantApiKey,
-    body_bytes: BodyBytes<5_242_880>,
+    body_bytes: VaultProxyBodyBytes,
     insight: InsightHeaders,
     params: ReflectHeaderParams,
     root_span: RootSpan,

@@ -9,12 +9,12 @@ use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
 use crate::ApiResponse;
 use crate::State;
+use crate::VaultProxyBodyBytes;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantAuth;
 use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
 use api_core::telemetry::RootSpan;
-use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiCoreError;
 use api_core::FpError;
 use newtypes::preview_api;
@@ -28,9 +28,6 @@ use paperclip::actix::web::HttpRequest;
 use paperclip::actix::web::HttpResponse;
 use reqwest::StatusCode;
 
-/// Limit the body payload to 5MB
-const FIVE_MB: usize = 5 * 1024 * 1024;
-
 #[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
     description = "Invoke the vault proxy 'just-in-time' (JIT) to securely send and receive data to a target destination. Please contact support to enable this API.",
@@ -40,7 +37,7 @@ const FIVE_MB: usize = 5 * 1024 * 1024;
 pub async fn just_in_time(
     state: web::Data<State>,
     auth: TenantApiKeyGated<preview_api::VaultProxyJit>,
-    body_bytes: BodyBytes<FIVE_MB>,
+    body_bytes: VaultProxyBodyBytes,
     jit_params: JitProxyHeaderParams,
     opt_params: ProxyHeaderParams,
     insight: InsightHeaders,
@@ -72,7 +69,7 @@ pub async fn id(
     state: web::Data<State>,
     auth: TenantApiKeyGated<preview_api::VaultProxy>,
     proxy_config_id: web::Path<ProxyConfigId>,
-    body_bytes: BodyBytes<FIVE_MB>,
+    body_bytes: VaultProxyBodyBytes,
     insight: InsightHeaders,
     params: ProxyHeaderParams,
     request: HttpRequest,
@@ -103,7 +100,7 @@ async fn invoke_vault_proxy(
     state: web::Data<State>,
     auth: Box<dyn TenantAuth>,
     source: ProxySource,
-    body_bytes: BodyBytes<FIVE_MB>,
+    body_bytes: VaultProxyBodyBytes,
     insight: InsightHeaders,
     request: HttpRequest,
     root_span: RootSpan,
