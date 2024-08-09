@@ -240,12 +240,6 @@
         "locked-tooltip": "Please reach out to request access to this API."
       }
     },
-    "internal-api-reference": {
-      "sections": {
-        "hosted": "Hosted API",
-        "private": "Private API"
-      }
-    },
     "phased-out-reference": {
       "title": "Phased out API"
     },

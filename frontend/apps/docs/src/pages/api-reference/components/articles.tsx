@@ -6,8 +6,9 @@ import Article from 'src/pages/api-reference/components/article';
 import ScrollLink from 'src/pages/api-reference/components/scroll-link';
 import SideBySideElement from 'src/pages/api-reference/components/side-by-side-element';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
-import { ARTICLES_CONTAINER_ID } from 'src/pages/internal-api-reference/components/articles/articles';
 import EndpointsOverview from './endpoints-overview';
+
+export const ARTICLES_CONTAINER_ID = 'articles-container';
 
 export type ApiArticle = {
   title?: string;

@@ -273,11 +273,9 @@
   ],
   "files": {
     "ignore": [
-      "src/pages/api-reference/assets/api-docs.json",
       "src/pages/api-reference/assets/public-api-docs.json",
-      "src/pages/api-reference/assets/api-preview-docs.json",
       "src/pages/api-reference/assets/hosted-api-docs.json",
-      "src/pages/api-reference/assets/private-api-docs.json",
+      "src/pages/api-reference/assets/dashboard-api-docs.json",
       "backend/infra",
       "backend/infra_global"
     ]

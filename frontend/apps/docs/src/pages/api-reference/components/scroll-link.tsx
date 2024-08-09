@@ -1,6 +1,6 @@
 import { Link } from 'react-scroll';
 import NavigationLink from 'src/components/markdown/components/navigation-link';
-import { ARTICLES_CONTAINER_ID } from '../../internal-api-reference/components/articles/articles';
+import { ARTICLES_CONTAINER_ID } from './articles';
 
 type ScrollLinkProps = {
   id: string;

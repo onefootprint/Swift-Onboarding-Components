@@ -1,7 +1,7 @@
 import { IcoLink16 } from '@onefootprint/icons';
 import { Link } from 'react-scroll';
-import { ARTICLES_CONTAINER_ID } from 'src/pages/internal-api-reference/components/articles/articles';
 import styled, { css } from 'styled-components';
+import { ARTICLES_CONTAINER_ID } from '../../articles';
 
 type HeadingAnchorProps = {
   id: string;

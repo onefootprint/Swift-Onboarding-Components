@@ -1,6 +1,6 @@
 import type { ContentSchemaNoRef } from '../../api-reference/api-reference.types';
+import dashboardApiData from '../assets/dashboard-api-docs.json';
 import hostedApiData from '../assets/hosted-api-docs.json';
-import privateApiData from '../assets/private-api-docs.json';
 import publicApiData from '../assets/public-api-docs.json';
 
 export const evaluateSchemaRef = (ref: string) => {
@@ -17,11 +17,11 @@ const getSchema = (schemaKey: string) => {
   const hostedSchemas = hostedApiData.components.schemas[schemaKey as keyof typeof hostedApiData.components.schemas] as
     | ContentSchemaNoRef
     | undefined;
-  const privateSchema = privateApiData.components.schemas[
-    schemaKey as keyof typeof privateApiData.components.schemas
+  const dashboardSchema = dashboardApiData.components.schemas[
+    schemaKey as keyof typeof dashboardApiData.components.schemas
   ] as ContentSchemaNoRef | undefined;
 
-  return publicSchema || hostedSchemas || privateSchema || undefined;
+  return publicSchema || hostedSchemas || dashboardSchema || undefined;
 };
 
 // Open API allows us to use "format"s other than the default ones. We should eventually have the

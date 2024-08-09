@@ -198,7 +198,7 @@ if __name__ == "__main__":
     specs = [
         (["PublicApi", "Preview", "PhasedOut"], "public-api-docs.json"),
         (["Hosted"], "hosted-api-docs.json"),
-        (["Private"], "private-api-docs.json"),
+        (["Private"], "dashboard-api-docs.json"),
     ]
     for tags, file_name in specs:
         spec = get_apis(open_api_spec, tags)

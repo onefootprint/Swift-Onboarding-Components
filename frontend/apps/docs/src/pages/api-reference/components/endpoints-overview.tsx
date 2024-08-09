@@ -4,8 +4,8 @@ import { Link } from 'react-scroll';
 import { HttpMethod } from 'src/pages/api-reference/api-reference.types';
 import { ApiArticle } from 'src/pages/api-reference/components/nav/nav.types';
 import { COLOR_FOR_METHOD } from 'src/pages/api-reference/components/type-badge/type-badge';
-import { ARTICLES_CONTAINER_ID } from 'src/pages/internal-api-reference/components/articles/articles';
 import styled, { css } from 'styled-components';
+import { ARTICLES_CONTAINER_ID } from './articles';
 
 type EndpointsOverviewProps = {
   apiArticles: ApiArticle[];
