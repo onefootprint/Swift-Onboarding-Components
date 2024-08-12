@@ -4,9 +4,6 @@ use crate::PgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::access_event;
-use db_schema::schema::scoped_vault;
-use diesel::dsl::count_distinct;
-use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use diesel::RunQueryDsl;
@@ -75,31 +72,5 @@ impl AccessEvent {
             .execute(conn)?;
 
         Ok(())
-    }
-
-    #[tracing::instrument("AccessEvent::count_hot_vaults", skip_all)]
-    pub fn count_hot_vaults(
-        conn: &mut PgConn,
-        t_id: &TenantId,
-        start_date: DateTime<Utc>,
-        end_date: DateTime<Utc>,
-        purposes: Vec<DecryptionContext>,
-    ) -> DbResult<i64> {
-        let count = access_event::table
-            // Cookie-cutter filters for all billable events
-            .filter(access_event::is_live.eq(true))
-            .filter(access_event::tenant_id.eq(t_id))
-            // Filter for access events made during this billing period
-            .filter(access_event::timestamp.ge(start_date))
-            .filter(access_event::timestamp.lt(end_date))
-            .filter(access_event::purpose.eq_any(purposes))
-            .filter(diesel::dsl::exists(
-                scoped_vault::table
-                    .filter(scoped_vault::id.eq(access_event::scoped_vault_id))
-                    .filter(scoped_vault::is_billable_for_vault_storage.eq(true))
-            ))
-            .select(count_distinct(access_event::scoped_vault_id))
-            .get_result(conn)?;
-        Ok(count)
     }
 }

@@ -29,6 +29,7 @@ use db_schema::schema::tenant;
 use db_schema::schema::tenant_api_key;
 use db_schema::schema::tenant_role;
 use db_schema::schema::tenant_user;
+use diesel::dsl::count_distinct;
 use diesel::dsl::sql;
 use diesel::prelude::*;
 use diesel::sql_types::Array;
@@ -44,6 +45,7 @@ use newtypes::AuditEventName;
 use newtypes::CommonAuditEventDetail;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::DecryptionContext;
 use newtypes::DocumentDataId;
 use newtypes::InsightEventId;
 use newtypes::ListEntryCreationId;
@@ -360,6 +362,39 @@ impl AuditEvent {
             .collect();
 
         Ok(events)
+    }
+
+    #[tracing::instrument("AuditEvent::count_hot_vaults", skip_all)]
+    pub fn count_hot_vaults(
+        conn: &mut PgConn,
+        t_id: &TenantId,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+        purposes: Vec<DecryptionContext>,
+    ) -> DbResult<i64> {
+        let count = audit_event::table
+            .filter(audit_event::name.eq_any(vec![
+                AuditEventName::DecryptUserData,
+                AuditEventName::UpdateUserData,
+                AuditEventName::DeleteUserData,
+            ]))
+            // Cookie-cutter filters for all billable events
+            .filter(audit_event::is_live.eq(true))
+            .filter(audit_event::tenant_id.eq(t_id))
+            // Filter for access events made during this billing period
+            .filter(audit_event::timestamp.ge(start_date))
+            .filter(audit_event::timestamp.lt(end_date))
+            .filter(
+                sql::<Text>("metadata -> 'data' ->> 'context'").eq_any(purposes)
+            )
+            .filter(diesel::dsl::exists(
+                scoped_vault::table
+                    .filter(scoped_vault::id.nullable().eq(audit_event::scoped_vault_id))
+                    .filter(scoped_vault::is_billable_for_vault_storage.eq(true))
+            ))
+            .select(count_distinct(audit_event::scoped_vault_id))
+            .get_result(conn)?;
+        Ok(count)
     }
 }
 

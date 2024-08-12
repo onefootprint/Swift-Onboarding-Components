@@ -2,7 +2,7 @@ use crate::interval::BillingInterval;
 use crate::profile::BillingProfile;
 use crate::BResult;
 use crate::Error;
-use db::models::access_event::AccessEvent;
+use db::models::audit_event::AuditEvent;
 use db::models::billing_event::BillingEvent;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::scoped_vault::ScopedVault;
@@ -127,13 +127,13 @@ impl BillingCounts {
         // These billing schemes are only used by some tenants, so only count them conditionally
         let hot_vaults = if bp.and_then(|p| p.prices.get(&Product::HotVaults)).is_some() {
             let p = DecryptionContext::iter().collect(); // Any access is billable
-            Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
+            Some(AuditEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None
         };
         let hot_proxy_vaults = if bp.and_then(|p| p.prices.get(&Product::HotProxyVaults)).is_some() {
             let p = vec![DecryptionContext::VaultProxy];
-            Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
+            Some(AuditEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None
         };
