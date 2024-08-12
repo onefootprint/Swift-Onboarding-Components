@@ -14,7 +14,7 @@ const BeneficialOwnersSection = () => {
   const [state] = useCollectKybDataMachine();
   const {
     data,
-    kybRequirement: { missingAttributes, populatedAttributes },
+    kybRequirement: { missingAttributes, populatedAttributes, hasLinkedBos },
     vaultBusinessData,
   } = state.context;
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +25,7 @@ const BeneficialOwnersSection = () => {
     (isKycBoMissing || isKycBoPopulated ? data[BusinessDI.kycedBeneficialOwners] : data[BusinessDI.beneficialOwners]) ??
     [];
 
-  if (!beneficialOwners.length) {
+  if (!beneficialOwners.length || hasLinkedBos) {
     return null;
   }
 

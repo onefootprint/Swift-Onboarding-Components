@@ -52,6 +52,7 @@ describe('Collect KYB Data Machine Tests', () => {
         kind: OnboardingRequirementKind.collectKybData,
         isMet: false,
         missingAttributes: missingKybAttributes,
+        hasLinkedBos: false,
       },
       kycRequirement: {
         kind: OnboardingRequirementKind.collectKycData,

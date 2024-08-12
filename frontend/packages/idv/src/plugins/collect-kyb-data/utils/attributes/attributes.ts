@@ -1,4 +1,4 @@
-import type { BeneficialOwner, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
+import { BeneficialOwner, BusinessDI, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import { isStringValid } from '../../../../utils';
 import { BeneficialOwnerIdFields } from '../constants';
@@ -10,6 +10,8 @@ const isBoField = (x: unknown): x is 'business.beneficial_owners' => x === 'busi
 const isKycBoField = (x: unknown): x is 'business.kyced_beneficial_owners' => x === 'business.kyced_beneficial_owners';
 
 const isBoFieldKey = (x: unknown) => isBoField(x) || isKycBoField(x);
+
+export const BO_FIELDS: BusinessDI[] = [BusinessDI.beneficialOwners, BusinessDI.kycedBeneficialOwners];
 
 const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
   return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
@@ -62,11 +64,22 @@ export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineCon
 };
 
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
-  return /** This order is important */ {
+  // TODO i think some strange things will happen if the user data is bootstrapped AND the business.beneficial_owners is bootstrap
+  const initialData = /** This order is important */ {
     ...extractBootstrapBusinessDataValues(ctx.bootstrapBusinessData),
     ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
     ...ctx.data,
   };
+  if (ctx.kybRequirement.hasLinkedBos) {
+    // If BOs are linked via API already, we don't support working with them in IDV.
+    BO_FIELDS.forEach(di => {
+      if (initialData[di]) {
+        console.warn(`${di} provided when they are already linked`);
+      }
+      initialData[di] = undefined;
+    });
+  }
+  return initialData;
 };
 
 const isMissingDataFromCollection = (ctx: MachineContext, cdos?: CollectedKybDataOption[]): boolean => {
@@ -106,6 +119,7 @@ export const isMissingAddressData = (ctx: MachineContext): boolean => {
 
 export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
   if (!ctx.kybRequirement) return false;
+  if (ctx.kybRequirement.hasLinkedBos) return false;
   const data = getBusinessDataFromContext(ctx);
   const boCdos = [CollectedKybDataOption.beneficialOwners, CollectedKybDataOption.kycedBeneficialOwners];
   const missingCdos = missingAttributes(ctx, boCdos);

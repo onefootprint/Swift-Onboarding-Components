@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../components/l10n-provider';
 import { useBusinessData } from '../../../queries';
+import { BO_FIELDS } from '../utils/attributes/attributes';
 import { formatPayload, omitEqualData } from '../utils/utils';
 import useCollectKybDataMachine from './use-collect-kyb-data-machine';
 
@@ -21,7 +22,7 @@ const useSyncData = () => {
   const [state] = useCollectKybDataMachine();
   const toast = useToast();
   const locale = useL10nContext()?.locale || 'en-US';
-  const { vaultBusinessData } = state.context;
+  const { kybRequirement, vaultBusinessData } = state.context;
 
   const syncData = ({ authToken, data, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
@@ -40,6 +41,17 @@ const useSyncData = () => {
 
     const filteredData = omitEqualData(vaultBusinessData, data);
     const payload = formatPayload(locale, filteredData);
+
+    if (kybRequirement.hasLinkedBos) {
+      // If BOs are linked via API already, we don't support working with them in IDV.
+      BO_FIELDS.forEach(di => {
+        if (payload[di]) {
+          console.warn(`About to vault ${di} when already linked`);
+        }
+        payload[di] = undefined;
+      });
+    }
+
     if (Object.keys(payload).length === 0) {
       onSuccess?.({ data: filteredData });
       return;

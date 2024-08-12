@@ -90,6 +90,7 @@ describe.skip('<CollectKybData />', () => {
         kind: OnboardingRequirementKind.collectKybData,
         isMet: false,
         missingAttributes: kybAttributes,
+        hasLinkedBos: false,
       },
       kycRequirement: {
         kind: OnboardingRequirementKind.collectKycData,

@@ -30,6 +30,8 @@ export type CollectKybDataRequirement = {
   isMet: boolean;
   missingAttributes: CollectedKybDataOption[];
   populatedAttributes?: CollectedKybDataOption[];
+  /** If true, the BOs have been linked via API and shouldn't be collected in Idv. */
+  hasLinkedBos: boolean;
 };
 
 export type CollectKycDataRequirement = {
