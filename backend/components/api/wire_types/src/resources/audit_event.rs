@@ -52,7 +52,7 @@ pub enum AuditEventDetail {
     DecryptUserData {
         fp_id: FpId,
         reason: String,
-        context: Option<DecryptionContext>,
+        context: DecryptionContext,
         decrypted_fields: Vec<DataIdentifier>,
     },
     DeleteUser {

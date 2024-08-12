@@ -490,7 +490,7 @@ mod tests {
                         is_live: true,
                         scoped_vault_id: scoped_vault_2.id.clone(),
                         reason: "investigating something".to_owned(),
-                        context: Some(DecryptionContext::Api),
+                        context: DecryptionContext::Api,
                         decrypted_fields: vec![
                             DataIdentifier::Id(newtypes::IdentityDataKind::Zip),
                             DataIdentifier::Id(newtypes::IdentityDataKind::Email),

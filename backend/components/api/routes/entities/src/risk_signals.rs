@@ -255,7 +255,7 @@ pub async fn decrypt_aml_hits(
                     is_live,
                     scoped_vault_id: sv_id,
                     reason,
-                    context: Some(DecryptionContext::Api),
+                    context: DecryptionContext::Api,
                     decrypted_fields: dis_searched,
                 },
             }

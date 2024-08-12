@@ -83,7 +83,7 @@ impl<Type> TenantVw<Type> {
                         is_live,
                         scoped_vault_id,
                         reason,
-                        context: Some(context),
+                        context,
                         decrypted_fields: targets,
                     },
                 }

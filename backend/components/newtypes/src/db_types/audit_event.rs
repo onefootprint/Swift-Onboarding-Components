@@ -47,7 +47,7 @@ pub enum AuditEventDetail {
         is_live: bool,
         scoped_vault_id: ScopedVaultId,
         reason: String,
-        context: Option<DecryptionContext>,
+        context: DecryptionContext,
         decrypted_fields: Vec<DataIdentifier>,
     },
     DeleteUser {
@@ -308,7 +308,7 @@ pub enum AuditEventMetadata {
     },
     DecryptUserData {
         reason: String,
-        context: Option<DecryptionContext>,
+        context: DecryptionContext,
         fields: Vec<DataIdentifier>,
     },
     DeleteUser,
@@ -357,7 +357,7 @@ mod tests {
             meta,
             AuditEventMetadata::DecryptUserData {
                 reason: "an example reason".to_owned(),
-                context: Some(DecryptionContext::Api),
+                context: DecryptionContext::Api,
                 fields: vec![
                     DataIdentifier::Id(IdentityDataKind::PhoneNumber),
                     DataIdentifier::Id(IdentityDataKind::LastName),

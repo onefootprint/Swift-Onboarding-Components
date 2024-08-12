@@ -166,7 +166,7 @@ where
                                 is_live: sv.is_live,
                                 scoped_vault_id: sv.id,
                                 reason: reason.clone(),
-                                context: Some(context),
+                                context,
                                 decrypted_fields: targets,
                             },
                         };
