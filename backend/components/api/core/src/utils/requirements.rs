@@ -472,12 +472,12 @@ fn get_requirement_inner(
                 } = get_data_collection_progress(vw, obc, DID::Business, decrypted_values);
                 let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
                 let bos = BusinessOwner::list_all(conn, &vw.vault.id, &sv.tenant_id)?;
-                let has_tenant_linked_bos = bos.iter().any(|bo| bo.0.source == BusinessOwnerSource::Tenant);
+                let has_linked_bos = bos.iter().any(|bo| bo.0.source == BusinessOwnerSource::Tenant);
                 CollectedData::BusinessBeneficialOwners
                     .options()
                     .into_iter()
                     .for_each(|cdo| {
-                        if has_tenant_linked_bos && missing_attributes.contains(&cdo) {
+                        if has_linked_bos && missing_attributes.contains(&cdo) {
                             // BOs linked manually via API meet the BeneficialOwners requirement
                             missing_attributes.retain(|missing_cdo| missing_cdo != &cdo);
                             populated_attributes.push(cdo);
@@ -486,6 +486,7 @@ fn get_requirement_inner(
                 Ok(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
+                    has_linked_bos,
                 })
             })
             .transpose()?

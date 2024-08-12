@@ -40,6 +40,9 @@ pub enum OnboardingRequirement {
     CollectBusinessData {
         missing_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
+        /// True if the tenant has already linked any BOs via API. This is mutually exclusive with
+        /// collecting info from the user via bifrost.
+        has_linked_bos: bool,
     },
     /// Register a passkey
     #[serde(rename = "liveness")]
@@ -168,6 +171,7 @@ impl OnboardingRequirement {
             Self::CollectBusinessData {
                 missing_attributes,
                 populated_attributes: _,
+                has_linked_bos: _,
             } => missing_attributes.is_empty(),
             Self::Authorize {
                 fields_to_authorize: _,
@@ -203,6 +207,7 @@ impl OnboardingRequirement {
             | Self::CollectBusinessData {
                 missing_attributes: cdos,
                 populated_attributes: _,
+                has_linked_bos: _,
             } => format!(
                 "Missing {}. At a minimum, the following vault data must be provided: {}",
                 cdos.iter().map(|c| c.to_string()).join(", "),
@@ -274,6 +279,7 @@ mod test {
             OnboardingRequirement::CollectBusinessData {
                 missing_attributes: vec![],
                 populated_attributes: vec![],
+                has_linked_bos: false,
             },
             OnboardingRequirement::CollectData {
                 missing_attributes: vec![],

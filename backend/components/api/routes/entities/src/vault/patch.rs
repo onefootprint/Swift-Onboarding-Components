@@ -54,6 +54,7 @@ use paperclip::actix::{
 pub async fn patch(
     state: web::Data<State>,
     path: FpIdPath,
+    // TODO the documentation isn't rendering for the request body properly here
     request: Json<RawUserDataRequest>,
     auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,

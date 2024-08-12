@@ -247,9 +247,8 @@ impl<Type> VaultWrapper<Type> {
         if self.vault.kind == VaultKind::Business {
             if let Some(sv_id) = self.sv_id.as_ref() {
                 let sv = ScopedVault::get(conn, sv_id)?;
-                let has_linked_bos = BusinessOwner::list_all(conn, &self.vault.id, &sv.tenant_id)?
-                    .iter()
-                    .any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
+                let bos = BusinessOwner::list_all(conn, &self.vault.id, &sv.tenant_id)?;
+                let has_linked_bos = bos.iter().any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
                 let request_has_vaulted_bos = request.contains_key(&BDK::BeneficialOwners.into());
                 if has_linked_bos && request_has_vaulted_bos {
                     // We shouldn't allow BOs to be vaulted when the tenant has already linked BOs
