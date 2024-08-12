@@ -50,14 +50,14 @@ const IdDocCountryAndTypeContainer = ({
   const l10n = useL10nContext();
   const { idDoc: defaultCountryDoc, sandboxOutcome, isConsentMissing, authToken, device, requirement } = state.context;
   const { supportedCountryAndDocTypes } = requirement.config;
-  const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
+  const { country: prevDefaultCountry, type: defaultType } = defaultCountryDoc;
   const supportedCountries = new Set(getRecordKeys(supportedCountryAndDocTypes));
   const supportedCountryRecords = COUNTRIES.filter(country => supportedCountries.has(country.value));
-  const defaultSupportedCountry = getDefaultCountry(supportedCountries, supportedCountryRecords);
+  const defaultSupportedCountry = getDefaultCountry(supportedCountries, supportedCountryRecords, prevDefaultCountry);
   const { type: deviceType } = device;
 
   const requestErrorToast = useIdvRequestErrorToast();
-  const [country, setCountry] = useState<CountryRecord>(getCountryFromCode(defaultCountry) ?? defaultSupportedCountry);
+  const [country, setCountry] = useState<CountryRecord>(defaultSupportedCountry);
 
   const types: SupportedIdDocTypes[] = supportedCountryAndDocTypes[country.value] ?? [];
   const firstTypeFromOptions = types.length ? types[0] : SupportedIdDocTypes.passport;

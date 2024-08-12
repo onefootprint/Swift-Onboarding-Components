@@ -16,9 +16,15 @@ export const getCountryFromCode3 = (countryCode?: CountryCode3) => {
 export const getCountryCodeFromLocale = (l?: SupportedLocale) =>
   l ? (l.slice(-2).toUpperCase() as CountryCode) : undefined;
 
-export const getDefaultCountry = (supportedCountries: Set<CountryCode>, supportedCountryRecords: CountryRecord[]) => {
+export const getDefaultCountry = (
+  supportedCountries: Set<CountryCode>,
+  supportedCountryRecords: CountryRecord[],
+  prevDefaultCountry?: CountryCode,
+) => {
   let defaultCountry;
-  if (supportedCountries.has('US')) {
+  if (prevDefaultCountry && supportedCountries.has(prevDefaultCountry)) {
+    defaultCountry = getCountryFromCode(prevDefaultCountry);
+  } else if (supportedCountries.has('US')) {
     defaultCountry = getCountryFromCode('US');
   }
 
