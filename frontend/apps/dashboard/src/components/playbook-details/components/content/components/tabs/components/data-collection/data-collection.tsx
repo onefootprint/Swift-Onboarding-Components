@@ -33,6 +33,10 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const isAuth = kind === 'auth';
   const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods?.length > 0;
 
+  const kycOnlyPrimaryBusinessOwner = mustCollectData.includes('business_beneficial_owners');
+  const kycAllBusinessOwners = mustCollectData.includes('business_kyced_beneficial_owners');
+  const collectBoInfo = kycOnlyPrimaryBusinessOwner || kycAllBusinessOwners;
+
   if (isAuth) {
     return (
       <Auth
@@ -52,9 +56,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
             options={{
               businessName: mustCollectData.includes('business_name'),
               businessAddress: mustCollectData.includes('business_address'),
-              businessBeneficialOwners:
-                mustCollectData.includes('business_beneficial_owners') ||
-                mustCollectData.includes('business_kyced_beneficial_owners'),
+              businessBeneficialOwners: collectBoInfo,
               businessTin: mustCollectData.includes('business_tin'),
             }}
           />
