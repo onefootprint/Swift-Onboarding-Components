@@ -29,21 +29,16 @@ const BusinessAddress = ({ ctaLabel, onComplete, onCancel, hideHeader }: Busines
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (businessAddress: BusinessAddressData) => {
-    const handleSuccess = () => {
-      send({ type: 'businessAddressSubmitted', payload: businessAddress });
-      onComplete?.();
-    };
-
-    const handleError = (error: string) => {
-      Logger.error(`Error vaulting kyb business-address data: ${error}`, { location: 'kyb-business-address' });
-    };
-
     syncData({
       authToken,
       data: businessAddress,
-      speculative: true,
-      onSuccess: handleSuccess,
-      onError: handleError,
+      onSuccess: () => {
+        send({ type: 'businessAddressSubmitted', payload: businessAddress });
+        onComplete?.();
+      },
+      onError: (error: string) => {
+        Logger.error(`Error vaulting kyb business-address data: ${error}`, { location: 'kyb-business-address' });
+      },
     });
   };
 

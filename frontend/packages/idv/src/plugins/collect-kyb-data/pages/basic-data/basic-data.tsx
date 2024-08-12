@@ -63,9 +63,8 @@ const BasicData = ({ ctaLabel, hideHeader, onCancel, onComplete }: BasicDataProp
     syncData({
       authToken,
       data: basicData,
-      speculative: true,
       onSuccess: () => {
-        send({ type: 'basicDataSubmitted', payload: { ...basicData } });
+        send({ type: 'basicDataSubmitted', payload: basicData });
         onComplete?.();
       },
       onError: (error: string) => {

@@ -53,18 +53,14 @@ export type LoadSuccessEvent = {
 };
 
 export type MachineEvents =
-  | { type: 'basicDataSubmitted'; payload: BasicData }
+  | { type: 'basicDataSubmitted'; payload: BusinessDIData }
   | { type: 'beneficialOwnerKycSubmitted' }
   | { type: 'beneficialOwnersSubmitted'; payload: BeneficialOwnersData }
   | { type: 'businessAddressSubmitted'; payload: BusinessAddressData }
   | { type: 'businessDataLoadError' }
   | { type: 'confirmed' }
-  | { type: 'editBasicData' }
-  | { type: 'editBeneficialOwners' }
-  | { type: 'editBusinessAddress' }
   | { type: 'introductionCompleted' }
   | { type: 'navigatedToPrevPage' }
-  | { type: 'returnToSummary' }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
   | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }
   | LoadSuccessEvent;

@@ -8,6 +8,7 @@ import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import { omitNullAndUndefined } from '../../utils/utils';
 import BeneficialOwnersForm from './components/form';
 import useCheckDuplicateContacts from './hooks/check-duplicate-contacts';
 
@@ -34,7 +35,9 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
 
-  const handleSubmit = (beneficialOwners: BeneficialOwner[]) => {
+  const handleSubmit = (beneficialOwnersRaw: BeneficialOwner[]) => {
+    const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
+
     if (config?.isLive) {
       // Check that no two beneficial owners have the same email or phone number, when not sandbox
       const hasDuplicateContacts = checkDuplicateContacts(beneficialOwners);
@@ -54,7 +57,6 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     syncData({
       authToken,
       data: payload,
-      speculative: true,
       onSuccess: () => {
         send({ type: 'beneficialOwnersSubmitted', payload });
         onComplete?.();

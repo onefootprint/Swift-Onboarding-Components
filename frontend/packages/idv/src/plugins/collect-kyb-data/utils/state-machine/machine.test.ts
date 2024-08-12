@@ -301,13 +301,8 @@ describe('Collect KYB Data Machine Tests', () => {
       expect(state.value).toEqual('confirm');
 
       // These events shouldn't trigger any state changes
-      state = machine.send({ type: 'editBasicData' });
-      expect(state.value).toEqual('confirm');
-
-      state = machine.send({ type: 'editBusinessAddress' });
-      expect(state.value).toEqual('confirm');
-
-      state = machine.send({ type: 'editBeneficialOwners' });
+      // @ts-expect-error: event doesn't exist
+      state = machine.send({ type: 'unknownEvent' });
       expect(state.value).toEqual('confirm');
 
       // We should be able to edit the data from the confirm state

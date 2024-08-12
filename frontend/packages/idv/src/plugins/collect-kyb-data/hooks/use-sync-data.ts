@@ -11,7 +11,6 @@ import useCollectKybDataMachine from './use-collect-kyb-data-machine';
 type SyncDataArgs = {
   authToken?: string;
   data: BusinessDIData;
-  speculative?: boolean;
   onSuccess?: (data: BusinessDataResponse) => void;
   onError?: (error: string) => void;
 };
@@ -24,7 +23,7 @@ const useSyncData = () => {
   const locale = useL10nContext()?.locale || 'en-US';
   const { vaultBusinessData } = state.context;
 
-  const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
+  const syncData = ({ authToken, data, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),
@@ -50,7 +49,6 @@ const useSyncData = () => {
       {
         authToken,
         data: payload,
-        speculative,
       },
       {
         onSuccess,
@@ -60,9 +58,7 @@ const useSyncData = () => {
             description: t('invalid-inputs.description'),
             variant: 'error',
           });
-          onError?.(
-            `KYB useSyncData encountered error while syncing data${speculative ? ' speculatively' : ''}: ${getErrorMessage(error)}`,
-          );
+          onError?.(`KYB useSyncData encountered error while syncing data: ${getErrorMessage(error)}`);
         },
       },
     );

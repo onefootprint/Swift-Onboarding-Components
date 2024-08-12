@@ -127,4 +127,20 @@ describe('omitEqualData', () => {
     const data = { 'business.name': 'Banana Inc.' };
     expect(omitEqualData(vaultData, data)).toEqual({ 'business.name': 'Banana Inc.' });
   });
+
+  it('should return data when one of the object keys in the array is different "Josh" != "Josn"', () => {
+    const vaultData = {
+      'business.beneficial_owners': [
+        { first_name: 'Jack', middle_name: 'Jill', last_name: 'Jane', ownership_stake: 70 },
+        { first_name: 'Jim', middle_name: 'Joe', last_name: 'Josh', ownership_stake: 30 },
+      ],
+    };
+    const data = {
+      'business.beneficial_owners': [
+        { ownership_stake: 70, first_name: 'Jack', middle_name: 'Jill', last_name: 'Jane' },
+        { ownership_stake: 30, first_name: 'Jim', middle_name: 'Joe', last_name: 'Josn' },
+      ],
+    };
+    expect(omitEqualData(vaultData, data)).toEqual(data);
+  });
 });

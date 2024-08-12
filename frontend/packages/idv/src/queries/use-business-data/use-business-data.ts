@@ -9,18 +9,9 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     Object.entries(payload.data).filter(([_key, value]) => !!value && value !== 'decrypted'),
   );
 
-  let method;
-  let url;
-  if (payload.speculative) {
-    method = 'POST';
-    url = '/hosted/business/vault/validate';
-  } else {
-    method = 'PATCH';
-    url = '/hosted/business/vault';
-  }
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({
-    method,
-    url,
+    method: 'PATCH',
+    url: '/hosted/business/vault',
     data,
     headers: {
       [AUTH_HEADER]: payload.authToken,

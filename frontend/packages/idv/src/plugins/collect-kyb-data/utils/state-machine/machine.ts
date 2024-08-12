@@ -62,8 +62,8 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         basicData: {
           on: {
             basicDataSubmitted: [
-              { target: 'businessAddress', actions: 'assignData', cond: isMissingAddressData },
-              { target: 'beneficialOwners', actions: 'assignData', cond: isMissingBeneficialOwnersData },
+              { target: 'businessAddress', cond: isMissingAddressData, actions: 'assignData' },
+              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData, actions: 'assignData' },
               { target: 'confirm', actions: 'assignData' },
             ],
             navigatedToPrevPage: {
@@ -74,7 +74,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         businessAddress: {
           on: {
             businessAddressSubmitted: [
-              { target: 'beneficialOwners', actions: 'assignData', cond: isMissingBeneficialOwnersData },
+              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData, actions: 'assignData' },
               { target: 'confirm', actions: 'assignData' },
             ],
             navigatedToPrevPage: [
@@ -130,10 +130,14 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
     },
     {
       actions: {
-        assignData: assign((ctx, event) => {
+        assignData: assign((ctx, { payload }) => {
+          ctx.vaultBusinessData = {
+            ...ctx.vaultBusinessData,
+            ...payload,
+          };
           ctx.data = {
             ...ctx.data,
-            ...event.payload,
+            ...payload,
           };
           return ctx;
         }),
