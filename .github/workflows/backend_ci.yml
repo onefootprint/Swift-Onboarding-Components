@@ -108,7 +108,8 @@ jobs:
             backend
 
       - name: Inject Rust cache into Docker
-        uses: reproducible-containers/buildkit-cache-dance@5de31fc1534ed8789e63d41ea933c5df9944a261 # ratchet:reproducible-containers/buildkit-cache-dance@v3.1.0
+        # Forked to use public.ecr.aws instead of Docker hub.
+        uses: onefootprint/buildkit-cache-dance@0b57ad680b6cd71e30faf021b1f6eae15638062e
         with:
           cache-map: |
             {
