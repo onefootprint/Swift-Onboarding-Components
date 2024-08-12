@@ -1,8 +1,10 @@
+use crate::api_keys::decrypt_scrubbed_api_keys;
 use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
+use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -40,5 +42,15 @@ pub async fn post(
         })
         .await?;
 
-    Ok(api_wire_types::SecretApiKey::from_db((api_key, role, None)))
+    let scrubbed_key = decrypt_scrubbed_api_keys(&state, auth.tenant(), vec![&api_key]).await?;
+    let (_, scrubbed_key) = scrubbed_key
+        .into_iter()
+        .next()
+        .ok_or(AssertionError("No scrubbed key"))?;
+    Ok(api_wire_types::SecretApiKey::from_db((
+        api_key,
+        role,
+        scrubbed_key,
+        None,
+    )))
 }

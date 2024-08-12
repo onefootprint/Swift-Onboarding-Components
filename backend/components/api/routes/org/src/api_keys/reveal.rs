@@ -47,10 +47,11 @@ async fn post(
         .enclave_client
         .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
         .await?;
-
+    let api_key = SecretApiKey::from(decrypted_secret_key);
     Ok(api_wire_types::SecretApiKey::from_db((
         key,
         role,
-        Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
+        api_key.scrub(),
+        Some(api_key),
     )))
 }

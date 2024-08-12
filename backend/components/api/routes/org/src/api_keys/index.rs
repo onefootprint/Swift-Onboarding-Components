@@ -1,8 +1,10 @@
+use crate::api_keys::decrypt_scrubbed_api_keys;
 use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
+use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
@@ -14,6 +16,7 @@ use db::models::tenant_api_key::ApiKeyListFilters;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use db::DbError;
+use itertools::Itertools;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::ApiKeyStatus;
 use newtypes::TenantApiKeyId;
@@ -56,20 +59,28 @@ pub async fn get(
         search,
     };
     let pagination = pagination.db_pagination(&state);
-    let (keys, next_page, count) = state
+    let (keys_and_roles, next_page, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let (keys, next_page) = TenantApiKey::list(conn, &query, pagination)?;
+            let (keys_and_roles, next_page) = TenantApiKey::list(conn, &query, pagination)?;
             let count = TenantApiKey::count(conn, &query)?;
-            Ok((keys, next_page, count))
+            Ok((keys_and_roles, next_page, count))
         })
         .await?;
 
-    let results = keys
+    let keys = keys_and_roles.iter().map(|(k, _)| k).collect_vec();
+    let mut scrubbed_keys = decrypt_scrubbed_api_keys(&state, auth.tenant(), keys).await?;
+
+    let results = keys_and_roles
         .into_iter()
-        .map(|(key, role)| (key, role, None))
-        .map(api_wire_types::SecretApiKey::from_db)
-        .collect::<Vec<api_wire_types::SecretApiKey>>();
+        .map(|(key, role)| {
+            let scrubbed_key = scrubbed_keys
+                .remove(&key.id)
+                .ok_or(AssertionError("Missing scrubbed key"))?;
+            Ok((key, role, scrubbed_key, None))
+        })
+        .map_ok(api_wire_types::SecretApiKey::from_db)
+        .collect::<FpResult<Vec<api_wire_types::SecretApiKey>>>()?;
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
 
@@ -110,6 +121,7 @@ pub async fn post(
     Ok(api_wire_types::SecretApiKey::from_db((
         api_key,
         role,
+        secret_key.scrub(),
         Some(secret_key),
     )))
 }
@@ -153,6 +165,16 @@ pub async fn patch(
             TenantApiKey::update(conn, id, tenant_id, is_live, name, status, role_id, None)
         })
         .await?;
+    let scrubbed_key = decrypt_scrubbed_api_keys(&state, auth.tenant(), vec![&api_key]).await?;
+    let (_, scrubbed_key) = scrubbed_key
+        .into_iter()
+        .next()
+        .ok_or(AssertionError("No scrubbed key"))?;
 
-    Ok(api_wire_types::SecretApiKey::from_db((api_key, role, None)))
+    Ok(api_wire_types::SecretApiKey::from_db((
+        api_key,
+        role,
+        scrubbed_key,
+        None,
+    )))
 }

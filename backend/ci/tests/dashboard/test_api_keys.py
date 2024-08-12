@@ -54,6 +54,9 @@ def test_api_key_list(secret_key, sandbox_tenant):
     assert key["name"] == secret_key.name
     assert key["status"] == secret_key.status
     assert key["created_at"]
+    scrubbed_key = key["scrubbed_key"]
+    assert scrubbed_key.startswith("sk_test_")
+    assert len(scrubbed_key.replace("sk_test_", "").replace("*", "")) == 3
     assert "key" not in key
     assert not key["last_used_at"]
 
@@ -184,6 +187,7 @@ def test_api_key_reveal(secret_key, sandbox_tenant):
     body = post(f"org/api_keys/{secret_key.id}/reveal", None, *sandbox_tenant.db_auths)
     key = body
     assert key["key"] == secret_key.key.value
+    assert key["scrubbed_key"][-3:] == key["key"][-3:]
     assert key["status"] == "enabled"
     assert key["name"] == "Test secret key"
 

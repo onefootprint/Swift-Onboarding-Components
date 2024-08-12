@@ -1,4 +1,5 @@
 use crate::Fingerprint;
+use crate::PiiString;
 use crate::SealedVaultBytes;
 use crate::VaultPublicKey;
 use async_trait::async_trait;
@@ -22,9 +23,10 @@ pub trait ApiKeyFingerprinter {
 }
 
 impl SecretApiKey {
-    const LENGTH: usize = 34;
+    const LENGTH: usize = 37;
     /// prefixed on LIVE keys
     pub const LIVE_PREFIX: &'static str = "sk_live";
+    const NUM_SCRUBBED_CHARS: usize = 3;
     /// prefix on sandbox keys
     pub const SANDBOX_PREFIX: &'static str = "sk_test";
 
@@ -59,23 +61,30 @@ impl SecretApiKey {
     pub fn is_maybe_ob_config_key(&self) -> bool {
         self.0.starts_with("ob_")
     }
+
+    pub fn scrub(&self) -> PiiString {
+        let prefix = if self.0.starts_with(Self::LIVE_PREFIX) {
+            format!("{}_", Self::LIVE_PREFIX)
+        } else if self.0.starts_with(Self::SANDBOX_PREFIX) {
+            format!("{}_", Self::SANDBOX_PREFIX)
+        } else {
+            "".to_string()
+        };
+        let suffix = &self.0[(self.0.len() - Self::NUM_SCRUBBED_CHARS)..];
+        let scrubbed_key = format!("{}{}{}", prefix, "*".repeat(8), suffix);
+        PiiString::from(scrubbed_key)
+    }
+}
+
+impl From<PiiString> for SecretApiKey {
+    fn from(value: PiiString) -> Self {
+        Self::from(value.leak().to_string())
+    }
 }
 
 impl Debug for SecretApiKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let debug1 = self
-            .0
-            .chars()
-            .take(Self::LIVE_PREFIX.len() + 3)
-            .collect::<String>();
-
-        let debug2 = self
-            .0
-            .chars()
-            .skip(Self::LIVE_PREFIX.len() + Self::LENGTH - 1)
-            .collect::<String>();
-
-        f.write_str(&format!("{}...{}", debug1, debug2))
+        f.write_str(self.scrub().leak())
     }
 }
 
@@ -113,6 +122,6 @@ mod tests {
         let debug = format!("{:?}", test.key);
 
         assert!(!debug.contains(fake_key));
-        assert_eq!(debug.as_str(), "sk_live_te...67");
+        assert_eq!(debug.as_str(), "sk_live_********567");
     }
 }

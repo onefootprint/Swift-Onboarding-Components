@@ -199,7 +199,8 @@ async fn post(
             .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
             .await?;
         let p_api_key = SecretApiKey::from(p_api_key.leak().to_string());
-        let serialized = api_wire_types::SecretApiKey::from_db((key, role, Some(p_api_key)));
+        let serialized =
+            api_wire_types::SecretApiKey::from_db((key, role, p_api_key.scrub(), Some(p_api_key)));
         keys.push(serialized);
     }
 
