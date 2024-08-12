@@ -31,7 +31,7 @@
     "@tanstack/react-query": "^4.35.7",
     "@tanstack/react-query-devtools": "^4.35.7",
     "@vercel/og": "^0.0.27",
-    "cmdk": "^0.2.0",
+    "cmdk": "^1.0.0",
     "framer-motion": "^10.11.2",
     "i18next-locales-sync": "^2.0.1",
     "i18next": "^23.7.16",

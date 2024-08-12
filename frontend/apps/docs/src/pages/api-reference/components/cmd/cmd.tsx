@@ -3,8 +3,10 @@ import { IconButton, Overlay, Stack, Text, createFontStyles } from '@onefootprin
 import { Command } from 'cmdk';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { scroller } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
+import { ARTICLES_CONTAINER_ID } from '../articles';
 import type { PageNavProps } from '../nav/nav.types';
 import Footer from './components/footer/footer';
 import Keycaps from './components/keycaps/keycaps';
@@ -36,11 +38,11 @@ const Cmd = ({ sections }: PageNavProps) => {
   }, []);
 
   const handleScroll = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-    setTimeout(() => setOpen(false), 1000);
+    // For some reason, need to set a timeout for keyboard events to work properly
+    setTimeout(() => {
+      setOpen(false);
+      scroller.scrollTo(id, { smooth: true, duration: 500, containerId: ARTICLES_CONTAINER_ID, delay: 100 });
+    }, 10);
   };
 
   return (
@@ -58,8 +60,8 @@ const Cmd = ({ sections }: PageNavProps) => {
           {sections.map(({ title, id, subsections }) => (
             // TODO headers have corresponding content in the new API reference site, but they aren't selectable here
             <Group heading={title} key={id}>
-              {subsections.flatMap(({ title: subtitle, id }) => (
-                <Option key={id} onSelect={() => handleScroll(id)}>
+              {subsections.map(({ title: subtitle, id, api }) => (
+                <Option key={id} onSelect={() => handleScroll(id)} keywords={api ? [api.method, api.path] : []}>
                   <Stack direction="row" gap={4} alignItems="center">
                     <Text variant="label-4">{subtitle}</Text>
                     <Text variant="body-4">-</Text>
