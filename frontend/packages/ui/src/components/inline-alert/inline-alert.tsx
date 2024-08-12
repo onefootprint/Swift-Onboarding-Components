@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../utils/mixins';
 import type { BoxProps } from '../box';
 import Box from '../box';
+import LinkButton from '../link-button';
 import Stack from '../stack';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
@@ -23,14 +24,12 @@ const InlineAlert = ({ cta, children, variant = 'info', ...props }: InlineAlertP
       <Stack marginRight={3}>
         <IconComponent color={variant} />
       </Stack>
-      <ContentContainer $variant={variant}>
-        <Box>{children}</Box>
-        {cta && (
-          <button onClick={cta.onClick} type="button">
-            {cta.label}
-          </button>
-        )}
-      </ContentContainer>
+      {children}
+      {cta && (
+        <LinkButton variant="label-3" onClick={cta.onClick}>
+          {cta.label}
+        </LinkButton>
+      )}
     </InlineAlertContainer>
   );
 };
@@ -41,10 +40,13 @@ const InlineAlertContainer = styled(Box)<{
   ${({ theme, $variant }) => css`
     ${createFontStyles('body-3')};
     ${createVariantStyles($variant)};
-    border-radius: ${theme.borderRadius.default};
     display: flex;
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
     width: 100%;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    border-radius: ${theme.borderRadius.default};
 
     a,
     button {
@@ -55,29 +57,18 @@ const InlineAlertContainer = styled(Box)<{
       cursor: pointer;
       text-decoration: underline;
 
+      &:active {
+        color: currentColor;
+        opacity: 0.85;
+      }
+
       @media (hover: hover) {
         &:hover {
           color: currentColor;
           opacity: 0.7;
         }
       }
-
-      &:active {
-        color: currentColor;
-        opacity: 0.85;
-      }
     }
-  `};
-`;
-
-const ContentContainer = styled.div<{
-  $variant: InlineAlertVariant;
-}>`
-  ${({ $variant }) => css`
-    ${createVariantStyles($variant)};
-    display: inline-flex;
-    justify-content: space-between;
-    width: 100%;
   `};
 `;
 
