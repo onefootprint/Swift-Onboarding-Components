@@ -1,21 +1,29 @@
+import { IcoPencil16 } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
-import { EventLog } from 'src/pages/kyc/onboarding-components/kyc.types';
-import styled, { css } from 'styled-components';
+import { InputEventProps } from 'src/pages/kyc/onboarding-components/kyc.types';
 
-const Event = ({ event }: { event: EventLog }) => {
+const InputEvent = ({ event }: { event: InputEventProps }) => {
   return (
-    <EventContainer padding={3} gap={2} direction="row" justify="space-between">
-      <Text variant="snippet-2" color="tertiary">
+    <Stack padding={4} gap={2} direction="row" width="100%">
+      <Text variant="snippet-2" color="tertiary" whiteSpace="nowrap">
         {event.createdAt && format(new Date(event.createdAt), 'HH:mm:ss')}
       </Text>
-      <Stack direction="column" gap={2} align="flex-end" flexWrap="wrap">
-        <Text variant="snippet-2" color="secondary">
+      <Stack
+        direction="row"
+        gap={2}
+        align="center"
+        flexWrap="wrap"
+        alignContent="center"
+        flexGrow={1}
+        justify="flex-end"
+      >
+        <IcoPencil16 color="tertiary" />
+        <Text variant="snippet-2" color="secondary" whiteSpace="nowrap">
           {event.type.charAt(0).toUpperCase() + event.type.slice(1)} ⋅ {event.name}
         </Text>
         {event.type === 'change' && event.value !== '' && (
-          <Stack direction="row" gap={2} align="center" flexWrap="wrap">
+          <Stack direction="row" gap={2} align="center">
             <Text variant="snippet-2" color="quaternary">
               {event.value}
               {event.isAutoCompleted && (
@@ -30,16 +38,8 @@ const Event = ({ event }: { event: EventLog }) => {
           </Stack>
         )}
       </Stack>
-    </EventContainer>
+    </Stack>
   );
 };
 
-const EventContainer = styled(motion(Stack))`
-  ${({ theme }) => css`
-    &:last-of-type {
-      margin-bottom: ${theme.spacing[9]};
-    }
-  `}
-`;
-
-export default Event;
+export default InputEvent;

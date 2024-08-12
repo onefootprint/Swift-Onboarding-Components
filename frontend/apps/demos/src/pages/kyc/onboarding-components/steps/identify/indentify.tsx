@@ -38,6 +38,7 @@ const Identify = ({ onFormSubmit, onInputEvent }: StepProps) => {
               <Fp.Label>Your email</Fp.Label>
               <Fp.Input
                 placeholder="jane@acme.com"
+                autoComplete="email"
                 onChange={onInputEvent}
                 onBlur={onInputEvent}
                 onMouseEnter={onInputEvent}
@@ -53,6 +54,7 @@ const Identify = ({ onFormSubmit, onInputEvent }: StepProps) => {
               <Fp.Label>Phone</Fp.Label>
               <Fp.Input
                 placeholder="(123) 456-7890"
+                autoComplete="tel"
                 onChange={onInputEvent}
                 onBlur={onInputEvent}
                 onMouseEnter={onInputEvent}

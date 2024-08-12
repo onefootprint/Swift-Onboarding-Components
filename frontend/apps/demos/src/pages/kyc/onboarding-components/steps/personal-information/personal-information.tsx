@@ -17,7 +17,13 @@ const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
     });
   };
 
-  const renderField = (name: keyof FormValues, label: string, placeholder: string, valueToEncrypt: string) =>
+  const renderField = (
+    name: keyof FormValues,
+    label: string,
+    placeholder: string,
+    valueToEncrypt: string,
+    autoComplete?: string,
+  ) =>
     formState !== 'default' ? (
       <EncryptedInput label={label} valueToEncrypt={valueToEncrypt} />
     ) : (
@@ -29,6 +35,7 @@ const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
           onBlur={onInputEvent}
           onMouseEnter={onInputEvent}
           onMouseLeave={onInputEvent}
+          autoComplete={autoComplete}
         />
         <Fp.FieldErrors />
       </Fp.Field>
@@ -44,10 +51,10 @@ const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
       </Box>
       <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column" width="100%">
-          {renderField('id.first_name', 'First name', 'Jane', 'Jane')}
-          {renderField('id.middle_name', 'Middle name', 'Sue', 'Sue')}
-          {renderField('id.last_name', 'Last name', 'Joe', 'Joe')}
-          {renderField('id.dob', 'DOB', 'MM/DD/YYYY', 'MM/DD/YYYY')}
+          {renderField('id.first_name', 'First name', 'Jane', 'Jane', 'given-name')}
+          {renderField('id.middle_name', 'Middle name', 'Sue', 'Sue', 'additional-name')}
+          {renderField('id.last_name', 'Last name', 'Joe', 'Joe', 'family-name')}
+          {renderField('id.dob', 'DOB', 'MM/DD/YYYY', 'MM/DD/YYYY', 'bday')}
           <Divider marginBlock={3} />
           <Fp.Field name="id.country">
             <Fp.Input

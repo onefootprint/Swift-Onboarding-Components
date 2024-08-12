@@ -59,6 +59,12 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
       onClose: undefined,
     },
   });
+
+  useEffect(() => {
+    // Update the context when the props change
+    setContext(prev => ({ ...prev, appearance, authToken, locale, sandboxOutcome }));
+  }, [appearance, authToken, locale, sandboxOutcome, publicKey]);
+
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
   const getOnboardingConfig = async (pKey?: string) => {
