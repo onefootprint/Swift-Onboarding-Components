@@ -1,10 +1,11 @@
+import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import NavigationLink from 'src/components/navigation-link';
-import NavigationSectionTitle from 'src/components/navigation-section-title';
 import NavigationSubcategory from 'src/components/navigation-subcategory';
 import type { PageNavigation } from 'src/types/page';
+import styled, { css } from 'styled-components';
 
 type AppNavProps = {
   navigation: PageNavigation;
@@ -44,5 +45,13 @@ const AppNav = ({ navigation, onItemClick }: AppNavProps) => {
     </React.Fragment>
   ));
 };
+
+const NavigationSectionTitle = styled.header`
+  ${({ theme }) => css`
+    ${createFontStyles('label-4')}
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    text-transform: capitalize;
+  `}
+`;
 
 export default AppNav;

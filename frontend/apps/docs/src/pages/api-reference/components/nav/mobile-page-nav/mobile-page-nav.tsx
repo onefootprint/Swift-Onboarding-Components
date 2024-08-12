@@ -1,12 +1,12 @@
-import { IcoClose16, IcoCode216, IcoFlask16, IcoMenu16 } from '@onefootprint/icons';
-import { Divider, Stack, Text, ThemeToggle, createFontStyles, media } from '@onefootprint/ui';
+import { IcoClose16, IcoMenu16 } from '@onefootprint/icons';
+import { Stack, Text, ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import styled, { css } from 'styled-components';
 
-import SubsectionNav from '../components/subsection-nav';
+import SectionNav from '../components/section-nav';
 import { PageNavProps } from '../nav.types';
 
 const PageNav = ({ sections }: PageNavProps) => {
@@ -49,19 +49,8 @@ const PageNav = ({ sections }: PageNavProps) => {
       {isOpen && (
         <InnerContainer>
           <NavContainer ref={navInnerScrollRef} onScroll={handleNavInnerScroll} id="nav-container">
-            {sections.map((section, i) => (
-              <React.Fragment key={section.title}>
-                <SectionTitle>
-                  {section.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
-                  {section.title}
-                </SectionTitle>
-                {section.subsections
-                  .filter(subsection => subsection.apiArticles.some(article => !article.api.isHidden))
-                  .map(subsection => (
-                    <SubsectionNav subsection={subsection} onLinkClick={handleLinkClick} />
-                  ))}
-                {i !== sections.length - 1 && <Divider />}
-              </React.Fragment>
+            {sections.map(section => (
+              <SectionNav section={section} onLinkClick={handleLinkClick} />
             ))}
           </NavContainer>
           <NavigationFooter />
@@ -107,19 +96,6 @@ const PageNavContainer = styled.div<{ $isOpen: boolean }>`
     ${media.greaterThan('md')`
       display: none;
     `};
-  `}
-`;
-
-const SectionTitle = styled.h3`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    color: ${theme.color.primary};
-    padding: ${theme.spacing[6]} ${theme.spacing[3]} ${theme.spacing[4]}
-      ${theme.spacing[3]};
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
   `}
 `;
 

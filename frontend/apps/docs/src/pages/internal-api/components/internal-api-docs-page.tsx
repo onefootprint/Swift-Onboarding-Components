@@ -3,37 +3,63 @@ import styled, { css } from 'styled-components';
 
 import ApiArticle from 'src/pages/api-reference/components/api-article';
 import Cmd from 'src/pages/api-reference/components/cmd';
+import MobilePageNav from 'src/pages/api-reference/components/nav/mobile-page-nav';
+import { PageNavSection } from 'src/pages/api-reference/components/nav/nav.types';
 import { HydratedApiArticle } from 'src/pages/api-reference/hooks/use-hydrate-articles';
 import { ARTICLES_CONTAINER_ID } from '../../api-reference/components/articles';
-import PageNav from '../../api-reference/components/nav/desktop-page-nav';
-import groupBySubsection from '../../api-reference/components/nav/utils/group-by-section';
+import DesktopPageNav from '../../api-reference/components/nav/desktop-page-nav';
+import ApiTitle from './api-title';
 
 type InternalApiDocsPageProps = {
-  title: string;
   apis: HydratedApiArticle[];
 };
 
-const InternalApiDocsPage = ({ title, apis }: InternalApiDocsPageProps) => {
-  const sections = [
-    {
+/**
+ * Our internal API reference doesn't have a manual grouping of APIs like our external API reference does.
+ * So we'll automatically group APIs by the first tag in their open API spec.
+ */
+const groupBySubsection = (apiArticles: HydratedApiArticle[]) => {
+  const sections: Record<string, HydratedApiArticle[]> = {};
+  apiArticles.forEach(api => {
+    if (!sections[api.section]) {
+      sections[api.section] = [];
+    }
+    sections[api.section].push(api);
+  });
+  return Object.entries(sections)
+    .toSorted()
+    .map(([title, subsections]) => ({
       title,
-      isPreview: true,
-      subsections: groupBySubsection(apis),
-    },
-  ];
-  const apiArticles = sections.flatMap(s => s.subsections).flatMap(s => s.apiArticles);
+      subsections,
+    }));
+};
+
+const InternalApiDocsPage = ({ apis }: InternalApiDocsPageProps) => {
+  const sections = groupBySubsection(apis);
+
+  const navSections: PageNavSection[] = sections.map(section => ({
+    title: section.title.charAt(0).toUpperCase() + section.title.slice(1),
+    subsections: section.subsections.map(api => ({
+      title: <ApiTitle api={api} />,
+      id: api.id,
+      api,
+    })),
+  }));
 
   return (
     <Box>
       <Layout>
-        <PageNav sections={sections} />
+        <MobilePageNav sections={navSections} />
+        <DesktopPageNav sections={navSections} />
         <ArticleList id={ARTICLES_CONTAINER_ID}>
-          {apiArticles.map(article => (
-            <ApiArticle key={article.api.id} article={article} />
-          ))}
+          {sections
+            .flatMap(s => s.subsections)
+            .map(api => (
+              <ApiArticle key={api.id} article={{ api }} />
+            ))}
         </ArticleList>
       </Layout>
-      <Cmd sections={sections} />
+      <Cmd sections={navSections} />
     </Box>
   );
 };

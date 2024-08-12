@@ -8,6 +8,7 @@ import DesktopPageNav from './components/nav/desktop-page-nav';
 import MobilePageNav from './components/nav/mobile-page-nav';
 
 import Articles from './components/articles';
+import { PageNavSection } from './components/nav/nav.types';
 import useParseApiSections from './hooks/use-parse-api-sections';
 import { ApiReferenceArticle } from './index.page';
 
@@ -31,13 +32,19 @@ export const ApiReference = ({ articles }: ApiReferenceProps) => {
 
   const parsedApiSections = useParseApiSections(articles);
 
-  // Nav was built for multiple larger sections, but we only have one. Can probably remove this
-  const section = {
-    title: t('sections.footprint-api'),
-    isPreview: false,
-    subsections: parsedApiSections,
-  };
-  const navSections = [section];
+  const navSections: PageNavSection[] = parsedApiSections
+    .filter(section => section.subsections.some(subsection => !subsection.api.isHidden))
+    .map(section => ({
+      title: section.title,
+      id: section.id,
+      subsections: section.subsections
+        .filter(subsection => !subsection.api.isHidden)
+        .map(subsection => ({
+          title: subsection.title,
+          id: subsection.api.id,
+          api: subsection.api,
+        })),
+    }));
 
   return (
     <Box>
@@ -45,7 +52,7 @@ export const ApiReference = ({ articles }: ApiReferenceProps) => {
       <Layout>
         <MobilePageNav sections={navSections} />
         <DesktopPageNav sections={navSections} />
-        <Articles sections={navSections} />
+        <Articles sections={parsedApiSections} />
       </Layout>
       <Cmd sections={navSections} />
     </Box>

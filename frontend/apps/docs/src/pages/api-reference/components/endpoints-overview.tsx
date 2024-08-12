@@ -2,13 +2,12 @@ import { Box, Text, createFontStyles, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-scroll';
 import { HttpMethod } from 'src/pages/api-reference/api-reference.types';
-import { ApiArticle } from 'src/pages/api-reference/components/nav/nav.types';
 import { COLOR_FOR_METHOD } from 'src/pages/api-reference/components/type-badge/type-badge';
 import styled, { css } from 'styled-components';
-import { ARTICLES_CONTAINER_ID } from './articles';
+import { ARTICLES_CONTAINER_ID, ApiArticleContent } from './articles';
 
 type EndpointsOverviewProps = {
-  apiArticles: ApiArticle[];
+  apiArticles: ApiArticleContent[];
 };
 
 const Method = ({ method }: { method: HttpMethod }) => {
@@ -39,6 +38,8 @@ const EndpointsOverview = ({ apiArticles }: EndpointsOverviewProps) => {
                 to={article.api.id}
                 containerId={ARTICLES_CONTAINER_ID}
                 href={`#${article.api.id}`}
+                smooth
+                duration={500}
               >
                 <Method method={article.api.method} />
                 <td>{article.api.path}</td>

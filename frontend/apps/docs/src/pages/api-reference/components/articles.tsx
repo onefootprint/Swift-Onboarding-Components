@@ -16,43 +16,36 @@ export type ApiArticleContent = {
   api: HydratedArticle;
 };
 
-export type SubSection = {
+export type ApiArticleSection = {
   title: string;
   id: string;
   content: string;
-  apiArticles: ApiArticleContent[];
-};
-
-export type PageNavSection = {
-  title: string;
-  isPreview: boolean;
-  subsections: SubSection[];
+  subsections: ApiArticleContent[];
 };
 
 export type ArticlesProps = {
-  sections: PageNavSection[];
+  sections: ApiArticleSection[];
 };
 
 const Articles = ({ sections }: ArticlesProps) => {
-  const subsections = sections.flatMap(s => s.subsections);
   const MARKDOWN_OVERRIDES = {
     ScrollLink,
   };
   return (
     <ArticleList id={ARTICLES_CONTAINER_ID}>
-      {subsections.map(subsection => {
+      {sections.map(section => {
         return (
           <>
             <SideBySideElement
-              id={subsection.id}
+              id={section.id}
               left={
                 <Box marginTop={8}>
-                  <Markdown overrides={MARKDOWN_OVERRIDES}>{subsection.content}</Markdown>
+                  <Markdown overrides={MARKDOWN_OVERRIDES}>{section.content}</Markdown>
                 </Box>
               }
-              right={<EndpointsOverview apiArticles={subsection.apiArticles} />}
+              right={<EndpointsOverview apiArticles={section.subsections} />}
             />
-            {subsection.apiArticles.map(article => (
+            {section.subsections.map(article => (
               <ApiArticle key={article.api.id} article={article} />
             ))}
           </>

@@ -1,12 +1,11 @@
-import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
-import { Divider, ThemeToggle, createFontStyles, media } from '@onefootprint/ui';
+import { ThemeToggle, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import styled, { css } from 'styled-components';
 
-import SubsectionNav from '../components/subsection-nav';
+import SectionNav from '../components/section-nav';
 import { PageNavProps } from '../nav.types';
 
 const PageNav = ({ sections }: PageNavProps) => {
@@ -32,19 +31,8 @@ const PageNav = ({ sections }: PageNavProps) => {
         <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
       </Header>
       <NavContainer ref={navInnerScrollRef} onScroll={handleNavInnerScroll} id="nav-container">
-        {sections.map((section, i) => (
-          <React.Fragment key={section.title}>
-            <SectionTitle>
-              {section.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
-              {section.title}
-            </SectionTitle>
-            {section.subsections
-              .filter(subsection => subsection.apiArticles.some(article => !article.api.isHidden))
-              .map(subsection => (
-                <SubsectionNav subsection={subsection} />
-              ))}
-            {i !== sections.length - 1 && <Divider />}
-          </React.Fragment>
+        {sections.map(section => (
+          <SectionNav section={section} />
         ))}
       </NavContainer>
       <NavigationFooter />
@@ -70,19 +58,6 @@ const PageNavContainer = styled.aside`
       width: 100%;
       z-index: 1;
     `};
-  `}
-`;
-
-const SectionTitle = styled.h3`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    color: ${theme.color.primary};
-    padding: ${theme.spacing[6]} ${theme.spacing[3]} ${theme.spacing[4]}
-      ${theme.spacing[3]};
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
   `}
 `;
 

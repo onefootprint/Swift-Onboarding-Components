@@ -1,12 +1,11 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import { Grid, IconButton, Overlay, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { IconButton, Overlay, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { PageNavProps } from '../nav/nav.types';
-import TypeBadge from '../type-badge';
 import Footer from './components/footer/footer';
 import Keycaps from './components/keycaps/keycaps';
 
@@ -56,51 +55,36 @@ const Cmd = ({ sections }: PageNavProps) => {
         </InputContainer>
         <List>
           <EmptyState>{t('no-results')}</EmptyState>
-          {sections &&
-            sections.map(({ title, isPreview, subsections }) => (
-              <Group heading={title} key={title} data-preview={isPreview}>
-                {subsections.flatMap(subsection =>
-                  subsection.apiArticles
-                    .filter(a => !a.api.isHidden)
-                    .map(({ api: { id, method, path }, title }) => (
-                      <Option key={id} onSelect={() => handleScroll(id)}>
-                        {title ? (
-                          <Stack direction="row" gap={4} alignItems="center">
-                            <Text variant="label-4">{title}</Text>
-                            <Text variant="body-4">-</Text>
-                            <Text variant="body-4">{subsection.title}</Text>
-                          </Stack>
-                        ) : (
-                          <Grid.Container columns={['56px', '1fr']}>
-                            <Grid.Item justify="start">
-                              <TypeBadge skinny type={method} />
-                            </Grid.Item>
-                            <Grid.Item>{path}</Grid.Item>
-                          </Grid.Container>
-                        )}
-                      </Option>
-                    )),
-                )}
-              </Group>
-            ))}
+          {sections.map(({ title, id, subsections }) => (
+            // TODO headers have corresponding content in the new API reference site, but they aren't selectable here
+            <Group heading={title} key={id}>
+              {subsections.flatMap(({ title: subtitle, id }) => (
+                <Option key={id} onSelect={() => handleScroll(id)}>
+                  <Stack direction="row" gap={4} alignItems="center">
+                    <Text variant="label-4">{subtitle}</Text>
+                    <Text variant="body-4">-</Text>
+                    <Text variant="body-4">{title}</Text>
+                  </Stack>
+                </Option>
+              ))}
+            </Group>
+          ))}
+          {/* TODO I don't think these are the most useful - maybe fields from the request / response body? */}
           <Group>
-            {sections.flatMap(({ subsections }) =>
-              subsections
-                .flatMap(s => s.apiArticles)
-                .filter(a => !a.api.isHidden)
-                .flatMap(({ api: { parameters = [], id } }) =>
-                  parameters.map(parameter => (
-                    <Option onSelect={() => handleScroll(id)} key={id}>
-                      <Stack direction="row" gap={3}>
-                        <Text variant="label-2">{parameter.name}</Text>
-                        <Text variant="body-2" color="tertiary">
-                          {id}
-                        </Text>
-                      </Stack>
-                    </Option>
-                  )),
-                ),
-            )}
+            {sections
+              .flatMap(section => section.subsections)
+              .map(({ api, title, id }) =>
+                (api?.parameters || []).map(parameter => (
+                  <Option onSelect={() => handleScroll(id)} key={id}>
+                    <Stack direction="row" gap={3}>
+                      <Text variant="label-2">{parameter.name}</Text>
+                      <Text variant="body-2" color="tertiary">
+                        {title}
+                      </Text>
+                    </Stack>
+                  </Option>
+                )),
+              )}
           </Group>
         </List>
         <Footer />

@@ -4,6 +4,7 @@ import useHydrateArticles from '.';
 import { ApiReferenceArticle } from '../../api-reference/index.page';
 import getArticles from '../../api-reference/utils/get-articles';
 import staticApiData from '../assets/public-api-docs.json';
+import { ApiArticleSection } from '../components/articles';
 
 /** The open API spec for all public-facing APIs, exported by the backend. */
 const staticApiArticles = getArticles(staticApiData);
@@ -12,7 +13,7 @@ const staticApiArticles = getArticles(staticApiData);
  * Parses all markdown files that describe individual APIs and joins them the with information from the open
  * API specs they document.
  */
-const useParseApiSections = (apiSections: ApiReferenceArticle[]) => {
+const useParseApiSections = (apiSections: ApiReferenceArticle[]): ApiArticleSection[] => {
   const publicApiArticles = useHydrateArticles(staticApiArticles);
   useEffect(() => {
     // Alert if there's a new public API that isn't documented on this site.
@@ -34,13 +35,13 @@ const useParseApiSections = (apiSections: ApiReferenceArticle[]) => {
     publicApiArticles.find(api => api.method === method && api.path === path);
 
   const sections = apiSections.map(article => ({
-    content: article.content,
     title: article.data.title,
     id: getSectionMeta(article.data.title).id,
+    content: article.content,
     // Each markdown file also includes a YAML list of the apis to be included in this section, specified
     // by the method and path. Use these to look up the open API reference for this API that is exported
     // by the backend.
-    apiArticles: article.data.apis.map(({ method, path, title, description }) => {
+    subsections: article.data.apis.map(({ method, path, title, description }) => {
       const api = findArticle({ method, path });
       if (!api) {
         throw Error(`No article found for ${method} ${path}`);

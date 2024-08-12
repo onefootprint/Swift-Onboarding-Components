@@ -7,7 +7,7 @@ const staticHostedArticles = getArticles(hostedApiData);
 
 const ApiReference = () => {
   const hostedArticles = useHydrateArticles(staticHostedArticles);
-  return <InternalApiDocsPage title="Hosted APIs" apis={hostedArticles} />;
+  return <InternalApiDocsPage apis={hostedArticles} />;
 };
 
 export default ApiReference;

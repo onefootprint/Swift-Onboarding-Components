@@ -7,7 +7,7 @@ const staticDashboardArticles = getArticles(dashboardApiData);
 
 const ApiReference = () => {
   const DashboardArticles = useHydrateArticles(staticDashboardArticles);
-  return <InternalApiDocsPage title="Dashboard APIs" apis={DashboardArticles} />;
+  return <InternalApiDocsPage apis={DashboardArticles} />;
 };
 
 export default ApiReference;
