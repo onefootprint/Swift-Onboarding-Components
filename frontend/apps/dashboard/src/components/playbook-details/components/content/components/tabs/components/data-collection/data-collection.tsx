@@ -52,7 +52,9 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
             options={{
               businessName: mustCollectData.includes('business_name'),
               businessAddress: mustCollectData.includes('business_address'),
-              businessBeneficialOwners: mustCollectData.includes('business_beneficial_owners'),
+              businessBeneficialOwners:
+                mustCollectData.includes('business_beneficial_owners') ||
+                mustCollectData.includes('business_kyced_beneficial_owners'),
               businessTin: mustCollectData.includes('business_tin'),
             }}
           />
