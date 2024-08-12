@@ -9,7 +9,7 @@ import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../com
 import useHandleCameraError from '../../../../plugins/collect-document/hooks/use-handle-camera-error';
 import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
-import type { CaptureKind } from '../../types';
+import { CaptureKind, ReceivedImagePayload } from '../../types';
 import { bytesToMegabytes, isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
@@ -21,7 +21,6 @@ import Instructions from './components/instructions';
 import Preview from './components/preview';
 
 type HeaderTextType = { camera: string; preview: string };
-type OnComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
 
 type PhotoCaptureProps = {
   autocaptureKind: AutoCaptureKind;
@@ -35,7 +34,7 @@ type PhotoCaptureProps = {
   onCameraStuck?: () => void;
   onCameraErrored?: () => void;
   onBack?: () => void;
-  onComplete: OnComplete;
+  onComplete: (payload: ReceivedImagePayload) => void;
   outlineHeightRatio: number; // with respect to the video width (not height)
   outlineWidthRatio: number; // with respect to the video width
   subtitle?: Partial<HeaderTextType>;
@@ -133,7 +132,7 @@ const PhotoCapture = ({
     logInfo(
       `Photocapture: size of the processed file to be sent in machine event type 'receivedImage' is ${bytesToMegabytes(file.size)} MB, file type ${file.type}`,
     );
-    onComplete(file, extraCompressed, captureKind);
+    onComplete({ captureKind, extraCompressed, imageFile: file });
   };
 
   const handleError = (err?: unknown) => {

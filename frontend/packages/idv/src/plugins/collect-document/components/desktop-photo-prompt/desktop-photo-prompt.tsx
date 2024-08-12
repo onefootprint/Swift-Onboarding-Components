@@ -12,7 +12,7 @@ import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import useProcessImage from '../../hooks/use-process-image';
-import type { CaptureKind, IdDocImageErrorType } from '../../types';
+import type { IdDocImageErrorType, ReceivedImagePayload } from '../../types';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 import DesktopHeader from '../desktop-header/desktop-header';
 import ErrorComponent from '../error';
@@ -30,11 +30,7 @@ type DesktopPhotoPromptProps = {
   errors?: IdDocImageErrorType[];
   hasBadConnectivity?: boolean;
   requirement: DocumentRequirement;
-  onUploadSuccess: (arg: {
-    imageFile: File | Blob;
-    captureKind: CaptureKind;
-    extraCompressed?: boolean;
-  }) => void;
+  onUploadSuccess: (arg: ReceivedImagePayload) => void;
   onUploadError: (errs: IdDocImageUploadError[]) => void;
   showCameraFallbackText?: boolean;
   isSelfie?: boolean;

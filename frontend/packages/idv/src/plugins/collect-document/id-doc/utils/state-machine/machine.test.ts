@@ -107,6 +107,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -130,6 +131,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -153,6 +155,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -212,6 +215,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -235,6 +239,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -258,6 +263,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
       ]);
@@ -310,6 +316,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -344,6 +351,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -362,6 +370,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -396,6 +405,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -414,6 +424,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -448,6 +459,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -461,6 +473,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -513,6 +526,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -556,6 +570,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -589,6 +604,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -622,6 +638,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -655,6 +672,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -711,6 +729,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -747,6 +766,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -809,6 +829,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {
@@ -839,6 +860,7 @@ describe('Id Doc Machine Tests', () => {
           payload: {
             imageFile: testFile,
             captureKind: 'manual',
+            extraCompressed: false,
           },
         },
         {

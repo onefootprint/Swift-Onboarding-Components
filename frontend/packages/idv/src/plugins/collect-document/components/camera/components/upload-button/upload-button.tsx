@@ -6,12 +6,14 @@ import styled, { css } from 'styled-components';
 import { Logger } from '../../../../../../utils/logger';
 import { CAPTURE_BTN_DEFAULT_INNER_RADIUS } from '../../../../constants';
 import useProcessImage from '../../../../hooks/use-process-image';
-import type { CaptureKind } from '../../../../types';
+import type { ReceivedImagePayload } from '../../../../types';
 
-type UploadButtonProps = {
+type Callbacks = 'onUploadSuccess' | 'onUploadChangeDone' | 'onUploadBtnClick';
+export type UploadButtonCallbacks = Pick<UploadButtonProps, Callbacks>;
+export type UploadButtonProps = {
   onUploadBtnClick: () => void;
   onUploadChangeDone: () => void;
-  onUploadSuccess: (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
+  onUploadSuccess: (payload: ReceivedImagePayload) => void;
   allowPdf: boolean;
   hasBadConnectivity?: boolean;
 };
@@ -73,7 +75,11 @@ const UploadButton = ({
     }
 
     logProcessedFile(processResult);
-    onUploadSuccess(processResult.file, processResult.extraCompressed, 'upload');
+    onUploadSuccess({
+      captureKind: 'upload',
+      extraCompressed: processResult.extraCompressed,
+      imageFile: processResult.file,
+    });
     onProcessingDone();
   };
 

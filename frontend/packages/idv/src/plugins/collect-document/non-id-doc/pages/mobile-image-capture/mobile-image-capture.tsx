@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import upperFirst from 'lodash/upperFirst';
 import PhotoCapture from '../../../components/photo-capture';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import useDocName from '../../hooks/use-doc-name';
 
@@ -19,15 +19,7 @@ const MobileImageCapture = () => {
   const toast = useToast();
   const docName = useDocName(requirement.config);
 
-  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
-    send({
-      type: 'receivedDocument',
-      payload: {
-        imageFile,
-        extraCompressed,
-        captureKind,
-      },
-    });
+  const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedDocument', payload });
 
   const handleClickBack = () => {
     send({ type: 'navigatedToPrev' });

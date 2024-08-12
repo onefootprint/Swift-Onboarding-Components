@@ -6,7 +6,7 @@ import type {
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../../hooks';
-import type { CaptureKind, IdDocImageErrorType } from '../../../types';
+import type { IdDocImageErrorType, ReceivedImagePayload } from '../../../types';
 
 export type MachineContext = {
   authToken: string;
@@ -14,11 +14,7 @@ export type MachineContext = {
   device: DeviceInfo;
   orgId: string;
   requirement: DocumentRequirement;
-  document?: {
-    imageFile: File | Blob;
-    captureKind: CaptureKind;
-    extraCompressed?: boolean;
-  };
+  document?: ReceivedImagePayload;
   id?: string;
   errors?: IdDocImageErrorType[];
   hasBadConnectivity?: boolean;
@@ -38,10 +34,7 @@ export type MachineEvents =
   | { type: 'navigatedToPrompt' }
   | { type: 'processingErrored'; payload: { errors: { errorType: IdDocImageProcessingError; errorInfo?: string }[] } }
   | { type: 'processingSucceeded' }
-  | {
-      type: 'receivedDocument';
-      payload: { imageFile: File | Blob; captureKind: CaptureKind; extraCompressed?: boolean };
-    }
+  | { type: 'receivedDocument'; payload: ReceivedImagePayload }
   | { type: 'retryLimitExceeded' }
   | { type: 'startImageCapture' }
   | { type: 'uploadErrored'; payload: { errors: { errorType: IdDocImageUploadError; errorInfo?: string }[] } };

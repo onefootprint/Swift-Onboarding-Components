@@ -5,14 +5,10 @@ import styled, { css } from 'styled-components';
 
 import { Logger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
-import type { CaptureKind } from '../../types';
+import type { ReceivedImagePayload } from '../../types';
 
 type IdDocPhotoButtonsProp = {
-  onComplete: (payload: {
-    imageFile: File | Blob;
-    extraCompressed: boolean;
-    captureKind: CaptureKind;
-  }) => void;
+  onComplete: (payload: ReceivedImagePayload) => void;
   uploadFirst?: boolean;
   hideCaptureButton?: boolean;
   hideUploadButton?: boolean;

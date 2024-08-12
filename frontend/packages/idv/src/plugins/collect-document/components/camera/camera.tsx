@@ -20,7 +20,7 @@ import {
   FORCED_UPLOAD_DELAY,
   PLAY_CHECK_INTERVAL,
 } from '../../constants';
-import type { CaptureKind } from '../../types';
+import type { CaptureKind, ReceivedImagePayload } from '../../types';
 import {
   VideoEvents,
   clearCanvas,
@@ -66,7 +66,7 @@ type CameraProps = {
   docName?: string;
   sideName?: string;
   onCapture: (image: string, captureKind: CaptureKind) => void;
-  onUpload: (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
+  onUpload: (payload: ReceivedImagePayload) => void;
   hasBadConnectivity?: boolean;
   onError?: (err?: unknown) => void;
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)

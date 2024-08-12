@@ -12,6 +12,7 @@ export const initialContextDL: MachineContext = {
       type: 'text/plain',
     }),
     captureKind: 'manual',
+    extraCompressed: false,
   },
 };
 

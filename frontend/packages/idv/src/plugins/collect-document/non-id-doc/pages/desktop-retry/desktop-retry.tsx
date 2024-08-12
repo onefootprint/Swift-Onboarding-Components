@@ -2,7 +2,7 @@ import type { IdDocImageUploadError } from '@onefootprint/types';
 
 import { NavigationHeader } from '../../../../../components';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import useDocName from '../../hooks/use-doc-name';
 
@@ -12,22 +12,9 @@ const DesktopRetry = () => {
 
   const docName = useDocName(requirement.config);
 
-  const handleClickBack = () => {
-    send({
-      type: 'navigatedToPrompt',
-    });
-  };
+  const handleClickBack = () => send({ type: 'navigatedToPrompt' });
 
-  const handleComplete = (payload: {
-    imageFile: File | Blob;
-    extraCompressed?: boolean;
-    captureKind: CaptureKind;
-  }) => {
-    send({
-      type: 'receivedDocument',
-      payload,
-    });
-  };
+  const handleComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedDocument', payload });
 
   const handleUploadError = (errs: IdDocImageUploadError[]) => {
     send({

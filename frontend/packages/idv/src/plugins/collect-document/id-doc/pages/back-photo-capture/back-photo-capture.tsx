@@ -5,7 +5,7 @@ import upperCase from 'lodash/upperCase';
 import upperFirst from 'lodash/upperFirst';
 import PhotoCapture from '../../../components/photo-capture/photo-capture';
 import { ID_OUTLINE_HEIGHT_RATIO, ID_OUTLINE_WIDTH_RATIO } from '../../../constants';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
@@ -30,15 +30,9 @@ const BackPhotoCapture = () => {
   const docNameCapitalized = upperFirst(docName);
   const sideName = getSideName();
   const sideNameCapitalized = upperCase(sideName);
-  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
-    send({
-      type: 'receivedImage',
-      payload: {
-        imageFile,
-        extraCompressed,
-        captureKind,
-      },
-    });
+
+  const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
+
   const handleClickBack = () => {
     send({ type: 'navigatedToPrev' });
   };

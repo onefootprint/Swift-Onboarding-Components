@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import PhotoCapture from '../../../components/photo-capture/photo-capture';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import DesktopCameraPermission from './desktop-camera-permission';
 import useCameraPermission from './hooks/use-camera-permission';
@@ -16,15 +16,7 @@ const DesktopSelfie = () => {
   const { orgId, requirement, hasBadConnectivity } = state.context;
   const permissionState = useCameraPermission();
 
-  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
-    send({
-      type: 'receivedImage',
-      payload: {
-        imageFile,
-        extraCompressed,
-        captureKind,
-      },
-    });
+  const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
 
   return permissionState === 'allowed' ? (
     <PhotoCapture

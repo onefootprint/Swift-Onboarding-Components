@@ -10,7 +10,7 @@ import type {
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../../hooks';
-import type { CaptureKind, IdDocImageErrorType } from '../../../types';
+import type { IdDocImageErrorType, ReceivedImagePayload } from '../../../types';
 
 export type MachineContext = {
   authToken: string;
@@ -19,11 +19,7 @@ export type MachineContext = {
   orgId: string;
   requirement: DocumentRequirement<IdDocRequirementConfig>;
   isConsentMissing: boolean;
-  image?: {
-    imageFile: File | Blob;
-    captureKind: CaptureKind;
-    extraCompressed?: boolean;
-  };
+  image?: ReceivedImagePayload;
   currSide?: IdDocImageTypes;
   idDoc: {
     type?: `${SupportedIdDocTypes}`;
@@ -52,7 +48,7 @@ export type MachineEvents =
   | { type: 'nextSide'; payload: { nextSideToCollect: string } }
   | { type: 'processingErrored'; payload: { errors: { errorType: IdDocImageProcessingError; errorInfo?: string }[] } }
   | { type: 'receivedCountryAndType'; payload: { type?: `${SupportedIdDocTypes}`; country?: CountryCode; id: string } }
-  | { type: 'receivedImage'; payload: { imageFile: File | Blob; captureKind: CaptureKind; extraCompressed?: boolean } }
+  | { type: 'receivedImage'; payload: ReceivedImagePayload }
   | { type: 'retryLimitExceeded' }
   | { type: 'startImageCapture' }
   | { type: 'uploadErrored'; payload: { errors: { errorType: IdDocImageUploadError; errorInfo?: string }[] } }

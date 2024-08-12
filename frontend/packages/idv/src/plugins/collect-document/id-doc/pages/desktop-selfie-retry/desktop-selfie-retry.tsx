@@ -10,7 +10,7 @@ import DesktopHeader from '../../../components/desktop-header';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
 import ErrorComponent from '../../../components/error';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../../constants';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
@@ -25,15 +25,8 @@ const DesktopSelfieRetry = () => {
   });
   const sideName = getSideName();
 
-  const handleUploadSuccess = (payload: {
-    imageFile: File | Blob;
-    captureKind: CaptureKind;
-    extraCompressed?: boolean;
-  }) => {
-    send({
-      type: 'receivedImage',
-      payload,
-    });
+  const handleUploadSuccess = (payload: ReceivedImagePayload) => {
+    send({ type: 'receivedImage', payload });
   };
 
   const handleUploadError = (errs: IdDocImageUploadError[]) => {

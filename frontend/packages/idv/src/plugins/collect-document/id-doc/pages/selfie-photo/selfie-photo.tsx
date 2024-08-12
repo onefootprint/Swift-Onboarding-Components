@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import PhotoCapture from '../../../components/photo-capture/photo-capture';
-import type { CaptureKind } from '../../../types';
+import type { ReceivedImagePayload } from '../../../types';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
@@ -13,15 +13,7 @@ const SelfiePhoto = () => {
   const [state, send] = useIdDocMachine();
   const { orgId, requirement, hasBadConnectivity } = state.context;
 
-  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
-    send({
-      type: 'receivedImage',
-      payload: {
-        imageFile,
-        extraCompressed,
-        captureKind,
-      },
-    });
+  const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
 
   const handleClickBack = () => {
     send({
