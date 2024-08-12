@@ -1374,7 +1374,7 @@
           }
         },
         "country-and-type-selection": {
-          "title": "Captura o subir tu documento de identificación",
+          "title": "Captura o sube una imágen de tu documento de identificación",
           "subtitle": "Asegúrate de tomar una foto clara de tu documento real en un lugar iluminado",
           "form": {
             "country": "País",
