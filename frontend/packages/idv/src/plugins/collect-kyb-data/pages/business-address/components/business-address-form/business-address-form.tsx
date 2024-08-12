@@ -43,9 +43,8 @@ export type BusinessAddressFormProps = {
 };
 
 const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onCancel }: BusinessAddressFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'kyb.pages.business-address.form',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.business-address.form' });
+  const initialCountry = getInitialCountry(defaultValues?.country);
 
   const methods = useForm<FormData>({
     defaultValues: {
@@ -78,7 +77,7 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
       [BusinessDI.addressLine2]: formData.addressLine2,
       [BusinessDI.city]: formData.city,
       [BusinessDI.zip]: formData.zip,
-      [BusinessDI.country]: formData.country.value,
+      [BusinessDI.country]: formData.country.value || initialCountry,
       [BusinessDI.state]: stateStr,
     });
   };
@@ -109,6 +108,7 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
     }
 
     const result = await getAddressComponent(prediction);
+
     if (result) {
       if (result.city) {
         setValue('city', result.city);

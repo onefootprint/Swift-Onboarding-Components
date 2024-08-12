@@ -2,6 +2,7 @@ import {
   BusinessDI,
   BusinessDIData,
   CollectedKybDataOption,
+  CollectedKybDataOptionToRequiredAttributes,
   DecryptUserResponse,
   SupportedLocale,
 } from '@onefootprint/types';
@@ -49,10 +50,21 @@ export const buildBeneficialOwner = (
 
 export const omitEqualData = <T extends BusinessDIData>(vaultData: T | undefined | null, payload: T): T => {
   const output = {} as T;
+  const AddressProps = CollectedKybDataOptionToRequiredAttributes[CollectedKybDataOption.address];
 
   if (!isObject(vaultData)) return payload;
 
   for (const key in payload) {
+    // @ts-expect-error: key is a string
+    if (AddressProps.includes(key) && !isEqual(payload[key], vaultData[key])) {
+      output[BusinessDI.addressLine1] = payload[BusinessDI.addressLine1];
+      output[BusinessDI.addressLine2] = payload[BusinessDI.addressLine2];
+      output[BusinessDI.city] = payload[BusinessDI.city];
+      output[BusinessDI.state] = payload[BusinessDI.state];
+      output[BusinessDI.zip] = payload[BusinessDI.zip];
+      output[BusinessDI.country] = payload[BusinessDI.country];
+    }
+
     if (isObject(payload[key]) || Array.isArray(payload[key])) {
       if (!isEqual(payload[key], vaultData[key])) {
         output[key] = payload[key];

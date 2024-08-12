@@ -357,6 +357,22 @@ describe('isMissingAddressData', () => {
     const result = isMissingAddressData(ctx);
     expect(result).toBe(false);
   });
+
+  it('should return true when country is missing', () => {
+    const ctx = {
+      kybRequirement: { missingAttributes: [CollectedKybDataOption.address] },
+      bootstrapBusinessData: {},
+      data: {
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.city]: 'city',
+        [BusinessDI.state]: 'state',
+        [BusinessDI.zip]: 'zip',
+        [BusinessDI.country]: '',
+      },
+    } as unknown as MachineContext;
+    const result = isMissingAddressData(ctx);
+    expect(result).toBe(true);
+  });
 });
 
 describe('isMissingBeneficialOwnersData', () => {
