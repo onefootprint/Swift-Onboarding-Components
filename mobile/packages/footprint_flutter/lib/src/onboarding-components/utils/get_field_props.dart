@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/config/countries.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/validators.dart';
@@ -211,6 +212,9 @@ Map<String, InputProps> getCommonProps() {
     validator: (value) {
       if (value == null || value.isEmpty) {
         return 'Country is required';
+      }
+      if (!COUNTRY_CODES.contains(value)) {
+        return 'Please use 2-letter country code e.g. "US", "MX", "CA"';
       }
       return null;
     }
