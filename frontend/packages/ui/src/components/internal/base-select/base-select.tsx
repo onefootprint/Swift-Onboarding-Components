@@ -173,6 +173,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
       {isOpen && !isMobile && (
         <div
           data-dd-privacy="mask"
+          data-dd-action-name={`select-${internalId}`}
           data-testid={`select-${internalId}`}
           ref={setPopperElement}
           style={{ ...styles.popper, zIndex: theme.zIndex.dropdown }}

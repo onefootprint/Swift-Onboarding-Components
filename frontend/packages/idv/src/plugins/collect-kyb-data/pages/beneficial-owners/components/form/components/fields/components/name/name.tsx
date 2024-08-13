@@ -31,6 +31,7 @@ const Name = ({ index }: NameProps) => {
         <TextInput
           autoFocus
           data-dd-privacy="mask"
+          data-dd-action-name="First name input"
           hasError={hasFirstNameError}
           hint={hasFirstNameError ? t('first-name.error') : undefined}
           label={t('first-name.label')}
@@ -40,6 +41,7 @@ const Name = ({ index }: NameProps) => {
 
         <TextInput
           data-dd-privacy="mask"
+          data-dd-action-name="Middle name input"
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
           {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.middleName}`)}
@@ -48,6 +50,7 @@ const Name = ({ index }: NameProps) => {
       <Row columns={1}>
         <TextInput
           data-dd-privacy="mask"
+          data-dd-action-name="Last name input"
           hasError={hasLastNameError}
           hint={hasLastNameError ? t('last-name.error') : undefined}
           label={t('last-name.label')}

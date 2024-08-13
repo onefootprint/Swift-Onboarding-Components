@@ -137,6 +137,7 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
           <AddressInput
             autoFocus
             data-dd-privacy="mask"
+            data-dd-action-name="Business address line 1"
             country={country.value}
             hasError={!!errors.addressLine1}
             hint={errors.addressLine1 && t('address-line-1.error')}
@@ -147,6 +148,7 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
           />
           <TextInput
             data-dd-privacy="mask"
+            data-dd-action-name="Business address line 2"
             autoComplete="address-line2"
             label={t('address-line-2.label')}
             placeholder={t('address-line-2.placeholder')}

@@ -110,6 +110,7 @@ const BasicDataForm = ({
         <TextInput
           autoFocus
           data-dd-privacy="mask"
+          data-dd-action-name="Business name"
           hasError={!!errors.name}
           hint={errors.name ? t('business-name.error') : undefined}
           label={t('business-name.label')}
@@ -125,6 +126,7 @@ const BasicDataForm = ({
         <div>
           <TextInput
             data-dd-privacy="mask"
+            data-dd-action-name="Business Tin"
             hasError={!!errors.tin}
             hint={tinHint}
             mask={inputMasks.tin}
@@ -146,6 +148,7 @@ const BasicDataForm = ({
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
             data-dd-privacy="mask"
+            data-dd-action-name="Business corporation type"
             control={control}
             name="corporationType"
             rules={{
@@ -171,6 +174,7 @@ const BasicDataForm = ({
         {optionalFields?.includes(BusinessDI.website) && (
           <TextInput
             data-dd-privacy="mask"
+            data-dd-action-name="Business website"
             hasError={!!websiteHint}
             hint={websiteHint}
             label={t('website.label')}
@@ -198,6 +202,7 @@ const BasicDataForm = ({
             render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <PhoneInput
                 data-dd-privacy="mask"
+                data-dd-action-name="Business phone number"
                 hasError={!!error && !!phoneNumberHint}
                 hint={phoneNumberHint}
                 label={t('phone-number.label')}

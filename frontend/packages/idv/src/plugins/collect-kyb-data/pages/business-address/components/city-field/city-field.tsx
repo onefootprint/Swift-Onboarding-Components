@@ -14,6 +14,7 @@ const CityField = () => {
   return (
     <TextInput
       data-dd-privacy="mask"
+      data-dd-action-name="City input"
       autoComplete="address-level2"
       hasError={!!errors.city}
       hint={errors.city && t('error')}

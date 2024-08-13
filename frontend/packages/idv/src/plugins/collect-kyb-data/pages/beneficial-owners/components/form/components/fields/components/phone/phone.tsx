@@ -46,6 +46,7 @@ const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
       render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
         <PhoneInput
           data-dd-privacy="mask"
+          data-dd-action-name="Phone input"
           hasError={!!error}
           hint={error ? phoneErrors?.message : undefined}
           label={t('label')}

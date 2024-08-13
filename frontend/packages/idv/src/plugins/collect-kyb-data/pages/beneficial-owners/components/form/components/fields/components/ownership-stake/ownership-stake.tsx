@@ -26,6 +26,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
     <TextInput
       type="number"
       data-dd-privacy="mask"
+      data-dd-action-name="Ownership stake input"
       hasError={hasError}
       hint={hint}
       label={t('label')}

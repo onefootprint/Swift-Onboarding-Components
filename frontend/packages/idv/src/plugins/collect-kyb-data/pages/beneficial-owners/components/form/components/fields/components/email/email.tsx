@@ -28,6 +28,7 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
     <TextInput
       type="email"
       data-dd-privacy="mask"
+      data-dd-action-name="Email input"
       label={t('label')}
       placeholder={t('placeholder')}
       hasError={hasError}

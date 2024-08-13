@@ -23,6 +23,7 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
   return (
     <TextInput
       data-dd-privacy="mask"
+      data-dd-action-name="Postal code input"
       autoComplete="postal-code"
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}
