@@ -2,8 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  fillAddressKYB,
-  fillBasicDataKYB,
   fillBeneficialOwners,
   selectOutcomeOptional,
   verifyAppIframeClick,
@@ -25,13 +23,23 @@ const state = 'CA';
 const zipCode = '94105';
 const country = 'US';
 
-const userTIN = '123456789';
 const beneficialOwner1Name = 'Bob';
 const beneficialOwner1LastName = 'Lee';
 const beneficialOwner1Email = 'boblee@acme.com';
 const beneficialOwner1Phone = '6105579459';
-const businessName = 'Business name';
-const businessNameOptional = 'Optional name';
+
+const businessName = 'Acme Bank Inc.';
+const businessDba = 'Banana Bank';
+const businessTin = '12-3456789';
+const businessCorporationType = 'unknown';
+const businessWebsite = 'http://www.google.com';
+
+const businessAddressLine1 = '123 Main St';
+const businessAddressLine2 = 'Apt 123';
+const businessCity = 'Boston';
+const businessState = 'MA';
+const businessZip = '02117';
+const businessUs = 'US';
 
 const userData = encodeURIComponent(
   JSON.stringify({
@@ -48,6 +56,20 @@ const userData = encodeURIComponent(
     'id.ssn9': ssn,
     'id.state': state,
     'id.zip': zipCode,
+    'business.name': businessName,
+    'business.dba': businessDba,
+    'business.tin': businessTin,
+    'business.corporation_type': businessCorporationType,
+    'business.website': businessWebsite,
+    'business.phone_number': '+12025550179',
+    'business.address_line1': businessAddressLine1,
+    'business.address_line2': businessAddressLine2,
+    'business.city': businessCity,
+    'business.state': businessState,
+    'business.zip': businessZip,
+    'business.country': businessUs,
+    'business.formation_date': '1999-12-25',
+    'business.formation_state': 'MA',
   }),
 );
 
@@ -62,7 +84,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYB basic #ci', async ({ page, isMobile }) => {
+test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   test.slow(); // ~48.9s
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
@@ -79,23 +101,6 @@ test('KYB basic #ci', async ({ page, isMobile }) => {
   await verifyPhoneNumber({ frame, page });
   await page.waitForLoadState();
 
-  const letsKYB = frame.getByText("Let's get to know your business!").first();
-  await letsKYB.waitFor({ state: 'attached', timeout: 10000 });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillBasicDataKYB(frame, {
-    businessName,
-    businessNameOptional,
-    userTIN,
-  });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await fillAddressKYB({ frame, page }, { addressLine1, city, zipCode });
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
   await fillBeneficialOwners(frame, {
     beneficialOwner1Email,
     beneficialOwner1LastName,
@@ -109,17 +114,35 @@ test('KYB basic #ci', async ({ page, isMobile }) => {
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
   await confirmH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
+
+  // Confirm
+  await frame.getByTestId('basic-data').getByRole('button', { name: 'Edit' }).click();
+  await page.waitForLoadState();
+
+  await frame.getByTestId('basic-data').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
+  await expect(frame.getByText(businessName).first()).toBeAttached();
+  await expect(frame.getByText(businessDba).first()).toBeAttached();
+  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await expect(frame.getByText(businessCorporationType).first()).toBeAttached();
+  await expect(frame.getByText(businessWebsite).first()).toBeAttached();
+
+  await frame.getByTestId('business-address').getByRole('button', { name: 'Edit' }).click();
+  await page.waitForLoadState();
+
+  await frame.getByTestId('business-address').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
+  await expect(frame.getByText(businessAddressLine1).first()).toBeAttached();
+  await expect(frame.getByText(businessAddressLine2).first()).toBeAttached();
+  await expect(frame.getByText(businessCity).first()).toBeAttached();
+  await expect(frame.getByText(businessState).first()).toBeAttached();
+  await expect(frame.getByText(businessZip).first()).toBeAttached();
+  await expect(frame.getByText(businessUs).first()).toBeAttached();
+
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const basicH2 = frame.getByText('Basic data').first();
-  await basicH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
-
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await clickOnContinue(frame);
-  await page.waitForLoadState();
-
-  await expect(page.getByTestId('result').first()).toContainText('_');
+  await expect(frame.getByText('Confirm your personal data').first()).toBeAttached();
 });

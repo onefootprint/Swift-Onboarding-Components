@@ -4,6 +4,15 @@ export type IdField = 'id.first_name' | 'id.last_name' | 'id.email' | 'id.phone_
 
 export const BeneficialOwnerIdFields: IdField[] = ['id.first_name', 'id.last_name', 'id.email', 'id.phone_number'];
 
+export const BusinessAddressFields = [
+  'business.address_line1',
+  'business.address_line2',
+  'business.city',
+  'business.state',
+  'business.zip',
+  'business.country',
+];
+
 export const BENEFICIAL_OWNER_ATTRIBUTE: Record<IdField, BeneficialOwnerDataAttribute> = {
   'id.first_name': BeneficialOwnerDataAttribute.firstName,
   'id.last_name': BeneficialOwnerDataAttribute.lastName,

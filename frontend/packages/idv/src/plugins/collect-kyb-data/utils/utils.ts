@@ -2,14 +2,13 @@ import {
   BusinessDI,
   BusinessDIData,
   CollectedKybDataOption,
-  CollectedKybDataOptionToRequiredAttributes,
   DecryptUserResponse,
   SupportedLocale,
 } from '@onefootprint/types';
 import isEqual from 'lodash/isEqual';
 import { isObject, isStringValid } from '../../../utils';
 import { fromUSDateToISO8601Format, isISO8601Format, strInputToUSDate } from '../../../utils/string';
-import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, IdField } from './constants';
+import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields, IdField } from './constants';
 
 export const omitNullAndUndefined = <T extends object>(data: T): T =>
   Object.entries(data).reduce((response, [key, value]) => {
@@ -50,19 +49,18 @@ export const buildBeneficialOwner = (
 
 export const omitEqualData = <T extends BusinessDIData>(vaultData: T | undefined | null, payload: T): T => {
   const output = {} as T;
-  const AddressProps = CollectedKybDataOptionToRequiredAttributes[CollectedKybDataOption.address];
 
   if (!isObject(vaultData)) return payload;
 
   for (const key in payload) {
-    // @ts-expect-error: key is a string
-    if (AddressProps.includes(key) && !isEqual(payload[key], vaultData[key])) {
+    if (BusinessAddressFields.includes(key) && !isEqual(payload[key], vaultData[key])) {
       output[BusinessDI.addressLine1] = payload[BusinessDI.addressLine1];
       output[BusinessDI.addressLine2] = payload[BusinessDI.addressLine2];
       output[BusinessDI.city] = payload[BusinessDI.city];
       output[BusinessDI.state] = payload[BusinessDI.state];
       output[BusinessDI.zip] = payload[BusinessDI.zip];
       output[BusinessDI.country] = payload[BusinessDI.country];
+      continue;
     }
 
     if (isObject(payload[key]) || Array.isArray(payload[key])) {
