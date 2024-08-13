@@ -485,6 +485,7 @@ export {
   OrganizationSize,
   OrgFrequentNoteKind,
   OverallOutcome,
+  IdVerificationOutcome,
   RawJsonKinds,
   ReviewStatus,
   RiskSignalAttribute,

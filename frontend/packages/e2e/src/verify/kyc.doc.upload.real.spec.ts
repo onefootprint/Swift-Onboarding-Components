@@ -51,8 +51,10 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({ page, browser, isMobile }) => 
   });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  const realOutcomeBtn = frame.getByLabel('Real outcome').first();
-  await realOutcomeBtn.waitFor({ state: 'attached', timeout }).then(() => realOutcomeBtn.click());
+  await expect(frame.getByRole('option', { name: 'Simulated outcome', selected: true })).toBeAttached();
+
+  await frame.locator('#docVerificationOutcome').selectOption('Real outcome');
+  await page.waitForLoadState();
 
   await clickOnContinue(frame);
   await page.waitForLoadState();

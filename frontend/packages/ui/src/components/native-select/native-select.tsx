@@ -45,6 +45,7 @@ const Select = styled.select`
       padding-inline: ${theme.spacing[4]};
       resize: none;
       width: 100%;
+      padding-right: ${theme.spacing[8]};
 
       @media (hover: hover) {
         &:enabled:hover {

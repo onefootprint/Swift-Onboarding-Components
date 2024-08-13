@@ -38,8 +38,7 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    height: ${theme.spacing[9]};
-    width: ${theme.spacing[9]};
+   
 
     svg {
       z-index: 1;
@@ -54,8 +53,6 @@ const Container = styled.div`
           left: 50%;
           transform: translate(-50%, -50%);
           border-radius: ${theme.borderRadius.default};
-          height: ${theme.spacing[8]};
-          width: ${theme.spacing[8]};
           background-color: ${theme.backgroundColor.secondary};
           z-index: 0;
         }
@@ -70,8 +67,6 @@ const Container = styled.div`
         left: 50%;
         transform: translate(-50%, -50%);
         border-radius: ${theme.borderRadius.default};
-        height: ${theme.spacing[8]};
-        width: ${theme.spacing[8]};
         background-color: ${theme.backgroundColor.senary};
         z-index: 0;
       }

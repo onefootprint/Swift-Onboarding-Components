@@ -11,3 +11,8 @@ export enum IdDocOutcome {
   fail = 'fail',
   real = 'real',
 }
+
+export enum IdVerificationOutcome {
+  real = 'real',
+  simulated = 'simulated',
+}

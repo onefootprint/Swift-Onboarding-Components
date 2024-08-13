@@ -233,7 +233,7 @@ export {
   RuleActionSection,
   RuleResultGroup,
 } from './rule';
-export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';
+export { IdDocOutcome, OverallOutcome, IdVerificationOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
 export type { Tenant } from './tenant';
 export type {

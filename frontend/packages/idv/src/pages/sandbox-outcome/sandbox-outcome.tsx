@@ -1,3 +1,4 @@
+import { IdDocOutcome, IdVerificationOutcome } from '@onefootprint/types';
 import { useIdvMachine } from '../../hooks';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
@@ -6,18 +7,18 @@ const SandboxOutcome = () => {
   const [state, send] = useIdvMachine();
   const { config, authToken } = state.context;
 
-  const handleAfterSubmit = (formData: SandboxOutcomeFormData) => {
-    const {
-      testID,
-      outcomes: { overallOutcome, idDocOutcome },
-    } = formData;
-
+  const handleAfterSubmit = ({
+    testID,
+    overallOutcome,
+    idDocOutcome,
+    docVerificationOutcome,
+  }: SandboxOutcomeFormData) => {
     send({
       type: 'sandboxOutcomeSubmitted',
       payload: {
         sandboxId: testID,
-        idDocOutcome: idDocOutcome?.value,
-        overallOutcome: overallOutcome.value,
+        idDocOutcome: docVerificationOutcome === IdVerificationOutcome.real ? IdDocOutcome.real : idDocOutcome,
+        overallOutcome,
       },
     });
   };

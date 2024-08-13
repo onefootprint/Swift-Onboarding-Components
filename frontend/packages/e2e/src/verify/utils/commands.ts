@@ -38,12 +38,10 @@ export const softCheckSupport = async (frame: FrameLocator) => {
     .catch(() => false);
 };
 
-export const selectOutcomeOptional = async (parent: FrameLocator | Page, outcome: Outcome) => {
-  const successOption = parent.getByRole('button', { name: 'Success' }).first();
-  await successOption.waitFor({ state: 'attached', timeout: 15000 }).then(() => successOption.click());
+export const selectOutcomeOptional = async (parent: FrameLocator | Page, outcome: Outcome, label?: string) => {
+  const generalOutcome = parent.getByLabel(label || /General outcome/i);
 
-  const outcomeBtn = parent.getByRole('button', { name: outcome }).first();
-  return outcomeBtn.waitFor({ state: 'attached', timeout: 15000 }).then(() => outcomeBtn.click());
+  await expect(generalOutcome.getByRole('option', { name: outcome, selected: true })).toBeAttached();
 };
 
 /** @deprecated: Please use `verifyAppIframeClick()` with /components/verify route instead.  */

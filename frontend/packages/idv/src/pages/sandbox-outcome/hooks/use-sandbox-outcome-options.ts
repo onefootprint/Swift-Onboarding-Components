@@ -1,4 +1,5 @@
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
+import { IdVerificationOutcome } from '@onefootprint/types/src/data/sandbox-outcomes-type';
 import { useTranslation } from 'react-i18next';
 
 const useSandboxOutcomeOptions = () => {
@@ -38,7 +39,12 @@ const useSandboxOutcomeOptions = () => {
   };
   const idDocOutcomeReal = {
     label: t('id-doc-outcome.real-outcome.title'),
-    value: IdDocOutcome.real,
+    value: IdVerificationOutcome.real,
+  };
+
+  const idDocOutcomeSimulated = {
+    label: t('id-doc-outcome.simulated-outcome.title'),
+    value: IdVerificationOutcome.simulated,
   };
 
   return {
@@ -55,6 +61,7 @@ const useSandboxOutcomeOptions = () => {
         idDocOutcomeFail,
       },
       idDocOutcomeReal,
+      idDocOutcomeSimulated,
     },
   };
 };

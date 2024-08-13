@@ -127,17 +127,18 @@
           }
         },
         "id-doc-outcome": {
-          "title": "ID doc images",
+          "title": "Document verification",
           "simulated-outcome": {
             "title": "Simulated outcome",
             "description": "Mocked outcome independent of the uploaded image",
+            "label": "Choose simulated outcome",
             "options": {
               "success": {
                 "title": "Success"
               },
               "fail": {
                 "title": "Fail",
-                "description": "General outcome will fail if ID-doc image fails."
+                "description": "General outcome will fail if document verification fails"
               }
             }
           },

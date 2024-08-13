@@ -1,12 +1,12 @@
 import '../../config/initializers/i18next-test';
 
-import { customRender, fireEvent, screen, selectEvents, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { customRender, screen, userEvent, within } from '@onefootprint/test-utils';
+import { IdVerificationOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OnboardingConfigStatus, OverallOutcome } from '@onefootprint/types';
 
 import { Layout } from '../../components';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
-import type { SandboxOutcomeFormData } from './types';
+import { SandboxOutcomeFormData } from './types';
 
 const getOnboardingConfig = (
   requiresIdDoc = true,
@@ -30,24 +30,11 @@ const getOnboardingConfig = (
   canMakeRealDocScanCallsInSandbox,
 });
 
-let submittedFormData: {
-  testID?: string;
-  overallOutcome: OverallOutcome;
-  idDocOutcome: IdDocOutcome;
-} = {
-  testID: undefined,
-  overallOutcome: OverallOutcome.fail,
-  idDocOutcome: IdDocOutcome.fail,
-};
+let submittedFormData: SandboxOutcomeFormData | undefined;
 
 const mockHandleFormSubmit = jest.fn().mockImplementation((formData: SandboxOutcomeFormData) => {
-  submittedFormData = {
-    testID: formData.testID,
-    overallOutcome: formData.outcomes.overallOutcome.value,
-    idDocOutcome: formData.outcomes.idDocOutcome.value,
-  };
+  submittedFormData = formData;
 });
-
 const SandboxOutcomeWrapper = ({
   requiresIdDoc,
   allowRealDocOutcome,
@@ -58,8 +45,8 @@ const SandboxOutcomeWrapper = ({
   collectTestId?: boolean;
 }) => (
   <SandboxOutcomeContainer
-    config={getOnboardingConfig(requiresIdDoc, allowRealDocOutcome)}
     onSubmit={mockHandleFormSubmit}
+    config={getOnboardingConfig(requiresIdDoc, allowRealDocOutcome)}
     collectTestId={collectTestId}
   />
 );
@@ -85,278 +72,133 @@ const renderSandbox = ({
 };
 
 describe('<SandboxOutcome/>', () => {
+  beforeEach(() => {
+    submittedFormData = undefined;
+  });
   describe('contains all the initial elements', () => {
     it('with id doc case:', async () => {
       renderSandbox({ requiresIdDoc: true });
 
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      expect(overallOutcomeOption).toBeInTheDocument();
-
-      const overallSuccessOption = within(overallOutcomeOption).getByText('Success');
-      expect(overallSuccessOption).toBeInTheDocument();
-      let trigger = within(overallOutcomeOption).getByRole('button', {
+      const overallOutcomeOption = screen.getByLabelText('General outcome');
+      within(overallOutcomeOption).getByRole('option', {
         name: 'Success',
+        selected: true,
       });
-      await selectEvents.openMenu(trigger);
-      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
-      const overallManualReviewOption = within(overallOutcomeOption).getByText('Manual review');
-      expect(overallFailOption).toBeInTheDocument();
-      expect(overallManualReviewOption).toBeInTheDocument();
+      within(overallOutcomeOption).getByRole('option', {
+        name: 'Fail',
+        selected: false,
+      });
+      within(overallOutcomeOption).getByRole('option', {
+        name: 'Manual review',
+        selected: false,
+      });
 
-      const simulateOutcomeRadioOption = screen.getByLabelText('Simulated outcome');
-      expect(simulateOutcomeRadioOption).toBeInTheDocument();
+      const docVerificationOption = screen.getByLabelText('Document verification');
+      within(docVerificationOption).getByRole('option', {
+        name: 'Simulated outcome',
+        selected: true,
+      });
+      within(docVerificationOption).getByRole('option', {
+        name: 'Real outcome',
+        selected: false,
+      });
 
-      const sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-      expect(sandboxSimulatedOutcomes).toBeInTheDocument();
-
-      const simulatedSuccessOption = within(sandboxSimulatedOutcomes).getByText('Success');
-      expect(simulatedSuccessOption).toBeInTheDocument();
-      trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
+      const simulatedOutcomeOption = screen.getByLabelText('Choose simulated outcome');
+      within(simulatedOutcomeOption).getByRole('option', {
         name: 'Success',
+        selected: true,
       });
-      await selectEvents.openMenu(trigger);
-      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText('Fail');
-      expect(idDocFailOption).toBeInTheDocument();
+      within(simulatedOutcomeOption).getByRole('option', {
+        name: 'Fail',
+        selected: false,
+      });
 
-      const realOutcomeOption = screen.getByLabelText('Real outcome');
-      expect(realOutcomeOption).toBeInTheDocument();
-
-      const testIdTitle = screen.getByText('Test ID');
-      expect(testIdTitle).toBeInTheDocument();
-
-      const testIdInfoIcon = screen.getByTestId('infoIcon');
-      expect(testIdInfoIcon).toBeInTheDocument();
-
-      const testIdInput = screen.getByTestId('test-id-input');
-      expect(testIdInput).toBeInTheDocument();
-
-      const copyButton = screen.getByLabelText('Copy');
-      expect(copyButton).toBeInTheDocument();
-
-      const editButton = screen.getByLabelText('Edit');
-      expect(editButton).toBeInTheDocument();
-
-      const continueButton = screen.getByText('Continue');
-      expect(continueButton).toBeInTheDocument();
+      expect(screen.getByTestId('test-id-input')).toBeInTheDocument();
+      expect(screen.getByTestId('infoIcon')).toBeInTheDocument();
+      expect(screen.getByLabelText('Copy')).toBeInTheDocument();
+      expect(screen.getByLabelText('Edit')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
     });
 
     it('without id doc case:', async () => {
       renderSandbox({ requiresIdDoc: false });
 
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      expect(overallOutcomeOption).toBeInTheDocument();
-
-      const overallSuccessOption = within(overallOutcomeOption).getByText('Success');
-      expect(overallSuccessOption).toBeInTheDocument();
-      const trigger = within(overallOutcomeOption).getByRole('button', {
+      const overallOutcomeOption = screen.getByLabelText('General outcome');
+      within(overallOutcomeOption).getByRole('option', {
         name: 'Success',
+        selected: true,
       });
-      await selectEvents.openMenu(trigger);
-      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
-      const overallManualReviewOption = within(overallOutcomeOption).getByText('Manual review');
-      expect(overallFailOption).toBeInTheDocument();
-      expect(overallManualReviewOption).toBeInTheDocument();
+      within(overallOutcomeOption).getByRole('option', {
+        name: 'Fail',
+        selected: false,
+      });
+      within(overallOutcomeOption).getByRole('option', {
+        name: 'Manual review',
+        selected: false,
+      });
 
-      const simulateOutcomeRadioOption = screen.queryAllByLabelText('Simulated outcome');
-      expect(simulateOutcomeRadioOption).toHaveLength(0);
-      const sandboxSimulatedOutcomes = screen.queryAllByTestId('simulatedOutcomeOptions');
-      expect(sandboxSimulatedOutcomes).toHaveLength(0);
+      const docVerificationOption = screen.queryByLabelText('Document verification');
+      expect(docVerificationOption).not.toBeInTheDocument();
 
-      const realOutcomeOption = screen.queryAllByLabelText('Real outcome');
-      expect(realOutcomeOption).toHaveLength(0);
+      const simulatedOutcomeOption = screen.queryByLabelText('Choose simulated outcome');
+      expect(simulatedOutcomeOption).not.toBeInTheDocument();
 
-      const testIdTitle = screen.getByText('Test ID');
-      expect(testIdTitle).toBeInTheDocument();
-
-      const testIdInfoIcon = screen.getByTestId('infoIcon');
-      expect(testIdInfoIcon).toBeInTheDocument();
-
-      const testIdInput = screen.getByTestId('test-id-input');
-      expect(testIdInput).toBeInTheDocument();
-
-      const copyButton = screen.getByLabelText('Copy');
-      expect(copyButton).toBeInTheDocument();
-
-      const editButton = screen.getByLabelText('Edit');
-      expect(editButton).toBeInTheDocument();
-
-      const continueButton = screen.getByText('Continue');
-      expect(continueButton).toBeInTheDocument();
+      expect(screen.getByTestId('test-id-input')).toBeInTheDocument();
+      expect(screen.getByTestId('infoIcon')).toBeInTheDocument();
+      expect(screen.getByLabelText('Copy')).toBeInTheDocument();
+      expect(screen.getByLabelText('Edit')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
     });
 
     it('without id doc real outcome case:', () => {
       renderSandbox({ requiresIdDoc: true, allowRealDocOutcome: false });
-      const simulateOutcomeRadioOption = screen.queryAllByLabelText('Simulated outcome');
-      expect(simulateOutcomeRadioOption).toHaveLength(0);
-      const sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-      expect(sandboxSimulatedOutcomes).toBeInTheDocument();
 
-      const realOutcomeOption = screen.queryAllByLabelText('Real outcome');
-      expect(realOutcomeOption).toHaveLength(0);
+      const docVerificationOption = screen.queryByLabelText('Document verification');
+      expect(docVerificationOption).not.toBeInTheDocument();
+
+      expect(screen.getByText('Simulated outcome')).toBeInTheDocument();
+      expect(screen.queryByText('Real outcome')).not.toBeInTheDocument();
     });
 
     it("doesn't show test id input when collectTestId is false", () => {
       renderSandbox({ collectTestId: false, requiresIdDoc: true });
-      const testIdInput = screen.queryAllByTestId('test-id-input');
-      expect(testIdInput).toHaveLength(0);
+      const testIdInput = screen.queryByTestId('test-id-input');
+      expect(testIdInput).not.toBeInTheDocument();
     });
-  });
-
-  it('the default options are selected correctly in the beginning', () => {
-    renderSandbox({ requiresIdDoc: true });
-
-    const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-    const overallSuccessOption = within(overallOutcomeOption).getByText('Success');
-    const overallManualReviewOption = within(overallOutcomeOption).queryAllByText('Manual review');
-    const overallFailOption = within(overallOutcomeOption).queryAllByText('Fail');
-
-    expect(overallSuccessOption).toBeInTheDocument();
-    expect(overallManualReviewOption).toHaveLength(0);
-    expect(overallFailOption).toHaveLength(0);
-
-    const simulateOutcomeRadioOption = screen.getByLabelText('Simulated outcome');
-    expect((simulateOutcomeRadioOption as HTMLInputElement).checked).toBeTruthy();
-
-    const sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-    const simulatedSuccessOption = within(sandboxSimulatedOutcomes).getByText('Success');
-    const simulatedFailOption = within(sandboxSimulatedOutcomes).queryAllByText('Fail');
-    expect(simulatedSuccessOption).toBeInTheDocument();
-    expect(simulatedFailOption).toHaveLength(0);
-
-    const realOutcomeOption = screen.getByLabelText('Real outcome');
-    expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
   });
 
   describe('Outcome selections work properly', () => {
-    it('Can change the overall outcome options', async () => {
+    it('Overall outcome is disabled and set to failed when doc outcome is selected to be failed', async () => {
       renderSandbox({ requiresIdDoc: true });
 
-      const continueButton = screen.getByText('Continue');
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      const overallSuccessOption = within(overallOutcomeOption).getByText('Success');
-      let overallManualReviewOptions = within(overallOutcomeOption).queryAllByText('Manual review');
-      const overallFailOptions = within(overallOutcomeOption).queryAllByText('Fail');
+      const simulatedOutcomeOption = screen.getByLabelText('Choose simulated outcome');
+      await userEvent.selectOptions(simulatedOutcomeOption, 'Fail');
+      expect(screen.getByText('General outcome will fail if document verification fails')).toBeInTheDocument();
 
-      expect(overallSuccessOption).toBeInTheDocument();
-      expect(overallManualReviewOptions).toHaveLength(0);
-      expect(overallFailOptions).toHaveLength(0);
+      const overallOutcomeOption = screen.getByLabelText('General outcome');
+      expect(overallOutcomeOption).toBeDisabled();
+      expect(overallOutcomeOption).toHaveTextContent('Fail');
 
-      await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('pass');
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-      let trigger = within(overallOutcomeOption).getByRole('button', {
-        name: 'Success',
-      });
-      await selectEvents.openMenu(trigger);
-      const overallManualReviewOption = within(overallOutcomeOption).getByText('Manual review');
-      fireEvent.click(overallManualReviewOption);
-      await waitFor(() => {
-        const overallSuccessOptions = within(overallOutcomeOption).queryAllByText('Success');
-        expect(overallSuccessOptions).toHaveLength(0);
-      });
-      await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('manual_review');
-
-      trigger = within(overallOutcomeOption).getByRole('button', {
-        name: 'Manual review',
-      });
-      await selectEvents.openMenu(trigger);
-      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
-      fireEvent.click(overallFailOption);
-      await waitFor(() => {
-        overallManualReviewOptions = within(overallOutcomeOption).queryAllByText('Manual review');
-        expect(overallManualReviewOptions).toHaveLength(0);
-      });
-      await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('fail');
-    });
-
-    it('Can change the sandbox outcome options', async () => {
-      renderSandbox({ requiresIdDoc: true });
-
-      const continueButton = screen.getByText('Continue');
-      const simulateOutcomeRadioOption = screen.getByLabelText('Simulated outcome');
-      expect((simulateOutcomeRadioOption as HTMLInputElement).checked).toBeTruthy();
-      await userEvent.click(continueButton);
-      expect(submittedFormData.idDocOutcome).toEqual('pass');
-
-      let sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-      const trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
-        name: 'Success',
-      });
-      await selectEvents.openMenu(trigger);
-      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText('Fail');
-      fireEvent.click(idDocFailOption);
-      await waitFor(() => {
-        const idDocSuccessOptions = within(sandboxSimulatedOutcomes).queryAllByText('Success');
-        expect(idDocSuccessOptions).toHaveLength(0);
-      });
-      await userEvent.click(continueButton);
-      expect(submittedFormData.idDocOutcome).toEqual('fail');
-
-      const realOutcomeOption = screen.getByLabelText('Real outcome');
-      await userEvent.click(realOutcomeOption);
-      expect((realOutcomeOption as HTMLInputElement).checked).toBeTruthy();
-      expect((simulateOutcomeRadioOption as HTMLInputElement).checked).toBeFalsy();
-      await userEvent.click(continueButton);
-      expect(submittedFormData.idDocOutcome).toEqual('real');
-
-      await userEvent.click(simulateOutcomeRadioOption); // everything goes back to prev state when simulated outcome radio button is clicked again
-      expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
-      sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-      await waitFor(() => {
-        const idDocSuccessOption = within(sandboxSimulatedOutcomes).getByText('Success');
-        expect(idDocSuccessOption).toBeInTheDocument();
-      });
-      await userEvent.click(continueButton);
-      await userEvent.click(continueButton);
-      expect(submittedFormData.idDocOutcome).toEqual('pass');
-    });
-
-    it('Overall outcome is disabled and set to failed when sandbox outcome is selected to be failed', async () => {
-      renderSandbox({ requiresIdDoc: true });
-
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      const continueButton = screen.getByText('Continue');
-      const sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
-      const trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
-        name: 'Success',
-      });
-      await selectEvents.openMenu(trigger);
-      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText('Fail');
-      fireEvent.click(idDocFailOption);
-      await waitFor(() => {
-        const idDocSuccessOptions = within(sandboxSimulatedOutcomes).queryAllByText('Success');
-        expect(idDocSuccessOptions).toHaveLength(0);
-      });
-
-      expect(
-        (
-          within(overallOutcomeOption).getByRole('button', {
-            name: 'Fail',
-          }) as HTMLButtonElement
-        ).disabled,
-      ).toBeTruthy();
-
-      await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('fail');
+      expect(submittedFormData?.overallOutcome).toEqual(OverallOutcome.fail);
+      expect(submittedFormData?.idDocOutcome).toEqual(IdDocOutcome.fail);
     });
 
     it('Overall outcome is disabled and set to use_rules_outcome when sandbox outcome is selected to be real', async () => {
       renderSandbox({ requiresIdDoc: true });
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      const continueButton = screen.getByText('Continue');
-      const realOutcomeOption = screen.getByLabelText('Real outcome');
-      await userEvent.click(realOutcomeOption);
-      expect(
-        (
-          within(overallOutcomeOption).getByRole('button', {
-            name: '-',
-          }) as HTMLButtonElement
-        ).disabled,
-      ).toBeTruthy();
-      await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('use_rules_outcome');
+
+      const docVerificationOption = screen.getByLabelText('Document verification');
+      await userEvent.selectOptions(docVerificationOption, 'Real outcome');
+
+      const overallOutcomeOption = screen.getByLabelText('General outcome');
+      expect(overallOutcomeOption).toBeDisabled();
+      expect(overallOutcomeOption).toHaveTextContent('-');
+
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+      expect(submittedFormData?.overallOutcome).toEqual(OverallOutcome.useRulesOutcome);
+      expect(submittedFormData?.docVerificationOutcome).toEqual(IdVerificationOutcome.real);
     });
   });
 
@@ -436,7 +278,7 @@ describe('<SandboxOutcome/>', () => {
 
       const continueButton = screen.getByText('Continue');
       await userEvent.click(continueButton);
-      expect(submittedFormData.testID).not.toEqual(`${defaultInputVal}${inputWithSpeciaChar}`);
+      expect(submittedFormData?.testID).not.toEqual(`${defaultInputVal}${inputWithSpeciaChar}`);
     });
   });
 });

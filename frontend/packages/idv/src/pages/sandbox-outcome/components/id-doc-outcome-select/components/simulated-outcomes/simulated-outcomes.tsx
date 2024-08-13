@@ -1,116 +1,69 @@
-import { IcoInfo16 } from '@onefootprint/icons';
-import { Box, Radio, Select, Tooltip } from '@onefootprint/ui';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Box, NativeSelect, Stack, Text } from '@onefootprint/ui';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
+import { IcoWarning16 } from '@onefootprint/icons';
+import { IdDocOutcome } from '@onefootprint/types';
 import useSandboxOutcomeOptions from '../../../../hooks/use-sandbox-outcome-options';
+import { SandboxOutcomeFormData } from '../../../../types';
 
-type SimulatedOutcomesProps = {
-  onSelect: () => void;
-  isSelected: boolean;
-  allowRealOutcome?: boolean;
-};
-
-const SimulatedOutcomes = ({ onSelect, isSelected, allowRealOutcome }: SimulatedOutcomesProps) => {
+const SimulatedOutcomes = () => {
   const { t } = useTranslation('idv', {
-    keyPrefix: 'global.pages.sandbox-outcome.id-doc-outcome',
+    keyPrefix: 'global.pages.sandbox-outcome.id-doc-outcome.simulated-outcome',
   });
   const {
-    overallOutcomeOptions: { overallOutcomeSuccess },
     idDocOutcomeOptions: {
       simulatedOutcomeOptions: { idDocOutcomeSuccess, idDocOutcomeFail },
     },
   } = useSandboxOutcomeOptions();
-  const { control, setValue, watch } = useFormContext();
-  const watchIdDocOutcome = watch('outcomes.idDocOutcome');
+  const { register } = useFormContext();
 
   const options = [idDocOutcomeSuccess, idDocOutcomeFail];
 
-  const handleOutcomeTypeChange = () => {
-    onSelect();
-    if (!isSelected) {
-      setValue('outcomes.idDocOutcome', idDocOutcomeSuccess);
-      setValue('outcomes.overallOutcome', overallOutcomeSuccess);
-    }
-  };
+  const watchIdDocOutcome = useWatch<SandboxOutcomeFormData, 'idDocOutcome'>({
+    name: 'idDocOutcome',
+  });
 
   return (
-    <Container>
-      {allowRealOutcome ? (
-        <>
-          <Box display="flex" gap={2} alignItems="center">
-            <Controller
-              control={control}
-              name="outcomes.idDocOutcome"
-              render={() => (
-                <Radio label={t('simulated-outcome.title')} onChange={handleOutcomeTypeChange} checked={isSelected} />
-              )}
-            />
-            <Tooltip text={t('simulated-outcome.description')} alignment="start" position="top">
-              <IcoInfo16 />
-            </Tooltip>
+    <Stack flexDirection="column" gap={5}>
+      <Text variant="body-4" color="tertiary">
+        {t('description')}
+      </Text>
+      <Box
+        backgroundColor="secondary"
+        padding={3}
+        paddingLeft={4}
+        borderStyle="solid"
+        borderRadius="default"
+        borderColor="tertiary"
+      >
+        <Stack alignItems="center" justifyContent="space-between">
+          <label htmlFor="idDocOutcome">
+            <Text variant="label-4" color="primary">
+              {t('label')}
+            </Text>
+          </label>
+          <NativeSelect {...register('idDocOutcome')} name="idDocOutcome" id="idDocOutcome">
+            {options.map(({ value, label }) => (
+              <option key={value} value={value} aria-selected={watchIdDocOutcome === value}>
+                {label}
+              </option>
+            ))}
+          </NativeSelect>
+        </Stack>
+      </Box>
+      {watchIdDocOutcome === IdDocOutcome.fail && (
+        <Stack gap={2} alignItems="end">
+          <Box>
+            <IcoWarning16 color="warning" />
           </Box>
-          {isSelected && (
-            <DropdownOptionsContainer>
-              <Controller
-                control={control}
-                name="outcomes.idDocOutcome"
-                render={({ field }) => (
-                  <Select
-                    options={options}
-                    disabled={!isSelected}
-                    value={isSelected ? field.value : null}
-                    onChange={field.onChange}
-                    testID="simulatedOutcomeOptions"
-                    placeholder="-"
-                  />
-                )}
-              />
-            </DropdownOptionsContainer>
-          )}
-        </>
-      ) : (
-        <RadioOptionsContainer data-testid="simulatedOutcomeOptions">
-          {options.map(option => (
-            <Radio
-              key={option.value}
-              label={option.label}
-              value={option.value}
-              testID={`overallOutcomeRadioOption-${option.value}`}
-              onChange={() => {
-                setValue('outcomes.idDocOutcome', option);
-              }}
-              checked={watchIdDocOutcome.value === option.value}
-            />
-          ))}
-        </RadioOptionsContainer>
+          <Text variant="body-4" color="warning">
+            {t('options.fail.description')}
+          </Text>
+        </Stack>
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    gap: ${theme.spacing[4]};
-  `}
-`;
-
-const DropdownOptionsContainer = styled.div`
-  ${({ theme }) => css`
-    padding-left: calc(${theme.spacing[5]} + ${theme.spacing[4]});
-  `}
-`;
-
-const RadioOptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `}
-`;
 
 export default SimulatedOutcomes;
