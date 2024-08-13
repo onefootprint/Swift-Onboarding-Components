@@ -39,11 +39,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
           </Text>
         </label>
         {allowRealOutcome ? (
-          <NativeSelect
-            {...register('docVerificationOutcome')}
-            name="docVerificationOutcome"
-            id="docVerificationOutcome"
-          >
+          <NativeSelect {...register('docVerificationOutcome')} id="docVerificationOutcome" size="compact">
             {options.map(({ value, label }) => (
               <option key={value} value={value} aria-selected={docVerificationOutcome === value}>
                 {label}

@@ -39,7 +39,7 @@ const CodeBlock = ({
         <Title tag="h5">{title || language}</Title>
         {!disableCopy && (
           <CopyButton
-            size="small"
+            size="compact"
             contentToCopy={children}
             tooltipText={tooltipText ?? t('components.code-block.tooltip-text-default')}
             tooltipTextConfirmation={

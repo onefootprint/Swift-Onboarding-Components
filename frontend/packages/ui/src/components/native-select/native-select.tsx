@@ -4,19 +4,20 @@ import styled, { css } from 'styled-components';
 import { createText } from '../../utils';
 import Label from '../label';
 
-export type NativeSelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
+export type NativeSelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
   label?: string;
+  size?: 'compact' | 'default';
 };
 
 const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
-  ({ children, id: baseId, label, ...props }: NativeSelectProps, ref) => {
+  ({ children, id: baseId, label, size = 'default', ...props }: NativeSelectProps, ref) => {
     const internalId = useId();
     const id = baseId || internalId;
 
     return (
       <div className="fp-dropdown">
         {label && <Label htmlFor={id}>{label}</Label>}
-        <Select {...props} id={id} ref={ref}>
+        <Select {...props} id={id} ref={ref} data-size={size}>
           {children}
         </Select>
       </div>
@@ -46,6 +47,16 @@ const Select = styled.select`
       resize: none;
       width: 100%;
       padding-right: ${theme.spacing[8]};
+      field-sizing: content;
+        
+      &[data-size='default'] {
+        ${createText(input.size.default.typography)};
+        height: ${input.size.default.height};
+      }
+      &[data-size='compact'] {
+        ${createText(input.size.compact.typography)};
+        height: ${input.size.compact.height};
+      }
 
       @media (hover: hover) {
         &:enabled:hover {

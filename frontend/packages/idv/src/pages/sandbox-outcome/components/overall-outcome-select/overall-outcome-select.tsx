@@ -81,30 +81,37 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
 
   return (
     <Stack
-      alignItems="center"
-      justifyContent="space-between"
+      flexDirection="column"
+      gap={5}
       borderStyle="dashed"
       borderBottomWidth={1}
       paddingBottom={5}
       borderColor="tertiary"
     >
-      <label htmlFor="overallOutcome">
-        <Text variant="label-4" color="primary">
-          {t('title')}
+      <Stack alignItems="center" justifyContent="space-between">
+        <label htmlFor="overallOutcome">
+          <Text variant="label-4" color="primary">
+            {t('title')}
+          </Text>
+        </label>
+        <NativeSelect size="compact" disabled={isDisabled} {...register('overallOutcome')} id="overallOutcome">
+          {options.map(({ value, label }) => (
+            <option key={value} value={value} aria-selected={watchOverallOutcome === value}>
+              {label}
+            </option>
+          ))}
+          {isDisabled && (
+            <option value={OverallOutcome.useRulesOutcome} aria-selected={true}>
+              -
+            </option>
+          )}
+        </NativeSelect>
+      </Stack>
+      {watchOverallOutcome === OverallOutcome.stepUp && (
+        <Text variant="body-4" color="tertiary">
+          {overallOutcomeStepUp.description}
         </Text>
-      </label>
-      <NativeSelect disabled={isDisabled} {...register('overallOutcome')} name="overallOutcome" id="overallOutcome">
-        {options.map(({ value, label }) => (
-          <option key={value} value={value} aria-selected={watchOverallOutcome === value}>
-            {label}
-          </option>
-        ))}
-        {isDisabled && (
-          <option value={OverallOutcome.useRulesOutcome} aria-selected={true}>
-            -
-          </option>
-        )}
-      </NativeSelect>
+      )}
     </Stack>
   );
 };

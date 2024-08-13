@@ -1,10 +1,8 @@
-import { IcoCheck16, IcoClose16, IcoCopy16, IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import { CopyButton, Hint, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { IcoCheck16, IcoClose16, IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
+import { CopyButton, Hint, IconButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-
-import InlineButton from './components/inline-button';
 
 const TestIdInput = () => {
   const { t } = useTranslation('idv', {
@@ -37,16 +35,16 @@ const TestIdInput = () => {
 
   return (
     <Stack flexDirection="column" justifyContent="flex-end">
-      <Stack justifyContent="space-between">
-        <Stack gap={2} alignItems="center">
-          <label htmlFor="testID">
+      <Stack justifyContent="space-between" alignItems="center">
+        <label htmlFor="testID">
+          <Stack gap={2}>
             <Text variant="label-4">{t('test-id.label')}</Text>
-          </label>
-          <Tooltip text={t('test-id.description')} alignment="start" position="top">
-            <IcoInfo16 testID="infoIcon" />
-          </Tooltip>
-        </Stack>
-        <Stack gap={4}>
+            <Tooltip text={t('test-id.description')} alignment="start" position="top">
+              <IcoInfo16 testID="infoIcon" />
+            </Tooltip>
+          </Stack>
+        </label>
+        <Stack gap={3}>
           <TextInput
             id="testID"
             hasError={!!errors.testID}
@@ -70,38 +68,37 @@ const TestIdInput = () => {
             })}
           />
           {idInputLocked ? (
-            <Stack gap={4}>
+            <Stack>
               <CopyButton
+                size="compact"
                 ariaLabel={t('test-id.button.copy')}
                 contentToCopy={getValues('testID')}
                 tooltipText={t('test-id.button.copy')}
                 tooltipPosition="top"
                 tooltipTextConfirmation={t('test-id.button.copy-confirmation')}
-              >
-                <InlineButton icon={IcoCopy16} />
-              </CopyButton>
-              <InlineButton
-                ariaLabel={t('test-id.button.edit')}
-                onClick={handleSaveOrEdit}
-                tooltipText={t('test-id.button.edit')}
-                icon={IcoPencil16}
               />
+              <Tooltip text={t('test-id.button.edit')}>
+                <IconButton aria-label={t('test-id.button.edit')} onClick={handleSaveOrEdit}>
+                  <IcoPencil16 />
+                </IconButton>
+              </Tooltip>
             </Stack>
           ) : (
-            <Stack gap={3}>
-              <InlineButton
-                ariaLabel={t('test-id.button.save')}
-                onClick={handleSaveOrEdit}
-                tooltipText={t('test-id.button.save')}
-                icon={IcoCheck16}
-                disabled={!!errors?.testID}
-              />
-              <InlineButton
-                ariaLabel={t('test-id.button.reset')}
-                onClick={handleReset}
-                tooltipText={t('test-id.button.reset')}
-                icon={IcoClose16}
-              />
+            <Stack>
+              <Tooltip text={t('test-id.button.save')}>
+                <IconButton
+                  aria-label={t('test-id.button.save')}
+                  onClick={handleSaveOrEdit}
+                  disabled={!!errors?.testID}
+                >
+                  <IcoCheck16 />
+                </IconButton>
+              </Tooltip>
+              <Tooltip text={t('test-id.button.reset')}>
+                <IconButton aria-label={t('test-id.button.reset')} onClick={handleReset}>
+                  <IcoClose16 />
+                </IconButton>
+              </Tooltip>
             </Stack>
           )}
         </Stack>

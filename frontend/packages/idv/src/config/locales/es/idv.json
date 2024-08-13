@@ -131,6 +131,7 @@
           "simulated-outcome": {
             "title": "Resultado simulado",
             "description": "Resultado ficticio, independiente de la imagen cargada",
+            "label": "Elija el resultado simulado",
             "options": {
               "success": {
                 "title": "Éxito"

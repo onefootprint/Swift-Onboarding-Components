@@ -43,7 +43,7 @@ const SimulatedOutcomes = () => {
               {t('label')}
             </Text>
           </label>
-          <NativeSelect {...register('idDocOutcome')} name="idDocOutcome" id="idDocOutcome">
+          <NativeSelect {...register('idDocOutcome')} id="idDocOutcome" size="compact">
             {options.map(({ value, label }) => (
               <option key={value} value={value} aria-selected={watchIdDocOutcome === value}>
                 {label}

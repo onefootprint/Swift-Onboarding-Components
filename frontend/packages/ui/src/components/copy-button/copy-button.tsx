@@ -6,6 +6,7 @@ import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import { IconButton } from '../index';
 import type { TooltipProps } from '../tooltip';
 import Tooltip from '../tooltip';
 
@@ -17,7 +18,7 @@ export type CopyButtonProps = {
   tooltipTextConfirmation?: string;
   children?: string | React.ReactNode;
   contentToCopy: string;
-  size?: 'small' | 'default';
+  size?: 'compact' | 'default';
 };
 
 const HIDE_TIMEOUT = 600;
@@ -37,7 +38,7 @@ const CopyButton = ({
   const { t } = useTranslation('ui');
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
-  const CopyIcon = size === 'small' ? IcoCopy16 : IcoCopy24;
+  const CopyIcon = size === 'compact' ? IcoCopy16 : IcoCopy24;
 
   useEffect(
     () => () => {
@@ -46,8 +47,8 @@ const CopyButton = ({
     [],
   );
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
+  const handleClick = (event?: React.MouseEvent<HTMLButtonElement>) => {
+    event?.stopPropagation();
     setShowConfirmation(true);
     scheduleToHideConfirmation();
     navigator.clipboard.writeText(contentToCopy);
@@ -88,14 +89,24 @@ const CopyButton = ({
       open={isTooltipVisible}
       onOpenChange={setTooltipVisible}
     >
-      <Button
-        aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
-        type="button"
-        disabled={disable}
-        onClick={handleClick}
-      >
-        {children || <CopyIcon color={disable ? 'tertiary' : undefined} />}
-      </Button>
+      {children ? (
+        <Button
+          aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
+          type="button"
+          disabled={disable}
+          onClick={handleClick}
+        >
+          {children}
+        </Button>
+      ) : (
+        <IconButton
+          aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
+          disabled={disable}
+          onClick={handleClick}
+        >
+          <CopyIcon color={disable ? 'tertiary' : undefined} />
+        </IconButton>
+      )}
     </Tooltip>
   );
 };

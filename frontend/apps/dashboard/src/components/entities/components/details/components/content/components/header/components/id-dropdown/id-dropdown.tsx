@@ -45,7 +45,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
     <Container>
       <Main>
         {mainId?.value}
-        <CopyButton size="small" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
+        <CopyButton size="compact" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
       </Main>
       {hasSingleId ? null : (
         <Dropdown.Root>
@@ -62,7 +62,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
                     </Text>
                     <Text variant="snippet-2">{item.value}</Text>
                   </Stack>
-                  <CopyButton contentToCopy={item.value || ''} size="small" />
+                  <CopyButton contentToCopy={item.value || ''} size="compact" />
                 </Item>
               );
             })}
