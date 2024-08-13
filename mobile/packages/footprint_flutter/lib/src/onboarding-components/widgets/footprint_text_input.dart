@@ -4,6 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
 
+typedef CustomTextInputProps = ({
+  TextInputType? keyboardType,
+  TextInputAction? textInputAction,
+  List<TextInputFormatter>? inputFormatters,
+  List<String>? autofillHints,
+  int? maxLength,
+  Function(String)? onChanged,
+  String? errorText,
+});
+
+typedef CustomTextInputBuilder = TextField Function(
+    CustomTextInputProps inputProps);
+
 class FootprintTextInput extends ConsumerStatefulWidget {
   const FootprintTextInput({
     super.key,
@@ -38,6 +51,7 @@ class FootprintTextInput extends ConsumerStatefulWidget {
     this.onEditingComplete,
     this.onFieldSubmitted,
     this.decoration,
+    this.createCustomTextInput,
   });
 
   final FocusNode? focusNode;
@@ -71,6 +85,7 @@ class FootprintTextInput extends ConsumerStatefulWidget {
   final VoidCallback? onEditingComplete;
   final ValueChanged<String>? onFieldSubmitted;
   final InputDecoration? decoration;
+  final CustomTextInputBuilder? createCustomTextInput;
 
   @override
   ConsumerState<FootprintTextInput> createState() => _FootprintTextInputState();
@@ -117,6 +132,28 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
           maxLength: null,
           autofillHints: null,
         );
+
+    if (widget.createCustomTextInput != null) {
+      return FormField(
+          validator: validator,
+          onSaved: (value) {
+            ref
+                .read(formContextNotifierProvider.notifier)
+                .setValue(name, value);
+          },
+          key: ValueKey(name),
+          builder: (FormFieldState state) {
+            return widget.createCustomTextInput!((
+              keyboardType: keyboardType,
+              textInputAction: textInputAction,
+              inputFormatters: inputFormatters,
+              maxLength: maxLength,
+              autofillHints: autofillHints,
+              onChanged: (value) => state.didChange(value),
+              errorText: state.errorText,
+            ));
+          });
+    }
 
     return TextFormField(
       key: ValueKey(name),
