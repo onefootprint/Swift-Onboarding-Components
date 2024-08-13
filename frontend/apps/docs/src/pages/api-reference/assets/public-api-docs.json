@@ -15,7 +15,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.",
+                "description": "Look up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.",
                 "parameters": [
                     {
                         "in": "query",
@@ -165,7 +165,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nReturns list of decisions made for this business in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.",
+                "description": "Returns list of decisions made for this business in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.",
                 "parameters": [
                     {
                         "in": "path",
@@ -222,7 +222,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nFor a user and business whose information have already been collected, runs the verification checks of the provided playbook. This will contact the identity and business verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
+                "description": "For a user and business whose information have already been collected, runs the verification checks of the provided playbook. This will contact the identity and business verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
                 "parameters": [
                     {
                         "in": "path",
@@ -269,7 +269,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks this business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
+                "description": "Get the list of playbooks this business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
                 "parameters": [
                     {
                         "in": "query",
@@ -326,7 +326,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGets the beneficial owners of a business.",
+                "description": "Gets the beneficial owners of a business.",
                 "parameters": [
                     {
                         "in": "path",
@@ -381,7 +381,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLink an existing fp_id to the provided business as a beneficial owner.",
+                "description": "Link an existing fp_id to the provided business as a beneficial owner.",
                 "parameters": [
                     {
                         "in": "path",
@@ -430,7 +430,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
+                "description": "Lists the risk signals for a Footprint user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -730,7 +730,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nGenerates a single-use session token for a playbook.",
+                "description": "Generates a single-use session token for a playbook.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -804,7 +804,7 @@
                     "Org",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nList all Footprint Risk Signals",
+                "description": "List all Footprint Risk Signals",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -833,7 +833,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLook up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `POST /users/search` API.",
+                "description": "Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the `POST /users/search` API.",
                 "parameters": [
                     {
                         "in": "query",
@@ -1490,7 +1490,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's label",
+                "description": "View a user's label",
                 "parameters": [
                     {
                         "in": "path",
@@ -1528,7 +1528,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUpdate a user's label",
+                "description": "Update a user's label",
                 "parameters": [
                     {
                         "in": "path",
@@ -1578,7 +1578,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's tags",
+                "description": "View a user's tags",
                 "parameters": [
                     {
                         "in": "path",
@@ -1619,7 +1619,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTag a user",
+                "description": "Tag a user",
                 "parameters": [
                     {
                         "in": "path",
@@ -1669,7 +1669,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUntag a user",
+                "description": "Untag a user",
                 "parameters": [
                     {
                         "in": "path",
@@ -1720,7 +1720,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nView a user's recent device insights",
+                "description": "View a user's recent device insights",
                 "parameters": [
                     {
                         "in": "path",
@@ -1824,7 +1824,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nReturns list of decisions made for this user in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.",
+                "description": "Returns list of decisions made for this user in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1879,7 +1879,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
+                "description": "Creates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1929,7 +1929,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nView the documents uploaded successfully by this user.",
+                "description": "View the documents uploaded successfully by this user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1972,7 +1972,7 @@
                     "Alpaca",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an Alpaca account",
+                "description": "Create an Alpaca account",
                 "parameters": [
                     {
                         "in": "path",
@@ -2020,7 +2020,7 @@
                     "Alpaca",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nForward CIP information to Alpaca",
+                "description": "Forward CIP information to Alpaca",
                 "parameters": [
                     {
                         "in": "path",
@@ -2068,7 +2068,7 @@
                     "Apex",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nExport CIP information for APEX as a JSON object",
+                "description": "Export CIP information for APEX as a JSON object",
                 "parameters": [
                     {
                         "in": "path",
@@ -2115,7 +2115,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nFor a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
+                "description": "For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2163,7 +2163,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
+                "description": "Lists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2206,7 +2206,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nLists the match signals for the provided user. This API is deprecated.",
+                "description": "Lists the match signals for the provided user. This API is deprecated.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2245,7 +2245,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
+                "description": "Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.",
                 "parameters": [
                     {
                         "in": "query",
@@ -2302,7 +2302,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
+                "description": "Lists the risk signals for a Footprint user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -2797,7 +2797,7 @@
                     "PhasedOut",
                     "HideWhenLocked"
                 ],
-                "description": "This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\nChecks if provided data is valid before adding it to the vault.",
+                "description": "Checks if provided data is valid before adding it to the vault.",
                 "parameters": [
                     {
                         "in": "path",

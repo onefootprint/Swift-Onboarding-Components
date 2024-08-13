@@ -95,12 +95,6 @@ class Endpoint:
         """
         # Update the description
         description = self._path_info.get("description", "")
-        if self.identifying_tag == "Preview":
-            # Add a disclaimer tag to all Preview APIs
-            description = f"This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\n{description}"
-        if self.identifying_tag == "PhasedOut":
-            # Add a disclaimer tag to all PhasedOut APIs
-            description = f"This API is phased out and is not to be used by new applications. It may change, but we will give notice before making backwards-incompatible changes.\n{description}"
         if self.identifying_tag == "Deprecated":
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
