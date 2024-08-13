@@ -6,6 +6,7 @@ import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { isURL } from '@onefootprint/core';
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 import checkIsPhoneValid from '../../../../../../utils/check-is-phone-valid';
@@ -179,12 +180,16 @@ const BasicDataForm = ({
             hint={websiteHint}
             label={t('website.label')}
             placeholder={t('website.placeholder')}
-            type="url"
             defaultValue={getValues('website')}
             {...register('website', {
               required: {
                 value: true,
                 message: t('website.errors.required'),
+              },
+              validate: value => {
+                if (!isURL(value ?? '')) {
+                  return t('website.errors.pattern');
+                }
               },
             })}
           />

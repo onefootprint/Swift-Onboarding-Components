@@ -610,7 +610,8 @@
             "label": "Website",
             "placeholder": "https://www.acmebank.com",
             "errors": {
-              "required": "Website cannot be empty or is invalid"
+              "required": "Website cannot be empty or is invalid",
+              "pattern": "Invalid website URL"
             }
           },
           "phone-number": {

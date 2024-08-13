@@ -23,3 +23,4 @@ export { default as isSsn9, isSSN9Flexible } from './validations/is-ssn9';
 export { default as isEmailDomain } from './validations/is-email-domain';
 export { default as isIpAddress } from './validations/is-ip-address';
 export { default as isPhoneCountryCode } from './validations/is-phone-country-code';
+export { default as isURL, isURLWithProtocol } from './validations/is-url';

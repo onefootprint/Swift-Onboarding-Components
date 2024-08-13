@@ -610,7 +610,8 @@
             "label": "Sitio web",
             "placeholder": "https://www.acmebank.com",
             "errors": {
-              "required": "El sitio web no puede quedar vacío o ser inválido"
+              "required": "El sitio web no puede quedar vacío o ser inválido",
+              "pattern": "URL de sitio web inválida"
             }
           },
           "phone-number": {
