@@ -100,7 +100,7 @@ const Form = ({
         (bo, index) =>
           bo[BeneficialOwnerDataAttribute.firstName] &&
           bo[BeneficialOwnerDataAttribute.lastName] &&
-          bo[BeneficialOwnerDataAttribute.ownershipStake] > 0 &&
+          bo[BeneficialOwnerDataAttribute.ownershipStake] >= 0 &&
           // Only require email/phone for additional BOs and if we are collecting business_kyced_benficial_owners
           (index === 0 ||
             !requireMultiKyc ||

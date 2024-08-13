@@ -30,6 +30,8 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
       hasError={hasError}
       hint={hint}
       label={t('label')}
+      min="0"
+      max="100"
       placeholder={t('placeholder')}
       {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`, {
         required: {
@@ -37,7 +39,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
           message: t('errors.required'),
         },
         min: {
-          value: 1,
+          value: 0,
           message: t('errors.min'),
         },
         max: {
