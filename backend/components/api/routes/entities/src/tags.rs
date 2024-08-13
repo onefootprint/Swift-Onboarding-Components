@@ -66,6 +66,7 @@ pub async fn post(
 #[route_alias(actix::get(
     "/users/{fp_id:fp_[_A-Za-z0-9]*}/tags",
     description = "View a user's tags",
+    // TODO before removing from preview, paginate this API
     tags(Users, Preview)
 ))]
 #[api_v2_operation(description = "View a user's tags", tags(Entities, Private))]
