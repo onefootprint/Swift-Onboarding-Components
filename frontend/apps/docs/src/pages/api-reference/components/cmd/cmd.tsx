@@ -1,15 +1,34 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import { IconButton, Overlay, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { IconButton, Overlay, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { scroller } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
+import { ContentSchemaNoRef } from '../../api-reference.types';
 import { ARTICLES_CONTAINER_ID } from '../articles';
 import type { PageNavProps } from '../nav/nav.types';
 import Footer from './components/footer/footer';
 import Keycaps from './components/keycaps/keycaps';
+import ScrollOption from './components/scroll-option';
+
+const IGNORE_PARAMETERS = ['fp_id', 'fp_bid', 'page', 'cursor', 'page_size'];
+
+/** Given a request or response schema, extracts the interesting schema that we actually want to display. This unwraps responses that are either lists or paginated. */
+const extractSchema = (schema?: ContentSchemaNoRef): ContentSchemaNoRef | undefined => {
+  if (schema?.properties?.meta) {
+    // This is a paginated response, return the nested schema
+    return schema?.properties?.data?.items;
+  }
+  return schema?.properties?.items || schema;
+};
+
+const extractSchemaProperties = (schema?: ContentSchemaNoRef) => {
+  return Object.keys(extractSchema(schema)?.properties || {}).filter(
+    propertyName => propertyName !== '<key>' && propertyName !== '<value>',
+  );
+};
 
 const Cmd = ({ sections }: PageNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.cmd' });
@@ -45,6 +64,8 @@ const Cmd = ({ sections }: PageNavProps) => {
     }, 10);
   };
 
+  const allSubsections = sections.flatMap(section => section.subsections).filter(({ api }) => !api?.isHidden);
+
   return (
     <>
       <DialogContainer open={open} onOpenChange={setOpen} label={t('title')}>
@@ -57,36 +78,47 @@ const Cmd = ({ sections }: PageNavProps) => {
         </InputContainer>
         <List>
           <EmptyState>{t('no-results')}</EmptyState>
-          {sections.map(({ title, id, subsections }) => (
+          {sections.map(({ title: parentTitle, id, subsections }) => (
             // TODO headers have corresponding content in the new API reference site, but they aren't selectable here
-            <Group heading={title} key={id}>
-              {subsections.map(({ title: subtitle, id, api }) => (
-                <Option key={id} onSelect={() => handleScroll(id)} keywords={api ? [api.method, api.path] : []}>
-                  <Stack direction="row" gap={4} alignItems="center">
-                    <Text variant="label-4">{subtitle}</Text>
-                    <Text variant="body-4">-</Text>
-                    <Text variant="body-4">{title}</Text>
-                  </Stack>
+            <Group heading={parentTitle} key={id}>
+              {subsections.map(({ title, id, api }) => (
+                <Option onSelect={() => handleScroll(id)} key={id} keywords={api ? [api.method, api.path] : undefined}>
+                  <ScrollOption title={title} parentTitle={parentTitle} />
                 </Option>
               ))}
             </Group>
           ))}
-          {/* TODO I don't think these are the most useful - maybe fields from the request / response body? */}
-          <Group>
-            {sections
-              .flatMap(section => section.subsections)
-              .map(({ api, title, id }) =>
-                (api?.parameters || []).map(parameter => (
-                  <Option onSelect={() => handleScroll(id)} key={id}>
-                    <Stack direction="row" gap={3}>
-                      <Text variant="label-2">{parameter.name}</Text>
-                      <Text variant="body-2" color="tertiary">
-                        {title}
-                      </Text>
-                    </Stack>
+          <Group heading="Requests">
+            {allSubsections.map(({ api, title, id }) =>
+              extractSchemaProperties(api?.requestBody).map(propertyName => (
+                <Option onSelect={() => handleScroll(id)} key={`request-${id}-${propertyName}`}>
+                  <ScrollOption title={propertyName} parentTitle={`${title} request`} />
+                </Option>
+              )),
+            )}
+          </Group>
+          <Group heading="Responses">
+            {allSubsections.map(({ api, title, id }) =>
+              Object.values(api?.responses || {})
+                .flatMap(response => extractSchemaProperties(response))
+                .map(propertyName => (
+                  <Option onSelect={() => handleScroll(id)} key={`response-${id}-${propertyName}`}>
+                    <ScrollOption title={propertyName} parentTitle={`${title} response`} />
                   </Option>
                 )),
-              )}
+            )}
+          </Group>
+          <Group heading="Parameters">
+            {allSubsections.map(({ api, title, id }) =>
+              (api?.parameters || [])
+                .filter(parameter => !IGNORE_PARAMETERS.includes(parameter.name))
+                .filter(parameter => parameter.in !== 'path')
+                .map(parameter => (
+                  <Option onSelect={() => handleScroll(id)} key={`param-${id}-${parameter.name}`}>
+                    <ScrollOption title={parameter.name} parentTitle={title} />
+                  </Option>
+                )),
+            )}
           </Group>
         </List>
         <Footer />
