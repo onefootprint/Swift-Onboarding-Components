@@ -1,6 +1,4 @@
-use crate::auth::tenant::TenantApiKey;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
@@ -31,7 +29,7 @@ use strum::IntoEnumIterator;
 pub async fn get_business_insights(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: TenantSessionAuth,
 ) -> ApiResponse<BusinessInsights> {
     let dis = BDK::iter().collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
