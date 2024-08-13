@@ -1,9 +1,9 @@
+import { ApiKey } from '@onefootprint/types';
 import { CodeInline, Shimmer } from '@onefootprint/ui';
-import { EncryptedCell } from 'src/components';
 
 type KeyCellProps = {
   isLoading: boolean;
-  value: string | null;
+  value: ApiKey;
 };
 
 const KeyCell = ({ value, isLoading }: KeyCellProps) => {
@@ -11,12 +11,10 @@ const KeyCell = ({ value, isLoading }: KeyCellProps) => {
     return <Shimmer height="24px" width="280px" />;
   }
 
-  return value ? (
-    <CodeInline isPrivate truncate>
-      {value}
+  return (
+    <CodeInline isPrivate truncate disabled={!value.key}>
+      {value.key ? value.key : value.scrubbedKey.replaceAll('*', '•')}
     </CodeInline>
-  ) : (
-    <EncryptedCell />
   );
 };
 

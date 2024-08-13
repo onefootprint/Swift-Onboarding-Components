@@ -29,6 +29,7 @@ export const ApiKeyFixture: ApiKey = {
   id: 'key_lorem',
   name: 'Lorem Bank',
   status: 'enabled',
+  scrubbedKey: 'sk_test_********_aL1',
   key: null,
   lastUsedAt: '2022-10-07T16:40:38.002041Z',
   createdAt: '2022-10-07T15:40:38.002041Z',

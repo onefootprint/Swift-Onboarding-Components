@@ -5,6 +5,7 @@ export type ApiKey = {
   id: string;
   isLive: boolean;
   key: string | null;
+  scrubbedKey: string;
   lastUsedAt: string | null;
   name: string;
   status: 'enabled' | 'disabled';
