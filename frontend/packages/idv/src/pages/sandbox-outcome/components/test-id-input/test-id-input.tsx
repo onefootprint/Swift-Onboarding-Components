@@ -1,5 +1,5 @@
 import { IcoCheck16, IcoClose16, IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import { CopyButton, Hint, IconButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { Box, CopyButton, Hint, IconButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,14 @@ const TestIdInput = () => {
   };
 
   return (
-    <Stack flexDirection="column" justifyContent="flex-end">
+    <Box
+      flexDirection="column"
+      justifyContent="flex-end"
+      borderStyle="dashed"
+      borderTopWidth={1}
+      paddingTop={5}
+      borderColor="tertiary"
+    >
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="testID">
           <Stack gap={2}>
@@ -104,7 +111,7 @@ const TestIdInput = () => {
         </Stack>
       </Stack>
       <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
-    </Stack>
+    </Box>
   );
 };
 

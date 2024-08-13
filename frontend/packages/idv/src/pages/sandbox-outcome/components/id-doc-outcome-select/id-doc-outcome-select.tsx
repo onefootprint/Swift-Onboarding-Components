@@ -24,14 +24,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
   const options = [idDocOutcomeReal, idDocOutcomeSimulated];
 
   return (
-    <Stack
-      flexDirection="column"
-      gap={5}
-      borderStyle="dashed"
-      borderBottomWidth={1}
-      paddingBottom={5}
-      borderColor="tertiary"
-    >
+    <Stack flexDirection="column" gap={5} borderStyle="dashed" borderTopWidth={1} paddingTop={5} borderColor="tertiary">
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="docVerificationOutcome">
           <Text variant="label-4" color="primary">

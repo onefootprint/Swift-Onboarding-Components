@@ -80,14 +80,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
     watchIdDocOutcome === IdDocOutcome.fail || watchDocVerificationOutcome === IdVerificationOutcome.real;
 
   return (
-    <Stack
-      flexDirection="column"
-      gap={5}
-      borderStyle="dashed"
-      borderBottomWidth={1}
-      paddingBottom={5}
-      borderColor="tertiary"
-    >
+    <Stack flexDirection="column" gap={5}>
       <Stack alignItems="center" justifyContent="space-between">
         <label htmlFor="overallOutcome">
           <Text variant="label-4" color="primary">
