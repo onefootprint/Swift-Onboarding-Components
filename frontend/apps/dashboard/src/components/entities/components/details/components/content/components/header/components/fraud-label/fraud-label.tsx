@@ -4,6 +4,7 @@ import { Dropdown, Stack, Tooltip, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import LabelDropdown from './components/label-dropdown';
 import useLabelText from './hooks/use-label-text';
 
 type FraudLabelProps = {
@@ -25,32 +26,41 @@ const FraudLabel = ({ entity }: FraudLabelProps) => {
     setIsOpen(isOpen => !isOpen);
   };
 
+  const handleSelectLabel = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
-      <Dropdown.Trigger>
-        {label ? (
-          <Stack align="center">
-            <LabelContainer>
-              <LabelText>
-                <IcoFlag16 />
-                {labelT(label)}
-                {tooltip}
-              </LabelText>
-            </LabelContainer>
-            {label && (
-              <TriggerContainer onClick={toggleDropdown} data-is-open={isOpen}>
+      {label ? (
+        <Stack align="center">
+          <LabelContainer>
+            <LabelText>
+              <IcoFlag16 />
+              {labelT(label)}
+              {tooltip}
+            </LabelText>
+          </LabelContainer>
+          {label && (
+            <StyledTrigger>
+              <LabelTrigger data-is-open={isOpen}>
                 <IcoChevronDown16 />
-              </TriggerContainer>
-            )}
-          </Stack>
-        ) : (
-          <AddLabelContainer onClick={toggleDropdown} data-is-open={isOpen}>
+              </LabelTrigger>
+            </StyledTrigger>
+          )}
+        </Stack>
+      ) : (
+        <StyledTrigger>
+          <NoLabelContainer data-is-open={isOpen}>
             <IcoPlusSmall16 />
             {t('add-label')}
             {tooltip}
-          </AddLabelContainer>
-        )}
-      </Dropdown.Trigger>
+          </NoLabelContainer>
+        </StyledTrigger>
+      )}
+      <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4} asChild>
+        <LabelDropdown selectedLabel={label} onClick={handleSelectLabel} />
+      </Dropdown.Content>
     </Dropdown.Root>
   );
 };
@@ -64,7 +74,7 @@ const LabelContainer = styled(Stack)`
     border-bottom-left-radius: ${theme.borderRadius.full};
     white-space: nowrap;
   `};
-  `;
+`;
 
 const LabelText = styled(Stack)`
   ${({ theme }) => css`
@@ -75,7 +85,18 @@ const LabelText = styled(Stack)`
   `};
 `;
 
-const TriggerContainer = styled(Stack)`
+const StyledTrigger = styled(Dropdown.Trigger)`
+  ${({ theme }) => css`
+    &[data-state='open'] {
+      background-color: ${theme.backgroundColor.transparent};
+    }
+    &:enabled:hover {
+      background-color: ${theme.backgroundColor.transparent};
+    }
+  `};
+`;
+
+const LabelTrigger = styled(Stack)`
   ${({ theme }) => css`
     align-items: center;
     padding: ${theme.spacing[2]};
@@ -91,7 +112,7 @@ const TriggerContainer = styled(Stack)`
   `};
 `;
 
-const AddLabelContainer = styled(Stack)`
+const NoLabelContainer = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
     gap: ${theme.spacing[2]};

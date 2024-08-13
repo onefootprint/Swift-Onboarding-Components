@@ -986,7 +986,8 @@
           "labels": {
             "active": "Active",
             "offboard-fraud": "Offboard (Fraud)",
-            "offboard-other": "Offboard (Other)"
+            "offboard-other": "Offboard (Other)",
+            "remove": "Remove label"
           }
         }
       },
