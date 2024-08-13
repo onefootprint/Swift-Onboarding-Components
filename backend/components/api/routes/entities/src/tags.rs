@@ -49,14 +49,15 @@ pub async fn post(
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
-
-            Ok(NewScopedVaultTag {
+            let args = NewScopedVaultTag {
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 scoped_vault_id: sv.id,
                 kind: tag_kind,
-            }
-            .insert(conn)?)
+            };
+            let tag = ScopedVaultTag::get_or_create(conn, args)?;
+
+            Ok(tag)
         })
         .await?;
 

@@ -61,9 +61,18 @@ def test_create_tag(sandbox_tenant, is_api):
     user = bifrost.run()
     data = {"tag": "delinquent"}
     tag = post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
-
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
+
+    assert len(body) == 1
     assert body[0]["tag"] == "delinquent"
+    created_time = body[0]["created_at"]
+
+    # create the same tag, no-ops
+    post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
+    assert len(body) == 1
+    assert body[0]["tag"] == "delinquent"
+    assert created_time == body[0]["created_at"]
 
     data = {"tag": "flerp_derp_blerp"}
     post(f"/{api_base}/{user.fp_id}/tags", data, *auth)

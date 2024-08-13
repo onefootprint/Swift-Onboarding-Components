@@ -61,6 +61,25 @@ impl ScopedVaultTag {
 
         Ok(())
     }
+
+    #[tracing::instrument("ScopedVaultTag::get_or_create", skip_all)]
+    pub fn get_or_create(conn: &mut PgConn, args: NewScopedVaultTag) -> Result<ScopedVaultTag, DbError> {
+        let existing = scoped_vault_tag::table
+            .filter(scoped_vault_tag::scoped_vault_id.eq(&args.scoped_vault_id))
+            .filter(scoped_vault_tag::kind.eq(&args.kind))
+            .get_result(conn)
+            .optional()?;
+
+        if let Some(tag) = existing {
+            Ok(tag)
+        } else {
+            let res = diesel::insert_into(scoped_vault_tag::table)
+                .values(args)
+                .get_result(conn)?;
+
+            Ok(res)
+        }
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -70,16 +89,4 @@ pub struct NewScopedVaultTag {
     pub created_seqno: DataLifetimeSeqno,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: String,
-}
-
-impl NewScopedVaultTag {
-    #[tracing::instrument("NewScopedVaultTag::insert", skip_all)]
-    pub fn insert(self, conn: &mut PgConn) -> Result<ScopedVaultTag, DbError> {
-        // now insert the new one
-        let ev = diesel::insert_into(db_schema::schema::scoped_vault_tag::table)
-            .values(self)
-            .get_result(conn)?;
-
-        Ok(ev)
-    }
 }
