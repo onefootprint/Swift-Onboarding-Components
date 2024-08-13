@@ -1,4 +1,4 @@
-import { Box, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-scroll';
 import { HttpMethod } from 'src/pages/api-reference/api-reference.types';
@@ -22,51 +22,32 @@ const Method = ({ method }: { method: HttpMethod }) => {
 const EndpointsOverview = ({ apiArticles }: EndpointsOverviewProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   return (
-    <StickyContainer>
-      <Container>
-        <Header>
-          <Text variant="caption-1" color="secondary" tag="h5">
-            {t('endpoints')}
-          </Text>
-        </Header>
-        <Content>
-          {apiArticles
-            .filter(article => !article.api.isHidden)
-            .map(article => (
-              <Link
-                id={article.api.id}
-                to={article.api.id}
-                containerId={ARTICLES_CONTAINER_ID}
-                href={`#${article.api.id}`}
-                smooth
-                duration={500}
-              >
-                <Method method={article.api.method} />
-                <td>{article.api.path}</td>
-              </Link>
-            ))}
-        </Content>
-      </Container>
-    </StickyContainer>
+    <Container>
+      <Header>
+        <Text variant="caption-1" color="secondary" tag="h5">
+          {t('endpoints')}
+        </Text>
+      </Header>
+      <Content>
+        {apiArticles
+          .filter(article => !article.api.isHidden)
+          .map(article => (
+            <Link
+              id={article.api.id}
+              to={article.api.id}
+              containerId={ARTICLES_CONTAINER_ID}
+              href={`#${article.api.id}`}
+              smooth
+              duration={500}
+            >
+              <Method method={article.api.method} />
+              <td>{article.api.path}</td>
+            </Link>
+          ))}
+      </Content>
+    </Container>
   );
 };
-
-const StickyContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    padding-top: ${theme.spacing[8]};
-    padding-bottom: ${theme.spacing[8]};
-    width: 100%;
-
-    ${media.greaterThan('md')`
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    `}
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`

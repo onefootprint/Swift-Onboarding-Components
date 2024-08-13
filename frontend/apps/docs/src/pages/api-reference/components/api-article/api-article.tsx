@@ -72,7 +72,7 @@ const Article = ({ article }: ArticleProps) => {
       </Stack>
     </>
   );
-  const codeColumn = responses && <DemoCode article={api} />;
+  const codeColumn = <DemoCode article={api} />;
   return <SideBySideElement id={encodedId} left={contentColumn} right={codeColumn} />;
 };
 
@@ -88,7 +88,6 @@ const HeaderContainer = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-top: ${theme.spacing[8]};
     padding-bottom: ${theme.spacing[7]};
     background-color: ${theme.backgroundColor.primary};
   `}

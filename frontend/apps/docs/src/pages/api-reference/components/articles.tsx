@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-import { Box, media } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import Markdown from 'src/components/markdown';
 import ApiArticle from 'src/pages/api-reference/components/api-article';
 import ScrollLink from 'src/pages/api-reference/components/scroll-link';
@@ -38,11 +38,7 @@ const Articles = ({ sections }: ArticlesProps) => {
           <>
             <SideBySideElement
               id={section.id}
-              left={
-                <Box marginTop={8}>
-                  <Markdown overrides={MARKDOWN_OVERRIDES}>{section.content}</Markdown>
-                </Box>
-              }
+              left={<Markdown overrides={MARKDOWN_OVERRIDES}>{section.content}</Markdown>}
               right={<EndpointsOverview apiArticles={section.subsections} />}
             />
             {section.subsections.map(article => (

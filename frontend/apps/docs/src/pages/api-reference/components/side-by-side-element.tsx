@@ -11,14 +11,18 @@ type SideBySideProps = {
   id: string;
 };
 
-/** Creates a two-column view with the provided content. When the viewport is too small, rearranges to a one-column view. */
+/** Creates a two-column view with the provided content. The right-side content is always sticky on desktop. When the viewport is too small, rearranges to a one-column view. */
 const SideBySideElement = ({ left, right, id }: SideBySideProps) => {
   return (
     // The id here is used to make sure the `spy` property works on react-scroll's Links
     <ElementContainer name={id} id={id} key={id}>
       <Container>
-        <LeftColumn>{left}</LeftColumn>
-        <RightColumn>{right}</RightColumn>
+        <LeftColumn>
+          <LeftColumnBody>{left}</LeftColumnBody>
+        </LeftColumn>
+        <RightColumn>
+          <RightColumnStickyBody>{right}</RightColumnStickyBody>
+        </RightColumn>
       </Container>
     </ElementContainer>
   );
@@ -48,7 +52,6 @@ const Container = styled.div`
 
 const LeftColumn = styled.div`
   ${({ theme }) => css`
-    padding-bottom: ${theme.spacing[7]};
     width: 100%;
 
     ${media.greaterThan('lg')`
@@ -58,11 +61,36 @@ const LeftColumn = styled.div`
   `}
 `;
 
+const LeftColumnBody = styled.div`
+  ${({ theme }) => css`
+    padding-top: ${theme.spacing[8]};
+    /* Unfortunately, a lot of items in the left column have some bottom padding already... */
+    padding-bottom: ${theme.spacing[7]};
+  `}
+`;
+
 const RightColumn = styled.div`
   width: 100%;
 
   ${media.greaterThan('lg')`
     width: 40%;
+  `}
+`;
+
+const RightColumnStickyBody = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+    padding-top: ${theme.spacing[8]};
+    padding-bottom: ${theme.spacing[8]};
+    width: 100%;
+
+    ${media.greaterThan('md')`
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    `}
   `}
 `;
 

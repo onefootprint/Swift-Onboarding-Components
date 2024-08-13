@@ -1,7 +1,6 @@
-import { Box, CodeBlock, Text, media } from '@onefootprint/ui';
+import { Box, CodeBlock, Stack, Text } from '@onefootprint/ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import { getExample } from '@/api-reference/utils/get-schemas';
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
@@ -39,7 +38,7 @@ const DemoCode = ({ article }: DemoCodeProps) => {
   );
 
   return (
-    <Container>
+    <Stack direction="column" gap={5}>
       <CodeBlock language="bash" title={curlTitle} showLineNumbers>
         {exampleCurlRequest}
       </CodeBlock>
@@ -47,7 +46,7 @@ const DemoCode = ({ article }: DemoCodeProps) => {
         Object.entries(responses).map(([code, schema]) => {
           return <Block key={code} title={t('response-example')} schema={schema} />;
         })}
-    </Container>
+    </Stack>
   );
 };
 
@@ -64,22 +63,5 @@ const Block = ({ title, schema }: BlockProps) => {
     </CodeBlock>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    padding-top: ${theme.spacing[8]};
-    padding-bottom: ${theme.spacing[8]};
-    width: 100%;
-
-    ${media.greaterThan('md')`
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    `}
-  `}
-`;
 
 export default DemoCode;
