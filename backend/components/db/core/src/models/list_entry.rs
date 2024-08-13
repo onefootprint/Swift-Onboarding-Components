@@ -1,3 +1,4 @@
+use super::audit_event::AuditEvent;
 use super::audit_event::NewAuditEvent;
 use super::data_lifetime::DataLifetime;
 use super::list::List;
@@ -15,7 +16,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::InsightEventId;
@@ -250,18 +250,19 @@ impl ListEntry {
             ))
             .get_result(conn.conn())?;
 
-        NewAuditEvent {
-            id: AuditEventId::generate(),
-            tenant_id: tenant_id.clone(),
-            principal_actor: actor.clone(),
-            insight_event_id: insight_event_id.clone(),
-            detail: AuditEventDetail::DeleteListEntry {
-                is_live,
-                list_id: res.list_id.clone(),
-                list_entry_id: res.id.clone(),
+        AuditEvent::create(
+            conn,
+            NewAuditEvent {
+                tenant_id: tenant_id.clone(),
+                principal_actor: actor.clone(),
+                insight_event_id: insight_event_id.clone(),
+                detail: AuditEventDetail::DeleteListEntry {
+                    is_live,
+                    list_id: res.list_id.clone(),
+                    list_entry_id: res.id.clone(),
+                },
             },
-        }
-        .create(conn)?;
+        )?;
 
         Ok(res)
     }

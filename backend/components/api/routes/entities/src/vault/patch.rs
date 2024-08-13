@@ -17,7 +17,7 @@ use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::DataLifetimeSources;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -27,11 +27,8 @@ use newtypes::put_data_request::PatchDataRequest;
 use newtypes::put_data_request::RawBusinessDataRequest;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::put_data_request::RawUserDataRequest;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DbActor;
-use newtypes::DecryptionContext;
 use newtypes::FpId;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
@@ -190,25 +187,9 @@ async fn patch_inner(
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let principal: DbActor = actor.into();
 
-            // Create access events to show data was added/deleted
+            // Create audit events to show data was added/deleted
             if !updated_dis.is_empty() {
-                let aeid = AuditEventId::generate();
-                NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: sv.id.clone(),
-                    tenant_id: sv.tenant_id.clone(),
-                    is_live: sv.is_live,
-                    reason: None,
-                    principal: principal.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Update,
-                    targets: updated_dis.clone(),
-                    purpose: DecryptionContext::Api,
-                }
-                .create(conn)?;
-
-                NewAuditEvent {
-                    id: aeid,
+                let event = NewAuditEvent {
                     tenant_id: sv.tenant_id.clone(),
                     principal_actor: principal.clone(),
                     insight_event_id: insight_event_id.clone(),
@@ -217,27 +198,11 @@ async fn patch_inner(
                         scoped_vault_id: sv.id.clone(),
                         updated_fields: updated_dis,
                     },
-                }
-                .create(conn)?;
+                };
+                AuditEvent::create(conn, event)?;
             }
             if !deleted_dis.is_empty() {
-                let aeid = AuditEventId::generate();
-                NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: sv.id.clone(),
-                    tenant_id: sv.tenant_id.clone(),
-                    is_live: sv.is_live,
-                    reason: None,
-                    principal: principal.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Delete,
-                    targets: deleted_dis.clone(),
-                    purpose: DecryptionContext::Api,
-                }
-                .create(conn)?;
-
-                NewAuditEvent {
-                    id: aeid,
+                let event = NewAuditEvent {
                     tenant_id: sv.tenant_id,
                     principal_actor: principal,
                     insight_event_id,
@@ -246,8 +211,8 @@ async fn patch_inner(
                         scoped_vault_id: sv.id,
                         deleted_fields: deleted_dis,
                     },
-                }
-                .create(conn)?;
+                };
+                AuditEvent::create(conn, event)?;
             }
 
             Ok(())

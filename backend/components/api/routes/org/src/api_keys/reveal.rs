@@ -25,7 +25,7 @@ struct RevealRequest {
 )]
 #[post("/org/api_keys/{id}/reveal")]
 /// Note, we make this a post because it does a decrypt operation. In the future, we may
-/// make an access event for it
+/// make an audit event for it
 async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,

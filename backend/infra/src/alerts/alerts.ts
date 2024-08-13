@@ -1,6 +1,6 @@
-import { Threshold } from './trigger';
-import { Query } from './query';
-import { GlobalState } from '../main';
+import {Threshold} from './trigger';
+import {Query} from './query';
+import {GlobalState} from '../main';
 
 // The minimal set of information needed to define an alert
 export interface Alert {
@@ -28,7 +28,6 @@ const LATENT_HTTP_ROUTES: string[] = [
   '/hosted/onboarding/tel',
   '/hosted/onboarding/process',
   '/users/{fp_id}/kyc',
-  '/org/access_events',
 ];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25

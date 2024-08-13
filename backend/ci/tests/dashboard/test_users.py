@@ -221,7 +221,7 @@ def test_audit_events_list(sandbox_user):
             for event in audit_events
         )
 
-    # Test filtering on kinds. We provide two different kinds, and we should get all access events
+    # Test filtering on kinds. We provide two different kinds, and we should get all audit events
     # that contain at least one of these fields
     params = dict(
         search=sandbox_user.fp_id,

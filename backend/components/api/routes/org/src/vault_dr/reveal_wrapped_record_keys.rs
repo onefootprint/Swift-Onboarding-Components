@@ -10,8 +10,6 @@ use api_core::State;
 use api_wire_types::VaultDrRevealWrappedRecordKeysRequest;
 use api_wire_types::VaultDrRevealWrappedRecordKeysResponse;
 use db::errors::FpOptionalExtension;
-use db::models::access_event::AccessEvent;
-use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -19,9 +17,7 @@ use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use itertools::Itertools;
 use newtypes::preview_api;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DbActor;
 use newtypes::DecryptionContext;
 use paperclip::actix;
@@ -86,36 +82,17 @@ pub async fn post(
             let insight_event_id = insight.id.clone();
             let db_actor: DbActor = actor.into();
 
-            let mut access_events = vec![];
             let mut audit_events = vec![];
             for (sv_id, dis) in dis_by_sv {
                 // Create audit events to show data could have been decrypted offline.
-                let aeid = AuditEventId::generate();
-                let reason = "Disaster recovery test".to_owned();
-
-                let access_event = NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: sv_id.clone(),
-                    tenant_id: tenant_id.clone(),
-                    is_live,
-                    reason: Some(reason.clone()),
-                    principal: db_actor.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Decrypt,
-                    targets: dis.clone(),
-                    purpose: DecryptionContext::Api,
-                };
-                access_events.push(access_event);
-
                 let audit_event = NewAuditEvent {
-                    id: aeid,
                     tenant_id: tenant_id.clone(),
                     principal_actor: db_actor.clone(),
                     insight_event_id: insight_event_id.clone(),
                     detail: AuditEventDetail::DecryptUserData {
                         is_live,
                         scoped_vault_id: sv_id,
-                        reason,
+                        reason: "Disaster recovery test".to_owned(),
                         context: DecryptionContext::Api,
                         decrypted_fields: dis.clone(),
                     },
@@ -123,7 +100,6 @@ pub async fn post(
                 audit_events.push(audit_event);
             }
 
-            AccessEvent::bulk_create(conn, access_events)?;
             AuditEvent::bulk_create(conn, audit_events)?;
 
             Ok(blobs)

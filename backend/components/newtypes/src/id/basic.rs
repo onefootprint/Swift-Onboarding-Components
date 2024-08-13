@@ -75,7 +75,6 @@ define_newtype_id!(
     String,
     "Identifier for a webauthn credential"
 );
-define_newtype_id!(AccessEventId, String, "Identifier for an access event");
 define_newtype_id!(InsightEventId, String, "Identifier for an insight event");
 define_newtype_id!(
     VerificationRequestId,

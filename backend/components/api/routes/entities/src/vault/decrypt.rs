@@ -16,7 +16,7 @@ use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::bulk_decrypt;
 use api_core::utils::vault_wrapper::BulkDecryptReq;
-use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
+use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
@@ -304,13 +304,13 @@ pub(super) async fn post_inner(
     let insight = CreateInsightEvent::from(insights);
     let actor = auth.actor().into();
     let purpose = DecryptionContext::Api;
-    let access_event = DecryptAccessEventInfo::AccessEvent {
+    let audit_event = DecryptAuditEventInfo::AuditEvent {
         insight,
         reason,
         principal: actor,
-        purpose,
+        context: purpose,
     };
-    let mut decrypted_results = bulk_decrypt(state, reqs, access_event)
+    let mut decrypted_results = bulk_decrypt(state, reqs, audit_event)
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();

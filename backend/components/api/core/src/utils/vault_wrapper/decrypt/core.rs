@@ -24,7 +24,7 @@ use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
     /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making
-    /// an access event.
+    /// an audit event.
     ///
     /// Returns a hashmap of identifiers to their decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
@@ -106,7 +106,7 @@ impl<Type> VaultWrapper<Type> {
         Ok(results)
     }
 
-    /// Util to decrypt a DataIdentifier WITHOUT checking permissions or making an access event.
+    /// Util to decrypt a DataIdentifier WITHOUT checking permissions or making an audit event.
     pub async fn decrypt_unchecked_single(
         &self,
         enclave_client: &EnclaveClient,
@@ -232,7 +232,7 @@ where
             .collect::<FpResult<Vec<_>>>()?
     };
 
-    // We don't want to make access events for the DIs that are already in plaintext - track which
+    // We don't want to make audit events for the DIs that are already in plaintext - track which
     // DIs were decrypted per ID
     let mut decrypted_dis: HashMap<_, _> = e_data
         .iter()

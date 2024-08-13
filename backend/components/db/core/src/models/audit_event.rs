@@ -12,6 +12,7 @@ use crate::models::tenant::Tenant;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
+use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -122,18 +123,10 @@ pub struct AuditEventRowDetailFields {
 
 #[derive(Debug, Clone)]
 pub struct NewAuditEvent {
-    pub id: AuditEventId,
     pub tenant_id: TenantId,
     pub principal_actor: DbActor,
     pub insight_event_id: InsightEventId,
     pub detail: AuditEventDetail,
-}
-
-impl NewAuditEvent {
-    #[tracing::instrument("NewAuditEvent::create", skip_all)]
-    pub fn create(self, conn: &mut TxnPgConn) -> DbResult<()> {
-        AuditEvent::bulk_create(conn, vec![self])
-    }
 }
 
 #[derive(Debug, Default)]
@@ -189,13 +182,23 @@ impl HasActor for DieselJoinedAuditEvent {
 }
 
 impl AuditEvent {
+    #[tracing::instrument("AuditEvent::create", skip_all)]
+    pub fn create(conn: &mut TxnPgConn, new: NewAuditEvent) -> DbResult<AuditEventId> {
+        let ids = AuditEvent::bulk_create(conn, vec![new])?;
+
+        ids.into_iter()
+            .next()
+            .ok_or(DbError::AssertionError("expected one AuditEventId".to_owned()))
+    }
+
     #[tracing::instrument("AuditEvent::bulk_create", skip_all)]
-    pub fn bulk_create(conn: &mut TxnPgConn, events: Vec<NewAuditEvent>) -> DbResult<()> {
+    pub fn bulk_create(conn: &mut TxnPgConn, events: Vec<NewAuditEvent>) -> DbResult<Vec<AuditEventId>> {
+        let ids = events.iter().map(|_| AuditEventId::generate()).collect_vec();
         let rows = events
             .into_iter()
-            .map(|event| {
+            .zip_eq(ids.clone().into_iter())
+            .map(|(event, id)| {
                 let NewAuditEvent {
-                    id,
                     tenant_id,
                     principal_actor,
                     insight_event_id,
@@ -240,7 +243,7 @@ impl AuditEvent {
             .values(rows)
             .execute(conn.conn())?;
 
-        Ok(())
+        Ok(ids)
     }
 
     #[tracing::instrument("AuditEvent::filter", skip_all)]
@@ -381,7 +384,7 @@ impl AuditEvent {
             // Cookie-cutter filters for all billable events
             .filter(audit_event::is_live.eq(true))
             .filter(audit_event::tenant_id.eq(t_id))
-            // Filter for access events made during this billing period
+            // Filter for audit events made during this billing period
             .filter(audit_event::timestamp.ge(start_date))
             .filter(audit_event::timestamp.lt(end_date))
             .filter(
@@ -421,8 +424,7 @@ mod tests {
         let scoped_vault = tests::fixtures::scoped_vault::create(conn, &vault.id, &obc.id);
         let insight_event = tests::fixtures::insight_event::create(conn);
 
-        NewAuditEvent {
-            id: AuditEventId::generate(),
+        let event = NewAuditEvent {
             tenant_id: tenant.id.clone(),
             principal_actor: DbActor::Footprint,
             insight_event_id: insight_event.id,
@@ -431,9 +433,8 @@ mod tests {
                 scoped_vault_id: scoped_vault.id.clone(),
                 created_fields: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Dob)],
             },
-        }
-        .create(conn)
-        .unwrap();
+        };
+        AuditEvent::create(conn, event).unwrap();
 
         let events: Vec<AuditEvent> = audit_event::table
             .filter(audit_event::tenant_id.eq(&tenant.id))
@@ -499,56 +500,49 @@ mod tests {
         .unwrap();
         assert_eq!(events.len(), 0);
 
-        let id1 = AuditEventId::generate();
-        let id2 = AuditEventId::generate();
-        let id3 = AuditEventId::generate();
-        AuditEvent::bulk_create(
-            conn,
-            vec![
-                NewAuditEvent {
-                    id: id1.clone(),
-                    tenant_id: tenant.id.clone(),
-                    principal_actor: DbActor::Footprint,
-                    insight_event_id: insight_event.id.clone(),
-                    detail: AuditEventDetail::CreateUser {
-                        is_live: true,
-                        scoped_vault_id: scoped_vault_1.id.clone(),
-                        created_fields: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Dob)],
-                    },
-                },
-                NewAuditEvent {
-                    id: id2.clone(),
-                    tenant_id: tenant.id.clone(),
-                    principal_actor: DbActor::Footprint,
-                    insight_event_id: insight_event.id.clone(),
-                    detail: AuditEventDetail::DecryptUserData {
-                        is_live: true,
-                        scoped_vault_id: scoped_vault_2.id.clone(),
-                        reason: "investigating something".to_owned(),
-                        context: DecryptionContext::Api,
-                        decrypted_fields: vec![
-                            DataIdentifier::Id(newtypes::IdentityDataKind::Zip),
-                            DataIdentifier::Id(newtypes::IdentityDataKind::Email),
-                        ],
-                    },
-                },
-                NewAuditEvent {
-                    id: id3.clone(),
-                    tenant_id: tenant.id.clone(),
-                    principal_actor: DbActor::Footprint,
-                    insight_event_id: insight_event.id.clone(),
-                    detail: AuditEventDetail::DeleteUserData {
-                        is_live: false,
-                        scoped_vault_id: scoped_vault_sandbox.id.clone(),
-                        deleted_fields: vec![
-                            DataIdentifier::Id(newtypes::IdentityDataKind::Ssn4),
-                            DataIdentifier::Id(newtypes::IdentityDataKind::Ssn9),
-                        ],
-                    },
-                },
-            ],
-        )
-        .unwrap();
+        let event1 = NewAuditEvent {
+            tenant_id: tenant.id.clone(),
+            principal_actor: DbActor::Footprint,
+            insight_event_id: insight_event.id.clone(),
+            detail: AuditEventDetail::CreateUser {
+                is_live: true,
+                scoped_vault_id: scoped_vault_1.id.clone(),
+                created_fields: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Dob)],
+            },
+        };
+        let id1 = AuditEvent::create(conn, event1).unwrap();
+
+        let event2 = NewAuditEvent {
+            tenant_id: tenant.id.clone(),
+            principal_actor: DbActor::Footprint,
+            insight_event_id: insight_event.id.clone(),
+            detail: AuditEventDetail::DecryptUserData {
+                is_live: true,
+                scoped_vault_id: scoped_vault_2.id.clone(),
+                reason: "investigating something".to_owned(),
+                context: DecryptionContext::Api,
+                decrypted_fields: vec![
+                    DataIdentifier::Id(newtypes::IdentityDataKind::Zip),
+                    DataIdentifier::Id(newtypes::IdentityDataKind::Email),
+                ],
+            },
+        };
+        let id2 = AuditEvent::create(conn, event2).unwrap();
+
+        let event3 = NewAuditEvent {
+            tenant_id: tenant.id.clone(),
+            principal_actor: DbActor::Footprint,
+            insight_event_id: insight_event.id.clone(),
+            detail: AuditEventDetail::DeleteUserData {
+                is_live: false,
+                scoped_vault_id: scoped_vault_sandbox.id.clone(),
+                deleted_fields: vec![
+                    DataIdentifier::Id(newtypes::IdentityDataKind::Ssn4),
+                    DataIdentifier::Id(newtypes::IdentityDataKind::Ssn9),
+                ],
+            },
+        };
+        let id3 = AuditEvent::create(conn, event3).unwrap();
 
         let events = AuditEvent::filter(
             conn,

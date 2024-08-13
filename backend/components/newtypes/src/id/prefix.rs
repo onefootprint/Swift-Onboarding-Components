@@ -1,4 +1,3 @@
-use crate::AccessEventId;
 use crate::AuditEventId;
 use crate::BoLinkId;
 use crate::BusinessOwnerKind;
@@ -126,10 +125,6 @@ impl AuditEventId {
 
     pub fn generate() -> Self {
         Self(generate_random_id("ae", Self::LENGTH))
-    }
-
-    pub fn into_correlated_access_event_id(self) -> AccessEventId {
-        AccessEventId::from(self.0)
     }
 }
 

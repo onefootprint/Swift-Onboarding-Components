@@ -3,13 +3,11 @@ use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::decrypt::Pii;
 use crate::FpResult;
 use crate::State;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
 use newtypes::DecryptionContext;
@@ -58,24 +56,7 @@ impl<Type> TenantVw<Type> {
                 let targets: Vec<DataIdentifier> =
                     results.decrypted_dis.into_iter().map(|t| t.identifier).collect();
 
-                let aeid = AuditEventId::generate();
-                NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: scoped_vault_id.clone(),
-                    tenant_id: tenant_id.clone(),
-                    is_live,
-                    reason: Some(reason.clone()),
-                    principal: principal.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Decrypt,
-                    // TODO: also store the transforms!
-                    targets: targets.clone(),
-                    purpose: context,
-                }
-                .create(conn)?;
-
-                NewAuditEvent {
-                    id: aeid,
+                let event = NewAuditEvent {
                     tenant_id,
                     principal_actor: principal,
                     insight_event_id,
@@ -84,10 +65,11 @@ impl<Type> TenantVw<Type> {
                         scoped_vault_id,
                         reason,
                         context,
+                        // TODO: also store the transforms!
                         decrypted_fields: targets,
                     },
-                }
-                .create(conn)?;
+                };
+                AuditEvent::create(conn, event)?;
 
                 Ok(())
             })

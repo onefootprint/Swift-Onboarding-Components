@@ -16,19 +16,16 @@ use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
 use newtypes::put_data_request::PatchDataRequest;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
-use newtypes::DecryptionContext;
 use newtypes::PiiJsonValue;
 use newtypes::SandboxId;
 use newtypes::ValidateArgs;
@@ -119,24 +116,8 @@ pub async fn create_non_portable_vault(
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 
-                // Create an access event to show data was added
-                let aeid = AuditEventId::generate();
-                NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: su.id.clone(),
-                    tenant_id: su.tenant_id.clone(),
-                    is_live: su.is_live,
-                    reason: None,
-                    principal: db_actor.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Update,
-                    targets: targets.clone(),
-                    purpose: DecryptionContext::Api,
-                }
-                .create(conn)?;
-
-                NewAuditEvent {
-                    id: aeid,
+                // Create an audit event to show data was added
+                let event = NewAuditEvent {
                     tenant_id: su.tenant_id.clone(),
                     principal_actor: db_actor,
                     insight_event_id,
@@ -145,8 +126,8 @@ pub async fn create_non_portable_vault(
                         scoped_vault_id: su.id.clone(),
                         updated_fields: targets,
                     },
-                }
-                .create(conn)?;
+                };
+                AuditEvent::create(conn, event)?;
             }
 
             Ok((su, vault))

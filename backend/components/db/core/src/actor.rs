@@ -1,4 +1,3 @@
-use crate::models::access_event::AccessEvent;
 use crate::models::annotation::Annotation;
 use crate::models::audit_event::AuditEvent;
 use crate::models::ob_configuration::ObConfiguration;
@@ -48,12 +47,6 @@ impl HasActor for OnboardingDecision {
 impl HasActor for ObConfiguration {
     fn actor(&self) -> Option<DbActor> {
         self.author.clone()
-    }
-}
-
-impl HasActor for AccessEvent {
-    fn actor(&self) -> Option<DbActor> {
-        Some(self.principal.clone())
     }
 }
 

@@ -16,7 +16,7 @@ use api_core::utils::search_utils::parse_search;
 use api_core::utils::vault_wrapper::bulk_decrypt;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::BulkDecryptReq;
-use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
+use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
 use api_core::utils::vault_wrapper::DecryptedData;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -200,10 +200,10 @@ pub async fn decrypt_visible_attrs(
             (sv_id, req)
         })
         .collect();
-    // TODO it's strange we don't make an access event here, but we would if you requested to
+    // TODO it's strange we don't make an audit event here, but we would if you requested to
     // decrypt it
-    let access_event = DecryptAccessEventInfo::NoAccessEvent;
-    let decrypted_results = bulk_decrypt(state, reqs, access_event)
+    let audit_event = DecryptAuditEventInfo::NoAuditEvent;
+    let decrypted_results = bulk_decrypt(state, reqs, audit_event)
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();

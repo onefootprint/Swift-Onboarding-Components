@@ -13,7 +13,7 @@ use crate::utils::{
 use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -23,13 +23,10 @@ use enclave_proxy::DataTransformer;
 use enclave_proxy::DataTransforms;
 use futures::future::try_join_all;
 use itertools::Itertools;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DataRequest;
 use newtypes::DbActor;
-use newtypes::DecryptionContext;
 use newtypes::DocumentDiKind;
 use newtypes::FpId;
 use newtypes::PiiBytes;
@@ -166,23 +163,7 @@ pub async fn vault_pii(
                     .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind.clone())))
                     .collect();
 
-                let aeid = AuditEventId::generate();
-                NewAccessEventRow {
-                    id: aeid.clone().into_correlated_access_event_id(),
-                    scoped_vault_id: sv.id.clone(),
-                    tenant_id: sv.tenant_id.clone(),
-                    is_live: sv.is_live,
-                    reason: None,
-                    principal: principal.clone(),
-                    insight_event_id: insight_event_id.clone(),
-                    kind: AccessEventKind::Update,
-                    targets: targets.clone(),
-                    purpose: DecryptionContext::VaultProxy,
-                }
-                .create(conn)?;
-
-                NewAuditEvent {
-                    id: aeid,
+                let event = NewAuditEvent {
                     tenant_id: sv.tenant_id,
                     principal_actor: principal,
                     insight_event_id,
@@ -191,8 +172,8 @@ pub async fn vault_pii(
                         scoped_vault_id: sv.id.clone(),
                         updated_fields: targets,
                     },
-                }
-                .create(conn)?;
+                };
+                AuditEvent::create(conn, event)?;
 
                 // put our data
                 if !data.is_empty() {

@@ -1,3 +1,4 @@
+use super::audit_event::AuditEvent;
 use super::audit_event::NewAuditEvent;
 use crate::DbResult;
 use crate::TxnPgConn;
@@ -8,7 +9,6 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::InsightEventId;
@@ -67,18 +67,19 @@ impl ListEntryCreation {
             .values(new)
             .get_result::<Self>(conn.conn())?;
 
-        NewAuditEvent {
-            id: AuditEventId::generate(),
-            tenant_id: tenant_id.clone(),
-            principal_actor: actor.clone(),
-            insight_event_id: insight_event_id.clone(),
-            detail: AuditEventDetail::CreateListEntry {
-                is_live,
-                list_id: list_id.clone(),
-                list_entry_creation_id: res.id.clone(),
+        AuditEvent::create(
+            conn,
+            NewAuditEvent {
+                tenant_id: tenant_id.clone(),
+                principal_actor: actor.clone(),
+                insight_event_id: insight_event_id.clone(),
+                detail: AuditEventDetail::CreateListEntry {
+                    is_live,
+                    list_id: list_id.clone(),
+                    list_entry_creation_id: res.id.clone(),
+                },
             },
-        }
-        .create(conn)?;
+        )?;
 
         Ok(res)
     }

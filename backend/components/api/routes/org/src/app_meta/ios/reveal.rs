@@ -17,7 +17,7 @@ use paperclip::actix::web;
 )]
 #[post("/org/app_meta/ios/{meta_id}/reveal")]
 /// Note, we make this a post because it does a decrypt operation. In the future, we may
-/// make an access event for it
+/// make an audit event for it
 async fn post(
     state: web::Data<State>,
     meta_id: web::Path<TenantIosAppMetaId>,

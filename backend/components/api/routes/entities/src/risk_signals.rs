@@ -21,7 +21,7 @@ use api_core::FpResult;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -37,9 +37,7 @@ use db::DbResult;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeUpdatedWatchlistResult;
 use newtypes::vendor_api_struct::IncodeWatchlistCheck;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
 use newtypes::DecryptionContext;
@@ -168,7 +166,7 @@ pub async fn get_detail(
     Ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits)))
 }
 
-const DECRYPT_AML_HITS_ACCESS_EVENT_REASON: &str = "Reviewing AML information";
+const DECRYPT_AML_HITS_AUDIT_EVENT_REASON: &str = "Reviewing AML information";
 
 #[api_v2_operation(
     description = "Decrypts structured information about the AML hits for a AML risk signal.",
@@ -186,7 +184,7 @@ pub async fn decrypt_aml_hits(
     let is_live = read_auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    // TODO: assert decrypt permissions + write AccessEvent. maybe just shoehorn into existing structs
+    // TODO: assert decrypt permissions + write AuditEvent. maybe just shoehorn into existing structs
     // as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI
     // dependent
 
@@ -222,32 +220,16 @@ pub async fn decrypt_aml_hits(
     // doesn't allow the user to view the results
     let auth = auth.check_guard(CanDecrypt::new(dis_searched.clone()))?;
 
-    // write an AccessEvent
+    // write an AuditEvent
     let principal: DbActor = auth.actor().into();
     let insight = CreateInsightEvent::from(insights);
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let insight_event_id = insight.insert_with_conn(conn)?.id;
-            let reason = DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned();
+            let reason = DECRYPT_AML_HITS_AUDIT_EVENT_REASON.to_owned();
 
-            let aeid = AuditEventId::generate();
-            NewAccessEventRow {
-                id: aeid.clone().into_correlated_access_event_id(),
-                scoped_vault_id: sv_id.clone(),
-                tenant_id: tenant_id.clone(),
-                is_live,
-                reason: Some(reason.clone()),
-                principal: principal.clone(),
-                insight_event_id: insight_event_id.clone(),
-                kind: AccessEventKind::Decrypt,
-                targets: dis_searched.clone(),
-                purpose: DecryptionContext::Api,
-            }
-            .create(conn)?;
-
-            NewAuditEvent {
-                id: aeid,
+            let event = NewAuditEvent {
                 tenant_id,
                 principal_actor: principal,
                 insight_event_id,
@@ -258,8 +240,8 @@ pub async fn decrypt_aml_hits(
                     context: DecryptionContext::Api,
                     decrypted_fields: dis_searched,
                 },
-            }
-            .create(conn)?;
+            };
+            AuditEvent::create(conn, event)?;
 
             Ok(())
         })

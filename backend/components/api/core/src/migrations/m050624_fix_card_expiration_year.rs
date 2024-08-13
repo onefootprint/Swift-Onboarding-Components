@@ -1,18 +1,26 @@
-use crate::{
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{
-        bulk_decrypt, Any, BulkDecryptReq, DataLifetimeSources, DecryptAccessEventInfo,
-        EnclaveDecryptOperation, VaultWrapper,
-    },
-    State,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::bulk_decrypt;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::BulkDecryptReq;
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DecryptAuditEventInfo;
+use crate::utils::vault_wrapper::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
 use itertools::Itertools;
-use newtypes::{
-    put_data_request::RawDataRequest, CardDataKind, CleanAndValidate, DataIdentifier, DataLifetimeSeqno,
-    FpId, PiiJsonValue, ScopedVaultId, ValidateArgs,
-};
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::CardDataKind;
+use newtypes::CleanAndValidate;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::ScopedVaultId;
+use newtypes::ValidateArgs;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
 
 
@@ -122,7 +130,7 @@ pub async fn fix_card_expiration_year(
         );
     }
 
-    let decrypted = bulk_decrypt(state, requests, DecryptAccessEventInfo::NoAccessEvent).await?;
+    let decrypted = bulk_decrypt(state, requests, DecryptAuditEventInfo::NoAuditEvent).await?;
 
     let mut skipped_already_correct_dis: HashMap<FpId, Vec<DataIdentifier>> = HashMap::new();
 

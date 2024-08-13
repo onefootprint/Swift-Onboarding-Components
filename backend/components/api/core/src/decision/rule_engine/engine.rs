@@ -8,7 +8,7 @@ use crate::decision::onboarding::RulesOutcome;
 use crate::decision::RuleError;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
-use crate::utils::vault_wrapper::DecryptAccessEventInfo;
+use crate::utils::vault_wrapper::DecryptAuditEventInfo;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::FpResult;
@@ -192,7 +192,7 @@ impl VaultDataForRules {
             })
             .collect();
 
-        let ret = bulk_decrypt(state, reqs, DecryptAccessEventInfo::NoAccessEvent)
+        let ret = bulk_decrypt(state, reqs, DecryptAuditEventInfo::NoAuditEvent)
             .await?
             .into_iter()
             .map(|(k, decrypted_data)| {

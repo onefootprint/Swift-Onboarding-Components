@@ -3,7 +3,7 @@
 //!
 //! `DataIdentifier`: the top level identitfier of a piece of data. Given a UVW and a
 //! `DataIdentifier`, we should be able to locate the underlying piece of data that is requested.
-//! `DataIdentifier`s are also used in access events to designate which pieces of data were
+//! `DataIdentifier`s are also used in audit events to designate which pieces of data were
 //! decrypted.
 //!
 //! `CollectedData` and `CollectedDataOption` are also tangential - they are used in onboarding
@@ -89,7 +89,7 @@ lazy_static! {
 )]
 #[diesel(sql_type = Text)]
 /// Represents a piece of data stored inside the user vault.
-/// Mostly used in requests to decrypt a piece of data and in access events to show the log of
+/// Mostly used in requests to decrypt a piece of data and in audit events to show the log of
 /// decrypted items.
 pub enum DataIdentifier {
     Id(IdentityDataKind),

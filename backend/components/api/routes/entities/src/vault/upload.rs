@@ -18,18 +18,15 @@ use api_core::utils::vault_wrapper::NewDocument;
 use api_core::utils::{
     self,
 };
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
-use newtypes::DecryptionContext;
 use newtypes::DocumentDiKind;
 use newtypes::FpId;
 use newtypes::PiiBytes;
@@ -185,24 +182,8 @@ async fn post_upload_inner(
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
 
-            // Create an access event to show data was added
-            let aeid = AuditEventId::generate();
-            NewAccessEventRow {
-                id: aeid.clone().into_correlated_access_event_id(),
-                scoped_vault_id: scoped_vault.id.clone(),
-                tenant_id: scoped_vault.tenant_id.clone(),
-                is_live: scoped_vault.is_live,
-                reason: None,
-                principal: principal.clone(),
-                insight_event_id: insight_event_id.clone(),
-                kind: AccessEventKind::Update,
-                targets: vec![di.clone()],
-                purpose: DecryptionContext::Api,
-            }
-            .create(conn)?;
-
-            NewAuditEvent {
-                id: aeid,
+            // Create an audit event to show data was added
+            let event = NewAuditEvent {
                 tenant_id: scoped_vault.tenant_id,
                 principal_actor: principal,
                 insight_event_id,
@@ -211,8 +192,8 @@ async fn post_upload_inner(
                     scoped_vault_id: scoped_vault.id,
                     updated_fields: vec![di],
                 },
-            }
-            .create(conn)?;
+            };
+            AuditEvent::create(conn, event)?;
 
             Ok(doc)
         })

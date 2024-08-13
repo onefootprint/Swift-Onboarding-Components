@@ -10,20 +10,17 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::WriteableVw;
-use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
-use newtypes::AccessEventKind;
 use newtypes::AuditEventDetail;
-use newtypes::AuditEventId;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
-use newtypes::DecryptionContext;
 use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -149,23 +146,7 @@ async fn delete_inner(
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let actor: DbActor = actor.into();
 
-            let aeid = AuditEventId::generate();
-            NewAccessEventRow {
-                id: aeid.clone().into_correlated_access_event_id(),
-                scoped_vault_id: scoped_vault.id.clone(),
-                tenant_id: scoped_vault.tenant_id.clone(),
-                is_live: scoped_vault.is_live,
-                reason: None,
-                principal: actor.clone(),
-                insight_event_id: insight_event_id.clone(),
-                kind: AccessEventKind::Delete,
-                targets: deleted_dis.clone(),
-                purpose: DecryptionContext::Api,
-            }
-            .create(conn)?;
-
-            NewAuditEvent {
-                id: aeid,
+            let event = NewAuditEvent {
                 tenant_id: scoped_vault.tenant_id,
                 principal_actor: actor,
                 insight_event_id,
@@ -174,8 +155,8 @@ async fn delete_inner(
                     scoped_vault_id: scoped_vault.id,
                     deleted_fields: deleted_dis.clone(),
                 },
-            }
-            .create(conn)?;
+            };
+            AuditEvent::create(conn, event)?;
 
             Ok((requested_fields_to_delete, deleted_dis))
         })
