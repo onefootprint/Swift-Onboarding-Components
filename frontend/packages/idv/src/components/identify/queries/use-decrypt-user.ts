@@ -3,7 +3,7 @@ import type { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/type
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-const requestFn = async ({ fields, authToken }: DecryptUserRequest) => {
+const decryptUser = async ({ fields, authToken }: DecryptUserRequest) => {
   const response = await requestWithoutCaseConverter<DecryptUserResponse>({
     method: 'POST',
     url: '/hosted/user/vault/decrypt',
@@ -14,6 +14,6 @@ const requestFn = async ({ fields, authToken }: DecryptUserRequest) => {
   return response.data;
 };
 
-const useDecryptUser = () => useMutation({ mutationFn: requestFn });
+const useDecryptUser = () => useMutation({ mutationFn: decryptUser });
 
 export default useDecryptUser;

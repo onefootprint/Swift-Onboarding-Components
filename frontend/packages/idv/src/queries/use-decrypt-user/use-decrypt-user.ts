@@ -24,7 +24,10 @@ const decryptUser = async ({ fields, authToken }: DecryptUserRequest, formatUtcD
 
 const useDecryptUser = () => {
   const { formatUtcDate } = useIntl();
-  return useMutation((data: DecryptUserRequest) => decryptUser(data, formatUtcDate));
+
+  return useMutation({
+    mutationFn: (data: DecryptUserRequest) => decryptUser(data, formatUtcDate),
+  });
 };
 
 export default useDecryptUser;

@@ -9,7 +9,7 @@ import type { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
-const SENSITIVE_DIS: IdDI[] = [IdDI.email, IdDI.phoneNumber, IdDI.ssn4, IdDI.ssn9, IdDI.itin, IdDI.usTaxId];
+const SENSITIVE_DIS: IdDI[] = [IdDI.ssn4, IdDI.ssn9, IdDI.itin, IdDI.usTaxId];
 const BASIC_PROFILE_DIS: IdDI[] = [...Object.values(IdDI)].filter(di => !SENSITIVE_DIS.includes(di));
 
 type UseDecryptKycDataArgs = {
