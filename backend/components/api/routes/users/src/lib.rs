@@ -7,14 +7,12 @@ mod delete;
 mod detail;
 mod documents;
 mod kyc;
-mod label;
 mod liveness;
 mod match_signals;
 mod onboardings;
 mod post;
 mod risk_signals;
 mod search;
-mod tags;
 mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -33,12 +31,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(auth_events::get)
         .service(detail::detail)
         .service(kyc::post)
-        .service(label::get)
-        .service(label::post)
-        .service(onboardings::get)
-        .service(tags::get)
-        .service(tags::post)
-        .service(tags::delete);
+        .service(onboardings::get);
 
     delete::configure_delete_aliases(config);
 }

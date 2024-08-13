@@ -2,12 +2,15 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::auth::tenant::TenantApiKeyGated;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::Either;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
+use macros::route_alias;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -16,12 +19,17 @@ use paperclip::actix::{
     self,
 };
 
-#[api_v2_operation(description = "Update a user's label", tags(Users, Preview))]
-#[actix::post("/users/{fp_id}/label")]
+#[route_alias(actix::post(
+    "/users/{fp_id:fp_[_A-Za-z0-9]*}/label",
+    description = "Update a user's label",
+    tags(Users, Preview)
+))]
+#[api_v2_operation(description = "Update a user's label", tags(Entities, Private))]
+#[actix::post("/entities/{fp_id:fp_[_A-Za-z0-9]*}/label")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: TenantApiKeyGated<preview_api::Labels>,
+    auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Labels>>,
     request: Json<CreateLabelRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
@@ -42,12 +50,17 @@ pub async fn post(
     Ok(api_wire_types::Empty)
 }
 
-#[api_v2_operation(description = "View a user's label", tags(Users, Preview))]
-#[actix::get("/users/{fp_id}/label")]
+#[route_alias(actix::get(
+    "/users/{fp_id:fp_[_A-Za-z0-9]*}/label",
+    description = "View a user's label",
+    tags(Users, Preview)
+))]
+#[api_v2_operation(description = "View a user's label", tags(Entities, Private))]
+#[actix::get("/entities/{fp_id:fp_[_A-Za-z0-9]*}/label")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: TenantApiKeyGated<preview_api::Labels>,
+    auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Labels>>,
 ) -> ApiResponse<api_wire_types::UserLabel> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();

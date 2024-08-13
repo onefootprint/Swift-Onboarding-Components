@@ -2,22 +2,30 @@
 Test creating and deactivating labels, test creating and deactivating tags
 """
 
+import pytest
 from tests.utils import get, post, delete
 from tests.bifrost_client import BifrostClient
 
 
-def test_create_label(sandbox_tenant):
+@pytest.mark.parametrize("is_api", [True, False])
+def test_create_label(sandbox_tenant, is_api):
+    if is_api:
+        auth = [sandbox_tenant.sk.key]
+        api_base = "users"
+    else:
+        auth = sandbox_tenant.db_auths
+        api_base = "entities"
+
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
-
     data = {"kind": "active"}
-    post(f"/users/{user.fp_id}/label", data, sandbox_tenant.sk.key)
-    body = get(f"/users/{user.fp_id}/label", None, sandbox_tenant.sk.key)
+    post(f"/{api_base}/{user.fp_id}/label", data, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
     assert body["kind"] == "active"
 
     data = {"kind": "offboard_fraud"}
-    post(f"/users/{user.fp_id}/label", data, sandbox_tenant.sk.key)
-    body = get(f"/users/{user.fp_id}/label", None, sandbox_tenant.sk.key)
+    post(f"/{api_base}/{user.fp_id}/label", data, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
     assert body["kind"] == "offboard_fraud"
 
     # Make sure the label is included in the entity serialization
@@ -40,18 +48,26 @@ def test_create_label(sandbox_tenant):
     assert label_events == ["offboard_fraud", "active"]
 
 
-def test_create_tag(sandbox_tenant):
+@pytest.mark.parametrize("is_api", [True, False])
+def test_create_tag(sandbox_tenant, is_api):
+    if is_api:
+        auth = [sandbox_tenant.sk.key]
+        api_base = "users"
+    else:
+        auth = sandbox_tenant.db_auths
+        api_base = "entities"
+
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
     data = {"tag": "delinquent"}
-    tag = post(f"/users/{user.fp_id}/tags", data, sandbox_tenant.sk.key)
+    tag = post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
 
-    body = get(f"/users/{user.fp_id}/tags", None, sandbox_tenant.sk.key)
+    body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert body[0]["tag"] == "delinquent"
 
     data = {"tag": "flerp_derp_blerp"}
-    post(f"/users/{user.fp_id}/tags", data, sandbox_tenant.sk.key)
-    body = get(f"/users/{user.fp_id}/tags", None, sandbox_tenant.sk.key)
+    post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert body[0]["tag"] == "delinquent"
     assert body[1]["tag"] == "flerp_derp_blerp"
 
@@ -60,7 +76,7 @@ def test_create_tag(sandbox_tenant):
     assert set(i["tag"] for i in body["tags"]) == {"delinquent", "flerp_derp_blerp"}
 
     tag_id = tag["id"]
-    delete(f"/users/{user.fp_id}/tags/{tag_id}", None, sandbox_tenant.sk.key)
-    body = get(f"/users/{user.fp_id}/tags", None, sandbox_tenant.sk.key)
+    delete(f"/{api_base}/{user.fp_id}/tags/{tag_id}", None, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert len(body) == 1
     assert body[0]["tag"] == "flerp_derp_blerp"

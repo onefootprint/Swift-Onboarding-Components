@@ -962,6 +962,265 @@
                 ]
             }
         },
+        "/entities/{fp_id:fp_[_A-Za-z0-9]*}/label": {
+            "get": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "description": "View a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLabel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": [
+                            "preview:labels"
+                        ]
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Update a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateLabelRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": [
+                            "preview:labels"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/entities/{fp_id:fp_[_A-Za-z0-9]*}/tags": {
+            "get": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "description": "View a user's tags",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserTag"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": [
+                            "preview:tags"
+                        ]
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Tag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTagRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserTag"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": [
+                            "preview:tags"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/entities/{fp_id:fp_[_A-Za-z0-9]*}/tags/{tag_id:tag_[_A-Za-z0-9]*}": {
+            "delete": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Untag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tag_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "tag_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": [
+                            "preview:tags"
+                        ]
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/actions": {
             "post": {
                 "tags": [
@@ -3262,7 +3521,7 @@
                     "Organization",
                     "Private"
                 ],
-                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an audit event for it",
                 "description": "Decrypts a specific tenant secret API key.",
                 "parameters": [
                     {
@@ -3466,7 +3725,7 @@
                     "Organization",
                     "Private"
                 ],
-                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an audit event for it",
                 "description": "Decrypts a specific android app metadata entry",
                 "parameters": [
                     {
@@ -3669,7 +3928,7 @@
                     "Organization",
                     "Private"
                 ],
-                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an access event for it",
+                "summary": "Note, we make this a post because it does a decrypt operation. In the future, we may make an audit event for it",
                 "description": "Decrypts a specific ios app metadata entry",
                 "parameters": [
                     {
@@ -9518,6 +9777,22 @@
                     "token"
                 ]
             },
+            "CreateLabelRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
             "CreateListEntryRequest": {
                 "type": "object",
                 "properties": {
@@ -10504,6 +10779,19 @@
                     "decision",
                     "note",
                     "submission_id"
+                ]
+            },
+            "CreateTagRequest": {
+                "type": "object",
+                "properties": {
+                    "tag": {
+                        "example": "transaction_chargeback",
+                        "description": "Any string to tag the user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "tag"
                 ]
             },
             "CreateTenantAndroidAppMetaRequest": {
@@ -22856,6 +23144,9 @@
                                         "scopes"
                                     ]
                                 },
+                                "scrubbed_key": {
+                                    "type": "string"
+                                },
                                 "status": {
                                     "type": "string",
                                     "enum": [
@@ -22870,6 +23161,7 @@
                                 "is_live",
                                 "name",
                                 "role",
+                                "scrubbed_key",
                                 "status"
                             ]
                         }
@@ -26576,6 +26868,9 @@
                             "scopes"
                         ]
                     },
+                    "scrubbed_key": {
+                        "type": "string"
+                    },
                     "status": {
                         "type": "string",
                         "enum": [
@@ -26590,6 +26885,7 @@
                     "is_live",
                     "name",
                     "role",
+                    "scrubbed_key",
                     "status"
                 ]
             },
@@ -27738,6 +28034,45 @@
                     "scope",
                     "unit",
                     "value"
+                ]
+            },
+            "UserLabel": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                }
+            },
+            "UserTag": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "example": "tag_2ZwAl6LyHB6l7Ap2Ksdw8X",
+                        "type": "string"
+                    },
+                    "tag": {
+                        "example": "transaction_chargeback",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "tag"
                 ]
             },
             "UserTimeline": {
