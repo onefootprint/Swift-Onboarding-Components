@@ -9,10 +9,3 @@ pub struct UserTag {
     pub tag: String,
     pub created_at: DateTime<Utc>,
 }
-
-#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
-pub struct EntityTag {
-    #[openapi(example = "transaction_chargeback")]
-    pub tag: String,
-    pub created_at: DateTime<Utc>,
-}

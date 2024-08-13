@@ -100,7 +100,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             workflows,
             has_outstanding_workflow_request: wr.is_some(),
             label: label.map(|l| l.kind),
-            tags: tags.into_iter().map(api_wire_types::EntityTag::from_db).collect(),
+            tags: tags.into_iter().map(api_wire_types::UserTag::from_db).collect(),
 
             // TODO deprecate all of these
             attributes,

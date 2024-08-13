@@ -11947,6 +11947,10 @@
                                                 "type": "string",
                                                 "format": "date-time"
                                             },
+                                            "id": {
+                                                "example": "tag_2ZwAl6LyHB6l7Ap2Ksdw8X",
+                                                "type": "string"
+                                            },
                                             "tag": {
                                                 "example": "transaction_chargeback",
                                                 "type": "string"
@@ -11954,6 +11958,7 @@
                                         },
                                         "required": [
                                             "created_at",
+                                            "id",
                                             "tag"
                                         ]
                                     }
@@ -14462,6 +14467,10 @@
                                     "type": "string",
                                     "format": "date-time"
                                 },
+                                "id": {
+                                    "example": "tag_2ZwAl6LyHB6l7Ap2Ksdw8X",
+                                    "type": "string"
+                                },
                                 "tag": {
                                     "example": "transaction_chargeback",
                                     "type": "string"
@@ -14469,6 +14478,7 @@
                             },
                             "required": [
                                 "created_at",
+                                "id",
                                 "tag"
                             ]
                         }
