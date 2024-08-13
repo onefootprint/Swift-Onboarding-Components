@@ -53,6 +53,12 @@ export const omitEqualData = <T extends BusinessDIData>(vaultData: T | undefined
   if (!isObject(vaultData)) return payload;
 
   for (const key in payload) {
+    if (key === BusinessDI.doingBusinessAs && !isEqual(payload[key], vaultData[key])) {
+      output[BusinessDI.name] = payload[BusinessDI.name];
+      output[BusinessDI.doingBusinessAs] = payload[BusinessDI.doingBusinessAs];
+      continue;
+    }
+
     if (BusinessAddressFields.includes(key) && !isEqual(payload[key], vaultData[key])) {
       output[BusinessDI.addressLine1] = payload[BusinessDI.addressLine1];
       output[BusinessDI.addressLine2] = payload[BusinessDI.addressLine2];

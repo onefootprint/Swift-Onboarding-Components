@@ -58,7 +58,32 @@ describe('omitEqualData', () => {
       'business.name': 'Acme Bank Inc.',
       'business.dba': 'Acme Bank',
     };
-    expect(omitEqualData(vaultData, data)).toEqual({ 'business.dba': 'Acme Bank' });
+    expect(omitEqualData(vaultData, data)).toEqual(data);
+  });
+
+  it('should return business.name data when business.name is different', () => {
+    const vaultData = {
+      'business.name': 'Company name A',
+      'business.dba': 'Acme',
+    };
+    const data = {
+      'business.name': 'Company name B',
+      'business.dba': 'Acme',
+    };
+
+    expect(omitEqualData(vaultData, data)).toEqual({ 'business.name': 'Company name B' });
+  });
+
+  it('should return business.name and business.dba when business.dba is different', () => {
+    const vaultData = {
+      'business.name': 'Company name A',
+      'business.dba': 'Acme',
+    };
+    const data = {
+      'business.name': 'Company name A',
+      'business.dba': 'Acme B',
+    };
+    expect(omitEqualData(vaultData, data)).toEqual(data);
   });
 
   it('should return the entire array when some keys are different', () => {
