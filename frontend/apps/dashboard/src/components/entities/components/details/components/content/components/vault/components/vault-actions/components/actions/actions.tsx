@@ -11,6 +11,7 @@ import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
 import AddToListDialog from '../add-to-list-dialog';
+import EditTagsDialog from '../edit-tags-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
@@ -24,6 +25,7 @@ enum ActionDialog {
   historicalData,
   summarize,
   uploadDoc,
+  editTags,
 }
 
 const Actions = ({ entity }: WithEntityProps) => {
@@ -115,6 +117,7 @@ const Actions = ({ entity }: WithEntityProps) => {
       <ViewHistoricalDataDialog open={openDialog === ActionDialog.historicalData} onClose={handleCloseDialog} />
       <SummarizeAiDialog open={openDialog === ActionDialog.summarize} onClose={handleCloseDialog} />
       <UploadDocDialog open={openDialog === ActionDialog.uploadDoc} onClose={handleCloseDialog} />
+      <EditTagsDialog open={openDialog === ActionDialog.editTags} onClose={handleCloseDialog} />
     </>
   ) : null;
 };

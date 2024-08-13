@@ -1475,6 +1475,16 @@
             "phone": "User will receive an SMS detailing the next steps shortly",
             "email": "User will receive an email detailing the next steps shortly"
           }
+        },
+        "edit-tags": {
+          "label": "Edit tags",
+          "title": "Edit tags",
+          "description": "Tags are an unstructured way to organize, categorize, and add metadata about your users.",
+          "empty-active-tags": "There are no tags associated with this user yet",
+          "inactive-tags": "Tags already used by {{org}}",
+          "add-tag": "Add custom tag",
+          "save": "Save",
+          "cancel": "Cancel"
         }
       },
       "manual-note-entry-form": {
