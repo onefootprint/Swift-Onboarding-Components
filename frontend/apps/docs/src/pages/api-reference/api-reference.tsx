@@ -10,10 +10,11 @@ import MobilePageNav from './components/nav/mobile-page-nav';
 import Articles from './components/articles';
 import { PageNavSection } from './components/nav/nav.types';
 import useParseApiSections from './hooks/use-parse-api-sections';
-import { ApiReferenceArticle } from './index.page';
+import { ApiReferenceArticle, IntroductionArticle } from './index.page';
 
 export type ApiReferenceProps = {
-  articles: ApiReferenceArticle[];
+  introductionSections: IntroductionArticle[];
+  apiSections: ApiReferenceArticle[];
 };
 
 /**
@@ -27,12 +28,20 @@ export type ApiReferenceProps = {
  * We then join the markdown files with the open API specs for the listed APIs and render documentation for
  * each API within the section.
  */
-export const ApiReference = ({ articles }: ApiReferenceProps) => {
+export const ApiReference = ({ introductionSections, apiSections }: ApiReferenceProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
 
-  const parsedApiSections = useParseApiSections(articles);
+  // We won't have multiple sections of written content on this docs site, so we just hardcode.
+  const introductionNavSection = {
+    title: undefined,
+    subsections: introductionSections.map(s => ({
+      title: s.title,
+      id: s.id,
+    })),
+  };
 
-  const navSections: PageNavSection[] = parsedApiSections
+  const parsedApiSections = useParseApiSections(apiSections);
+  const apiNavSections: PageNavSection[] = parsedApiSections
     .filter(section => section.subsections.some(subsection => !subsection.api.isHidden))
     .map(section => ({
       title: section.title,
@@ -45,6 +54,7 @@ export const ApiReference = ({ articles }: ApiReferenceProps) => {
           api: subsection.api,
         })),
     }));
+  const navSections = [introductionNavSection, ...apiNavSections];
 
   return (
     <Box>
@@ -52,7 +62,7 @@ export const ApiReference = ({ articles }: ApiReferenceProps) => {
       <Layout>
         <MobilePageNav sections={navSections} />
         <DesktopPageNav sections={navSections} />
-        <Articles sections={parsedApiSections} />
+        <Articles introductionSections={introductionSections} sections={parsedApiSections} />
       </Layout>
       <Cmd sections={navSections} />
     </Box>

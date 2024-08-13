@@ -1,0 +1,39 @@
+---
+title: Authentication
+---
+
+## Authentication
+
+The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the [developer dashboard](https://dashboard.onefootprint.com/developers).
+
+You will have separate API keys for your sandbox environment and production environment. Each API key can only access its respective environment. You may securely use your sandbox API keys in your development environment. Each API key has a prefix indicating its environment:
+- `sk_test`: Prefix for **Sandbox** API keys. No costs are incurred when using these keys.
+- `sk_live`: Prefix for **Production** API keys.
+
+<inline-alert variant='warning'>Treat these key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret API keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
+
+When your service issues requests to Footprint's API, it must authenticate using the `X-Footprint-Secret-Key` header, passing an API key configured on the developer dashboard as the value.
+
+Alternatively, Footprint's API also supports [HTTP Basic Authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) for convenience. You may provide your API key as the basic auth username value with no password. This is especially convenient when issuing requests via cURL.
+
+
+
+<ApiReferenceColumnBreak />
+
+
+
+[TODO also use the tenant's sandbox API key here]: <>
+
+```bash
+curl https://api.onefootprint.com/users \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+# The colon prevents curl from asking for a password.
+```
+
+```bash
+curl https://api.onefootprint.com/users \
+  -H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"
+# Alternatively, you may provide the X-Footprint-Secret-Key header
+```
+
+[TODO uncomment this when we start to show sandbox API keys in the dashboard <inline-alert variant='info'>Your sandbox API keys are included in the example cURL requests here, so you can test examples right away. Only you can see this value.</inline-alert>]: <>

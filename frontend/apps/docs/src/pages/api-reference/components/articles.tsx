@@ -1,11 +1,11 @@
 import styled, { css } from 'styled-components';
 
 import { media } from '@onefootprint/ui';
-import Markdown from 'src/components/markdown';
 import ApiArticle from 'src/pages/api-reference/components/api-article';
-import ScrollLink from 'src/pages/api-reference/components/scroll-link';
 import SideBySideElement from 'src/pages/api-reference/components/side-by-side-element';
 import { HydratedArticle } from 'src/pages/api-reference/hooks';
+import { IntroductionArticle } from '../index.page';
+import ApiMarkdown from './api-markdown';
 import EndpointsOverview from './endpoints-overview';
 
 export const ARTICLES_CONTAINER_ID = 'articles-container';
@@ -24,21 +24,26 @@ export type ApiArticleSection = {
 };
 
 export type ArticlesProps = {
+  introductionSections: IntroductionArticle[];
   sections: ApiArticleSection[];
 };
 
-const Articles = ({ sections }: ArticlesProps) => {
-  const MARKDOWN_OVERRIDES = {
-    ScrollLink,
-  };
+const Articles = ({ introductionSections, sections }: ArticlesProps) => {
   return (
     <ArticleList id={ARTICLES_CONTAINER_ID}>
+      {introductionSections.map(section => (
+        <SideBySideElement
+          id={section.id}
+          left={<ApiMarkdown>{section.leftContent || ''}</ApiMarkdown>}
+          right={<ApiMarkdown>{section.rightContent || ''}</ApiMarkdown>}
+        />
+      ))}
       {sections.map(section => {
         return (
           <>
             <SideBySideElement
               id={section.id}
-              left={<Markdown overrides={MARKDOWN_OVERRIDES}>{section.content}</Markdown>}
+              left={<ApiMarkdown>{section.content}</ApiMarkdown>}
               right={<EndpointsOverview apiArticles={section.subsections} />}
             />
             {section.subsections.map(article => (

@@ -4,7 +4,7 @@ import kebabCase from 'lodash/kebabCase';
  * Extract the annotated section ID from the markdown string.
  * We add this annotated section ID in order to generate unique IDs for each section.
  */
-const getSectionId = (section: string) => {
+export const getSectionId = (section: string) => {
   const idRegex = /\[\[id=([A-Za-z0-9-]+)\]\]/g;
   if (section.match(idRegex)) {
     return section.split('[[id=')[1].split(']]')[0];
