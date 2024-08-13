@@ -446,6 +446,7 @@ impl Workflow {
         use db_schema::schema::onboarding_decision;
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq_any(&sv_ids))
+            .filter(workflow::deactivated_at.is_null())
             .filter(workflow::ob_configuration_id.eq(obc_id))
             .left_join(
                 onboarding_decision::table.on(onboarding_decision::workflow_id

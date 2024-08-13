@@ -158,6 +158,8 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
 
     send_missing_secondary_bo_links(state, biz_wf, &bvw, tenant, &dbo).await?;
 
+    // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF for
+    // the obc_id https://linear.app/footprint/issue/BE-513/consolidate-logic-for-bo-is-done-with-kyc
     let all_bo_kyc_complete = dbo.iter().filter(|bo| bo.linked_bo.is_some()).all(|bo| {
         bo.scoped_user
             .as_ref()
