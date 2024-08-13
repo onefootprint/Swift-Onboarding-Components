@@ -79,15 +79,15 @@ const Container = styled(Stack)`
     display: flex;
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
+    height: ${theme.spacing[8]};
   `}
 `;
 
 const Main = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2')}
-    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} ${theme.spacing[4]};
+    padding-left: calc(${theme.spacing[4]} - ${theme.spacing[1]});
     align-items: center;
-    gap: ${theme.spacing[3]};
   `}
 `;
 
@@ -106,16 +106,24 @@ const ChevronContainer = styled(Dropdown.Trigger)`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-left: ${theme.spacing[2]};
     width: fit-content;
     height: 100%;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} ${theme.spacing[2]};
     border-radius: 0 ${theme.borderRadius.full} ${theme.borderRadius.full} 0;
+    height: ${theme.spacing[8]};
+    width: ${theme.spacing[7]};
+    position: relative;
 
-    &:hover {
-      svg path {
-        fill: ${theme.color.tertiary};
-      }
+    &:before {
+      content: '';
+      width: 1px;
+      height: ${theme.spacing[4]};
+      background-color: ${theme.borderColor.tertiary};
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translate(-50%, -50%);
     }
   `}
 `;
