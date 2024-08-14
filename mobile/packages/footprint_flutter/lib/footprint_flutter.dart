@@ -12,3 +12,4 @@ export 'src/onboarding-components/widgets/footprint_field.dart';
 export 'src/onboarding-components/widgets/footprint_form.dart';
 export "src/onboarding-components/utils/footprint_utils.dart";
 export 'src/config/countries.dart';
+export 'src/config/corporation_types.dart';

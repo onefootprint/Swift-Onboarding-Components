@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/config/corporation_types.dart';
 import 'package:footprint_flutter/src/config/countries.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
@@ -397,6 +398,9 @@ Map<String, InputProps> getBusinessProps() {
     validator: (value) {
       if (value == null || value.isEmpty) {
         return 'Corporation type is required';
+      }
+      if (!CORPORATION_TYPES.contains(value)) {
+        return 'Invalid corporation type';
       }
       return null;
     }
