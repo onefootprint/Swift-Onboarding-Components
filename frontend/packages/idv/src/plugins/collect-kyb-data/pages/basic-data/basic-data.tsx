@@ -25,6 +25,12 @@ type BasicDataProps = {
 
 const { logError } = getLogger({ location: 'kyb-basic-data' });
 
+const getTinDefaultValue = (tin?: string): string => {
+  if (!tin || tin === 'decrypted') return '';
+  const numericTin = tin.replace(/[^0-9]/g, '');
+  return `${numericTin.slice(0, 2)}-${numericTin.slice(2)}`;
+};
+
 const getDefaultValues = (t: TFunction<'idv', undefined>, data: BusinessDIData) => {
   const corporationTypeValue = data?.[BusinessDI.corporationType];
   const tinValue = data?.[BusinessDI.tin];
@@ -32,7 +38,7 @@ const getDefaultValues = (t: TFunction<'idv', undefined>, data: BusinessDIData) 
   return {
     name: data?.[BusinessDI.name],
     doingBusinessAs: data?.[BusinessDI.doingBusinessAs],
-    tin: tinValue === 'decrypted' ? '' : tinValue,
+    tin: getTinDefaultValue(tinValue),
     corporationType: corporationTypeValue
       ? {
           value: corporationTypeValue,
