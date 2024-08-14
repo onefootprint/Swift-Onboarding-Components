@@ -18,6 +18,7 @@ use db::models::scoped_vault_tag::NewScopedVaultTag;
 use db::models::scoped_vault_tag::ScopedVaultTag;
 use macros::route_alias;
 use newtypes::preview_api;
+use newtypes::DbActor;
 use newtypes::TagId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -43,6 +44,7 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let tag_kind = request.into_inner().tag;
+    let actor: DbActor = auth.actor().into();
 
     let tag = state
         .db_pool
@@ -54,6 +56,7 @@ pub async fn post(
                 created_seqno: seqno,
                 scoped_vault_id: sv.id,
                 kind: tag_kind,
+                created_by_actor: actor,
             };
             let tag = ScopedVaultTag::get_or_create(conn, args)?;
 
@@ -107,6 +110,7 @@ pub async fn delete(
     auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Tags>>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    let actor: DbActor = auth.actor().into();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let (fp_id, tag_id) = path.into_inner();
@@ -115,7 +119,7 @@ pub async fn delete(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            Ok(ScopedVaultTag::deactivate(conn, &sv.id, &tag_id)?)
+            Ok(ScopedVaultTag::deactivate(conn, &sv.id, &tag_id, actor)?)
         })
         .await?;
 

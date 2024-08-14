@@ -1,0 +1,2 @@
+ALTER TABLE scoped_vault_tag ADD COLUMN created_by_actor JSONB, ADD COLUMN deactivated_by_actor JSONB;
+ALTER TABLE scoped_vault_label ADD COLUMN created_by_actor JSONB, ADD COLUMN deactivated_by_actor JSONB;

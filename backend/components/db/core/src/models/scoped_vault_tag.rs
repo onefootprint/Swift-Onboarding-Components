@@ -8,6 +8,7 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
 use newtypes::ScopedVaultId;
 use newtypes::TagId;
 
@@ -23,13 +24,16 @@ pub struct ScopedVaultTag {
     pub kind: String,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub created_by_actor: Option<DbActor>,
+    pub deactivated_by_actor: Option<DbActor>,
 }
 
-#[derive(Debug, Clone, AsChangeset, Default)]
+#[derive(Debug, Clone, AsChangeset)]
 #[diesel(table_name = scoped_vault_tag)]
 pub struct DeactivateTagUpdate {
     pub deactivated_at: DateTime<Utc>,
     pub deactivated_seqno: DataLifetimeSeqno,
+    pub deactivated_by_actor: DbActor,
 }
 
 impl ScopedVaultTag {
@@ -44,12 +48,18 @@ impl ScopedVaultTag {
     }
 
     #[tracing::instrument("ScopedVaultTag::deactivate", skip_all)]
-    pub fn deactivate(conn: &mut PgConn, sv_id: &ScopedVaultId, tag_id: &TagId) -> Result<(), DbError> {
+    pub fn deactivate(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        tag_id: &TagId,
+        deactivated_by_actor: DbActor,
+    ) -> Result<(), DbError> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
 
         let update = DeactivateTagUpdate {
             deactivated_at: Utc::now(),
             deactivated_seqno: seqno,
+            deactivated_by_actor,
         };
 
         diesel::update(scoped_vault_tag::table)
@@ -89,4 +99,5 @@ pub struct NewScopedVaultTag {
     pub created_seqno: DataLifetimeSeqno,
     pub scoped_vault_id: ScopedVaultId,
     pub kind: String,
+    pub created_by_actor: DbActor,
 }

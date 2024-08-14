@@ -1120,6 +1120,8 @@ diesel::table! {
         kind -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        created_by_actor -> Nullable<Jsonb>,
+        deactivated_by_actor -> Nullable<Jsonb>,
     }
 }
 
@@ -1136,6 +1138,8 @@ diesel::table! {
         kind -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        created_by_actor -> Nullable<Jsonb>,
+        deactivated_by_actor -> Nullable<Jsonb>,
     }
 }
 

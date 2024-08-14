@@ -11,6 +11,7 @@ use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
 use newtypes::LabelAddedInfo;
 use newtypes::LabelId;
 use newtypes::LabelKind;
@@ -29,6 +30,8 @@ pub struct ScopedVaultLabel {
     pub kind: LabelKind,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub created_by_actor: Option<DbActor>,
+    pub deactivated_by_actor: Option<DbActor>,
 }
 
 impl ScopedVaultLabel {
@@ -60,6 +63,7 @@ struct NewScopedVaultLabelRow {
     created_seqno: DataLifetimeSeqno,
     scoped_vault_id: ScopedVaultId,
     kind: LabelKind,
+    created_by_actor: DbActor,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -67,16 +71,23 @@ struct NewScopedVaultLabelRow {
 pub struct DeactivateLabelUpdate {
     pub deactivated_at: DateTime<Utc>,
     pub deactivated_seqno: DataLifetimeSeqno,
+    pub deactivated_by_actor: DbActor,
 }
 
 impl ScopedVaultLabel {
     #[tracing::instrument("ScopedVaultLabel::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, sv: ScopedVault, kind: LabelKind) -> DbResult<ScopedVaultLabel> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        sv: ScopedVault,
+        kind: LabelKind,
+        actor: DbActor,
+    ) -> DbResult<ScopedVaultLabel> {
         // first deactivate existing one
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let update: DeactivateLabelUpdate = DeactivateLabelUpdate {
             deactivated_at: Utc::now(),
             deactivated_seqno: seqno,
+            deactivated_by_actor: actor.clone(),
         };
 
         let _: Vec<ScopedVaultLabel> = diesel::update(scoped_vault_label::table)
@@ -90,6 +101,7 @@ impl ScopedVaultLabel {
             created_at: Utc::now(),
             created_seqno: seqno,
             scoped_vault_id: sv.id.clone(),
+            created_by_actor: actor,
             kind,
         };
         let ev = diesel::insert_into(db_schema::schema::scoped_vault_label::table)

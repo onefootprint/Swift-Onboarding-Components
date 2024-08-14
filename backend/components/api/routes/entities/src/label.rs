@@ -12,6 +12,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use macros::route_alias;
 use newtypes::preview_api;
+use newtypes::DbActor;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -37,12 +38,13 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let label_kind = request.kind;
+    let actor: DbActor = auth.actor().into();
 
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            ScopedVaultLabel::create(conn, sv, label_kind)?;
+            ScopedVaultLabel::create(conn, sv, label_kind, actor)?;
             Ok(())
         })
         .await?;
