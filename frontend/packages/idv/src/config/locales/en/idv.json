@@ -760,6 +760,7 @@
           "middle-name": "Middle name",
           "last-name": "Last name",
           "email": "Email",
+          "phone-number": "Phone number",
           "ownership-stake": "Ownership stake"
         },
         "hide": "Hide",

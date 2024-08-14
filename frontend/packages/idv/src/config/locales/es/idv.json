@@ -760,6 +760,7 @@
           "middle-name": "Segundo nombre",
           "last-name": "Apellido(s)",
           "email": "Correo electrónico",
+          "phone-number": "Phone number",
           "ownership-stake": "Porcentaje de propiedad"
         },
         "hide": "Ocultar",

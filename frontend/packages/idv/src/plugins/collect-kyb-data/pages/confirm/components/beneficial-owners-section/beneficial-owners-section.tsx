@@ -20,7 +20,7 @@ const BeneficialOwnersSection = () => {
   const [isEditing, setIsEditing] = useState(false);
   const isKycBoMissing = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const isKycBoPopulated = populatedAttributes?.includes(CollectedKybDataOption.kycedBeneficialOwners) || false;
-
+  const shouldHideEditButton = !!vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
   const beneficialOwners =
     (isKycBoMissing || isKycBoPopulated ? data[BusinessDI.kycedBeneficialOwners] : data[BusinessDI.beneficialOwners]) ??
     [];
@@ -29,68 +29,77 @@ const BeneficialOwnersSection = () => {
     return null;
   }
 
-  const shouldHideEditButton = !!vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
+  const getPreviewSections = () => {
+    const sections: SectionProps[] = [];
 
-  const sections: SectionProps[] = [];
-  beneficialOwners.forEach((beneficialOwner, index) => {
-    const items: { text: string; subtext: string }[] = [];
-    const firstName = beneficialOwner[BeneficialOwnerDataAttribute.firstName];
-    const middleName = beneficialOwner[BeneficialOwnerDataAttribute.middleName];
-    const lastName = beneficialOwner[BeneficialOwnerDataAttribute.lastName];
-    const email = beneficialOwner[BeneficialOwnerDataAttribute.email];
-    const ownershipStake = beneficialOwner[BeneficialOwnerDataAttribute.ownershipStake];
+    beneficialOwners.forEach((beneficialOwner, index) => {
+      const items: { text: string; subtext: string }[] = [];
+      const isPrimary = index === 0;
+      const firstName = beneficialOwner[BeneficialOwnerDataAttribute.firstName];
+      const middleName = beneficialOwner[BeneficialOwnerDataAttribute.middleName];
+      const lastName = beneficialOwner[BeneficialOwnerDataAttribute.lastName];
+      const email = beneficialOwner[BeneficialOwnerDataAttribute.email];
+      const phoneNumber = beneficialOwner[BeneficialOwnerDataAttribute.phoneNumber];
+      const ownershipStake = beneficialOwner[BeneficialOwnerDataAttribute.ownershipStake];
 
-    if (firstName) {
-      items.push({ text: t('beneficial-owners.first-name'), subtext: firstName });
-    }
+      if (firstName) {
+        items.push({ text: t('beneficial-owners.first-name'), subtext: firstName });
+      }
+      if (middleName) {
+        items.push({ text: t('beneficial-owners.middle-name'), subtext: middleName });
+      }
+      if (lastName) {
+        items.push({ text: t('beneficial-owners.last-name'), subtext: lastName });
+      }
+      if (!isPrimary) {
+        if (email) {
+          items.push({ text: t('beneficial-owners.email'), subtext: email });
+        }
+        if (phoneNumber) {
+          items.push({ text: t('beneficial-owners.phone-number'), subtext: phoneNumber });
+        }
+      }
+      items.push({ text: t('beneficial-owners.ownership-stake'), subtext: `${ownershipStake}%` });
 
-    if (middleName) {
-      items.push({ text: t('beneficial-owners.middle-name'), subtext: middleName });
-    }
-
-    if (lastName) {
-      items.push({ text: t('beneficial-owners.last-name'), subtext: lastName });
-    }
-
-    if (index > 0 && email) {
-      items.push({ text: t('beneficial-owners.email'), subtext: email });
-    }
-
-    items.push({ text: t('beneficial-owners.ownership-stake'), subtext: `${ownershipStake}%` });
-
-    sections.push({
-      title: index === 0 ? t('beneficial-owners.beneficial-owner-you') : t('beneficial-owners.beneficial-owner-other'),
-      content: (
-        <Box display="flex" flexDirection="column" gap={6}>
-          {items.map(({ text, subtext, textColor }: SectionItemProps) => (
-            <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
-          ))}
-        </Box>
-      ),
+      sections.push({
+        title: isPrimary ? t('beneficial-owners.beneficial-owner-you') : t('beneficial-owners.beneficial-owner-other'),
+        content: (
+          <Box display="flex" flexDirection="column" gap={6}>
+            {items.map(({ text, subtext, textColor }: SectionItemProps) => (
+              <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+            ))}
+          </Box>
+        ),
+      });
     });
-  });
+    return sections;
+  };
 
-  const startEditing = () => setIsEditing(true);
+  const startEditing = () => {
+    setIsEditing(true);
+  };
 
-  const stopEditing = () => setIsEditing(false);
+  const stopEditing = () => {
+    setIsEditing(false);
+  };
 
   return isEditing ? (
     <Section
-      title={t('beneficial-owners.title')}
-      IconComponent={IcoUserCircle24}
       content={
         <BeneficialOwners hideHeader ctaLabel={t('summary.save')} onComplete={stopEditing} onCancel={stopEditing} />
       }
+      IconComponent={IcoUserCircle24}
       testID="beneficial-owners"
+      title={t('beneficial-owners.title')}
     />
   ) : (
     <MultiSection
-      title={t('beneficial-owners.title')}
       editLabel={isKycBoPopulated || shouldHideEditButton ? '' : t('summary.edit')}
-      onEdit={startEditing}
       IconComponent={IcoUserCircle24}
-      sections={sections}
+      onEdit={startEditing}
+      sections={getPreviewSections()}
       testID="beneficial-owners"
+      title={t('beneficial-owners.title')}
     />
   );
 };
