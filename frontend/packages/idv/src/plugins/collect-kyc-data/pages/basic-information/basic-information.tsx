@@ -62,7 +62,7 @@ const BasicInformation = ({
   const requiresPhone = !isTest && attributes.includes(CollectedKycDataOption.phoneNumber);
   const requiresEmail = !isTest && attributes.includes(CollectedKycDataOption.email);
 
-  const isNameDisabled = data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled = data?.[IdDI.firstName]?.disabled && data?.[IdDI.lastName]?.disabled;
   const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const isPhoneDisabled = data?.[IdDI.phoneNumber]?.disabled;

@@ -12,7 +12,7 @@ const BeneficialOwnerKyc = () => {
     config,
     data,
     idvContext,
-    kybRequirement: { missingAttributes },
+    kybRequirement: { missingAttributes, hasLinkedBos },
     kycRequirement,
   } = state.context;
   if (!config || !kycRequirement) {
@@ -39,7 +39,7 @@ const BeneficialOwnerKyc = () => {
     <CollectKycData
       idvContext={idvContext}
       context={{
-        disabledFields: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
+        disabledFields: hasLinkedBos ? [] : [IdDI.firstName, IdDI.middleName, IdDI.lastName],
         bootstrapUserData: kycUserData,
         requirement: kycRequirement,
         config,

@@ -24,7 +24,7 @@ const getInitData = (
   });
 
   // Used for fields that are autofilled in the KYB machine
-  if (disabledFields) {
+  if (disabledFields?.length) {
     disabledFields.forEach(field => {
       const entry = data[field];
       if (entry) {
