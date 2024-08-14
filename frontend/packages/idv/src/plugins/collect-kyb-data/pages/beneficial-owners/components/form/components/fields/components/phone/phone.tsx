@@ -40,7 +40,7 @@ const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
         },
         validate: value => {
           const isInvalid = value && !checkIsPhoneValid(value, !config?.isLive);
-          return isInvalid ? t('errors.pattern') : undefined;
+          return isInvalid ? t('errors.invalid') : undefined;
         },
       }}
       render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (

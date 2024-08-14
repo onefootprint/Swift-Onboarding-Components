@@ -9,10 +9,7 @@
   "device-added": "Device added",
   "edit-details-in-account": "You can edit the details in your account.",
   "edit": "Edit",
-  "email-is-required": "Email is required",
-  "email-placeholder": "jane.doe@acme.com",
   "email-update-success": "You've updated your email address successfully.",
-  "email": "Email",
   "enhance-security-advice": "To enhance the security of your account, we advise verifying the following information.",
   "fail-to-decrypt": "Failed to decrypt",
   "finish": "Finish",
@@ -31,6 +28,14 @@
   "token-missing-error": "Token missing; unable to decrypt user's phone and email",
   "use-camera-or-qr-reader": "Use your camera app or QR code reader on your mobile device and we`ll continue from there.",
   "verified": "Verified",
+  "email": {
+    "label": "Email",
+    "placeholder": "jane.doe@acme.com",
+    "errors": {
+      "required": "Email is required",
+      "invalid": "Email is invalid"
+    }
+  },
   "notification": {
     "404-auth-method-description": "An email or phone number is needed to verify your account and continue onboarding.",
     "404-auth-method-title": "Contact information required",

@@ -1,3 +1,4 @@
+import { isEmail } from '@onefootprint/core';
 import { IdDI } from '@onefootprint/types';
 import { Grid, Stack, TextInput } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
@@ -95,6 +96,12 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
               required: {
                 value: true,
                 message: t('email.errors.required'),
+              },
+              validate: (value: string) => {
+                if (!isEmail(value)) {
+                  return t('email.errors.invalid');
+                }
+                return true;
               },
             })}
           />

@@ -52,18 +52,23 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
 
   return (
     <EmailPageStructure
-      Header={Header}
-      Footer={<LegalFooter />}
-      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
       defaultEmail={email?.value}
+      Footer={<LegalFooter />}
+      Header={Header}
       isLoading={mutIdentify.isLoading}
+      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
       texts={{
-        headerTitle: t('email-step.title'),
-        headerSubtitle: t('email-step.subtitle'),
+        header: {
+          title: t('email-step.title'),
+          subtitle: t('email-step.subtitle'),
+        },
+        email: {
+          invalid: t('email.errors.invalid'),
+          label: t('email.label'),
+          placeholder: t('email.placeholder'),
+          required: t('email.errors.required'),
+        },
         cta: t('continue'),
-        emailIsRequired: t('email-is-required'),
-        emailLabel: t('email'),
-        emailPlaceholder: t('email-placeholder'),
       }}
     >
       {children}

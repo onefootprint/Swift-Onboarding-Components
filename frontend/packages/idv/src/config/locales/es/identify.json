@@ -9,10 +9,7 @@
   "device-added": "Dispositivo agregado",
   "edit-details-in-account": "Puedes editar los detalles en tu cuenta.",
   "edit": "Editar",
-  "email-is-required": "Correo electrónico es un campo requerido",
-  "email-placeholder": "jane.doe@acme.com",
   "email-update-success": "Has actualizado tu dirección de correo electrónico exitosamente.",
-  "email": "Correo electrónico",
   "enhance-security-advice": "Para mejorar la seguridad de tu cuenta, te recomendamos verificar la siguiente información.",
   "fail-to-decrypt": "Error al desencriptar",
   "finish": "Finalizar",
@@ -31,6 +28,14 @@
   "token-missing-error": "Falta el token. No podemos desencriptar el teléfono y correo electrónico del usuario sin él.",
   "use-camera-or-qr-reader": "Utiliza la cámara o lector de códigos QR en tu móvil y continúa desde allí.",
   "verified": "Verificado",
+  "email": {
+    "label": "Email",
+    "placeholder": "jane.doe@acme.com",
+    "errors": {
+      "required": "Correo electrónico es obligatorio",
+      "invalid": "Correo electrónico es inválido"
+    }
+  },
   "notification": {
     "404-auth-method-description": "Se requiere una dirección de correo electrónico o un número de teléfono para continuar.",
     "404-auth-method-title": "Información de contacto requerida",

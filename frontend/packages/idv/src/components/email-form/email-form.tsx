@@ -1,16 +1,21 @@
+import { isEmail } from '@onefootprint/core';
 import { Box, Button, TextInput } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 
 export type EmailFormData = { email: string };
+
 export type EmailFormProps = {
   defaultEmail?: string;
   isLoading?: boolean;
   onSubmit: (formData: EmailFormData) => void;
   texts: {
     cta: string;
-    emailIsRequired: string;
-    emailLabel: string;
-    emailPlaceholder: string;
+    email: {
+      invalid: string;
+      label: string;
+      placeholder: string;
+      required: string;
+    };
   };
 };
 
@@ -29,18 +34,24 @@ const EmailForm = ({ defaultEmail, isLoading, onSubmit, texts }: EmailFormProps)
       <Box marginBottom={7} marginTop={5}>
         <TextInput
           autoFocus
-          data-nid-target="email"
           data-dd-privacy="mask"
+          data-nid-target="email"
           defaultValue={getValues('email')}
           hasError={hasError}
           hint={hint}
-          label={texts.emailLabel}
-          placeholder={texts.emailPlaceholder}
+          label={texts.email.label}
+          placeholder={texts.email.placeholder}
           type="email"
           {...register('email', {
             required: {
               value: true,
-              message: texts.emailIsRequired,
+              message: texts.email.required,
+            },
+            validate: (value: string) => {
+              if (!isEmail(value)) {
+                return texts.email.invalid;
+              }
+              return true;
             },
           })}
         />

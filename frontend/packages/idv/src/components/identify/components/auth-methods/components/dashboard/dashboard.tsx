@@ -107,7 +107,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
           ? {
               isLoading: mutDecryptUser.isLoading,
               isVerified: methodsMap.email.isVerified,
-              label: userDashboard.email?.label || t('email'),
+              label: userDashboard.email?.label || t('email.label'),
               status: userDashboard.email?.status || 'empty',
               onClick: () =>
                 send({
@@ -118,7 +118,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
           : {
               isLoading: false,
               isVerified: false,
-              label: t('email'),
+              label: t('email.label'),
               status: 'empty',
               onClick: () =>
                 send({

@@ -270,10 +270,9 @@
         "email": {
           "label": "Email",
           "placeholder": "jane.doe@acme.com",
-          "hint": "Add ”#string” (e.g., #test1) at the end of your email address.",
           "errors": {
             "required": "Email is required",
-            "pattern": "Add ”#string” (e.g., #test1) at the end of your email address."
+            "invalid": "Email is invalid"
           }
         }
       },
@@ -689,10 +688,9 @@
             "email": {
               "label": "Email",
               "placeholder": "jane.doe@acme.com",
-              "hint": "Add ”#string” (e.g., #test1) at the end of your email address.",
               "errors": {
                 "required": "Email is required",
-                "pattern": "Add ”#string” (e.g., #test1) at the end of your email address."
+                "invalid": "Email is invalid"
               }
             },
             "phone": {
@@ -700,7 +698,7 @@
               "placeholder": "(123) 456-7890",
               "errors": {
                 "required": "Phone number is required",
-                "pattern": "Phone number is invalid"
+                "invalid": "Phone number is invalid"
               }
             },
             "ownership-stake": {

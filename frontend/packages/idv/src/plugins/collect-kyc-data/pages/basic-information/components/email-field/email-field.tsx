@@ -1,3 +1,4 @@
+import { isEmail } from '@onefootprint/core';
 import { TextInput } from '@onefootprint/ui';
 import type { FieldErrors, FieldValues } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
@@ -35,6 +36,12 @@ const EmailField = ({ disabled }: EmailFieldProps) => {
         required: {
           value: true,
           message: t('email.errors.required'),
+        },
+        validate: (value: string) => {
+          if (!isEmail(value)) {
+            return t('email.errors.invalid');
+          }
+          return true;
         },
       })}
     />

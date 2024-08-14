@@ -1,3 +1,4 @@
+import { isEmail } from '@onefootprint/core';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
@@ -26,17 +27,23 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
 
   return shouldHide ? null : (
     <TextInput
-      type="email"
-      data-dd-privacy="mask"
       data-dd-action-name="Email input"
-      label={t('label')}
-      placeholder={t('placeholder')}
+      data-dd-privacy="mask"
       hasError={hasError}
       hint={hint}
+      label={t('label')}
+      placeholder={t('placeholder')}
+      type="email"
       {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.email}`, {
         required: {
           value: true,
           message: t('errors.required'),
+        },
+        validate: (value: string) => {
+          if (!isEmail(value)) {
+            return t('errors.invalid');
+          }
+          return true;
         },
       })}
     />

@@ -4,6 +4,7 @@ import EmailForm from '../../../email-form';
 import type { HeaderProps } from '../../types';
 
 type EmailFormProps = ComponentProps<typeof EmailForm>;
+
 type EmailPageStructureProps = {
   children?: JSX.Element | null;
   defaultEmail?: string;
@@ -12,8 +13,10 @@ type EmailPageStructureProps = {
   isLoading?: boolean;
   onSubmit: (email: string) => void;
   texts: {
-    headerTitle: string;
-    headerSubtitle?: string;
+    header: {
+      title: string;
+      subtitle?: string;
+    };
   } & EmailFormProps['texts'];
 };
 
@@ -26,14 +29,18 @@ const EmailPageStructure = ({
   onSubmit,
   texts,
 }: EmailPageStructureProps) => {
-  const { headerTitle, headerSubtitle, ...formTexts } = texts;
+  const {
+    header: { title, subtitle },
+    ...formTexts
+  } = texts;
+
   const handleFormSubmit = (formData: { email: string }) => {
     onSubmit(formData.email);
   };
 
   return (
     <>
-      <Header title={headerTitle} subtitle={headerSubtitle} />
+      <Header title={title} subtitle={subtitle} />
       <EmailForm defaultEmail={defaultEmail} isLoading={isLoading} onSubmit={handleFormSubmit} texts={formTexts} />
       {Footer}
       {children}

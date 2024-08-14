@@ -1,4 +1,3 @@
-import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,13 +17,16 @@ type UpdateEmailProps = {
   onSuccess: (newEmail: string) => void;
 };
 
-const getHeaderTitle = (t: TFunction<'identify'>, kind: UpdateAuthMethodActionKind): string =>
-  kind === UpdateAuthMethodActionKind.replace ? t('email-step.replace-title') : t('email-step.add-primary-title');
-
 const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, initialEmail, onSuccess }: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<ScreenState>(initialEmail ? ScreenState.verify : ScreenState.collect);
   const [email, setEmail] = useState<string>(initialEmail || '');
+
+  const getHeaderTitle = (kind: UpdateAuthMethodActionKind): string => {
+    return kind === UpdateAuthMethodActionKind.replace
+      ? t('email-step.replace-title')
+      : t('email-step.add-primary-title');
+  };
 
   return isCollectScreen(screen) || !email ? (
     <EmailPageStructure
@@ -36,12 +38,17 @@ const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, initialEm
       defaultEmail={email}
       isLoading={false}
       texts={{
-        headerTitle: getHeaderTitle(t, actionKind),
-        headerSubtitle: t('email-step.update-subtitle'),
+        header: {
+          title: getHeaderTitle(actionKind),
+          subtitle: t('email-step.update-subtitle'),
+        },
+        email: {
+          invalid: t('email.errors.invalid'),
+          label: t('email.label'),
+          placeholder: t('email.placeholder'),
+          required: t('email.errors.required'),
+        },
         cta: t('continue'),
-        emailIsRequired: t('email-is-required'),
-        emailLabel: t('email'),
-        emailPlaceholder: t('email-placeholder'),
       }}
     />
   ) : (
