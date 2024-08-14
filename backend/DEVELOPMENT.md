@@ -228,11 +228,17 @@ Here's how to get talking to the DB:
 4. Now, you have the credentials and the IP. Open a shell **warning -- tailscale ssh does not work with the Warp terminal, there is currently a bug. Use a different shell** on the jumpbox with and pop a psql shell:
 
 ```bash
-$ ssh ec2-user@jumpbox-dev
+$ ssh ec2-user@jumpbox-read-dev
 $ /connect_db.sh
 ```
 
-Note: replace `jumpbox-dev` with `jumpbox-<ENV_NAME_HERE>`
+Note: replace `jumpbox-read-dev` with `jumpbox-read-<ENV_NAME_HERE>`
+
+We have separate instances that have write access. If you'd like to open a shell with write access:
+```bash
+$ ssh ec2-user@jumpbox-write-dev
+$ /connect_db.sh --write
+```
 
 ## Using Diesel CLI on dev/dev-ephemeral DB
 
