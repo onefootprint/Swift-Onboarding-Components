@@ -1,5 +1,6 @@
 import type { LogsEvent } from '@datadog/browser-logs';
 import { datadogLogs } from '@datadog/browser-logs';
+import type { RumEvent, RumEventDomainContext } from '@datadog/browser-rum';
 import { datadogRum } from '@datadog/browser-rum';
 import { RumInitConfiguration } from '@datadog/browser-rum-core';
 
@@ -159,6 +160,10 @@ export const initDataDogRum = (appName: string): boolean => {
       { match: 'https://api.dev.onefootprint.com', propagatorTypes: ['tracecontext'] },
       ...localBackendTracing,
     ],
+    beforeSend: (ev: RumEvent, _ctx: RumEventDomainContext) => {
+      ev.view.url = ev.view.url.replace(/#.*/, '#fragment');
+      return true; // Discard a RUM event by returning false
+    },
   });
 
   return true;
