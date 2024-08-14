@@ -187,9 +187,13 @@ const validateBootstrapData = (
 
   // If the values are provided, they should pass the validators
   const validatedEntries = filledEntries.filter(([k, v]) => {
-    if (k === IdDI.state || k === BusinessDI.state) {
+    if (k === IdDI.state) {
       const country = filledData[IdDI.country];
       return !!FieldsValidator[IdDI.state](v.value as string, country?.value as string);
+    }
+    if (k === BusinessDI.state) {
+      const country = filledData[BusinessDI.country];
+      return !!FieldsValidator[BusinessDI.state](v.value as string, country?.value as string);
     }
     return !!FieldsValidator[k as IdDI](v.value as string);
   });
