@@ -7,9 +7,7 @@ import useFilters, { EntityStatusFilter } from '@/entities/hooks/use-filters';
 import useShouldShow from './hooks/use-should-show';
 
 const Info = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entities.filters',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entities.filters' });
   const { shouldShow, dismiss } = useShouldShow();
   const {
     values: { state, verification },

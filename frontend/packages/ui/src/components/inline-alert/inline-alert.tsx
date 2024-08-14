@@ -40,13 +40,14 @@ const InlineAlertContainer = styled(Box)<{
   ${({ theme, $variant }) => css`
     ${createFontStyles('body-3')};
     ${createVariantStyles($variant)};
+    align-items: center;
+    border-radius: ${theme.borderRadius.default};
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
+    gap: ${theme.spacing[2]};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    border-radius: ${theme.borderRadius.default};
+    width: 100%;
 
     a,
     button {
