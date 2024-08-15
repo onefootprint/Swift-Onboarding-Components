@@ -17,6 +17,7 @@ mod liveness_event;
 mod onboarding;
 mod onboarding_configuration;
 mod onboarding_decision;
+mod onboarding_status;
 mod organization;
 mod organization_frequent_note;
 mod organization_member;

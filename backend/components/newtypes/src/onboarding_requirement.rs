@@ -15,7 +15,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants, derive_more::IsVariant)]
 #[strum_discriminants(name(OnboardingRequirementKind))]
 #[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
 #[serde(tag = "kind")]
@@ -67,7 +67,7 @@ pub enum OnboardingRequirement {
     Process,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, derive_more::IsVariant)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum CollectDocumentConfig {
@@ -93,63 +93,77 @@ impl From<&CollectDocumentConfig> for DocumentRequestKind {
 }
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Clone, Hash)]
+/// Orderable struct that allows sorting onboarding requirements by priorty. The requirements will
+/// be sorted in ascending order, with the first requirement being the highest priority.
 pub struct OnboardingRequirementPriority {
+    pub priority: usize,
+    /// Tie breaker for document requirements
+    pub document_priority: Option<DocumentPriority>,
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq, Clone, Hash)]
+/// Orderable struct that allows sorting CollectDocumentConfigs by priorty. The requirements will be
+/// sorted in ascending order, with the first requirement being the highest priority.
+pub struct DocumentPriority {
     pub priority: usize,
     /// Tie breaker for custom document requirements
     pub tie_breaker: Option<String>,
 }
 
-impl OnboardingRequirement {
-    /// Returns an order-able struct that allows sorting requirements by a priority
-    pub fn priority(&self, is_doc_first: bool) -> OnboardingRequirementPriority {
-        let priority = if !is_doc_first {
-            match self {
-                OnboardingRequirement::RegisterAuthMethod { .. } => 0,
-                OnboardingRequirement::CollectBusinessData { .. } => 1,
-                OnboardingRequirement::CollectData { .. } => 2,
-                OnboardingRequirement::CollectInvestorProfile { .. } => 3,
-
-                OnboardingRequirement::RegisterPasskey => 4,
-                OnboardingRequirement::CollectDocument { config, .. } => match config {
-                    CollectDocumentConfig::Identity { .. } => 5,
-                    CollectDocumentConfig::ProofOfSsn { .. } => 6,
-                    CollectDocumentConfig::ProofOfAddress { .. } => 7,
-                    CollectDocumentConfig::Custom(..) => 8,
-                },
-                OnboardingRequirement::Authorize { .. } => 9,
-                OnboardingRequirement::Process => 10,
-            }
-        } else {
-            // For a doc-first config, we show passkey and doc collection first
-            match self {
-                OnboardingRequirement::RegisterAuthMethod { .. } => 0,
-                OnboardingRequirement::RegisterPasskey => 1,
-                OnboardingRequirement::CollectDocument { config, .. } => match config {
-                    CollectDocumentConfig::Identity { .. } => 2,
-                    CollectDocumentConfig::ProofOfSsn { .. } => 3,
-                    CollectDocumentConfig::ProofOfAddress { .. } => 4,
-                    CollectDocumentConfig::Custom(..) => 5,
-                },
-                OnboardingRequirement::CollectBusinessData { .. } => 6,
-                OnboardingRequirement::CollectData { .. } => 7,
-                OnboardingRequirement::CollectInvestorProfile { .. } => 8,
-
-                OnboardingRequirement::Authorize { .. } => 9,
-                OnboardingRequirement::Process => 10,
-            }
+impl CollectDocumentConfig {
+    fn document_priority(&self) -> DocumentPriority {
+        let priority = match self {
+            Self::Identity { .. } => 0,
+            Self::ProofOfSsn { .. } => 1,
+            Self::ProofOfAddress { .. } => 2,
+            Self::Custom(..) => 3,
         };
-        let tie_breaker = if let OnboardingRequirement::CollectDocument {
-            config: CollectDocumentConfig::Custom(CustomDocumentConfig { identifier, .. }),
-            ..
-        } = self
-        {
+        let tie_breaker = if let Self::Custom(CustomDocumentConfig { identifier, .. }) = self {
             Some(identifier.to_string())
         } else {
             None
         };
-        OnboardingRequirementPriority {
+        DocumentPriority {
             priority,
             tie_breaker,
+        }
+    }
+}
+
+impl OnboardingRequirement {
+    /// Returns an order-able struct that allows sorting requirements by a priority
+    pub fn priority(&self, is_doc_first: bool) -> OnboardingRequirementPriority {
+        let priority = match self {
+            Self::RegisterAuthMethod { .. } => 0,
+
+            // Special case: show ID doc requirements before collecting data if we're in a doc-first flow.
+            // While we're doing this, we'll also handle the passkey requirement since we'll already be
+            // transferred to mobile.
+            Self::RegisterPasskey if is_doc_first => 1,
+            Self::CollectDocument { config, .. } if is_doc_first && config.is_identity() => 2,
+
+            Self::CollectBusinessData { .. } => 3,
+            Self::CollectData { .. } => 4,
+            Self::CollectInvestorProfile { .. } => 5,
+            Self::RegisterPasskey => 6,
+            Self::CollectDocument { .. } => 7,
+            Self::Authorize { .. } => 8,
+            Self::Process => 9,
+        };
+
+        let document_priority = self.collect_document_config().map(|c| c.document_priority());
+
+        OnboardingRequirementPriority {
+            priority,
+            document_priority,
+        }
+    }
+
+    fn collect_document_config(&self) -> Option<&CollectDocumentConfig> {
+        if let OnboardingRequirement::CollectDocument { config, .. } = self {
+            Some(config)
+        } else {
+            None
         }
     }
 }
@@ -253,6 +267,28 @@ pub struct AuthorizeFields {
     pub document_types: Vec<DocumentKind>,
 }
 
+#[derive(derive_more::Into)]
+pub struct OrderedOnboardingRequirements(Vec<OnboardingRequirement>);
+
+impl OrderedOnboardingRequirements {
+    pub fn from_unordered(requirements: Vec<OnboardingRequirement>, is_doc_first: bool) -> Self {
+        let requirements = requirements
+            .into_iter()
+            .sorted_by_key(|r| r.priority(is_doc_first))
+            .collect_vec();
+        Self(requirements)
+    }
+}
+
+impl IntoIterator for OrderedOnboardingRequirements {
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type Item = OnboardingRequirement;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::AuthMethodKind;
@@ -265,6 +301,7 @@ mod test {
     use crate::DocumentUploadSettings;
     use crate::OnboardingRequirement;
     use crate::OnboardingRequirementKind;
+    use crate::OrderedOnboardingRequirements;
     use itertools::Itertools;
     use std::collections::HashMap;
     use std::str::FromStr;
@@ -331,7 +368,7 @@ mod test {
 
     #[test_case(true)]
     #[test_case(false)]
-    fn test_priority(is_doc_first: bool) {
+    fn test_unique_priority(is_doc_first: bool) {
         let expected_len = OnboardingRequirementKind::iter().len() + DocumentRequestKind::iter().len() - 1;
         // Make sure each requirement has its own unique priority
         assert_eq!(
@@ -342,5 +379,68 @@ mod test {
                 .count(),
             expected_len
         )
+    }
+
+    #[test]
+    fn test_priority() {
+        let mut requirements = OrderedOnboardingRequirements::from_unordered(test_requirements(), false)
+            .into_iter()
+            .rev()
+            .collect_vec();
+        let mut next_req = || requirements.pop().unwrap();
+
+        assert!(next_req().is_register_auth_method());
+        assert!(next_req().is_collect_business_data());
+        assert!(next_req().is_collect_data());
+        assert!(next_req().is_collect_investor_profile());
+        assert!(next_req().is_register_passkey());
+
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_identity()));
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_proof_of_ssn()));
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_proof_of_address()));
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_custom()));
+
+        assert!(next_req().is_authorize());
+        assert!(next_req().is_process());
+    }
+
+    #[test]
+    fn test_priority_doc_first() {
+        let mut requirements = OrderedOnboardingRequirements::from_unordered(test_requirements(), true)
+            .into_iter()
+            .rev()
+            .collect_vec();
+        let mut next_req = || requirements.pop().unwrap();
+
+        assert!(next_req().is_register_auth_method());
+        assert!(next_req().is_register_passkey());
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_identity()));
+
+        assert!(next_req().is_collect_business_data());
+        assert!(next_req().is_collect_data());
+        assert!(next_req().is_collect_investor_profile());
+
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_proof_of_ssn()));
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_proof_of_address()));
+        assert!(next_req()
+            .collect_document_config()
+            .is_some_and(|c| c.is_custom()));
+
+        assert!(next_req().is_authorize());
+        assert!(next_req().is_process());
     }
 }

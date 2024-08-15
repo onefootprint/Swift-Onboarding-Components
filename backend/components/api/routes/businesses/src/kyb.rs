@@ -146,6 +146,7 @@ pub async fn post(
 
             // Check requirements for this Business vault w.r.t the OBC
             let opts = RequirementOpts::default();
+            // TODO should this also check person requirements?
             let reqs = get_requirements_inner(conn, bvw, &obc, &biz_wf, decrypted_values, opts, &[])?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs

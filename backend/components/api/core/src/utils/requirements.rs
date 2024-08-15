@@ -157,7 +157,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
     let requirements = state
         .db_pool
-        .db_query(move |conn| -> FpResult<Vec<_>> {
+        .db_query(move |conn| -> FpResult<_> {
             let person_requirements = get_requirements_inner(
                 conn,
                 uvw,
@@ -187,9 +187,10 @@ pub async fn get_requirements_for_person_and_maybe_business(
                     vec![]
                 };
 
-            Ok(chain!(business_requirements, person_requirements).collect())
+            Ok(chain!(business_requirements, person_requirements).collect_vec())
         })
         .await?;
+
     Ok(requirements)
 }
 
@@ -358,7 +359,6 @@ pub fn get_requirements_inner(
             }
             true
         })
-        .sorted_by_key(|r| r.priority(obc.is_doc_first))
         .collect();
 
     tracing::info!(workflow_id=%wf.id, requirements=%format!("{:?}", requirements), scoped_user_id=%wf.scoped_vault_id, "get_requirements result");

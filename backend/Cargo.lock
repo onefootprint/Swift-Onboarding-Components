@@ -1648,6 +1648,7 @@ dependencies = [
  "alpaca",
  "chrono",
  "derive_more",
+ "itertools",
  "macros",
  "newtypes",
  "paperclip",
