@@ -36,7 +36,7 @@ use paperclip::actix::post;
 use paperclip::actix::web;
 
 #[api_v2_operation(
-    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
+    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions).",
     tags(Users, PublicApi)
 )]
 #[post("/users/{fp_id}/token")]

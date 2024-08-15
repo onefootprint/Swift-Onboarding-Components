@@ -5948,7 +5948,7 @@
                         "description": "A list of filter and transform functions to apply to each decrypted datum.\n Omit or leave empty to apply no transforms.\n Can find more information on allowed transform functions on our docs",
                         "type": "array",
                         "items": {
-                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions",
+                            "description": "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/articles/vault/proxy#filter-functions",
                             "type": "string",
                             "enum": [
                                 "to_lowercase",

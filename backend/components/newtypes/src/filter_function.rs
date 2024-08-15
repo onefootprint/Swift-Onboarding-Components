@@ -104,7 +104,7 @@ mod json_schema {
         }
 
         fn description() -> &'static str {
-            "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions"
+            "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/articles/vault/proxy#filter-functions"
         }
 
         fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {

@@ -24,7 +24,7 @@ pub struct CreateTokenRequest {
     ///   Footprint Verify SDK to trigger onboarding.
     /// - `update_auth_methods` creates a token that allows the user to update their contact info
     ///   using the Footprint Auth SDK.
-    /// You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).
+    /// You can find more information on the options [here](https://docs.onefootprint.com/articles/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).
     #[openapi(required)]
     // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,

@@ -35,7 +35,7 @@ api_headers_schema! {
 }
 
 #[api_v2_operation(
-    description = "Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy. Tokens use the same syntax as the vault proxy. More information on vault proxy tokens can be found [here](https://docs.onefootprint.com/vault/proxy#basics-token-body-template-format).",
+    description = "Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy. Tokens use the same syntax as the vault proxy. More information on vault proxy tokens can be found [here](https://docs.onefootprint.com/articles/vault/proxy#basics-token-body-template-format).",
     tags(VaultProxy, PublicApi)
 )]
 #[post("/vault_proxy/reflect")]
