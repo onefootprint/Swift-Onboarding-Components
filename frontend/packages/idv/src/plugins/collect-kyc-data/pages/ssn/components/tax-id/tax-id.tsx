@@ -51,21 +51,23 @@ const TaxId = ({
     }
   }, [isSkipped, setValue]);
 
-  const getErrorHint = (taxId: VaultTaxId) => {
-    const errorMessage = errors?.[taxId]?.message;
-    const fallbackMessage = taxId === 'ssn9' ? t('ssn-invalid') : t('ssn-us-tax-id-invalid');
+  const getErrorHint = () => {
+    if (!errors?.[vaultTaxId]) return undefined;
+
+    const errorMessage = errors?.[vaultTaxId]?.message;
+    const fallbackMessage = vaultTaxId === 'ssn9' ? t('ssn-invalid') : t('ssn-us-tax-id-invalid');
     return errorMessage && typeof errorMessage === 'string' ? errorMessage : fallbackMessage;
   };
 
-  const getLabel = (taxId: VisualTaxId) => {
-    if (isSsn9(taxId)) return t('ssn9-label');
-    if (isItin(taxId)) return t('itin-label');
+  const getLabel = () => {
+    if (isSsn9(visualTaxId)) return t('ssn9-label');
+    if (isItin(visualTaxId)) return t('itin-label');
     return t('us-tax-id-label');
   };
 
-  const getDisclaimerDescription = (taxId: VisualTaxId) => {
-    if (isSsn9(taxId)) return t('ssn9-disclaimer');
-    if (isItin(taxId)) return t('itin-disclaimer');
+  const getDisclaimerDescription = () => {
+    if (isSsn9(visualTaxId)) return t('ssn9-disclaimer');
+    if (isItin(visualTaxId)) return t('itin-disclaimer');
     return t('us-tax-id-disclaimer');
   };
 
@@ -77,8 +79,8 @@ const TaxId = ({
         data-nid-target={vaultTaxId}
         disabled={disabled}
         hasError={Boolean(errors[vaultTaxId])}
-        hint={getErrorHint(vaultTaxId)}
-        label={getLabel(visualTaxId)}
+        hint={getErrorHint()}
+        label={getLabel()}
         mask={inputMasks.ssn}
         placeholder={t('ssn9-placeholder')}
         type="tel"
@@ -95,7 +97,7 @@ const TaxId = ({
             {
               Icon: IcoShield24,
               title: t('your-data-is-safe'),
-              description: getDisclaimerDescription(vaultTaxId),
+              description: getDisclaimerDescription(),
             },
           ]}
           variant="default"
