@@ -63,111 +63,53 @@ describe('extractBootstrapBusinessDataValues', () => {
 });
 
 describe('getBusinessDataFromContext', () => {
-  it('should respect the values of bootstrapBusinessData', () => {
-    const ctx = {
-      kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
-      bootstrapBusinessData: {
-        'business.kyced_beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
-      },
-      bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'aa' },
-      },
-      data: {},
-    } as unknown as MachineContext;
-
-    expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.kyced_beneficial_owners': [{ first_name: 'aaa', last_name: 'aa', middle_name: 'a' }],
-    });
-  });
-
-  it('should get beneficial owners from bootstrapUserData when bootstrapBusinessData is empty', () => {
+  it('should build kyced_beneficial_owners from bootstrapUserData', () => {
     const ctx = {
       kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
       bootstrapBusinessData: {},
       bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'bb' },
+        'id.first_name': { value: 'id.first-name' },
+        'id.last_name': { value: 'id.last-name' },
       },
       data: {},
     } as unknown as MachineContext;
 
     expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.kyced_beneficial_owners': [{ first_name: 'bbb', last_name: 'bb' }],
+      'business.kyced_beneficial_owners': [{ first_name: 'id.first-name', last_name: 'id.last-name' }],
     });
   });
 
-  it('should respect the data already in the context', () => {
-    const ctx = {
-      kybRequirement: { missingAttributes: ['business_kyced_beneficial_owners'] },
-      bootstrapBusinessData: {
-        'business.kyced_beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
-      },
-      bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'bb' },
-      },
-      data: {
-        'business.kyced_beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
-      },
-    } as unknown as MachineContext;
-
-    expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.kyced_beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
-    });
-  });
-
-  it('should respect the values of bootstrapBusinessData', () => {
-    const ctx = {
-      kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
-      bootstrapBusinessData: {
-        'business.beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
-      },
-      bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'aa' },
-      },
-      data: {},
-    } as unknown as MachineContext;
-
-    expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.beneficial_owners': [{ first_name: 'aaa', last_name: 'aa', middle_name: 'a' }],
-    });
-  });
-
-  it('should get beneficial owners from bootstrapUserData when bootstrapBusinessData is empty', () => {
+  it('should build business.beneficial_owners from bootstrapUserData', () => {
     const ctx = {
       kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
       bootstrapBusinessData: {},
       bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'bb' },
+        'id.first_name': { value: 'id.first-name' },
+        'id.last_name': { value: 'id.last-name' },
       },
       data: {},
     } as unknown as MachineContext;
 
     expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.beneficial_owners': [{ first_name: 'bbb', last_name: 'bb' }],
+      'business.beneficial_owners': [{ first_name: 'id.first-name', last_name: 'id.last-name' }],
     });
   });
 
   it('should respect the data already in the context', () => {
     const ctx = {
       kybRequirement: { missingAttributes: ['business_beneficial_owners'] },
-      bootstrapBusinessData: {
-        'business.beneficial_owners': { value: [{ firstName: 'aaa', lastName: 'aa', middleName: 'a' }] },
-      },
+      bootstrapBusinessData: {},
       bootstrapUserData: {
-        'id.first_name': { value: 'bbb' },
-        'id.last_name': { value: 'bb' },
+        'id.first_name': { value: 'id.first-name' },
+        'id.last_name': { value: 'id.last-name' },
       },
       data: {
-        'business.beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
+        'business.beneficial_owners': [{ first_name: 'Joe', last_name: 'Doe' }],
       },
     } as unknown as MachineContext;
 
     expect(getBusinessDataFromContext(ctx)).toEqual({
-      'business.beneficial_owners': [{ first_name: 'ccc', last_name: 'cc' }],
+      'business.beneficial_owners': [{ first_name: 'Joe', last_name: 'Doe' }],
     });
   });
 
@@ -238,7 +180,6 @@ describe('isMissingRequiredData', () => {
         'business.address_line1': '300 Park Avenue',
         'business.city': 'New York',
         'business.country': 'US',
-        'business.formation_date': '12/12/1990',
         'business.name': 'Piper',
         'business.state': 'NY',
         'business.zip': '10022',

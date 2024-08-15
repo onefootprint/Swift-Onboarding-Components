@@ -258,6 +258,7 @@ export type {
   AmlHitMedia,
   Annotation,
   AnnotationSource,
+  BootstrapIgnoredBusinessDI,
   ApiKey,
   AuthEvent,
   AuthTokenIdentifier,

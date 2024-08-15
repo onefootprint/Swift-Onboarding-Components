@@ -7,7 +7,7 @@ import type {
 } from '@onefootprint/types';
 
 import { StateValue } from 'xstate';
-import type { BusinessData, UserData } from '../../../../types';
+import type { BootstrapBusinessData, UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
 export type BasicData = Required<Pick<BusinessDIData, BusinessDI.name>> &
@@ -39,7 +39,7 @@ export type MachineContext = {
   /** Readonly object with bootstrapped ``id.*`` data */
   bootstrapUserData: Readonly<UserData>;
   /** Readonly object with bootstrapped ``business.*`` data */
-  bootstrapBusinessData: Readonly<BusinessData>;
+  bootstrapBusinessData: Readonly<BootstrapBusinessData>;
   idvContext: CommonIdvContext;
   config?: PublicOnboardingConfig;
   /** Object with ``business.*`` form data */

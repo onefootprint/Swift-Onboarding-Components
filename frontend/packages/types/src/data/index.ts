@@ -26,6 +26,7 @@ export type {
   IdvBootstrapData,
   IdvOptions,
   KycBootstrapData,
+  BootstrapIgnoredBusinessDI,
 } from './bootstrap-data';
 export type { BusinessBoKycData } from './business-bo-kyc-data';
 export type {

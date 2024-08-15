@@ -2,7 +2,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 
 import type { DIMetadata } from '../../../../../../types';
-import validateBootstrapData, { isBeneficialOwnerValid } from './validate-bootstrap-data';
+import validateBootstrapData from './validate-bootstrap-data';
 
 const config: PublicOnboardingConfig = {
   isLive: true,
@@ -182,34 +182,5 @@ describe('validateBootstrapData', () => {
       [IdDI.state]: d('MA'),
       [IdDI.ssn9]: d('123-45-1234'),
     });
-  });
-});
-
-describe('isBeneficialOwnerValid', () => {
-  it('should return false if object is not provided', () => {
-    expect(isBeneficialOwnerValid(undefined)).toBe(false);
-  });
-
-  it('should return true for a valid object', () => {
-    const validObject = {
-      first_name: 'John',
-      middle_name: 'X',
-      last_name: 'Doe',
-      ownership_stake: 50,
-      email: 'john.doe@example.com',
-      phone_number: '+15555550100',
-    };
-    expect(isBeneficialOwnerValid(validObject)).toBe(true);
-  });
-
-  it('should return false for an object with invalid data', () => {
-    const invalidObject = {
-      first_name: 'Jane',
-      last_name: 'Doe',
-      ownership_stake: 150, // Stake exceeds 100
-      email: 'jane.doe@example.com',
-      phone_number: 'invalidPhoneNumber', // Invalid phone number
-    };
-    expect(isBeneficialOwnerValid(invalidObject)).toBe(false);
   });
 });

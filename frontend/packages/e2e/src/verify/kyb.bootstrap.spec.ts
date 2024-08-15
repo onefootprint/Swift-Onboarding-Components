@@ -68,8 +68,6 @@ const userData = encodeURIComponent(
     'business.state': businessState,
     'business.zip': businessZip,
     'business.country': businessUs,
-    'business.formation_date': '1999-12-25',
-    'business.formation_state': 'MA',
   }),
 );
 

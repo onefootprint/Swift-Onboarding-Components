@@ -1,13 +1,21 @@
 import { BusinessDI, IdDI } from '@onefootprint/types';
 import pickBy from 'lodash/pickBy';
 
-import type { BusinessData, UserData } from '../../../../../../../types';
+import type { BootstrapBusinessData, BusinessData, UserData } from '../../../../../../../types';
 import { isObject } from '../../../../../../../utils';
 import { getLogger } from '../../../../../../../utils/logger';
 
 const { logInfo } = getLogger();
 
-const isKeyBusinessDI = (_: unknown, key: BusinessDI) => Object.values(BusinessDI).includes(key);
+const BootstrapBusinessDIKeys: BusinessDI[] = Object.values(BusinessDI).filter(
+  di =>
+    di !== BusinessDI.beneficialOwners &&
+    di !== BusinessDI.formationDate &&
+    di !== BusinessDI.formationState &&
+    di !== BusinessDI.kycedBeneficialOwners,
+);
+
+const isKeyBusinessDI = (_: unknown, key: BusinessDI) => BootstrapBusinessDIKeys.includes(key);
 const isKeyIdDI = (_: unknown, key: IdDI) => Object.values(IdDI).includes(key);
 
 export const filterUserData = (inObj: UserData & BusinessData): UserData => {
@@ -24,7 +32,7 @@ export const filterUserData = (inObj: UserData & BusinessData): UserData => {
   return outObj;
 };
 
-export const filterBusinessData = (inObj: UserData & BusinessData): BusinessData => {
+export const filterBusinessData = (inObj: UserData & BusinessData): BootstrapBusinessData => {
   if (!isObject(inObj)) return {};
 
   const outObj = pickBy(inObj, isKeyBusinessDI); // Filter down to keys of the BusinessDI enum

@@ -1,45 +1,18 @@
-import { BeneficialOwner, BusinessDI, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
+import { BusinessDI, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import { isStringValid } from '../../../../utils';
 import { BeneficialOwnerIdFields } from '../constants';
 import type { MachineContext } from '../state-machine/types';
 import { buildBeneficialOwner, getBoDi } from '../utils';
 
-const isBoField = (x: unknown): x is 'business.beneficial_owners' => x === 'business.beneficial_owners';
-
-const isKycBoField = (x: unknown): x is 'business.kyced_beneficial_owners' => x === 'business.kyced_beneficial_owners';
-
-const isBoFieldKey = (x: unknown) => isBoField(x) || isKycBoField(x);
-
 export const BO_FIELDS: BusinessDI[] = [BusinessDI.beneficialOwners, BusinessDI.kycedBeneficialOwners];
 
-const beneficialOwnerMapper = (beneficialOwner: BeneficialOwner): BeneficialOwner => {
-  return Object.entries(beneficialOwner).reduce((output, [key, value]) => {
-    if (typeof value === 'string' || typeof value === 'number') {
-      if (key === 'firstName') output.first_name = value;
-      if (key === 'middleName') output.middle_name = value;
-      if (key === 'lastName') output.last_name = value;
-      if (key === 'ownershipStake') output.ownership_stake = value;
-      if (key === 'email') output.email = value;
-      if (key === 'phoneNumber') output.phone_number = value;
-    }
-    return output;
-  }, Object.create(null));
-};
-
-export const extractBootstrapBusinessDataValues = (obj: MachineContext['bootstrapBusinessData']): BusinessDIData => {
-  return Object.entries(obj).reduce<BusinessDIData>((output, [k, v]): BusinessDIData => {
-    if (v.value != null) {
-      if (isBoFieldKey(k) && Array.isArray(v.value) && v.value.length > 0) {
-        output[k] = v.value.map(beneficialOwnerMapper);
-        return output;
-      }
-      /** @ts-expect-error: k is a string */
-      output[k] = v.value;
-    }
-    return output;
-  }, Object.create(null));
-};
+export const extractBootstrapBusinessDataValues = (obj: MachineContext['bootstrapBusinessData']): BusinessDIData =>
+  Object.fromEntries(
+    Object.entries(obj)
+      .filter(([_k, v]) => v.value != null)
+      .map(([k, v]) => [k, v.value] as const),
+  );
 
 export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineContext): BusinessDIData => {
   /* Ignore when business owners kind are not missing */
@@ -47,7 +20,6 @@ export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineCon
   if (!boDi) return {};
 
   /* Ignore when business owners kind are populated */
-  if (ctx?.bootstrapBusinessData?.[boDi] != null) return {};
   if (ctx?.data?.[boDi] != null) return {};
 
   const userData: DecryptUserResponse = Object.fromEntries(
@@ -70,7 +42,7 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
     ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
     ...ctx.data,
   };
-  if (ctx.kybRequirement.hasLinkedBos) {
+  if (ctx?.kybRequirement?.hasLinkedBos) {
     // If BOs are linked via API already, we don't support working with them in IDV.
     BO_FIELDS.forEach(di => {
       if (initialData[di]) {

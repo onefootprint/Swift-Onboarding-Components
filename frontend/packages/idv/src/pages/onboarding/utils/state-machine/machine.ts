@@ -2,14 +2,14 @@ import type { L10n } from '@onefootprint/footprint-js';
 import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { BusinessData, UserData } from '../../../../types';
+import type { BootstrapBusinessData, UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 import type { MachineContext, MachineEvents } from './types';
 import validateBootstrapData from './utils/validate-bootstrap-data';
 
 export type OnboardingMachineArgs = {
   config: PublicOnboardingConfig;
-  bootstrapData: UserData & BusinessData;
+  bootstrapData: UserData & BootstrapBusinessData;
   idvContext: CommonIdvContext;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
