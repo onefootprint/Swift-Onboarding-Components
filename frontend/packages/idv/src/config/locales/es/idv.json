@@ -748,6 +748,9 @@
           "website": "Sitio web",
           "phone-number": "Número de teléfono"
         },
+        "identity": {
+          "title": "Identificación"
+        },
         "business-address": {
           "title": "Dirección registrada de la empresa"
         },

@@ -748,6 +748,9 @@
           "website": "Website",
           "phone-number": "Phone number"
         },
+        "identity": {
+          "title": "Identification"
+        },
         "business-address": {
           "title": "Registered business address"
         },

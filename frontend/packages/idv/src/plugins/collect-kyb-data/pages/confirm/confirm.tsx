@@ -7,6 +7,7 @@ import useSyncData from '../../hooks/use-sync-data';
 import BasicDataSection from './components/basic-data-section';
 import BeneficialOwnersSection from './components/beneficial-owners-section';
 import BusinessAddressSection from './components/business-address-section';
+import IdentitySection from './components/identity-section';
 
 const { logError } = getLogger({ location: 'kyb-confirm' });
 
@@ -40,6 +41,7 @@ const Confirm = () => {
       headerVariant={shouldShowCloseButton ? 'close' : 'back'}
     >
       <BasicDataSection />
+      <IdentitySection />
       <BusinessAddressSection />
       <BeneficialOwnersSection />
     </ConfirmCollectedData>

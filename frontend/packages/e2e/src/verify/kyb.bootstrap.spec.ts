@@ -124,9 +124,13 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
 
   await expect(frame.getByText(businessName).first()).toBeAttached();
   await expect(frame.getByText(businessDba).first()).toBeAttached();
-  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await expect(frame.getByText('•••••••••').first()).toBeAttached();
   await expect(frame.getByText(businessCorporationType).first()).toBeAttached();
   await expect(frame.getByText(businessWebsite).first()).toBeAttached();
+
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
+  await expect(frame.getByText(businessTin).first()).toBeAttached();
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Hide' }).click();
 
   await frame.getByTestId('business-address').getByRole('button', { name: 'Edit' }).click();
   await page.waitForLoadState();

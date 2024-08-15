@@ -94,3 +94,15 @@ export const formatPayload = (locale: SupportedLocale, data: BusinessDIData): Bu
     }),
   );
 };
+
+export const isDecrypted = (str: unknown): str is 'decrypted' => str === 'decrypted';
+
+export const formatTin = (tin?: string): string => {
+  if (!tin) return '';
+  const numericTin = tin.replace(/[^0-9]/g, '');
+  return `${numericTin.slice(0, 2)}-${numericTin.slice(2)}`;
+};
+
+export const getTinDefaultValue = (tin?: string): string => {
+  return !tin || isDecrypted(tin) ? '' : formatTin(tin);
+};

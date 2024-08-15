@@ -1,5 +1,5 @@
 import { useInputMask } from '@onefootprint/hooks';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, CorporationType } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
@@ -28,6 +28,7 @@ export type BasicDataFormProps = {
   config?: PublicOnboardingConfig;
   ctaLabel?: string;
   defaultValues?: Partial<FormData>;
+  hideInputTin?: boolean;
   isLoading: boolean;
   onCancel?: () => void;
   onSubmit: (data: BasicData) => void;
@@ -53,6 +54,7 @@ const BasicDataForm = ({
   config,
   ctaLabel,
   defaultValues,
+  hideInputTin,
   isLoading,
   onCancel,
   onSubmit,
@@ -89,11 +91,12 @@ const BasicDataForm = ({
     const basicData = {
       [BusinessDI.name]: formData.name,
       [BusinessDI.doingBusinessAs]: formData.doingBusinessAs ? formData.doingBusinessAs : undefined,
-      [BusinessDI.tin]: formData.tin,
+      ...(hideInputTin ? {} : { [BusinessDI.tin]: formData.tin }),
       [BusinessDI.corporationType]: formData.corporationType?.value,
       [BusinessDI.phoneNumber]: formData.phoneNumber,
       [BusinessDI.website]: formData.website,
     };
+
     const isPhoneValid = getFormPhoneState(formData.phoneNumber);
     if (!isPhoneValid) return;
 
@@ -124,7 +127,7 @@ const BasicDataForm = ({
           placeholder={t('doing-business-as.placeholder')}
           {...register('doingBusinessAs', { setValueAs: value => value.trim() || undefined })}
         />
-        <div>
+        {hideInputTin ? null : (
           <TextInput
             data-dd-privacy="mask"
             data-dd-action-name="Business Tin"
@@ -145,7 +148,7 @@ const BasicDataForm = ({
               },
             })}
           />
-        </div>
+        )}
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
             data-dd-privacy="mask"

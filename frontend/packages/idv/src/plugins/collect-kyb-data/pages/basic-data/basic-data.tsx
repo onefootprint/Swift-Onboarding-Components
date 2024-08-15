@@ -14,22 +14,18 @@ import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-na
 import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { BasicData as BasicDataFields } from '../../utils/state-machine/types';
+import { getTinDefaultValue } from '../../utils/utils';
 import BasicDataForm from './components/basic-data-form';
 
 type BasicDataProps = {
-  hideHeader?: boolean;
   ctaLabel?: string;
-  onComplete?: () => void;
+  hideHeader?: boolean;
+  hideInputTin?: boolean;
   onCancel?: () => void;
+  onComplete?: () => void;
 };
 
 const { logError } = getLogger({ location: 'kyb-basic-data' });
-
-const getTinDefaultValue = (tin?: string): string => {
-  if (!tin || tin === 'decrypted') return '';
-  const numericTin = tin.replace(/[^0-9]/g, '');
-  return `${numericTin.slice(0, 2)}-${numericTin.slice(2)}`;
-};
 
 const getDefaultValues = (t: TFunction<'idv', undefined>, data: BusinessDIData) => {
   const corporationTypeValue = data?.[BusinessDI.corporationType];
@@ -52,7 +48,7 @@ const getDefaultValues = (t: TFunction<'idv', undefined>, data: BusinessDIData) 
   };
 };
 
-const BasicData = ({ ctaLabel, hideHeader, onCancel, onComplete }: BasicDataProps) => {
+const BasicData = ({ ctaLabel, hideHeader, hideInputTin, onCancel, onComplete }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
@@ -102,6 +98,7 @@ const BasicData = ({ ctaLabel, hideHeader, onCancel, onComplete }: BasicDataProp
         config={config}
         ctaLabel={ctaLabel}
         defaultValues={defaultValues}
+        hideInputTin={hideInputTin}
         isLoading={mutation.isLoading}
         onCancel={onCancel}
         onSubmit={handleSubmit}
