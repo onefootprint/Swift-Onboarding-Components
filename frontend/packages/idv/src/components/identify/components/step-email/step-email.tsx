@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import noop from 'lodash/fp/noop';
+import noop from 'lodash/noop';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';

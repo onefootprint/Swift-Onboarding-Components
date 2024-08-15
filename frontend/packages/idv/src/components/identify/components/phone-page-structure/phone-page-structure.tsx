@@ -1,5 +1,5 @@
 import { Stack } from '@onefootprint/ui';
-import noop from 'lodash/fp/noop';
+import noop from 'lodash/noop';
 import type { ComponentProps } from 'react';
 
 import EmailPreview from '../../../email-preview';
