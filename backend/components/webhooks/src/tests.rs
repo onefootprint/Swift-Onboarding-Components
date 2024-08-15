@@ -33,6 +33,7 @@ fn generate_event_type_schema() {
             WebhookEventKind::WatchlistCheckCompleted => generate::<WatchlistCheckCompletedPayload>(evt),
             WebhookEventKind::UserInfoRequested => generate::<UserInfoRequestedPayload>(evt),
             WebhookEventKind::UserManualReview => generate::<UserManualReviewPayload>(evt),
+            WebhookEventKind::UserVaultUpdated => generate::<UserVaultUpdatedPayload>(evt),
         }
     }
 }
@@ -76,6 +77,7 @@ async fn sync_webhook_event_types() {
             }
             WebhookEventKind::UserInfoRequested => generate_json_value::<UserInfoRequestedPayload>(),
             WebhookEventKind::UserManualReview => generate_json_value::<UserManualReviewPayload>(),
+            WebhookEventKind::UserVaultUpdated => generate_json_value::<UserVaultUpdatedPayload>(),
         };
 
         let schemas = HashMap::from_iter([("1".to_string(), schema)]);

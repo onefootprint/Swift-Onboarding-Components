@@ -10,6 +10,7 @@ use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
 use crate::FpResult;
 use crate::State;
+use chrono::Utc;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
@@ -17,6 +18,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
+use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::TxnPgConn;
@@ -32,7 +34,10 @@ use newtypes::PiiString;
 use newtypes::S3Url;
 use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
+use newtypes::UserVaultUpdateSource;
+use newtypes::UserVaultUpdatedPayload;
 use newtypes::VaultId;
+use newtypes::WebhookEvent;
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
 
@@ -66,9 +71,29 @@ impl<Type> WriteableVw<Type> {
     ) -> FpResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let r_source = DataRequestSource::PatchVault;
+        let fields = request.data.keys().cloned().collect_vec();
         let request = self.validate_request(conn, request, sources, actor.clone(), r_source)?;
-        let result = self.internal_save_data(conn, request, actor)?;
+        let result = self.internal_save_data(conn, request, actor.clone())?;
         self.create_bos_if_needed(conn, kyced_bos)?;
+
+        // create a webhook task for the vault update
+        // currently we do this only for dashboard actors
+        if matches!(
+            actor,
+            Some(AuthActor::FirmEmployee(_)) | Some(AuthActor::TenantUser(_))
+        ) {
+            let webhook_event = WebhookEvent::UserVaultUpdated(UserVaultUpdatedPayload {
+                fp_id: self.sv.fp_id.clone(),
+                timestamp: Utc::now(),
+                is_live: self.sv.is_live,
+                source: UserVaultUpdateSource::Dashboard,
+                fields,
+            });
+            let task_data = self.sv.webhook_event(webhook_event);
+            Task::create(conn, Utc::now(), task_data)?;
+        }
+
+
         Ok(result)
     }
 

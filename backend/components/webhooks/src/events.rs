@@ -1,11 +1,14 @@
 use chrono::DateTime;
 use chrono::Utc;
+use newtypes::DataIdentifier;
 use newtypes::FpId;
 use newtypes::ObConfigurationKey;
 use newtypes::OnboardingCompletedPayload as NTOnboardingCompletedPayload;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload;
 use newtypes::UserSpecificWebhookPayload;
+use newtypes::UserVaultUpdateSource;
+use newtypes::UserVaultUpdatedPayload as NTUserVaultUpdatedPayload;
 use newtypes::WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload;
 use newtypes::WatchlistCheckError;
 use newtypes::WatchlistCheckStatusKind;
@@ -51,6 +54,10 @@ pub enum WebhookEvent {
         message = "A Footprint dashboard user has changed the user's status during manual review. When responding to this webhook, you can see more context on the user's up-to-date status using the GET /users/{fp_id} API."
     ))]
     UserManualReview(UserManualReviewPayload),
+
+    #[strum_discriminants(strum(serialize = "footprint.vault.updated"))]
+    #[strum_discriminants(strum(message = "A Footprint user or business vault was updated."))]
+    UserVaultUpdated(UserVaultUpdatedPayload),
 }
 
 impl schemars::JsonSchema for WebhookEventKind {
@@ -180,6 +187,30 @@ enum WatchlistCheckErrorShadow {
     RequiredDataNotPresent,
 }
 
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "UserVaultUpdatedPayload::example")]
+pub struct UserVaultUpdatedPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    pub is_live: bool,
+    #[schemars(with = "Option<UserVaultUpdateSourceShadow>")]
+    pub source: UserVaultUpdateSource,
+    #[schemars(with = "Vec<String>")]
+    pub fields: Vec<DataIdentifier>,
+}
+
+#[derive(JsonSchema)]
+#[serde(remote = "UserVaultUpdateSource")]
+#[serde(rename_all = "snake_case")]
+pub enum UserVaultUpdateSourceShadow {
+    /// The vault was updated by a person using the dashboard
+    #[allow(unused)]
+    Dashboard,
+}
+
 mod examples {
     use super::*;
     use newtypes::ObConfigurationKey;
@@ -245,6 +276,22 @@ mod examples {
             }
         }
     }
+
+    impl UserVaultUpdatedPayload {
+        pub fn example() -> Self {
+            UserVaultUpdatedPayload {
+                event_kind: WebhookEventKind::UserVaultUpdated,
+                fp_id: FpId::test_data("fp_id_xyz".into()),
+                timestamp: Utc::now(),
+                is_live: false,
+                source: UserVaultUpdateSource::Dashboard,
+                fields: vec![
+                    DataIdentifier::Id(newtypes::IdentityDataKind::Ssn9),
+                    DataIdentifier::Id(newtypes::IdentityDataKind::FirstName),
+                ],
+            }
+        }
+    }
 }
 
 impl WebhookEvent {
@@ -261,6 +308,7 @@ impl From<NTWebhookEvent> for WebhookEvent {
             NTWebhookEvent::WatchlistCheckCompleted(v) => WebhookEvent::WatchlistCheckCompleted(v.into()),
             NTWebhookEvent::UserInfoRequested(v) => WebhookEvent::UserInfoRequested(v.into()),
             NTWebhookEvent::UserManualReview(v) => WebhookEvent::UserManualReview(v.into()),
+            NTWebhookEvent::UserVaultUpdated(v) => WebhookEvent::UserVaultUpdated(v.into()),
         }
     }
 }
@@ -323,6 +371,19 @@ impl From<UserSpecificWebhookPayload> for UserManualReviewPayload {
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             is_live: value.is_live,
+        }
+    }
+}
+
+impl From<NTUserVaultUpdatedPayload> for UserVaultUpdatedPayload {
+    fn from(value: NTUserVaultUpdatedPayload) -> Self {
+        Self {
+            event_kind: WebhookEventKind::UserVaultUpdated,
+            fp_id: value.fp_id,
+            timestamp: value.timestamp,
+            is_live: value.is_live,
+            source: value.source,
+            fields: value.fields,
         }
     }
 }

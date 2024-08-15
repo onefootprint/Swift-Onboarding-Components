@@ -1,3 +1,4 @@
+use crate::DataIdentifier;
 use crate::FpId;
 use crate::ObConfigurationKey;
 use crate::OnboardingStatus;
@@ -156,6 +157,7 @@ pub enum WebhookEvent {
     // and require you to hit our API to fetch the most up-to-date info
     UserInfoRequested(UserSpecificWebhookPayload),
     UserManualReview(UserSpecificWebhookPayload),
+    UserVaultUpdated(UserVaultUpdatedPayload),
     // TODO WorkflowCompleted
     // TODO WatchlistCheck
 }
@@ -200,4 +202,21 @@ pub struct WatchlistCheckCompletedPayload {
     pub status: WatchlistCheckStatusKind,
     pub error: Option<WatchlistCheckError>,
     pub is_live: bool,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+
+pub struct UserVaultUpdatedPayload {
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    pub source: UserVaultUpdateSource,
+    pub fields: Vec<DataIdentifier>,
+    pub is_live: bool,
+}
+
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum UserVaultUpdateSource {
+    Dashboard,
 }
