@@ -23,7 +23,7 @@
   "dependencies": {
     "@onefootprint/types": "*",
     "axios-case-converter": "^0.9.0",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {
