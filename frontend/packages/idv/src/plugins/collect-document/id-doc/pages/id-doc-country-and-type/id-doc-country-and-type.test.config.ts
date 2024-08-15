@@ -76,7 +76,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
       ...initialContextDL.requirement.config,
       supportedCountryAndDocTypes: {
         BD: [SupportedIdDocTypes.passport],
-        US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
+        US: [],
       },
     },
   },

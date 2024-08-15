@@ -271,7 +271,7 @@ describe('<SandboxOutcome/>', () => {
       const inputWithSpeciaChar = ':O -> :) -> XD';
       await userEvent.type(testIdInput, ':O -> :) -> XD');
       const saveButton = screen.getByLabelText('Save');
-      expect(saveButton.getAttribute('data-disabled')).toBe('true');
+      expect(saveButton).toBeDisabled();
 
       const errorHint = screen.getByText('Test ID is invalid. Please remove spaces and special characters.');
       expect(errorHint).toBeInTheDocument();

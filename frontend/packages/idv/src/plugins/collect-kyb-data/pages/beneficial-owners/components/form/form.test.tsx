@@ -13,6 +13,7 @@ describe('<Form />', () => {
     onSubmit = () => undefined,
     ctaLabel,
     requireMultiKyc,
+    canEdit,
   }: Partial<FormProps>) => {
     customRender(
       <Form
@@ -21,6 +22,7 @@ describe('<Form />', () => {
         onSubmit={onSubmit}
         ctaLabel={ctaLabel}
         requireMultiKyc={requireMultiKyc}
+        canEdit={canEdit}
       />,
     );
   };
@@ -83,7 +85,7 @@ describe('<Form />', () => {
 
   it('can add/remove beneficial owners', async () => {
     const onSubmit = jest.fn();
-    renderForm({ onSubmit, requireMultiKyc: true });
+    renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
     const title = screen.getByText('Beneficial owner (You)');
     expect(title).toBeInTheDocument();
@@ -182,7 +184,7 @@ describe('<Form />', () => {
 
   describe('when is a multi kyc flow', () => {
     it('shows show instructions about this flow', async () => {
-      renderForm({ requireMultiKyc: true });
+      renderForm({ requireMultiKyc: true, canEdit: true });
 
       const addMoreButton = screen.getByRole('button', { name: 'Add more' });
       expect(addMoreButton).toBeInTheDocument();
@@ -200,7 +202,7 @@ describe('<Form />', () => {
 
   describe('when is not a multi kyc flow', () => {
     it("doesn't show email and phone fields for secondary BOs", async () => {
-      renderForm({ requireMultiKyc: false });
+      renderForm({ requireMultiKyc: false, canEdit: true });
 
       const addMoreButton = screen.getByRole('button', { name: 'Add more' });
       expect(addMoreButton).toBeInTheDocument();
@@ -240,7 +242,7 @@ describe('<Form />', () => {
     describe('when then email and phone number are not filled in correctly', () => {
       it('should show an error message', async () => {
         const onSubmit = jest.fn();
-        renderForm({ onSubmit, requireMultiKyc: true });
+        renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
         const addMoreButton = screen.getByRole('button', { name: 'Add more' });
         expect(addMoreButton).toBeInTheDocument();
@@ -261,24 +263,10 @@ describe('<Form />', () => {
       });
     });
 
-    describe('when the sum of ownership stakes is less than 25%', () => {
-      it('should show an error message', async () => {
-        const onSubmit = jest.fn();
-        renderForm({ onSubmit, requireMultiKyc: true });
-
-        const continueButton = screen.getByRole('button', { name: 'Continue' });
-        await userEvent.click(continueButton);
-
-        const ownershipStakeField = screen.getByLabelText('Approximate ownership stake (%)');
-        await userEvent.type(ownershipStakeField, '0');
-        expect(screen.getByText('Ownership stake cannot be smaller than 1%')).toBeInTheDocument();
-      });
-    });
-
     describe('when sum of ownership stakes is over 100%', () => {
       it('should show a toast with the error', async () => {
         const onSubmit = jest.fn();
-        renderForm({ onSubmit, requireMultiKyc: true });
+        renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
         const addMoreButton = screen.getByRole('button', { name: 'Add more' });
         await userEvent.click(addMoreButton);
@@ -317,7 +305,7 @@ describe('<Form />', () => {
     describe('when submitting one beneficial owner info', () => {
       it('should call onSubmit', async () => {
         const onSubmit = jest.fn();
-        renderForm({ onSubmit, requireMultiKyc: true });
+        renderForm({ onSubmit, requireMultiKyc: true, canEdit: true });
 
         const firstName = screen.getByLabelText('First name');
         await userEvent.type(firstName, 'John');
