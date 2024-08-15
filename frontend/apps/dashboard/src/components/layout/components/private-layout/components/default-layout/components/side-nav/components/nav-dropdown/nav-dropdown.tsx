@@ -1,6 +1,5 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
-import { IcoArrowUpRight16, IcoDotsHorizontal16 } from '@onefootprint/icons';
-import { IcoLogOut24 } from '@onefootprint/icons';
+import { IcoArrowTopRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
 import { Dropdown } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -76,11 +75,11 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             <Dropdown.Group>
               <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
                 {t('help-links.documentation')}
-                <IcoArrowUpRight16 color="secondary" />
+                <IcoArrowTopRight16 color="secondary" />
               </StyledLink>
               <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
                 {t('help-links.api-reference')}
-                <IcoArrowUpRight16 color="secondary" />
+                <IcoArrowTopRight16 color="secondary" />
               </StyledLink>
               <StyledLink onSelect={handleGlossaryOpen}>{t('help-links.risk-signals-glossary')}</StyledLink>
               <StyledLink onSelect={handlePgpHelperOpen}>{t('help-links.pgp-helper-tool')}</StyledLink>
@@ -108,6 +107,9 @@ const NavDropdownContent = styled(Dropdown.Content)`
 
 const StyledLink = styled(Dropdown.Item)`
   ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[1]};
     text-decoration: none;
     cursor: pointer;
 

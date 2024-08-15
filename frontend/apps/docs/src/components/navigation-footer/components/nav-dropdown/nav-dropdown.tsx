@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { IcoArrowUpRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
+import { IcoArrowTopRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
 import { Dropdown, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -53,11 +53,11 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
             <Dropdown.Group>
               <StyledLink as={Link} href={`${DASHBOARD_BASE_URL}`} target="_blank">
                 {t('dashboard')}
-                <IcoArrowUpRight16 color="secondary" />
+                <IcoArrowTopRight16 color="secondary" />
               </StyledLink>
               <StyledLink as={Link} href={isApiReference ? '/' : API_REFERENCE_PATH}>
                 {isApiReference ? t('docs') : t('api-reference')}
-                <IcoArrowUpRight16 color="secondary" />
+                <IcoArrowTopRight16 color="secondary" />
               </StyledLink>
               <StyledLink as={'a'} onClick={handleClickHelp}>
                 {t('help')}
@@ -77,6 +77,12 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
   );
 };
 
+const NavDropdownContent = styled(Dropdown.Content)`
+  width: 260px;
+  overflow: hidden;
+  z-index: 1000;
+`;
+
 const UserDropdownItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
     align-items: flex-start;
@@ -94,14 +100,11 @@ const UserDropdownItem = styled(Dropdown.Item)`
   `};
 `;
 
-const NavDropdownContent = styled(Dropdown.Content)`
-  width: 260px;
-  overflow: hidden;
-  z-index: 1000;
-`;
-
 const StyledLink = styled(Dropdown.Item)`
   ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing[1]};
     text-decoration: none;
     cursor: pointer;
 
