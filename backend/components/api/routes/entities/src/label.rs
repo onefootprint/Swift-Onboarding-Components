@@ -7,7 +7,7 @@ use api_core::auth::Either;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
-use api_wire_types::CreateLabelRequest;
+use api_wire_types::UpdateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use macros::route_alias;
@@ -31,7 +31,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Labels>>,
-    request: Json<CreateLabelRequest>,
+    request: Json<UpdateLabelRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -44,7 +44,12 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            ScopedVaultLabel::create(conn, sv, label_kind, actor)?;
+            if let Some(label) = label_kind {
+                ScopedVaultLabel::create(conn, sv, label, actor)?;
+            } else {
+                ScopedVaultLabel::deactivate(conn, &sv.id, actor)?;
+            }
+
             Ok(())
         })
         .await?;

@@ -18,11 +18,20 @@ def test_create_label(sandbox_tenant, is_api):
 
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
+
+    # no label set yet
+    body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
+    assert body["kind"] is None
+    body = get(f"/entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["label"] is None
+
+    # Add a label
     data = {"kind": "active"}
     post(f"/{api_base}/{user.fp_id}/label", data, *auth)
     body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
     assert body["kind"] == "active"
 
+    # Add a label, should replce
     data = {"kind": "offboard_fraud"}
     post(f"/{api_base}/{user.fp_id}/label", data, *auth)
     body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
@@ -46,6 +55,15 @@ def test_create_label(sandbox_tenant, is_api):
         i["event"]["data"]["kind"] for i in body if i["event"]["kind"] == "label_added"
     ]
     assert label_events == ["offboard_fraud", "active"]
+
+    # test deactivating
+    data = {"kind": None}
+    post(f"/{api_base}/{user.fp_id}/label", data, *auth)
+    body = get(f"/{api_base}/{user.fp_id}/label", None, *auth)
+    assert body["kind"] is None
+
+    body = get(f"/entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["label"] is None
 
 
 @pytest.mark.parametrize("is_api", [True, False])

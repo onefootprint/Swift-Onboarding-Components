@@ -55,6 +55,26 @@ impl ScopedVaultLabel {
             .collect();
         Ok(results)
     }
+
+    #[tracing::instrument("ScopedVaultLabel::deactivate", skip_all)]
+    pub fn deactivate(
+        conn: &mut PgConn,
+        scoped_vault_id: &ScopedVaultId,
+        actor: DbActor,
+    ) -> DbResult<DataLifetimeSeqno> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let update: DeactivateLabelUpdate = DeactivateLabelUpdate {
+            deactivated_at: Utc::now(),
+            deactivated_seqno: seqno,
+            deactivated_by_actor: actor.clone(),
+        };
+        let _: Vec<ScopedVaultLabel> = diesel::update(scoped_vault_label::table)
+            .filter(scoped_vault_label::scoped_vault_id.eq(scoped_vault_id))
+            .filter(scoped_vault_label::deactivated_seqno.is_null())
+            .set(update)
+            .get_results(conn)?;
+        Ok(seqno)
+    }
 }
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = scoped_vault_label)]
@@ -82,19 +102,8 @@ impl ScopedVaultLabel {
         kind: LabelKind,
         actor: DbActor,
     ) -> DbResult<ScopedVaultLabel> {
-        // first deactivate existing one
-        let seqno = DataLifetime::get_next_seqno(conn)?;
-        let update: DeactivateLabelUpdate = DeactivateLabelUpdate {
-            deactivated_at: Utc::now(),
-            deactivated_seqno: seqno,
-            deactivated_by_actor: actor.clone(),
-        };
-
-        let _: Vec<ScopedVaultLabel> = diesel::update(scoped_vault_label::table)
-            .filter(scoped_vault_label::scoped_vault_id.eq(&sv.id))
-            .filter(scoped_vault_label::deactivated_seqno.is_null())
-            .set(update)
-            .get_results(conn.conn())?;
+        // First deactivate
+        let seqno = Self::deactivate(conn.conn(), &sv.id, actor.clone())?;
 
         // now insert the new one
         let row = NewScopedVaultLabelRow {
