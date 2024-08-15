@@ -39,7 +39,7 @@ const StoreData = () => {
         <Text variant="display-4" color="secondary">
           {t('subtitle')}
         </Text>
-        <LinkButton iconComponent={IcoArrowRightSmall16} href="/vaulting" target="_blank">
+        <LinkButton iconComponent={IcoArrowRightSmall16} href="/platform/vaulting" target="_blank">
           {t('learn-more')}
         </LinkButton>
       </TitleContainer>
