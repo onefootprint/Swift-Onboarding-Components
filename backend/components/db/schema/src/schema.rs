@@ -1146,6 +1146,19 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    scoped_vault_version (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        scoped_vault_id -> Text,
+        seqno -> Int8,
+        version -> Int8,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     session (key) {
         key -> Varchar,
         _created_at -> Timestamptz,
@@ -1883,6 +1896,7 @@ diesel::joinable!(scoped_vault -> tenant (tenant_id));
 diesel::joinable!(scoped_vault -> vault (vault_id));
 diesel::joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
 diesel::joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
+diesel::joinable!(scoped_vault_version -> scoped_vault (scoped_vault_id));
 diesel::joinable!(socure_device_session -> workflow (workflow_id));
 diesel::joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(stytch_fingerprint_event -> vault (vault_id));
@@ -2000,6 +2014,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     scoped_vault,
     scoped_vault_label,
     scoped_vault_tag,
+    scoped_vault_version,
     session,
     socure_device_session,
     stytch_fingerprint_event,

@@ -386,3 +386,8 @@ define_newtype_id!(
     "Identifier for Vault Disaster Recovery blob row"
 );
 define_newtype_id!(TenantTagId, String, "Identifier for a tenant tag");
+define_newtype_id!(
+    ScopedVaultVersionId,
+    String,
+    "Identifier for a scoped_vault_version"
+);

@@ -2,10 +2,12 @@ mod alias;
 mod basic;
 mod data_lifetime;
 mod prefix;
+mod scoped_vault_version_number;
 mod tenant_utils;
 pub use self::alias::*;
 pub use self::basic::*;
 pub use self::data_lifetime::*;
+pub use self::scoped_vault_version_number::*;
 pub use self::tenant_utils::*;
 
 /// This macro generates an Id type that wraps a string

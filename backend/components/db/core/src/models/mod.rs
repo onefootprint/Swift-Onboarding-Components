@@ -53,6 +53,7 @@ pub mod samba_report;
 pub mod scoped_vault;
 pub mod scoped_vault_label;
 pub mod scoped_vault_tag;
+pub mod scoped_vault_version;
 pub mod session;
 pub mod socure_device_session;
 pub mod stytch_fingerprint_event;
