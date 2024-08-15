@@ -1,4 +1,4 @@
-import { isAddressLine, isEmail, isName, isSSN9Flexible, isSsn4 } from '@onefootprint/core';
+import { isAddressLine, isEmail, isName, isPhoneNumber, isSSN9Flexible, isSsn4 } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
 import { CorporationType } from '@onefootprint/types';
@@ -12,7 +12,6 @@ import {
   isCountryCode,
 } from '@onefootprint/types';
 import { isFuture } from 'date-fns';
-import { PhoneNumberUtil } from 'google-libphonenumber';
 
 import type { DIMetadata, UserData } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
@@ -39,25 +38,6 @@ const getIsoDateString = (dateStr: string, locale: SupportedLocale): string | un
     return undefined;
   }
   return isoDate;
-};
-
-const isPhoneValid = (str: string): boolean => {
-  if (!isStringValid(str)) return false;
-
-  const phoneUtils = PhoneNumberUtil.getInstance();
-  const sandboxNumber = '+1 555-555-0100';
-  const matchesSandboxNumber = phoneUtils.isNumberMatch(str, sandboxNumber) === PhoneNumberUtil.MatchType.EXACT_MATCH;
-  if (matchesSandboxNumber) {
-    return true;
-  }
-
-  try {
-    const parsedPhoneNumber = phoneUtils.parseAndKeepRawInput(str);
-    const region = phoneUtils.getRegionCodeForNumber(parsedPhoneNumber);
-    return phoneUtils.isValidNumberForRegion(parsedPhoneNumber, region);
-  } catch (_) {
-    return false;
-  }
 };
 
 const isStateValid = (state: string, country?: string): boolean =>
@@ -104,11 +84,15 @@ const isCountryValid = (config: PublicOnboardingConfig, country: string): boolea
 const isCorporationTypeValid = (str: string): boolean =>
   isStringValid(str) && Object.values(CorporationType).includes(str as CorporationType);
 
-const validateBootstrapData = (
-  bootstrapData: UnvalidatedUserData,
-  config: PublicOnboardingConfig,
-  locale: SupportedLocale = 'en-US',
-): UserData => {
+const validateBootstrapData = ({
+  bootstrapData,
+  config,
+  locale = 'en-US',
+}: {
+  bootstrapData: UnvalidatedUserData;
+  config: PublicOnboardingConfig;
+  locale?: SupportedLocale;
+}): UserData => {
   if (!isObject(bootstrapData)) return {};
 
   const FieldsValidator: Record<IdDI | Exclude<BusinessDI, BootstrapIgnoredBusinessDI>, Predicate> = {
@@ -124,7 +108,7 @@ const validateBootstrapData = (
     [IdDI.lastName]: (s: string) => isNameValid(s),
     [IdDI.middleName]: (s: string) => isNameValid(s, true),
     [IdDI.nationality]: isCountryCode,
-    [IdDI.phoneNumber]: isPhoneValid,
+    [IdDI.phoneNumber]: (value: string) => isPhoneNumber(value),
     [IdDI.ssn4]: isSsn4,
     [IdDI.ssn9]: isSSN9Flexible,
     [IdDI.state]: (state: string, country?: string) => isStateValid(state, country),
@@ -140,7 +124,7 @@ const validateBootstrapData = (
     [BusinessDI.country]: (s: string) => isCountryValid(config, s),
     [BusinessDI.doingBusinessAs]: isStringValid,
     [BusinessDI.name]: isStringValid,
-    [BusinessDI.phoneNumber]: isPhoneValid,
+    [BusinessDI.phoneNumber]: (value: string) => isPhoneNumber(value),
     [BusinessDI.state]: (state: string, country?: string) => isStateValid(state, country),
     [BusinessDI.tin]: () => true, // TODO: Add real validators for this field
     [BusinessDI.website]: isStringValid,

@@ -33,7 +33,11 @@ const createOnboardingMachine = (
       initial: 'requirements',
       context: {
         config,
-        bootstrapData: validateBootstrapData(bootstrapData, config, l10n?.locale),
+        bootstrapData: validateBootstrapData({
+          bootstrapData,
+          config,
+          locale: l10n?.locale,
+        }),
         idvContext,
         idDocOutcome,
         overallOutcome,
