@@ -1026,7 +1026,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateLabelRequest"
+                                "$ref": "#/components/schemas/UpdateLabelRequest"
                             }
                         }
                     },
@@ -9772,22 +9772,6 @@
                     "expires_at",
                     "link",
                     "token"
-                ]
-            },
-            "CreateLabelRequest": {
-                "type": "object",
-                "properties": {
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "active",
-                            "offboard_fraud",
-                            "offboard_other"
-                        ]
-                    }
-                },
-                "required": [
-                    "kind"
                 ]
             },
             "CreateListEntryRequest": {
@@ -27053,6 +27037,20 @@
                     "description",
                     "name"
                 ]
+            },
+            "UpdateLabelRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "description": "Label value to set. Unset by sending `null`",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                }
             },
             "UpdateListRequest": {
                 "type": "object",
