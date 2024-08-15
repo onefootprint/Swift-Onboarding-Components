@@ -122,7 +122,7 @@ const BasicDataForm = ({
           data-dd-privacy="mask"
           label={t('doing-business-as.label')}
           placeholder={t('doing-business-as.placeholder')}
-          {...register('doingBusinessAs')}
+          {...register('doingBusinessAs', { setValueAs: value => value.trim() || undefined })}
         />
         <div>
           <TextInput

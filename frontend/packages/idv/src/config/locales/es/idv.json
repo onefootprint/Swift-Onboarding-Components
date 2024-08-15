@@ -671,6 +671,7 @@
           },
           "fields": {
             "primary-bo-name-hint": "Escribe tus nombres y apellidos tal como aparecen en tu identificación emitida por el gobierno",
+            "primary-bo-name-hint-readonly": "No se pueden cambiar los datos de los beneficiarios finales ya guardados.",
             "first-name": {
               "label": "Nombre",
               "placeholder": "Jane",

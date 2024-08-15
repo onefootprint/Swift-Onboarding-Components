@@ -13,9 +13,10 @@ const { logError } = getLogger({ location: 'kyb-confirm' });
 const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.confirm.summary' });
   const [state, send] = useCollectKybDataMachine();
-  const { data, idvContext } = state.context;
+  const { data, idvContext, dataCollectionScreensToShow } = state.context;
   const { mutation, syncData } = useSyncData();
   const { isLoading } = mutation;
+  const shouldShowCloseButton = dataCollectionScreensToShow.length === 1;
 
   const handleConfirm = () => {
     syncData({
@@ -36,6 +37,7 @@ const Confirm = () => {
       onClickPrev={() => send({ type: 'navigatedToPrevPage' })}
       onClickConfirm={handleConfirm}
       isLoading={isLoading}
+      headerVariant={shouldShowCloseButton ? 'close' : 'back'}
     >
       <BasicDataSection />
       <BusinessAddressSection />

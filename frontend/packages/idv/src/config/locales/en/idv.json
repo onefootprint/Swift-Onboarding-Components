@@ -671,6 +671,7 @@
           },
           "fields": {
             "primary-bo-name-hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
+            "primary-bo-name-hint-readonly": "Can not change already saved beneficial owners data",
             "first-name": {
               "label": "First name",
               "placeholder": "Jane",

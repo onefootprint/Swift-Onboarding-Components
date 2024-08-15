@@ -64,6 +64,7 @@ describe('Collect KYB Data Machine Tests', () => {
       bootstrapBusinessData: {},
       bootstrapUserData: {},
       data: {},
+      dataCollectionScreensToShow: [],
     };
 
     const machine = interpret(createCollectKybDataMachine(initialContext));
@@ -107,11 +108,13 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
 
     state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('basicData');
+    state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
-    expect(state.value).toEqual('businessAddress');
-
+    expect(state.value).toEqual('basicData');
+    state = machine.send('basicDataSubmitted', {});
     state = machine.send('businessAddressSubmitted', {
       payload: {
         [BusinessDI.addressLine1]: '123 Main St',
@@ -128,12 +131,6 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.context.data[BusinessDI.state]).toEqual('NY');
     expect(state.context.data[BusinessDI.country]).toEqual('USA');
     expect(state.context.data[BusinessDI.zip]).toEqual('023123');
-    expect(state.value).toEqual('beneficialOwners');
-
-    state = machine.send({ type: 'navigatedToPrevPage' });
-    expect(state.value).toEqual('introduction');
-
-    state = machine.send('introductionCompleted');
     expect(state.value).toEqual('beneficialOwners');
 
     state = machine.send('beneficialOwnersSubmitted', {
@@ -168,6 +165,22 @@ describe('Collect KYB Data Machine Tests', () => {
         [BeneficialOwnerDataAttribute.ownershipStake]: 50,
       },
     ]);
+    expect(state.value).toEqual('confirm');
+    state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('beneficialOwners');
+    state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('businessAddress');
+    state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('basicData');
+    state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('introduction');
+    state = machine.send('introductionCompleted');
+    expect(state.value).toEqual('basicData');
+    state = machine.send('basicDataSubmitted', {});
+    expect(state.value).toEqual('businessAddress');
+    state = machine.send('businessAddressSubmitted', {});
+    expect(state.value).toEqual('beneficialOwners');
+    state = machine.send('beneficialOwnersSubmitted', {});
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });
@@ -234,9 +247,13 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'navigatedToPrevPage' });
+    expect(state.value).toEqual('businessAddress');
+    state = machine.send({ type: 'navigatedToPrevPage' });
     expect(state.value).toEqual('introduction');
 
     state = machine.send('introductionCompleted');
+    expect(state.value).toEqual('businessAddress');
+    state = machine.send('businessAddressSubmitted', {});
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });

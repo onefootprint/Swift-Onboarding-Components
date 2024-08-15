@@ -3,6 +3,7 @@ import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI 
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import { cloneDeep } from 'lodash';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
@@ -28,12 +29,14 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     data,
     kybRequirement: { missingAttributes },
     bootstrapUserData,
+    vaultBusinessData,
     config,
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners' });
   const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
+  const canEdit = !vaultBusinessData?.['business.kyced_beneficial_owners']?.length;
 
   const handleSubmit = (beneficialOwnersRaw: BeneficialOwner[]) => {
     const beneficialOwners = beneficialOwnersRaw.map(omitNullAndUndefined);
@@ -68,7 +71,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
   };
 
   const defaultData = requireMultiKyc ? data?.[BusinessDI.kycedBeneficialOwners] : data?.[BusinessDI.beneficialOwners];
-  const defaultValues = defaultData ?? [
+  const defaultValues = cloneDeep(defaultData) ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.middleName]: '',
@@ -96,6 +99,7 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
         onCancel={onCancel}
         onSubmit={handleSubmit}
         requireMultiKyc={requireMultiKyc}
+        canEdit={canEdit}
       />
     </Stack>
   );

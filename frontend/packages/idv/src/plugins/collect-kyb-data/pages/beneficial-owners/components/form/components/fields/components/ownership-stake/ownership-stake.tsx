@@ -7,9 +7,10 @@ import type { FormData } from '../../../../types';
 
 type OwnershipStakeProps = {
   index: number;
+  canEdit?: boolean;
 };
 
-const OwnershipStake = ({ index }: OwnershipStakeProps) => {
+const OwnershipStake = ({ index, canEdit }: OwnershipStakeProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields.ownership-stake',
   });
@@ -33,6 +34,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
       min="0"
       max="100"
       placeholder={t('placeholder')}
+      disabled={!canEdit}
       {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`, {
         required: {
           value: true,

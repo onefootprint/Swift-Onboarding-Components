@@ -152,7 +152,7 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
             autoComplete="address-line2"
             label={t('address-line-2.label')}
             placeholder={t('address-line-2.placeholder')}
-            {...register('addressLine2')}
+            {...register('addressLine2', { setValueAs: value => value.trim() || undefined })}
           />
           <Grid.Container gap={5} columns={['1fr', '1fr']}>
             <CityField />

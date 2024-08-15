@@ -16,9 +16,10 @@ export type FieldsProps = {
   l10n?: L10n;
   onRemove: (index: number) => void;
   requiresMultiKyc?: boolean;
+  canEdit?: boolean;
 };
 
-const Fields = ({ config, hasBorder, index, l10n, onRemove, requiresMultiKyc }: FieldsProps) => {
+const Fields = ({ config, hasBorder, index, l10n, onRemove, requiresMultiKyc, canEdit }: FieldsProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form.fields' });
 
   return (
@@ -34,14 +35,14 @@ const Fields = ({ config, hasBorder, index, l10n, onRemove, requiresMultiKyc }: 
       {index === 0 && (
         <InlineAlert variant="info">
           <Text variant="body-2" color="info">
-            {t('primary-bo-name-hint')}
+            {canEdit ? t('primary-bo-name-hint') : t('primary-bo-name-hint-readonly')}
           </Text>
         </InlineAlert>
       )}
-      <Name index={index} />
-      <Email index={index} requireMultiKyc={requiresMultiKyc} />
-      <Phone index={index} config={config} locale={l10n?.locale} requireMultiKyc={requiresMultiKyc} />
-      <OwnershipStake index={index} />
+      <Name index={index} canEdit={canEdit} />
+      <Email index={index} requireMultiKyc={requiresMultiKyc} canEdit={canEdit} />
+      <Phone index={index} config={config} locale={l10n?.locale} requireMultiKyc={requiresMultiKyc} canEdit={canEdit} />
+      <OwnershipStake index={index} canEdit={canEdit} />
     </Grid.Container>
   );
 };

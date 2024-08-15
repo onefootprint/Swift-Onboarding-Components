@@ -6,6 +6,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
+import { StateValue } from 'xstate';
 import type { BusinessData, UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
@@ -45,6 +46,7 @@ export type MachineContext = {
   data: BusinessDIData;
   /** Readonly object with decrypted ``business.*`` data */
   vaultBusinessData?: Readonly<BusinessDIData>;
+  dataCollectionScreensToShow: StateValue[];
 };
 
 export type LoadSuccessEvent = {

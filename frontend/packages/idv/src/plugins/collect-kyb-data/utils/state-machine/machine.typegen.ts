@@ -32,6 +32,7 @@ export interface Typegen0 {
     | 'completed'
     | 'confirm'
     | 'introduction'
-    | 'loadFromVault';
+    | 'loadFromVault'
+    | 'router';
   tags: never;
 }

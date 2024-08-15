@@ -27,7 +27,9 @@ const ConfirmCollectedData = ({
   headerVariant = 'back',
 }: ConfirmCollectedDataProps) => (
   <>
-    <NavigationHeader leftButton={{ variant: headerVariant, onBack: onClickPrev }} />
+    <NavigationHeader
+      leftButton={{ confirmClose: headerVariant === 'close', variant: headerVariant, onBack: onClickPrev }}
+    />
     <Stack gap={7} direction="column">
       <HeaderTitle title={title} subtitle={subtitle} />
       <SectionsContainer>{children}</SectionsContainer>

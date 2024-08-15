@@ -13,11 +13,12 @@ type PhoneProps = {
   config?: PublicOnboardingConfig;
   locale?: SupportedLocale;
   requireMultiKyc?: boolean;
+  canEdit?: boolean;
 };
 
 const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
-const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
+const Phone = ({ index, config, locale, requireMultiKyc, canEdit }: PhoneProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields.phone',
   });
@@ -55,6 +56,7 @@ const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
           onChange={onChange}
           value={value}
           locale={locale}
+          disabled={!canEdit}
         />
       )}
     />

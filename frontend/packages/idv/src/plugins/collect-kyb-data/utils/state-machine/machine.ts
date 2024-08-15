@@ -1,18 +1,92 @@
-import { assign, createMachine } from 'xstate';
+import { StateValue, assign, createMachine } from 'xstate';
 
 import {
-  getBusinessDataFromContext,
   isMissingAddressData,
   isMissingBasicData,
   isMissingBeneficialOwnersData,
   isMissingRequiredData,
 } from '../attributes';
-import type { LoadSuccessEvent, MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
-type PredicateFn = (ctx: MachineContext) => boolean;
+type Screen = {
+  screen: StateValue;
+  missingCheck: (ctx: MachineContext) => boolean;
+};
 
-const fromLoad = (predicate: PredicateFn) => (context: MachineContext, event: LoadSuccessEvent) =>
-  predicate({ ...context, data: { ...context.data, ...event.payload.data } });
+const ORDERED_SCREENS: Screen[] = [
+  {
+    screen: 'introduction',
+    missingCheck: isMissingRequiredData,
+  },
+  {
+    screen: 'basicData',
+    missingCheck: isMissingBasicData,
+  },
+  {
+    screen: 'businessAddress',
+    missingCheck: isMissingAddressData,
+  },
+  {
+    screen: 'beneficialOwners',
+    missingCheck: isMissingBeneficialOwnersData,
+  },
+  {
+    screen: 'confirm',
+    missingCheck: () => true,
+  },
+];
+
+const getScreenOrder = (screen: StateValue) => ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
+
+/**
+ * Given the initial context, computes the static set of screens we
+ * might show. The state machine transitions will only navigate forward and backward through this
+ * set of static pages of data that need to be collected.
+ */
+const getDataCollectionScreensToShow = (initialContext: MachineContext): StateValue[] =>
+  ORDERED_SCREENS.filter(s => s.missingCheck(initialContext)).map(s => s.screen);
+
+/**
+ * The forward transitions made for the specific `currentScreen`.
+ * They don't allow transitioning to a screen that is before the `currentScreen`.
+ */
+const nextScreenTransitions = (currentScreen: StateValue) => {
+  const currentScreenOrder = getScreenOrder(currentScreen);
+
+  return ORDERED_SCREENS.map(s => ({
+    target: s.screen as string,
+    actions: s.screen === 'introduction' ? [] : ['assignData'],
+    cond: (ctx: MachineContext) => {
+      return (
+        // The requirement from the backend says there's info to collect on this screen
+        ctx.dataCollectionScreensToShow.includes(s.screen) &&
+        // The current screen came before this screen
+        getScreenOrder(s.screen) > currentScreenOrder
+      );
+    },
+  }));
+};
+
+/**
+ * The backward transitions made for the specific `currentScreen` when the back button is hit.
+ * They don't allow transitioning to a screen that is after the `currentScreen`.
+ */
+const prevScreenTransitions = (currentScreen: StateValue) => {
+  const currentScreenOrder = getScreenOrder(currentScreen);
+
+  const reversedScreens = [...ORDERED_SCREENS].reverse();
+  return reversedScreens.map(s => ({
+    target: s.screen as string,
+    cond: (ctx: MachineContext) => {
+      return (
+        // The requirement from the backend says there's info to collect on this screen
+        ctx.dataCollectionScreensToShow.includes(s.screen) &&
+        // The current screen came after this screen
+        getScreenOrder(s.screen) < currentScreenOrder
+      );
+    },
+  }));
+};
 
 const createCollectKybDataMachine = (initialContext: MachineContext) =>
   createMachine(
@@ -27,78 +101,49 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
       initial: 'loadFromVault',
       context: {
         ...initialContext,
-        data: getBusinessDataFromContext(initialContext),
-        vaultBusinessData: {},
+        dataCollectionScreensToShow: getDataCollectionScreensToShow(initialContext),
       },
       states: {
         loadFromVault: {
           on: {
-            businessDataLoadSuccess: [
-              { target: 'introduction', cond: fromLoad(isMissingRequiredData), actions: 'assignVaultData' },
-              { target: 'basicData', cond: fromLoad(isMissingBasicData), actions: 'assignVaultData' },
-              { target: 'businessAddress', cond: fromLoad(isMissingAddressData), actions: 'assignVaultData' },
-              { target: 'beneficialOwners', cond: fromLoad(isMissingBeneficialOwnersData), actions: 'assignVaultData' },
-              { target: 'confirm', actions: 'assignVaultData' },
-            ],
-            businessDataLoadError: [
-              { target: 'introduction', cond: isMissingRequiredData },
-              { target: 'basicData', cond: isMissingBasicData },
-              { target: 'businessAddress', cond: isMissingAddressData },
-              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
-              { target: 'confirm' },
-            ],
+            businessDataLoadSuccess: {
+              target: 'router',
+              actions: 'assignVaultData',
+            },
+            businessDataLoadError: {
+              target: 'router',
+            },
           },
+        },
+        router: {
+          always: [
+            ...nextScreenTransitions('router'),
+            {
+              target: 'completed',
+            },
+          ],
         },
         introduction: {
           on: {
-            introductionCompleted: [
-              { target: 'basicData', cond: isMissingBasicData },
-              { target: 'businessAddress', cond: isMissingAddressData },
-              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
-              { target: 'confirm' },
-            ],
+            introductionCompleted: nextScreenTransitions('introduction'),
           },
         },
         basicData: {
           on: {
-            basicDataSubmitted: [
-              { target: 'businessAddress', cond: isMissingAddressData, actions: 'assignData' },
-              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData, actions: 'assignData' },
-              { target: 'confirm', actions: 'assignData' },
-            ],
-            navigatedToPrevPage: {
-              target: 'introduction',
-            },
+            basicDataSubmitted: nextScreenTransitions('basicData'),
+            navigatedToPrevPage: prevScreenTransitions('basicData'),
           },
         },
         businessAddress: {
           on: {
-            businessAddressSubmitted: [
-              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData, actions: 'assignData' },
-              { target: 'confirm', actions: 'assignData' },
-            ],
-            navigatedToPrevPage: [
-              {
-                target: 'basicData',
-                cond: isMissingBasicData,
-              },
-              { target: 'introduction' },
-            ],
+            businessAddressSubmitted: nextScreenTransitions('businessAddress'),
+            navigatedToPrevPage: prevScreenTransitions('businessAddress'),
           },
         },
         beneficialOwners: {
           on: {
-            beneficialOwnersSubmitted: [
-              {
-                target: 'confirm',
-                actions: 'assignData',
-              },
-            ],
-            navigatedToPrevPage: [
-              { target: 'businessAddress', cond: isMissingAddressData },
-              { target: 'basicData', cond: isMissingBasicData },
-              { target: 'introduction' },
-            ],
+            beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners'),
+            navigatedToPrevPage: prevScreenTransitions('beneficialOwners'),
           },
         },
         confirm: {
@@ -110,12 +155,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             basicDataSubmitted: { actions: 'assignData' },
             businessAddressSubmitted: { actions: 'assignData' },
             beneficialOwnersSubmitted: { actions: 'assignData' },
-            navigatedToPrevPage: [
-              { target: 'beneficialOwners', cond: isMissingBeneficialOwnersData },
-              { target: 'businessAddress', cond: isMissingAddressData },
-              { target: 'basicData', cond: isMissingBasicData },
-              { target: 'introduction' },
-            ],
+            navigatedToPrevPage: prevScreenTransitions('confirm'),
             stepUpAuthTokenCompleted: { actions: ['assignAuthToken'] },
             stepUpDecryptionCompleted: { actions: ['assignData'] },
           },

@@ -9,9 +9,10 @@ import type { FormData } from '../../../../types';
 type EmailProps = {
   index: number;
   requireMultiKyc?: boolean;
+  canEdit?: boolean;
 };
 
-const Email = ({ index, requireMultiKyc }: EmailProps) => {
+const Email = ({ index, requireMultiKyc, canEdit }: EmailProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields.email',
   });
@@ -34,6 +35,7 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
       label={t('label')}
       placeholder={t('placeholder')}
       type="email"
+      disabled={!canEdit}
       {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.email}`, {
         required: {
           value: true,

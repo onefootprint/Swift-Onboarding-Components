@@ -21,6 +21,7 @@ export type FormProps = {
   onCancel?: () => void;
   onSubmit: (data: BeneficialOwner[]) => void;
   requireMultiKyc?: boolean;
+  canEdit?: boolean;
 };
 
 const Form = ({
@@ -32,6 +33,7 @@ const Form = ({
   onCancel,
   onSubmit,
   requireMultiKyc,
+  canEdit,
 }: FormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
@@ -134,6 +136,7 @@ const Form = ({
               l10n={l10n}
               requiresMultiKyc={requireMultiKyc}
               hasBorder={!hideHeader}
+              canEdit={canEdit}
             />
             {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>
@@ -144,7 +147,7 @@ const Form = ({
           </Text>
         )}
         <Divider />
-        <AddButton onClick={handleAddMore} />
+        {canEdit && <AddButton onClick={handleAddMore} />}
         {shouldShowError && <FormInvalidError />}
         <EditableFormButtonContainer
           onCancel={onCancel}
