@@ -8,7 +8,11 @@ import styled, { css, keyframes } from 'styled-components';
 import type { SXStyles } from '../../hooks';
 import { media } from '../../utils';
 import Box from '../box';
+import Button from '../button';
+import LinkButton from '../link-button';
 import Overlay from '../overlay';
+import ScrollArea from '../scroll-area';
+import Stack from '../stack';
 import Header from './components/header';
 
 export type DrawerProps = {
@@ -20,7 +24,21 @@ export type DrawerProps = {
   closeIconComponent?: Icon;
   onClose: () => void;
   onClickOutside?: () => void;
+  primaryButton?: {
+    label: string;
+    onClick: () => void;
+  };
+  secondaryButton?: {
+    label: string;
+    onClick: () => void;
+  };
+  linkButton?: {
+    label: string;
+    onClick: () => void;
+  };
 };
+
+const FOOTER_HEIGHT = '56px';
 
 const Drawer = ({
   children,
@@ -31,6 +49,9 @@ const Drawer = ({
   closeIconComponent: CloseIconComponent = IcoClose24,
   onClickOutside,
   onClose,
+  primaryButton,
+  secondaryButton,
+  linkButton,
 }: DrawerProps) => {
   const { t } = useTranslation('ui');
   const handleOpenChange = (newOpen: boolean) => {
@@ -51,7 +72,28 @@ const Drawer = ({
             {title}
           </Header>
           {headerComponent}
-          <Body>{children}</Body>
+          <Body padding={7} hideBottomLine hideTopLine>
+            {children}
+          </Body>
+          {(primaryButton || secondaryButton || linkButton) && (
+            <Footer justify="space-between" align="center" tag="footer">
+              <Stack flex={1}>
+                {linkButton && <LinkButton onClick={linkButton.onClick}>{linkButton.label}</LinkButton>}
+              </Stack>
+              <Stack direction="row" gap={3}>
+                {secondaryButton && (
+                  <Button onClick={secondaryButton.onClick} variant="secondary">
+                    {secondaryButton.label}
+                  </Button>
+                )}
+                {primaryButton && (
+                  <Button onClick={primaryButton.onClick} variant="primary">
+                    {primaryButton.label}
+                  </Button>
+                )}
+              </Stack>
+            </Footer>
+          )}
         </DrawerSurface>
       </DrawerContainer>
       <DrawerPrimitive.Overlay asChild>
@@ -88,8 +130,11 @@ const DrawerSurface = styled(Box)`
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     height: 100%;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
+    isolation: isolate;
   `}
 `;
 
@@ -121,11 +166,17 @@ const DrawerContainer = styled(DrawerPrimitive.Content)<{ sx?: SXStyles }>`
   `}
 `;
 
-const Body = styled.div`
+const Body = styled(ScrollArea)`
+    flex: 1;
+`;
+
+const Footer = styled(Stack)`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]};
-    height: calc(100% - 56px);
-    overflow: auto;
+    bottom: 0;
+    z-index: ${theme.zIndex.drawer};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
+    height: ${FOOTER_HEIGHT};
   `}
 `;
 

@@ -1,16 +1,6 @@
 import { IcoFilter16 } from '@onefootprint/icons';
 import { EntityLabel } from '@onefootprint/types';
-import {
-  Button,
-  Checkbox,
-  DateRangeInput,
-  Drawer,
-  LinkButton,
-  Radio,
-  Stack,
-  TextInput,
-  createFontStyles,
-} from '@onefootprint/ui';
+import { Checkbox, DateRangeInput, Drawer, Radio, Stack, TextInput, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +68,13 @@ const DrawerFilter = () => {
         <IcoFilter16 />
         {t('trigger')} {hasFilters && `(${filtersCount})`}
       </DrawerTrigger>
-      <Drawer title={t('title')} open={open} onClose={close}>
+      <Drawer
+        title={t('title')}
+        open={open}
+        onClose={close}
+        primaryButton={{ label: t('cta'), onClick: handleSubmit(onSubmit) }}
+        secondaryButton={{ label: t('reset'), onClick: handleReset }}
+      >
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Stack direction="column" justify="space-between" height="100%" gap={7}>
@@ -161,10 +157,6 @@ const DrawerFilter = () => {
                   />
                 </fieldset>
               </Stack>
-              <Footer justify="space-between" align="center" tag="footer">
-                <LinkButton onClick={handleReset}>{t('reset')}</LinkButton>
-                <Button type="submit">{t('cta')}</Button>
-              </Footer>
             </Stack>
           </Form>
         </FormProvider>
@@ -217,14 +209,6 @@ const Legend = styled.legend`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     margin-bottom: ${theme.spacing[5]};
-  `}
-`;
-
-const Footer = styled(Stack)`
-  ${({ theme }) => css`
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    margin: 0 -${theme.spacing[7]} -${theme.spacing[7]};
-    padding: ${theme.spacing[4]} ${theme.spacing[7]};
   `}
 `;
 

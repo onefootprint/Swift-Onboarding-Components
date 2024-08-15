@@ -13,6 +13,9 @@ describe('<Drawer />', () => {
     onClose = jest.fn(),
     open,
     children = 'content',
+    primaryButton,
+    secondaryButton,
+    linkButton,
   }: Partial<DrawerProps>) =>
     customRender(
       <Drawer
@@ -21,6 +24,9 @@ describe('<Drawer />', () => {
         onClose={onClose}
         open={open}
         title={title}
+        primaryButton={primaryButton}
+        secondaryButton={secondaryButton}
+        linkButton={linkButton}
       >
         {children}
       </Drawer>,
@@ -64,6 +70,39 @@ describe('<Drawer />', () => {
     it('should show the content', () => {
       renderDrawer({ open: true, children: 'content' });
       expect(screen.getByText('content')).toBeInTheDocument();
+    });
+
+    it('should render the primary button and trigger onClick', async () => {
+      const onPrimaryClickMockFn = jest.fn();
+      renderDrawer({
+        open: true,
+        primaryButton: { label: 'Primary', onClick: onPrimaryClickMockFn },
+      });
+      const primaryButton = screen.getByRole('button', { name: 'Primary' });
+      await userEvent.click(primaryButton);
+      expect(onPrimaryClickMockFn).toHaveBeenCalled();
+    });
+
+    it('should render the secondary button and trigger onClick', async () => {
+      const onSecondaryClickMockFn = jest.fn();
+      renderDrawer({
+        open: true,
+        secondaryButton: { label: 'Secondary', onClick: onSecondaryClickMockFn },
+      });
+      const secondaryButton = screen.getByRole('button', { name: 'Secondary' });
+      await userEvent.click(secondaryButton);
+      expect(onSecondaryClickMockFn).toHaveBeenCalled();
+    });
+
+    it('should render the link button and trigger onClick', async () => {
+      const onLinkClickMockFn = jest.fn();
+      renderDrawer({
+        open: true,
+        linkButton: { label: 'Link', onClick: onLinkClickMockFn },
+      });
+      const linkButton = screen.getByRole('button', { name: 'Link' });
+      await userEvent.click(linkButton);
+      expect(onLinkClickMockFn).toHaveBeenCalled();
     });
   });
 });
