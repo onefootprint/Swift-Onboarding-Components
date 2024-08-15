@@ -54,6 +54,7 @@ const Drawer = ({
   linkButton,
 }: DrawerProps) => {
   const { t } = useTranslation('ui');
+
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       onClose();

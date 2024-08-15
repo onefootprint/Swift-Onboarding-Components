@@ -38,14 +38,33 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
     setIsOpen(false);
   };
 
+  const handleGlossaryOpen = () => {
+    setIsOpen(false);
+    setTimeout(() => {
+      setIsGlossaryOpen(true);
+    }, 50);
+  };
+
+  const handleGlossaryClose = () => {
+    setIsGlossaryOpen(false);
+  };
+
+  const handlePgpHelperOpen = () => {
+    setIsPgpHelperOpen(true);
+  };
+
+  const handlePgpHelperClose = () => {
+    setIsPgpHelperOpen(false);
+  };
+
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
         <StyledTrigger aria-label="Account">
           <IcoDotsHorizontal16 testID="nav-dropdown-button" />
         </StyledTrigger>
-        {isOpen && (
-          <NavDropdownContent sideOffset={8} $noPadding>
+        <Dropdown.Portal>
+          <NavDropdownContent sideOffset={8}>
             <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
             <Dropdown.Separator />
             {tenants?.length > 1 ? (
@@ -63,20 +82,8 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
                 {t('help-links.api-reference')}
                 <IcoArrowUpRight16 color="secondary" />
               </StyledLink>
-              <StyledLink
-                onSelect={() => {
-                  setIsGlossaryOpen(true);
-                }}
-              >
-                {t('help-links.risk-signals-glossary')}
-              </StyledLink>
-              <StyledLink
-                onSelect={() => {
-                  setIsPgpHelperOpen(true);
-                }}
-              >
-                {t('help-links.pgp-helper-tool')}
-              </StyledLink>
+              <StyledLink onSelect={handleGlossaryOpen}>{t('help-links.risk-signals-glossary')}</StyledLink>
+              <StyledLink onSelect={handlePgpHelperOpen}>{t('help-links.pgp-helper-tool')}</StyledLink>
             </Dropdown.Group>
             <Dropdown.Separator />
             <Dropdown.Group>
@@ -86,10 +93,10 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
               </Dropdown.Item>
             </Dropdown.Group>
           </NavDropdownContent>
-        )}
+        </Dropdown.Portal>
       </Dropdown.Root>
-      <RiskSignalsGlossary open={isGlossaryOpen} onClose={() => setIsGlossaryOpen(false)} />
-      <PgpUploadTool open={isPgpHelperOpen} onClose={() => setIsPgpHelperOpen(false)} />
+      <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
+      <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
     </>
   );
 };
