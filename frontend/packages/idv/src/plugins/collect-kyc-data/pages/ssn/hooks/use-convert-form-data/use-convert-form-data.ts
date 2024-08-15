@@ -5,7 +5,7 @@ import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-mac
 import getAllKycAttributes from '../../../../utils/all-attributes/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 import updateDataValue from '../../../../utils/update-data-value';
-import type { FormData } from '../../types';
+import type { FormValues } from '../../ssn.types';
 
 const { logError } = getLogger({ location: 'ssn-use-convert-form-data' });
 
@@ -16,7 +16,7 @@ const useConvertFormData = () => {
   const requiresSsn9 = attributes.includes(CollectedKycDataOption.ssn9);
   const requiresUsTaxId = attributes.includes(CollectedKycDataOption.usTaxId);
 
-  return (formData: FormData, isSkipped?: boolean) => {
+  return (formData: FormValues, isSkipped?: boolean) => {
     const output: KycData = {};
     const { ssn4, ssn9, usTaxId } = formData;
 

@@ -14,7 +14,7 @@ const renderSsn = (initialContext: InitMachineArgs, onComplete?: () => void) => 
   );
 };
 
-describe('Ssn', () => {
+describe('<SSN />', () => {
   const otherValues = {
     disabled: false,
     decrypted: false,

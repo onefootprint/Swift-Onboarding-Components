@@ -4,6 +4,7 @@ import { TFunction } from 'i18next';
 import { useEffect } from 'react';
 import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import type { FormValues } from '../../ssn.types';
 
 type SSN4Props = {
   disabled?: boolean;
@@ -31,7 +32,7 @@ const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
     getValues,
     formState: { errors },
     setValue,
-  } = useFormContext();
+  } = useFormContext<FormValues>();
 
   useEffect(() => {
     if (isSkipped) {

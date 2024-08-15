@@ -16,10 +16,12 @@ import { getTaxIdKind, getTypeOfTaxId, isSsnOptional } from '../../utils/ssn-uti
 import SSN4 from './components/ssn4';
 import TaxId from './components/tax-id';
 import useConvertFormData from './hooks/use-convert-form-data';
-import type { FormData } from './types';
+import type { FormValues } from './ssn.types';
 
 type T = TFunction<'idv', 'kyc.pages.ssn'>;
+
 type TaxPayerIdKind = NonNullable<ReturnType<typeof getTaxIdKind>>;
+
 type SsnOrTaxIdProps = {
   ctaLabel?: string;
   hideDisclaimer?: boolean;
@@ -28,7 +30,7 @@ type SsnOrTaxIdProps = {
   onComplete?: (args: KycData) => void;
 };
 
-const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
+const fieldByDi: Partial<Record<IdDI, keyof FormValues>> = {
   [IdDI.ssn4]: 'ssn4',
   [IdDI.ssn9]: 'ssn9',
   [IdDI.usTaxId]: 'usTaxId',
@@ -76,7 +78,7 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
   const subtitle = getSubTitle(t, requirementTaxIdKind);
   const hasDocStepup = config.requiresIdDoc;
 
-  const methods = useForm<FormData>({
+  const methods = useForm<FormValues>({
     defaultValues: {
       ssn4: data[IdDI.ssn4]?.value,
       ssn9: data[IdDI.ssn9]?.value,
@@ -107,7 +109,7 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
     });
   };
 
-  const onSubmitForm = (formData: FormData) => {
+  const onSubmitForm = (formData: FormValues) => {
     sendData(convertFormData(formData));
   };
 

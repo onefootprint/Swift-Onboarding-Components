@@ -2,15 +2,17 @@ import { useInputMask } from '@onefootprint/hooks';
 import { IcoShield24 } from '@onefootprint/icons';
 import { TextInput, Toggle } from '@onefootprint/ui';
 import { useEffect } from 'react';
-import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { getTaxIdInputPattern } from '../../../../utils/ssn-utils/ssn-utils';
+import type { FormValues } from '../../ssn.types';
 
-import { TFunction } from 'i18next';
 import InfoBox from '../../../../../../components/info-box';
 
 type VaultTaxId = 'ssn9' | 'usTaxId';
+
 type VisualTaxId = VaultTaxId | 'itin';
+
 type TaxIdProps = {
   disabled?: boolean;
   hideDisclaimer?: boolean;
@@ -21,16 +23,9 @@ type TaxIdProps = {
   visualTaxId: VisualTaxId;
 };
 
-const isSsn9 = (x: VisualTaxId): x is 'ssn9' => x === 'ssn9';
-const isItin = (x: VisualTaxId): x is 'itin' => x === 'itin';
+const isSsn9 = (value: VisualTaxId) => value === 'ssn9';
 
-const getErrorHint = (idProp: VisualTaxId, t: TFunction<'idv', 'kyc.pages.ssn'>, errors: FieldErrors<FieldValues>) => {
-  if (!errors?.[idProp]) return undefined;
-
-  const errorMessage = errors?.[idProp]?.message;
-  const fallbackMessage = idProp === 'ssn9' ? t('ssn-invalid') : t('ssn-us-tax-id-invalid');
-  return errorMessage && typeof errorMessage === 'string' ? errorMessage : fallbackMessage;
-};
+const isItin = (value: VisualTaxId) => value === 'itin';
 
 const TaxId = ({
   disabled,
@@ -48,7 +43,7 @@ const TaxId = ({
     getValues,
     formState: { errors },
     setValue,
-  } = useFormContext();
+  } = useFormContext<FormValues>();
 
   useEffect(() => {
     if (isSkipped) {
@@ -56,16 +51,34 @@ const TaxId = ({
     }
   }, [isSkipped, setValue]);
 
+  const getErrorHint = (taxId: VaultTaxId) => {
+    const errorMessage = errors?.[taxId]?.message;
+    const fallbackMessage = taxId === 'ssn9' ? t('ssn-invalid') : t('ssn-us-tax-id-invalid');
+    return errorMessage && typeof errorMessage === 'string' ? errorMessage : fallbackMessage;
+  };
+
+  const getLabel = (taxId: VisualTaxId) => {
+    if (isSsn9(taxId)) return t('ssn9-label');
+    if (isItin(taxId)) return t('itin-label');
+    return t('us-tax-id-label');
+  };
+
+  const getDisclaimerDescription = (taxId: VisualTaxId) => {
+    if (isSsn9(taxId)) return t('ssn9-disclaimer');
+    if (isItin(taxId)) return t('itin-disclaimer');
+    return t('us-tax-id-disclaimer');
+  };
+
   return (
     <>
       <TextInput
         autoFocus
-        data-nid-target={vaultTaxId}
         data-dd-privacy="mask"
+        data-nid-target={vaultTaxId}
         disabled={disabled}
         hasError={Boolean(errors[vaultTaxId])}
-        hint={getErrorHint(vaultTaxId, t, errors)}
-        label={isSsn9(visualTaxId) ? t('ssn9-label') : isItin(visualTaxId) ? t('itin-label') : t('us-tax-id-label')}
+        hint={getErrorHint(vaultTaxId)}
+        label={getLabel(visualTaxId)}
         mask={inputMasks.ssn}
         placeholder={t('ssn9-placeholder')}
         type="tel"
@@ -75,18 +88,14 @@ const TaxId = ({
           pattern: getTaxIdInputPattern(visualTaxId),
         })}
       />
-      {isOptional && <Toggle checked={isSkipped} label={t('skip-label')} onChange={onSkipChange} />}
-      {!hideDisclaimer && (
+      {isOptional ? <Toggle checked={isSkipped} label={t('skip-label')} onChange={onSkipChange} /> : null}
+      {hideDisclaimer ? null : (
         <InfoBox
           items={[
             {
               Icon: IcoShield24,
               title: t('your-data-is-safe'),
-              description: isSsn9(visualTaxId)
-                ? t('ssn9-disclaimer')
-                : isItin(visualTaxId)
-                  ? t('itin-disclaimer')
-                  : t('us-tax-id-disclaimer'),
+              description: getDisclaimerDescription(vaultTaxId),
             },
           ]}
           variant="default"
