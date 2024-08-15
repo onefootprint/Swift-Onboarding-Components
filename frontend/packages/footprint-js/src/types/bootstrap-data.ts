@@ -26,26 +26,13 @@ type IDProps = {
   'id.zip': string;
 };
 
-type Business_BeneficialOwners = {
-  email: string;
-  first_name: string;
-  last_name: string;
-  middle_name: string;
-  ownership_stake: number;
-  phone_number: string;
-};
-
 type BusinessProps = {
   'business.address_line1': string;
   'business.address_line2': string;
-  'business.beneficial_owners': Partial<Business_BeneficialOwners>[];
   'business.city': string;
   'business.corporation_type': string;
   'business.country': string;
   'business.dba': string;
-  'business.formation_date': string;
-  'business.formation_state': string;
-  'business.kyced_beneficial_owners': Partial<Business_BeneficialOwners>[];
   'business.name': string;
   'business.phone_number': string;
   'business.state': string;
