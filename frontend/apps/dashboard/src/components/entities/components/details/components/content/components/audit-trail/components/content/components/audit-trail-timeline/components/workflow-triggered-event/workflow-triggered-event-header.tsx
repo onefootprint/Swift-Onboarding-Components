@@ -17,7 +17,7 @@ const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProp
 
   return (
     <>
-      <Text variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary" display="flex" gap={2}>
         <Trans
           i18nKey="pages.entity.audit-trail.timeline.workflow-triggered-event.user-requested-to"
           values={{ action }}
