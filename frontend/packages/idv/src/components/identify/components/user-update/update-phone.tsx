@@ -1,5 +1,4 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import type { TFunction } from 'i18next';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -25,11 +24,6 @@ const isTest = process.env.NODE_ENV === 'test';
 const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
-const getHeaderTitle = (t: TFunction<'identify'>, kind: UpdateAuthMethodActionKind): string =>
-  kind === UpdateAuthMethodActionKind.replace // Maybe add some information that the company requires primary phone?
-    ? t('phone-step.replace-title')
-    : t('phone-step.add-primary-title');
-
 const UpdatePhone = ({ Header, authToken, actionKind, onSuccess, identifyVariant }: UpdatePhoneProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
@@ -52,7 +46,10 @@ const UpdatePhone = ({ Header, authToken, actionKind, onSuccess, identifyVariant
         onSubmit={handleOnSubmit}
         phoneValidator={handlePhoneValidation}
         texts={{
-          headerTitle: getHeaderTitle(t, actionKind),
+          headerTitle:
+            actionKind === UpdateAuthMethodActionKind.replace // Maybe add some information that the company requires primary phone?
+              ? t('phone-step.replace-title')
+              : t('phone-step.add-primary-title'),
           headerSubtitle: t('phone-step.subtitle'),
           cta: t('phone-step.verify-with-sms'),
           phoneInvalid: t('phone-step.form.input-invalid'),
