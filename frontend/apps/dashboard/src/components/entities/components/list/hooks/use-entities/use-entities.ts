@@ -10,8 +10,8 @@ import useFilters from '../../../../hooks/use-filters';
 
 const getEntities = async (authHeaders: AuthHeaders, req: GetEntitiesRequest) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { cursor, page_size, ...filters } = req;
-  const data = { pagination: { cursor, page_size }, ...filters };
+  const { cursor, pageSize, ...filters } = req;
+  const data = { pagination: { cursor, pageSize }, ...filters };
   const { data: response } = await request<PaginatedRequestResponse<GetEntitiesResponse>>({
     method: 'POST',
     url: '/entities/search',

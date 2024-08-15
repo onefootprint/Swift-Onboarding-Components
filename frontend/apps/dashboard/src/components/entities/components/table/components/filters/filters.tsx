@@ -1,7 +1,7 @@
+import { useEntitiesContext } from '@/entities/components/list/hooks/use-entities-context';
+import { EntityKind } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-
-import { useRouter } from 'next/router';
 import useFilters, { EntityStatusFilter } from '../../../../hooks/use-filters';
 import DrawerFilter from './components/drawer-filter';
 import Info from './components/info';
@@ -33,10 +33,10 @@ const Filters = () => {
     keyPrefix: 'pages.entities.filters',
   });
   const filters = useFilters();
-  const manualReviewQuery = useManualReview();
+  const context = useEntitiesContext();
+  const manualReviewQuery = useManualReview(context.kind);
   const isAll = !filters.values.state && !filters.values.verification;
-  const router = useRouter();
-  const isBusinesses = router.pathname.includes('/businesses');
+  const isBusinesses = context.kind === EntityKind.business;
 
   return (
     <>

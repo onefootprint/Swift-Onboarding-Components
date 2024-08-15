@@ -28,8 +28,8 @@ const useInitialFilters = (now = new Date()) => {
     if (requestParams.labels) {
       defaultData.labels = values.labels;
     }
-    if (requestParams.playbook_ids) {
-      defaultData.playbooks = requestParams.playbook_ids.reduce(
+    if (requestParams.playbookIds) {
+      defaultData.playbooks = requestParams.playbookIds.reduce(
         (acc, id) => {
           acc[id] = true;
           return acc;
@@ -38,13 +38,13 @@ const useInitialFilters = (now = new Date()) => {
       );
     }
     if (defaultData.others) {
-      if (requestParams.watchlist_hit) {
+      if (requestParams.watchlistHit) {
         defaultData.others.push('watchlist_hit');
       }
-      if (requestParams.has_outstanding_workflow_request) {
+      if (requestParams.hasOutstandingWorkflowRequest) {
         defaultData.others.push('has_outstanding_workflow_request');
       }
-      if (requestParams.show_unverified) {
+      if (requestParams.showUnverified) {
         defaultData.others.push('show_unverified');
       }
     }
