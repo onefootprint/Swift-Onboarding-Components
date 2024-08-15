@@ -1,3 +1,5 @@
+import isSandboxFixtureNumber from '../is-sandbox-fixture-number';
+
 const phones: Record<string, RegExp> = {
   'am-AM': /^(\+?374|0)(33|4[134]|55|77|88|9[13-689])\d{6}$/,
   'ar-AE': /^((\+?971)|0)?5[024568]\d{7}$/,
@@ -171,41 +173,44 @@ phones['fr-CH'] = phones['de-CH'];
 phones['it-CH'] = phones['fr-CH'];
 
 export default function isMobilePhone(
-  str: string,
-  locale?: string | string[],
-  options?: {
-    strictMode?: boolean;
-  },
+  value: string,
+  options: {
+    locale?: string | string[];
+    sandbox?: boolean;
+  } = {},
 ) {
-  if (options && options.strictMode && !str.startsWith('+')) {
-    return false;
+  if (options.sandbox) {
+    if (isSandboxFixtureNumber(value)) {
+      return true;
+    }
   }
-  if (Array.isArray(locale)) {
-    return locale.some(key => {
+
+  if (Array.isArray(options.locale)) {
+    return options.locale.some(key => {
       if (phones[key]) {
         const phone = phones[key];
-        if (phone.test(str)) {
+        if (phone.test(value)) {
           return true;
         }
       }
       return false;
     });
   }
-  if (locale && phones[locale]) {
-    return phones[locale].test(str);
+  if (options.locale && phones[options.locale]) {
+    return phones[options.locale].test(value);
   }
-  if (!locale) {
+  if (!options.locale) {
     for (const key in phones) {
       if (phones[key]) {
         const phone = phones[key];
-        if (phone.test(str)) {
+        if (phone.test(value)) {
           return true;
         }
       }
     }
     return false;
   }
-  throw new Error(`Invalid locale '${locale}'`);
+  throw new Error(`Invalid locale '${options.locale}'`);
 }
 
 export const locales = Object.keys(phones);

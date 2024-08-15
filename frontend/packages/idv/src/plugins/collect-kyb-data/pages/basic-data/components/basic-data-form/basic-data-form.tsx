@@ -1,6 +1,5 @@
 import { useInputMask } from '@onefootprint/hooks';
-import { PublicOnboardingConfig } from '@onefootprint/types';
-import { BusinessDI, CorporationType } from '@onefootprint/types';
+import { BusinessDI, CorporationType, type PublicOnboardingConfig } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';

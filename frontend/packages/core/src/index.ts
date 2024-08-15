@@ -24,3 +24,4 @@ export { default as isEmailDomain } from './validations/is-email-domain';
 export { default as isIpAddress } from './validations/is-ip-address';
 export { default as isPhoneCountryCode } from './validations/is-phone-country-code';
 export { default as isURL, isURLWithProtocol } from './validations/is-url';
+export { default as isSandboxFixtureNumber } from './validations/is-sandbox-fixture-number';

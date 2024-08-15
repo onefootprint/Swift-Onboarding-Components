@@ -1,15 +1,15 @@
 import validateBootstrapData from './validate-bootstrap-data';
 
 describe('validateBootstrapData', () => {
-  it('filters out entries with invalid values', () => {
+  it('should filter out invalid inputs', () => {
     expect(
       validateBootstrapData({
-        email: 'belce@onefootprint.com',
+        email: 'jane@onefootprint.com',
         phoneNumber: '+16204623730',
       }),
     ).toEqual({
       email: {
-        value: 'belce@onefootprint.com',
+        value: 'jane@onefootprint.com',
         isBootstrap: true,
       },
       phoneNumber: {
@@ -20,19 +20,19 @@ describe('validateBootstrapData', () => {
 
     expect(
       validateBootstrapData({
-        email: 'belce@onefootprint.com',
+        email: 'jane@onefootprint.com',
         phoneNumber: '++121313+',
       }),
     ).toEqual({
       email: {
-        value: 'belce@onefootprint.com',
+        value: 'jane@onefootprint.com',
         isBootstrap: true,
       },
     });
 
     expect(
       validateBootstrapData({
-        email: 'belce@!@@#!.com',
+        email: 'jane@!@@#!.com',
         phoneNumber: '+1231231231231231231231',
       }),
     ).toEqual({});
@@ -51,12 +51,12 @@ describe('validateBootstrapData', () => {
 
     expect(
       validateBootstrapData({
-        email: 'belce@onefootprint.com',
+        email: 'jane@onefootprint.com',
         phoneNumber: 'invalid-email',
       }),
     ).toEqual({
       email: {
-        value: 'belce@onefootprint.com',
+        value: 'jane@onefootprint.com',
         isBootstrap: true,
       },
     });
@@ -69,7 +69,7 @@ describe('validateBootstrapData', () => {
     ).toEqual({});
   });
 
-  it('accepts sandbox emails/phones', () => {
+  it('should accept valid inputs', () => {
     expect(
       validateBootstrapData({
         phoneNumber: '+16204623730#erwerwer',
@@ -78,7 +78,7 @@ describe('validateBootstrapData', () => {
 
     expect(
       validateBootstrapData({
-        email: 'belce@onefootprint.com#ooooo',
+        email: 'jane@onefootprint.com#ooooo',
       }),
     ).toEqual({});
   });

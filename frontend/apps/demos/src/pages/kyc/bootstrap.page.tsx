@@ -11,6 +11,7 @@ const launchFootprint = () => {
     publicKey,
     bootstrapData: {
       'id.email': 'jane@acme.com',
+      'id.phone_number': '+15555550100',
       'id.first_name': 'Jane',
       'id.last_name': 'Doe',
       'id.dob': '01/01/1990',

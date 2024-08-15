@@ -5,23 +5,17 @@ describe('isPhoneNumber', () => {
   describe('valid phone numbers', () => {
     it('should return true', () => {
       const validPhoneNumbers = [
-        // International format
-        // '+1234567890',
-
         // US
         '+12125552368', // Standard US mobile format with country code
         '2125552368', // US mobile without country code
         '(212) 555-2368', // US mobile with parentheses
         '212-555-2368', // US mobile with dashes
         '+1 212-555-2368', // US mobile with country code and dashes
-
         // MX Mobile Numbers
-        '+521234567890', // Standard MX mobile format with country code
         '+521234567890', // Standard MX mobile format with country code
         '1234567890', // MX mobile without country code
         '044123456790', // MX mobile with domestic prefix
       ];
-
       validPhoneNumbers.forEach(number => {
         expect(isPhoneNumber(number)).toBe(true);
       });
@@ -41,10 +35,20 @@ describe('isPhoneNumber', () => {
         '123-45-678', // Missing digits
         '(123) 456-7890', // US format with parentheses but missing country code
       ];
-
       invalidPhoneNumbers.forEach(number => {
         expect(isPhoneNumber(number)).toBe(false);
       });
+    });
+  });
+
+  describe('sandbox phone numbers', () => {
+    it('should return true for sandbox fixture number', () => {
+      expect(isPhoneNumber('+1 555-555-0100', { sandbox: true })).toBe(true);
+      expect(isPhoneNumber('+15555550100', { sandbox: true })).toBe(true);
+    });
+
+    it('should return false for non-sandbox numbers with sandbox option', () => {
+      expect(isPhoneNumber('', { sandbox: true })).toBe(false);
     });
   });
 });
