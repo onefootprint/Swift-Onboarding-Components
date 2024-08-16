@@ -1,4 +1,5 @@
 use super::fingerprint::Fingerprint;
+use super::scoped_vault_version::ScopedVaultVersion;
 use crate::nextval;
 use crate::DbError;
 use crate::DbResult;
@@ -182,6 +183,9 @@ impl DataLifetime {
                 origin_id: r.origin_id,
             })
             .collect();
+
+        ScopedVaultVersion::get_or_create(conn, scoped_vault_id, seqno)?;
+
         let result = diesel::insert_into(data_lifetime::table)
             .values(new_rows)
             .get_results::<Self>(conn.conn())?;
@@ -260,11 +264,16 @@ impl DataLifetime {
     #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
     pub fn bulk_deactivate(
         conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
-        let filter = Box::new(data_lifetime::id.eq_any(ids));
-        Self::_bulk_deactivate(conn, filter, seqno)
+        let filter = Box::new(
+            data_lifetime::id
+                .eq_any(ids)
+                .and(data_lifetime::scoped_vault_id.eq(scoped_vault_id.clone())),
+        );
+        Self::_bulk_deactivate(conn, scoped_vault_id, filter, seqno)
     }
 
     /// Deactivates the old DataLifetimes with the provided kinds associated with this (user,
@@ -281,12 +290,13 @@ impl DataLifetime {
                 .eq_any(kinds)
                 .and(data_lifetime::scoped_vault_id.eq(scoped_vault_id.clone())),
         );
-        Self::_bulk_deactivate(conn, filter, seqno)
+        Self::_bulk_deactivate(conn, scoped_vault_id, filter, seqno)
     }
 
     /// Deactivates the DLs with the provided filter, and any fingerprints for these DLs
     fn _bulk_deactivate(
         conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
         filter: Box<dyn BoxableExpression<data_lifetime::table, Pg, SqlType = sql_types::Bool>>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -296,14 +306,21 @@ impl DataLifetime {
             deactivated_seqno: Some(Some(seqno)),
             ..DataLifetimeUpdate::default()
         };
-        let results = diesel::update(data_lifetime::table)
+
+        let updated = diesel::update(data_lifetime::table)
             .filter(filter)
             .filter(data_lifetime::deactivated_seqno.is_null())
             .set(update)
             .get_results::<Self>(conn.conn())?;
-        let lifetime_ids = results.iter().map(|dl| &dl.id).collect_vec();
+
+        if !updated.is_empty() {
+            // Only update the SV version if the seqno was actually added to DLs.
+            ScopedVaultVersion::get_or_create(conn, scoped_vault_id, seqno)?;
+        }
+
+        let lifetime_ids = updated.iter().map(|dl| &dl.id).collect_vec();
         Fingerprint::bulk_deactivate(conn, lifetime_ids, deactivated_at)?;
-        Ok(results)
+        Ok(updated)
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided scoped_vault_id at a

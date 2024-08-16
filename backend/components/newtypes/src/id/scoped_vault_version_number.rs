@@ -19,6 +19,7 @@ use paperclip::actix::Apiv2Schema;
     derive_more::From,
     derive_more::Into,
     derive_more::FromStr,
+    derive_more::Add,
     serde::Serialize,
     serde::Deserialize,
     Default,

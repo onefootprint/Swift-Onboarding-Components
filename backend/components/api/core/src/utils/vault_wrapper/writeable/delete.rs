@@ -40,7 +40,7 @@ impl<Type> WriteableVw<Type> {
             .unzip();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        let _ = DataLifetime::bulk_deactivate(conn, dls, seqno)?;
+        let _ = DataLifetime::bulk_deactivate(conn, &self.sv.id, dls, seqno)?;
 
         Ok(dis)
     }
