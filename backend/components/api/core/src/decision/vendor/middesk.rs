@@ -823,11 +823,14 @@ impl MiddeskResponseDerivedVaultData {
     }
 
     pub fn write(self, conn: &mut TxnPgConn) -> FpResult<()> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
         let dis = Self::DATA_KINDS
             .iter()
             .map(|bdk| DataIdentifier::Business(*bdk))
             .collect();
+
+        let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
+
+        let seqno = DataLifetime::get_next_seqno(conn)?;
 
         // Clear all derived data kinds
         DataLifetime::bulk_deactivate_kinds(conn, &self.scoped_vault_id, dis, seqno)?;
@@ -838,7 +841,6 @@ impl MiddeskResponseDerivedVaultData {
         if !self.data_request.is_empty() {
             // Then add new vault data
             let sources = DataLifetimeSources::single(DataLifetimeSource::Vendor);
-            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
 
             //TODO: we should probably store the resulting seqno somewhere on the vres?
             let _ = uvw.patch_data(conn, self.data_request, sources, None)?;
