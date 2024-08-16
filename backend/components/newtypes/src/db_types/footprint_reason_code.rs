@@ -1566,7 +1566,7 @@ impl FootprintReasonCode {
                 | Self::InputPhoneNumberDoesNotMatchIpState
                 | Self::DocumentRequiresReview
                 | Self::DocumentLowMatchScoreWithSelfie
-                | Self::IpTorExitNode // 2024-04-12 new naming for this one
+                | Self::IpAlertHighRiskTor // 2024-04-12 new naming for this one
         )
     }
 }
