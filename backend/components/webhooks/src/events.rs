@@ -196,7 +196,7 @@ pub struct UserVaultUpdatedPayload {
     pub fp_id: FpId,
     pub timestamp: DateTime<Utc>,
     pub is_live: bool,
-    #[schemars(with = "Option<UserVaultUpdateSourceShadow>")]
+    #[schemars(with = "UserVaultUpdateSourceShadow")]
     pub source: UserVaultUpdateSource,
     #[schemars(with = "Vec<String>")]
     pub fields: Vec<DataIdentifier>,
