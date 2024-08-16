@@ -52,30 +52,16 @@ data class FootprintBootstrapData(
     @SerialName("id.visa_expiration_date") val visaExpirationDate: String? = null,
     @SerialName("business.address_line1") val businessAddressLine1: String? = null,
     @SerialName("business.address_line2") val businessAddressLine2: String? = null,
-    @SerialName("business.beneficial_owners") val businessBeneficialOwners: List<BusinessBeneficialOwners>? = null,
     @SerialName("business.city") val businessCity: String? = null,
     @SerialName("business.corporation_type") val businessCorporationType: String? = null,
     @SerialName("business.country") val businessCountry: String? = null,
     @SerialName("business.dba") val businessDba: String? = null,
-    @SerialName("business.formation_date") val businessFormationDate: String? = null,
-    @SerialName("business.formation_state") val businessFormationState: String? = null,
-    @SerialName("business.kyced_beneficial_owners") val businessKycedBeneficialOwners: List<BusinessBeneficialOwners>? = null,
     @SerialName("business.name") val businessName: String? = null,
     @SerialName("business.phone_number") val businessPhoneNumber: String? = null,
     @SerialName("business.state") val businessState: String? = null,
     @SerialName("business.tin") val businessTin: String? = null,
     @SerialName("business.website") val businessWebsite: String? = null,
     @SerialName("business.zip") val businessZip: String? = null
-)
-
-@Serializable
-data class BusinessBeneficialOwners(
-    @SerialName("email") val boEmail: String? = null,
-    @SerialName("first_name") val boFirstName: String? = null,
-    @SerialName("last_name") val boLastName: String? = null,
-    @SerialName("middle_name") val boMiddleName: String? = null,
-    @SerialName("ownership_stake") val boOwnershipStack: Int? = null,
-    @SerialName("phone_number") val boPhoneNumber: String? = null
 )
 
 @Serializable

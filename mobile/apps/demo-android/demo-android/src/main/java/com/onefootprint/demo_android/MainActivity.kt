@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.android.BusinessBeneficialOwners
 import com.footprint.android.FootprintAndroid
 import com.footprint.android.FootprintAppearance
 import com.footprint.android.FootprintAppearanceRules
@@ -44,18 +43,11 @@ class MainActivity : AppCompatActivity() {
                 visaExpirationDate = "05/12/2024",
                 businessAddressLine1 = "1 Main St",
                 businessAddressLine2 = "Apt 10",
-                businessBeneficialOwners = listOf(BusinessBeneficialOwners(
-                    boEmail = "example@gmail.com",
-                    boFirstName = "Piip",
-                    boLastName = "Foot",
-                    boPhoneNumber = "+15555550100"
-                )),
                 businessCity = "San Francisco",
                 businessState = "CA",
                 businessCountry = "US",
                 businessCorporationType = "llc",
                 businessDba = "Test",
-                businessFormationDate = "2010-01-01",
                 businessName = "Acme",
                 businessPhoneNumber = "+15555550100",
                 businessTin = "12-3456789",
