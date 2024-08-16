@@ -145,11 +145,11 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
 
   return (
     <>
-      {!hideHeader && <NavigationHeader />}
+      {hideHeader ? null : <NavigationHeader />}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit}>
           <Grid.Container gap={7} width="100%">
-            {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
+            {hideHeader ? null : <HeaderTitle title={title} subtitle={subtitle} />}
             <Stack gap={7} direction="column">
               {requirementTaxIdKind === 'usTaxId' ? (
                 <TaxId

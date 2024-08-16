@@ -1,8 +1,8 @@
+import { isSsn4 } from '@onefootprint/core';
 import { useInputMask } from '@onefootprint/hooks';
 import { TextInput, Toggle } from '@onefootprint/ui';
-import { TFunction } from 'i18next';
 import { useEffect } from 'react';
-import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormValues } from '../../ssn.types';
 
@@ -11,17 +11,6 @@ type SSN4Props = {
   isOptional?: boolean;
   isSkipped: boolean;
   onSkipChange: () => void;
-};
-
-const getErrorHint = (errors: FieldErrors<FieldValues>, t: TFunction<'idv', 'kyc.pages.ssn'>) => {
-  if (!errors.ssn4) {
-    return undefined;
-  }
-  const { message } = errors.ssn4;
-  if (message && typeof message === 'string') {
-    return message;
-  }
-  return t('ssn-invalid');
 };
 
 const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
@@ -44,20 +33,22 @@ const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
     <>
       <TextInput
         autoFocus
-        data-nid-target="ssn4"
         data-dd-privacy="mask"
+        data-nid-target="ssn4"
         disabled={disabled}
         hasError={!!errors.ssn4}
-        hint={getErrorHint(errors, t)}
-        label={t('ssn4-label')}
+        hint={errors.ssn4?.message}
+        label={t('ssn-4.label')}
         mask={inputMasks.lastFourSsn}
-        placeholder={t('ssn4-placeholder')}
+        placeholder={t('ssn-4.placeholder')}
         type="tel"
         value={getValues('ssn4')}
         {...register('ssn4', {
-          required: !isSkipped,
-          // 0000 is not allowed, has to be 4 digits long
-          pattern: /^((?!(0000))\d{4})$/,
+          validate: value => {
+            if (!value) return t('ssn-4.errors.required');
+            if (!isSsn4(value)) return t('ssn-4.errors.invalid');
+            return true;
+          },
         })}
       />
       {isOptional && <Toggle checked={isSkipped} label={t('skip-label')} onChange={onSkipChange} />}

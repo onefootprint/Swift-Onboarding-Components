@@ -421,8 +421,6 @@
         "skip-label": "I don't have a Social Security Number",
         "ssn-invalid": "SSN cannot be empty or is invalid",
         "ssn-us-tax-id-invalid": "SSN or ITIN cannot be empty or is invalid",
-        "ssn4-label": "SSN (last 4)",
-        "ssn4-placeholder": "XXXX",
         "ssn4-subtitle": "We need to collect this information to verify your identity.",
         "ssn4-title": "What are the last 4 digits of your Social Security Number?",
         "ssn9-disclaimer": "Your SSN is encrypted and protected by a state-of-the-art secure environment.",
@@ -434,6 +432,14 @@
         "us-tax-id-label": "Tax ID",
         "us-tax-id-title": "What's your Tax ID?",
         "your-data-is-safe": "Your data is safe",
+        "ssn-4": {
+          "label": "SSN (last 4)",
+          "placeholder": "XXXX",
+          "errors": {
+            "required": "SSN cannot be empty",
+            "invalid": "SSN is invalid"
+          }
+        },
         "skip": {
           "cta": "I don't have a Social Security Number",
           "confirmation": {
