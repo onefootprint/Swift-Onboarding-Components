@@ -27,14 +27,10 @@ public struct FootprintBootstrapData: Encodable {
     
     public var businessAddressLine1: String?
     public var businessAddressLine2: String?
-    public var businessBeneficialOwners: [BusinessBeneficialOwners]?
     public var businessCity: String?
     public var businessCorporationType: String?
     public var businessCountry: String?
     public var businessDba: String?
-    public var businessFormationDate: String?
-    public var businessFormationState: String?
-    public var businessKycedBeneficialOwners: [BusinessBeneficialOwners]?
     public var businessName: String?
     public var businessPhoneNumber: String?
     public var businessState: String?
@@ -67,14 +63,10 @@ public struct FootprintBootstrapData: Encodable {
                 driversLicenseState: String? = nil,
                 businessAddressLine1: String? = nil,
                 businessAddressLine2: String? = nil,
-                businessBeneficialOwners: [BusinessBeneficialOwners]? = nil,
                 businessCity: String? = nil,
                 businessCorporationType: String? = nil,
                 businessCountry: String? = nil,
                 businessDba: String? = nil,
-                businessFormationDate: String? = nil,
-                businessFormationState: String? = nil,
-                businessKycedBeneficialOwners: [BusinessBeneficialOwners]? = nil,
                 businessName: String? = nil,
                 businessPhoneNumber: String? = nil,
                 businessState: String? = nil,
@@ -107,14 +99,10 @@ public struct FootprintBootstrapData: Encodable {
         
         self.businessAddressLine1 = businessAddressLine1
         self.businessAddressLine2 = businessAddressLine2
-        self.businessBeneficialOwners = businessBeneficialOwners
         self.businessCity = businessCity
         self.businessCorporationType = businessCorporationType
         self.businessCountry = businessCountry
         self.businessDba = businessDba
-        self.businessFormationDate = businessFormationDate
-        self.businessFormationState = businessFormationState
-        self.businessKycedBeneficialOwners = businessKycedBeneficialOwners
         self.businessName = businessName
         self.businessPhoneNumber = businessPhoneNumber
         self.businessState = businessState
@@ -149,14 +137,10 @@ public struct FootprintBootstrapData: Encodable {
         case middleName = "id.middle_name"
         case businessAddressLine1 = "business.address_line1"
         case businessAddressLine2 = "business.address_line2"
-        case businessBeneficialOwners = "business.beneficial_owners"
         case businessCity = "business.city"
         case businessCorporationType = "business.corporation_type"
         case businessCountry = "business.country"
         case businessDba = "business.dba"
-        case businessFormationDate = "business.formation_date"
-        case businessFormationState = "business.formation_state"
-        case businessKycedBeneficialOwners = "business.kyced_beneficial_owners"
         case businessName = "business.name"
         case businessPhoneNumber = "business.phone_number"
         case businessState = "business.state"
@@ -192,62 +176,15 @@ public struct FootprintBootstrapData: Encodable {
         try container.encodeIfPresent(self.middleName, forKey: .middleName)
         try container.encodeIfPresent(self.businessAddressLine1, forKey: .businessAddressLine1)
         try container.encodeIfPresent(self.businessAddressLine2, forKey: .businessAddressLine2)
-        try container.encodeIfPresent(self.businessBeneficialOwners, forKey: .businessBeneficialOwners)
         try container.encodeIfPresent(self.businessCity, forKey: .businessCity)
         try container.encodeIfPresent(self.businessCorporationType, forKey: .businessCorporationType)
         try container.encodeIfPresent(self.businessCountry, forKey: .businessCountry)
         try container.encodeIfPresent(self.businessDba, forKey: .businessDba)
-        try container.encodeIfPresent(self.businessFormationDate, forKey: .businessFormationDate)
-        try container.encodeIfPresent(self.businessFormationState, forKey: .businessFormationState)
-        try container.encodeIfPresent(self.businessKycedBeneficialOwners, forKey: .businessKycedBeneficialOwners)
         try container.encodeIfPresent(self.businessName, forKey: .businessName)
         try container.encodeIfPresent(self.businessPhoneNumber, forKey: .businessPhoneNumber)
         try container.encodeIfPresent(self.businessState, forKey: .businessState)
         try container.encodeIfPresent(self.businessTin, forKey: .businessTin)
         try container.encodeIfPresent(self.businessWebsite, forKey: .businessWebsite)
         try container.encodeIfPresent(self.businessZip, forKey: .businessZip)
-    }
-}
-
-
-public struct BusinessBeneficialOwners: Encodable {
-    public var boEmail: String?
-    public var boFirstName: String?
-    public var boLastName: String?
-    public var boMiddleName: String?
-    public var boOwnershipStack: Int?
-    public var boPhoneNumber: String?
-    
-    public init(boEmail: String? = nil,
-                boFirstName: String? = nil,
-                boLastName: String? = nil,
-                boMiddleName: String? = nil,
-                boOwnershipStack: Int? = nil,
-                boPhoneNumber: String? = nil) {
-        self.boEmail = boEmail
-        self.boFirstName = boFirstName
-        self.boLastName = boLastName
-        self.boMiddleName = boMiddleName
-        self.boOwnershipStack = boOwnershipStack
-        self.boPhoneNumber = boPhoneNumber
-    }
-    
-    private enum CodingKeys: String, CodingKey {
-        case boEmail = "email"
-        case boFirstName = "first_name"
-        case boLastName = "last_name"
-        case boMiddleName = "middle_name"
-        case boOwnershipStack = "ownership_stake"
-        case boPhoneNumber = "phone_number"
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(self.boEmail, forKey: .boEmail)
-        try container.encodeIfPresent(self.boFirstName, forKey: .boFirstName)
-        try container.encodeIfPresent(self.boLastName, forKey: .boLastName)
-        try container.encodeIfPresent(self.boMiddleName, forKey: .boMiddleName)
-        try container.encodeIfPresent(self.boOwnershipStack, forKey: .boOwnershipStack)
-        try container.encodeIfPresent(self.boPhoneNumber, forKey: .boPhoneNumber)
     }
 }
