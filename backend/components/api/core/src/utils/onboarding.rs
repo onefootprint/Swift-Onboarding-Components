@@ -64,6 +64,7 @@ pub struct NewOnboardingArgs<'a> {
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,
     pub is_neuro_enabled: bool,
+    pub is_secondary_bo: bool,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -85,6 +86,7 @@ pub fn get_or_start_onboarding(
         actor,
         maybe_prefill_data,
         is_neuro_enabled,
+        is_secondary_bo,
     } = args;
     let user_vault = Vault::lock(conn, &sv.vault_id)?;
     if !obc.kind.can_onboard() {
@@ -156,7 +158,7 @@ pub fn get_or_start_onboarding(
     let biz_wf = maybe_create_business_wf(conn, args)?;
 
     if is_new_ob {
-        maybe_create_doc_requests(conn, &wf_id, biz_wf.as_ref(), obc)?;
+        maybe_create_doc_requests(conn, &wf_id, biz_wf.as_ref(), obc, is_secondary_bo)?;
     }
 
     Ok((wf_id, biz_wf, is_new_ob))
@@ -247,6 +249,7 @@ fn maybe_create_doc_requests(
     wf_id: &WorkflowId,
     biz_wf: Option<&Workflow>,
     obc: &ObConfiguration,
+    is_secondary_bo: bool,
 ) -> FpResult<()> {
     let wf = Workflow::get(conn, wf_id)?;
     let user_doc_requests = match wf.config {
@@ -265,10 +268,10 @@ fn maybe_create_doc_requests(
         }
     };
     let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf));
-    let biz_doc_requests = obc
-        .business_documents_to_collect
-        .clone()
+    let biz_doc_requests = (!is_secondary_bo)
+        .then_some(obc.business_documents_to_collect.clone())
         .into_iter()
+        .flatten()
         .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
 
 

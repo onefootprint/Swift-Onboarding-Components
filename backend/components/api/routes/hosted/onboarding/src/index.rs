@@ -114,6 +114,7 @@ pub async fn post(
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,
+                is_secondary_bo: user_auth.is_secondary_bo(),
             };
             let (wf_id, biz_wf, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
 

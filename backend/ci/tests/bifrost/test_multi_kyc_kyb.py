@@ -27,6 +27,16 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
         must_collect_data + kyb_cdos,
         can_access_data + kyb_cdos,
         kind="kyb",
+        business_documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Business document",
+                    identifier="document.custom.biz_doc",
+                    requires_human_review=False,
+                ),
+            ),
+        ],
     )
 
 
@@ -72,6 +82,11 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     # Shouldn't have collected business data from the secondary owner
     assert not any(
         req["kind"] == "collect_business_data"
+        for req in secondary_bo.client.handled_requirements
+    )
+    # Only the first BO to fill out the KYB form should have to upload the business documents
+    assert not any(
+        req["kind"] == "collect_document"
         for req in secondary_bo.client.handled_requirements
     )
 

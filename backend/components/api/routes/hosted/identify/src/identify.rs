@@ -4,6 +4,7 @@ use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
@@ -18,6 +19,7 @@ use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyRequest;
 use api_wire_types::IdentifyResponse;
 use db::models::scoped_vault::ScopedVault;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::email::Email;
 use newtypes::DataIdentifier;
@@ -171,18 +173,24 @@ pub(super) async fn create_identified_token(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scopes = vec![];
-            // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
-            let bo = ob_context.as_ref().and_then(|obc| obc.business_owner()).cloned();
-            let sb = if let Some(bo) = bo.as_ref() {
-                if let Some(obc) = ob_context.as_ref() {
+            let (bo, sb) = if let Some(obc) = ob_context.as_ref() {
+                if let Some(bo) = obc.secondary_business_owner().cloned() {
                     let sb = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant().id))?;
-                    Some(sb)
+                    (Some(bo), Some(sb))
                 } else {
-                    None
+                    (None, None)
                 }
             } else {
-                None
+                (None, None)
             };
+            let purposes = chain!(
+                Some(scope.into()),
+                // TODO we should migrate the BO tokens to use these new un-authed, identified tokens.
+                // Then the purpose here would come from the SecondayBo token. But for now, we'll just
+                // manually add this purpose to keep track of when the auth session is for a secondary BO.
+                bo.is_some().then_some(TokenCreationPurpose::SecondaryBo),
+            )
+            .collect();
             let context = NewUserSessionContext {
                 su_id: sv.map(|sv| sv.id),
                 sb_id: sb.map(|sb| sb.id),
@@ -192,7 +200,7 @@ pub(super) async fn create_identified_token(
             };
             let args = NewUserSessionArgs {
                 user_vault_id: v_id,
-                purposes: vec![scope.into()],
+                purposes,
                 context,
                 scopes: scopes.clone(),
                 auth_events: vec![],

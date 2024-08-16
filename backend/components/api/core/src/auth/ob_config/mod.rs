@@ -33,7 +33,7 @@ impl ObConfigAuth {
     }
 
     /// The BusinessOwner associated with this auth session. Only non-null for BoSessionAuth
-    pub fn business_owner(&self) -> Option<&BusinessOwner> {
+    pub fn secondary_business_owner(&self) -> Option<&BusinessOwner> {
         match self {
             Either::Right(Either::Right(a)) => Some(&a.bo),
             _ => None,

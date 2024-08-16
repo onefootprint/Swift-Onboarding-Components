@@ -85,6 +85,8 @@ pub enum TokenCreationPurpose {
     Kba,
     /// This token was created after adding a workflow
     AddWorkflow,
+    /// This token was created to onboard a secondary BO in a multi-KYC playbook
+    SecondaryBo,
     ApiOnboard,
     ApiReonboard,
     ApiInherit,
@@ -126,6 +128,7 @@ impl TokenCreationPurpose {
             | Self::BifrostComponentsSdk
             | Self::Handoff
             | Self::AddWorkflow
+            | Self::SecondaryBo
             | Self::Kba => false,
         }
     }
@@ -309,6 +312,12 @@ impl UserSession {
     /// API.
     pub fn is_from_api(&self) -> bool {
         self.purposes.iter().any(|p| p.is_from_api())
+    }
+
+    pub fn is_secondary_bo(&self) -> bool {
+        self.purposes
+            .iter()
+            .any(|p| matches!(p, TokenCreationPurpose::SecondaryBo))
     }
 }
 

@@ -161,6 +161,7 @@ pub async fn post(
                 maybe_prefill_data: None,
                 // can't run neuro if using this path
                 is_neuro_enabled: false,
+                is_secondary_bo: false,
             };
             let (wf_id, _, is_new_ob) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
             if !is_new_ob {
