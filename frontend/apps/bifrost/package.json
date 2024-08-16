@@ -67,7 +67,9 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"]
+    "setupFiles": [
+      "<rootDir>/src/config/initializers/i18next-test.ts"
+    ]
   },
   "browser": {
     "fs": false

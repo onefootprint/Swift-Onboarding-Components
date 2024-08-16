@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.12.2
+
+### Patch Changes
+
+- b42f3e862c: Use correct url for update auth methods
+
 ## 3.12.1
 
 ### Patch Changes
@@ -173,10 +179,10 @@
 
   ```js
   const userData = {
-    'id.email': 'jane.doe@acme.com',
-    'id.phone_number': '+12025550179',
+    "id.email": "jane.doe@acme.com",
+    "id.phone_number": "+12025550179",
     //...and so on for the rest of the data.
-    'id.nationality': 'US',
+    "id.nationality": "US",
   };
   ```
 
