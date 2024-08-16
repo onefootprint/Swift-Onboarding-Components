@@ -69,7 +69,14 @@ const QRRegister = () => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container textAlign="center">
         <Grid.Item paddingBottom={7} direction="column" gap={5}>
-          <HeaderTitle title={title} subtitle={linkSentToPhoneSubtitle} icon={IcoSmartphone40} />
+          <HeaderTitle
+            title={title}
+            subtitle={linkSentToPhoneSubtitle}
+            icon={IcoSmartphone40}
+            gap={5}
+            display="flex"
+            flexDirection="column"
+          />
           <SmsButtonWithCountdown authToken={scopedAuthToken} url={urlStr} />
         </Grid.Item>
         <QRSection
