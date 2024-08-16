@@ -75,35 +75,44 @@ def test_create_tag(sandbox_tenant, is_api):
         auth = sandbox_tenant.db_auths
         api_base = "entities"
 
+    tag1 = "deliquent"
+    tag2 = "flerp_derp_blerp"
+
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
-    data = {"tag": "delinquent"}
+    data = {"tag": tag1}
     tag = post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
+    tag1_id = tag["id"]
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
 
     assert len(body) == 1
-    assert body[0]["tag"] == "delinquent"
+    assert body[0]["tag"] == tag1
     created_time = body[0]["created_at"]
 
     # create the same tag, no-ops
     post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert len(body) == 1
-    assert body[0]["tag"] == "delinquent"
+    assert body[0]["tag"] == tag1
     assert created_time == body[0]["created_at"]
 
-    data = {"tag": "flerp_derp_blerp"}
+    data = {"tag": tag2}
     post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
-    assert body[0]["tag"] == "delinquent"
-    assert body[1]["tag"] == "flerp_derp_blerp"
+    assert body[0]["tag"] == tag1
+    assert body[1]["tag"] == tag2
 
     # Make sure the tags exist in entities API
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
-    assert set(i["tag"] for i in body["tags"]) == {"delinquent", "flerp_derp_blerp"}
+    assert set(i["tag"] for i in body["tags"]) == {tag1, tag2}
 
-    tag_id = tag["id"]
-    delete(f"/{api_base}/{user.fp_id}/tags/{tag_id}", None, *auth)
+    delete(f"/{api_base}/{user.fp_id}/tags/{tag1_id}", None, *auth)
     body = get(f"/{api_base}/{user.fp_id}/tags", None, *auth)
     assert len(body) == 1
-    assert body[0]["tag"] == "flerp_derp_blerp"
+    assert body[0]["tag"] == tag2
+
+    # Now add a previously added tag back, and it should re-add
+    data = {"tag": tag1}
+    tag = post(f"/{api_base}/{user.fp_id}/tags", data, *auth)
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert set(i["tag"] for i in body["tags"]) == {tag1, tag2}

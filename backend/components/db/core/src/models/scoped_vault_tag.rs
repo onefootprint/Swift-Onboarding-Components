@@ -76,6 +76,7 @@ impl ScopedVaultTag {
     pub fn get_or_create(conn: &mut PgConn, args: NewScopedVaultTag) -> Result<ScopedVaultTag, DbError> {
         let existing = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq(&args.scoped_vault_id))
+            .filter(scoped_vault_tag::deactivated_seqno.is_null())
             .filter(scoped_vault_tag::kind.eq(&args.kind))
             .get_result(conn)
             .optional()?;
