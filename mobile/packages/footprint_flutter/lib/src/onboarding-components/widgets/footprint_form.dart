@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/form_context_notifier.dart';
 
 typedef FormProps = ({
@@ -15,7 +15,7 @@ final formContextNotifierProvider =
         () => FormContextNotifier());
 
 class FootprintForm extends StatelessWidget {
-  final void Function(FootprintBootstrapData formData) onSubmit;
+  final void Function(FormData formData) onSubmit;
   final Widget Function(void Function() handleSubmit, FormProps props)
       createForm;
   final Map<String, dynamic>? initialData;
@@ -51,7 +51,7 @@ class FormWrapper extends ConsumerStatefulWidget {
       required this.createForm,
       this.initialData});
 
-  final void Function(FootprintBootstrapData formData) onSubmit;
+  final void Function(FormData formData) onSubmit;
   final Widget Function(void Function() handleSubmit, FormProps props)
       createForm;
   final Map<String, dynamic>? initialData;
@@ -68,8 +68,9 @@ class _FootprintFormState extends ConsumerState<FormWrapper> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.initialData != null) {
-        ref.read(formContextNotifierProvider.notifier).updateFormData(
-            FootprintBootstrapData.fromJson(widget.initialData!));
+        ref
+            .read(formContextNotifierProvider.notifier)
+            .updateFormData(FormData.fromJson(widget.initialData!));
       }
     });
   }

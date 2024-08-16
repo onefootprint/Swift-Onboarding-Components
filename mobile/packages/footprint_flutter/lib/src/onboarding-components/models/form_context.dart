@@ -1,8 +1,8 @@
-import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 
 class FormContext {
-  final FootprintBootstrapData formData;
+  final FormData formData;
   final FormErrors formErrors;
 
   FormContext({
@@ -11,7 +11,7 @@ class FormContext {
   });
 
   FormContext copyWith({
-    FootprintBootstrapData? formData,
+    FormData? formData,
     FormErrors? formErrors,
   }) {
     return FormContext(

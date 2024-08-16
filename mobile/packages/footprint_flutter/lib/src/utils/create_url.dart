@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:footprint_flutter/src/models/configuration.dart';
+import 'package:footprint_flutter/src/models/internal/configuration.dart';
 import 'package:meta/meta.dart';
 
 @internal
 String createUrl({
-  FootprintConfiguration? config,
+  Configuration? config,
   String? redirectUrl,
   required String token,
 }) {

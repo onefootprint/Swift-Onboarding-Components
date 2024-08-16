@@ -1,16 +1,16 @@
-import 'package:footprint_flutter/src/models/bootstrap_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class FormContextNotifier extends Notifier<FormContext> {
   @override
   FormContext build() {
     return FormContext(
-        formData: FootprintBootstrapData(), formErrors: FormErrors(errors: {}));
+        formData: FormData(), formErrors: FormErrors(errors: {}));
   }
 
-  void updateFormData(FootprintBootstrapData data) {
+  void updateFormData(FormData data) {
     state = state.copyWith(formData: data);
   }
 

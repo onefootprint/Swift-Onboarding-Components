@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/src/models/bootstrap_data.dart';
-import 'package:footprint_flutter/src/models/configuration.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
@@ -19,7 +19,7 @@ typedef IdentifyLauncher = void Function({
   void Function()? onCancel,
 });
 
-typedef SaveHandler = Future<void> Function(FootprintBootstrapData data);
+typedef SaveHandler = Future<void> Function(FormData data);
 typedef HandoffHandler = void Function({
   void Function(String validationToken)? onComplete,
   void Function(Object err)? onError,
@@ -45,11 +45,11 @@ typedef HandoffHandler = void Function({
     final publicKey = ref.read(fpContextNotifierProvider).publicKey;
     final redirectUrl = ref.read(fpContextNotifierProvider).redirectUrl;
 
-    final data = FootprintBootstrapData(email: email, phoneNumber: phoneNumber);
+    final data = FormData(email: email, phoneNumber: phoneNumber);
 
     final config = FootprintConfiguration(
         publicKey: publicKey,
-        bootstrapData: data,
+        formData: data,
         redirectUrl: redirectUrl,
         onAuthComplete: (
             {required String authToken, required String vaultingToken}) {
@@ -71,7 +71,7 @@ typedef HandoffHandler = void Function({
     fpWebview.init(config, OnboardingStep.auth, context);
   }
 
-  Future<void> vault(FootprintBootstrapData data) async {
+  Future<void> vault(FormData data) async {
     final fpContext = ref.read(fpContextNotifierProvider);
     final vaultToken = fpContext.vaultingToken;
     final onboardingConfig = fpContext.onboardingConfig;

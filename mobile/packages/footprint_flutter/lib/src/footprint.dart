@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:footprint_flutter/src/models/configuration.dart';
+import 'package:footprint_flutter/src/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/utils/create_url.dart';
 import 'package:footprint_flutter/src/utils/logger.dart';
 import 'package:footprint_flutter/src/utils/send_sdk_args.dart';

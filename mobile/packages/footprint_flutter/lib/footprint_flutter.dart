@@ -1,7 +1,7 @@
 library;
 
 export 'src/footprint.dart';
-export 'src/models/configuration.dart';
+export 'src/models/footprint_configuration.dart';
 export 'src/models/appearance.dart';
 export 'src/models/bootstrap_data.dart';
 export 'src/models/l10n.dart';
@@ -13,3 +13,4 @@ export 'src/onboarding-components/widgets/footprint_form.dart';
 export "src/onboarding-components/utils/footprint_utils.dart";
 export 'src/config/countries.dart';
 export 'src/config/corporation_types.dart';
+export 'src/onboarding-components/models/form_data.dart';

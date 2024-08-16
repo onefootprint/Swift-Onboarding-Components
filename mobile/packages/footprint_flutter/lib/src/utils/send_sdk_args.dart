@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
-import 'package:footprint_flutter/src/models/configuration.dart';
+import 'package:footprint_flutter/src/models/internal/configuration.dart';
 import 'package:http/http.dart' as http;
 
 class SdkArgsResponse {
@@ -39,7 +39,7 @@ Future<SdkArgsResponse> _sendSdkArgsRecursive(
   }
 }
 
-Future<SdkArgsResponse> sendSdkArgs(FootprintConfiguration data,
+Future<SdkArgsResponse> sendSdkArgs(Configuration data,
     {bool? isComponentSdk}) async {
   final dataJson = data.toJson();
   if (isComponentSdk != null) {

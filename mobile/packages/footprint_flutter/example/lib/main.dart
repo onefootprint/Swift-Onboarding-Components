@@ -1,6 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: Container(
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size.fromWidth(300),
+                    padding: const EdgeInsets.all(12),
+                  ),
+                  onPressed: () {
+                    Navigator.of(_context).push(
+                      MaterialPageRoute(
+                        builder: (_context) => const Hosted(),
+                      ),
+                    );
+                  },
+                  child: const Text("Footprint Hosted Flow"),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: const Size.fromWidth(300),
+                      padding: const EdgeInsets.all(12),
+                    ),
+                    onPressed: () {
+                      Navigator.of(_context).push(
+                        MaterialPageRoute(
+                          builder: (_context) => const OnboardingComponents(),
+                        ),
+                      );
+                    },
+                    child: const Text("Footprint Onboarding Components")),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Example of how to use the Footprint Flutter SDK to create a hosted verification flow
+class Hosted extends StatelessWidget {
+  const Hosted({Key? key}) : super(key: key);
+
+  void handlePress(BuildContext context) {
+    var bootstrapData = FootprintBootstrapData(
+        email: "example@gmail.com",
+        phoneNumber: "+15555550100",
+        firstName: "Piip",
+        middleName: "the",
+        lastName: "Foot",
+        dob: "01/01/1996",
+        addressLine1: "123 Main St",
+        addressLine2: "Unit 123",
+        city: "Huntington Beach",
+        state: "CA",
+        country: "US",
+        zip: "12345",
+        ssn9: "343434344",
+        ssn4: "1234",
+        nationality: "US",
+        usLegalStatus: "citizen",
+        citizenships: ["US", "BD"],
+        visaKind: "f1",
+        visaExpirationDate: "05/12/2024",
+        businessAddressLine1: "1 Main St",
+        businessAddressLine2: "Apt 10",
+        businessCity: "San Francisco",
+        businessCorporationType: "llc",
+        businessCountry: "US",
+        businessDba: "Test",
+        businessName: "Acme",
+        businessPhoneNumber: "+15555550100",
+        businessState: "CA",
+        businessTin: "12-3456789",
+        businessWebsite: "test.test.com",
+        businessZip: "94107");
+
+    var config = FootprintConfiguration(
+        appearance: FootprintAppearance(
+            variables: FootprintAppearanceVariables(buttonPrimaryBg: 'red')),
+        l10n: FootprintL10n(language: FootprintSupportedLanguage.en),
+        onCancel: () => print("onCancel"),
+        onComplete: (String token) => print("onComplete $token"),
+        publicKey:
+            "pb_test_pZoERpZeZkGW7RRVeBawSm", // using kyb public key to test the business bootstrap data as well
+        redirectUrl: "com.footprint.fluttersdk://example",
+        bootstrapData: bootstrapData);
+    footprint.init(config, context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (_context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Hosted flow'),
+        ),
+        body: Container(
+          // center child
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+          ),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              fixedSize: const Size.fromWidth(120),
+              padding: const EdgeInsets.all(12),
+            ),
+            onPressed: () => handlePress(context),
+            child: const Text("Verify"),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Example of how to use the Footprint Flutter Onboarding Components to create an onboarding flow
 enum Steps {
   identify,
   dataCollection,
@@ -18,18 +162,14 @@ enum Steps {
   }
 }
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class OnboardingComponents extends StatefulWidget {
+  const OnboardingComponents({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<OnboardingComponents> createState() => _OnboardingComponentsState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _OnboardingComponentsState extends State<OnboardingComponents> {
   Steps currentStep = Steps.identify;
   String validationToken = '';
 
@@ -42,52 +182,50 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Builder(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            title: const Text('Footprint Flutter Demo'),
-          ),
-          body: FootprintProvider(
-            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
-            redirectUrl: "com.footprint.fluttersdk://example",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (currentStep == Steps.identify)
-                      Identify(
-                        handleAuthenticated: () {
-                          handleComplete();
-                        },
+    return Builder(
+      builder: (_context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Onboarding Components'),
+        ),
+        body: FootprintProvider(
+          publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+          redirectUrl: "com.footprint.fluttersdk://example",
+          child: Container(
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (currentStep == Steps.identify)
+                    Identify(
+                      handleAuthenticated: () {
+                        handleComplete();
+                      },
+                    ),
+                  if (currentStep == Steps.dataCollection)
+                    DataCollection(
+                      onCompleted: (String token) {
+                        handleComplete(token: token);
+                      },
+                    ),
+                  if (currentStep == Steps.complete)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          const Text("KYC Complete"),
+                          const SizedBox(height: 12),
+                          const Text("Validation Token:"),
+                          const SizedBox(height: 8),
+                          Text(validationToken),
+                        ],
                       ),
-                    if (currentStep == Steps.dataCollection)
-                      DataCollection(
-                        onCompleted: (String token) {
-                          handleComplete(token: token);
-                        },
-                      ),
-                    if (currentStep == Steps.complete)
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            const Text("KYC Complete"),
-                            const SizedBox(height: 12),
-                            const Text("Validation Token:"),
-                            const SizedBox(height: 8),
-                            Text(validationToken),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -126,7 +264,7 @@ class Identify extends StatelessWidget {
 
   final void Function() handleAuthenticated;
 
-  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+  void handleComplete(BuildContext context, FormData formData) {
     footprintUtils(context).launchIdentify(
         email: formData.email,
         phoneNumber: formData.phoneNumber,
@@ -195,7 +333,7 @@ class DataCollection extends StatelessWidget {
 
   final void Function(String token) onCompleted;
 
-  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+  void handleComplete(BuildContext context, FormData formData) {
     var utilMethods = footprintUtils(context);
     utilMethods
         .save(
