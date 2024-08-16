@@ -23,14 +23,17 @@ const VerifyHeader: ComponentProps<typeof UpdateVerify>['Header'] = ({ title, su
 );
 
 const Router = ({ onDone }: { onDone: () => void }) => {
+  const { t } = useTranslation('idv');
   const [state, send] = useCollectKycDataMachine();
   const { matches, context } = state;
   const isStateCompleted = matches('completed');
   useLogStateMachine('collect-kyc-data', state);
-  const onBack = () => send({ type: 'navigatedToPrevPage' });
-  const { t } = useTranslation('idv');
   const phoneValue = context.data['id.phone_number']?.value;
   const emailValue = context.data['id.email']?.value;
+
+  const handleBack = () => {
+    send({ type: 'navigatedToPrevPage' });
+  };
 
   useEffect(() => {
     if (isStateCompleted) {
@@ -39,14 +42,27 @@ const Router = ({ onDone }: { onDone: () => void }) => {
     }
   }, [isStateCompleted, onDone]);
 
-  if (matches('init')) return <Init />;
-  if (matches('email')) return <Email />;
-  if (matches('basicInformation')) return <BasicInformation />;
-  if (matches('residentialAddress')) return <Address />;
-  if (matches('usLegalStatus')) return <LegalStatus />;
-  if (matches('ssn')) return <Ssn />;
-  if (matches('confirm')) return <Confirm />;
-
+  if (matches('init')) {
+    return <Init />;
+  }
+  if (matches('email')) {
+    return <Email />;
+  }
+  if (matches('basicInformation')) {
+    return <BasicInformation />;
+  }
+  if (matches('residentialAddress')) {
+    return <Address />;
+  }
+  if (matches('usLegalStatus')) {
+    return <LegalStatus />;
+  }
+  if (matches('ssn')) {
+    return <Ssn />;
+  }
+  if (matches('confirm')) {
+    return <Confirm />;
+  }
   if (matches('addVerificationPhone') && phoneValue && context.authToken) {
     return (
       <UpdateVerify
@@ -63,8 +79,8 @@ const Router = ({ onDone }: { onDone: () => void }) => {
         identifyVariant="verify"
         logError={logError}
         logWarn={logWarn}
-        onBack={onBack}
-        onChallengeVerificationSuccess={onBack}
+        onBack={handleBack}
+        onChallengeVerificationSuccess={handleBack}
         challengePayload={{
           authToken: context.authToken,
           kind: AuthMethodKind.phone,
@@ -73,7 +89,6 @@ const Router = ({ onDone }: { onDone: () => void }) => {
       />
     );
   }
-
   if (matches('addVerificationEmail') && emailValue && context.authToken) {
     return (
       <UpdateVerify
@@ -88,8 +103,8 @@ const Router = ({ onDone }: { onDone: () => void }) => {
         identifyVariant="verify"
         logError={logError}
         logWarn={logWarn}
-        onBack={onBack}
-        onChallengeVerificationSuccess={onBack}
+        onBack={handleBack}
+        onChallengeVerificationSuccess={handleBack}
         challengePayload={{
           authToken: context.authToken,
           kind: AuthMethodKind.email,
