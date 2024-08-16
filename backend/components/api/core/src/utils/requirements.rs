@@ -158,31 +158,28 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let requirements = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let person_requirements = get_requirements_inner(
-                conn,
-                uvw,
-                &person_obc,
-                &person_workflow,
-                person_decrypted_values,
-                person_requirement_opts,
-                &auth_events,
-            )?;
+            let entity = EntityInfo {
+                vw: &uvw,
+                wf: &person_workflow,
+                decrypted_values: &person_decrypted_values,
+                auth_events: &auth_events,
+            };
+            let person_requirements =
+                get_requirements_inner(conn, entity, &person_obc, person_requirement_opts)?;
 
 
             let business_requirements =
                 if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
+                    let entity = EntityInfo {
+                        vw: &bvw,
+                        wf: &business_workflow,
+                        decrypted_values: &business_decrypted_values,
+                        auth_events: &[],
+                    };
                     // Technically for this case, the business's OBC should be the same as the person's and
                     // it'd be a bit more clear to see business_obc here. But they should be same and this is
                     // the existing logic so may as well keep as is
-                    get_requirements_inner(
-                        conn,
-                        bvw,
-                        &person_obc,
-                        &business_workflow,
-                        business_decrypted_values,
-                        RequirementOpts::default(),
-                        &[],
-                    )?
+                    get_requirements_inner(conn, entity, &person_obc, RequirementOpts::default())?
                 } else {
                     vec![]
                 };
@@ -311,13 +308,11 @@ fn get_data_collection_progress<Type>(
 #[tracing::instrument(skip_all)]
 pub fn get_requirements_inner(
     conn: &mut PgConn,
-    vw: VaultWrapper<Any>,
+    entity_info: EntityInfo,
     obc: &ObConfiguration,
-    wf: &Workflow,
-    decrypted_values: DecryptUncheckedResultForReqs,
     opts: RequirementOpts,
-    aes: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
+    let wf = &entity_info.wf;
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = wf.state.relevant_requirements();
 
@@ -325,7 +320,7 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values, &opts, aes))
+        .map(|k| get_requirement_inner(k, conn, entity_info, obc, &opts))
         .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .flatten()
@@ -400,18 +395,30 @@ pub fn get_register_auth_method_requirements(
     Ok(requirements)
 }
 
+
+#[derive(Clone, Copy)]
+pub struct EntityInfo<'a> {
+    pub vw: &'a VaultWrapper<Any>,
+    pub wf: &'a Workflow,
+    pub decrypted_values: &'a DecryptUncheckedResultForReqs,
+    pub auth_events: &'a [AssociatedAuthEvent],
+}
+
 /// Generates a requirement of the given kind `k`, if one exists.
 #[allow(clippy::too_many_arguments)]
 fn get_requirement_inner(
     k: OnboardingRequirementKind,
     conn: &mut PgConn,
-    vw: &VaultWrapper<Any>,
+    entity_info: EntityInfo,
     obc: &ObConfiguration,
-    wf: &Workflow,
-    decrypted_values: &DecryptUncheckedResultForReqs,
     opts: &RequirementOpts,
-    auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
+    let EntityInfo {
+        vw,
+        wf,
+        decrypted_values,
+        auth_events,
+    } = entity_info;
     let req = match k {
         OnboardingRequirementKind::RegisterAuthMethod => {
             get_register_auth_method_requirements(conn, obc, &wf.scoped_vault_id, auth_events)?

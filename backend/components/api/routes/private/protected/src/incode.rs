@@ -20,6 +20,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::requirements::get_requirements_inner;
+use api_core::utils::requirements::EntityInfo;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
@@ -438,7 +439,13 @@ pub async fn adhoc_document_process(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let opts = RequirementOpts::default();
-            let reqs = get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, opts, &[])?;
+            let entity = EntityInfo {
+                vw: &uvw,
+                wf: &wf,
+                decrypted_values: &decrypted_values,
+                auth_events: &[],
+            };
+            let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
             Ok(reqs)
         })
         .await?

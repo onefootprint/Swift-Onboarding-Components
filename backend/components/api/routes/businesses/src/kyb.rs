@@ -13,6 +13,7 @@ use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::requirements::get_requirements_inner;
+use api_core::utils::requirements::EntityInfo;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
@@ -146,8 +147,13 @@ pub async fn post(
 
             // Check requirements for this Business vault w.r.t the OBC
             let opts = RequirementOpts::default();
-            // TODO should this also check person requirements?
-            let reqs = get_requirements_inner(conn, bvw, &obc, &biz_wf, decrypted_values, opts, &[])?;
+            let entity = EntityInfo {
+                vw: &bvw,
+                wf: &biz_wf,
+                decrypted_values: &decrypted_values,
+                auth_events: &[],
+            };
+            let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()
