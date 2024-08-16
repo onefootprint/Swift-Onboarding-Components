@@ -6,7 +6,7 @@ import Loading from './loading';
 
 const AuthMethodsApp = dynamic(() => import('@/src/components/auth-methods-app'), {
   ssr: false,
-  loading: () => <Loading isRoot />,
+  loading: () => <Loading />,
 });
 
 type UserPageProps = {
