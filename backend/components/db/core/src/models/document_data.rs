@@ -1,4 +1,5 @@
 use super::data_lifetime::DataLifetime;
+use super::scoped_vault::ScopedVault;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
@@ -14,9 +15,9 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::DocumentDataId;
+use newtypes::Locked;
 use newtypes::PiiString;
 use newtypes::S3Url;
-use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
 use newtypes::VaultId;
 use std::collections::HashMap;
@@ -53,7 +54,7 @@ impl DocumentData {
     pub fn create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         kind: DataIdentifier,
         mime_type: String,
         filename: String,
@@ -63,15 +64,7 @@ impl DocumentData {
         source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let dl = DataLifetime::create(
-            conn,
-            vault_id,
-            scoped_vault_id,
-            kind.clone(),
-            seqno,
-            source,
-            actor,
-        )?;
+        let dl = DataLifetime::create(conn, vault_id, scoped_vault, kind.clone(), seqno, source, actor)?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

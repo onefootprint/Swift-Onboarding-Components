@@ -5,6 +5,7 @@ use super::WriteableVw;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault_data::NewVaultData;
 use db::models::vault_data::VaultData;
@@ -35,7 +36,8 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
-    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
     // Add identity data
     let data = vec![
@@ -81,7 +83,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, None).unwrap();
+    let vds = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
 
     // Portablize the phone as happens in prod
     let phone_data = vds
@@ -90,7 +92,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         .unwrap();
     DataLifetime::portablize(conn, &phone_data.lifetime_id, seqno).unwrap();
 
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();
     let tests = vec![
         (IDK::FirstName, Some(SealedVaultBytes(vec![1]))),
         (IDK::LastName, Some(SealedVaultBytes(vec![2]))),
@@ -144,14 +146,15 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     let ob_config2 = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
-    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
-    let su2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
+
+    let sv = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
 
     // Chronologically create data across two different tenants
     let data = vec![
         // Add portable Dob data at tenant 1
         (
-            &su.id,
+            &sv.id,
             true,
             vec![NewVaultData {
                 kind: IDK::Dob.into(),
@@ -164,7 +167,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
         ),
         // Add speculative Dob and Email data at tenant 2
         (
-            &su2.id,
+            &sv2.id,
             false,
             vec![
                 NewVaultData {
@@ -187,7 +190,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
         ),
         // // Add speculative Dob at tenant 1
         (
-            &su.id,
+            &sv.id,
             false,
             vec![NewVaultData {
                 kind: IDK::Dob.into(),
@@ -200,7 +203,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
         ),
         // Add portable Email at tenant 1
         (
-            &su.id,
+            &sv.id,
             true,
             vec![NewVaultData {
                 kind: IDK::Email.into(),
@@ -212,19 +215,21 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
             }],
         ),
     ];
-    for (su_id, portablize, data) in data {
+    for (sv_id, portablize, data) in data {
+        let sv = ScopedVault::lock(conn, sv_id).unwrap();
+
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_kinds(conn, su_id, kinds, seqno).unwrap();
-        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, None).unwrap();
+        DataLifetime::bulk_deactivate_kinds(conn, &sv, kinds, seqno).unwrap();
+        let vds = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
-            DataLifetime::bulk_portablize_for_tenant(conn, ids, su_id, seqno).unwrap();
+            DataLifetime::bulk_portablize_for_tenant(conn, ids, sv_id, seqno).unwrap();
         }
     }
 
     // Vault wrapper for tenant 1
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![3]))),
         (IDK::Email, Some(SealedVaultBytes(vec![4]))),
@@ -235,7 +240,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     }
 
     // Vault wrapper for tenant 2
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv2.id)).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![1]))),
         (IDK::Email, Some(SealedVaultBytes(vec![2]))),
@@ -262,7 +267,8 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let bv = db::tests::fixtures::vault::create_business(conn);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
-    let sb = db::tests::fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
+    let sv = db::tests::fixtures::scoped_vault::create(conn, &bv.id, &ob_config.id);
+    let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
     let data = vec![
         NewVaultData {
@@ -291,9 +297,9 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, None).unwrap();
+    VaultData::bulk_create(conn, &bv.id, &sv, data, seqno, None).unwrap();
 
-    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
+    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();
     let tests = vec![
         (BDK::Name, None), // The business name is stored in plaintext, so it won't show in e_data
         (BDK::Website, Some(SealedVaultBytes(vec![2]))),

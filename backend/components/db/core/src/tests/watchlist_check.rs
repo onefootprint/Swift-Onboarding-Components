@@ -317,5 +317,5 @@ fn make_vault(
         .unwrap();
     }
 
-    sv.id
+    sv.into_inner().id
 }

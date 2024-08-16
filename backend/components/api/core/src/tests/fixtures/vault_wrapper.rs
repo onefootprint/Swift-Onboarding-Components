@@ -29,7 +29,8 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
     let uv = db::tests::fixtures::vault::create_person(conn, uv_is_live);
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, uv_is_live);
-    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
     // Add identity data
     let data = vec![
@@ -75,12 +76,12 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, None).unwrap();
+    VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
 
     (
-        su.clone(),
+        sv.clone(),
         ob_config,
-        VaultWrapper::build(conn, VwArgs::Tenant(&su.id)).unwrap(),
+        VaultWrapper::build(conn, VwArgs::Tenant(&sv.id)).unwrap(),
         tenant,
         uv,
     )

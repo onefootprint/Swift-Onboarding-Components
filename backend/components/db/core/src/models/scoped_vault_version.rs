@@ -1,4 +1,5 @@
 use super::data_lifetime::DataLifetime;
+use super::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::DbResult;
 use crate::TxnPgConn;
@@ -9,6 +10,7 @@ use db_schema::schema::scoped_vault_version;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
+use newtypes::Locked;
 use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
 use newtypes::ScopedVaultVersionNumber;
@@ -34,22 +36,13 @@ struct NewScopedVaultVersion {
 }
 
 impl ScopedVaultVersion {
-    // Called only from contexts where we hold a lock on ScopedVault.
-    //
-    // However, even if we didn't have a lock, the table constraints would still ensure that we
-    // don't assign two different versions to the same scoped_vault_id/seqno, or two different
-    // seqnos to the same scoped_vault_id. We read the latest version number for a scoped_vault_id,
-    // increment it by 1, and write back to the table. Multiple such transactions running
-    // concurrently with read committed isolation, hypothetically without a locked ScopedVault,
-    // would race to write the row for the next version number. However, only one would succeed,
-    // and the rest would fail with constraint violations. The ScopedVault lock prevents the race &
-    // constraint
-    // violations.
     pub fn get_or_create(
         conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
+        let scoped_vault_id = &scoped_vault.id;
+
         let existing: Option<Self> = scoped_vault_version::table
             .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault_id))
             .filter(scoped_vault_version::seqno.eq(seqno))

@@ -75,7 +75,6 @@ impl ValidatedDataRequest {
         }
 
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Saving DIs");
-        let sv_id = &vw.sv.id;
         let v_id = &vw.vault.id;
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
@@ -91,11 +90,11 @@ impl ValidatedDataRequest {
             .unique()
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_kinds(conn, sv_id, kinds_to_deactivate, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &vw.sv, kinds_to_deactivate, seqno)?;
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());
-        let vd = VaultData::bulk_create(conn, v_id, sv_id, data, seqno, actor)?;
+        let vd = VaultData::bulk_create(conn, v_id, &vw.sv, data, seqno, actor)?;
 
         // Save fingerprints
         fingerprints.save(conn, vw, &vd)?;

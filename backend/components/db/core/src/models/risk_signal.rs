@@ -344,10 +344,11 @@ mod tests {
     use newtypes::DecisionIntentId;
     use newtypes::DecisionIntentKind;
     use newtypes::DecisionStatus;
+    use newtypes::Locked;
     use newtypes::ScopedVaultId;
     use serde_json::json;
 
-    fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Workflow) {
+    fn setup(conn: &mut TestPgConn) -> (Locked<ScopedVault>, DecisionIntent, Workflow) {
         let t = fixtures::tenant::create(conn);
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();

@@ -368,8 +368,8 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     vw.on_otp_verified(conn, IDK::PhoneNumber.into()).unwrap();
 
     TestData {
-        su1,
-        su2,
+        su1: su1.into_inner(),
+        su2: su2.into_inner(),
         pb1,
         auth_pb2,
         pb2,

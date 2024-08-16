@@ -195,7 +195,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
                         uv.id.clone()
                     };
                     let sv = fixtures::scoped_vault::create(conn, &v_id, &obc_map.get(t).unwrap().id.clone());
-                    ((v.clone(), t.clone()), sv)
+                    ((v.clone(), t.clone()), sv.into_inner())
                 })
                 .collect();
             Ok(sv_map)

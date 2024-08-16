@@ -305,6 +305,7 @@ mod tests {
     use newtypes::DecisionIntentKind;
     use newtypes::DocumentRequestKind;
     use newtypes::FootprintReasonCode as FRC;
+    use newtypes::Locked;
     use newtypes::RiskSignalGroupKind;
     use newtypes::RiskSignalId;
     use newtypes::RuleAction as RA;
@@ -436,7 +437,7 @@ mod tests {
         rule_set_result.action_triggered
     }
 
-    fn make_user(conn: &mut TestPgConn) -> (ScopedVault, ObConfiguration) {
+    fn make_user(conn: &mut TestPgConn) -> (Locked<ScopedVault>, ObConfiguration) {
         let t = tests::fixtures::tenant::create(conn);
         let obc = tests::fixtures::ob_configuration::create_with_opts(
             conn,

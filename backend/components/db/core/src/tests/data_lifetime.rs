@@ -82,9 +82,9 @@ impl TestData {
         let vx_id = fixtures::vault::create_person(conn, true).into_inner().id;
 
         // Create scoped users
-        let su_id = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id).id;
-        let su2_id = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id).id;
-        let su3_id = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id).id;
+        let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id);
+        let sv2 = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id);
+        let sv3 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id);
 
         // Timeline of seqnos
         let seqno0 = DataLifetime::get_next_seqno(conn).unwrap();
@@ -97,11 +97,11 @@ impl TestData {
 
         // Place some DataLifetimes at various points along the timeline
         let dl1 =
-            fixtures::data_lifetime::build(conn, &v1_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
+            fixtures::data_lifetime::build(conn, &v1_id, &sv1, seqno1, None, None, IdentityDataKind::Email);
         let dl2 = fixtures::data_lifetime::build(
             conn,
             &v1_id,
-            &su_id,
+            &sv1,
             seqno1,
             Some(seqno3),
             None,
@@ -110,7 +110,7 @@ impl TestData {
         let dl3 = fixtures::data_lifetime::build(
             conn,
             &v1_id,
-            &su_id,
+            &sv1,
             seqno1,
             Some(seqno4),
             Some(seqno5),
@@ -120,7 +120,7 @@ impl TestData {
         let dl4 = fixtures::data_lifetime::build(
             conn,
             &v1_id,
-            &su3_id,
+            &sv3,
             seqno1,
             Some(seqno4),
             None,
@@ -130,7 +130,7 @@ impl TestData {
         let dl5 = fixtures::data_lifetime::build(
             conn,
             &v2_id,
-            &su2_id,
+            &sv2,
             seqno1,
             None,
             None,
@@ -139,7 +139,7 @@ impl TestData {
         let dl6 = fixtures::data_lifetime::build(
             conn,
             &v2_id,
-            &su2_id,
+            &sv2,
             seqno1,
             Some(seqno3),
             None,
@@ -152,9 +152,9 @@ impl TestData {
             v1: v1_id,
             v2: v2_id,
             vx: vx_id,
-            su: su_id,
-            su2: su2_id,
-            su3: su3_id,
+            su: sv1.into_inner().id,
+            su2: sv2.into_inner().id,
+            su3: sv3.into_inner().id,
             seqno0,
             seqno1,
             seqno2,

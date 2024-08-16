@@ -40,7 +40,7 @@ impl<Type> WriteableVw<Type> {
             .unzip();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        let _ = DataLifetime::bulk_deactivate(conn, &self.sv.id, dls, seqno)?;
+        let _ = DataLifetime::bulk_deactivate(conn, &self.sv, dls, seqno)?;
 
         Ok(dis)
     }
@@ -69,6 +69,7 @@ mod tests {
             .map(|_| {
                 let uv = fixtures::vault::create_person(conn, true).into_inner();
                 let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+                let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
                 let data = vec![
                     NewVaultData {
@@ -89,7 +90,7 @@ mod tests {
                     },
                 ];
                 let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-                VaultData::bulk_create(conn, &uv.id, &sv.id, data, seqno, None).unwrap();
+                VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
                 sv
             })
             .collect();

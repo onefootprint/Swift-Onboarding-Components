@@ -1,4 +1,5 @@
 use super::fingerprint::Fingerprint;
+use super::scoped_vault::ScopedVault;
 use super::scoped_vault_version::ScopedVaultVersion;
 use crate::nextval;
 use crate::DbError;
@@ -22,6 +23,7 @@ use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
+use newtypes::Locked;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 
@@ -165,7 +167,7 @@ impl DataLifetime {
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         rows: Vec<NewDataLifetimeArgs>,
         seqno: DataLifetimeSeqno,
         actor: Option<DbActor>,
@@ -174,7 +176,7 @@ impl DataLifetime {
             .into_iter()
             .map(|r| NewDataLifetime {
                 vault_id: vault_id.clone(),
-                scoped_vault_id: scoped_vault_id.clone(),
+                scoped_vault_id: scoped_vault.id.clone(),
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 kind: r.kind,
@@ -184,7 +186,7 @@ impl DataLifetime {
             })
             .collect();
 
-        ScopedVaultVersion::get_or_create(conn, scoped_vault_id, seqno)?;
+        ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?;
 
         let result = diesel::insert_into(data_lifetime::table)
             .values(new_rows)
@@ -197,7 +199,7 @@ impl DataLifetime {
     pub(crate) fn create(
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         kind: DataIdentifier,
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
@@ -208,7 +210,7 @@ impl DataLifetime {
             origin_id: None,
             source,
         };
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![args], seqno, actor)?
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault, vec![args], seqno, actor)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;
@@ -264,16 +266,16 @@ impl DataLifetime {
     #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
     pub fn bulk_deactivate(
         conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let filter = Box::new(
             data_lifetime::id
                 .eq_any(ids)
-                .and(data_lifetime::scoped_vault_id.eq(scoped_vault_id.clone())),
+                .and(data_lifetime::scoped_vault_id.eq(scoped_vault.id.clone())),
         );
-        Self::_bulk_deactivate(conn, scoped_vault_id, filter, seqno)
+        Self::_bulk_deactivate(conn, scoped_vault, filter, seqno)
     }
 
     /// Deactivates the old DataLifetimes with the provided kinds associated with this (user,
@@ -281,22 +283,22 @@ impl DataLifetime {
     #[tracing::instrument("DataLifetime::bulk_deactivate_kinds", skip_all)]
     pub fn bulk_deactivate_kinds(
         conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
         let filter = Box::new(
             data_lifetime::kind
                 .eq_any(kinds)
-                .and(data_lifetime::scoped_vault_id.eq(scoped_vault_id.clone())),
+                .and(data_lifetime::scoped_vault_id.eq(scoped_vault.id.clone())),
         );
-        Self::_bulk_deactivate(conn, scoped_vault_id, filter, seqno)
+        Self::_bulk_deactivate(conn, scoped_vault, filter, seqno)
     }
 
     /// Deactivates the DLs with the provided filter, and any fingerprints for these DLs
     fn _bulk_deactivate(
         conn: &mut TxnPgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         filter: Box<dyn BoxableExpression<data_lifetime::table, Pg, SqlType = sql_types::Bool>>,
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Vec<Self>> {
@@ -315,7 +317,7 @@ impl DataLifetime {
 
         if !updated.is_empty() {
             // Only update the SV version if the seqno was actually added to DLs.
-            ScopedVaultVersion::get_or_create(conn, scoped_vault_id, seqno)?;
+            ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?;
         }
 
         let lifetime_ids = updated.iter().map(|dl| &dl.id).collect_vec();

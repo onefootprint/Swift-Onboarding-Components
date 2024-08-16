@@ -40,5 +40,5 @@ pub use add_data::PatchDataResult;
 pub struct WriteableVw<Type> {
     #[deref]
     uvw: Locked<VaultWrapper<Type>>,
-    sv: ScopedVault,
+    pub(crate) sv: Locked<ScopedVault>,
 }

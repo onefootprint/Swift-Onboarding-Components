@@ -400,7 +400,7 @@ impl Complete {
             .map(|odk| DocumentDiKind::OcrData(validated_doc_kind, odk).into())
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_kinds(conn, sv_id, odks_to_clear, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &uvw.sv, odks_to_clear, seqno)?;
 
         // Save Risk Signals
         RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;

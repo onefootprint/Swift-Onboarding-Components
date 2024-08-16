@@ -20,7 +20,7 @@ impl<Type> VaultWrapper<Type> {
         let uvw = Self::build(conn, VwArgs::Tenant(scoped_vault_id))?;
         let ob_uvw = WriteableVw::<Type> {
             uvw: Locked::new(uvw),
-            sv: sv.into_inner(),
+            sv,
         };
         Ok(ob_uvw)
     }

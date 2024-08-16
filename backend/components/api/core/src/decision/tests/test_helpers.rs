@@ -28,6 +28,7 @@ use newtypes::BusinessDataKind;
 use newtypes::DataIdentifier;
 use newtypes::DocumentRequestKind;
 use newtypes::IdentityDataKind;
+use newtypes::Locked;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
@@ -81,6 +82,7 @@ pub async fn create_user_and_onboarding(
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, None).unwrap();
 
             let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
+            let su = su.into_inner();
 
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
@@ -185,7 +187,7 @@ pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     ob_config: ObConfiguration,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (Vault, ScopedVault) {
+) -> (Vault, Locked<ScopedVault>) {
     let sandbox_id = fixture_result.map(|f| format!("{}_sandbox", f.as_ref()));
     let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true);
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);

@@ -22,7 +22,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let uv = fixtures::vault::create_person(conn, true).into_inner();
     Vault::mark_verified(conn, &uv.id).unwrap();
-    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
 
@@ -30,7 +30,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     let lifetime = fixtures::data_lifetime::build(
         conn,
         &uv.id,
-        &su.id,
+        &sv,
         seqno,
         is_portablized.then_some(seqno),
         is_deactivated.then_some(seqno),
@@ -42,7 +42,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
         fingerprint.clone(),
         IDK::PhoneNumber.into(),
         FingerprintScope::Global,
-        &su,
+        &sv,
     );
     if is_deactivated {
         DbFingerprint::bulk_deactivate(conn, vec![&lifetime.id], Utc::now()).unwrap();

@@ -43,7 +43,7 @@ pub fn create_user_and_populate_vault(
     tenant_id: TenantId,
     ob_config: Option<ObConfiguration>,
     idks: Vec<IDK>,
-) -> (Vault, ScopedVault) {
+) -> (Vault, Locked<ScopedVault>) {
     let sandbox_id = (!is_live).then_some("#pass".to_string());
     let (uv, su) = if let Some(ob_config) = ob_config {
         let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true).into_inner();
@@ -80,7 +80,7 @@ pub fn create_user_and_onboarding(
     obc_opts: ObConfigurationOpts,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
-) -> (Tenant, Vault, ScopedVault, Workflow) {
+) -> (Tenant, Vault, Locked<ScopedVault>, Workflow) {
     let is_live = obc_opts.is_live;
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);

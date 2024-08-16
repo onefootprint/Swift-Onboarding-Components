@@ -219,11 +219,10 @@ impl WriteableVw<Person> {
         make_timeline_event: bool,
     ) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
-        let su_id = self.sv.id.clone();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_kinds(conn, &su_id, kinds.clone(), seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &self.sv, kinds.clone(), seqno)?;
 
         let docs = docs
             .into_iter()
@@ -239,7 +238,7 @@ impl WriteableVw<Person> {
                 DocumentData::create(
                     conn,
                     &vault_id,
-                    &su_id,
+                    &self.sv,
                     kind,
                     mime_type,
                     filename,

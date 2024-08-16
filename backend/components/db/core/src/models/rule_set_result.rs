@@ -399,7 +399,10 @@ mod tests {
         );
     }
 
-    fn create_vault(conn: &mut TxnPgConn, obc: &ObConfiguration) -> (ScopedVault, Vault, Vec<RiskSignal>) {
+    fn create_vault(
+        conn: &mut TxnPgConn,
+        obc: &ObConfiguration,
+    ) -> (Locked<ScopedVault>, Vault, Vec<RiskSignal>) {
         let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
         let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
 
@@ -532,10 +535,10 @@ mod tests {
                 .unwrap();
         assert_have_same_elements(
             vec![
-                (sv1.id, uv1, rsr1, sort_risk_signals(risk_signals_1)),
-                (sv2.id, uv2, rsr2b, sort_risk_signals(risk_signals_2)),
-                (sv3.id, uv3, rsr3b, sort_risk_signals(risk_signals_3)),
-                (sv4.id, uv4, rsr4a, sort_risk_signals(risk_signals_4)),
+                (sv1.into_inner().id, uv1, rsr1, sort_risk_signals(risk_signals_1)),
+                (sv2.into_inner().id, uv2, rsr2b, sort_risk_signals(risk_signals_2)),
+                (sv3.into_inner().id, uv3, rsr3b, sort_risk_signals(risk_signals_3)),
+                (sv4.into_inner().id, uv4, rsr4a, sort_risk_signals(risk_signals_4)),
             ],
             results
                 .into_iter()

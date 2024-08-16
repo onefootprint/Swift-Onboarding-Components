@@ -833,7 +833,7 @@ impl MiddeskResponseDerivedVaultData {
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
         // Clear all derived data kinds
-        DataLifetime::bulk_deactivate_kinds(conn, &self.scoped_vault_id, dis, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &uvw.sv, dis, seqno)?;
 
         // note: there is an edge case here where the formation is null which
         // means we should deactivate the old DIs. We should handle this properly

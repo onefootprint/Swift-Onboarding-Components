@@ -1,5 +1,6 @@
 use super::data_lifetime::DataLifetime;
 use super::data_lifetime::NewDataLifetimeArgs;
+use super::scoped_vault::ScopedVault;
 use crate::errors::AssertionError;
 use crate::DbError;
 use crate::DbResult;
@@ -17,8 +18,8 @@ use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
+use newtypes::Locked;
 use newtypes::PiiString;
-use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::StorageType;
 use newtypes::VaultDataFormat;
@@ -66,7 +67,7 @@ impl VaultData {
     pub fn bulk_create(
         conn: &mut TxnPgConn,
         user_vault_id: &VaultId,
-        scoped_user_id: &ScopedVaultId,
+        scoped_vault: &Locked<ScopedVault>,
         data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
         actor: Option<DbActor>,
@@ -100,7 +101,7 @@ impl VaultData {
                 source: d.source,
             })
             .collect();
-        let dls = DataLifetime::bulk_create(conn, user_vault_id, scoped_user_id, dl_data, seqno, actor)?;
+        let dls = DataLifetime::bulk_create(conn, user_vault_id, scoped_vault, dl_data, seqno, actor)?;
         let mut dls: HashMap<_, _> = dls.into_iter().map(|dl| (dl.kind.clone(), dl)).collect();
         let new_rows: Vec<_> = data
             .into_iter()

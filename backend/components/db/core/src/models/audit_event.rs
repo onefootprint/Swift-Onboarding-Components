@@ -446,7 +446,7 @@ mod tests {
         let event = events.into_iter().next().unwrap();
         if let AuditEventMetadata::CreateUser { fields } = event.metadata {
             assert_eq!(event.is_live, Some(true));
-            assert_eq!(event.scoped_vault_id, Some(scoped_vault.id));
+            assert_eq!(event.scoped_vault_id, Some(scoped_vault.id.clone()));
             assert_eq!(fields, vec![DataIdentifier::Id(newtypes::IdentityDataKind::Dob)],);
         } else {
             panic!("incorrect metadata type");

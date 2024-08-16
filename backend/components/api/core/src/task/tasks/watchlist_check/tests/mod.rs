@@ -94,7 +94,7 @@ async fn create_user_and_task(
             };
 
             let task = fixtures::task::create_watchlist_check(conn, &sv.id);
-            Ok((sv, task))
+            Ok((sv.into_inner(), task))
         })
         .await
         .unwrap();
