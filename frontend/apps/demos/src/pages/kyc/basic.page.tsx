@@ -1,31 +1,21 @@
 import footprint from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import styled, { css } from 'styled-components';
 
+const publicKey = process.env.NEXT_PUBLIC_KYC_KEY as string;
+
 const Footprint = () => {
-  const router = useRouter();
-
-  const getAuthToken = () => {
-    const authToken = router.query.auth_token;
-    if (!authToken || typeof authToken !== 'string') {
-      throw new Error('Invalid auth token');
-    }
-    return authToken;
-  };
-
   const launchFootprint = () => {
-    const authToken = getAuthToken();
     const component = footprint.init({
       kind: 'verify',
-      authToken,
+      publicKey,
     });
 
     component.render();
   };
 
-  return router.isReady ? (
+  return (
     <>
       <Head>
         <title>Footprint</title>
@@ -36,7 +26,7 @@ const Footprint = () => {
         </Button>
       </Container>
     </>
-  ) : null;
+  );
 };
 
 const Container = styled.div`

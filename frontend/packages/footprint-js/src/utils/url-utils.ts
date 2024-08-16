@@ -2,7 +2,7 @@ import type { Props } from '../types/components';
 import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
-import { isAuthOrVerifyOrUpdateLogin, isUpdateLoginMethods, isValidString } from './type-guards';
+import { isValidString } from './type-guards';
 
 /** @deprecated: import from `@onefootprint/core` */
 export const getWindowUrl = (): string =>
@@ -25,27 +25,22 @@ export const getSearchParams = (props: Props, token: string): string => {
 
 const getURL = (props: Props, token: string): string => {
   const { kind } = props;
-  let url: string | undefined;
+  const searchParams = getSearchParams(props, token);
+  let url = `${process.env.COMPONENTS_URL}/${kind}`;
 
-  switch (kind) {
-    case ComponentKind.Verify:
-    case ComponentKind.Components:
-      url = process.env.BIFROST_URL;
-      break;
-    case ComponentKind.Auth:
-      url = isUpdateLoginMethods(props) ? `${process.env.AUTH_URL}/user` : process.env.AUTH_URL;
-      break;
-    default:
-      url = process.env.COMPONENTS_URL;
+  if (kind === ComponentKind.UpdateLoginMethods) {
+    url = `${process.env.AUTH_URL}/user`;
   }
-
-  if (isValidString(url)) {
-    return isAuthOrVerifyOrUpdateLogin(kind)
-      ? `${url}?${getSearchParams(props, token)}`.trim()
-      : `${url}/${kind}?${getSearchParams(props, token)}`.trim();
+  if (kind === ComponentKind.Auth) {
+    url = process.env.AUTH_URL as string;
   }
-
-  throw new Error(`${kind}_URL environment variable is not defined.`);
+  if (kind === ComponentKind.Verify || kind === ComponentKind.VerifyButton || kind === ComponentKind.Components) {
+    url = process.env.BIFROST_URL as string;
+  }
+  if (!isValidString(url)) {
+    throw new Error(`${kind}_URL environment variable is not defined.`);
+  }
+  return `${url}?${searchParams}`.trim();
 };
 
 export default getURL;
