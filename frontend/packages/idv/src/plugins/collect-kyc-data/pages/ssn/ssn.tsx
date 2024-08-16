@@ -23,7 +23,6 @@ type T = TFunction<'idv', 'kyc.pages.ssn'>;
 type TaxPayerIdKind = NonNullable<ReturnType<typeof getTaxIdKind>>;
 
 type SsnOrTaxIdProps = {
-  ctaLabel?: string;
   hideDisclaimer?: boolean;
   hideHeader?: boolean;
   onCancel?: () => void;
@@ -63,7 +62,7 @@ const filterTypeOfTaxId = (value?: string): 'ssn9' | 'itin' | 'usTaxId' => {
   }
 };
 
-const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrTaxIdProps) => {
+const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrTaxIdProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn' });
   const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
@@ -109,16 +108,16 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
     });
   };
 
-  const onSubmitForm = (formData: FormValues) => {
+  const submitForm = (formData: FormValues) => {
     sendData(convertFormData(formData));
   };
 
-  const onSubmitSkippedForm = () => {
+  const skipForm = () => {
     const convertedData = convertFormData(getValues(), true);
     sendData(convertedData);
   };
 
-  const handleSkip = () => {
+  const confirmIfWantsToSkip = () => {
     confirmationDialog.open({
       title: t('skip.confirmation.title'),
       description: hasDocStepup
@@ -126,7 +125,7 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
         : t('skip.confirmation.without-stepup-description'),
       primaryButton: {
         label: t('skip.confirmation.yes'),
-        onClick: onSubmitSkippedForm,
+        onClick: skipForm,
       },
       secondaryButton: {
         label: t('skip.confirmation.no'),
@@ -134,12 +133,13 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
     });
   };
 
-  const handleSubmit = (ev: React.FormEvent<HTMLDivElement>) => {
-    ev.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (isTaxPayerIdSkipped) {
-      handleSkip();
+      confirmIfWantsToSkip();
     } else {
-      methods.handleSubmit(onSubmitForm)(ev);
+      methods.handleSubmit(submitForm)(event);
     }
   };
 
@@ -147,46 +147,47 @@ const SsnOrTaxId = ({ ctaLabel, hideDisclaimer, hideHeader, onCancel, onComplete
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit}>
-          {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
-          <Stack gap={7} direction="column">
-            {requirementTaxIdKind === 'usTaxId' ? (
-              <TaxId
-                disabled={isUsTaxIdDisabled || isTaxPayerIdSkipped}
-                isOptional={isOptional}
-                isSkipped={isTaxPayerIdSkipped}
-                onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
-                vaultTaxId="usTaxId"
-                visualTaxId={filterTypeOfTaxId(data[IdDI.usTaxId]?.value)}
-              />
-            ) : null}
-            {requirementTaxIdKind === 'ssn9' ? (
-              <TaxId
-                disabled={isSsn9Disabled || isTaxPayerIdSkipped}
-                hideDisclaimer={hideDisclaimer}
-                isOptional={isOptional}
-                isSkipped={isTaxPayerIdSkipped}
-                onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
-                vaultTaxId="ssn9"
-                visualTaxId="ssn9"
-              />
-            ) : null}
-            {requirementTaxIdKind === 'ssn4' ? (
-              <SSN4
-                disabled={isSsn4Disabled || isTaxPayerIdSkipped}
-                isOptional={isOptional}
-                isSkipped={isTaxPayerIdSkipped}
-                onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
-              />
-            ) : null}
-          </Stack>
-          <EditableFormButtonContainer
-            ctaLabel={ctaLabel}
-            isLoading={mutation.isLoading}
-            onCancel={onCancel}
-            submitButtonTestID="ssn-save-edit-button"
-          />
-        </Grid.Container>
+        <form onSubmit={handleSubmit}>
+          <Grid.Container gap={7} width="100%">
+            {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
+            <Stack gap={7} direction="column">
+              {requirementTaxIdKind === 'usTaxId' ? (
+                <TaxId
+                  disabled={isUsTaxIdDisabled || isTaxPayerIdSkipped}
+                  isOptional={isOptional}
+                  isSkipped={isTaxPayerIdSkipped}
+                  onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
+                  vaultTaxId="usTaxId"
+                  visualTaxId={filterTypeOfTaxId(data[IdDI.usTaxId]?.value)}
+                />
+              ) : null}
+              {requirementTaxIdKind === 'ssn9' ? (
+                <TaxId
+                  disabled={isSsn9Disabled || isTaxPayerIdSkipped}
+                  hideDisclaimer={hideDisclaimer}
+                  isOptional={isOptional}
+                  isSkipped={isTaxPayerIdSkipped}
+                  onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
+                  vaultTaxId="ssn9"
+                  visualTaxId="ssn9"
+                />
+              ) : null}
+              {requirementTaxIdKind === 'ssn4' ? (
+                <SSN4
+                  disabled={isSsn4Disabled || isTaxPayerIdSkipped}
+                  isOptional={isOptional}
+                  isSkipped={isTaxPayerIdSkipped}
+                  onSkipChange={() => setIsTaxPayerIdSkipped(prev => !prev)}
+                />
+              ) : null}
+            </Stack>
+            <EditableFormButtonContainer
+              isLoading={mutation.isLoading}
+              onCancel={onCancel}
+              submitButtonTestID="ssn-save-edit-button"
+            />
+          </Grid.Container>
+        </form>
       </FormProvider>
     </>
   );
