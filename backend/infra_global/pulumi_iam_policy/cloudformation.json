@@ -5,6 +5,13 @@
       "Effect": "Allow",
       "Action": ["cloudformation:*"],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*"
+      ],
+      "Resource": "*"
     }
   ]
 }
