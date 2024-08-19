@@ -1,4 +1,4 @@
-import { isAddressLine, isEmail, isName, isPhoneNumber, isSSN9Flexible, isSsn4 } from '@onefootprint/core';
+import { isAddressLine, isEmail, isName, isPhoneNumber, isSSN9Flexible, isSsn4, isURL } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
 import { CorporationType } from '@onefootprint/types';
@@ -127,7 +127,7 @@ const validateBootstrapData = ({
     [BusinessDI.phoneNumber]: (value: string) => isPhoneNumber(value),
     [BusinessDI.state]: (state: string, country?: string) => isStateValid(state, country),
     [BusinessDI.tin]: () => true, // TODO: Add real validators for this field
-    [BusinessDI.website]: isStringValid,
+    [BusinessDI.website]: value => isURL(value),
     [BusinessDI.zip]: isStringValid,
   };
 

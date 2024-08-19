@@ -1,5 +1,6 @@
-import { BusinessDI, BusinessDIData, DecryptUserResponse } from '@onefootprint/types';
+import { BusinessDI, BusinessDIData, CdoToAllDisMap, DecryptUserResponse } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
+import pickBy from 'lodash/pickBy';
 import { isStringValid } from '../../../../utils';
 import { BeneficialOwnerIdFields } from '../constants';
 import type { MachineContext } from '../state-machine/types';
@@ -36,9 +37,15 @@ export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineCon
 };
 
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
+  const cdos = [...(ctx.kybRequirement?.populatedAttributes || []), ...(ctx.kybRequirement?.missingAttributes || [])];
+  const kybAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as BusinessDI[];
+  const filteredBootstrapBusinessData = pickBy(ctx.bootstrapBusinessData, (_, key) =>
+    kybAttributes.includes(key as BusinessDI),
+  );
+
   // TODO i think some strange things will happen if the user data is bootstrapped AND the business.beneficial_owners is bootstrap
   const initialData = /** This order is important */ {
-    ...extractBootstrapBusinessDataValues(ctx.bootstrapBusinessData),
+    ...extractBootstrapBusinessDataValues(filteredBootstrapBusinessData),
     ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
     ...ctx.data,
   };

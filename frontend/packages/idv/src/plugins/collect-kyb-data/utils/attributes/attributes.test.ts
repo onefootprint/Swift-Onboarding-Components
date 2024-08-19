@@ -115,6 +115,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should merge bootstrapBusinessData and data properties', () => {
     const ctx = {
+      kybRequirement: { missingAttributes: ['business_name', 'business_website'] },
       bootstrapBusinessData: {
         'business.name': { value: 'Acme Inc' },
         'business.website': { value: 'www.acme.com' },

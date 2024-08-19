@@ -117,18 +117,27 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Edit' }).click();
   await page.waitForLoadState();
 
+  await frame.getByLabel('Business name').first().fill('Umbrella Bank');
+  await frame.getByLabel('Doing Business As (optional)').first().fill('Umbrella');
+
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
-  await expect(frame.getByText(businessName).first()).toBeAttached();
-  await expect(frame.getByText(businessDba).first()).toBeAttached();
+  await expect(frame.getByText('Umbrella Bank').first()).toBeAttached();
+  await expect(frame.getByText('Umbrella').first()).toBeAttached();
   await expect(frame.getByText('•••••••••').first()).toBeAttached();
-  await expect(frame.getByText(businessCorporationType).first()).toBeAttached();
-  await expect(frame.getByText(businessWebsite).first()).toBeAttached();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Reveal' }).click();
   await expect(frame.getByText(businessTin).first()).toBeAttached();
+
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill('12-7777777');
+  await frame.getByTestId('identity-section').getByRole('button', { name: 'Save' }).click();
+  await page.waitForLoadState();
+
+  await expect(frame.getByText('12-7777777').first()).toBeAttached();
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Hide' }).click();
+  await expect(frame.getByText('•••••••••').first()).toBeAttached();
 
   await frame.getByTestId('business-address').getByRole('button', { name: 'Edit' }).click();
   await page.waitForLoadState();
