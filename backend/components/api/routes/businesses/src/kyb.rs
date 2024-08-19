@@ -152,6 +152,7 @@ pub async fn post(
                 wf: &biz_wf,
                 decrypted_values: &decrypted_values,
                 auth_events: &[],
+                is_secondary_bo: false,
             };
             let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
             // TODO: consolidate with /authorize code

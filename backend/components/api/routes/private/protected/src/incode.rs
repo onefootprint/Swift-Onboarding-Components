@@ -444,6 +444,7 @@ pub async fn adhoc_document_process(
                 wf: &wf,
                 decrypted_values: &decrypted_values,
                 auth_events: &[],
+                is_secondary_bo: false,
             };
             let reqs = get_requirements_inner(conn, entity, &obc, opts)?;
             Ok(reqs)

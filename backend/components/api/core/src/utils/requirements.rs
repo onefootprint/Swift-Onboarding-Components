@@ -57,6 +57,7 @@ pub struct GetRequirementsArgs {
     pub business_sv: Option<ScopedVaultId>,
     pub biz_wf_id: Option<WorkflowId>,
     pub auth_events: Vec<AssociatedAuthEvent>,
+    pub is_secondary_bo: bool,
 }
 
 impl GetRequirementsArgs {
@@ -67,6 +68,7 @@ impl GetRequirementsArgs {
             business_sv: value.scoped_business_id(),
             biz_wf_id: value.business_workflow_id(),
             auth_events: value.user_session.auth_events.clone(),
+            is_secondary_bo: value.user_session.is_secondary_bo(),
         })
     }
 }
@@ -99,7 +101,7 @@ impl DecryptUncheckedResultForReqs {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct RequirementOpts {
     pub require_capture_on_stepup: Option<bool>,
 }
@@ -121,6 +123,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
         business_sv,
         biz_wf_id,
         auth_events,
+        is_secondary_bo,
     } = args;
 
     let su_id = person_workflow.scoped_vault_id.clone();
@@ -151,7 +154,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let require_capture_on_stepup = state
         .ff_client
         .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key));
-    let person_requirement_opts = RequirementOpts {
+    let requirement_opts = RequirementOpts {
         require_capture_on_stepup: Some(require_capture_on_stepup),
     };
 
@@ -163,9 +166,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 wf: &person_workflow,
                 decrypted_values: &person_decrypted_values,
                 auth_events: &auth_events,
+                is_secondary_bo,
             };
-            let person_requirements =
-                get_requirements_inner(conn, entity, &person_obc, person_requirement_opts)?;
+            let person_requirements = get_requirements_inner(conn, entity, &person_obc, requirement_opts)?;
 
 
             let business_requirements =
@@ -175,11 +178,12 @@ pub async fn get_requirements_for_person_and_maybe_business(
                         wf: &business_workflow,
                         decrypted_values: &business_decrypted_values,
                         auth_events: &[],
+                        is_secondary_bo,
                     };
                     // Technically for this case, the business's OBC should be the same as the person's and
                     // it'd be a bit more clear to see business_obc here. But they should be same and this is
                     // the existing logic so may as well keep as is
-                    get_requirements_inner(conn, entity, &person_obc, RequirementOpts::default())?
+                    get_requirements_inner(conn, entity, &person_obc, requirement_opts)?
                 } else {
                     vec![]
                 };
@@ -320,13 +324,14 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, entity_info, obc, &opts))
+        .map(|k| get_requirement_inner(k, conn, entity_info, obc, opts))
         .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .flatten()
         .filter(|r| {
+            let kind = OnboardingRequirementKind::from(r);
             let is_data_collection_step = matches!(
-                OnboardingRequirementKind::from(r),
+                kind,
                 OnboardingRequirementKind::CollectData
                     | OnboardingRequirementKind::CollectInvestorProfile
                     | OnboardingRequirementKind::CollectBusinessData
@@ -338,6 +343,9 @@ pub fn get_requirements_inner(
             );
             if is_data_collection_step {
                 if wf.completed_at.is_some() {
+                    // TODO this logic looks like it should only be hit if r.is_met(). Logging now to see if
+                    // we are ever hiding unmet requirements. If not, we can consolidate this logic
+                    tracing::info!(%kind, is_met=%r.is_met(), "Removing data collection step for completed wf");
                     // Omit the confirm screen when the workflow is entirely completed
                     return false;
                 }
@@ -351,6 +359,10 @@ pub fn get_requirements_inner(
                         return false;
                     }
                 }
+            }
+            if kind == OnboardingRequirementKind::CollectBusinessData && r.is_met() && entity_info.is_secondary_bo {
+                // Omit the confirm screen for business data when the user filling out the form is not the primary BO
+                return false;
             }
             true
         })
@@ -402,6 +414,7 @@ pub struct EntityInfo<'a> {
     pub wf: &'a Workflow,
     pub decrypted_values: &'a DecryptUncheckedResultForReqs,
     pub auth_events: &'a [AssociatedAuthEvent],
+    pub is_secondary_bo: bool,
 }
 
 /// Generates a requirement of the given kind `k`, if one exists.
@@ -411,14 +424,18 @@ fn get_requirement_inner(
     conn: &mut PgConn,
     entity_info: EntityInfo,
     obc: &ObConfiguration,
-    opts: &RequirementOpts,
+    opts: RequirementOpts,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let EntityInfo {
         vw,
         wf,
         decrypted_values,
         auth_events,
+        is_secondary_bo: _,
     } = entity_info;
+    let RequirementOpts {
+        require_capture_on_stepup,
+    } = opts;
     let req = match k {
         OnboardingRequirementKind::RegisterAuthMethod => {
             get_register_auth_method_requirements(conn, obc, &wf.scoped_vault_id, auth_events)?
@@ -535,7 +552,7 @@ fn get_requirement_inner(
 
                     let upload_settings = match &dr.config {
                         DocumentRequestConfig::Identity { .. } => {
-                            if opts.require_capture_on_stepup.unwrap_or(false) {
+                            if require_capture_on_stepup.unwrap_or(false) {
                                 // Only for coba
                                 DocumentUploadSettings::CaptureOnlyOnMobile
                             } else {

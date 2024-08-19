@@ -49,6 +49,10 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     assert bifrost.validate_response["business"]["status"] == "incomplete"
     assert primary_bo.fp_id
     assert primary_bo.fp_bid
+    assert any(
+        r["kind"] == "collect_business_data"
+        for r in primary_bo.client.handled_requirements
+    )
 
     # Extract the link sent to the secondary BO's phone number and verify it contains references to
     # the business and the BO that invited them
@@ -79,10 +83,11 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "pass"
 
-    # Shouldn't have collected business data from the secondary owner
+    # Shouldn't show confirm screen for secondary BO
     assert not any(
-        req["kind"] == "collect_business_data"
-        for req in secondary_bo.client.handled_requirements
+        r["kind"] == "collect_business_data"
+        for r in secondary_bo.client.already_met_requirements
+        + secondary_bo.client.handled_requirements
     )
     # Only the first BO to fill out the KYB form should have to upload the business documents
     assert not any(
