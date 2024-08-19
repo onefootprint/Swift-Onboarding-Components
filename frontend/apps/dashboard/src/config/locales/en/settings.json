@@ -2,6 +2,7 @@
   "title": "Settings",
   "pages": {
     "billing": {
+      "page-title": "Footprint | Settings - Billing",
       "meta-title": "Settings",
       "title": "Billing",
       "subtitle": "View your billing details for the current month",
@@ -17,6 +18,375 @@
         "no-results": "An invoice hasn't yet been generated.",
         "subtotal": "Subtotal",
         "info": "Last updated {{lastUpdatedAt}}. This is a preliminary invoice intended to provide an estimate of your usage for the month and may not include all charges for the month. The final invoice, which will reflect the actual usage and charges, will be issued and sent out at the end of the month."
+      }
+    },
+    "team-roles": {
+      "page-title": "Footprint | Settings - Members",
+      "meta-title": "Settings",
+      "header": {
+        "title": "Members & Roles",
+        "subtitle": "Manage who is a member of your team and their roles"
+      },
+      "tabs": {
+        "members": "Members",
+        "roles": "Roles",
+        "access": "Domain access"
+      }
+    },
+    "members": {
+      "table": {
+        "aria-label": "Table of organization members",
+        "header": {
+          "email": "Email",
+          "lastActive": "Last Active",
+          "role": "Role"
+        },
+        "pending-invite": "Pending",
+        "actions": {
+          "aria-label": "Open actions for member {{email}}",
+          "not-allowed": "You are not allowed to change teammates",
+          "remove": {
+            "cta": "Remove",
+            "confirmation": {
+              "title": "Remove team member",
+              "description": "You're about to remove <b>{{name}}</b> from your team. Are you sure?"
+            },
+            "notification": {
+              "success": {
+                "title": "Team member removed",
+                "description": "{{email}} has been removed from the team."
+              },
+              "error": {
+                "title": "Error removing team member"
+              }
+            }
+          }
+        },
+        "empty-state": "No members found"
+      },
+      "filters": {
+        "role": {
+          "label": "Role"
+        }
+      },
+      "invite": {
+        "title": "Invite teammates",
+        "not-allowed": "You are not allowed to invite teammates",
+        "form": {
+          "email": {
+            "label": "Email address",
+            "placeholder": "jane.doe@acme.com",
+            "errors": {
+              "required": "Please enter an email"
+            }
+          },
+          "role": {
+            "label": "Role",
+            "placeholder": "Select",
+            "errors": {
+              "required": "Please select a role"
+            }
+          },
+          "errors": {
+            "invalid": "Please complete the fields above."
+          }
+        },
+        "notification": {
+          "success": {
+            "title_one": "Invitation sent successfully.",
+            "description_one": "The user will receive an email with instructions to join the organization.",
+            "title_other": "Invitations sent successfully.",
+            "description_other": "The users will receive an email with instructions to join the organization."
+          },
+          "error": {
+            "title_one": "Invitation wasn't sent",
+            "title_other": "Invitations weren't sent"
+          }
+        }
+      },
+      "edit-role": {
+        "aria-label": "Change {{email}} role",
+        "scopes": {
+          "admin": "Access to everything",
+          "read": "Read-only"
+        },
+        "notifications": {
+          "error": {
+            "title": "Error updating role"
+          }
+        }
+      },
+      "roles": {
+        "table": {
+          "aria-label": "Table of organization roles",
+          "header": {
+            "role": "Role",
+            "active-users": "Active users",
+            "active-api-keys": "Active API keys",
+            "created": "Created at",
+            "permissions": "Permissions"
+          },
+          "empty-state": "No roles found",
+          "actions": {
+            "aria-label": "Open actions for role {{name}}",
+            "not-allowed": "You are not allowed to manage roles",
+            "remove": "Delete role",
+            "edit": "Edit role"
+          }
+        },
+        "create": {
+          "title": "Create role",
+          "not-allowed": "You are not allowed to add roles",
+          "notifications": {
+            "success": {
+              "title": "Role created",
+              "description": "Role {{name}} was created successfully."
+            },
+            "error": {
+              "title": "Error creating role"
+            }
+          }
+        },
+        "edit": {
+          "title": "Edit role",
+          "notifications": {
+            "success": {
+              "title": "Role updated",
+              "description": "Role {{name}} was updated successfully."
+            },
+            "error": {
+              "title": "Error updating role"
+            }
+          }
+        },
+        "remove": {
+          "confirmation": {
+            "title": "Delete role",
+            "description": "You're about to delete the role <b>{{name}}</b>. Are you sure?"
+          },
+          "errors": {
+            "num-active-users": {
+              "title": "Role can't be deleted",
+              "description_one": "One user is assigned to this role. Please assign those users to a different role.",
+              "description_other": "{{count}} users are assigned to this role. Please assign those users to a different role."
+            },
+            "num-active-api-keys": {
+              "title": "Role can't be deleted",
+              "description_one": "One API key is active on this role. Please assign a different role to this API key.",
+              "description_other": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
+            }
+          },
+          "feedback": {
+            "success": {
+              "title": "Role deleted",
+              "description": "{{name}} role has been deleted."
+            },
+            "error": {
+              "title": "Error removing role"
+            }
+          }
+        },
+        "form": {
+          "name": {
+            "label": "Name",
+            "placeholder": "Customer support",
+            "errors": {
+              "required": "Please enter a name"
+            }
+          },
+          "permissions": {
+            "title": "Permissions"
+          },
+          "proxy-configs": {
+            "label": "Allowed proxy configs",
+            "errors": {
+              "required": "Must select at least one proxy configuration"
+            }
+          },
+          "decrypt": {
+            "label": "Decrypt data",
+            "errors": {
+              "required": "Must select at least one permissible attribute"
+            }
+          },
+          "decrypt-attributes": {
+            "label": "Permissible attributes"
+          }
+        },
+        "scopes": {
+          "admin": "Everything",
+          "decrypt_fields_one": "Decrypt {{field}}",
+          "decrypt_fields_other": "Decrypt {{count}} fields",
+          "read": "Read-only",
+          "onboarding_configuration": "Manage Playbooks",
+          "api_keys": "Manage API keys",
+          "manage_vault_proxy": "Manage vault proxy configurations",
+          "invoke_vault_proxy_options": {
+            "all": "All",
+            "jit": "Just-in-time proxy"
+          },
+          "invoke_vault_proxy": {
+            "checkbox": "Invoke vault proxy",
+            "all": "Invoke all vault proxies",
+            "jit": "Invoke just-in-time proxy",
+            "one": "Invoke one vault proxy",
+            "other": "Invoke {{ count }} vault proxies"
+          },
+          "cip_integration": "Make CIP proxy requests",
+          "org_settings": "Manage access control and org settings",
+          "manual_review": "Perform manual review",
+          "write_entities": "Create and update users",
+          "trigger_kyc": "Manually initiate KYC",
+          "trigger_kyb": "Manually initiate KYB",
+          "auth_token": "Create auth tokens",
+          "decrypt_all": "Everything",
+          "decrypt_custom": "Custom attributes",
+          "decrypt_documents": "Documents",
+          "onboarding": "Onboarding",
+          "manage_webhooks": "Manage webhook configuration",
+          "decrypt": {
+            "all": "Everything",
+            "name": "Full name",
+            "email": "Email",
+            "phone_number": "Phone number",
+            "ssn9": "SSN",
+            "ssn4": "SSN (last 4)",
+            "dob": "Date of birth",
+            "documents": "Documents",
+            "full_address": "Address",
+            "custom": "Custom attributes",
+            "us_legal_status": "Legal status in the U.S.",
+            "investor_profile": "Broker questions (Investor profile)",
+            "card": "Card data"
+          },
+          "hints": {
+            "read": "Basic read-only access",
+            "playbooks": "Create and update Playbooks",
+            "api_keys": "Add, edit, and decrypt secret API keys and their roles",
+            "manage_vault_proxy": "Create and update vault proxy configurations",
+            "invoke_vault_proxy": "Invoke the specified vault proxies",
+            "cip_integration": "Forward identity data to a CIP integration",
+            "org_settings": "Administer roles, users, and org settings",
+            "manual_review": "Make new decisions, add annotations, re-trigger KYC",
+            "write_entities": "Create new vaults and update existing vaults' information",
+            "trigger_kyc": "Run KYC checks on an existing vaulted user",
+            "trigger_kyb": "Run KYB checks on an existing vaulted business",
+            "auth_token": "Generate user-scoped auth tokens for Footprint.js",
+            "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
+            "manage_webhooks": "Configure webhook endpoints",
+            "decrypt": "Decrypt the specified attributes"
+          }
+        }
+      },
+      "onboarding": {
+        "page-title": "Footprint | Onboarding",
+        "header": {
+          "logged-as": "Logged in as",
+          "logout": "Log out"
+        },
+        "stepper": {
+          "aria-label": "An onboarding process with 4 steps"
+        },
+        "welcome": {
+          "img-alt": "A Penguin using a cellphone",
+          "nav": "Welcome",
+          "title": "Welcome to Footprint!",
+          "subtitle": "Your account is almost ready. We just need a bit more information about you and your company."
+        },
+        "user-data": {
+          "nav": "About you",
+          "title": "Tell us about you",
+          "subtitle": "Please provide some basic personal information",
+          "form": {
+            "email": {
+              "label": "Email address",
+              "placeholder": "jane.doe@acme.com"
+            },
+            "first-name": {
+              "label": "First name",
+              "placeholder": "Jane",
+              "errors": {
+                "required": "Please enter a first name"
+              }
+            },
+            "last-name": {
+              "label": "Last name",
+              "placeholder": "Doe",
+              "errors": {
+                "required": "Please enter a last name"
+              }
+            }
+          }
+        },
+        "company-data": {
+          "nav": "About your company",
+          "title": "Tell us about your company",
+          "subtitle": "Please provide some basic company information",
+          "form": {
+            "name": {
+              "label": "Company name",
+              "placeholder": "Acme Bank",
+              "errors": {
+                "required": "Please enter a name"
+              }
+            },
+            "website": {
+              "label": "Company website",
+              "placeholder": "https://www.acme.com",
+              "errors": {
+                "required": "Please enter a website"
+              }
+            },
+            "size": {
+              "label": "Company size",
+              "placeholder": "Select",
+              "errors": {
+                "required": "Please select one option"
+              }
+            }
+          }
+        },
+        "invite": {
+          "nav": "Invite teammates",
+          "title": "Invite teammates",
+          "subtitle": "Invite your teammates to join you on Footprint",
+          "form": {
+            "email": {
+              "label": "Email address",
+              "placeholder": "jane.doe@acme.com",
+              "errors": {
+                "required": "Please enter an email"
+              }
+            },
+            "role": {
+              "label": "Role",
+              "placeholder": "Select",
+              "errors": {
+                "required": "Please select a role"
+              }
+            },
+            "errors": {
+              "invalid": "Please complete the fields above."
+            }
+          },
+          "allow-domain-access": {
+            "title": "Allow domain access",
+            "subtitle": "Allow users with email addresses with this domain to join your team with read-only access without requiring an invite.",
+            "action": "Enable access for",
+            "toggle": {
+              "cta-not-allowed": "You're not allowed to toggle domain access",
+              "domain-already-claimed": "Domain access for {{domain}} has already been claimed. Please contact your admin to invite you to the existing organization."
+            }
+          },
+          "add-more": "Add more",
+          "notification": {
+            "error": {
+              "title_one": "Invitation wasn't sent",
+              "title_other": "Invitations weren't sent"
+            }
+          },
+          "cta": "Go to dashboard"
+        }
       }
     }
   }

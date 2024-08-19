@@ -1,5 +1,6 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Divider, Stack, Table, Text } from '@onefootprint/ui';
+import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useGetPreviewInvoice, { InvoiceItem } from './hooks/use-get-preview-invoice';
@@ -25,52 +26,57 @@ const Billing = () => {
   const lastUpdatedAt = invoice?.lastUpdatedAt || '-';
 
   return (
-    <Stack direction="column" gap={7} marginTop={3}>
-      <Text variant="heading-2">{t('meta-title')}</Text>
-      <Stack direction="column">
-        <Text variant="label-1">{t('title')}</Text>
-        <Text variant="body-3" marginTop={2}>
-          {t('subtitle')}
-        </Text>
-        <Divider marginTop={5} marginBottom={7} />
-        <TableContainer direction="column">
-          <Table<InvoiceItem>
-            aria-label={t('table.aria-label')}
-            columns={columns}
-            emptyStateText={isError ? t('table.error') : t('table.no-results')}
-            getKeyForRow={(r: InvoiceItem) => r.id}
-            isLoading={isLoading}
-            items={invoice?.lineItems}
-            renderTr={({ item }) => (
-              <>
-                <td>{item.description}</td>
-                <QuantityTd>{withCommas(item.quantity.toString())}</QuantityTd>
-                <QuantityTd>
-                  {dollarAmountFromCents(item.unitPriceCents ? parseFloat(item.unitPriceCents) : 0)}
-                </QuantityTd>
-                <QuantityTd>{dollarAmountFromCents(item.notionalCents)}</QuantityTd>
-              </>
-            )}
-          />
-          {invoice?.lineItems.length ? (
-            <Stack gap={5} padding={5} direction="column">
-              <Stack gap={11} justifyContent="right">
-                <Text variant="label-3">{t('table.subtotal')}</Text>
-                <Text variant="label-3">{totalAmountDue ? dollarAmountFromCents(totalAmountDue) : '-'}</Text>
+    <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Stack direction="column" gap={7} marginTop={3}>
+        <Text variant="heading-2">{t('meta-title')}</Text>
+        <Stack direction="column">
+          <Text variant="label-1">{t('title')}</Text>
+          <Text variant="body-3" marginTop={2}>
+            {t('subtitle')}
+          </Text>
+          <Divider marginTop={5} marginBottom={7} />
+          <TableContainer direction="column">
+            <Table<InvoiceItem>
+              aria-label={t('table.aria-label')}
+              columns={columns}
+              emptyStateText={isError ? t('table.error') : t('table.no-results')}
+              getKeyForRow={(r: InvoiceItem) => r.id}
+              isLoading={isLoading}
+              items={invoice?.lineItems}
+              renderTr={({ item }) => (
+                <>
+                  <td>{item.description}</td>
+                  <QuantityTd>{withCommas(item.quantity.toString())}</QuantityTd>
+                  <QuantityTd>
+                    {dollarAmountFromCents(item.unitPriceCents ? parseFloat(item.unitPriceCents) : 0)}
+                  </QuantityTd>
+                  <QuantityTd>{dollarAmountFromCents(item.notionalCents)}</QuantityTd>
+                </>
+              )}
+            />
+            {invoice?.lineItems.length ? (
+              <Stack gap={5} padding={5} direction="column">
+                <Stack gap={11} justifyContent="right">
+                  <Text variant="label-3">{t('table.subtotal')}</Text>
+                  <Text variant="label-3">{totalAmountDue ? dollarAmountFromCents(totalAmountDue) : '-'}</Text>
+                </Stack>
+                <InfoContainer padding={5} gap={3}>
+                  <Box marginTop={1}>
+                    <IcoInfo16 />
+                  </Box>
+                  <Text variant="body-3" color="secondary" lineHeight={'20px'}>
+                    {t('table.info', { lastUpdatedAt })}
+                  </Text>
+                </InfoContainer>
               </Stack>
-              <InfoContainer padding={5} gap={3}>
-                <Box marginTop={1}>
-                  <IcoInfo16 />
-                </Box>
-                <Text variant="body-3" color="secondary" lineHeight={'20px'}>
-                  {t('table.info', { lastUpdatedAt })}
-                </Text>
-              </InfoContainer>
-            </Stack>
-          ) : null}
-        </TableContainer>
+            ) : null}
+          </TableContainer>
+        </Stack>
       </Stack>
-    </Stack>
+    </>
   );
 };
 
