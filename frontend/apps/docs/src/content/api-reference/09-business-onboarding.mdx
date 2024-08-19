@@ -4,7 +4,12 @@ apis:
 - method: post
   path: /businesses/{fp_bid}/kyb
   title: Create a headless KYB onboarding session
-  description: For a business whose information has already been collected, runs the verification checks of the provided playbook. This will contact the business verification and identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+  description: |
+    For a business whose information has already been collected, runs the verification checks of the provided playbook. This will contact the business verification and identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+    <br><br>
+    The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
+    <br><br>
+    Note, this API does not support KYCing beneficial owners, so the playbook you provide must not collect or verify beneficial owners. If you would like to also verify the identifies of the beneficial owners, you can separately use the <ScrollLink id="post-users-fp-id-kyc">POST /users/{fp_id}/kyc</ScrollLink> API to run existing users through a KYC playbook.
 - method: get
   path: /businesses/{fp_bid}/decisions
   title: List all decisions for a business
@@ -24,7 +29,7 @@ apis:
 - method: get
   path: /businesses/{fp_bid}/owners
   title: List all owners of a business
-  description: List all beneficial owners of a business. Beneficial owners can be provided either by the user during interactive onboarding to a KYB playbook or via the <ScrollLink id="post-businesses-fp-bid-owners">POST /businesses/{fp_id}/owners</ScrollLink> API.
+  description: List all beneficial owners of a business. Beneficial owners can be provided either by the user during interactive onboarding to a KYB playbook or via the <ScrollLink id="post-businesses-fp-bid-owners">POST /businesses/{fp_bid}/owners</ScrollLink> API.
 ---
 
 # Business onboarding

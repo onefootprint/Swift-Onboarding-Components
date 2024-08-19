@@ -39,6 +39,7 @@ pub struct ValidateResponse {
 pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,
+    /// The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).
     pub status: OnboardingStatus,
     pub playbook_key: ObConfigurationKey,
 }

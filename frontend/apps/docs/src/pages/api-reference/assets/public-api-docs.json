@@ -5449,6 +5449,7 @@
                         "type": "boolean"
                     },
                     "status": {
+                        "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
                         "type": "string",
                         "enum": [
                             "pass",
@@ -13944,6 +13945,7 @@
                                 "type": "boolean"
                             },
                             "status": {
+                                "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
                                 "type": "string",
                                 "enum": [
                                     "pass",
@@ -13975,6 +13977,7 @@
                                 "type": "boolean"
                             },
                             "status": {
+                                "description": "The decision issued by the rules configured on your playbook. For more information on interpreting statuses, see [here](https://docs.onefootprint.com/articles/kyc/getting-started#verify-the-footprint-token-server-side-check-the-onboarding-status).",
                                 "type": "string",
                                 "enum": [
                                     "pass",

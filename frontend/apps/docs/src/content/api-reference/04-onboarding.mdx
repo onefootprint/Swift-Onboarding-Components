@@ -8,7 +8,10 @@ apis:
 - method: post
   path: /users/{fp_id}/kyc
   title: Create a headless onboarding session
-  description: For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+  description: |
+    For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+    <br><br>
+    The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
 - method: post
   path: /users/{fp_id}/decisions
   title: Create a manual decision for a user
