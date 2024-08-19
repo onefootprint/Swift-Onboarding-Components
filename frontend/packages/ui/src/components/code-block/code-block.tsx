@@ -99,7 +99,7 @@ const Header = styled.header`
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
+    padding: ${theme.spacing[2]} ${theme.spacing[5]};
     width: 100%;
   `}
 `;
