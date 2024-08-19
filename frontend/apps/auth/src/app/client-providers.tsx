@@ -28,25 +28,11 @@ const queryClient = new QueryClient({
 });
 Logger.init('auth', /* deferSessionRecord */ true);
 
-const overrideThemeBackground = (theme: Theme) => {
-  if (theme) {
-    return {
-      ...theme,
-      backgroundColor: {
-        ...theme.backgroundColor,
-        primary: theme.backgroundColor.primary === '#ffffff' ? 'transparent' : theme.backgroundColor.primary,
-      },
-    };
-  }
-
-  return theme;
-};
-
 const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => (
   <AppearanceProvider
     appearance={loadedStyle.appearance || {}}
     rules={loadedStyle.rules || ''}
-    theme={overrideThemeBackground(loadedStyle.theme) as NonNullable<Theme>}
+    theme={loadedStyle.theme as NonNullable<Theme>}
   >
     <QueryClientProvider client={queryClient}>
       <FootprintProvider client={fpClient}>{children}</FootprintProvider>
