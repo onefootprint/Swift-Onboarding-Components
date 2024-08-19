@@ -22,7 +22,10 @@ const StateField = ({ countryCode }: StateFieldProps) => {
     <Controller
       control={control}
       name="state"
-      rules={{ required: true }}
+      rules={{
+        required: true,
+        validate: value => (value ? STATES.some(s => s.value === value.value) : false),
+      }}
       render={({ field, fieldState: { error } }) => {
         const value = typeof field.value === 'object' ? field.value : undefined;
         return (
