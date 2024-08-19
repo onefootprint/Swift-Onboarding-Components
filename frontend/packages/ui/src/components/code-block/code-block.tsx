@@ -6,6 +6,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { createFontStyles } from '../../utils/mixins';
 import Box from '../box';
 import CopyButton from '../copy-button';
+import Stack from '../stack';
 
 export type CodeBlockProps = {
   ariaLabel?: string;
@@ -35,7 +36,16 @@ const CodeBlock = ({
 
   return (
     <Container>
-      <Header>
+      <Stack
+        justifyContent="space-between"
+        backgroundColor="secondary"
+        borderBottomWidth={1}
+        borderStyle="solid"
+        borderColor="tertiary"
+        width="100%"
+        paddingInline={5}
+        height="48px"
+      >
         <Title tag="h5">{title || language}</Title>
         {!disableCopy && (
           <CopyButton
@@ -48,7 +58,7 @@ const CodeBlock = ({
             ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
           />
         )}
-      </Header>
+      </Stack>
       <Content>
         <SyntaxHighlighter
           language={language}
@@ -89,18 +99,6 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     overflow: hidden;
-  `}
-`;
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    align-items: center;
-    background-color: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[2]} ${theme.spacing[5]};
-    width: 100%;
   `}
 `;
 
