@@ -39,6 +39,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::risk_signal;
     use db_schema::schema::risk_signal_group;
     use db_schema::schema::scoped_vault;
+    use db_schema::schema::scoped_vault_version;
     use db_schema::schema::socure_device_session;
     use db_schema::schema::stytch_fingerprint_event;
     use db_schema::schema::user_consent;
@@ -323,6 +324,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(workflow::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
+
+        deleted_rows += diesel::delete(scoped_vault_version::table)
+            .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
 
         // delete scoped_users
         deleted_rows += diesel::delete(scoped_vault::table)
