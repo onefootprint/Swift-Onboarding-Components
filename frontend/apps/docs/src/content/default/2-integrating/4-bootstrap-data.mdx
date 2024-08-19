@@ -14,8 +14,11 @@ meta:
 
 If you already have certain data about your user, you can share it with Footprint to expedite the onboarding process for your users.
 We will pre-fill already available data and skip completed pages for your users. The users can always edit and correct this data
-while onboarding through Footprint. To pass user data to Footprint's flow, use the `bootstrapData` option:
+while onboarding through Footprint. To pass pre-collected data to Footprint's flow, use the `bootstrapData` option in the SDK.
 
+Bootstrap data will be validated using the same validations applied to user-entered data. Any bootstrap data that fails validation will be ignored and the user will be asked to re-provide the value.
+
+Note also that only data fields that are collected by the provided playbook may be provided as bootstrap data.
 
 ## Boostraping KYC data
 
@@ -74,6 +77,8 @@ const launchFootprint = () => {
 | `id.visa_kind`                      | Optional. Type of visa the user has. Must be one of `'e1'`, `'e2'`, `'e3'`, `'f1'`, `'g4'`, `'h1b'`, `'l1'`, `'o1'`, `'tn1'`, or `'other'`. |
 | `id.visa_expiration_date`           | Optional. User's visa expiration date. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
 
+<inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
+
 ## Boostraping KYB data
 
 ```typescript
@@ -118,3 +123,5 @@ const launchFootprint = () => {
 | `business.zip`                      | Optional. Postal code for the business's street address                                                                                     |
 | `business.country`                  | Optional. Country for the business's street address                                                                                         |
 | `business.corporation_type`         | Optional. One of c_corporation, s_corporation, b_corporation, llc, llp, partnership, sole_proprietorship, non_profit, unknown, trust, agent |
+
+<inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
