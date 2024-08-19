@@ -13,6 +13,7 @@ use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use db::models::tenant::NewTenant;
 use db::models::tenant::Tenant;
+use newtypes::CompanySize;
 use newtypes::SessionAuthToken;
 use newtypes::TenantId;
 
@@ -21,6 +22,7 @@ pub struct SandboxTenantRequest {
     name: String,
     domains: Vec<String>,
     super_tenant_id: Option<TenantId>,
+    company_size: Option<CompanySize>,
 }
 
 #[derive(serde::Serialize, macros::JsonResponder)]
@@ -40,6 +42,7 @@ pub async fn post(
         name,
         domains,
         super_tenant_id,
+        company_size,
     } = request.into_inner();
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
@@ -53,6 +56,7 @@ pub async fn post(
             if Tenant::is_domain_already_claimed(conn, &domains)? {
                 return ValidationError("Tenant for this domain already exists").into();
             }
+            let website_url = domains.first().cloned();
             let new_tenant = NewTenant {
                 name,
                 e_private_key: e_priv_key,
@@ -67,6 +71,8 @@ pub async fn post(
                 domains,
                 allow_domain_access: false,
                 super_tenant_id,
+                website_url,
+                company_size,
             };
             let tenant = Tenant::create(conn, new_tenant)?;
             // Issue a new token to impersonate the new tenant

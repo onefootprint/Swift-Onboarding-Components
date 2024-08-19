@@ -124,6 +124,8 @@ pub struct NewTenant {
     pub allow_domain_access: bool,
     pub domains: Vec<String>,
     pub super_tenant_id: Option<TenantId>,
+    pub website_url: Option<String>,
+    pub company_size: Option<CompanySize>,
 }
 
 /// Allows creating with an application-generated TenantId rather than db-generated

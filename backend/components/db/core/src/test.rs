@@ -116,6 +116,8 @@ mod test {
             domains: vec![],
             allow_domain_access: false,
             super_tenant_id: None,
+            website_url: None,
+            company_size: None,
         };
         pool.db_transaction(|conn| Tenant::create(conn, tenant))
             .await

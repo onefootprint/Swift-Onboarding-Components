@@ -792,6 +792,13 @@
             "placeholder": "Select",
             "errors": {
               "required": "Please select one option"
+            },
+            "values": {
+              "s1_to10": "1-10",
+              "s11_to50": "11-50",
+              "s51_to100": "51-100",
+              "s101_to1000": "101-1000",
+              "s1001_plus": "> 1000"
             }
           }
         }

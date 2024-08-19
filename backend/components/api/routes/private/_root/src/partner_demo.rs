@@ -179,6 +179,8 @@ pub async fn post(
                         domains: vec![],
                         allow_domain_access: false,
                         super_tenant_id: None,
+                        website_url: None,
+                        company_size: None,
                     },
                 )?;
 

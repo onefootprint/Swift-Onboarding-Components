@@ -1,12 +1,10 @@
-import type { Organization, OrganizationSize } from '@onefootprint/types';
+import { Organization, OrganizationSize } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Button, Select, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
 import styled, { css } from 'styled-components';
-
-import SIZE_OPTIONS from './content.constants';
 
 export type FormData = {
   name: string;
@@ -23,6 +21,10 @@ export type ContentProps = {
 const Content = ({ onBack, onComplete, organization }: ContentProps) => {
   const { t } = useTranslation('common');
   const mutation = useUpdateOrg();
+  const SIZE_OPTIONS = Object.values(OrganizationSize).map(size => ({
+    value: size,
+    label: t(`pages.onboarding.company-data.form.size.values.${size}`),
+  }));
   const {
     control,
     register,

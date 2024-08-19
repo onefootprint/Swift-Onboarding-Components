@@ -243,9 +243,11 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Te
         is_prod_kyb_playbook_restricted: true,
         is_prod_auth_playbook_restricted: true,
         domains: domain.into_iter().collect(),
-        allow_domain_access: false, /* false by default on creation, has to become true manually with PATCH
-                                     * /org */
+        // false by default on creation, has to become true manually with PATCH /org
+        allow_domain_access: false,
         super_tenant_id: None,
+        website_url: None,
+        company_size: None,
     };
     let tenant = state
         .db_pool

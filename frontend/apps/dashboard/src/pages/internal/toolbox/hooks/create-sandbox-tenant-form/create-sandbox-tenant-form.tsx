@@ -1,9 +1,11 @@
-import { Text, TextInput, useToast } from '@onefootprint/ui';
+import { Select, SelectOption, Text, TextInput, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
+import { OrganizationSize } from '@onefootprint/types';
+import { useTranslation } from 'react-i18next';
 import type { ToolFormProps } from '../../toolbox';
 import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 
@@ -11,6 +13,7 @@ type CreateSandboxTenantFormData = {
   name: string;
   domain?: string;
   superTenantId?: string | undefined;
+  companySize?: SelectOption<OrganizationSize>;
 };
 
 const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
@@ -21,15 +24,22 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = methods;
   const router = useRouter();
   const { logIn } = useSession();
+  const { t } = useTranslation('common');
+  const SIZE_OPTIONS = Object.values(OrganizationSize).map(size => ({
+    value: size,
+    label: t(`pages.onboarding.company-data.form.size.values.${size}`),
+  }));
 
   const handleBeforeSubmit = async (data: CreateSandboxTenantFormData) => {
     const requestData = {
       name: data.name,
       domains: data.domain ? [data.domain] : [],
       superTenantId: data.superTenantId ? data.superTenantId : undefined,
+      companySize: data.companySize?.value,
     };
     createSandboxTenantMutation.mutate(requestData, {
       onSuccess: async ({ token }) => {
@@ -61,6 +71,21 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
           placeholder="acme.org"
           hasError={!!errors.domain}
           {...register('domain', { required: false })}
+        />
+        <Controller
+          control={control}
+          name="companySize"
+          rules={{ required: true }}
+          render={({ field, fieldState }) => (
+            <Select
+              hasError={!!fieldState.error}
+              label="Company size"
+              onBlur={field.onBlur}
+              onChange={field.onChange}
+              options={SIZE_OPTIONS}
+              value={field.value}
+            />
+          )}
         />
         <TextInput
           label="Parent tenant ID"

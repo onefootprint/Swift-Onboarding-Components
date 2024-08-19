@@ -8,6 +8,7 @@ type CreateSandboxTenantRequest = {
   name: string;
   domains: string[];
   superTenantId?: string;
+  companySize?: string;
 };
 
 type CreateSandboxTenantResponse = {
