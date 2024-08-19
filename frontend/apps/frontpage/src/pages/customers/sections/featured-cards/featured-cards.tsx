@@ -1,5 +1,5 @@
 import { Box, Container, media } from '@onefootprint/ui';
-import { BloomLogo, CobaLogo, FlexcarLogo } from 'src/components/company-logos/themed';
+import { BloomLogo, CobaLogo, ComposerLogo, FlexcarLogo } from 'src/components/company-logos/themed';
 import styled, { css } from 'styled-components';
 
 import Line from '../../components/line';
@@ -14,7 +14,7 @@ const featuredCases = [
     url: '/customers/coba',
   },
   {
-    company: 'composer',
+    company: 'flexcar',
     logo: FlexcarLogo,
     title: 'Flexcar',
     gridArea: 'flexcar',
@@ -27,6 +27,7 @@ const featuredCases = [
     gridArea: 'bloom',
     url: '/customers/bloom',
   },
+  { company: 'composer', logo: ComposerLogo, title: 'Findigs', gridArea: 'composer', url: '/customers/composer' },
 ];
 
 const FeaturedCards = () => (
@@ -61,8 +62,8 @@ const GridContainer = styled(Container)`
     ${media.greaterThan('md')`
       display: grid;
       height: 280px;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-areas: 'findigs flexcar bloom';
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-areas: 'findigs flexcar bloom composer';
     `}
   `}
 `;

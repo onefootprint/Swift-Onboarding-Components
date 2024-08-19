@@ -6,7 +6,7 @@ type H2Props = {
 };
 
 const H2 = ({ children }: H2Props) => (
-  <Text variant="display-3" color="primary" marginBottom={9}>
+  <Text variant="display-3" color="primary" marginBottom={9} tag="h2">
     {children}
   </Text>
 );

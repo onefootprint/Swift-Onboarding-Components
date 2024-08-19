@@ -1,0 +1,87 @@
+import { CaseStudyLayout } from '../components/case-study-layout';
+import { IcoCrosshair24, IcoLightBulb24 } from '@onefootprint/icons';
+import { Stack } from '@onefootprint/ui';
+import { Challenge } from '../components/challenge';
+import { IconTitle } from '../components/icon-title';
+import { Banner } from '../components/banner';
+import { Section } from '../components/section';
+import { Result } from '../components/result';
+import { Quote } from '../components/quote';
+import SEO from 'src/components/seo';
+
+<SEO
+  title="Transforming Composer's Onboarding Process with Footprint"
+  description="Discover how Composer, a leading investment platform, leveraged Footprint to enhance their KYC process, significantly reducing manual review times and improving overall efficiency."
+  image="/customers/composer/composer-og.png"
+  og={{
+    image: '/customers/composer/composer-og.png',
+  }}
+  twitter={{
+    image: '/customers/composer/composer-og.png',
+  }}
+/>
+
+<CaseStudyLayout
+  companyDetails={{
+    name: 'Composer',
+    industry: "Investment Platform",
+    website: "https://www.composer.trade/",
+    logo: "/customers/composer/composer-logo.svg",
+    customerSince: "2023",
+    title: "Transforming Composer's Onboarding Process with Footprint",
+    subtitle: "Composer, a cutting-edge investment platform, partnered with Footprint to streamline their KYC process, resulting in faster onboarding, improved compliance, and enhanced customer experience."
+}}>
+
+Composer, a cutting-edge investment platform, initially relied on a combination of tools from their broker-dealer to satisfy KYC. However, as they grew products (such as adding retirement accounts) and onboarded more users (7x growth in the last year), they recognized the need for a more robust and efficient KYC solution. Composer partnered with Footprint to rebuild their onboarding stack.
+
+<Challenge>
+
+- Speed and Efficiency: Manual approval process often led to significant delays, with customers sometimes waiting weeks to complete their onboarding due to manual reviews.
+- Document Verification: Customers frequently had to submit documents via email, leading to inefficiencies.
+- Need for Independent Security + Compliance: Composer was not just in the market for an onboarding tool. As they continued to grow, they recognized the need to own their own data and securely store that data. They were looking for both a KYC and Compliance tool as well as a data vaulting tool
+
+</Challenge>
+
+<Section>
+### The Footprint Solution
+
+**Accelerated processing times**: With Footprint, the average time to exit manual review dropped dramatically from six hours to just nine minutes. And less than 4.5% of applicants end up in manual review.
+
+**Seamless KYC experience**: End-customers praised the ease of use and the secure document upload feature, enhancing their onboarding experience.
+
+**Robust verification**: Footprint’s use of App Clips + ML Models for document verification dramatically reduced ID verification failures and lowered the need for constant manual checks.
+</Section>
+
+<Section>
+### Impact on Composer’s Operations
+
+The integration of Footprint into Composer’s operations brought significant benefits:
+
+<Result>
+
+- **Increased Efficiency:** Composer experienced a substantial reduction in manual processing time, enabling them to focus on expanding their customer base.
+- **Improved Conversion Rates:** Composer believes that when traffic flows through just Footprint, they seem up to doubled rates of signup-to-funded rate.
+- **Enhanced Compliance:** Footprint streamlined the compliance workflow, assisting Composer’s CCO in preparing for FINRA reviews and ensuring adherence to regulatory standards. All of Composer’s compliance processes are now run out of Footprint. 
+
+</Result>
+</Section>
+
+<Section>
+### Cross-Departmental Benefits
+
+The benefits of Footprint’s solution were felt across various teams within Composer:
+
+<Result>
+
+- **CISO:** Gained the ability to spot-check processes, ensuring frontline teams adhered to protocols and securely uploaded documents.
+- **CTO:** Enjoyed the flexibility to quickly modify playbooks, analyze backtests and collaborate directly with Footprint’s engineering team for rapid implementation.
+- **COO’s Team:** Benefited from the ability to swiftly process customers stuck in manual review, improving overall operational efficiency.
+
+</Result>
+</Section>
+<Banner cta="Get a demo" title="Ready to start?">
+  If you're looking to onboard customers quickly and securely store their
+  sensitive data, we'd love to help.
+</Banner>
+
+</CaseStudyLayout>
