@@ -23,7 +23,6 @@ const Billing = () => {
 
   const totalAmountDue = invoice?.lineItems?.map(li => li.notionalCents || 0).reduce((a, b) => a + b, 0);
   const lastUpdatedAt = invoice?.lastUpdatedAt || '-';
-  console.log(invoice);
 
   return (
     <Stack direction="column">

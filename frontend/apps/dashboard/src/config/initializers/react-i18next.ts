@@ -12,6 +12,7 @@ import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import playbooks from '../locales/en/playbooks.json';
+import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
 import users from '../locales/en/users.json';
 
@@ -32,6 +33,7 @@ const configureReactI18next = () => {
         ui,
         users,
         home,
+        settings,
       },
     },
     lng: 'en',
@@ -46,6 +48,7 @@ const configureReactI18next = () => {
       'internal',
       'lists',
       'playbooks',
+      'settings',
       'switch-org',
       'ui',
       'users',

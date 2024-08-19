@@ -12,6 +12,7 @@ import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import playbooks from '../locales/en/playbooks.json';
+import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
 import users from '../locales/en/users.json';
 
@@ -31,6 +32,7 @@ i18next.use(initReactI18next).init({
       ui,
       users,
       home,
+      settings,
     },
   },
   lng: 'en',
@@ -49,6 +51,7 @@ i18next.use(initReactI18next).init({
     'ui',
     'users',
     'home',
+    'settings',
   ],
   returnNull: false,
   interpolation: {
