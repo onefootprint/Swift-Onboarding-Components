@@ -1,26 +1,26 @@
 ---
 title: Business vault
 apis:
-- method: patch
-  path: /businesses/{fp_bid}/vault
-  title: Update a business's vault
-  description: Updates data in a business's vault.
-- method: post
-  path: /businesses/{fp_bid}/vault/validate
-  title: Validate a vault data update
-  description: Check if the provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.
-- method: post
-  path: /businesses/{fp_bid}/vault/decrypt
-  title: Decrypt data from a business's vault
-  description: Decrypts the specified list of Data Identifiers from the provided business's vault.
-- method: get
-  path: /businesses/{fp_bid}/vault
-  title: Check presence of data in a business's vault
-  description: Retrieve information on which Data Identifiers are present in the business's vault.
-- method: delete
-  path: /businesses/{fp_bid}/vault
-  title: Delete data from a business's vault
-  description: Delete the provided Data Identifiers from the business's vault.
+  - method: patch
+    path: /businesses/{fp_bid}/vault
+    title: Update a business's vault
+    description: Updates data in a business's vault.
+  - method: post
+    path: /businesses/{fp_bid}/vault/validate
+    title: Validate a vault data update
+    description: Check if the provided data is valid before adding it to the vault. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.
+  - method: post
+    path: /businesses/{fp_bid}/vault/decrypt
+    title: Decrypt data from a business's vault
+    description: Decrypts the specified list of Data Identifiers from the provided business's vault.
+  - method: get
+    path: /businesses/{fp_bid}/vault
+    title: Check presence of data in a business's vault
+    description: Retrieve information on which Data Identifiers are present in the business's vault.
+  - method: delete
+    path: /businesses/{fp_bid}/vault
+    title: Delete data from a business's vault
+    description: Delete the provided Data Identifiers from the business's vault.
 ---
 
 # Business vault

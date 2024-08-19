@@ -6,8 +6,8 @@ subcategory: Expo
 title: Onboarding (Hosted flow)
 meta:
   {
-    title: 'Footprint Expo Integration',
-    description: 'Discover how to integrate Footprint with a Expo Codebase',
+    title: "Footprint Expo Integration",
+    description: "Discover how to integrate Footprint with a Expo Codebase",
   }
 ---
 
@@ -26,21 +26,21 @@ be executed in a Webview, and hence, it's our most simple and quick integration.
    - Trigger Footprint, for example, when a button is pressed. Then, pass the `publicKey` and `onComplete` callback to the `init` method.
 
 ```typescript
-import React from 'react';
-import { Button, View, StyleSheet } from 'react-native';
-import footprint from '@onefootprint/footprint-expo';
+import React from "react";
+import { Button, View, StyleSheet } from "react-native";
+import footprint from "@onefootprint/footprint-expo";
 
 export default function App() {
   const handleButtonPress = async () => {
     const component = footprint.init({
-      publicKey: 'pb_test_ilBQgKtvrgQrQNV8U2rb7e',
-      onComplete: validationToken => {
+      publicKey: "pb_test_ilBQgKtvrgQrQNV8U2rb7e",
+      onComplete: (validationToken) => {
         alert(validationToken);
       },
       onCancel: () => {
-        console.log('canceled');
+        console.log("canceled");
       },
-      onError: error => {
+      onError: (error) => {
         // Triggered if there are unrecoverable errors initializing the flow
         console.error(error);
       },
@@ -58,9 +58,9 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 ```
@@ -70,28 +70,28 @@ const styles = StyleSheet.create({
 Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `init` method.
 
 ```typescript
-import footprint from '@onefootprint/footprint-expo';
+import footprint from "@onefootprint/footprint-expo";
 
-import { View, Button } from 'react-native';
+import { View, Button } from "react-native";
 
 const Screen = () => {
   const handlePress = () => {
     const component = footprint.init({
-      publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-      onComplete: validationToken => {
+      publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+      onComplete: (validationToken) => {
         console.log(validationToken);
       },
-      onError: error => {
+      onError: (error) => {
         console.log(error);
       },
-      onAuth: validationToken => {
+      onAuth: (validationToken) => {
         console.log(validationToken);
       },
       onCancel: () => {
-        console.log('User canceled the flow');
+        console.log("User canceled the flow");
       },
       onClose: () => {
-        console.log('User closed the flow');
+        console.log("User closed the flow");
       },
     });
 
@@ -111,28 +111,28 @@ const Screen = () => {
 Utilize the `bootstrapData` option to pre-fill any available data and bypass completed pages for your users. For complete details, click [here](/integrate/bootstrap-data).
 
 ```typescript
-import footprint from '@onefootprint/footprint-expo';
+import footprint from "@onefootprint/footprint-expo";
 
-import { View, Button } from 'react-native';
+import { View, Button } from "react-native";
 
 const Screen = () => {
   const handlePress = () => {
     footprint.open({
-      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+      publicKey: "pb_test_VMooXd04EUlnu3AvMYKjMW",
       bootstrapData: {
-        'id.email': 'jane.doe@acme.com',
-        'id.phone_number': '+12025550179',
-        'id.first_name': 'Jane',
-        'id.last_name': 'Doe',
-        'id.dob': '01/01/2001',
-        'id.ssn9': '123456789',
-        'id.ssn4': '1234',
-        'id.address_line1': '123 Apple St.',
-        'id.address_line2': 'APT 123',
-        'id.city': 'Boston',
-        'id.state': 'MA',
-        'id.country': 'US',
-        'id.zip': '02117',
+        "id.email": "jane.doe@acme.com",
+        "id.phone_number": "+12025550179",
+        "id.first_name": "Jane",
+        "id.last_name": "Doe",
+        "id.dob": "01/01/2001",
+        "id.ssn9": "123456789",
+        "id.ssn4": "1234",
+        "id.address_line1": "123 Apple St.",
+        "id.address_line2": "APT 123",
+        "id.city": "Boston",
+        "id.state": "MA",
+        "id.country": "US",
+        "id.zip": "02117",
       },
     });
   };
@@ -174,15 +174,15 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 
 ### Available Props
 
-| Variable        | Description                                                                                                                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                  |
+| Variable        | Description                                                                                                                                                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                           |
 | `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/articles/integrate/user-specific-sessions). |
-| `redirectUrl`   | Optional. A deep link that will be navigated to when the web browser is closed. Can be created using `Linking.createURL` from `expo-linking`.                                                                                   |
+| `redirectUrl`   | Optional. A deep link that will be navigated to when the web browser is closed. Can be created using `Linking.createURL` from `expo-linking`.                                                                                            |
 | `bootstrapData` | Optional. An object that contains previously collected data that can bootstrap the onboarding flow. More information [here](/articles/integrate/bootstrap-data).                                                                         |
 | `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                                                      |
-| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                           |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                    |
 | `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                                                     |
-| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                           |
-| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                           |
-| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                            |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                    |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                                    |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                     |

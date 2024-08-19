@@ -1,22 +1,22 @@
 ---
 title: Users
 apis:
-- method: post
-  path: /users
-  title: Create a user
-  description: Creates a new user, optionally initializing with the provided vault data.
-- method: post
-  path: /users/search
-  title: Search users by PII
-  description: Search users by fingerprinted vault data. Some pieces of vault data are automatically fingerprinted for search here. Searchable fields include `id.phone_number`, `id.email`, `id.ssn9`, `id.drivers_license_number`, `id.us_tax_id`, and `id.itin`.
-- method: get
-  path: /users/{fp_id}
-  title: Retrieve a user
-  description: View basic details for a user. See the APIs under the <ScrollLink id="user-vault">User vault</ScrollLink> section for information on reading vault data.
-- method: get
-  path: /users
-  title: List users
-  description: Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the <ScrollLink id="post-users-search">POST /users/search</ScrollLink> API.
+  - method: post
+    path: /users
+    title: Create a user
+    description: Creates a new user, optionally initializing with the provided vault data.
+  - method: post
+    path: /users/search
+    title: Search users by PII
+    description: Search users by fingerprinted vault data. Some pieces of vault data are automatically fingerprinted for search here. Searchable fields include `id.phone_number`, `id.email`, `id.ssn9`, `id.drivers_license_number`, `id.us_tax_id`, and `id.itin`.
+  - method: get
+    path: /users/{fp_id}
+    title: Retrieve a user
+    description: View basic details for a user. See the APIs under the <ScrollLink id="user-vault">User vault</ScrollLink> section for information on reading vault data.
+  - method: get
+    path: /users
+    title: List users
+    description: Look up users based on external ID. This API is not intended to be used to paginate through all of your organization's users. To search for users based on PII, use the <ScrollLink id="post-users-search">POST /users/search</ScrollLink> API.
 ---
 
 # Users
@@ -29,4 +29,3 @@ Users can be created in two ways:
 - Or, they can be create directly via the <ScrollLink id="post-users">POST /users</ScrollLink> API below.
 
 We recommend creating one Footprint user for each user you have in your database and storing the user's `fp_id` in your database table of users. Footprint is meant to act as the source of truth for your users' PII and other sensitive information, so you may often need your user's corresponding `fp_id`.
-

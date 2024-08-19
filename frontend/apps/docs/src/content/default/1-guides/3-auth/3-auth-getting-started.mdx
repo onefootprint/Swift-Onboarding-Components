@@ -23,14 +23,14 @@ At a high level, the Footprint Auth component will prompt the user to authentica
 Here's what your integration may look like if you use Javascript:
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const Page = () => {
   const handleOpen = () => {
     const component = footprint.init({
-      kind: 'auth',
-      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+      kind: "auth",
+      publicKey: "pb_test_VMooXd04EUlnu3AvMYKjMW",
       onComplete: (validationToken: string) => {
         // TODO: Post to Footprint server to fetch user ID
       },
@@ -38,9 +38,7 @@ const Page = () => {
     component.render();
   };
 
-  return (
-    <button onClick={handleOpen}>Launch Auth</button>
-  );
+  return <button onClick={handleOpen}>Launch Auth</button>;
 };
 ```
 
@@ -111,18 +109,18 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
 You may then invoke Footprint KYC with the provided onboarding token. The user will not be asked to re-authenticate if they have logged into your app recently. Instead, they will be send straight to the identity verification portion of the playbook.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const App = () => {
   const handleComplete = (validationToken: string) => {
     // TODO: Post to Footprint server to fetch user ID and verification status
   };
-  
+
   const handleOpen = () => {
     const component = footprint.init({
-      kind: 'auth',
-      authToken: 'tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
+      kind: "auth",
+      authToken: "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0",
       onComplete: (validationToken: string) => {
         // TODO: Post to Footprint server to fetch user ID
       },
@@ -130,9 +128,7 @@ const App = () => {
     component.render();
   };
 
-  return (
-    <button onClick={handleOpen}>Launch Auth</button>
-  );
+  return <button onClick={handleOpen}>Launch Auth</button>;
 };
 ```
 

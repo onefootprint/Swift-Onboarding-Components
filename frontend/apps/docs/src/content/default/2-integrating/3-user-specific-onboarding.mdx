@@ -64,7 +64,7 @@ You should select the kind of token to match the SDK you are using and the flow 
 | `reonboard`           | Convenience method to reonboard the user onto the last playbook that they onboarded onto.                                                               | Verify        |
 | `inherit`             | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. | Verify        |
 | `user`                | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          | Verify        |
-| `update_auth_methods` | Allows the user to update any/all of their login methods (phone and email) using the Footprint Auth component.                                    | Auth          |
+| `update_auth_methods` | Allows the user to update any/all of their login methods (phone and email) using the Footprint Auth component.                                          | Auth          |
 
 You can find more info in the <navigation-link href="/api-reference#post-users-fp-id-token" fontFamily="code">POST /users/{fp_id}/token</navigation-link> API reference.
 
@@ -125,14 +125,14 @@ You will provide this auth token to the Footprint SDK. This will ask the user to
 If you are launching the user into a KYC onboarding flow, you would pass the `authToken` as a prop like so:
 
 ```javascript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const handleClick = () => {
   const component = footprint.init({
-    kind: 'verify',
-    authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0', // Auth token from Step 2
-    onComplete: validationToken => {
+    kind: "verify",
+    authToken: "utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0", // Auth token from Step 2
+    onComplete: (validationToken) => {
       // TODO: Post to Footprint server to fetch user ID or verification status
     },
   });
@@ -147,14 +147,14 @@ If you are launching the user into the Update auth methods flow, you would pass 
 <inline-alert variant='info'>Make sure you are using at least the @onefootprint/footprint-js@3.9.0 version.</inline-alert>
 
 ```javascript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const handleClick = () => {
   const component = footprint.init({
-    kind: 'update_login_methods',
-    authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
-    onComplete: validationToken => {
+    kind: "update_login_methods",
+    authToken: "utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0",
+    onComplete: (validationToken) => {
       // TODO: Post to Footprint server to fetch user ID or verification status
     },
   });

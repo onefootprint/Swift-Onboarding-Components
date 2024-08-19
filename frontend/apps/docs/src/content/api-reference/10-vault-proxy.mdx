@@ -1,34 +1,33 @@
 ---
 title: Vault proxy
 apis:
-- method: post
-  path: /vault_proxy/{id}
-  title: Issue a request to a preconfigured proxy
-  description:
-    Given the `id` of a vault proxy configured in the [dashboard](https://dashboard.preview.onefootprint.com/proxy-configs), issues the provided request via the vault proxy to send and receive data to the preconfigured target.
-    <br><br>
-    The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided user's vault. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
-- method: post
-  path: /vault_proxy/jit
-  title: Issue a just-in-time request
-  description:
-    If you don't have a preconfigured proxy configuration set up in the dashboard or are working on an integration in active development, you may invoke the vault proxy "just-in-time" (JIT) to send and receive data to a target destination provided inline.
-    <br><br>
-    The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided user's vault. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
-- method: post
-  path: /vault_proxy/reflect
-  title: Reflect raw decrypted data
-  description:
-    Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy.
-    <br><br>
-    The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided users' vaults. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
+  - method: post
+    path: /vault_proxy/{id}
+    title: Issue a request to a preconfigured proxy
+    description:
+      Given the `id` of a vault proxy configured in the [dashboard](https://dashboard.preview.onefootprint.com/proxy-configs), issues the provided request via the vault proxy to send and receive data to the preconfigured target.
+      <br><br>
+      The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided user's vault. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
+  - method: post
+    path: /vault_proxy/jit
+    title: Issue a just-in-time request
+    description:
+      If you don't have a preconfigured proxy configuration set up in the dashboard or are working on an integration in active development, you may invoke the vault proxy "just-in-time" (JIT) to send and receive data to a target destination provided inline.
+      <br><br>
+      The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided user's vault. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
+  - method: post
+    path: /vault_proxy/reflect
+    title: Reflect raw decrypted data
+    description:
+      Given a raw HTTP body, decrypts data tokens in place for up to 1000 users at a time. Can be used to generate reports or test payloads that will be sent using the vault proxy.
+      <br><br>
+      The request body may contain "vault proxy tokens," which are hydrated with decrypted data from the provided users' vaults. More information on vault proxy tokens can be found [here](/articles/vault/proxy#basics-token-body-template-format).
 ---
 
 # Vault proxy
 
 Since Footprint custodies all of your users' most sensitive information, your application may need to fetch this information and send it to third party services. To prevent your application from needing to touch sensitive data in plaintext, Footprint supports proxying your users' information directly to third parties configured by you. Footprint even supports vaulting new information from third parties into your users' vaults, all without your code needing to handle sensitive information.
 
-For proxy upstreams that you talk to frequently, you may preconfigure the egress request headers and body 
+For proxy upstreams that you talk to frequently, you may preconfigure the egress request headers and body
 
 You can learn more about Footprint's vault proxy at our documentation site [here](/articles/vault/proxy).
-

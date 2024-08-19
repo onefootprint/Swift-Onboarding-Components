@@ -1,30 +1,30 @@
 ---
 title: Client vaulting
 apis:
-- method: post
-  path: /users/{fp_id}/client_token
-  title: Create a client vaulting token
-  description: Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](/articles/embedded-components/getting-started).
-- method: patch
-  path: /users/vault
-  title: Update the vault
-  description: Updates data in a vault given a short-lived, entity-scoped client token. The client token must have access to vault the provided data.
-- method: post
-  path: /users/vault/validate
-  title: Validate a vault data update
-  description: Checks if provided data is valid before adding it to the vault given a short-lived client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.
-- method: post
-  path: /users/vault/decrypt
-  title: Decrypt data from the vault
-  description: Decrypts the specified list of fields given a short-lived client token. The client token must have access to decrypt the requested data.
-- method: get
-  path: /users/vault/decrypt/{token}
-  title: Download a file stored in the vault
-  description: Decrypts and downloads the single piece of data from the user's vault as specified by the provided token.
-- method: post
-  path: /users/vault/{identifier}/upload
-  title: Upload a large file to the vault
-  description: Upload a large file to the user's vault under the provided Data Identifier. The contents of the provided Data Identifier will be set to the contents of the provided HTTP request body.
+  - method: post
+    path: /users/{fp_id}/client_token
+    title: Create a client vaulting token
+    description: Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](/articles/embedded-components/getting-started).
+  - method: patch
+    path: /users/vault
+    title: Update the vault
+    description: Updates data in a vault given a short-lived, entity-scoped client token. The client token must have access to vault the provided data.
+  - method: post
+    path: /users/vault/validate
+    title: Validate a vault data update
+    description: Checks if provided data is valid before adding it to the vault given a short-lived client token. Returns an HTTP 200 if there are no validation errors, or HTTP 400 with context describing validation errors if any.
+  - method: post
+    path: /users/vault/decrypt
+    title: Decrypt data from the vault
+    description: Decrypts the specified list of fields given a short-lived client token. The client token must have access to decrypt the requested data.
+  - method: get
+    path: /users/vault/decrypt/{token}
+    title: Download a file stored in the vault
+    description: Decrypts and downloads the single piece of data from the user's vault as specified by the provided token.
+  - method: post
+    path: /users/vault/{identifier}/upload
+    title: Upload a large file to the vault
+    description: Upload a large file to the user's vault under the provided Data Identifier. The contents of the provided Data Identifier will be set to the contents of the provided HTTP request body.
 ---
 
 # Client vaulting

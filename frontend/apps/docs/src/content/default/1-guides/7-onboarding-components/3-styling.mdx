@@ -18,8 +18,8 @@ Styling your onboarding components are easy and it should be the same process as
 You can pass class names to your components using the `className` prop. This is useful if have already your classes or you use a CSS library, like Tailwind. Here's an example:
 
 ```jsx filename="app.tsx"
-import React from 'react';
-import { Fp } from '@onefootprint/footprint-react';
+import React from "react";
+import { Fp } from "@onefootprint/footprint-react";
 
 const App = () => {
   return (
@@ -39,42 +39,42 @@ const App = () => {
 You can pass inline styles to your components using the `style` prop. This is useful when you need to apply styles conditionally or avoid creating a separate CSS file. Here's an example:
 
 ```jsx filename="app.tsx"
-import React from 'react';
-import { Fp } from '@onefootprint/footprint-react';
+import React from "react";
+import { Fp } from "@onefootprint/footprint-react";
 
 const App = () => {
   return (
-    <Fp.Field name="id.first_name" style={{ marginBottom: '1rem' }}>
+    <Fp.Field name="id.first_name" style={{ marginBottom: "1rem" }}>
       <Fp.Label
         style={{
-          display: 'block',
-          color: '#4a5568',
-          fontSize: '0.875rem',
-          fontWeight: 'bold',
-          marginBottom: '0.5rem',
+          display: "block",
+          color: "#4a5568",
+          fontSize: "0.875rem",
+          fontWeight: "bold",
+          marginBottom: "0.5rem",
         }}
       >
         First name
       </Fp.Label>
       <Fp.Input
         style={{
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          appearance: 'none',
-          border: '1px solid #e2e8f0',
-          borderRadius: '0.25rem',
-          width: '100%',
-          padding: '0.5rem 0.75rem',
-          color: '#4a5568',
-          lineHeight: '1.25',
-          outline: 'none',
-          transition: 'box-shadow 0.2s',
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+          appearance: "none",
+          border: "1px solid #e2e8f0",
+          borderRadius: "0.25rem",
+          width: "100%",
+          padding: "0.5rem 0.75rem",
+          color: "#4a5568",
+          lineHeight: "1.25",
+          outline: "none",
+          transition: "box-shadow 0.2s",
         }}
       />
       <Fp.FieldErrors
         style={{
-          color: '#f56565',
-          fontSize: '0.75rem',
-          fontStyle: 'italic',
+          color: "#f56565",
+          fontSize: "0.75rem",
+          fontStyle: "italic",
         }}
       />
     </Fp.Field>

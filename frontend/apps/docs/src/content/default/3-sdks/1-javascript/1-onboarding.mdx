@@ -25,14 +25,14 @@ This guide explains how to integrate the Footprint onboarding flow for KYC (Know
    - Trigger Footprint, for example, when a button is clicked. Them, pass the `publicKey` and `onComplete` callback to the `init` method.
 
 ```javascript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const handleButtonClick = () => {
   const component = footprint.init({
-    kind: 'verify',
-    publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-    onComplete: validationToken => {
+    kind: "verify",
+    publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+    onComplete: (validationToken) => {
       console.log(validationToken);
     },
   });
@@ -52,22 +52,22 @@ Footprint provides some events based on some actions performed by the user. To l
 
 ```typescript
 const component = footprint.init({
-  kind: 'verify',
-  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-  onComplete: validationToken => {
+  kind: "verify",
+  publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+  onComplete: (validationToken) => {
     console.log(validationToken);
   },
-  onError: error => {
+  onError: (error) => {
     console.log(error);
   },
-  onAuth: validationToken => {
+  onAuth: (validationToken) => {
     console.log(validationToken);
   },
   onCancel: () => {
-    console.log('User canceled the flow');
+    console.log("User canceled the flow");
   },
   onClose: () => {
-    console.log('User closed the flow');
+    console.log("User closed the flow");
   },
 });
 component.render();
@@ -79,17 +79,17 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 
 ```typescript
 const component = footprint.init({
-  kind: 'verify',
-  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
-  onComplete: validationToken => {
+  kind: "verify",
+  publicKey: "pb_test_LRfe5D3dZnWSf5vOGSeCFk",
+  onComplete: (validationToken) => {
     console.log(validationToken);
   },
   appearance: {
     variables: {
-      borderRadius: '8px',
-      colorSuccess: '#10b981',
-      colorError: '#F87171',
-      buttonPrimaryBg: '#5550e9',
+      borderRadius: "8px",
+      colorSuccess: "#10b981",
+      colorError: "#F87171",
+      buttonPrimaryBg: "#5550e9",
     },
   },
 });
@@ -101,15 +101,15 @@ For more information, including a list of available variables, check out the [cu
 ## Overriding localization
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_LRfe5D3dZnWSf5vOGSeCFk';
+const publicKey = "pb_test_LRfe5D3dZnWSf5vOGSeCFk";
 const l10n = {
-  language: 'es',
+  language: "es",
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, l10n });
+const component = footprint.init({ kind: "verify", publicKey, l10n });
 component.render();
 ```
 
@@ -117,17 +117,17 @@ For more information, including a list of available languages, check out the [lo
 
 ## Available Props
 
-| Variable          | Description                                                                                                                                                                                                                                          |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicKey`       | Optional. Onboarding configuration public key.                                                                                                                                                                                                       |
-| `authToken`       | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/articles/integrate/user-specific-sessions).                      |
-| `onComplete`      | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                                |
-| `onAuth`          | Optional. Triggered after the user finishes logging in, before the user has finished fully onboarding. You'll receive a `validationToken` in this callback that your backend can exchange with Footprint to see the fp_id and the login method used. |
-| `onError`         | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                 |
-| `onCancel`        | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                                          |
-| `onClose`         | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                                              |
-| `bootstrapData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](/articles/integrate/bootstrap-data).                                                                 |
-| `options`         | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                                              |
-| `appearance`      | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                |
-| `variant`         | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                                                                       |
-| `l10n`            | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                                             |
+| Variable        | Description                                                                                                                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                                       |
+| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided. More info [here](/articles/integrate/user-specific-sessions).             |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.                                                |
+| `onAuth`        | Optional. Triggered after the user finishes logging in, before the user has finished fully onboarding. You'll receive a `validationToken` in this callback that your backend can exchange with Footprint to see the fp_id and the login method used. |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                 |
+| `onCancel`      | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                                          |
+| `onClose`       | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                                              |
+| `bootstrapData` | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](/articles/integrate/bootstrap-data).                                                                                |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                                                                  |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                |
+| `variant`       | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                                                                       |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                                                                 |

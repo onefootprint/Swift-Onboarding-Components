@@ -6,13 +6,14 @@ subcategory: React Native
 title: Onboarding Components
 meta:
   {
-    title: 'Footprint React Native Integration',
-    description: 'How to integrate react native and onboarding components',
+    title: "Footprint React Native Integration",
+    description: "How to integrate react native and onboarding components",
   }
 ---
 
 <inline-alert variant="warning">
-Onboarding Components is currently in beta. If you have any feedback, please reach out using the "Need help" button at the bottom left of the page.
+  Onboarding Components is currently in beta. If you have any feedback, please
+  reach out using the "Need help" button at the bottom left of the page.
 </inline-alert>
 
 ## 1. Before you start
@@ -46,7 +47,7 @@ yarn add @onefootprint/footprint-react-native@beta
 To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Then, pass the `publicKey`.
 
 ```tsx filename="app.tsx" highlight="5,6,7"
-import { Fp } from '@onefootprint/footprint-react-native';
+import { Fp } from "@onefootprint/footprint-react-native";
 
 const Demo = () => {
   return (
@@ -66,8 +67,8 @@ export default Demo;
 With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number. Our components are raw, meaning that you have to define a `style` to match your application's design.
 
 ```jsx filename="app.tsx" highlight="14,15,16,17,18,19,20,21,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36"
-import { Fp } from '@onefootprint/footprint-react';
-import { Button } from 'react-native';
+import { Fp } from "@onefootprint/footprint-react";
+import { Button } from "react-native";
 
 const Demo = () => {
   return (
@@ -80,22 +81,16 @@ const Demo = () => {
 const Identify = () => {
   return (
     <Fp.Form onSubmit={handleCreate} style={styles.form}>
-      {({handleSubmit, errors}) => (
+      {({ handleSubmit, errors }) => (
         <>
           <Fp.Field name="id.email">
             <Label>Email</Label>
-            <Fp.Input
-              placeholder="Email"
-              returnKeyType="next"
-            />
+            <Fp.Input placeholder="Email" returnKeyType="next" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.phone_number">
             <Label>Phone number</Label>
-            <Fp.Input
-              placeholder="Phone number"
-              returnKeyType="done"
-            />
+            <Fp.Input placeholder="Phone number" returnKeyType="done" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Button title="Submit" />

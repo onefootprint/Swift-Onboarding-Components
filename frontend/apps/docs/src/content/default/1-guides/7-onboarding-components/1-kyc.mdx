@@ -36,7 +36,7 @@ These are the steps you'll need to follow:
 To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Then, pass the `publicKey`.
 
 ```tsx filename="app.tsx"
-import { Fp } from '@onefootprint/footprint-react';
+import { Fp } from "@onefootprint/footprint-react";
 
 const Demo = () => {
   return (
@@ -54,7 +54,7 @@ export default Demo;
 With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number:
 
 ```jsx filename="app.tsx" highlight="6,13,14,15,16,17,18,19,20,21,22,23,24,25"
-import { Fp } from '@onefootprint/footprint-react';
+import { Fp } from "@onefootprint/footprint-react";
 
 const Demo = () => {
   return (
@@ -96,7 +96,7 @@ As you can see, our components are really raw: they don't have any styling. This
 Our Onboarding Components are totally customizable. If you want to change the default placeholder, you can just pass the attribute as you would normally do. The same goes for all the other input attributes:
 
 ```jsx filename="app.tsx" highlight="15,16,21"
-import { Fp } from '@onefootprint/footprint-react';
+import { Fp } from "@onefootprint/footprint-react";
 
 const Demo = () => {
   return (
@@ -169,7 +169,7 @@ You can customize the style of Onboarding Components with your preferred approac
     box-shadow: rgba(74, 36, 219, 0.12) 0px 0px 0px 4px;
   }
 
-  &[aria-invalid='true'] {
+  &[aria-invalid="true"] {
     background: rgb(255, 255, 255);
     border-color: rgb(191, 20, 10);
     box-shadow: rgba(191, 20, 10, 0.12) 0px 0px 0px 4px;
@@ -216,7 +216,7 @@ You can customize the style of Onboarding Components with your preferred approac
     box-shadow: rgba(74, 36, 219, 0.12) 0px 0px 0px 4px;
   }
 
-  &[aria-invalid='true'] {
+  &[aria-invalid="true"] {
     background: rgb(255, 255, 255);
     border-color: rgb(191, 20, 10);
     box-shadow: rgba(191, 20, 10, 0.12) 0px 0px 0px 4px;

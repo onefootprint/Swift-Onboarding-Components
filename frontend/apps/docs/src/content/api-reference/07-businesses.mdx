@@ -1,18 +1,18 @@
 ---
 title: Businesses
 apis:
-- method: post
-  path: /businesses
-  title: Create a business
-  description: Creates a new business, optionally initializing with the provided vault data.
-- method: get
-  path: /businesses/{fp_bid}
-  title: Retrieve a business
-  description: View basic details for a business. See the APIs under the <ScrollLink id="business-vault">Buiness vault</ScrollLink> section for information on reading vault data.
-- method: get
-  path: /businesses
-  title: List businesses
-  description: Look up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.
+  - method: post
+    path: /businesses
+    title: Create a business
+    description: Creates a new business, optionally initializing with the provided vault data.
+  - method: get
+    path: /businesses/{fp_bid}
+    title: Retrieve a business
+    description: View basic details for a business. See the APIs under the <ScrollLink id="business-vault">Buiness vault</ScrollLink> section for information on reading vault data.
+  - method: get
+    path: /businesses
+    title: List businesses
+    description: Look up businesses based on external ID. This API is not intended to be used to paginate through all of your organization's businesses.
 ---
 
 # Businesses
@@ -20,6 +20,7 @@ apis:
 In addition to verifying the identity of users, Footprint also supports KYB, verifying the legitimacy of businesses. Businesses are treated very similarly to users in Footprint's ecosystem, but they are verified using a different set of business verification vendors.
 
 Businesses can similarly be onboarded to Footprint in two ways:
+
 - First, they can onboard through [Footprint's interactive business onboarding product](/articles/kyb/getting-started) using a Playbook configured in the [Footprint dashboard](https://dashboard.onefootprint.com/playbooks).
 - Or, they can be create directly via the <ScrollLink id="post-businesses">POST /businesses</ScrollLink> API below.
 

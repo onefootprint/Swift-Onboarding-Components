@@ -4,7 +4,7 @@ category: Guides
 subcategory: Vaulting APIs
 title: Vault fields
 slug: /articles/vault/fields
-meta: { title: 'Vaulting API fields' }
+meta: { title: "Vaulting API fields" }
 ---
 
 Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the allowed data identifiers and any validation rules enforced.
@@ -77,7 +77,6 @@ Note that not all fields may be populated in the vault.
 | `investor_profile.political_organization`   | If the user selected `senior_political_figure` in declarations, the name of the political organization                           | Any valid UTF-8 string <1KB                                                                                           |
 
 ### Document extracted fie
-
 
 If a document is uploaded during onboarding, Footprint will attempt to extracted the following fields from respective documents. These extracted fields can be accessed through the document's type, which is one of `id_card`, `drivers_license`, `passport`, `permit`, `visa`, or `residence_document`. For example, `document.drivers_license.document_number` represents the driver's license document number.
 

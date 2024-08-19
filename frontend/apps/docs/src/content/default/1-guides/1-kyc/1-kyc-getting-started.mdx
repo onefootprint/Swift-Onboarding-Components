@@ -36,26 +36,24 @@ yarn add @onefootprint/footprint-js
 On your app, initialize Footprint when needed, passing the `publicKey` and `onComplete` callback. The `onComplete` callback will be called with a validation token that you can use to verify the user server-side.
 
 ```javascript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const App = () => {
   const handleClick = () => {
     const component = footprint.init({
-      kind: 'verify',
-      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+      kind: "verify",
+      publicKey: "pb_test_VMooXd04EUlnu3AvMYKjMW",
       bootstrapData: {},
-      onComplete: validationToken => {
+      onComplete: (validationToken) => {
         // TODO: Post the token to Footprint server to exchange with Footprint user ID
       },
     });
     component.render();
   };
 
-  return (
-    <button onClick={handleClick}>Verify with Footprint</button>
-  );
-}
+  return <button onClick={handleClick}>Verify with Footprint</button>;
+};
 ```
 
 ## Verify the Footprint token server-side
@@ -97,11 +95,11 @@ Footprint will give you some information from this onboarding session. We’ll a
 
 Your playbook will define a set of rules used to evaluate the user's status. Use the `status` and `requires_manual_review` fields to decide whether or not to onboard this user to your product.
 
-| Status    | What does this mean?                                                                                                                                                                                                                              |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pass`    | The rules defined on your playbook to verify the user evaluated to an outcome of `pass`.                                                                                                                                                          |
-| `fail`    | The rules defined on your playbook evaluated to an outcome of `fail`.                                                                                                                                                                             |
-| `none`    | Your playbook has no rules defined.                                                                                                                                                                                                               |
+| Status    | What does this mean?                                                                                                                                                                                                                                       |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pass`    | The rules defined on your playbook to verify the user evaluated to an outcome of `pass`.                                                                                                                                                                   |
+| `fail`    | The rules defined on your playbook evaluated to an outcome of `fail`.                                                                                                                                                                                      |
+| `none`    | Your playbook has no rules defined.                                                                                                                                                                                                                        |
 | `pending` | Verifying this user's identity is taking longer than expected. This happens in rare cases where asynchronous actions are required to make a decision. A final decision will be delivered via [webhooks](/articles/integrate/webhooks) to your application. |
 
 | Review | What does this mean?                                                                        |

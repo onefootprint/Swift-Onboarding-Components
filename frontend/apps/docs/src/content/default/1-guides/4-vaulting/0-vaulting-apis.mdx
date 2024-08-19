@@ -4,7 +4,7 @@ category: Guides
 subcategory: Vaulting APIs
 title: Introduction
 slug: /articles/vault/apis
-meta: { title: 'Vault identity, payment cards, and anything sensitive' }
+meta: { title: "Vault identity, payment cards, and anything sensitive" }
 ---
 
 Footprint vaults are structured as a key-value store. We define a fixed set of predefined keys that you can use for structured data: like SSN (`id.ssn9`), address (`id.address_line1`, `id.address_line2`, etc), and card number (`card.*.number`). These fields have validation specific to the type of data that they're storing, allowing you to read and write data to these fields with confidence that the data is in the correct format.

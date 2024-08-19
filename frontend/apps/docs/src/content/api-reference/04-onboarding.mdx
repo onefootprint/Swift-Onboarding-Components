@@ -1,55 +1,55 @@
 ---
 title: User onboarding
 apis:
-- method: post
-  path: /onboarding/session/validate
-  title: Validate a user's onboarding session
-  description: After a user finishes an interactive Footprint onboarding flow through one of our SDKs, your application will be given a validation token. This API allows you to exchange that short-lived validation token for the long-lived fp_id of the user who finished the flow. This also returns some information about the flow that the user has completed.
-- method: post
-  path: /users/{fp_id}/kyc
-  title: Create a headless onboarding session
-  description: |
-    For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
-    <br><br>
-    The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
-- method: post
-  path: /users/{fp_id}/decisions
-  title: Create a manual decision for a user
-  description: Creates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.
-- method: get
-  path: /users/{fp_id}/decisions
-  title: List all decisions for a user
-  description: Returns list of decisions made for this user in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.
-- method: get
-  path: /users/{fp_id}/onboardings
-  title: List all onboardings for a user
-  description: Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.
-- method: get
-  path: /users/{fp_id}/risk_signals
-  title: List all risk signals for a user
-  description: Lists the risk signals for a Footprint user.
+  - method: post
+    path: /onboarding/session/validate
+    title: Validate a user's onboarding session
+    description: After a user finishes an interactive Footprint onboarding flow through one of our SDKs, your application will be given a validation token. This API allows you to exchange that short-lived validation token for the long-lived fp_id of the user who finished the flow. This also returns some information about the flow that the user has completed.
+  - method: post
+    path: /users/{fp_id}/kyc
+    title: Create a headless onboarding session
+    description: |
+      For a user whose information has already been collected, runs the verification checks of the provided playbook. This will contact the identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+      <br><br>
+      The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
+  - method: post
+    path: /users/{fp_id}/decisions
+    title: Create a manual decision for a user
+    description: Creates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.
+  - method: get
+    path: /users/{fp_id}/decisions
+    title: List all decisions for a user
+    description: Returns list of decisions made for this user in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard users.
+  - method: get
+    path: /users/{fp_id}/onboardings
+    title: List all onboardings for a user
+    description: Get the list of playbooks this user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.
+  - method: get
+    path: /users/{fp_id}/risk_signals
+    title: List all risk signals for a user
+    description: Lists the risk signals for a Footprint user.
 
-# These will all be hidden for non-legacy tenants
-- method: post
-  path: /onboarding/session
-  title: Create a short-lived onboarding token
-  description: Generates a single-use session token for a playbook.
-- method: get
-  path: /users/{fp_id}/auth_events
-  title: List the auth events for a user
-  description: View a user's recent auth events.
-- method: get
-  path: /users/{fp_id}/documents
-  title: List the documents for a user
-  description: View the documents uploaded successfully by this user.
-- method: get
-  path: /users/{fp_id}/liveness
-  title: List liveness for a user
-  description:  Lists the liveness signals for the provided user. This API is deprecated in favor of the <ScrollLink id="get-users-fp-id-auth-events">GET /users/{fp_id}/auth_events</ScrollLink> API.
-- method: get
-  path: /users/{fp_id}/match_signals
-  title: List match signals for a user
-  description: Lists the match signals for the provided user. This API is deprecated.
+  # These will all be hidden for non-legacy tenants
+  - method: post
+    path: /onboarding/session
+    title: Create a short-lived onboarding token
+    description: Generates a single-use session token for a playbook.
+  - method: get
+    path: /users/{fp_id}/auth_events
+    title: List the auth events for a user
+    description: View a user's recent auth events.
+  - method: get
+    path: /users/{fp_id}/documents
+    title: List the documents for a user
+    description: View the documents uploaded successfully by this user.
+  - method: get
+    path: /users/{fp_id}/liveness
+    title: List liveness for a user
+    description: Lists the liveness signals for the provided user. This API is deprecated in favor of the <ScrollLink id="get-users-fp-id-auth-events">GET /users/{fp_id}/auth_events</ScrollLink> API.
+  - method: get
+    path: /users/{fp_id}/match_signals
+    title: List match signals for a user
+    description: Lists the match signals for the provided user. This API is deprecated.
 ---
 
 # User onboarding

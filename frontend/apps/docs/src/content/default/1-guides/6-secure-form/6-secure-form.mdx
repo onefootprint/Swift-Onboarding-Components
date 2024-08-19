@@ -97,15 +97,15 @@ or
 Make sure to pass the auth token generated from Step 5.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
 const renderForm = () => {
   const component = footprint.init({
-    kind: 'form',
-    variant: 'inline',
-    containerId: 'myContainerId', // unique ID for the div that the form should be rendered in
-    authToken: 'cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit',
+    kind: "form",
+    variant: "inline",
+    containerId: "myContainerId", // unique ID for the div that the form should be rendered in
+    authToken: "cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit",
     onComplete: () => {
       // TODO:
     },
@@ -127,7 +127,7 @@ When the user has completed filling the secure collection form on your product, 
 | Variable     | Description                                                                                                                                                                                                                                                           |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `title`      | Optional. A form header.                                                                                                                                                                                                                                              |
-| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/articles/integrate/user-specific-sessions).                                                                                       |
+| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/articles/integrate/user-specific-sessions).                                                                              |
 | `onComplete` | Triggered after user completes the form and data is saved to the user vault.                                                                                                                                                                                          |
 | `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                                  |
 | `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |

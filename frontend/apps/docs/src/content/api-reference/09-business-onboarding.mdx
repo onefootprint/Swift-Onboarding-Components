@@ -1,35 +1,35 @@
 ---
 title: Business onboarding
 apis:
-- method: post
-  path: /businesses/{fp_bid}/kyb
-  title: Create a headless KYB onboarding session
-  description: |
-    For a business whose information has already been collected, runs the verification checks of the provided playbook. This will contact the business verification and identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
-    <br><br>
-    The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
-    <br><br>
-    Note, this API does not support KYCing beneficial owners, so the playbook you provide must not collect or verify beneficial owners. If you would like to also verify the identifies of the beneficial owners, you can separately use the <ScrollLink id="post-users-fp-id-kyc">POST /users/{fp_id}/kyc</ScrollLink> API to run existing users through a KYC playbook.
-- method: get
-  path: /businesses/{fp_bid}/decisions
-  title: List all decisions for a business
-  description: Returns list of decisions made for this business in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard businesss.
-- method: get
-  path: /businesses/{fp_bid}/onboardings
-  title: List all onboardings for a business
-  description: Get the list of playbooks this business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.
-- method: get
-  path: /businesses/{fp_bid}/risk_signals
-  title: List all risk signals for a business
-  description: Lists the risk signals for a Footprint business.
-- method: post
-  path: /businesses/{fp_bid}/owners
-  title: Link a business owner
-  description: Link an existing `fp_id` to the provided business as a beneficial owner. Note, linking business beneficial owners via API is mutually exclusive with collecting beneficial owners using our interactive KYB onboarding product. You may either link existing vaults via API _or_ request the user to provide information on all beneficial owners during onboarding to a KYB playbook.
-- method: get
-  path: /businesses/{fp_bid}/owners
-  title: List all owners of a business
-  description: List all beneficial owners of a business. Beneficial owners can be provided either by the user during interactive onboarding to a KYB playbook or via the <ScrollLink id="post-businesses-fp-bid-owners">POST /businesses/{fp_bid}/owners</ScrollLink> API.
+  - method: post
+    path: /businesses/{fp_bid}/kyb
+    title: Create a headless KYB onboarding session
+    description: |
+      For a business whose information has already been collected, runs the verification checks of the provided playbook. This will contact the business verification and identity verification vendors configured on your playbook and issue a decision using the rules defined on your playbook.
+      <br><br>
+      The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
+      <br><br>
+      Note, this API does not support KYCing beneficial owners, so the playbook you provide must not collect or verify beneficial owners. If you would like to also verify the identifies of the beneficial owners, you can separately use the <ScrollLink id="post-users-fp-id-kyc">POST /users/{fp_id}/kyc</ScrollLink> API to run existing users through a KYC playbook.
+  - method: get
+    path: /businesses/{fp_bid}/decisions
+    title: List all decisions for a business
+    description: Returns list of decisions made for this business in timestamp descending order. Includes both automated decisions made by running rules on a playbook and manual decisions made via dashboard businesss.
+  - method: get
+    path: /businesses/{fp_bid}/onboardings
+    title: List all onboardings for a business
+    description: Get the list of playbooks this business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be multiple onboardings. Useful to find the status from onboarding onto a specific playbook.
+  - method: get
+    path: /businesses/{fp_bid}/risk_signals
+    title: List all risk signals for a business
+    description: Lists the risk signals for a Footprint business.
+  - method: post
+    path: /businesses/{fp_bid}/owners
+    title: Link a business owner
+    description: Link an existing `fp_id` to the provided business as a beneficial owner. Note, linking business beneficial owners via API is mutually exclusive with collecting beneficial owners using our interactive KYB onboarding product. You may either link existing vaults via API _or_ request the user to provide information on all beneficial owners during onboarding to a KYB playbook.
+  - method: get
+    path: /businesses/{fp_bid}/owners
+    title: List all owners of a business
+    description: List all beneficial owners of a business. Beneficial owners can be provided either by the user during interactive onboarding to a KYB playbook or via the <ScrollLink id="post-businesses-fp-bid-owners">POST /businesses/{fp_bid}/owners</ScrollLink> API.
 ---
 
 # Business onboarding

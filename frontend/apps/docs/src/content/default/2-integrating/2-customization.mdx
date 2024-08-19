@@ -27,20 +27,20 @@ the resulting DOM using the DOM explorer in your browser. Scroll down to see the
 Properties can be set using the unit that you prefer: pixels, rem, hex, rgb, etc.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = "pb_test_VMooXd04EUlnu3AvMYKjMW";
 const appearance = {
   variables: {
-    borderRadius: '0px',
-    buttonPrimaryBg: '#315E4C',
-    buttonPrimaryHoverBg: '#46866c',
-    buttonPrimaryColor: '#FFF',
+    borderRadius: "0px",
+    buttonPrimaryBg: "#315E4C",
+    buttonPrimaryHoverBg: "#46866c",
+    buttonPrimaryColor: "#FFF",
   },
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, appearance });
+const component = footprint.init({ kind: "verify", publicKey, appearance });
 component.render();
 ```
 
@@ -48,12 +48,12 @@ component.render();
 
 In the Footprint SDK, visual token inheritance operates on a hierarchical system. A higher-level token can set default values for a series of lower-level tokens. The table below lists these higher-level tokens and the lower-level tokens they influence by default:
 
-| Higher-level Token | Lower-level Tokens Influenced                                                                                                                                                |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `borderRadius`     | `buttonBorderRadius`, `containerBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                        |
-| `colorError`       | `borderColorError`, `hintErrorColor`, `linkButtonDestructiveColor`                                                                                                           |
+| Higher-level Token | Lower-level Tokens Influenced                                                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `borderRadius`     | `buttonBorderRadius`, `containerBorderRadius`, `inputBorderRadius`, `dropdownBorderRadius`, `radioSelectBorderRadius`                                                                |
+| `colorError`       | `borderColorError`, `hintErrorColor`, `linkButtonDestructiveColor`                                                                                                                   |
 | `colorAccent`      | `linkColor`, `linkButtonColor`, `linkButtonHoverColor`, `linkButtonActiveColor`, `radioSelectSelectedColor`, `radioSelectSelectedBorderColor`, `radioSelectComponentsIconSelectedBg` |
-| `borderColorError` | `inputErrorBorderColor`                                                                                                                                                      |
+| `borderColorError` | `inputErrorBorderColor`                                                                                                                                                              |
 
 You can define these tokens to easily propagate design choices across multiple lower-level tokens. However, should you need to customize a specific token, setting it individually will override the higher-level default. This allows you to maintain broad stylistic consistency across your interface while still providing granular control over specific components.
 
@@ -339,15 +339,15 @@ Footprint also lets you customize some other options that influence the UI flow.
 If you want to render a pre-built completion page at the end of the onboarding flow, you can pass an `options` object into your integration, as in below:
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = "pb_test_VMooXd04EUlnu3AvMYKjMW";
 const options = {
   showCompletionPage: true,
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, options });
+const component = footprint.init({ kind: "verify", publicKey, options });
 component.render();
 ```
 
@@ -365,15 +365,15 @@ If the `showCompletionPage` is not provided, the modal will automatically close 
 You can also add your company logo at the top of the modal by a passing boolean field `showLogo` in the `options` object.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = "pb_test_VMooXd04EUlnu3AvMYKjMW";
 const options = {
   showLogo: true,
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, options });
+const component = footprint.init({ kind: "verify", publicKey, options });
 component.render();
 ```
 
@@ -411,31 +411,31 @@ Footprint also supports localization settings, you can use the `l10n` (localizat
 For example, if you have Spanish speaking users, you can set the language to "es", and it will show the onboarding flow in Spanish.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = "pb_test_VMooXd04EUlnu3AvMYKjMW";
 const l10n = {
-  language: 'es',
+  language: "es",
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, l10n });
+const component = footprint.init({ kind: "verify", publicKey, l10n });
 component.render();
 ```
 
 Similarly, if your audience is in Mexico, you can set the locale to "es-MX" (Spanish - Mexico). This locale configuration helps Footprint format dates and numbers and adapt to cultural conventions.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import footprint from '@onefootprint/footprint-js';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import footprint from "@onefootprint/footprint-js";
 
-const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const publicKey = "pb_test_VMooXd04EUlnu3AvMYKjMW";
 const l10n = {
-  language: 'es',
-  locale: 'es-MX',
+  language: "es",
+  locale: "es-MX",
 };
 
-const component = footprint.init({ kind: 'verify', publicKey, l10n });
+const component = footprint.init({ kind: "verify", publicKey, l10n });
 component.render();
 ```
 

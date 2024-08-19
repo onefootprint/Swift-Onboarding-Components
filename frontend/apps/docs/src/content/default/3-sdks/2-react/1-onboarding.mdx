@@ -25,13 +25,13 @@ This component will render a button that will launch the onboarding flow when cl
 2. **Initialize the Footprint Flow**:
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
 
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from "@onefootprint/footprint-react";
 
 const Page = () => {
   const handleCancel = () => {
-    console.log('user canceled');
+    console.log("user canceled");
   };
 
   const handleComplete = (validationToken: string) => {
@@ -71,9 +71,9 @@ you might have this data already available, so Footprint doesn't need to request
 use the prop `userData`:
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
 
-import { FootprintButton } from '@onefootprint/footprint-react';
+import { FootprintButton } from "@onefootprint/footprint-react";
 
 const Page = () => {
   return (
@@ -82,8 +82,8 @@ const Page = () => {
         kind="verify"
         publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         userData={{
-          'id.email': 'jane.doe@acme.com',
-          'id.phone_number': '+12025550179',
+          "id.email": "jane.doe@acme.com",
+          "id.phone_number": "+12025550179",
         }}
       />
     </main>
@@ -98,24 +98,24 @@ Click [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-r
 Footprint provides some events based on some actions performed by the user.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintButton } from '@onefootprint/footprint-react';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import { FootprintButton } from "@onefootprint/footprint-react";
 
 const Page = () => {
   const handleComplete = (validationToken: string) => {
     console.log(validationToken);
   };
 
-  const handleError = error => {
+  const handleError = (error) => {
     console.log(error);
   };
 
   const handleCancel = () => {
-    console.log('User canceled the flow');
+    console.log("User canceled the flow");
   };
 
   const handleClose = () => {
-    console.log('User closed the flow');
+    console.log("User closed the flow");
   };
 
   return (
@@ -140,8 +140,8 @@ export default Page;
 You can customize the appearance of the onboarding flow by passing an `appearance` object to the `init` method.
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintButton } from '@onefootprint/footprint-react';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import { FootprintButton } from "@onefootprint/footprint-react";
 
 const Page = () => {
   return (
@@ -151,10 +151,10 @@ const Page = () => {
         publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         appearance={{
           variables: {
-            borderRadius: '8px',
-            colorSuccess: '#10b981',
-            colorError: '#F87171',
-            buttonPrimaryBg: '#5550e9',
+            borderRadius: "8px",
+            colorSuccess: "#10b981",
+            colorError: "#F87171",
+            buttonPrimaryBg: "#5550e9",
           },
         }}
       />
@@ -168,11 +168,11 @@ For more information, including a list of available variables, check out the [cu
 ## Overriding localization
 
 ```typescript
-import '@onefootprint/footprint-js/dist/footprint-js.css';
-import { FootprintButton } from '@onefootprint/footprint-react';
+import "@onefootprint/footprint-js/dist/footprint-js.css";
+import { FootprintButton } from "@onefootprint/footprint-react";
 
 const Page = () => {
-  const handleComplete = validationToken => {
+  const handleComplete = (validationToken) => {
     console.log(validationToken);
   };
 
@@ -183,7 +183,7 @@ const Page = () => {
         publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         onComplete={handleComplete}
         l10n={{
-          language: 'es',
+          language: "es",
         }}
       />
     </main>
@@ -195,20 +195,20 @@ For more information, including a list of available languages, check out the [lo
 
 ## Available props
 
-| Variable        | Description                                                                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`         | Optional. A string that will be displayed on the button                                                                                                                                                 |
-| `publicKey`     | Optional. Onboarding configuration public key that will be used to launch the onboarding modal when button is clicked.                                                                                  |
-| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/articles/integrate/user-specific-sessions).                         |
-| `dialogVariant` | Optional. One of `modal` or `drawer`. Specifies how the onboarding dialog should be displayed when launched.                                                                                            |
-| `onClick`       | Optional. A function that is called when the button is clicked.                                                                                                                                         |
-| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status.   |
-| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                    |
-| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                   |
-| `onClose`       | Optional. A function that is called when the onboarding flow is closed by the user.                                                                                                                     |
-| `userData`      | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://www.npmjs.com/package/@onefootprint/footprint-react).          |
-| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options) |
-| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                   |
-| `testID`        | Optional. A test string to use for UI tests.                                                                                                                                                            |
-| `ref`           | Optional. Access to the DOM button node managed by React.                                                                                                                                               |
-| `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                |
+| Variable        | Description                                                                                                                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`         | Optional. A string that will be displayed on the button                                                                                                                                               |
+| `publicKey`     | Optional. Onboarding configuration public key that will be used to launch the onboarding modal when button is clicked.                                                                                |
+| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. More info [here](/articles/integrate/user-specific-sessions).              |
+| `dialogVariant` | Optional. One of `modal` or `drawer`. Specifies how the onboarding dialog should be displayed when launched.                                                                                          |
+| `onClick`       | Optional. A function that is called when the button is clicked.                                                                                                                                       |
+| `onComplete`    | Triggered after the user completes the onboarding flow. You'll receive a `validationToken` that your backend can exchange with Footprint to see the fp_id, the login method used, and the KYC status. |
+| `onError`       | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                  |
+| `onCancel`      | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                 |
+| `onClose`       | Optional. A function that is called when the onboarding flow is closed by the user.                                                                                                                   |
+| `userData`      | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://www.npmjs.com/package/@onefootprint/footprint-react).        |
+| `options`       | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](/articles/integrate/customization#available-options)                   |
+| `appearance`    | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                 |
+| `testID`        | Optional. A test string to use for UI tests.                                                                                                                                                          |
+| `ref`           | Optional. Access to the DOM button node managed by React.                                                                                                                                             |
+| `l10n`          | Optional. Specifies the desired localization. More information [here](/articles/integrate/customization#localization-configuration).                                                                  |
