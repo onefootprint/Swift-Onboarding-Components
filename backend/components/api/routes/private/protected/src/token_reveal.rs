@@ -34,6 +34,7 @@ pub struct RevealResponse {
     data: UnsealedData,
     kind: SessionKind,
     expires_at: DateTime<Utc>,
+    token_hash: AuthTokenHash,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -102,6 +103,7 @@ pub async fn post(
         data,
         kind,
         expires_at: session.expires_at,
+        token_hash: session.key,
     };
     Ok(response)
 }
