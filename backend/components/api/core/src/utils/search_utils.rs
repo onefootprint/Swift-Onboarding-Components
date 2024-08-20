@@ -152,6 +152,7 @@ pub async fn parse_search(
                     .compute(&fps.into_iter().collect())
                     .ok(),
                 CompositeFingerprintKind::NameDob => None,
+                CompositeFingerprintKind::NameSsn4 => None,
             },
         })
         .collect_vec();

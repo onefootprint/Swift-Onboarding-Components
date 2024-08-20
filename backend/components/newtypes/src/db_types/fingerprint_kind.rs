@@ -95,6 +95,8 @@ pub enum CompositeFingerprint {
     NameDob,
     #[strum_discriminants(strum(serialize = "composite.name"))]
     Name(TenantId),
+    #[strum_discriminants(strum(serialize = "composite.name_ssn4"))]
+    NameSsn4(TenantId),
 }
 
 impl CompositeFingerprint {
@@ -109,6 +111,7 @@ impl CompositeFingerprint {
             .map(|cfpk| match cfpk {
                 CompositeFingerprintKind::NameDob => Self::NameDob,
                 CompositeFingerprintKind::Name => Self::Name(t_id.clone()),
+                CompositeFingerprintKind::NameSsn4 => Self::NameSsn4(t_id.clone()),
             })
             .collect()
     }
@@ -125,6 +128,11 @@ impl CompositeFingerprint {
             Self::Name(tenant_id) => vec![
                 FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
                 FingerprintSalt::Tenant(IDK::LastName.into(), tenant_id.clone()),
+            ],
+            Self::NameSsn4(tenant_id) => vec![
+                FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
+                FingerprintSalt::Tenant(IDK::LastName.into(), tenant_id.clone()),
+                FingerprintSalt::Tenant(IDK::Ssn4.into(), tenant_id.clone()),
             ],
         }
     }
@@ -170,6 +178,7 @@ impl CompositeFingerprintKind {
         match self {
             Self::Name => FingerprintScope::Tenant,
             Self::NameDob => FingerprintScope::Global,
+            Self::NameSsn4 => FingerprintScope::Tenant,
         }
     }
 }
@@ -209,6 +218,10 @@ mod test {
                 FingerprintSalt::Tenant(IDK::LastName.into(), test_tenant_id()),
                 Fingerprint(vec![5]),
             ),
+            (
+                FingerprintSalt::Tenant(IDK::Ssn4.into(), test_tenant_id()),
+                Fingerprint(vec![6]),
+            ),
         ]
         .into_iter()
         .collect();
@@ -228,6 +241,9 @@ mod test {
                     CompositeFingerprint::Name(_) => {
                         "e650e2487086bac8d363ee1cb5a799ba7004ac92df2ee217a6a8df7c3af72f98"
                     }
+                    CompositeFingerprint::NameSsn4(_) => {
+                        "db657b5e5a961a3a2f14dc50b9962e9b2a6a7152d0ce76a5b37d05e152e1d677"
+                    }
                 };
                 assert_eq!(expected, computed);
             });
@@ -245,7 +261,7 @@ mod test {
         assert_eq!(
             result,
             Err(MissingFingerprint(PartialFingerprintKind::Dob.into()))
-        )
+        );
     }
 
     #[test_case(CompositeFingerprint::NameDob, vec![], vec![] => false)]
