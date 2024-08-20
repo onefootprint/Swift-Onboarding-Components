@@ -57,28 +57,33 @@ jobs:
       - name: Lint
         working-directory: ./frontend
         run: yarn lint:ci
+  
+  test:
+    runs-on: frontend_runner
+    steps:
+      - name: Check out code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
-  # test:
-  #   needs: install-dependencies
-  #   strategy:
-  #     matrix:
-  #       node-version: [18.x]
-  #   runs-on: frontend_runner
-  #   steps:
-  #     - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
+        with:
+          node-version: 20
 
-  #     - name: Use Node.js ${{ matrix.node-version }}
-  #       uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
+      - name: Cache turbo build setup
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
+        with: 
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
-  #     - name: Install node_modules
-  #       working-directory: ./frontend
-  #       run: yarn install --frozen-lockfile
+      - name: Install node_modules
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
 
-  #     - name: Tests
-  #       working-directory: ./frontend
-  #       run: yarn test:ci
+      - name: Unit tests
+        working-directory: ./frontend
+        run: yarn test:ci
 
   typecheck:
     runs-on: frontend_runner

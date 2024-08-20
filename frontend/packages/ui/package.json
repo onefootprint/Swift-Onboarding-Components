@@ -19,7 +19,7 @@
     "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
     "lint:ci": "biome ci src",
     "lint": "biome check --fix src",
-    "test:ci": "jest --ci --bail --runInBand",
+    "test:ci:hidden": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest --coverage --passWithNoTests",
     "typecheck": "yarn tsc --noEmit"

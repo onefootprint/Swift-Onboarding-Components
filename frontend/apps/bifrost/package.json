@@ -16,7 +16,7 @@
     "lint": "biome check src --fix",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3000",
-    "test:ci": "jest --ci --bail --runInBand",
+    "test:ci:hidden": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest",
     "typecheck": "yarn tsc --noEmit",
@@ -67,9 +67,7 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/i18next-test.ts"
-    ]
+    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"]
   },
   "browser": {
     "fs": false

@@ -15,7 +15,7 @@
     "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
     "lint:ci": "biome ci src",
     "lint": "biome check --fix src",
-    "test:ci": "jest --ci --bail --runInBand",
+    "test:ci:hidden": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
     "typecheck": "yarn tsc --noEmit"
@@ -88,15 +88,11 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/i18next-test.ts"
-    ],
+    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"],
     "moduleNameMapper": {
       "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1",
       "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
     },
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/utils/tests/setupTests.js"
-    ]
+    "setupFilesAfterEnv": ["<rootDir>/src/utils/tests/setupTests.js"]
   }
 }
