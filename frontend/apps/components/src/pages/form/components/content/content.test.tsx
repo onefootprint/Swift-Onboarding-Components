@@ -63,13 +63,6 @@ describe('<Content />', () => {
     mockRouter.setCurrentUrl('/form#tok_testAuthToken');
   });
 
-  describe('when there are no sdk args', () => {
-    beforeEach(() => {
-      mockRouter.setCurrentUrl('/form');
-      withSdkArgsError();
-    });
-  });
-
   it('should show shimmer loading page', async () => {
     renderContent(getMockClient());
     await waitFor(() => {

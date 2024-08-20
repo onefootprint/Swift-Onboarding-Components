@@ -11,6 +11,8 @@ import Loading from '../loading';
 import Content from './content';
 import { withDecrypt, withDecryptError, withSdkArgs, withSdkArgsError } from './content.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe('<Content />', () => {
   const getMockClient = () => ({
     getAdapterResponse: () => null,
