@@ -28,6 +28,7 @@ export enum TenantPreviewApi {
   Tags = 'tags',
   VaultProxy = 'vault_proxy',
   VaultProxyJit = 'vault_proxy_jit',
+  VaultVersioning = 'vault_versioning',
   OnboardingsList = 'onboardings_list',
   DecisionsList = 'decisions_list',
   ImplicitAuth = 'implicit_auth',

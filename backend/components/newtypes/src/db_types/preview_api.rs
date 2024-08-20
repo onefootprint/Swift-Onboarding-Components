@@ -41,6 +41,7 @@ pub enum PreviewApi {
     ListBusinessOwners,
     VaultProxy,
     VaultProxyJit,
+    VaultVersioning,
     OnboardingsList,
     DecisionsList,
     /// When enabled, sends the legacy footprint.onboarding.status_changed webhook
