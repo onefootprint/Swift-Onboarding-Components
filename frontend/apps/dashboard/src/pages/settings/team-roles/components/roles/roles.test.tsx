@@ -1,7 +1,7 @@
 import {
   MockDate,
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -30,17 +30,19 @@ import {
   withUpdateRoleError,
 } from './roles.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 
 describe('<Roles />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/settings',
-      query: {
-        tab: 'roles',
-      },
-    });
+    mockRouter.setCurrentUrl('/settings');
+    mockRouter.query = {
+      tab: 'roles',
+    };
+  });
+
+  beforeEach(() => {
     withProxyConfigs();
     asAdminUser();
   });
@@ -117,42 +119,27 @@ describe('<Roles />', () => {
 
     describe('when typing on the table search', () => {
       it('should append email to query', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/settings',
-          query: {
-            tab: 'roles',
-          },
-          push,
-        });
         await renderRolesAndWaitData();
 
         const search = screen.getByPlaceholderText('Search...');
         await userEvent.type(search, 'Admin');
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            {
-              query: {
-                roles_search: 'Admin',
-                tab: 'roles',
-              },
+          expect(mockRouter).toMatchObject({
+            query: {
+              roles_search: 'Admin',
+              tab: 'roles',
             },
-            undefined,
-            { shallow: true },
-          );
+          });
         });
       });
     });
 
     describe('when opening with a member_search query', () => {
       it('should show the search value', async () => {
-        useRouterSpy({
-          pathname: '/settings',
-          query: {
-            roles_search: 'Admin',
-            tab: 'roles',
-          },
-        });
+        mockRouter.query = {
+          roles_search: 'Admin',
+          tab: 'roles',
+        };
         await renderRolesAndWaitData();
 
         const search = screen.getByPlaceholderText('Search...');

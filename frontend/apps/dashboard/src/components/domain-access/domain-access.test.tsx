@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { Organization } from '@onefootprint/types';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
 
@@ -9,16 +9,12 @@ import {
   orgEnabledAllowDomainAccessFixture,
 } from './domain-access.test.config';
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('<DomainAccess />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/settings',
-      query: {
-        tab: 'domain-access',
-      },
-    });
+    mockRouter.setCurrentUrl('/settings?tab=domain-access');
+    mockRouter.query = {
+      tab: 'domain-access',
+    };
     mockRequest({
       method: 'get',
       path: '/org',

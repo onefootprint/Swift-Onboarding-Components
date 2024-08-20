@@ -1,19 +1,15 @@
-import { createUseRouterSpy, customRenderHook, waitFor } from '@onefootprint/test-utils';
+import { customRenderHook, mockRouter, waitFor } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
 import useRiskSignalsOverview from './use-risk-signals-overview';
 import { createRiskSignal, withRiskSignals } from './use-risk-signals-overview.test.config';
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('useRiskSignalsOverview', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/businesses/fp_bid_cDsFPmDwz784hdwovghMqt',
-      query: {
-        id: 'fp_bid_cDsFPmDwz784hdwovghMqt',
-      },
-    });
+    mockRouter.setCurrentUrl('/businesses/fp_bid_cDsFPmDwz784hdwovghMqt');
+    mockRouter.query = {
+      id: 'fp_bid_cDsFPmDwz784hdwovghMqt',
+    };
   });
 
   describe('when the request succeeds', () => {

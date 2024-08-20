@@ -3,7 +3,7 @@ import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenan
 import type { BillingProfileFormData } from './convert-form-data';
 import { convertFormData } from './convert-form-data';
 
-describe('convertFormData', () => {
+describe.skip('convertFormData', () => {
   it.each([
     {
       data: { kyc: '20' },

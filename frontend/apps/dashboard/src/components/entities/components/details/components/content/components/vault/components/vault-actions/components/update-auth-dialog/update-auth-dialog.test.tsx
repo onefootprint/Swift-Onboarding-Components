@@ -1,8 +1,8 @@
 import {
   createClipboardSpy,
-  createUseRouterSpy,
   customRender,
   mockRequest,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -13,12 +13,12 @@ import type { UpdateAuthDialogProps } from './update-auth-dialog';
 import UpdateAuthDialog from './update-auth-dialog';
 import { entityFixture, withEntity } from './update-auth-dialog.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const defaultOptions = {
   open: true,
   onClose: jest.fn(),
 };
-
-const useRouterSpy = createUseRouterSpy();
 
 const renderDialog = ({
   open = defaultOptions.open,
@@ -27,13 +27,12 @@ const renderDialog = ({
 
 describe('<UpdateAuthDialog />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/entities/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
+
     withEntity();
-    useRouterSpy({
-      pathname: `/entities/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
     mockRequest({
       method: 'post',
       path: `/entities/${entityFixture.id}/token`,

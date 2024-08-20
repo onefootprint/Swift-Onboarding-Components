@@ -17,7 +17,7 @@
     "start": "next start -p 3001",
     "test:ci:hidden": "NODE_OPTIONS=--max-old-space-size=9216 jest --ci --bail --runInBand",
     "test:watch": "NODE_OPTIONS=--max-old-space-size=9216 NODE_OPTIONS=--max-old-space-size=9216 jest --watch",
-    "test": "NODE_OPTIONS=--max-old-space-size=9216 jest",
+    "test": "jest",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --noEmit"
   },
   "dependencies": {
@@ -25,13 +25,13 @@
     "@datadog/browser-rum": "^5.20.0",
     "@formkit/auto-animate": "^0.8.2",
     "@googlemaps/js-api-loader": "^1.16.6",
+    "@onefootprint/core": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/core": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@radix-ui/react-collapsible": "1.0.2",
@@ -72,14 +72,12 @@
     "ua-parser-js": "^1.0.38",
     "usehooks-ts": "^2.9.1",
     "xstate": "^4.37.1",
-    "zustand": "^4.3.2",
-    "zod": "^3.0.0"
+    "zod": "^3.0.0",
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@faker-js/faker": "^7.6.0",
     "@next/bundle-analyzer": "^13.4.19",
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@types/file-saver": "^2.0.5",
     "@types/flat": "^5.0.2",
@@ -91,22 +89,9 @@
     "@types/react-virtualized": "^9.21.29",
     "@types/ua-parser-js": "^0.7.39",
     "copy-and-watch": "^0.1.6",
+    "next-router-mock": "^0.9.13",
+    "ts-node": "^10.9.2",
     "tsconfig": "*",
     "typescript": "^5.5.2"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/react-i18next-test.ts"],
-    "moduleNameMapper": {
-      "@/proxy-configs/(.*)": "<rootDir>/src/pages/developers/components/proxy-configs/$1",
-      "@/entities/(.*)": "<rootDir>/src/components/entities/$1",
-      "@/entity/(.*)": "<rootDir>/src/components/entities/components/details/$1",
-      "@/playbooks/(.*)": "<rootDir>/src/pages/playbooks/$1",
-      "@/create-playbook/*": "<rootDir>/src/pages/playbooks/components/create-dialog/$1",
-      "@/lists/(.*)": "<rootDir>/src/pages/lists/$1",
-      "\\.css$": "<rootDir>/emptyModule.js"
-    },
-    "setupFilesAfterEnv": ["<rootDir>/src/config/initializers/setupTests.js"],
-    "transformIgnorePatterns": ["<rootDir>/node_modules/(?!(mapbox-gl|mapbox))/"]
   }
 }

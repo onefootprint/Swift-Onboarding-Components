@@ -1,14 +1,14 @@
 import {
   createFileSaverSpy,
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
   within,
 } from '@onefootprint/test-utils';
 import { DocumentDI, IdDI, InvestorProfileDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
-import { asAdminUser, resetUser } from 'src/config/tests';
+import { asAdminUser } from 'src/config/tests';
 
 import Details from './details';
 import {
@@ -29,15 +29,8 @@ import {
   withTimeline,
 } from './details.test.config';
 
-beforeEach(() => {
-  asAdminUser();
-});
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
-afterAll(() => {
-  resetUser();
-});
-
-const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
 const ENCRIPTED_TEXT = '••••••••••••';
 
@@ -45,13 +38,14 @@ describe.skip('<Details />', () => {
   const fileSaverMock = fileSaverSpy();
 
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/users/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
+  });
+
+  beforeEach(() => {
     asAdminUser();
-    useRouterSpy({
-      pathname: `/users/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
     withRiskSignals();
     withDocuments();
     withTimeline();
@@ -59,8 +53,8 @@ describe.skip('<Details />', () => {
     withAnnotations();
   });
 
-  afterAll(() => {
-    resetUser();
+  beforeEach(() => {
+    asAdminUser();
   });
 
   const renderDetails = () => {

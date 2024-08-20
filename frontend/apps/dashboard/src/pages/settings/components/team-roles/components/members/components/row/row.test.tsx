@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 
 import type { RowProps } from './row';
 import Row from './row';
@@ -11,18 +11,19 @@ import {
   withRoles,
 } from './row.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Row />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/settings');
+    mockRouter.query = {
+      tab: 'members',
+    };
+  });
+
+  beforeEach(() => {
     withCurrentUserDifferentFromMember();
     withRoles();
-    useRouterSpy({
-      pathname: '/settings',
-      query: {
-        tab: 'members',
-      },
-    });
   });
 
   const renderRow = ({ member = memberFixture }: Partial<RowProps>) =>

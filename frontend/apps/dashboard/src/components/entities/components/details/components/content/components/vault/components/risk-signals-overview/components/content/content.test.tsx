@@ -1,19 +1,17 @@
-import { createUseRouterSpy, customRender, screen, userEvent, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, within } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
 import type { ContentProps } from './content';
 import Content from './content';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Content />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/businesses/fp_bid_VXND11zUVRYQKKUxbUN3KD',
-      query: {
-        id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-      },
-    });
+    mockRouter.setCurrentUrl('/businesses/fp_bid_VXND11zUVRYQKKUxbUN3KD');
+    mockRouter.query = {
+      id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
+    };
   });
 
   const renderContent = ({ high, medium, low }: ContentProps) =>
@@ -102,15 +100,6 @@ describe('<Content />', () => {
 
     describe('when clicking on the risk signal row', () => {
       it('should append risk signal id to the url', async () => {
-        const pushMockFn = jest.fn();
-        useRouterSpy({
-          pathname: '/businesses/fp_bid_VXND11zUVRYQKKUxbUN3KD',
-          query: {
-            id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-          },
-          push: pushMockFn,
-        });
-
         renderContent({
           high: [],
           medium: [
@@ -139,16 +128,12 @@ describe('<Content />', () => {
         const riskSignalRow = within(listDialog).getByText(note);
         await userEvent.click(riskSignalRow);
 
-        expect(pushMockFn).toHaveBeenCalledWith(
-          {
-            query: {
-              id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-              risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
-            },
+        expect(mockRouter).toMatchObject({
+          query: {
+            id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
+            risk_signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
           },
-          undefined,
-          { shallow: true },
-        );
+        });
       });
     });
 

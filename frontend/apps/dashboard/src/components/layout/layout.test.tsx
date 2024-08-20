@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';
@@ -8,7 +8,7 @@ import { withEntities, withOrgAuthRoles, withRiskSignals } from './layout.test.c
 
 const originalState = useStore.getState();
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Layout />', () => {
   const renderLayout = ({ children = 'Foo', name }: Partial<LayoutProps>) =>
@@ -21,7 +21,7 @@ describe('<Layout />', () => {
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/authentication/sign-in', query: {} });
+      mockRouter.setCurrentUrl('/authentication/sign-in');
       useStore.setState(originalState);
     });
 
@@ -33,7 +33,7 @@ describe('<Layout />', () => {
 
   describe('when the user is logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/users', query: {} });
+      mockRouter.setCurrentUrl('/users');
       asAdminUser();
       withOrgAuthRoles();
     });

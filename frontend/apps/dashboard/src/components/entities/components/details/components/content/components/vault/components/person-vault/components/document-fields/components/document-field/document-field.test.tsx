@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 
 import TestWrapper from '../../../../../utils/test-wrapper';
@@ -6,7 +6,7 @@ import type { DocumentFieldProps } from './document-field';
 import DocumentField from './document-field';
 import driversLicensePartialDIs, { entityId } from './document-field.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderDocumentField = ({ vault, documentType, documents }: DocumentFieldProps) =>
   customRender(
@@ -17,13 +17,10 @@ const renderDocumentField = ({ vault, documentType, documents }: DocumentFieldPr
 
 describe('<DocumentField />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      asPath: `/entities/${entityId}&mode=sandbox`,
-      pathname: '/users/[id]',
-      query: {
-        id: entityId,
-      },
-    });
+    mockRouter.setCurrentUrl(`/entities/${entityId}&mode=sandbox`);
+    mockRouter.query = {
+      id: entityId,
+    };
   });
   it('should properly open drawer', async () => {
     renderDocumentField({

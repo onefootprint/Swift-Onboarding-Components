@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
@@ -6,7 +6,7 @@ import { AUDIT_TRAILS_ID } from '@/entity/constants';
 import AuditTrail from './audit-trail';
 import mockFrequentNotes from './audit-trail.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<AuditTrail />', () => {
   beforeEach(() => {
@@ -24,12 +24,10 @@ describe('<AuditTrail />', () => {
     const userId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
     beforeAll(() => {
-      useRouterSpy({
-        pathname: '/users/detail',
-        query: {
-          footprint_user_id: userId,
-        },
-      });
+      mockRouter.setCurrentUrl('/users/detail');
+      mockRouter.query = {
+        footprint_user_id: userId,
+      };
     });
 
     it('should open the dialog when user clicks the add note button', async () => {

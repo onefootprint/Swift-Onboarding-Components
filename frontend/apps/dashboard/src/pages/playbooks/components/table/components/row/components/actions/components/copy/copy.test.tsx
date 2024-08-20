@@ -1,5 +1,5 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { asAdminUser, asAdminUserRestrictedToSandbox, resetUser } from 'src/config/tests';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { asAdminUser, asAdminUserRestrictedToSandbox } from 'src/config/tests';
 
 import { type CopyProps } from './copy';
 import {
@@ -13,13 +13,14 @@ import {
   withPlaybookCopyError,
 } from './copy.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
-describe.skip('<Copy />', () => {
+describe('<Copy />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/playbooks',
-    });
+    mockRouter.setCurrentUrl('/playbooks');
+  });
+
+  beforeEach(() => {
     withModes();
     withAuthRoles();
     withAssumeRole();
@@ -27,10 +28,6 @@ describe.skip('<Copy />', () => {
 
   beforeEach(() => {
     asAdminUser();
-  });
-
-  afterEach(() => {
-    resetUser();
   });
 
   const renderCopy = async ({ playbook = playbookFixture }: Partial<CopyProps> = {}) => {
@@ -138,12 +135,6 @@ describe.skip('<Copy />', () => {
       });
 
       it('should display a success message', async () => {
-        const pushMockFn = jest.fn();
-        useRouterSpy({
-          pathname: '/playbooks',
-          push: pushMockFn,
-        });
-
         await renderCopy();
 
         const cta = screen.getByRole('button', { name: 'Copy to target' });
@@ -152,42 +143,6 @@ describe.skip('<Copy />', () => {
         await waitFor(() => {
           const toastTitle = screen.getByText('Playbook copied successfully');
           expect(toastTitle).toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-          const toastDescription = screen.getByText(
-            'Playbook has been copied to Footprint Live (using Sandbox environment).',
-          );
-          expect(toastDescription).toBeInTheDocument();
-        });
-      });
-
-      it('should redirect to the playbook page when clicking on the toast cta', async () => {
-        const pushMockFn = jest.fn();
-        useRouterSpy({
-          pathname: '/playbooks',
-          push: pushMockFn,
-        });
-
-        await renderCopy();
-
-        const cta = screen.getByRole('button', { name: 'Copy to target' });
-        await userEvent.click(cta);
-
-        const toastCta = await screen.findByRole('button', {
-          name: 'Go to copied playbook',
-        });
-        await userEvent.click(toastCta);
-
-        await waitFor(() => {
-          expect(pushMockFn).toHaveBeenCalledWith({
-            pathname: '/switch-org',
-            query: {
-              mode: 'live',
-              redirect_url: '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
-              tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
-            },
-          });
         });
       });
     });

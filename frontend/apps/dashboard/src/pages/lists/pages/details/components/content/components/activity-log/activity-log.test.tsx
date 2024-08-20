@@ -1,19 +1,19 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 
 import ActivityLog from './activity-log';
 import { withListDetails, withListTimeline, withListTimelineError } from './activity-log.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<ActivityLog />', () => {
   const renderActivityLog = () => customRender(<ActivityLog />);
   const listId = 'list_123';
 
   beforeEach(() => {
-    useRouterSpy({
-      pathname: `/lists/${listId}`,
-      query: { id: listId },
-    });
+    mockRouter.setCurrentUrl(`/lists/${listId}`);
+    mockRouter.query = {
+      id: listId,
+    };
   });
 
   describe('when fetching activity log is successful', () => {

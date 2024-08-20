@@ -1,12 +1,12 @@
 import {
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
-import { asAdminUser, resetUser } from 'src/config/tests';
+import { asAdminUser } from 'src/config/tests';
 
 import BusinessProfile from './business-profile';
 import {
@@ -17,18 +17,15 @@ import {
   withUpdateOrgError,
 } from './business-profile.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<BusinessProfile />', () => {
   beforeEach(() => {
-    asAdminUser();
-    useRouterSpy({
-      pathname: '/settings',
-    });
+    mockRouter.setCurrentUrl('/settings');
   });
 
-  afterAll(() => {
-    resetUser();
+  beforeEach(() => {
+    asAdminUser();
   });
 
   const renderBusinessProfile = () => {

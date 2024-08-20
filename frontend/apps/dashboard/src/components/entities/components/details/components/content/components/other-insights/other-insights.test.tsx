@@ -1,21 +1,20 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 
 import OtherInsights from './other-insights';
 import { withOtherInsights, withOtherInsightsEmpty, withOtherInsightsError } from './other-insights.test.config';
 
-const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
+
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderOtherInsights = () => customRender(<OtherInsights />);
 
 describe('<OtherInsights/>', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/entities',
-      query: {
-        id,
-      },
-    });
+    mockRouter.setCurrentUrl('/entities');
+    mockRouter.query = {
+      id,
+    };
   });
 
   const renderOtherInsightsAndWait = async () => {

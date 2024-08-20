@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUserFirmEmployee, asAdminUserInLive, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
@@ -14,13 +14,14 @@ import {
   withTwoOrgAuthRoles,
 } from './side-nav.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const AUTH_METHOD_NOT_SUPPORTED_TEXT = (tenantName: string) =>
   `${tenantName} has disabled the ability to log in using this auth method. Please retry using another method.`;
 
 describe('<SideNav />', () => {
   beforeEach(() => {
-    useRouterSpy({ pathname: '/' });
+    mockRouter.setCurrentUrl('/');
     withEntities();
     withTwoOrgAuthRoles();
     asAdminUserInLive();

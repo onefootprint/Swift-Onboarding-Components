@@ -1,20 +1,19 @@
-import { createUseRouterSpy, customRender, filterEvents, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, filterEvents, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 
 import SecurityLogsFilters from './security-logs-filters';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe('<SecurityLogsFilters />', () => {
-  const useRouterSpy = createUseRouterSpy();
   const renderSecurityLogsFilters = () => {
     customRender(<SecurityLogsFilters />);
   };
 
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/security-logs');
+  });
+
   it('should show all data attributes when opening popovers', async () => {
-    const pushMockFn = jest.fn();
-    useRouterSpy({
-      pathname: '/security-logs',
-      query: {},
-      push: pushMockFn,
-    });
     renderSecurityLogsFilters();
     const personalData = screen.getByRole('button', {
       name: 'Personal data',
@@ -49,12 +48,6 @@ describe('<SecurityLogsFilters />', () => {
   });
 
   it('should change router path correctly when applying personal filters', async () => {
-    const pushMockFn = jest.fn();
-    useRouterSpy({
-      pathname: '/security-logs',
-      query: {},
-      push: pushMockFn,
-    });
     renderSecurityLogsFilters();
 
     const personalData = screen.getByRole('button', {
@@ -73,50 +66,31 @@ describe('<SecurityLogsFilters />', () => {
       options: ['First name', 'Last name'],
     });
 
-    expect(pushMockFn).toHaveBeenCalledWith(
-      {
-        query: {
-          data_attributes_personal: ['id.first_name', 'id.last_name'],
-        },
+    expect(mockRouter).toMatchObject({
+      query: {
+        data_attributes_personal: ['id.first_name', 'id.last_name'],
       },
-      undefined,
-      { shallow: true },
-    );
+    });
   });
 
   it('should change router path correctly when applying business filters', async () => {
-    const pushMockFn = jest.fn();
-    useRouterSpy({
-      pathname: '/security-logs',
-      query: {},
-      push: pushMockFn,
-    });
     renderSecurityLogsFilters();
-
     await filterEvents.apply({
       trigger: 'Business data',
       options: ['Doing Business As', 'Phone number'],
     });
 
-    expect(pushMockFn).toHaveBeenLastCalledWith(
-      {
-        query: {
-          data_attributes_business: ['business.dba', 'business.phone_number'],
-        },
+    expect(mockRouter).toMatchObject({
+      query: {
+        data_attributes_business: ['business.dba', 'business.phone_number'],
       },
-      undefined,
-      { shallow: true },
-    );
+    });
   });
 
   it('should change router path correctly when applying business filters after personal filters', async () => {
-    const pushMockFn = jest.fn();
-    useRouterSpy({
-      pathname: '/security-logs',
-      query: { data_attributes_personal: ['id.first_name', 'id.phone_number'] },
-      push: pushMockFn,
-    });
-
+    mockRouter.query = {
+      data_attributes_personal: ['id.first_name', 'id.phone_number'],
+    };
     renderSecurityLogsFilters();
 
     await filterEvents.apply({
@@ -125,28 +99,19 @@ describe('<SecurityLogsFilters />', () => {
     });
 
     await waitFor(() => {
-      expect(pushMockFn).toHaveBeenCalledWith(
-        {
-          query: {
-            data_attributes_business: ['business.dba', 'business.phone_number'],
-            data_attributes_personal: ['id.first_name', 'id.phone_number'],
-          },
+      expect(mockRouter).toMatchObject({
+        query: {
+          data_attributes_business: ['business.dba', 'business.phone_number'],
+          data_attributes_personal: ['id.first_name', 'id.phone_number'],
         },
-        undefined,
-        { shallow: true },
-      );
+      });
     });
   });
 
   it('should change router path correctly when applying personal filters after business filters', async () => {
-    const pushMockFn = jest.fn();
-    useRouterSpy({
-      pathname: '/security-logs',
-      query: {
-        data_attributes_business: ['business.dba', 'business.phone_number'],
-      },
-      push: pushMockFn,
-    });
+    mockRouter.query = {
+      data_attributes_business: ['business.dba', 'business.phone_number'],
+    };
 
     renderSecurityLogsFilters();
 
@@ -156,16 +121,12 @@ describe('<SecurityLogsFilters />', () => {
     });
 
     await waitFor(() => {
-      expect(pushMockFn).toHaveBeenCalledWith(
-        {
-          query: {
-            data_attributes_personal: ['id.first_name', 'id.phone_number'],
-            data_attributes_business: ['business.dba', 'business.phone_number'],
-          },
+      expect(mockRouter).toMatchObject({
+        query: {
+          data_attributes_personal: ['id.first_name', 'id.phone_number'],
+          data_attributes_business: ['business.dba', 'business.phone_number'],
         },
-        undefined,
-        { shallow: true },
-      );
+      });
     });
   });
 });

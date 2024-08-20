@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint/test-utils';
 import { BusinessDI, EntityKind } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -19,18 +19,16 @@ import {
   withTimeline,
 } from './details.test.config';
 
-const useRouterSpy = createUseRouterSpy();
 const ENCRYPTED_TEXT = '••••••••••••';
 
 describe.skip('<Details />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/entities/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
+
     asAdminUser();
-    useRouterSpy({
-      pathname: `/entities/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
     withRiskSignals();
     withTimeline();
     withBusinessOwners();

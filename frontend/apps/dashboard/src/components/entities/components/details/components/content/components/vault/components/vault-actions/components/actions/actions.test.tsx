@@ -1,8 +1,8 @@
 import {
-  createUseRouterSpy,
   customRender,
   fireEvent,
   mockRequest,
+  mockRouter,
   screen,
   selectEvents,
   userEvent,
@@ -31,7 +31,7 @@ import {
   withTriggerError,
 } from './actions.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderActions = async (isNoPhone?: boolean) =>
   customRender(
@@ -42,17 +42,14 @@ const renderActions = async (isNoPhone?: boolean) =>
 
 describe('<Actions />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/entities/${entityId}&mode=sandbox`);
+    mockRouter.query = {
+      id: entityId,
+    };
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     withPlaybooks();
     withLists();
     withData();
-    useRouterSpy({
-      asPath: `/entities/${entityId}&mode=sandbox`,
-      pathname: '/users/[id]',
-      query: {
-        id: entityId,
-      },
-    });
     mockRequest({
       method: 'get',
       path: `/org/onboarding_configs`,

@@ -1,21 +1,19 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewDialogProps } from './manual-review-dialog';
 import ManualReviewDialog from './manual-review-dialog';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<ManualReviewDialog />', () => {
   beforeEach(() => {
     withFrequentNotes(OrgFrequentNoteKind.ManualReview, []);
-    useRouterSpy({
-      pathname: '/users/detail',
-      query: {
-        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
-      },
-    });
+    mockRouter.setCurrentUrl('/users/detail');
+    mockRouter.query = {
+      footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+    };
   });
 
   const defaultOptions = {

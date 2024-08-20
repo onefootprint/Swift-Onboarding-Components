@@ -1,6 +1,6 @@
 import {
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -18,15 +18,14 @@ import {
   withEvaluateRulesError,
 } from './backtesting-dialog.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<BacktestingDialog />', () => {
-  useRouterSpy({
-    asPath: `/playbooks/${kycPlaybookFixture.id}`,
-    pathname: `/playbooks/${kycPlaybookFixture.id}`,
-    query: {
+  beforeEach(() => {
+    mockRouter.setCurrentUrl(`/playbooks/${kycPlaybookFixture.id}`);
+    mockRouter.query = {
       id: kycPlaybookFixture.id,
-    },
+    };
   });
 
   const defaultOptions = {

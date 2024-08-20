@@ -1,18 +1,16 @@
-import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
 
 import type { PinnedNoteProps } from './pinned-note';
 import PinnedNote from './pinned-note';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<PinnedNote />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: `/entities/1`,
-      query: {
-        id: '1',
-      },
-    });
+    mockRouter.setCurrentUrl('/entities/1');
+    mockRouter.query = {
+      id: '1',
+    };
   });
 
   const renderPinnedNote = ({ author, note, timestamp, noteId }: PinnedNoteProps) =>

@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUser } from 'src/config/tests';
 
 import Entries from './entries';
@@ -10,8 +10,7 @@ import {
   withListEntries,
   withListEntriesError,
 } from './entries.test.config';
-
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Entries />', () => {
   const renderEntries = () => customRender(<Entries />);
@@ -25,17 +24,19 @@ describe('<Entries />', () => {
 
   describe('When clearing filter', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl(`/lists/${listId}`);
+      mockRouter.query = {
+        id: listId,
+      };
       withListEntries(listId);
     });
 
     it('should clear the filter', async () => {
-      const pushMockFn = jest.fn();
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId, search: 'test2' },
-        push: pushMockFn,
-      });
-
+      mockRouter.setCurrentUrl(`/lists/${listId}`);
+      mockRouter.query = {
+        id: listId,
+        search: 'test2',
+      };
       renderEntries();
 
       await waitFor(() => {
@@ -52,16 +53,11 @@ describe('<Entries />', () => {
 
       await userEvent.clear(searchInput);
 
-      expect(pushMockFn).toHaveBeenCalledWith(
-        {
-          query: {
-            search: undefined,
-            id: listId,
-          },
+      expect(mockRouter).toMatchObject({
+        query: {
+          id: listId,
         },
-        undefined,
-        { shallow: true },
-      );
+      });
     });
   });
 
@@ -71,15 +67,7 @@ describe('<Entries />', () => {
     });
 
     it('should filter the entries', async () => {
-      const pushMockFn = jest.fn();
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId },
-        push: pushMockFn,
-      });
-
       renderEntries();
-
       await waitFor(() => {
         expect(screen.getByText('test@onefootprint.com')).toBeInTheDocument();
       });
@@ -91,16 +79,12 @@ describe('<Entries />', () => {
       await userEvent.type(searchInput, '2');
 
       await waitFor(() => {
-        expect(pushMockFn).toHaveBeenCalledWith(
-          {
-            query: {
-              id: listId,
-              search: '2',
-            },
+        expect(mockRouter).toMatchObject({
+          query: {
+            id: listId,
+            search: '2',
           },
-          undefined,
-          { shallow: true },
-        );
+        });
       });
     });
   });
@@ -108,10 +92,10 @@ describe('<Entries />', () => {
   describe('When fetching entries succeeds', () => {
     beforeEach(() => {
       withListEntries(listId);
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId },
-      });
+      mockRouter.setCurrentUrl(`/lists/${listId}`);
+      mockRouter.query = {
+        id: listId,
+      };
     });
 
     it('should render the entries', async () => {
@@ -130,10 +114,6 @@ describe('<Entries />', () => {
   describe('When fetching entries fails', () => {
     beforeEach(() => {
       withListEntriesError(listId);
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId },
-      });
     });
 
     it('should render the error message', async () => {
@@ -147,10 +127,6 @@ describe('<Entries />', () => {
 
   describe('When deleting errors', () => {
     beforeEach(() => {
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId },
-      });
       withListEntries(listId);
       withDeleteError(listId, entryId);
     });
@@ -174,10 +150,6 @@ describe('<Entries />', () => {
 
   describe('When deleting succeeds', () => {
     beforeEach(() => {
-      useRouterSpy({
-        pathname: `/lists/${listId}`,
-        query: { id: listId },
-      });
       withListEntries(listId);
       withDelete(listId, entryId);
     });

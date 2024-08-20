@@ -1,23 +1,21 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import type { RowProps } from './row';
 import Row from './row';
 import { ApiKeyFixture, RolesFixture, withApiKeys, withRoles } from './row.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Row />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/developers');
+    mockRouter.query = {
+      tab: 'api-keys',
+    };
     asAdminUser();
     withRoles();
     withApiKeys();
-    useRouterSpy({
-      pathname: '/developers',
-      query: {
-        tab: 'api-keys',
-      },
-    });
   });
 
   afterAll(() => {

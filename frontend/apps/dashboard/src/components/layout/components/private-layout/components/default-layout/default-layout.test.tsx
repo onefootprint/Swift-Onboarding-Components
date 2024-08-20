@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { RoleScopeKind } from '@onefootprint/types';
 import {
   asAdminUserFirmEmployee,
@@ -11,6 +11,8 @@ import {
 import DefaultLayout from './default-layout';
 import { withEntities, withOrgAuthRoles, withRiskSignals } from './default-layout.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const renderDefaultLayout = () =>
   customRender(
     <DefaultLayout>
@@ -19,14 +21,10 @@ const renderDefaultLayout = () =>
   );
 
 const SANDBOX_MODE_TEXT = "You're in sandbox mode.";
-const useRouterSpy = createUseRouterSpy();
 
 describe('<DefaultLayout />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/users',
-      query: {},
-    });
+    mockRouter.setCurrentUrl('/users');
     mockRequest({
       method: 'get',
       path: '/org/member',
@@ -86,24 +84,21 @@ describe('<DefaultLayout />', () => {
 
     describe('when toggling on details page', () => {
       it('should navigate from user details page back to just users page when toggling sandbox', async () => {
-        asAdminUserInLive();
         const id = 'fp_id_ub0TUlzLv3dyoJbaxlObCe';
-        const pushMockFn = jest.fn();
-        useRouterSpy({
-          pathname: '/users/detail',
-          query: {
-            id,
-          },
-          push: pushMockFn,
-        });
-        renderDefaultLayout();
 
+        asAdminUserInLive();
+        mockRouter.setCurrentUrl('/users');
+        mockRouter.query = {
+          id,
+        };
+
+        renderDefaultLayout();
         expect(screen.queryByText(SANDBOX_MODE_TEXT)).not.toBeInTheDocument();
 
         const toggle = screen.getByRole('switch', { name: 'Sandbox mode' });
         await userEvent.click(toggle);
         await waitFor(() => {
-          expect(pushMockFn).toHaveBeenCalledWith({
+          expect(mockRouter).toMatchObject({
             pathname: '/users',
             query: {},
           });
@@ -118,22 +113,18 @@ describe('<DefaultLayout />', () => {
     it('should navigate from business details page back to just business page when toggling sandbox', async () => {
       asAdminUserInLive();
       const id = 'fp_bid_ub0TUlzLv3dyoJbaxlObCe';
-      const pushMockFn = jest.fn();
-      useRouterSpy({
-        pathname: '/businesses/detail',
-        query: {
-          id,
-        },
-        push: pushMockFn,
-      });
-      renderDefaultLayout();
+      mockRouter.setCurrentUrl('/businesses/detail');
+      mockRouter.query = {
+        id,
+      };
 
+      renderDefaultLayout();
       expect(screen.queryByText(SANDBOX_MODE_TEXT)).not.toBeInTheDocument();
 
       const toggle = screen.getByRole('switch', { name: 'Sandbox mode' });
       await userEvent.click(toggle);
       await waitFor(() => {
-        expect(pushMockFn).toHaveBeenCalledWith({
+        expect(mockRouter).toMatchObject({
           pathname: '/businesses',
           query: {},
         });
@@ -146,16 +137,13 @@ describe('<DefaultLayout />', () => {
     it('should keep query params when toggling to sandbox', async () => {
       asAdminUserInLive();
       const id = 'fp_bid_ub0TUlzLv3dyoJbaxlObCe';
-      const pushMockFn = jest.fn();
-      useRouterSpy({
-        pathname: '/businesses/detail',
-        query: {
-          date_range: ['last-30-days'],
-          status: ['pass', 'fail', 'incomplete', 'none'],
-          id,
-        },
-        push: pushMockFn,
-      });
+      mockRouter.setCurrentUrl('/businesses/detail');
+      mockRouter.query = {
+        date_range: ['last-30-days'],
+        status: ['pass', 'fail', 'incomplete', 'none'],
+        id,
+      };
+
       renderDefaultLayout();
 
       expect(screen.queryByText(SANDBOX_MODE_TEXT)).not.toBeInTheDocument();
@@ -163,7 +151,7 @@ describe('<DefaultLayout />', () => {
       const toggle = screen.getByRole('switch', { name: 'Sandbox mode' });
       await userEvent.click(toggle);
       await waitFor(() => {
-        expect(pushMockFn).toHaveBeenCalledWith({
+        expect(mockRouter).toMatchObject({
           pathname: '/businesses',
           query: {
             date_range: ['last-30-days'],

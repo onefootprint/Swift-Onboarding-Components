@@ -1,7 +1,7 @@
 import {
   createFileSaverSpy,
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -11,19 +11,18 @@ import {
 import Details from './details';
 import { proxyConfigDetailsFixture, withProxyConfigDetails, withProxyConfigDetailsError } from './details.test.config';
 
-const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
+
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Details />', () => {
   const fileSaverMock = fileSaverSpy();
 
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/developers',
-      query: {
-        proxy_config_id: proxyConfigDetailsFixture.id,
-      },
-    });
+    mockRouter.setCurrentUrl('/developers');
+    mockRouter.query = {
+      proxy_config_id: proxyConfigDetailsFixture.id,
+    };
   });
 
   const renderDetails = () => {

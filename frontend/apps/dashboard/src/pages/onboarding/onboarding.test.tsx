@@ -1,14 +1,18 @@
-import { createUseRouterSpy, customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
-import { asAdminUser, resetUser } from 'src/config/tests';
+import { customRender, mockRouter, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
+import { asAdminUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import Onboarding from './onboarding';
 import { withInviteMember, withOrg, withRoles, withUpdateOrg, withUpdateUser } from './onboarding.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Onboarding />', () => {
   const renderOnboarding = () => customRender(<Onboarding />);
+
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/onboarding');
+  });
 
   beforeEach(() => {
     asAdminUser();
@@ -22,19 +26,7 @@ describe('<Onboarding />', () => {
     withInviteMember();
   });
 
-  afterAll(() => {
-    resetUser();
-  });
-
   describe('when completing all the steps', () => {
-    const push = jest.fn();
-
-    useRouterSpy({
-      pathname: '/onboarding',
-      query: {},
-      push,
-    });
-
     it('should redirect to the /users page', async () => {
       renderOnboarding();
 
@@ -89,7 +81,9 @@ describe('<Onboarding />', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Go to dashboard' }));
       await waitFor(() => {
-        expect(push).toHaveBeenCalled();
+        expect(mockRouter).toMatchObject({
+          pathname: '/users',
+        });
       });
 
       await waitFor(() => {

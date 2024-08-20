@@ -1,7 +1,7 @@
 import {
   MockDate,
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -29,17 +29,16 @@ import {
   withRolesError,
 } from './members.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 
 describe('<Members />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/settings',
-      query: {
-        tab: 'members',
-      },
-    });
+    mockRouter.setCurrentUrl('/settings');
+    mockRouter.query = {
+      tab: 'members',
+    };
   });
 
   beforeEach(() => {
@@ -109,42 +108,26 @@ describe('<Members />', () => {
 
     describe('when typing on the table search', () => {
       it('should append members_search query', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/settings',
-          query: {
-            tab: 'Members',
-          },
-          push,
-        });
         await renderMembersAndWaitData();
 
         const search = screen.getByPlaceholderText('Search...');
         await userEvent.type(search, 'Jane');
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            {
-              query: {
-                members_search: 'Jane',
-                tab: 'Members',
-              },
+          expect(mockRouter).toMatchObject({
+            query: {
+              members_search: 'Jane',
             },
-            undefined,
-            { shallow: true },
-          );
+          });
         });
       });
     });
 
     describe('when opening with a member_search query', () => {
       it('should render the search input with the query value', async () => {
-        useRouterSpy({
-          pathname: '/settings',
-          query: {
-            members_search: 'Jane',
-            tab: 'Members',
-          },
-        });
+        mockRouter.query = {
+          members_search: 'Jane',
+          tab: 'Members',
+        };
         await renderMembersAndWaitData();
 
         const search = screen.getByPlaceholderText('Search...');
@@ -156,14 +139,6 @@ describe('<Members />', () => {
       const [firstRole] = RolesFixture;
 
       it('should append members_role query', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/settings',
-          query: {
-            tab: 'Members',
-          },
-          push,
-        });
         await renderMembersAndWaitData();
 
         const filterTrigger = screen.getByRole('button', {
@@ -183,16 +158,11 @@ describe('<Members />', () => {
         await userEvent.click(submitButton);
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            {
-              query: {
-                members_role: [firstRole.id],
-                tab: 'Members',
-              },
+          expect(mockRouter).toMatchObject({
+            query: {
+              members_role: [firstRole.id],
             },
-            undefined,
-            { shallow: true },
-          );
+          });
         });
       });
     });

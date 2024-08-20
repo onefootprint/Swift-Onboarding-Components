@@ -1,8 +1,8 @@
 import {
   createClipboardSpy,
-  createUseRouterSpy,
   customRender,
   mockRequest,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -23,17 +23,18 @@ import {
   withRuleSetResult,
 } from './audit-trail-timeline.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<AuditTrailTimeline />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/entities/${entityIdFixure}`);
+    mockRouter.query = {
+      id: entityIdFixure,
+    };
+  });
+
+  beforeEach(() => {
     withEntity(entityFixture);
-    useRouterSpy({
-      pathname: `/entities/${entityIdFixure}`,
-      query: {
-        id: entityIdFixure,
-      },
-    });
     withRuleSetResult();
     asAdminUser();
   });

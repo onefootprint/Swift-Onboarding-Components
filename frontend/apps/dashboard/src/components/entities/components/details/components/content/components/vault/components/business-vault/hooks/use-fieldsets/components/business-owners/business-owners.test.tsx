@@ -1,19 +1,15 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 
 import type { BusinessOwnersProps } from './business-owners';
 import BusinessOwners from './business-owners';
 import { entityFixture, withBusinessOwnersError } from './business-owners.test.config';
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('<BusinessOwners />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: `/businesses/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
+    mockRouter.setCurrentUrl(`/businesses/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
   });
 
   const renderBusinessOwners = ({ entity = entityFixture }: Partial<BusinessOwnersProps>) =>

@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 import { clickOnAction } from 'src/config/tests';
 
 import {
@@ -14,14 +14,11 @@ import {
 } from './proxy-config.test.config';
 import ProxyConfigs from './proxy-configs';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<ProxyConfigs />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/proxy-configs',
-      query: {},
-    });
+    mockRouter.setCurrentUrl('/proxy-configs');
   });
 
   const renderProxyConfigs = () => customRender(<ProxyConfigs />);
@@ -61,13 +58,6 @@ describe('<ProxyConfigs />', () => {
 
     describe('when clicking on the proxy config row', () => {
       it('should append the proxy_config_id to the query params', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          push,
-          pathname: '/proxy-configs',
-          query: {},
-        });
-
         await renderProxyConfigsAndWaitData();
 
         const firstRow = screen.getByRole('row', {
@@ -75,27 +65,24 @@ describe('<ProxyConfigs />', () => {
         });
         firstRow.click();
 
-        expect(push).toHaveBeenCalledWith(
-          {
-            query: {
-              proxy_config_id: proxyConfigDetailsFixture.id,
-            },
+        expect(mockRouter).toMatchObject({
+          query: {
+            proxy_config_id: proxyConfigDetailsFixture.id,
           },
-          undefined,
-          { shallow: true },
-        );
+        });
       });
     });
 
     describe('when it has a proxy_config_id in the query params', () => {
       beforeEach(() => {
+        mockRouter.setCurrentUrl('/proxy-configs');
+        mockRouter.query = {
+          proxy_config_id: proxyConfigDetailsFixture.id,
+        };
+      });
+
+      beforeEach(() => {
         withProxyConfigDetails(proxyConfigDetailsFixture.id);
-        useRouterSpy({
-          pathname: '/proxy-configs',
-          query: {
-            proxy_config_id: proxyConfigDetailsFixture.id,
-          },
-        });
       });
 
       it('should show the proxy config details', async () => {

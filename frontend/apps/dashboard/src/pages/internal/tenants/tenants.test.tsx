@@ -1,21 +1,19 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 import { asAdminUserFirmEmployee, resetUser } from 'src/config/tests';
 
 import Tenants from './tenants';
 import { tenantsFixture, withTenants, withTenantsError } from './tenants.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderTenants = () => customRender(<Tenants />);
 
 describe('<Tenants />', () => {
   beforeAll(() => {
-    useRouterSpy({
-      pathname: '/',
-      query: {
-        'super-admin': 'true',
-      },
-    });
+    mockRouter.setCurrentUrl('/');
+    mockRouter.query = {
+      'super-admin': 'true',
+    };
     asAdminUserFirmEmployee();
   });
 

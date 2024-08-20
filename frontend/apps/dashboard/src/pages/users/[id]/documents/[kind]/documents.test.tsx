@@ -1,11 +1,11 @@
-import { createUseRouterSpy, customRender, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 
 import Documents from './documents';
 import { entityFixture, withDocuments } from './documents.test.config';
 
-describe('Documents', () => {
-  const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
+describe('Documents', () => {
   const renderDocuments = () => customRender(<Documents />);
 
   const renderDocumentsAndWait = async () => {
@@ -16,14 +16,15 @@ describe('Documents', () => {
 
   describe('when the document is not found', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl(`/users/${entityFixture.id}/documents/lorem`);
+      mockRouter.query = {
+        id: entityFixture.id,
+        kind: 'lorem',
+      };
+    });
+
+    beforeEach(() => {
       withDocuments();
-      useRouterSpy({
-        pathname: `/users/${entityFixture.id}/documents/lorem`,
-        query: {
-          id: entityFixture.id,
-          kind: 'lorem',
-        },
-      });
     });
 
     it('renders a 404 page', async () => {
@@ -38,14 +39,15 @@ describe('Documents', () => {
 
   describe('when the document is found', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl(`/users/${entityFixture.id}/documents/drivers_license`);
+      mockRouter.query = {
+        id: entityFixture.id,
+        kind: 'drivers_license',
+      };
+    });
+
+    beforeEach(() => {
       withDocuments();
-      useRouterSpy({
-        pathname: `/users/${entityFixture.id}/documents/drivers_license`,
-        query: {
-          id: entityFixture.id,
-          kind: 'drivers_license',
-        },
-      });
     });
 
     describe('when the data is encrypted', () => {
@@ -71,14 +73,12 @@ describe('Documents', () => {
 
       describe('when there is a query parameter with session', () => {
         it('should show the session selected', async () => {
-          useRouterSpy({
-            pathname: `/users/${entityFixture.id}/documents/drivers_license`,
-            query: {
-              id: entityFixture.id,
-              kind: 'drivers_license',
-              session: '2024-04-30T19%3A56%3A43.368966Z',
-            },
-          });
+          mockRouter.setCurrentUrl(`/users/${entityFixture.id}/documents/drivers_license`);
+          mockRouter.query = {
+            id: entityFixture.id,
+            kind: 'drivers_license',
+            session: '2024-04-30T19%3A56%3A43.368966Z',
+          };
 
           await renderDocumentsAndWait();
 

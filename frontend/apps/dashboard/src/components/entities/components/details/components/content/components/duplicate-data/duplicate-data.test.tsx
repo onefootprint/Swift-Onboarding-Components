@@ -1,4 +1,4 @@
-import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint/test-utils';
 
 import DuplicateData from './duplicate-data';
 import {
@@ -7,19 +7,18 @@ import {
   withDuplicateDataPopulated,
 } from './duplicate-data.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const renderDuplicateData = () => customRender(<DuplicateData />);
 
-const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
 describe('<DuplicateData/>', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/entities',
-      query: {
-        id,
-      },
-    });
+    mockRouter.setCurrentUrl('/entities');
+    mockRouter.query = {
+      id,
+    };
   });
 
   it('should render the duplicate data table and correct columns and number of rows', async () => {

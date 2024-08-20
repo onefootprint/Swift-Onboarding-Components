@@ -1,18 +1,11 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 
 import Playbooks from './playbooks';
 import { withPlaybooks, withPlaybooksError } from './playbooks.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Playbooks />', () => {
-  beforeEach(() => {
-    useRouterSpy({
-      pathname: '/playbooks',
-      query: {},
-    });
-  });
-
   const renderPlaybooks = () => customRender(<Playbooks />);
 
   const renderPlaybooksAndWait = async () => {
@@ -24,6 +17,10 @@ describe('<Playbooks />', () => {
       expect(isLoading).toBe('false');
     });
   };
+
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/playbooks');
+  });
 
   describe('when the request to fetch playbooks succeeds', () => {
     beforeEach(() => {

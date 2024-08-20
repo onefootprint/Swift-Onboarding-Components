@@ -1,25 +1,15 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
 import { asAdminUser } from 'src/config/tests';
 
 import Home from './home';
 import { emptyOrgMetricsFixture, withOrgMetrics, withOrgMetricsError, withPlaybooks } from './home.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Home />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/');
     asAdminUser();
-    useRouterSpy({
-      pathname: '/org/metrics',
-      query: {},
-    });
     withPlaybooks();
   });
 

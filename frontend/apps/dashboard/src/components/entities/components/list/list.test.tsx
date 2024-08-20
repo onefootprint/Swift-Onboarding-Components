@@ -1,12 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  filterEvents,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, filterEvents, mockRouter, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import { EntityKind } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -14,15 +6,12 @@ import Table from '../table';
 import List from './list';
 import { entitiesFixture, withEntities, withEntitiesError } from './list.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe.skip('<List />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/entities');
     asAdminUser();
-    useRouterSpy({
-      pathname: '/entities',
-      query: {},
-    });
   });
 
   afterAll(() => {
@@ -63,7 +52,7 @@ describe.skip('<List />', () => {
     });
   };
 
-  describe('when the request to fetch the entities succeeds', () => {
+  describe.skip('when the request to fetch the entities succeeds', () => {
     beforeEach(() => {
       withEntities();
     });
@@ -94,12 +83,6 @@ describe.skip('<List />', () => {
 
     describe('when clicking on the row', () => {
       it('should redirect to the entity details page', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/entities',
-          push,
-          query: {},
-        });
         await renderEntitiesAndWaitData();
 
         const [firstResult] = entitiesFixture;
@@ -108,40 +91,27 @@ describe.skip('<List />', () => {
         });
         await userEvent.click(row);
 
-        expect(push).toHaveBeenCalledWith({
+        expect(mockRouter).toMatchObject({
           pathname: `/entities/${firstResult.id}`,
-          query: {},
         });
       });
     });
 
     describe('when typing on the search', () => {
       it('should apply the "entities_search" in the url', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/entities',
-          push,
-          query: {},
-        });
         await renderEntitiesAndWaitData();
 
         const searchField = screen.getByPlaceholderText('Search...');
         await userEvent.type(searchField, 'Koch Inc');
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith({ query: { search: 'Koch Inc' } }, undefined, expect.anything());
+          expect(mockRouter).toMatchObject({ query: { search: 'Koch Inc' } });
         });
       });
     });
 
     describe('when filtering by "status"', () => {
       it('should apply the "status" in the url', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/entities',
-          push,
-          query: {},
-        });
         await renderEntitiesAndWaitData();
 
         await filterEvents.apply({
@@ -150,19 +120,13 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith({ query: { status: ['fail'] } }, undefined, expect.anything());
+          expect(mockRouter).toMatchObject({ query: { status: ['fail'] } });
         });
       });
     });
 
     describe('when filtering by "date range"', () => {
       it('should apply the "date_range" in the url', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/entities',
-          push,
-          query: {},
-        });
         await renderEntitiesAndWaitData();
 
         await filterEvents.apply({
@@ -171,19 +135,13 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith({ query: { date_range: ['last-7-days'] } }, undefined, expect.anything());
+          expect(mockRouter).toMatchObject({ query: { date_range: ['last-7-days'] } });
         });
       });
     });
 
     describe('when filtering by "On a watchlist"', () => {
       it('should apply the "watchlist_hit" in the url', async () => {
-        const push = jest.fn();
-        useRouterSpy({
-          pathname: '/entities',
-          push,
-          query: {},
-        });
         await renderEntitiesAndWaitData();
 
         await filterEvents.apply({
@@ -192,21 +150,15 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith({ query: { watchlist_hit: 'true' } }, undefined, expect.anything());
+          expect(mockRouter).toMatchObject({ query: { watchlist_hit: 'true' } });
         });
       });
     });
   });
 
   describe('when filtering by "Requires manual review"', () => {
-    it.skip('should apply the "requires_manual_review" in the url', async () => {
+    it('should apply the "requires_manual_review" in the url', async () => {
       withEntities();
-      const push = jest.fn();
-      useRouterSpy({
-        pathname: '/entities',
-        push,
-        query: {},
-      });
       await renderEntitiesAndWaitData();
 
       await filterEvents.apply({
@@ -215,7 +167,7 @@ describe.skip('<List />', () => {
       });
 
       await waitFor(() => {
-        expect(push).toHaveBeenCalledWith({ query: { requires_manual_review: 'true' } }, undefined, expect.anything());
+        expect(mockRouter).toMatchObject({ query: { requires_manual_review: 'true' } });
       });
     });
   });

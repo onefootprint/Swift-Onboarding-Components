@@ -1,19 +1,18 @@
-import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
-import { asAssumedUser, asUser, resetUser } from 'src/config/tests';
+import { customRender, mockRouter, screen } from '@onefootprint/test-utils';
+import { asAssumedUser, asUser } from 'src/config/tests';
+
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 import AssumeBanner from './assume-banner';
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('<AssumeBanner />', () => {
-  afterAll(() => {
-    resetUser();
-  });
-
   const renderAssumeBanner = () => customRender(<AssumeBanner />);
 
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/users');
+  });
+
   describe('when assuming a tenant', () => {
-    useRouterSpy({ pathname: '/users' });
     beforeEach(() => {
       asAssumedUser();
     });
@@ -27,7 +26,6 @@ describe('<AssumeBanner />', () => {
 
   describe('when not assuming a tenant', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/users' });
       asUser();
     });
 

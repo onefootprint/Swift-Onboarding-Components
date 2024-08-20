@@ -1,11 +1,11 @@
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUser } from 'src/config/tests';
 
 import type { EditDialogProps } from './edit-dialog';
 import EditDialog from './edit-dialog';
 import { withListDetails, withListUpdate, withListUpdateError } from './edit-dialog.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<EditDialog />', () => {
   const listId = 'list_1';
@@ -14,12 +14,12 @@ describe('<EditDialog />', () => {
     customRender(<EditDialog open onClose={onClose} onEdit={onEdit} />);
 
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/lists/${listId}`);
+    mockRouter.query = {
+      id: listId,
+    };
     asAdminUser();
     withListDetails(listId);
-    useRouterSpy({
-      pathname: `/lists/${listId}`,
-      query: { id: listId },
-    });
   });
 
   it('should call onClose', async () => {

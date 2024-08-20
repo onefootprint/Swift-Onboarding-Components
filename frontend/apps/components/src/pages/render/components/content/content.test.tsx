@@ -1,7 +1,7 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, waitFor } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ProviderReturn } from 'src/components/footprint-provider';
@@ -10,8 +10,6 @@ import FootprintProvider from 'src/components/footprint-provider';
 import Loading from '../loading';
 import Content from './content';
 import { withDecrypt, withDecryptError, withSdkArgs, withSdkArgsError } from './content.test.config';
-
-const useRouterSpy = createUseRouterSpy();
 
 describe('<Content />', () => {
   const getMockClient = () => ({
@@ -42,11 +40,7 @@ describe('<Content />', () => {
   });
 
   beforeEach(() => {
-    useRouterSpy({
-      isReady: true,
-      pathname: '/form',
-      asPath: '/form#tok_testAuthToken',
-    });
+    mockRouter.setCurrentUrl('/form#tok_testAuthToken');
   });
 
   const renderContent = (mockFootprint: ProviderReturn) =>
@@ -62,12 +56,8 @@ describe('<Content />', () => {
 
   describe('when there are no sdk args', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl('/form');
       withSdkArgsError();
-      useRouterSpy({
-        isReady: true,
-        pathname: '/form',
-        asPath: '/form',
-      });
     });
 
     it('should show shimmer loading page', async () => {

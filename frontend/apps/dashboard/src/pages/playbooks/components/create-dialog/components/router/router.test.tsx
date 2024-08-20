@@ -116,6 +116,11 @@ describe('<Router />', () => {
       expect(detailsStep).toBeInTheDocument();
       await moveForward();
 
+      // Otp
+      const otpStep = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+      expect(otpStep).toBeInTheDocument();
+      await moveForward();
+
       // Verification checks
       const verificationChecks = screen.getByRole('heading', { name: 'Verification checks' });
       expect(verificationChecks).toBeInTheDocument;
@@ -332,14 +337,19 @@ describe('<Router />', () => {
           expect(detailsStep).toBeInTheDocument();
           await moveForward();
 
+          // Otp
+          const otpStep = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+          expect(otpStep).toBeInTheDocument();
+          await moveForward();
+
           // Verification checks
           const verificationChecksStep = screen.getByRole('heading', { name: 'Verification checks' });
           expect(verificationChecksStep).toBeInTheDocument();
           await moveBack();
 
           // Details
-          const detailsStepAgain = screen.getByRole('heading', { name: 'Your Playbook recommendation' });
-          expect(detailsStepAgain).toBeInTheDocument();
+          const otpStepAgain = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+          expect(otpStepAgain).toBeInTheDocument();
         });
       });
     });
@@ -372,6 +382,11 @@ describe('<Router />', () => {
       // BOs
       const bosStep = screen.getByRole('heading', { name: 'Business owners’ information' });
       expect(bosStep).toBeInTheDocument();
+      await moveForward();
+
+      // OTP
+      const otpStep = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+      expect(otpStep).toBeInTheDocument();
       await moveForward();
 
       // Verification checks
@@ -445,7 +460,7 @@ describe('<Router />', () => {
     });
 
     describe('when in "verification checks" step', () => {
-      it('should go to "Business owners’ information" when clicking "Back"', async () => {
+      it('should go to "OTP" when clicking "Back"', async () => {
         renderRouter({ onCreate: jest.fn() });
 
         // Kind
@@ -472,13 +487,18 @@ describe('<Router />', () => {
         expect(bosStep).toBeInTheDocument();
         await moveForward();
 
+        // OTP
+        const otpStep = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+        expect(otpStep).toBeInTheDocument();
+        await moveForward();
+
         // Verification checks
         const verificationChecks = screen.getByRole('heading', { name: 'Verification checks' });
         expect(verificationChecks).toBeInTheDocument();
         await moveBack();
 
-        const bosStepAgain = screen.getByRole('heading', { name: 'Business owners’ information' });
-        expect(bosStepAgain).toBeInTheDocument();
+        const otpStepAgain = screen.getByRole('heading', { name: 'OTP (one-time-passcode) verifications' });
+        expect(otpStepAgain).toBeInTheDocument();
       });
     });
   });

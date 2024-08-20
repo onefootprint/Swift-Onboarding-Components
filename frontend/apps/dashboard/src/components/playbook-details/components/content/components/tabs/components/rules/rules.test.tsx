@@ -1,6 +1,6 @@
 import {
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -29,7 +29,7 @@ import {
   withRulesError,
 } from './rules.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const renderRules = ({ playbook = kycPlaybookFixture }: Partial<RulesProps>) => {
   customRender(<Rules playbook={playbook} toggleDisableHeading={jest.fn()} />);
@@ -49,13 +49,10 @@ describe('<Rules />', () => {
   });
 
   describe('when it is a KYC playbook', () => {
-    useRouterSpy({
-      asPath: `/playbooks/${kycPlaybookFixture.id}`,
-      pathname: `/playbooks/${kycPlaybookFixture.id}`,
-      query: {
-        id: kycPlaybookFixture.id,
-      },
-    });
+    mockRouter.setCurrentUrl(`/playbooks/${kycPlaybookFixture.id}`);
+    mockRouter.query = {
+      id: kycPlaybookFixture.id,
+    };
 
     describe('when the rules request fails', () => {
       it('should show an error message', async () => {
@@ -649,18 +646,15 @@ describe('<Rules />', () => {
 
   describe('when it is a KYB playbook', () => {
     beforeEach(() => {
-      useRouterSpy({
-        asPath: `/playbooks/${kybPlaybookFixture.id}`,
-        pathname: `/playbooks/${kybPlaybookFixture.id}`,
-        query: {
-          id: kybPlaybookFixture.id,
-        },
-      });
+      mockRouter.setCurrentUrl(`/playbooks/${kybPlaybookFixture.id}`);
+      mockRouter.query = {
+        id: kybPlaybookFixture.id,
+      };
+      withRules(kybPlaybookFixture.id);
+      withLists();
     });
 
     it('should show an alert', async () => {
-      withRules(kybPlaybookFixture.id);
-      withLists();
       await renderRules({ playbook: kybPlaybookFixture });
 
       await waitFor(() => {

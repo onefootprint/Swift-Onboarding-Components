@@ -1,7 +1,7 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, waitFor } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ProviderReturn } from 'src/components/footprint-provider';
@@ -18,9 +18,20 @@ import {
   withSdkArgsError,
 } from './content.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<Content />', () => {
+  const renderContent = (mockFootprint: ProviderReturn) =>
+    render(
+      <DesignSystemProvider theme={themes.light}>
+        <QueryClientProvider client={queryClient}>
+          <FootprintProvider client={mockFootprint}>
+            <Content fallback={<Loading />} />
+          </FootprintProvider>
+        </QueryClientProvider>
+      </DesignSystemProvider>,
+    );
+
   const getMockClient = () => ({
     getAdapterResponse: () => null,
     getLoadingStatus: () => false,
@@ -49,39 +60,20 @@ describe('<Content />', () => {
   });
 
   beforeEach(() => {
-    useRouterSpy({
-      isReady: true,
-      pathname: '/form',
-      asPath: '/form#tok_testAuthToken',
-    });
+    mockRouter.setCurrentUrl('/form#tok_testAuthToken');
   });
-
-  const renderContent = (mockFootprint: ProviderReturn) =>
-    render(
-      <DesignSystemProvider theme={themes.light}>
-        <QueryClientProvider client={queryClient}>
-          <FootprintProvider client={mockFootprint}>
-            <Content fallback={<Loading />} />
-          </FootprintProvider>
-        </QueryClientProvider>
-      </DesignSystemProvider>,
-    );
 
   describe('when there are no sdk args', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl('/form');
       withSdkArgsError();
-      useRouterSpy({
-        isReady: true,
-        pathname: '/form',
-        asPath: '/form',
-      });
     });
+  });
 
-    it('should show shimmer loading page', async () => {
-      renderContent(getMockClient());
-      await waitFor(() => {
-        expect(screen.getByTestId('init-shimmer')).toBeInTheDocument();
-      });
+  it('should show shimmer loading page', async () => {
+    renderContent(getMockClient());
+    await waitFor(() => {
+      expect(screen.getByTestId('init-shimmer')).toBeInTheDocument();
     });
   });
 

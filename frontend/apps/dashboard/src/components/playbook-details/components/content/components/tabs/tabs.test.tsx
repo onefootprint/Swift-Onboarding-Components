@@ -4,6 +4,8 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import Tabs from './tabs';
 import playbookFixture from './tabs.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const renderTabs = (playbook: OnboardingConfig) => {
   customRender(<Tabs playbook={playbook} isTabsDisabled={false} toggleDisableHeading={jest.fn()} />);
 };
@@ -15,8 +17,11 @@ describe('<Tabs />', () => {
     const dataCollection = screen.getByRole('tab', { name: 'Data collection' });
     expect(dataCollection).toBeInTheDocument();
 
-    const aml = screen.getByRole('tab', { name: 'AML monitoring' });
-    expect(aml).toBeInTheDocument();
+    const verificationChecks = screen.getByRole('tab', { name: 'Verification checks' });
+    expect(verificationChecks).toBeInTheDocument();
+
+    const passkeys = screen.getByRole('tab', { name: 'Passkeys' });
+    expect(passkeys).toBeInTheDocument();
 
     const rules = screen.getByRole('tab', { name: 'Rules' });
     expect(rules).toBeInTheDocument();

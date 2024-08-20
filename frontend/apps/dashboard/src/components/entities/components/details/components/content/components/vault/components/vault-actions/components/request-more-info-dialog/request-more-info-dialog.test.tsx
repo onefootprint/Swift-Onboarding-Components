@@ -1,9 +1,9 @@
 import {
   createClipboardSpy,
-  createUseRouterSpy,
   customRender,
   fireEvent,
   mockRequest,
+  mockRouter,
   screen,
   selectEvents,
   userEvent,
@@ -24,12 +24,12 @@ import {
   withEntityWithIncompleteOnboarding,
 } from './request-more-info.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 const defaultOptions = {
   open: true,
   onClose: jest.fn(),
 };
-
-const useRouterSpy = createUseRouterSpy();
 
 const renderDialog = ({
   open = defaultOptions.open,
@@ -41,12 +41,10 @@ describe('<RequestMoreInfoDialog />', () => {
     withEntity(entityFixture.id);
     withPlaybooks();
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
-    useRouterSpy({
-      pathname: `/entities/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
+    mockRouter.setCurrentUrl(`/entities/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
   });
 
   it('should call close callback', async () => {
@@ -92,15 +90,16 @@ describe('<RequestMoreInfoDialog />', () => {
 
   describe('Incomplete onboarding', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl(`/entities/${entityFixtureWithIncompleteOnboarding.id}`);
+      mockRouter.query = {
+        id: entityFixtureWithIncompleteOnboarding.id,
+      };
+    });
+
+    beforeEach(() => {
       withEntityWithIncompleteOnboarding(entityFixtureWithIncompleteOnboarding.id);
       withPlaybooks();
       withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
-      useRouterSpy({
-        pathname: `/entities/${entityFixtureWithIncompleteOnboarding.id}`,
-        query: {
-          id: entityFixtureWithIncompleteOnboarding.id,
-        },
-      });
     });
 
     it('document option is disabled and onboard option is selected by default', async () => {
@@ -122,14 +121,15 @@ describe('<RequestMoreInfoDialog />', () => {
 
   describe('Manual review clearing option', () => {
     beforeEach(() => {
+      mockRouter.setCurrentUrl(`/entities/${entityFixture.id}`);
+      mockRouter.query = {
+        id: entityFixture.id,
+      };
+    });
+
+    beforeEach(() => {
       withPlaybooks();
       withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
-      useRouterSpy({
-        pathname: `/entities/${entityFixture.id}`,
-        query: {
-          id: entityFixture.id,
-        },
-      });
     });
 
     it('no option when user doesnt require manual review', async () => {

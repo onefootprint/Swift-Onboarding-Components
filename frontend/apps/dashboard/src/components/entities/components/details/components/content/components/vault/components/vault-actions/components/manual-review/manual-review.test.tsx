@@ -1,6 +1,6 @@
 import {
-  createUseRouterSpy,
   customRender,
+  mockRouter,
   screen,
   userEvent,
   waitFor,
@@ -13,18 +13,16 @@ import type { ManualReviewProps } from './manual-review';
 import ManualReview from './manual-review';
 import { entityFixture, withDecision, withDecisionError, withEntity } from './manual-review.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<ManualReview />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl(`/entities/${entityFixture.id}`);
+    mockRouter.query = {
+      id: entityFixture.id,
+    };
     withEntity(entityFixture.id);
     withFrequentNotes(OrgFrequentNoteKind.ManualReview, []);
-    useRouterSpy({
-      pathname: `/entities/${entityFixture.id}`,
-      query: {
-        id: entityFixture.id,
-      },
-    });
   });
 
   const renderManualReview = ({ status = EntityStatus.pass, kind = EntityKind.person }: Partial<ManualReviewProps>) =>

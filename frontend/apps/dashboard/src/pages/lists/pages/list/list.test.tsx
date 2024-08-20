@@ -1,18 +1,18 @@
-import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitFor } from '@onefootprint/test-utils';
 import { asAdminUser } from 'src/config/tests';
 
 import List from './list';
 import { withLists, withListsError } from './list.test.config';
 
-const useRouterSpy = createUseRouterSpy();
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 describe('<List />', () => {
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/lists');
+  });
+
+  beforeEach(() => {
     asAdminUser();
-    useRouterSpy({
-      pathname: '/lists',
-      query: {},
-    });
   });
 
   const renderList = () => customRender(<List />);
