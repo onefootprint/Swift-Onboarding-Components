@@ -52,6 +52,15 @@ const Form = ({ onClose, meta: { kind } }: FormProps) => {
     }
   };
 
+  const handleResetDocuments = () => {
+    setValue('person.docs.gov.global', []);
+    setValue('person.docs.gov.country', {});
+    setValue('person.docs.additional.poa', false);
+    setValue('person.docs.additional.possn', false);
+    setValue('person.docs.additional.custom', []);
+    setValue('person.docs.additional.requireManualReview', false);
+  };
+
   return (
     <Stack flexDirection="column" gap={8}>
       {isKyb(kind) && (
@@ -63,8 +72,11 @@ const Form = ({ onClose, meta: { kind } }: FormProps) => {
               <Stack flexDirection="column" alignItems="flex-start">
                 <Toggle
                   onBlur={field.onBlur}
-                  onChange={nextValue => {
-                    field.onChange(nextValue);
+                  onChange={event => {
+                    field.onChange(event);
+                    if (!event.target.checked) {
+                      handleResetDocuments();
+                    }
                   }}
                   checked={field.value}
                   label={t('collect-bo.label')}

@@ -1,6 +1,6 @@
 import { type DataToCollectFormData, type DataToCollectMeta } from '@/playbooks/utils/machine/types';
 import { InlineAlert, Stack } from '@onefootprint/ui';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import Footer from '../footer';
@@ -20,7 +20,8 @@ type StepBoProps = {
 const StepBo = ({ defaultValues, meta, onBack, onSubmit }: StepBoProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.bo' });
   const formMethods = useForm<DataToCollectFormData>({ defaultValues });
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, control } = formMethods;
+  const collectsBo = useWatch({ control, name: 'business.basic.collectBOInfo', defaultValue: true });
 
   return (
     <Stack flexDirection="column" gap={8}>
@@ -30,8 +31,12 @@ const StepBo = ({ defaultValues, meta, onBack, onSubmit }: StepBoProps) => {
           <form onSubmit={handleSubmit(onSubmit)} id="step-bo-form">
             <Stack flexDirection="column" gap={5}>
               <Person meta={meta} />
-              <GovDocs />
-              <AdditionalDocs />
+              {collectsBo ? (
+                <>
+                  <GovDocs />
+                  <AdditionalDocs />
+                </>
+              ) : null}
               <InlineAlert variant="info">{t('info')}</InlineAlert>
             </Stack>
           </form>
