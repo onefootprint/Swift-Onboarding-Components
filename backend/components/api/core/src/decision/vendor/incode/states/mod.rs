@@ -292,8 +292,11 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
-    if expected_country != provided_country && id_doc_kind != IdDocKind::Passport {
-        // TODO: maybe also check if here expected_country is allowed by OBC?
+    if expected_country != provided_country
+        && validate_doc_type_is_allowed(&ctx.obc, id_doc_kind, ctx.vault_country, provided_country).is_err()
+    {
+        // only throw CountryCodeMismatch if the Incode country and the user-specified country do not match
+        // AND the Incode country is not supportable according to the Tenant's OBC
         return Ok(Err(IncodeFailureReason::CountryCodeMismatch));
     }
     Ok(Ok(ValidatedIdDocKind(id_doc_kind)))

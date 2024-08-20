@@ -49,6 +49,7 @@ pub fn get_config_id(
 pub fn validate_doc_type_is_allowed(
     obc: &ObConfiguration,
     document_type: IdDocKind,
+    // TODO why are these two countries different?
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     country_code: Iso3166TwoDigitCountryCode,
 ) -> FpResult<()> {
