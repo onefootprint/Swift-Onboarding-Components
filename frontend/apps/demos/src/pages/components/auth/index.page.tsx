@@ -61,6 +61,24 @@ const AuthDemo = () => {
     const component = fakeSdk.init({
       authToken,
       bootstrapData,
+      kind: FootprintComponentKind.UpdateLoginMethods,
+      onCancel: () => console.log('demo onCancel'),
+      onClose: () => console.log('demo onClose'),
+      onComplete: (s: string) => console.log('demo onComplete', s),
+      options: { showLogo: false },
+      variant: 'modal',
+    });
+    component.render(appUrl);
+
+    return () => {
+      component.destroy();
+    };
+  };
+
+  const handleUpdateFlowOldClick = () => {
+    const component = fakeSdk.init({
+      authToken,
+      bootstrapData,
       kind: FootprintComponentKind.Auth,
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
@@ -82,7 +100,7 @@ const AuthDemo = () => {
         <title>Footprint Auth Demo</title>
       </Head>
       <Container>
-        <Button onClick={handleAuthenticateClick} variant="secondary">
+        <Button onClick={handleAuthenticateClick} variant="primary">
           Authenticate with Footprint
         </Button>
         <br />
@@ -90,8 +108,12 @@ const AuthDemo = () => {
           Authenticate with Footprint (via userData)
         </Button>
         <br />
-        <Button onClick={handleUpdateFlowClick} variant="secondary">
+        <Button onClick={handleUpdateFlowClick} variant="primary">
           Update Authentication Methods with Footprint
+        </Button>
+        <br />
+        <Button onClick={handleUpdateFlowOldClick} variant="secondary">
+          Update Authentication Methods with Footprint (Legacy)
         </Button>
       </Container>
     </>
