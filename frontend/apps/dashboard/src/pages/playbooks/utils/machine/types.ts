@@ -425,7 +425,7 @@ export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
         country: {},
         global: [SupportedIdDocTypes.driversLicense],
         selfie: true,
-        idDocFirst: true,
+        idDocFirst: false,
       },
       additional: {
         custom: [],
@@ -468,7 +468,7 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
           SupportedIdDocTypes.voterIdentification,
         ],
         selfie: true,
-        idDocFirst: true,
+        idDocFirst: false,
       },
       additional: {
         custom: [],
