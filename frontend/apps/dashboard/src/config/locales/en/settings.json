@@ -33,6 +33,97 @@
         "access": "Domain access"
       }
     },
+    "business-profile": {
+      "meta-title": "Settings",
+      "page-title": "Footprint | Settings - Business Profile",
+      "loading-aria": "Business profile loading...",
+      "dialog": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "form": {
+        "success": {
+          "title": "Success!",
+          "description": "Changes successfully saved."
+        }
+      },
+      "save-changes": "Save changes",
+      "header": {
+        "title": "Business profile",
+        "subtitle": "Manage your business details"
+      },
+      "not-allowed": "You are not allowed to manage the organization",
+      "add": "Add {{label}}",
+      "edit": "Edit {{label}}",
+      "logo": {
+        "cta": "Change logo",
+        "not-allowed": "You are not allowed to change the organization logo"
+      },
+      "id": {
+        "label": "Organization ID"
+      },
+      "parent": {
+        "name": "Parent Organization",
+        "id": "Parent id"
+      },
+      "name": {
+        "label": "Company name",
+        "form": {
+          "placeholder": "Acme Bank",
+          "errors": {
+            "required": "Please enter a name"
+          }
+        }
+      },
+      "website": {
+        "label": "Website",
+        "form": {
+          "placeholder": "https://acme.com",
+          "errors": {
+            "required": "Please enter a website",
+            "invalid": "Please enter a valid website"
+          }
+        }
+      },
+      "support-links": {
+        "title": "Support links",
+        "subtitle": "Links will be accessible to users during onboarding.",
+        "more-details": "Learn more.",
+        "dialog": {
+          "title": "Support links",
+          "body": "When available, support links help users get in touch with your support team. By including a support email, website, or phone number, these contact options will be visible to users during the onboarding process.",
+          "img-alt": "Bifrost footer with support links"
+        }
+      },
+      "support-email": {
+        "label": "Support email",
+        "form": {
+          "placeholder": "support@acme.com",
+          "errors": {
+            "required": "Please enter a valid email address"
+          }
+        }
+      },
+      "support-website": {
+        "label": "Support website",
+        "form": {
+          "placeholder": "https://acme.com/support",
+          "errors": {
+            "required": "Please enter a valid website"
+          }
+        }
+      },
+      "support-phone": {
+        "label": "Support phone",
+        "form": {
+          "placeholder": "1 (123) 456-7890",
+          "errors": {
+            "required": "Please enter a valid phone number"
+          }
+        }
+      }
+    },
     "members": {
       "table": {
         "aria-label": "Table of organization members",

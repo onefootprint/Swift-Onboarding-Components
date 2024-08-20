@@ -10,8 +10,8 @@ import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 const BusinessProfile = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.business-profile',
+  const { t } = useTranslation('settings', {
+    keyPrefix: 'pages.business-profile',
   });
   const { isLoading, error, data } = useOrg();
 
