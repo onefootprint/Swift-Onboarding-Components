@@ -1,6 +1,4 @@
 import type { Meta, Story } from '@storybook/react';
-
-import LinkButton from '../link-button';
 import type { InlineAlertProps } from './inline-alert';
 import InlineAlert from './inline-alert';
 
@@ -54,24 +52,4 @@ WithCta.args = {
     label: 'Dismiss',
     onClick: () => undefined,
   },
-};
-
-export const WithLink = Template.bind({});
-WithLink.args = {
-  children: (
-    <>
-      Critical message goes here. <a href="/">Link</a>
-    </>
-  ),
-  variant: 'error',
-};
-
-export const WithLinkButton = Template.bind({});
-WithLinkButton.args = {
-  children: (
-    <>
-      Critical message goes here. <LinkButton>Link Button</LinkButton>
-    </>
-  ),
-  variant: 'warning',
 };

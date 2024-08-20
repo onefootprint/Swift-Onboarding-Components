@@ -24,12 +24,14 @@ const InlineAlert = ({ cta, children, variant = 'info', ...props }: InlineAlertP
       <Stack marginRight={3}>
         <IconComponent color={variant} />
       </Stack>
-      {children}
-      {cta && (
-        <LinkButton variant="label-3" onClick={cta.onClick}>
-          {cta.label}
-        </LinkButton>
-      )}
+      <Box>
+        {children}
+        {cta && (
+          <LinkButton variant="label-3" onClick={cta.onClick} $paddingLeft={2} $paddingBottom={1}>
+            {cta.label}
+          </LinkButton>
+        )}
+      </Box>
     </InlineAlertContainer>
   );
 };
@@ -40,11 +42,9 @@ const InlineAlertContainer = styled(Box)<{
   ${({ theme, $variant }) => css`
     ${createFontStyles('body-3')};
     ${createVariantStyles($variant)};
-    align-items: center;
     border-radius: ${theme.borderRadius.default};
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     gap: ${theme.spacing[2]};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     width: 100%;
