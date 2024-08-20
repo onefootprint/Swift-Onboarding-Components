@@ -149,5 +149,8 @@
       "source.fixAll.eslint": "explicit"
     }
   },
-  "search.followSymlinks": false
+  "search.followSymlinks": false,
+  "python.analysis.include": [
+    "backend/ci/tests"
+  ],
 }
