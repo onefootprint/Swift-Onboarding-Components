@@ -21,7 +21,7 @@ const onboardingComponents = createOptions({
     links: [
       {
         name: 'KYC + Next.js',
-        href: 'https://github.com/onefootprint/examples/tree/master/kyc/onboarding-components/web-next-js',
+        href: 'https://github.com/onefootprint/examples/tree/master/onboarding-components/kyc/web-next-js',
         img: {
           src: '/examples/next.png',
           height: 32,
@@ -30,7 +30,7 @@ const onboardingComponents = createOptions({
       },
       {
         name: 'KYB + Next.js',
-        href: 'https://github.com/onefootprint/examples/tree/master/kyb/onboarding-components/web-next-js',
+        href: 'https://github.com/onefootprint/examples/tree/master/onboarding-components/kyb/web-next-js',
         img: {
           src: '/examples/next.png',
           height: 32,
