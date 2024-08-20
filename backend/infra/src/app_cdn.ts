@@ -3,6 +3,7 @@ import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { Certificate } from './certs';
 import { StackEnvironment, StackMetadata } from './stack_metadata';
+import { APP_CDN_WAF_RULES, RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY } from './app_cdn_waf';
 
 export type CdnConfig = {
   cert: Certificate;
@@ -120,33 +121,12 @@ export function CreateAppCloudfrontDistribution(
   );
 
   // Create the WAF (Web Application Firewall)
-
-  function awsManagedRule(name: string, priority: number, sample: boolean) {
-    return {
-      name: name,
-      priority: priority,
-      overrideAction: {
-        count: {},
-      },
-      statement: {
-        managedRuleGroupStatement: {
-          name: name,
-          vendorName: 'AWS',
-        },
-      },
-      visibilityConfig: {
-        metricName: name,
-        cloudwatchMetricsEnabled: true,
-        sampledRequestsEnabled: sample,
-      },
-    };
-  }
-
   const waf = new aws.wafv2.WebAcl('app-cdb-waf', {
     name: `AppCDNWAF-${config.stack.shortStackName}`,
     visibilityConfig: {
       metricName: 'appCdnWAF',
       cloudwatchMetricsEnabled: true,
+      // Critical: Disable sampling to avoid leaking API keys.
       sampledRequestsEnabled: false,
     },
     defaultAction: {
@@ -157,11 +137,14 @@ export function CreateAppCloudfrontDistribution(
       },
     },
     scope: 'CLOUDFRONT',
-    rules: [
-      awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0, true),
-      awsManagedRule('AWSManagedRulesCommonRuleSet', 1, false),
-      awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2, true),
+    customResponseBodies: [
+      {
+        key: RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY,
+        contentType: 'APPLICATION_JSON',
+        content: '{"message": "Rate limit exceeded"}',
+      }
     ],
+    rules: APP_CDN_WAF_RULES,
   });
 
   const logBucket = createLogBucket(config);

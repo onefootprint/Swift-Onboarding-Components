@@ -353,6 +353,7 @@ async function createCdnFrontedLoadBalancer(
     visibilityConfig: {
       metricName: 'fpcLbWAF',
       cloudwatchMetricsEnabled: true,
+      // Critical: Disable sampling to avoid leaking API keys.
       sampledRequestsEnabled: false,
     },
     defaultAction: {
