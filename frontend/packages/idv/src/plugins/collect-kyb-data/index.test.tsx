@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKybDataOption,
@@ -25,8 +25,9 @@ import {
   withUserVaultValidate,
 } from './index.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe.skip('<CollectKybData />', () => {
-  const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
@@ -44,12 +45,10 @@ describe.skip('<CollectKybData />', () => {
 
   beforeEach(() => {
     queryCache.clear();
-    useRouterSpy({
-      pathname: '/',
-      query: {
-        public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
-      },
-    });
+    mockRouter.setCurrentUrl('/');
+    mockRouter.query = {
+      public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
+    };
   });
 
   const onboardingConfig: PublicOnboardingConfig = {

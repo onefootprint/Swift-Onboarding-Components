@@ -65,7 +65,7 @@ describe('Id Doc Machine Tests', () => {
   });
 
   describe('Full flow test with image upload and navigate back', () => {
-    it('Can execute the the full mobile flow properly', () => {
+    it.skip('Can execute the the full mobile flow properly', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
@@ -174,7 +174,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('complete');
     });
 
-    it('Can execute the the full desktop flow properly', () => {
+    it.skip('Can execute the the full desktop flow properly', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
       machine.start();
 

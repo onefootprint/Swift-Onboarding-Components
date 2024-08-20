@@ -1,6 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import { Layout } from '../layout';
@@ -30,19 +30,16 @@ import {
 } from './identify.test.config';
 import { IdentifyVariant } from './state/types';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 jest.mock('../../utils/get-biometric-challenge-response', () => ({
   __esModule: true,
   ...jest.requireActual('../../utils/get-biometric-challenge-response'),
 }));
 
-const useRouterSpy = createUseRouterSpy();
-
 describe('<Identify />', () => {
   beforeEach(() => {
-    useRouterSpy({
-      pathname: '/',
-      query: {},
-    });
+    mockRouter.setCurrentUrl('/');
   });
 
   const renderIdentify = ({

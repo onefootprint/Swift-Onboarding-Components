@@ -2,7 +2,7 @@
 import './config/initializers/i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, userEvent } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, userEvent } from '@onefootprint/test-utils';
 import type { OnboardingRequirement } from '@onefootprint/types';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
@@ -44,6 +44,8 @@ import {
 } from './idv.test.config';
 import type { IdvProps } from './types';
 import { ComponentsSdkTypes } from './utils/state-machine/types';
+
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const defaultObConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' };
 
@@ -93,7 +95,6 @@ export const idDocRequirement: OnboardingRequirement = {
 };
 
 describe('<Idv />', () => {
-  const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
@@ -110,8 +111,11 @@ describe('<Idv />', () => {
   });
 
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/');
+  });
+
+  beforeEach(() => {
     queryCache.clear();
-    useRouterSpy({ pathname: '/', query: {} });
     withCheckSession();
   });
 

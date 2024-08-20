@@ -51,7 +51,6 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@happy-dom/global-registrator": "^14.7.1",
     "@next/bundle-analyzer": "^13.4.19",
     "@testing-library/react": "^14.3.0",

@@ -16,7 +16,7 @@
     "lint": "biome check src --fix",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3000",
-    "test:ci:hidden": "jest --ci --bail --runInBand",
+    "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest",
     "typecheck": "yarn tsc --noEmit",
@@ -51,9 +51,7 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@next/bundle-analyzer": "^13.4.19",
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@tanstack/react-query": "^4.35.7",
     "@types/lodash": "^4.14.194",
@@ -64,10 +62,6 @@
     "copy-and-watch": "^0.1.6",
     "tsconfig": "*",
     "typescript": "^5.5.2"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"]
   },
   "browser": {
     "fs": false

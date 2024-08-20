@@ -15,7 +15,7 @@
     "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
     "lint:ci": "biome ci src",
     "lint": "biome check --fix src",
-    "test:ci:hidden": "jest --ci --bail --runInBand",
+    "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
     "typecheck": "yarn tsc --noEmit"
@@ -64,7 +64,6 @@
     "xstate": "^4.37.1"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
     "@rive-app/react-canvas": "^3.0.35",
     "@types/lodash": "^4.14.194",
@@ -79,20 +78,12 @@
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
     "typescript": "^5.5.2",
-    "webpack": "*"
+    "webpack": "*",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "next": "14.x",
     "react": "18.x",
     "react-dom": "18.x"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"],
-    "moduleNameMapper": {
-      "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1",
-      "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
-    },
-    "setupFilesAfterEnv": ["<rootDir>/src/utils/tests/setupTests.js"]
   }
 }

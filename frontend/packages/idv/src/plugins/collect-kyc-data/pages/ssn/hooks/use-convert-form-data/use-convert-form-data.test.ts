@@ -1,8 +1,6 @@
 import { renderHook } from '@onefootprint/test-utils';
 import useConvertFormData from './use-convert-form-data';
 
-const noop = () => undefined;
-
 jest.mock('../../../../hooks/use-collect-kyc-data-machine', () => ({
   __esModule: true,
   default: () => [
@@ -26,12 +24,12 @@ jest.mock('../../../../hooks/use-collect-kyc-data-machine', () => ({
 
 jest.mock('../../../../../../utils/logger/logger', () => ({
   __esModule: true,
-  default: noop,
+  default: () => undefined,
   getLogger: () => ({
-    logError: noop,
-    logInfo: noop,
-    logTrack: noop,
-    logWarn: noop,
+    logError: () => undefined,
+    logInfo: () => undefined,
+    logTrack: () => undefined,
+    logWarn: () => undefined,
   }),
 }));
 

@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
@@ -9,8 +9,9 @@ import InvestorProfile from './index';
 import { withDecryptUser, withOnboardingConfig, withUserVault, withUserVaultValidate } from './index.test.config';
 import type { InvestorProfileProps } from './investor-profile.types';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe('<InvestorProfile />', () => {
-  const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
@@ -23,15 +24,19 @@ describe('<InvestorProfile />', () => {
   });
 
   beforeEach(() => {
-    queryCache.clear();
-    useRouterSpy({
-      pathname: '/',
-      query: { public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY' },
-    });
+    mockRouter.setCurrentUrl('/');
+    mockRouter.query = { public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY' };
+  });
+
+  beforeEach(() => {
     withOnboardingConfig();
     withUserVaultValidate();
     withUserVault();
     withDecryptUser();
+  });
+
+  afterEach(() => {
+    queryCache.clear();
   });
 
   const renderPlugin = ({ onDone }: Pick<InvestorProfileProps, 'onDone'>) => {

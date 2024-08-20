@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import { createUseRouterSpy, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
@@ -11,8 +11,9 @@ import CollectKycData from './index';
 import { withIdentify, withOnboardingConfig, withUserToken, withUserVault } from './index.test.config';
 import type { CollectKycDataProps } from './types';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe('<CollectKycData />', () => {
-  const useRouterSpy = createUseRouterSpy();
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
@@ -29,13 +30,14 @@ describe('<CollectKycData />', () => {
   });
 
   beforeEach(() => {
+    mockRouter.setCurrentUrl('/');
+    mockRouter.query = {
+      public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
+    };
+  });
+
+  afterEach(() => {
     queryCache.clear();
-    useRouterSpy({
-      pathname: '/',
-      query: {
-        public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
-      },
-    });
   });
 
   const renderPlugin = ({ idvContext, context, onDone }: CollectKycDataProps) =>

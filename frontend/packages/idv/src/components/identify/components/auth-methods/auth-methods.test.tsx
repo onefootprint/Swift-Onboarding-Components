@@ -1,6 +1,6 @@
 import '../../../../config/initializers/i18next-test';
 
-import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import * as React from 'react';
 
 import { Layout } from '../../../layout';
@@ -14,12 +14,13 @@ import {
   withUserVaultDecrypt,
 } from './auth-methods.test.config';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 type AuthMethodsProps = React.ComponentProps<typeof AuthMethods>;
 type LayoutProps = React.ComponentProps<typeof Layout>;
 
 const emailRegEx = /sandbox@onefootprint.com/i;
 const phoneRegEx = /15555550100/i;
-const useRouterSpy = createUseRouterSpy();
 const renderAuthMethods = ({
   authToken,
   initialMachineState,
@@ -39,7 +40,7 @@ const renderAuthMethods = ({
 
 describe('<AuthMethods />', () => {
   beforeEach(() => {
-    useRouterSpy({ pathname: '/', query: {} });
+    mockRouter.setCurrentUrl('/');
   });
 
   describe('for dashboard machine state', () => {
