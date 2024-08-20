@@ -1,14 +1,11 @@
-use super::data_lifetime::DataLifetime;
 use super::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::DbResult;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
-use db_schema::schema::data_lifetime;
 use db_schema::schema::scoped_vault_version;
 use diesel::prelude::*;
-use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
 use newtypes::ScopedVaultId;
@@ -53,54 +50,24 @@ impl ScopedVaultVersion {
             return Ok(existing);
         }
 
-        // Since the backfill may or may not be finished for this scoped vault, we need to
-        // determine the next version number using the same methodology as the backfill.
+        let latest_row: Option<Self> = scoped_vault_version::table
+            .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault_id))
+            .order(scoped_vault_version::version.desc())
+            .limit(1)
+            .get_result(conn.conn())
+            .optional()?;
 
-        // Temporary methodology during backfill:
-        // ----------------------------
+        let version = if let Some(latest_row) = latest_row {
+            if seqno <= latest_row.seqno {
+                return Err(DbError::AssertionError(
+                    "seqnos must increment with each scoped vault version".to_owned(),
+                ));
+            }
 
-        let dls: Vec<DataLifetime> = data_lifetime::table
-            .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
-            .select(DataLifetime::as_select())
-            .get_results(conn.conn())?;
-
-        let created_seqnos = dls.iter().map(|dl| dl.created_seqno);
-        let deactivated_seqnos = dls.iter().flat_map(|dl| dl.deactivated_seqno);
-        let num_seqnos = created_seqnos
-            .chain(deactivated_seqnos)
-            // Filter out the seqno we're operating on, since in some cases we insert
-            // data_lifetimes before we insert the scoped_vault_version.
-            .filter(|s| *s != seqno)
-            .unique()
-            .count();
-
-        let num_seqnos: i64 = num_seqnos
-            .try_into()
-            .map_err(|e| DbError::AssertionError(format!("num_seqnos is out of bounds for an i64: {}", e)))?;
-        let version = ScopedVaultVersionNumber::from(num_seqnos) + ScopedVaultVersionNumber::from(1);
-
-
-        // Switch to this methodology after the backfill:
-        // ----------------------------------------------
-        //
-        // let latest_row: Option<Self> = scoped_vault_version::table
-        //     .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault_id))
-        //     .order(scoped_vault_version::version.desc())
-        //     .limit(1)
-        //     .get_result(conn.conn())
-        //     .optional()?;
-
-        // let version = if let Some(latest_row) = latest_row {
-        //     if seqno <= latest_row.seqno {
-        //         return Err(DbError::AssertionError(
-        //             "seqnos must increment with each scoped vault version".to_owned(),
-        //         ));
-        //     }
-
-        //     latest_row.version + ScopedVaultVersionNumber::from(1)
-        // } else {
-        //     ScopedVaultVersionNumber::from(1)
-        // };
+            latest_row.version + ScopedVaultVersionNumber::from(1)
+        } else {
+            ScopedVaultVersionNumber::from(1)
+        };
 
         let new = NewScopedVaultVersion {
             scoped_vault_id: scoped_vault_id.clone(),
