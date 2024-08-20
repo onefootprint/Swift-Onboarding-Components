@@ -30,7 +30,7 @@ config:
       schedule: cron(0 * * * ? *)
     db:
       deletionProtection: true
-      maxAcus: 64
+      maxAcus: 128
       minAcus: 16
     domain:
       assets: i.onefp.net
