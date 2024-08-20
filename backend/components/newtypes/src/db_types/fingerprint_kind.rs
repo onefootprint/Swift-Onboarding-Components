@@ -97,6 +97,8 @@ pub enum CompositeFingerprint {
     Name(TenantId),
     #[strum_discriminants(strum(serialize = "composite.name_ssn4"))]
     NameSsn4(TenantId),
+    #[strum_discriminants(strum(serialize = "composite.dob_ssn4"))]
+    DobSsn4(TenantId),
 }
 
 impl CompositeFingerprint {
@@ -112,6 +114,7 @@ impl CompositeFingerprint {
                 CompositeFingerprintKind::NameDob => Self::NameDob,
                 CompositeFingerprintKind::Name => Self::Name(t_id.clone()),
                 CompositeFingerprintKind::NameSsn4 => Self::NameSsn4(t_id.clone()),
+                CompositeFingerprintKind::DobSsn4 => Self::DobSsn4(t_id.clone()),
             })
             .collect()
     }
@@ -132,6 +135,10 @@ impl CompositeFingerprint {
             Self::NameSsn4(tenant_id) => vec![
                 FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
                 FingerprintSalt::Tenant(IDK::LastName.into(), tenant_id.clone()),
+                FingerprintSalt::Tenant(IDK::Ssn4.into(), tenant_id.clone()),
+            ],
+            Self::DobSsn4(tenant_id) => vec![
+                FingerprintSalt::Tenant(IDK::Dob.into(), tenant_id.clone()),
                 FingerprintSalt::Tenant(IDK::Ssn4.into(), tenant_id.clone()),
             ],
         }
@@ -179,6 +186,7 @@ impl CompositeFingerprintKind {
             Self::Name => FingerprintScope::Tenant,
             Self::NameDob => FingerprintScope::Global,
             Self::NameSsn4 => FingerprintScope::Tenant,
+            Self::DobSsn4 => FingerprintScope::Tenant,
         }
     }
 }
@@ -222,6 +230,10 @@ mod test {
                 FingerprintSalt::Tenant(IDK::Ssn4.into(), test_tenant_id()),
                 Fingerprint(vec![6]),
             ),
+            (
+                FingerprintSalt::Tenant(IDK::Dob.into(), test_tenant_id()),
+                Fingerprint(vec![7]),
+            ),
         ]
         .into_iter()
         .collect();
@@ -243,6 +255,9 @@ mod test {
                     }
                     CompositeFingerprint::NameSsn4(_) => {
                         "db657b5e5a961a3a2f14dc50b9962e9b2a6a7152d0ce76a5b37d05e152e1d677"
+                    }
+                    CompositeFingerprint::DobSsn4(_) => {
+                        "7dc712d8d0ef8b72dc4fbafb92d7de33cc14dbc80b266a702224d4397494e2e9"
                     }
                 };
                 assert_eq!(expected, computed);

@@ -212,12 +212,13 @@ pub struct ExternalDupes {
 }
 
 impl Fingerprint {
-    const DUPLICATE_FINGERPRINT_KINDS: [FingerprintKind; 5] = [
+    const DUPLICATE_FINGERPRINT_KINDS: [FingerprintKind; 6] = [
         FingerprintKind::DI(DI::Id(IDK::PhoneNumber)),
         FingerprintKind::DI(DI::Id(IDK::Email)),
         FingerprintKind::DI(DI::Id(IDK::Ssn9)),
         FingerprintKind::Composite(CompositeFingerprintKind::NameDob),
         FingerprintKind::Composite(CompositeFingerprintKind::NameSsn4),
+        FingerprintKind::Composite(CompositeFingerprintKind::DobSsn4),
     ];
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
