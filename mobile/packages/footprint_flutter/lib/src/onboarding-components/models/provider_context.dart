@@ -12,6 +12,7 @@ class ProviderContext {
   final FootprintSupportedLocale? locale;
   final OnboardingConfig? onboardingConfig;
   final String redirectUrl;
+  final String? sandboxId;
 
   ProviderContext({
     required this.publicKey,
@@ -22,6 +23,7 @@ class ProviderContext {
     this.appearance,
     this.locale,
     this.onboardingConfig,
+    this.sandboxId,
   });
 
   ProviderContext copyWith({
@@ -33,6 +35,7 @@ class ProviderContext {
     FootprintSupportedLocale? locale,
     OnboardingConfig? onboardingConfig,
     String? redirectUrl,
+    String? sandboxId,
   }) {
     return ProviderContext(
       publicKey: publicKey ?? this.publicKey,
@@ -43,6 +46,7 @@ class ProviderContext {
       locale: locale ?? this.locale,
       onboardingConfig: onboardingConfig ?? this.onboardingConfig,
       redirectUrl: redirectUrl ?? this.redirectUrl,
+      sandboxId: sandboxId ?? this.sandboxId,
     );
   }
 }

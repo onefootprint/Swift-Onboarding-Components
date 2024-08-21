@@ -11,6 +11,7 @@ class FootprintProvider extends StatelessWidget {
   final String? authToken;
   final FootprintSupportedLocale? locale;
   final String redirectUrl;
+  final String? sandboxId;
 
   const FootprintProvider({
     super.key,
@@ -20,6 +21,7 @@ class FootprintProvider extends StatelessWidget {
     this.appearance,
     this.authToken,
     this.locale,
+    this.sandboxId,
   });
 
   @override
@@ -31,6 +33,7 @@ class FootprintProvider extends StatelessWidget {
       authToken: authToken,
       locale: locale,
       redirectUrl: redirectUrl,
+      sandboxId: sandboxId,
       child: child,
     ));
   }

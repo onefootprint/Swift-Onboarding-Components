@@ -16,6 +16,7 @@ class Wrapper extends ConsumerStatefulWidget {
   final String publicKey;
   final FootprintSupportedLocale? locale;
   final String redirectUrl;
+  final String? sandboxId;
 
   const Wrapper({
     super.key,
@@ -25,6 +26,7 @@ class Wrapper extends ConsumerStatefulWidget {
     this.appearance,
     this.authToken,
     this.locale,
+    this.sandboxId,
   });
 
   @override
@@ -50,6 +52,7 @@ class _WrapperState extends ConsumerState<Wrapper> {
               authToken: widget.authToken ?? currentProvider.authToken,
               vaultingToken: null,
               redirectUrl: widget.redirectUrl,
+              sandboxId: widget.sandboxId,
             ),
           );
       getOnboardingConfig(widget.publicKey).then((config) {

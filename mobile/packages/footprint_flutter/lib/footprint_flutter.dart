@@ -14,3 +14,5 @@ export "src/onboarding-components/utils/footprint_utils.dart";
 export 'src/config/countries.dart';
 export 'src/config/corporation_types.dart';
 export 'src/onboarding-components/models/form_data.dart';
+export 'src/onboarding-components/widgets/footprint_otp.dart';
+export 'src/onboarding-components/models/inline_otp_not_supported_exception.dart';

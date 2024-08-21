@@ -19,6 +19,7 @@ class FpContextNotifier extends _$FpContextNotifier {
       authToken: null,
       vaultingToken: null,
       redirectUrl: '',
+      sandboxId: null,
     );
   }
 
