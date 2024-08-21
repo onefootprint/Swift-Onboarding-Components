@@ -8,7 +8,7 @@ import EditableFormButtonContainer from '../../../../components/editable-form-bu
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import useSyncData, { omitPhoneAndEmail, SyncDataFieldErrors } from '../../hooks/use-sync-data';
+import useSyncData, { omitPhoneAndEmail, type SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import type { KycData } from '../../utils/data-types';
 import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
