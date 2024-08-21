@@ -363,6 +363,9 @@ Map<String, InputProps> getBusinessProps() {
       if (value == null || value.isEmpty) {
         return 'Website is required';
       }
+      if (!isURL(value)) {
+        return 'Invalid URL';
+      }
       return null;
     }
   );

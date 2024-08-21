@@ -154,3 +154,11 @@ bool isName(String value) {
 
   return allowedChars.hasMatch(trimmedName);
 }
+
+bool isURL(String value) {
+  final RegExp pattern = RegExp(
+    r'^(?:(https?:\/\/)?(?!-)(?:[A-Za-z0-9-]{1,63}\.)+(?!-)[A-Za-z0-9]{2,}(?::\d{2,5})?)?(?:\/[^\s?#]*)?(?:\?[^\s#]*)?(?:#[^\s]*)?$',
+    caseSensitive: false,
+  );
+  return pattern.hasMatch(value);
+}
