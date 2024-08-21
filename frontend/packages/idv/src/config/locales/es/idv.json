@@ -363,7 +363,10 @@
           }
         },
         "title": "¿Cuál es tu dirección?",
-        "subtitle": "Asegúrate de proporcionar una dirección que coincida con un comprobante de domicilio y tu nombre completo"
+        "subtitle": "Asegúrate de proporcionar una dirección que coincida con un comprobante de domicilio y tu nombre completo",
+        "invalid-inputs": {
+          "title": "Uh-oh!"
+        }
       },
       "legal-status": {
         "title": "¿Cuál es tu situación legal en EE.UU.?",

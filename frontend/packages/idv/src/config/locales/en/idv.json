@@ -363,7 +363,10 @@
           }
         },
         "title": "What's your residential address?",
-        "subtitle": "Make sure to provide your updated residential address (no P.O. Boxes)."
+        "subtitle": "Make sure to provide your updated residential address (no P.O. Boxes).",
+        "invalid-inputs": {
+          "title": "Uh-oh!"
+        }
       },
       "legal-status": {
         "title": "What's your legal status in the U.S.?",

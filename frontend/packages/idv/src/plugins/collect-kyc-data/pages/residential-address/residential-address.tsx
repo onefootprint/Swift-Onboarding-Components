@@ -1,6 +1,6 @@
 import type { CountryCode } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
-import { Grid, Stack } from '@onefootprint/ui';
+import { Grid, Stack, useToast } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ import EditableFormButtonContainer from '../../../../components/editable-form-bu
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
-import useSyncData, { omitPhoneAndEmail } from '../../hooks/use-sync-data';
+import useSyncData, { omitPhoneAndEmail, SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import type { KycData } from '../../utils/data-types';
 import getInitialCountry from '../../utils/get-initial-country';
 import AddressLines from './components/address-lines';
@@ -43,6 +43,7 @@ const ResidentialAddress = ({
   const countryFromContext = data[IdDI.country]?.value;
   const { mutation, syncData } = useSyncData();
   const convertFormData = useConvertFormData();
+  const toast = useToast();
 
   let defaultCountry: CountryCode | undefined;
   const { supportedCountries } = config;
@@ -80,6 +81,16 @@ const ResidentialAddress = ({
           payload: cleanData,
         });
         onComplete?.(cleanData);
+      },
+      onError: (error: SyncDataFieldErrors) => {
+        const fieldErrorMessages = Object.values(error);
+        if (fieldErrorMessages.length > 0) {
+          toast.show({
+            title: t('invalid-inputs.title'),
+            description: fieldErrorMessages[0],
+            variant: 'error',
+          });
+        }
       },
     });
   };
