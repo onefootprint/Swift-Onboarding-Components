@@ -2,19 +2,15 @@ import { useEffect } from 'react';
 import getSectionMeta from 'src/utils/section';
 import useHydrateArticles from '.';
 import type { ApiReferenceArticle } from '../../api-reference/index.page';
-import getArticles from '../../api-reference/utils/get-articles';
 import staticApiData from '../assets/public-api-docs.json';
 import type { ApiArticleSection } from '../components/articles';
-
-/** The open API spec for all public-facing APIs, exported by the backend. */
-const staticApiArticles = getArticles(staticApiData);
 
 /**
  * Parses all markdown files that describe individual APIs and joins them the with information from the open
  * API specs they document.
  */
 const useParseApiSections = (apiSections: ApiReferenceArticle[]): ApiArticleSection[] => {
-  const publicApiArticles = useHydrateArticles(staticApiArticles);
+  const publicApiArticles = useHydrateArticles(staticApiData);
   useEffect(() => {
     // Alert if there's a new public API that isn't documented on this site.
     // All APIs in the public-api-docs.json should be included in articles on the API reference site.

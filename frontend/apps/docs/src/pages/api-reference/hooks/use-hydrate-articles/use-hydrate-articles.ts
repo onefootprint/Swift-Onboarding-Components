@@ -1,12 +1,8 @@
 import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
-import useSession from 'src/hooks/use-session';
-import {
-  type ApiArticle,
-  type ContentSchema,
-  type ContentSchemaNoRef,
-  SecurityTypes,
-} from '../../api-reference/api-reference.types';
-import { evaluateSchemaRef } from '../utils/get-schemas';
+import { type ApiArticle, type ContentSchemaNoRef, SecurityTypes } from '../../api-reference.types';
+import useCanAccessPreviewApi from './hooks/use-can-access-preview-api';
+import useHydrateSchema from './hooks/use-hydrate-schema';
+import getArticles from './utils/get-articles';
 
 type AdditionalArticleProps = {
   /** True if this API should be hidden when the tenant doesn't have access to it. */
@@ -29,43 +25,12 @@ export enum ArticleTag {
 
 export type HydratedApiArticle = ApiArticle<ContentSchemaNoRef> & AdditionalArticleProps;
 
-// TODO unit tests
-const getPreviewApiGateFromDescription = (description: string) => {
-  const gatedRegex = /gated\(([A-Za-z_-]+)\)/;
-  return gatedRegex.exec(description)?.[1] as TenantPreviewApi | undefined;
-};
+// TODO this should take in an open API spec
+const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiArticle[] => {
+  const hydrateSchema = useHydrateSchema(rawArticles);
+  const canAccessPreviewApi = useCanAccessPreviewApi();
 
-const useHydrateArticles = (articles: ApiArticle[]): HydratedApiArticle[] => {
-  const {
-    data: { user },
-  } = useSession();
-
-  const canAccessPreviewApi = (previewApi: TenantPreviewApi) =>
-    user?.tenant?.allowedPreviewApis?.includes(previewApi) || user?.isFirmEmployee || false;
-
-  /** Filters out feature-gated properties from the provided properties */
-  const filterVisibleProperties = (properties?: Record<string, ContentSchemaNoRef>) => {
-    if (!properties) return undefined;
-    return Object.fromEntries(
-      Object.entries(properties).flatMap(([name, schema]) => {
-        const requiredPreviewApi = getPreviewApiGateFromDescription(schema.description || '');
-        if (requiredPreviewApi && !canAccessPreviewApi(requiredPreviewApi)) {
-          return [];
-        }
-        return [[name, schema]];
-      }),
-    );
-  };
-
-  const hydrateSchema = (schema: ContentSchema) => {
-    const dereferencedSchema = dereferenceSchema(schema);
-    return {
-      ...dereferencedSchema,
-      properties: filterVisibleProperties(dereferencedSchema.properties),
-    };
-  };
-
-  // TODO move getSchema here, make it a function of the provided open API spec?
+  const articles = getArticles(rawArticles);
 
   return articles.map(article => {
     const hasTag = (tag: string) => article.tags?.includes(tag) || false;
@@ -123,21 +88,3 @@ const useHydrateArticles = (articles: ApiArticle[]): HydratedApiArticle[] => {
 };
 
 export default useHydrateArticles;
-
-/** Open API request and response schemas may by defined either inline or by a reference to a list of schemas. This dereferenecs the referenced schema and returns a guaranteed schema definition. */
-const dereferenceSchema = (schema: ContentSchema): ContentSchemaNoRef => {
-  if (schema.$ref) {
-    const dereferencedSchema = evaluateSchemaRef(schema.$ref);
-    if (!dereferencedSchema) {
-      throw Error(`Couldn't dereference schema ${schema.$ref}`);
-    }
-    return dereferencedSchema;
-  }
-  if (schema.items?.$ref) {
-    return {
-      ...schema,
-      items: dereferenceSchema(schema.items),
-    };
-  }
-  return schema;
-};

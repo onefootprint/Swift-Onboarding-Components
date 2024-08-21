@@ -1,12 +1,12 @@
 import sortBy from 'lodash/sortBy';
 
-import type { ApiArticle } from '../../api-reference/api-reference.types';
+import type { ApiArticle } from '../../../api-reference.types';
 
-export const isClientApi = (path: string) => path.startsWith('/users/vault');
+const isClientApi = (path: string) => path.startsWith('/users/vault');
 
 /// Compute the ID used to form a deeplink to this API.
 /// BE CAREFUL: changing this logic could break any previously sent/documented deeplinks.
-export const getId = (method: string, path: string) => {
+const getId = (method: string, path: string) => {
   const elements = path
     .split('/')
     .map(element => element.replace('_', '-').replace('{', '').replace('}', ''))
@@ -16,7 +16,7 @@ export const getId = (method: string, path: string) => {
   return `${method}-${joinedElements}${client}`;
 };
 
-export const getPath = (path: string) =>
+const getPath = (path: string) =>
   path
     .split('/')
     .map(element => {
