@@ -64,7 +64,7 @@ impl DocumentData {
         source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let dl = DataLifetime::create(conn, vault_id, scoped_vault, kind.clone(), seqno, source, actor)?;
+        let (dl, _) = DataLifetime::create(conn, vault_id, scoped_vault, kind.clone(), seqno, source, actor)?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

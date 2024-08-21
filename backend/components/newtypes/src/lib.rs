@@ -151,6 +151,8 @@ pub enum Error {
     ValidationError(String),
     #[error("{0}")]
     AssertionError(String),
+    #[error("Vault version must be a non-negative integer")]
+    VaultVersionParseError,
 }
 
 impl From<DataValidationError> for Error {

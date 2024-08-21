@@ -20,6 +20,7 @@ use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::Locked;
 use newtypes::PiiString;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::SealedVaultBytes;
 use newtypes::StorageType;
 use newtypes::VaultDataFormat;
@@ -71,7 +72,7 @@ impl VaultData {
         data: Vec<NewVaultData>,
         seqno: DataLifetimeSeqno,
         actor: Option<DbActor>,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         // One more sanity check that we don't store plaintext data where not desired
         if let Some(d) = data
             .iter()
@@ -101,7 +102,7 @@ impl VaultData {
                 source: d.source,
             })
             .collect();
-        let dls = DataLifetime::bulk_create(conn, user_vault_id, scoped_vault, dl_data, seqno, actor)?;
+        let (dls, svv) = DataLifetime::bulk_create(conn, user_vault_id, scoped_vault, dl_data, seqno, actor)?;
         let mut dls: HashMap<_, _> = dls.into_iter().map(|dl| (dl.kind.clone(), dl)).collect();
         let new_rows: Vec<_> = data
             .into_iter()
@@ -120,7 +121,7 @@ impl VaultData {
         let results = diesel::insert_into(vault_data::table)
             .values(new_rows)
             .get_results(conn.conn())?;
-        Ok(results)
+        Ok((results, svv))
     }
 
     #[tracing::instrument("VaultData::bulk_get_by_id", skip_all)]

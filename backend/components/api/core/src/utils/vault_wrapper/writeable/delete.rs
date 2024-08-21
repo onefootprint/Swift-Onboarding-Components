@@ -2,9 +2,16 @@ use super::WriteableVw;
 use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::TxnPgConn;
 use newtypes::output::Csv;
 use newtypes::DataIdentifier;
+use newtypes::ScopedVaultVersionNumber;
+
+pub struct DeleteDataResult {
+    pub deleted_dis: Vec<DataIdentifier>,
+    pub new_version: ScopedVaultVersionNumber,
+}
 
 impl<Type> WriteableVw<Type> {
     /// soft "delete" an entire scoped vault, but not the corresponding data lifetimes.
@@ -26,9 +33,14 @@ impl<Type> WriteableVw<Type> {
         &self,
         conn: &mut TxnPgConn,
         dis: Vec<DataIdentifier>,
-    ) -> FpResult<Vec<DataIdentifier>> {
+    ) -> FpResult<DeleteDataResult> {
         if dis.is_empty() {
-            return Ok(dis);
+            let latest_version = ScopedVaultVersion::latest_version_number(conn, &self.sv.id)?;
+
+            return Ok(DeleteDataResult {
+                deleted_dis: dis,
+                new_version: latest_version,
+            });
         }
         tracing::info!(dis=%Csv::from(dis.clone()), "Deactivating DIs");
         let (dis, dls) = dis
@@ -40,9 +52,12 @@ impl<Type> WriteableVw<Type> {
             .unzip();
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        let _ = DataLifetime::bulk_deactivate(conn, &self.sv, dls, seqno)?;
+        let (_, svv) = DataLifetime::bulk_deactivate(conn, &self.sv, dls, seqno)?;
 
-        Ok(dis)
+        Ok(DeleteDataResult {
+            deleted_dis: dis,
+            new_version: svv,
+        })
     }
 }
 

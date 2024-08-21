@@ -24,6 +24,7 @@ use newtypes::InvestorProfileKind as IPK;
 use newtypes::KvDataKey;
 use newtypes::PiiString;
 use newtypes::S3Url;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::SealedVaultBytes;
 use newtypes::VaultDataFormat;
 use std::collections::HashSet;
@@ -83,7 +84,9 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
-    let vds = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+    let (vds, svv) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+
+    assert_eq!(svv, ScopedVaultVersionNumber::from(1));
 
     // Portablize the phone as happens in prod
     let phone_data = vds
@@ -221,7 +224,8 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, &sv, kinds, seqno).unwrap();
-        let vds = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+        let (vds, _) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
             DataLifetime::bulk_portablize_for_tenant(conn, ids, sv_id, seqno).unwrap();

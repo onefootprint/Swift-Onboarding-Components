@@ -25,6 +25,7 @@ use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::Locked;
 use newtypes::ScopedVaultId;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::VaultId;
 
 #[derive(Debug, Clone, Queryable, Selectable)]
@@ -171,7 +172,7 @@ impl DataLifetime {
         rows: Vec<NewDataLifetimeArgs>,
         seqno: DataLifetimeSeqno,
         actor: Option<DbActor>,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let new_rows: Vec<NewDataLifetime> = rows
             .into_iter()
             .map(|r| NewDataLifetime {
@@ -186,12 +187,19 @@ impl DataLifetime {
             })
             .collect();
 
-        ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?;
-
         let result = diesel::insert_into(data_lifetime::table)
             .values(new_rows)
             .get_results::<Self>(conn.conn())?;
-        Ok(result)
+
+        let svv = if !result.is_empty() {
+            // Only update the SV version if the seqno was actually added to DLs.
+            ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?.version
+        } else {
+            // Otherwise, return the current version.
+            ScopedVaultVersion::version_number_at_seqno(conn, &scoped_vault.id, seqno)?
+        };
+
+        Ok((result, svv))
     }
 
     /// Creates a single new DataLifetime row
@@ -204,17 +212,15 @@ impl DataLifetime {
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
         actor: Option<DbActor>,
-    ) -> DbResult<Self> {
+    ) -> DbResult<(Self, ScopedVaultVersionNumber)> {
         let args = NewDataLifetimeArgs {
             kind,
             origin_id: None,
             source,
         };
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault, vec![args], seqno, actor)?
-            .into_iter()
-            .next()
-            .ok_or(DbError::ObjectNotFound)?;
-        Ok(lifetime)
+        let (lifetime, svv) = Self::bulk_create(conn, vault_id, scoped_vault, vec![args], seqno, actor)?;
+        let lifetime = lifetime.into_iter().next().ok_or(DbError::ObjectNotFound)?;
+        Ok((lifetime, svv))
     }
 
     #[tracing::instrument("DataLifetime::portablize", skip_all)]
@@ -269,7 +275,7 @@ impl DataLifetime {
         scoped_vault: &Locked<ScopedVault>,
         ids: Vec<DataLifetimeId>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let filter = Box::new(
             data_lifetime::id
                 .eq_any(ids)
@@ -286,7 +292,7 @@ impl DataLifetime {
         scoped_vault: &Locked<ScopedVault>,
         kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let filter = Box::new(
             data_lifetime::kind
                 .eq_any(kinds)
@@ -301,7 +307,7 @@ impl DataLifetime {
         scoped_vault: &Locked<ScopedVault>,
         filter: Box<dyn BoxableExpression<data_lifetime::table, Pg, SqlType = sql_types::Bool>>,
         seqno: DataLifetimeSeqno,
-    ) -> DbResult<Vec<Self>> {
+    ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         let deactivated_at = Utc::now();
         let update = DataLifetimeUpdate {
             deactivated_at: Some(Some(deactivated_at)),
@@ -315,14 +321,17 @@ impl DataLifetime {
             .set(update)
             .get_results::<Self>(conn.conn())?;
 
-        if !updated.is_empty() {
+        let svv = if !updated.is_empty() {
             // Only update the SV version if the seqno was actually added to DLs.
-            ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?;
-        }
+            ScopedVaultVersion::get_or_create(conn, scoped_vault, seqno)?.version
+        } else {
+            // Otherwise, return the current version.
+            ScopedVaultVersion::version_number_at_seqno(conn, &scoped_vault.id, seqno)?
+        };
 
         let lifetime_ids = updated.iter().map(|dl| &dl.id).collect_vec();
         Fingerprint::bulk_deactivate(conn, lifetime_ids, deactivated_at)?;
-        Ok(updated)
+        Ok((updated, svv))
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided scoped_vault_id at a

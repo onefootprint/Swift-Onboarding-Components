@@ -2,6 +2,7 @@ use api_errors::FpError;
 use api_errors::FpErrorCode;
 use http::StatusCode;
 use newtypes::Base64Data;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::Uuid;
 use paperclip::actix::api_v2_errors;
 use paperclip::actix::web::Json;
@@ -348,6 +349,92 @@ where
 impl<T> TypedData for Base64Cursor<T> {
     fn data_type() -> paperclip::v2::models::DataType {
         paperclip::v2::models::DataType::String
+    }
+}
+
+
+#[derive(derive_more::Constructor)]
+pub struct WithVaultVersionHeader<T: actix_web::Responder> {
+    response: T,
+    vault_version: Option<ScopedVaultVersionNumber>,
+}
+
+const VAULT_VERSION_HEADER_NAME: &str = "x-fp-vault-version";
+
+impl<T> actix_web::Responder for WithVaultVersionHeader<T>
+where
+    T: actix_web::Responder,
+{
+    type Body = actix_web::body::EitherBody<<T as actix_web::Responder>::Body>;
+
+    fn respond_to(self, req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        if let Some(version) = self.vault_version {
+            self.response
+                .customize()
+                .insert_header((VAULT_VERSION_HEADER_NAME, version.to_string()))
+                .respond_to(req)
+        } else {
+            self.response.customize().respond_to(req)
+        }
+    }
+}
+
+impl<T: actix_web::Responder + Apiv2Schema + Sized> Apiv2Schema for WithVaultVersionHeader<T> {
+    fn name() -> Option<String> {
+        T::name()
+    }
+
+    fn description() -> &'static str {
+        T::description()
+    }
+
+    fn required() -> bool {
+        T::required()
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        T::raw_schema()
+    }
+
+    fn schema_with_ref() -> paperclip::v2::models::DefaultSchemaRaw {
+        T::schema_with_ref()
+    }
+
+    fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
+        T::security_scheme()
+    }
+
+    fn header_parameter_schema(
+    ) -> Vec<paperclip::v2::models::Parameter<paperclip::v2::models::DefaultSchemaRaw>> {
+        T::header_parameter_schema()
+    }
+}
+
+impl<T: actix_web::Responder + Apiv2Schema + paperclip::actix::OperationModifier>
+    paperclip::actix::OperationModifier for WithVaultVersionHeader<T>
+{
+    fn update_parameter(op: &mut paperclip::v2::models::DefaultOperationRaw) {
+        T::update_parameter(op);
+    }
+
+    fn update_response(op: &mut paperclip::v2::models::DefaultOperationRaw) {
+        T::update_response(op);
+    }
+
+    fn update_definitions(
+        map: &mut std::collections::BTreeMap<String, paperclip::v2::models::DefaultSchemaRaw>,
+    ) {
+        T::update_definitions(map);
+    }
+
+    fn update_security(op: &mut paperclip::v2::models::DefaultOperationRaw) {
+        T::update_security(op);
+    }
+
+    fn update_security_definitions(
+        map: &mut std::collections::BTreeMap<String, paperclip::v2::models::SecurityScheme>,
+    ) {
+        T::update_security_definitions(map);
     }
 }
 

@@ -6,7 +6,7 @@ use diesel::serialize::ToSql;
 use diesel::sql_types::BigInt;
 use paperclip::actix::Apiv2Schema;
 
-#[doc = "Sequence number used to order DataLifetimes for a single ScopedVault"]
+#[doc = "Sequential version number of the data in a vault. A version number of zero indicates that no data has been written to the vault."]
 #[derive(
     Debug,
     Clone,

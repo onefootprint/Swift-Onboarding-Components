@@ -12,11 +12,14 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::CanVault;
 use api_core::auth::Either;
 use api_core::errors::AssertionError;
+use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::DataLifetimeSources;
+use api_core::utils::vault_wrapper::DeleteDataResult;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
+use api_core::utils::vault_wrapper::PatchDataResult;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -30,6 +33,7 @@ use newtypes::put_data_request::RawUserDataRequest;
 use newtypes::AuditEventDetail;
 use newtypes::DbActor;
 use newtypes::FpId;
+use newtypes::PreviewApi;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -56,7 +60,7 @@ pub async fn patch(
     auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
-) -> ApiResponse<api_wire_types::Empty> {
+) -> ApiResponse<WithVaultVersionHeader<api_wire_types::Empty>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let path = path.into_inner();
@@ -77,7 +81,7 @@ pub async fn patch_business(
     auth: Either<TenantSessionAuth, TenantApiKey>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
-) -> ApiResponse<api_wire_types::Empty> {
+) -> ApiResponse<WithVaultVersionHeader<api_wire_types::Empty>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let path = path.into_inner();
@@ -101,7 +105,7 @@ pub async fn patch_client(
     request: Json<RawUserDataRequest>,
     auth: ClientTenantAuthContext,
     insight: InsightHeaders,
-) -> ApiResponse<api_wire_types::Empty> {
+) -> ApiResponse<WithVaultVersionHeader<api_wire_types::Empty>> {
     // This is a little different - we actually require a permission to update the data in the
     // vault since the ClientTenantAuth tokens are scoped to specific fields
     let request = request.into_inner();
@@ -119,10 +123,11 @@ async fn patch_inner(
     auth: Box<dyn TenantAuth>,
     insight: InsightHeaders,
     ignore_luhn_validation: bool,
-) -> ApiResponse<api_wire_types::Empty> {
+) -> ApiResponse<WithVaultVersionHeader<api_wire_types::Empty>> {
     let insight = CreateInsightEvent::from(insight);
 
-    let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
+    let tenant = auth.tenant();
+    let tenant_id: newtypes::TenantId = tenant.id.clone();
     let is_live = auth.is_live()?;
 
     // If the initial request has an ssn4, see if the vault already has the same ssn4 and if so no-op
@@ -173,16 +178,21 @@ async fn patch_inner(
 
     let source = auth.dl_source();
     let actor = auth.actor();
-    state
+    let new_version = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
+
             // TODO one day, delete in `patch_data` below and make a more informative timeline
             // event with context on what was updated, deleted, and added
-            let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
+            let DeleteDataResult { deleted_dis, .. } = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
             let sources = DataLifetimeSources::single(source);
-            uvw.patch_data(conn, updates, sources, Some(actor.clone()))?;
+            let PatchDataResult {
+                new_ci: _,
+                seqno: _,
+                new_version: svv,
+            } = uvw.patch_data(conn, updates, sources, Some(actor.clone()))?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let principal: DbActor = actor.into();
@@ -215,9 +225,15 @@ async fn patch_inner(
                 AuditEvent::create(conn, event)?;
             }
 
-            Ok(())
+            Ok(svv)
         })
         .await?;
 
-    Ok(api_wire_types::Empty)
+    let vault_version = if tenant.can_access_preview(&PreviewApi::VaultVersioning) {
+        Some(new_version)
+    } else {
+        None
+    };
+
+    Ok(WithVaultVersionHeader::new(api_wire_types::Empty, vault_version))
 }

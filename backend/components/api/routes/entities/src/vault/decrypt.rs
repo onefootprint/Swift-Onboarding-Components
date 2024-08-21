@@ -13,7 +13,9 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
+use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::VaultVersion;
 use api_core::utils::vault_wrapper::bulk_decrypt;
 use api_core::utils::vault_wrapper::BulkDecryptReq;
 use api_core::utils::vault_wrapper::DecryptAuditEventInfo;
@@ -28,6 +30,7 @@ use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::output::Csv;
@@ -36,6 +39,8 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DecryptionContext;
 use newtypes::FilterFunction;
 use newtypes::FpId;
+use newtypes::PreviewApi;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::UserDataIdentifier;
 use newtypes::VersionedDataIdentifier;
 use paperclip::actix::api_v2_operation;
@@ -123,16 +128,35 @@ pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<UserDecryptRequest>,
+    vault_version: VaultVersion,
     auth: Either<TenantSessionAuth, TenantApiKey>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<UserDecryptResponse> {
+) -> ApiResponse<WithVaultVersionHeader<UserDecryptResponse>> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
-    let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    Ok(UserDecryptResponse(result))
+    let vault_version = if auth.tenant().can_access_preview(&PreviewApi::VaultVersioning) {
+        vault_version.into_inner()
+    } else {
+        None
+    };
+
+    let result = post_inner(
+        &state,
+        path.into_inner(),
+        request,
+        vault_version,
+        auth,
+        insights,
+        root_span,
+    )
+    .await?;
+    Ok(WithVaultVersionHeader::new(
+        UserDecryptResponse(result),
+        vault_version,
+    ))
 }
 
 #[api_v2_operation(
@@ -145,11 +169,18 @@ pub async fn post_business(
     path: FpIdPath,
     request: Json<BusinessDecryptRequest>,
     auth: Either<TenantSessionAuth, TenantApiKey>,
+    vault_version: VaultVersion,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<BusinessDecryptResponse> {
+) -> ApiResponse<WithVaultVersionHeader<BusinessDecryptResponse>> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
+
+    let vault_version = if auth.tenant().can_access_preview(&PreviewApi::VaultVersioning) {
+        vault_version.into_inner()
+    } else {
+        None
+    };
 
     let BusinessDecryptRequest {
         fields,
@@ -163,8 +194,20 @@ pub async fn post_business(
         version_at: None,
     };
 
-    let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    Ok(BusinessDecryptResponse(result))
+    let result = post_inner(
+        &state,
+        path.into_inner(),
+        request,
+        vault_version,
+        auth,
+        insights,
+        root_span,
+    )
+    .await?;
+    Ok(WithVaultVersionHeader::new(
+        BusinessDecryptResponse(result),
+        vault_version,
+    ))
 }
 
 #[route_alias(post(
@@ -180,6 +223,7 @@ pub async fn post_business(
 pub async fn post_client(
     state: web::Data<State>,
     request: Json<ClientDecryptRequest>,
+    // TODO: support VaultVersion header potentially with token restricted to certain versions.
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
@@ -204,22 +248,27 @@ pub async fn post_client(
         version_at: None,
     };
 
-    let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
+    let result = post_inner(&state, fp_id, request, None, Box::new(auth), insights, root_span).await?;
     Ok(UserDecryptResponse(result))
 }
 
 #[derive(derive_more::From, Clone, Copy, Hash, Eq, PartialEq)]
 enum VwVersion {
     /// Build at the provided seqno
+    // #[deprecated(note = "Use `ScopedVaultVersion` instead")]
     Seqno(DataLifetimeSeqno),
     /// Build at the provided timestamp
+    // #[deprecated(note = "Use `ScopedVaultVersion` instead")]
     Timestamp(DateTime<Utc>),
+    /// Build at the provided timestamp
+    ScopedVaultVersion(ScopedVaultVersionNumber),
 }
 
 pub(super) async fn post_inner(
     state: &State,
     fp_id: FpId,
     request: UserDecryptRequest,
+    vault_version: Option<ScopedVaultVersionNumber>,
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
     root_span: RootSpan,
@@ -236,6 +285,8 @@ pub(super) async fn post_inner(
         "meta",
         Csv::from(fields.iter().cloned().collect_vec()).to_string(),
     );
+
+    let vault_version = vault_version.map(VwVersion::from);
     let timestamp_version = version_at.map(VwVersion::from);
 
     // Create a VW for each version in fields
@@ -243,14 +294,14 @@ pub(super) async fn post_inner(
         .into_iter()
         .map(|f| {
             let seqno_version = f.version.map(VwVersion::from);
-            let version = match (timestamp_version, seqno_version) {
-                (Some(_), Some(_)) => {
-                    return ValidationError("Cannot provide both `version_at` and inline per-field versions.")
-                        .into()
-                }
-                (Some(v), None) | (None, Some(v)) => Some(v),
-                (None, None) => None,
-            };
+
+            let version_args = [vault_version, seqno_version, timestamp_version];
+            if version_args.iter().filter(|v| v.is_some()).count() > 1 {
+                return ValidationError("Conflicting version arguments given").into();
+            }
+
+            let version = version_args.into_iter().find(|v| v.is_some()).flatten();
+
             let target = EnclaveDecryptOperation::new(f.di, transforms.clone().unwrap_or_default());
             Ok((version, target))
         })
@@ -259,12 +310,15 @@ pub(super) async fn post_inner(
         .into_group_map();
     let versions = version_to_targets.keys().cloned().collect_vec();
 
+    let has_vault_versions = versions
+        .iter()
+        .any(|v| matches!(v, Some(VwVersion::ScopedVaultVersion(_))));
     let has_seqno_versions = versions.iter().any(|v| matches!(v, Some(VwVersion::Seqno(_))));
     let has_timestamp_versions = versions
         .iter()
         .any(|v| matches!(v, Some(VwVersion::Timestamp(_))));
-    if has_seqno_versions || has_timestamp_versions {
-        tracing::info!(%has_seqno_versions, %has_timestamp_versions, "Decrypting with version");
+    if has_vault_versions || has_seqno_versions || has_timestamp_versions {
+        tracing::info!(%has_vault_versions, %has_seqno_versions, %has_timestamp_versions, "Decrypting with version");
     }
 
     let is_live = auth.is_live()?;
@@ -284,6 +338,16 @@ pub(super) async fn post_inner(
                         Some(VwVersion::Timestamp(t)) => {
                             let seqno = DataLifetime::get_seqno_at(conn, t)?;
                             Some(seqno)
+                        }
+                        Some(VwVersion::ScopedVaultVersion(svv)) => {
+                            if svv == 0.into() {
+                                // A version number of 0 represents the state of the vault with no
+                                // DLs. Translate this into a seqno of 0, which is before all DLs.
+                                Some(DataLifetimeSeqno::from(0))
+                            } else {
+                                let svv = ScopedVaultVersion::get(conn, &scoped_user.id, svv)?;
+                                Some(svv.seqno)
+                            }
                         }
                     };
                     VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v_seqno).map(|vw| (v, vw))

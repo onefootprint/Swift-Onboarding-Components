@@ -18,6 +18,7 @@ mod tests;
 pub use add_data::seal_file_and_upload_to_s3;
 pub use add_data::NewDocument;
 pub use add_data::PatchDataResult;
+pub use delete::DeleteDataResult;
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a
 /// user's vault. It can only be constructed via a ScopedVaultId.
 ///

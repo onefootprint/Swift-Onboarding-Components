@@ -33,6 +33,7 @@ use newtypes::KycedBusinessOwnerData;
 use newtypes::PiiString;
 use newtypes::S3Url;
 use newtypes::ScopedVaultId;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::SealedVaultDataKey;
 use newtypes::UserVaultUpdateSource;
 use newtypes::UserVaultUpdatedPayload;
@@ -44,6 +45,7 @@ type NewContactInfo = (DataIdentifier, ContactInfo);
 pub struct PatchDataResult {
     pub new_ci: Vec<NewContactInfo>,
     pub seqno: DataLifetimeSeqno,
+    pub new_version: ScopedVaultVersionNumber,
 }
 
 pub struct NewDocument {
@@ -105,7 +107,12 @@ impl<Type> WriteableVw<Type> {
     ) -> FpResult<PatchDataResult> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
-        let SavedData { vd, ci, seqno } = request.save(conn, self, actor.clone())?;
+        let SavedData {
+            vd,
+            ci,
+            seqno,
+            new_version,
+        } = request.save(conn, self, actor.clone())?;
 
         if keys.iter().any(|di| !di.is_vault_storage_free()) && !self.sv.is_billable_for_vault_storage {
             // If we just added the first billable DI, set the vault as billable
@@ -128,7 +135,11 @@ impl<Type> WriteableVw<Type> {
             })
             .collect();
 
-        let result = PatchDataResult { new_ci, seqno };
+        let result = PatchDataResult {
+            new_ci,
+            seqno,
+            new_version,
+        };
         Ok(result)
     }
 

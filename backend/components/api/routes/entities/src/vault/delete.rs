@@ -6,9 +6,11 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use api_core::errors::ValidationError;
+use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::DeleteDataResult;
 use api_core::utils::vault_wrapper::WriteableVw;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
@@ -21,6 +23,8 @@ use newtypes::AuditEventDetail;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
 use newtypes::DbActor;
+use newtypes::PreviewApi;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -92,10 +96,14 @@ pub async fn delete(
     request: Json<DeleteRequest>,
     auth: TenantApiKey,
     insight: InsightHeaders,
-) -> ApiResponse<UserDeleteResponse> {
+) -> ApiResponse<WithVaultVersionHeader<UserDeleteResponse>> {
     let DeleteRequest { delete_all, fields } = request.into_inner();
-    let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
-    Ok(UserDeleteResponse(result))
+    let (result, vault_version) = delete_inner(state, path, delete_all, fields, auth, insight).await?;
+
+    Ok(WithVaultVersionHeader::new(
+        UserDeleteResponse(result),
+        vault_version,
+    ))
 }
 
 #[api_v2_operation(
@@ -109,10 +117,14 @@ pub async fn delete_business(
     request: Json<BusinessDeleteRequest>,
     auth: TenantApiKey,
     insight: InsightHeaders,
-) -> ApiResponse<BusinessDeleteResponse> {
+) -> ApiResponse<WithVaultVersionHeader<BusinessDeleteResponse>> {
     let BusinessDeleteRequest { delete_all, fields } = request.into_inner();
-    let result = delete_inner(state, path, delete_all, fields, auth, insight).await?;
-    Ok(BusinessDeleteResponse(result))
+    let (result, vault_version) = delete_inner(state, path, delete_all, fields, auth, insight).await?;
+
+    Ok(WithVaultVersionHeader::new(
+        BusinessDeleteResponse(result),
+        vault_version,
+    ))
 }
 
 async fn delete_inner(
@@ -122,16 +134,17 @@ async fn delete_inner(
     fields: Option<Vec<DataIdentifier>>,
     auth: TenantApiKey,
     insight: InsightHeaders,
-) -> ApiResponse<HashMap<DataIdentifier, bool>> {
+) -> ApiResponse<(HashMap<DataIdentifier, bool>, Option<ScopedVaultVersionNumber>)> {
     let fp_id = path.into_inner();
     let delete_all = delete_all.unwrap_or_default();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let actor = auth.actor();
     let is_live = auth.is_live()?;
-    let tenant_id = auth.tenant().id.clone();
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
 
-    let (requested_fields_to_delete, deleted_dis) = state
+    let (requested_fields_to_delete, deleted_dis, new_version) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -141,7 +154,10 @@ async fn delete_inner(
                 (false, Some(fields)) => fields,
                 _ => return ValidationError("Must provide only one of `delete_all` and `fields`").into(),
             };
-            let deleted_dis = uvw.soft_delete_vault_data(conn, requested_fields_to_delete.clone())?;
+            let DeleteDataResult {
+                deleted_dis,
+                new_version,
+            } = uvw.soft_delete_vault_data(conn, requested_fields_to_delete.clone())?;
 
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let actor: DbActor = actor.into();
@@ -158,7 +174,7 @@ async fn delete_inner(
             };
             AuditEvent::create(conn, event)?;
 
-            Ok((requested_fields_to_delete, deleted_dis))
+            Ok((requested_fields_to_delete, deleted_dis, new_version))
         })
         .await?;
 
@@ -168,5 +184,12 @@ async fn delete_inner(
             .into_iter()
             .map(|di| (di.clone(), deleted_dis.contains(&di))),
     );
-    Ok(results)
+
+    let new_version = if auth.tenant().can_access_preview(&PreviewApi::VaultVersioning) {
+        Some(new_version)
+    } else {
+        None
+    };
+
+    Ok((results, new_version))
 }

@@ -23,18 +23,16 @@ pub fn build<T: Into<DataIdentifier>>(
         origin_id: None,
         source: DataLifetimeSource::LikelyHosted,
     };
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, scoped_vault, vec![args], created_seqno, None)
-        .unwrap()
-        .pop()
-        .unwrap();
+    let (mut lifetime, _) =
+        DataLifetime::bulk_create(conn, uv_id, scoped_vault, vec![args], created_seqno, None).unwrap();
+    let mut lifetime = lifetime.pop().unwrap();
     if let Some(portablized_seqno) = portablized_seqno {
         lifetime = DataLifetime::portablize(conn, &lifetime.id, portablized_seqno).unwrap();
     }
     if let Some(deactivated_seqno) = deactivated_seqno {
-        lifetime = DataLifetime::bulk_deactivate(conn, scoped_vault, vec![lifetime.id], deactivated_seqno)
-            .unwrap()
-            .pop()
-            .unwrap();
+        let (mut dls, _) =
+            DataLifetime::bulk_deactivate(conn, scoped_vault, vec![lifetime.id], deactivated_seqno).unwrap();
+        lifetime = dls.pop().unwrap();
     }
     lifetime
 }

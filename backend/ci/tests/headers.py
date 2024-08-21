@@ -86,3 +86,10 @@ class BootstrappedFields(BaseAuth):
 
 class SessionId(BaseAuth):
     HEADER_NAME = "x-fp-session-id"
+
+
+class VaultVersion(BaseAuth):
+    HEADER_NAME = "x-fp-vault-version"
+
+    def __init__(self, value):
+        super().__init__(str(value))

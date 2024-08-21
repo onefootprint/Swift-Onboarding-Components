@@ -24,6 +24,9 @@ pub use external_id::*;
 mod is_components_sdk;
 pub use is_components_sdk::*;
 
+mod vault_version;
+pub use vault_version::*;
+
 mod bootstrap_fields;
 use crate::ApiCoreError;
 use crate::FpResult;

@@ -103,7 +103,7 @@ def _make_request(
     return response
 
 
-def get(path, params=None, *auths, body=None, status_code=200):
+def get_raw(path, params=None, *auths, body=None, status_code=200):
     return _make_request(
         method=requests.get,
         path=path,
@@ -112,22 +112,14 @@ def get(path, params=None, *auths, body=None, status_code=200):
         status_code=status_code,
         auths=auths,
         files=None,
-    ).json()
-
-
-def get_raw(path, status_code=200):
-    return _make_request(
-        method=requests.get,
-        path=path,
-        data=None,
-        params=None,
-        status_code=status_code,
-        auths=[],
-        files=None,
     )
 
 
-def put(path, data=None, *auths, status_code=200, files=None):
+def get(path, params=None, *auths, body=None, status_code=200):
+    return get_raw(path, params, *auths, body=body, status_code=status_code).json()
+
+
+def put_raw(path, data, *auths, status_code=200, files=None):
     return _make_request(
         method=requests.put,
         path=path,
@@ -136,20 +128,23 @@ def put(path, data=None, *auths, status_code=200, files=None):
         status_code=status_code,
         auths=auths,
         files=files,
-    ).json()
+    )
 
 
-def post(
+def put(path, data, *auths, status_code=200, files=None):
+    return put_raw(path, data, *auths, status_code=status_code, files=files).json()
+
+
+def post_raw(
     path,
-    data=None,
+    data,
     *auths,
     status_code=200,
     files=None,
-    raw_response=False,
     addl_headers=None,
     raw_data=None,
 ):
-    res = _make_request(
+    return _make_request(
         method=requests.post,
         path=path,
         data=data,
@@ -160,13 +155,35 @@ def post(
         addl_headers=addl_headers,
         raw_data=raw_data,
     )
-    if raw_response:
-        return res
-    else:
-        return res.json()
 
 
-def patch(path, data=None, *auths, status_code=200, addl_headers=None):
+def post(
+    path,
+    data,
+    *auths,
+    status_code=200,
+    files=None,
+    addl_headers=None,
+    raw_data=None,
+):
+    return post_raw(
+        path,
+        data,
+        *auths,
+        status_code=status_code,
+        files=files,
+        addl_headers=addl_headers,
+        raw_data=raw_data,
+    ).json()
+
+
+def patch_raw(
+    path,
+    data,
+    *auths,
+    status_code=200,
+    addl_headers=None,
+):
     return _make_request(
         method=requests.patch,
         path=path,
@@ -176,10 +193,32 @@ def patch(path, data=None, *auths, status_code=200, addl_headers=None):
         auths=auths,
         files=None,
         addl_headers=addl_headers,
+    )
+
+
+def patch(
+    path,
+    data,
+    *auths,
+    status_code=200,
+    addl_headers=None,
+):
+    return patch_raw(
+        path,
+        data,
+        *auths,
+        status_code=status_code,
+        addl_headers=addl_headers,
     ).json()
 
 
-def delete(path, data=None, *auths, status_code=200, addl_headers=None):
+def delete_raw(
+    path,
+    data,
+    *auths,
+    status_code=200,
+    addl_headers=None,
+):
     return _make_request(
         method=requests.delete,
         path=path,
@@ -188,6 +227,22 @@ def delete(path, data=None, *auths, status_code=200, addl_headers=None):
         status_code=status_code,
         auths=auths,
         files=None,
+        addl_headers=addl_headers,
+    )
+
+
+def delete(
+    path,
+    data,
+    *auths,
+    status_code=200,
+    addl_headers=None,
+):
+    return delete_raw(
+        path,
+        data,
+        *auths,
+        status_code=status_code,
         addl_headers=addl_headers,
     ).json()
 

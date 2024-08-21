@@ -4,6 +4,7 @@ use crate::FpResult;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::models::vault_data::NewVaultData;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
@@ -13,6 +14,7 @@ use newtypes::CollectedDataOption;
 use newtypes::ContactInfoPriority;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultVersionNumber;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -45,6 +47,7 @@ pub struct SavedData {
     pub vd: Vec<VaultData>,
     pub ci: Vec<ContactInfo>,
     pub seqno: DataLifetimeSeqno,
+    pub new_version: ScopedVaultVersionNumber,
 }
 
 impl ValidatedDataRequest {
@@ -65,12 +68,14 @@ impl ValidatedDataRequest {
         } = self;
 
         if data.is_empty() {
-            // The request is a no-op, no reason to increment the seqno
+            // The request is a no-op, no reason to increment the seqno.
             let seqno = DataLifetime::get_current_seqno(conn)?;
+            let latest_version = ScopedVaultVersion::version_number_at_seqno(conn, &vw.sv.id, seqno)?;
             return Ok(SavedData {
                 vd: vec![],
                 ci: vec![],
                 seqno,
+                new_version: latest_version,
             });
         }
 
@@ -94,7 +99,7 @@ impl ValidatedDataRequest {
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());
-        let vd = VaultData::bulk_create(conn, v_id, &vw.sv, data, seqno, actor)?;
+        let (vd, svv) = VaultData::bulk_create(conn, v_id, &vw.sv, data, seqno, actor)?;
 
         // Save fingerprints
         fingerprints.save(conn, vw, &vd)?;
@@ -118,7 +123,12 @@ impl ValidatedDataRequest {
             .collect_vec();
         let ci = ContactInfo::bulk_create(conn, new_contact_info)?;
 
-        let saved_data = SavedData { vd, ci, seqno };
+        let saved_data = SavedData {
+            vd,
+            ci,
+            seqno,
+            new_version: svv,
+        };
         Ok(saved_data)
     }
 }

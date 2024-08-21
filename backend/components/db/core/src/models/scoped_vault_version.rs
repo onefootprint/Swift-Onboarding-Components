@@ -1,6 +1,8 @@
+use super::data_lifetime::DataLifetime;
 use super::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::DbResult;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
@@ -21,6 +23,7 @@ pub struct ScopedVaultVersion {
 
     pub scoped_vault_id: ScopedVaultId,
     pub seqno: DataLifetimeSeqno,
+
     pub version: ScopedVaultVersionNumber,
 }
 
@@ -33,6 +36,7 @@ struct NewScopedVaultVersion {
 }
 
 impl ScopedVaultVersion {
+    #[tracing::instrument("ScopedVaultVersion::get_or_create", skip_all)]
     pub fn get_or_create(
         conn: &mut TxnPgConn,
         scoped_vault: &Locked<ScopedVault>,
@@ -66,6 +70,8 @@ impl ScopedVaultVersion {
 
             latest_row.version + ScopedVaultVersionNumber::from(1)
         } else {
+            // Note that we start from 1. A value of zero is reserved for vaults without associated
+            // DataLifetimes.
             ScopedVaultVersionNumber::from(1)
         };
 
@@ -78,5 +84,49 @@ impl ScopedVaultVersion {
             .values(new)
             .get_result(conn.conn())?;
         Ok(result)
+    }
+
+    #[tracing::instrument("ScopedVaultVersion::get", skip_all)]
+    pub fn get(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        version: ScopedVaultVersionNumber,
+    ) -> DbResult<Self> {
+        let result = scoped_vault_version::table
+            .filter(scoped_vault_version::scoped_vault_id.eq(sv_id))
+            .filter(scoped_vault_version::version.eq(version))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("ScopedVaultVersion::latest_version_number", skip_all)]
+    pub fn latest_version_number(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<ScopedVaultVersionNumber> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        Self::version_number_at_seqno(conn, sv_id, seqno)
+    }
+
+    #[tracing::instrument("ScopedVaultVersion::version_number_at_seqno", skip_all)]
+    pub fn version_number_at_seqno(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        seqno: DataLifetimeSeqno,
+    ) -> DbResult<ScopedVaultVersionNumber> {
+        let existing_version: Option<ScopedVaultVersion> = scoped_vault_version::table
+            .filter(scoped_vault_version::scoped_vault_id.eq(sv_id))
+            .filter(scoped_vault_version::seqno.le(seqno))
+            .select(ScopedVaultVersion::as_select())
+            .order(scoped_vault_version::seqno.desc())
+            .limit(1)
+            .get_result(conn)
+            .optional()?;
+
+        // Default to 0 if no scoped vault version exists at the given seqno.
+        // A version of zero represents the vault before data was added.
+        Ok(existing_version
+            .map(|v| v.version)
+            .unwrap_or(ScopedVaultVersionNumber::from(0)))
     }
 }
