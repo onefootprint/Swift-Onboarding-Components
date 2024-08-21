@@ -33,6 +33,9 @@ const useDocName = ({ docType, imageType }: UseDocNameProps) => {
   };
 
   const getSideName = () => {
+    if (imageType === IdDocImageTypes.selfie) {
+      return t('side.selfie');
+    }
     if (docType === SupportedIdDocTypes.passport || docType === SupportedIdDocTypes.visa) {
       return t('side.photo');
     }
@@ -41,8 +44,6 @@ const useDocName = ({ docType, imageType }: UseDocNameProps) => {
         return t('side.front');
       case IdDocImageTypes.back:
         return t('side.back');
-      case IdDocImageTypes.selfie:
-        return t('side.selfie');
       default:
         return '';
     }
