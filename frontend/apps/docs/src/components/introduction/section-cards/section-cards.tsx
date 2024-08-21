@@ -115,18 +115,23 @@ const Grid = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     grid-gap: ${theme.spacing[5]};
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     grid-template-areas:
-      'kyc' 'kyb' 'vaulting' 'vault-proxy' 'components',
+      'kyc'
+      'kyb'
+      'vaulting'
+      'vault-proxy'
+      'components'
       'auth';
 
     ${media.greaterThan('sm')`
-         grid-template-columns: repeat(2, 1fr);
-         grid-template-areas:
-      'kyc kyb'
-      'vaulting vault-proxy'
-      'components auth';
-      `}
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      grid-template-areas:
+        'kyc kyb'
+        'vaulting vault-proxy'
+        'components auth';
+    `}
   `}
 `;
 
