@@ -13,6 +13,7 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useTimeout } from 'usehooks-ts';
 
+import { useRequestError } from '@onefootprint/request';
 import useProps from './hooks/use-props';
 
 const STUCK_ON_SHIMMER_TIMEOUT = 5000;
@@ -58,6 +59,7 @@ const Init = () => {
   const [state, send] = useBifrostMachine();
   const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
+  const { getErrorCode } = useRequestError();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const startMs = Date.now();
   const obConfigAuth = publicKeyContext ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext } : undefined;
@@ -122,7 +124,12 @@ const Init = () => {
       });
     },
     (error: unknown) => {
-      logError('Failed to fetch initial properties', error);
+      const errorCode = getErrorCode(error);
+      if (errorCode === 'E118') {
+        send({ type: 'sessionExpired' });
+        return;
+      }
+
       send({ type: 'initError' });
     },
   );

@@ -21,6 +21,7 @@ export {
   SandboxBanner,
   SecuredByFootprint,
   StepHeader,
+  SessionExpired,
   useFootprintProvider,
   WhatsThisContent,
 } from './components';

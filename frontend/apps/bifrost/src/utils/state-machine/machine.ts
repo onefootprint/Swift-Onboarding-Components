@@ -29,6 +29,7 @@ export const createBifrostMachine = () =>
           on: {
             configRequestFailed: { target: 'idv' },
             initError: { target: 'initError' },
+            sessionExpired: { target: 'sessionExpired' },
             initContextUpdated: [
               {
                 cond: isContextReady,
@@ -49,6 +50,7 @@ export const createBifrostMachine = () =>
             ],
           },
         },
+        sessionExpired: { type: 'final' },
         initError: { type: 'final' },
         complete: { type: 'final' },
       },

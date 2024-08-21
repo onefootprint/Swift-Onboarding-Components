@@ -2,7 +2,14 @@ import getCustomAppearance from '@onefootprint/appearance';
 import { FootprintPrivateEvent, type FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
-import Idv, { AppErrorBoundary, getLogger, Logger, useFootprintProvider, useLogStateMachine } from '@onefootprint/idv';
+import Idv, {
+  AppErrorBoundary,
+  getLogger,
+  Logger,
+  useFootprintProvider,
+  useLogStateMachine,
+  SessionExpired,
+} from '@onefootprint/idv';
 import { useIdentifyValidate } from '@onefootprint/idv/src/queries';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
@@ -107,6 +114,7 @@ const Root = ({ variant }: RootProps) => {
     <Layout variant={variant}>
       <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
         {state.matches('init') && <Init />}
+        {state.matches('sessionExpired') && <SessionExpired onRestart={() => undefined} retryLimitExceeded />}
         {state.matches('initError') && <InitError />}
         {state.matches('idv') && (
           <Idv

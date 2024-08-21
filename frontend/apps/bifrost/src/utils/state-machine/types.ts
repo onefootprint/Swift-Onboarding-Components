@@ -37,5 +37,6 @@ export type MachineEvents =
     }
   | { type: 'configRequestFailed' }
   | { type: 'initError' }
+  | { type: 'sessionExpired' }
   | { type: 'reset' }
   | { type: 'idvComplete'; payload: IdvCompletePayload };
