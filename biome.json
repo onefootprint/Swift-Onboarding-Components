@@ -290,7 +290,8 @@
       "src/pages/api-reference/assets/hosted-api-docs.json",
       "src/pages/api-reference/assets/dashboard-api-docs.json",
       "backend/infra",
-      "backend/infra_global"
+      "backend/infra_global",
+      ".next"
     ]
   }
 }
