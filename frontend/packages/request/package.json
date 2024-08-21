@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@onefootprint/dev-tools": "*",
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/types": "*",
     "@testing-library/react": "^13.3.0",
     "axios": "^1.7.4",

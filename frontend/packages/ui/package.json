@@ -29,7 +29,6 @@
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
-    "@onefootprint/jest-presets": "*",
     "@popperjs/core": "^2.11.5",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "2.0.2",
@@ -97,8 +96,5 @@
   "peerDependencies": {
     "react": "18.x",
     "react-dom": "18.x"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

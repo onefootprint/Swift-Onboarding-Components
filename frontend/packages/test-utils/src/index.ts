@@ -4,7 +4,6 @@ import './utils/mock-react-virtualized';
 
 export {
   createClipboardSpy,
-  createUseRouterSpy,
   getPlacePredictions,
   defaultGoogleMapsData,
   createGoogleMapsSpy,
