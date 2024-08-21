@@ -34,7 +34,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-watch-typeahead": "^2.2.2",
-    "turbo": "^2.0.14",
+    "turbo": "^2.0.9",
     "webpack": "^5.76.0"
   },
   "overrides": {
