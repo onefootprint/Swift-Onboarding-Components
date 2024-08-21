@@ -2,7 +2,7 @@
 page: default
 slug: /articles/integrate/bootstrap-data
 category: Integrate
-title: Bootstrapping user data
+title: Bootstrapping data
 meta:
   {
     title: Bootstrapping data in Footprint,
@@ -90,7 +90,8 @@ const launchFootprint = () => {
     kind: "verify",
     publicKey: "pb_test_VMooXd04EUlnu3AvMYKjMW",
     bootstrapData: {
-      "business.dba": "Acme Bank",
+      "business.name": "Acme Bank",
+      "business.dba": "Acme",
       "business.tin": "12-3456789",
       "business.website": "www.google.com",
       "business.phone_number": "+12025550179",
@@ -100,7 +101,7 @@ const launchFootprint = () => {
       "business.state": "MA",
       "business.zip": "02117",
       "business.country": "US",
-      "business.corporation_type": "unknown",
+      "business.corporation_type": "c_corporation",
     },
   });
   component.render();
