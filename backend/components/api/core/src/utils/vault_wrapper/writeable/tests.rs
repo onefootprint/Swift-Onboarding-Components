@@ -146,6 +146,7 @@ async fn test_prefill_data(state: &mut State) {
         (IDK::LastName.into(), Some(FingerprintScope::Tenant)),
         (IDK::FirstName.into(), None),
         (IDK::LastName.into(), None),
+        (IDK::Ssn4.into(), None),
     ];
     assert_have_same_elements(fingerprints, expected_fingerprints);
     // Check prefill contact info

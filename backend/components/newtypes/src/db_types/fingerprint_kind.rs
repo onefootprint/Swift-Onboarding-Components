@@ -1,6 +1,7 @@
 use crate::fingerprint_salt::FingerprintSalt;
 use crate::fingerprint_salt::GlobalFingerprintKind;
 use crate::fingerprint_salt::PartialFingerprintKind;
+use crate::fingerprint_salt::PartialTenantFingerprintKind;
 use crate::util::impl_enum_string_diesel;
 use crate::DataIdentifier;
 use crate::Fingerprint;
@@ -119,7 +120,7 @@ impl CompositeFingerprint {
             .collect()
     }
 
-    /// Returns the _ordered_ list of PartialFingerprintKinds whose fingerprints are used to compute
+    /// Returns the _ordered_ list of FingerprintSalts whose fingerprints are used to compute
     /// this composite fingerprint.
     pub fn salts(&self) -> Vec<FingerprintSalt> {
         match self {
@@ -135,11 +136,11 @@ impl CompositeFingerprint {
             Self::NameSsn4(tenant_id) => vec![
                 FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
                 FingerprintSalt::Tenant(IDK::LastName.into(), tenant_id.clone()),
-                FingerprintSalt::Tenant(IDK::Ssn4.into(), tenant_id.clone()),
+                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, tenant_id.clone()),
             ],
             Self::DobSsn4(tenant_id) => vec![
-                FingerprintSalt::Tenant(IDK::Dob.into(), tenant_id.clone()),
-                FingerprintSalt::Tenant(IDK::Ssn4.into(), tenant_id.clone()),
+                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Dob, tenant_id.clone()),
+                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, tenant_id.clone()),
             ],
         }
     }
@@ -198,6 +199,7 @@ pub struct MissingFingerprint(pub FingerprintSalt);
 mod test {
     use crate::fingerprint_salt::FingerprintSalt;
     use crate::fingerprint_salt::PartialFingerprintKind;
+    use crate::fingerprint_salt::PartialTenantFingerprintKind;
     use crate::CompositeFingerprint;
     use crate::DataIdentifier;
     use crate::Fingerprint;
@@ -227,11 +229,11 @@ mod test {
                 Fingerprint(vec![5]),
             ),
             (
-                FingerprintSalt::Tenant(IDK::Ssn4.into(), test_tenant_id()),
+                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, test_tenant_id()),
                 Fingerprint(vec![6]),
             ),
             (
-                FingerprintSalt::Tenant(IDK::Dob.into(), test_tenant_id()),
+                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Dob, test_tenant_id()),
                 Fingerprint(vec![7]),
             ),
         ]

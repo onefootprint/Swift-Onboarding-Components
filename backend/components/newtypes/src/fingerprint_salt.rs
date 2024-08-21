@@ -26,12 +26,22 @@ impl DataIdentifier {
             .ok()
             .map(FingerprintSalt::from);
         // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
-        let partial_salt = PartialFingerprintKind::try_from(self)
+        let transient_global_salt = PartialFingerprintKind::try_from(self)
             .ok()
             .map(FingerprintSalt::from);
-        chain!(global_salt, tenant_salt, partial_salt)
-            .map(|scope| (scope, v))
-            .collect_vec()
+        // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
+        let transient_tenant_salt = PartialTenantFingerprintKind::try_from(self)
+            .ok()
+            .zip(tenant_id)
+            .map(|(s, t_id)| FingerprintSalt::PartialTenant(s, t_id.clone()));
+        chain!(
+            global_salt,
+            tenant_salt,
+            transient_global_salt,
+            transient_tenant_salt
+        )
+        .map(|scope| (scope, v))
+        .collect_vec()
     }
 }
 
@@ -45,7 +55,10 @@ pub enum FingerprintSalt {
     Tenant(DataIdentifier, TenantId),
     /// Represents pieces of data that are fingerprinted in order to build a composite fingerprint.
     /// These are not saved to the database.
+    // TODO rename TransientGlobal,
     Partial(PartialFingerprintKind),
+    // TODO rename TransientTenant,
+    PartialTenant(PartialTenantFingerprintKind, TenantId),
 }
 
 impl FingerprintSalt {
@@ -68,16 +81,27 @@ impl FingerprintSalt {
                 .concat(),
             )
             .to_vec(),
+            Self::PartialTenant(s, tenant_id) => crypto::sha256(
+                &[
+                    &crypto::sha256(s.di().to_string().as_bytes()),
+                    &crypto::sha256(tenant_id.to_string().as_bytes()),
+                    Self::PARTIAL_FINGERPRINT_SALT,
+                ]
+                .concat(),
+            )
+            .to_vec(),
         }
     }
 
     /// Returns the FingerprintVariant for this salt, if exists.
     /// Only FingerprintSalts with a corresponding variant are saved into the database.
+    // TODO rename
     pub fn kind(&self) -> Option<FingerprintScope> {
         match self {
             Self::Global(_) => Some(FingerprintScope::Global),
             Self::Tenant(_, _) => Some(FingerprintScope::Tenant),
             Self::Partial(_) => None,
+            Self::PartialTenant(_, _) => None,
         }
     }
 
@@ -86,6 +110,7 @@ impl FingerprintSalt {
             Self::Global(s) => s.di(),
             Self::Tenant(di, _) => (*di).clone(),
             Self::Partial(s) => s.di(),
+            Self::PartialTenant(s, _) => s.di(),
         }
     }
 }
@@ -127,8 +152,9 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
 
 #[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
 #[strum(serialize_all = "snake_case")]
-/// Represents pieces of data that are fingerprinted in order to build a composite fingerprint.
-/// These are not saved to the database.
+/// Represents pieces of data that are globally fingerprinted in order to build a composite
+/// fingerprint. These are not saved to the database.
+// TODO rename
 pub enum PartialFingerprintKind {
     Dob,
     FirstName,
@@ -152,7 +178,37 @@ impl<'a> TryFrom<&'a DataIdentifier> for PartialFingerprintKind {
         Self::iter()
             .find(|g| &g.di() == value)
             .ok_or(crate::Error::Custom(
-                "Data is not partially fingerprintable as a composite fingerprint".into(),
+                "Data is not partially globally fingerprintable as a composite fingerprint".into(),
+            ))
+    }
+}
+
+#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
+#[strum(serialize_all = "snake_case")]
+/// Represents pieces of data that are fingerprinted at the tenant scope in order to build a
+/// composite fingerprint. These are not saved to the database.
+pub enum PartialTenantFingerprintKind {
+    Ssn4,
+    Dob,
+}
+
+impl PartialTenantFingerprintKind {
+    pub fn di(&self) -> DataIdentifier {
+        match self {
+            PartialTenantFingerprintKind::Ssn4 => DataIdentifier::from(IDK::Ssn4),
+            PartialTenantFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
+        }
+    }
+}
+
+impl<'a> TryFrom<&'a DataIdentifier> for PartialTenantFingerprintKind {
+    type Error = crate::Error;
+
+    fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
+        Self::iter()
+            .find(|g| &g.di() == value)
+            .ok_or(crate::Error::Custom(
+                "Data is not partially tenant fingerprintable as a composite fingerprint".into(),
             ))
     }
 }
