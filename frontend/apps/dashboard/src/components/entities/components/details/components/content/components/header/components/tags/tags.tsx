@@ -1,4 +1,4 @@
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import Tag from './components/tag';
 

@@ -118,15 +118,15 @@ export const primaryBtnBoxShadow = {
   active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12),
   inset 0px -1px 1px rgba(200, 200, 200, 0.1),
   inset 0px 1px 1px rgba(255, 255, 255, 0.2);`,
-  disabled: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
+  disabled: '0px 1px 2px 0px rgba(0, 0, 0, 0.12);',
 };
 
 export const secondaryBtnBoxShadow = {
   none: 'none',
-  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
-  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.12);`,
-  active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12);`,
-  disabled: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
+  default: '0px 1px 2px 0px rgba(0, 0, 0, 0.12);',
+  hover: '0px 1px 1px 0px rgba(0, 0, 0, 0.12);',
+  active: '0px 1px 1px 0px rgba(0, 0, 0, 0.12);',
+  disabled: '0px 1px 2px 0px rgba(0, 0, 0, 0.12);',
 };
 
 const tokens: Tokens = {

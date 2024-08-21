@@ -1,5 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createOverlayBackground } from '../../utils/mixins';

@@ -1,5 +1,5 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React from 'react';
+import type React from 'react';
 
 import configureReactI18next from '../../config/initializers/react-i18next';
 import ReactQueryProvider from '../../config/initializers/react-query-provider';

@@ -2,9 +2,9 @@ import { IcoPin16 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import { useEffect, useRef } from 'react';
-import { MapRef, Map as MapboxMap } from 'react-map-gl';
+import { type MapRef, Map as MapboxMap } from 'react-map-gl';
 import styled, { css } from 'styled-components';
-import { GeolocationEventProps } from '../../kyc.types';
+import type { GeolocationEventProps } from '../../kyc.types';
 
 const PUBLIC_MAP_BOX_TOKEN = process.env.MAPBOX_TOKEN;
 

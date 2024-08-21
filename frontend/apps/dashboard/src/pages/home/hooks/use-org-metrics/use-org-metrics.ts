@@ -9,7 +9,7 @@ import useFilters from '../use-filters';
 const getOrgMetrics = async (authHeaders: AuthHeaders, params: GetOrgMetricsRequest) => {
   const { data: response } = await request<GetOrgMetricsResponse>({
     method: 'GET',
-    url: `/org/metrics`,
+    url: '/org/metrics',
     headers: authHeaders,
     params,
   });

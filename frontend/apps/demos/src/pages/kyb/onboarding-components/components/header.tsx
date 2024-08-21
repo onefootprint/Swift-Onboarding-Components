@@ -1,5 +1,5 @@
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 const Header = ({ children }: React.PropsWithChildren) => (
   <Stack

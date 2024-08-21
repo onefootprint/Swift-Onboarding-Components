@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { ErrorBoundary as RErrorBoundary } from 'react-error-boundary';
 
 import ErrorComponent from './components/error';

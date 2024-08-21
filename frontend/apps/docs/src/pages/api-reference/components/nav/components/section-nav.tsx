@@ -1,6 +1,6 @@
 import { Box, Text } from '@onefootprint/ui';
 
-import { PageNavSection } from '../nav.types';
+import type { PageNavSection } from '../nav.types';
 import NavigationScrollLink from './navigation-scroll-link';
 
 type SubsectionProps = {

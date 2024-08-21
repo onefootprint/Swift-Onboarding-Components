@@ -40,7 +40,7 @@ const Vault = ({ entity }: VaultProps) => {
       }
 
       const stayedEmpty = (!previousData || !previousData[di]) && !value;
-      const wasDeleted = previousData && previousData[di] && !value;
+      const wasDeleted = previousData?.[di] && !value;
       let wasEdited = (previousData && previousData[di] !== value) || ((!previousData || !previousData[di]) && value);
       if (di === IdDI.citizenships && previousData && previousData[di]) {
         wasEdited = JSON.stringify(previousData[di]) !== JSON.stringify(value);
@@ -64,7 +64,7 @@ const Vault = ({ entity }: VaultProps) => {
     if (convertedData[IdDI.usLegalStatus]) {
       const legalStatusDIs = [IdDI.nationality, IdDI.citizenships, IdDI.visaKind, IdDI.visaExpirationDate];
       legalStatusDIs.forEach(di => {
-        const hadPreviousValue = previousData && previousData[di];
+        const hadPreviousValue = previousData?.[di];
         const wasUnchanged = !(di in convertedData);
         if (hadPreviousValue && wasUnchanged) {
           convertedData[di] = previousData[di];

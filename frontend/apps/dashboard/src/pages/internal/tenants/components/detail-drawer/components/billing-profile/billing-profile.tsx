@@ -3,7 +3,8 @@ import type { TenantDetail } from '@onefootprint/types';
 import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenants';
 import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 import { Checkbox, Stack, Text, TextInput } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';
@@ -126,12 +127,12 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     {
       title: 'Send invoice automatically',
       content: checkbox(bp?.sendAutomatically || false),
-      editModeContent: <Checkbox {...register(`sendAutomatically`, {})} />,
+      editModeContent: <Checkbox {...register('sendAutomatically', {})} />,
     },
     {
       title: 'Omit generating invoices',
       content: checkbox(bp?.omitBilling || false),
-      editModeContent: <Checkbox {...register(`omitBilling`, {})} />,
+      editModeContent: <Checkbox {...register('omitBilling', {})} />,
     },
   ];
 

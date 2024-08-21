@@ -87,7 +87,7 @@ describe('<CardHeader />', () => {
       });
     });
 
-    it(`should display last4 on dropdown element`, async () => {
+    it('should display last4 on dropdown element', async () => {
       const firstCard = {
         ...defaultCard,
         alias: 'Hayes',

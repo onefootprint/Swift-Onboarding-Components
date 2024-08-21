@@ -1,6 +1,6 @@
 import { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate } from '@onefootprint/core';
-import { SupportedLocale } from '@onefootprint/types';
-import { CleaveOptions } from 'cleave.js/options';
+import type { SupportedLocale } from '@onefootprint/types';
+import type { CleaveOptions } from 'cleave.js/options';
 
 const validateDob = (dob: string, locale?: SupportedLocale) => {
   const mask = {

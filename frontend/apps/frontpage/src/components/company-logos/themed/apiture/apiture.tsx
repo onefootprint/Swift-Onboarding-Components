@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const ApitureLogo = ({ color }: Logo) => (
   <StyledSvg width="568.99" height="241.86" viewBox="0 0 568.99 241.86" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -5,7 +5,7 @@ import type {
   RawBusinessWatchlist,
   RawSOSFiling,
 } from '../data';
-import { RawBusinessDetails } from '../data/business-details';
+import type { RawBusinessDetails } from '../data/business-details';
 
 export type GetBusinessInsightsResponse = {
   names: RawBusinessName[];

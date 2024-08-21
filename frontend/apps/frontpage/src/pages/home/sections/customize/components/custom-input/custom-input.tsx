@@ -1,6 +1,6 @@
 import { Box, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 type CustomInputTypes = {
@@ -18,19 +18,19 @@ const CardMotionVariants = {
     rotate: ['-2deg', '3deg', '-2deg', '3deg', '-2deg'],
     transition: {
       x: {
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         repeatType: 'loop',
         duration: 20,
         ease: 'easeInOut',
       },
       y: {
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         repeatType: 'loop',
         duration: 15,
         ease: 'easeInOut',
       },
       rotate: {
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         repeatType: 'mirror',
         duration: 15,
         ease: 'easeInOut',

@@ -36,7 +36,7 @@ const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: E
     <Section>
       <LabelContainer>
         <IcoFileText24 />
-        <Text variant="label-2">{t(`drawer.document-data.title` as ParseKeys<'common'>)}</Text>
+        <Text variant="label-2">{t('drawer.document-data.title' as ParseKeys<'common'>)}</Text>
       </LabelContainer>
       <DocumentDataFieldContainer>
         {relevantKeys.sort().map(key => (

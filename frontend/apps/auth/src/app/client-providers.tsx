@@ -3,7 +3,7 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { Logger } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import type React from 'react';
 
 import configureI18n from '@/src/config/initializers/18next';
 import FootprintProvider from '@/src/provider-footprint';

@@ -1,5 +1,5 @@
-import { BusinessName } from '@onefootprint/types';
-import { Table, TableRow } from '@onefootprint/ui';
+import type { BusinessName } from '@onefootprint/types';
+import { Table, type TableRow } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Row from './components/row';
 

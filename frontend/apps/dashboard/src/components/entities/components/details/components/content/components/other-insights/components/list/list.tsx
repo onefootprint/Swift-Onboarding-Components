@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type ListProps = {
   title: string;

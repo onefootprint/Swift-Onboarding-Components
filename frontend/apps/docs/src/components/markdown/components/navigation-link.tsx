@@ -2,7 +2,7 @@ import type { Color, FontFamily, FontVariant } from '@onefootprint/design-tokens
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import { Stack, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
-import styled, { css, WebTarget } from 'styled-components';
+import styled, { css, type WebTarget } from 'styled-components';
 
 type NavigationLinkProps<TLinkProps> = {
   children: string;

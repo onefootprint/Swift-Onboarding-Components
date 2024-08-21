@@ -1,7 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { BoxProps } from '@onefootprint/ui';
 import { Box } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type AnimatedContainerProps = BoxProps & {
   isExpanded: boolean;

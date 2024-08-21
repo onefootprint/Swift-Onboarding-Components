@@ -1,6 +1,6 @@
 import { IcoCrosshair24, IcoLightBulb24 } from '@onefootprint/icons';
 import { Stack, media } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import { IconTitle } from '../icon-title';

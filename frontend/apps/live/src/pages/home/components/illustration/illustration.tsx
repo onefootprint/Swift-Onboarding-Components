@@ -16,7 +16,7 @@ const Illustration = () => {
           rotate: [0, 360],
           transition: {
             duration: 20,
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
             repeatType: 'loop',
             ease: 'linear',
           },
@@ -29,7 +29,7 @@ const Illustration = () => {
               rotate: [0, -360],
               transition: {
                 duration: 20,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 repeatType: 'loop',
                 ease: 'linear',
               },
@@ -44,7 +44,7 @@ const Illustration = () => {
           rotate: [0, 360],
           transition: {
             duration: 25,
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
             repeatType: 'loop',
             ease: 'linear',
           },
@@ -57,7 +57,7 @@ const Illustration = () => {
               rotate: [0, -360],
               transition: {
                 duration: 25,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 repeatType: 'loop',
                 ease: 'linear',
               },

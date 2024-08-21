@@ -46,13 +46,12 @@ const Seo = ({
     <meta property="og:image" content={og.image || image} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={twitter.title || title} />
-    {twitter.extraData &&
-      twitter.extraData.map(({ label, data }, index) => (
-        <Fragment key={label}>
-          <meta name={`twitter:label${index + 1}`} content={label} />
-          <meta name={`twitter:data${index + 1}`} content={data} />
-        </Fragment>
-      ))}
+    {twitter.extraData?.map(({ label, data }, index) => (
+      <Fragment key={label}>
+        <meta name={`twitter:label${index + 1}`} content={label} />
+        <meta name={`twitter:data${index + 1}`} content={data} />
+      </Fragment>
+    ))}
     <meta name="twitter:description" content={twitter.description || description} />
     <meta name="twitter:url" content="https://live.onefootprint.com" />
     <meta name="twitter:image" content={twitter.image || image} />

@@ -32,7 +32,7 @@ export const primaryBtnBackgroundColor = {
 };
 
 export const secondaryBtnBackgroundColor = {
-  default: `transparent`,
+  default: 'transparent',
   hover: `${p.Gray900}`,
   active: `${p.Gray700}`,
   disabled: `${p.Gray900}`,
@@ -113,9 +113,9 @@ export const primaryBtnBoxShadow = {
 
 export const secondaryBtnBoxShadow = {
   none: 'none',
-  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
-  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.2);`,
-  active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12),;`,
+  default: '0px 1px 2px 0px rgba(0, 0, 0, 0.12);',
+  hover: '0px 1px 1px 0px rgba(0, 0, 0, 0.2);',
+  active: '0px 1px 1px 0px rgba(0, 0, 0, 0.12),;',
   disabled: 'none',
 };
 

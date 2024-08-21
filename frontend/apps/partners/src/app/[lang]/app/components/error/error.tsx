@@ -2,7 +2,7 @@
 
 import { Button, Stack, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import type React from 'react';
 
 type ErrorProps = {
   children?: React.ReactNode;

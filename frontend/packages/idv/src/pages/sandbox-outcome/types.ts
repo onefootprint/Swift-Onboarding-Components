@@ -1,4 +1,4 @@
-import { IdDocOutcome, IdVerificationOutcome, OverallOutcome } from '@onefootprint/types';
+import type { IdDocOutcome, IdVerificationOutcome, OverallOutcome } from '@onefootprint/types';
 
 export type SandboxOutcomeFormData = {
   testID?: string;

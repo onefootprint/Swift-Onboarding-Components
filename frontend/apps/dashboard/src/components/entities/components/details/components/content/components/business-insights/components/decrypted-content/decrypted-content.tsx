@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { IcoBuilding16, IcoEye16, IcoFileText16, IcoStore16, IcoUsers16 } from '@onefootprint/icons';
-import { BusinessInsights } from '@onefootprint/types';
+import type { BusinessInsights } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import BusinessNameList from '../business-name-list';
 import FilingDetailsDialog from '../filing-details';

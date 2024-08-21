@@ -2,7 +2,7 @@ import { AppearanceProvider } from '@onefootprint/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 
-import React from 'react';
+import type React from 'react';
 
 import configureReactI18next from '../../config/initializers/react-i18next';
 import queryClient from '../../config/initializers/react-query';

@@ -1,7 +1,7 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Layout as AppLayout } from '@onefootprint/idv';
 import { media } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled from 'styled-components';
 

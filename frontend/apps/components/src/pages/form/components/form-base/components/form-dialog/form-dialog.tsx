@@ -1,6 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { ScrollArea } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 import Container from '../../../container';
 import Footer from './components/footer';

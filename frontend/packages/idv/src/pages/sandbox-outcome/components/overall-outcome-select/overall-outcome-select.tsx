@@ -1,11 +1,11 @@
-import { IdVerificationOutcome, PublicOnboardingConfig } from '@onefootprint/types';
+import { IdVerificationOutcome, type PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 import { NativeSelect, Stack, Text } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSandboxOutcomeOptions from '../../hooks/use-sandbox-outcome-options';
-import { SandboxOutcomeFormData } from '../../types';
+import type { SandboxOutcomeFormData } from '../../types';
 
 type OverallOutcomeSelectProps = {
   config?: PublicOnboardingConfig;

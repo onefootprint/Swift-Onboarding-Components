@@ -1,4 +1,4 @@
-import { StateValue, assign, createMachine } from 'xstate';
+import { type StateValue, assign, createMachine } from 'xstate';
 
 import {
   isMissingAddressData,

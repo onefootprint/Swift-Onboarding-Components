@@ -18,7 +18,7 @@ const frameVariants = {
     height: ['80%', '75%', '95%', '80%'],
     transition: {
       duration: 2,
-      repeat: Infinity,
+      repeat: Number.POSITIVE_INFINITY,
       repeatType: 'loop' as const,
     },
   },

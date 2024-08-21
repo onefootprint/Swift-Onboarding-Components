@@ -4,7 +4,8 @@ import type { TenantDetail } from '@onefootprint/types';
 import { TenantPreviewApi, TenantSupportedAuthMethod } from '@onefootprint/types/src/api/get-tenants';
 import type { SelectOption } from '@onefootprint/ui';
 import { Checkbox, CodeInline, MultiSelect, Stack, TextInput } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';
@@ -73,7 +74,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'Is demo tenant',
       content: checkbox(tenant.isDemoTenant),
-      editModeContent: <Checkbox {...register(`isDemoTenant`, {})} />,
+      editModeContent: <Checkbox {...register('isDemoTenant', {})} />,
     },
     {
       title: 'Domains',
@@ -83,7 +84,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'Domain access enabled',
       content: checkbox(tenant.allowDomainAccess),
-      editModeContent: <Checkbox {...register(`allowDomainAccess`, {})} />,
+      editModeContent: <Checkbox {...register('allowDomainAccess', {})} />,
     },
   ];
 
@@ -91,22 +92,22 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'General access',
       content: checkbox(!tenant.sandboxRestricted),
-      editModeContent: <Checkbox {...register(`notSandboxRestricted`, {})} />,
+      editModeContent: <Checkbox {...register('notSandboxRestricted', {})} />,
     },
     {
       title: 'KYC playbooks',
       content: checkbox(!tenant.isProdKycPlaybookRestricted),
-      editModeContent: <Checkbox {...register(`notIsProdKycPlaybookRestricted`, {})} />,
+      editModeContent: <Checkbox {...register('notIsProdKycPlaybookRestricted', {})} />,
     },
     {
       title: 'KYB playbooks',
       content: checkbox(!tenant.isProdKybPlaybookRestricted),
-      editModeContent: <Checkbox {...register(`notIsProdKybPlaybookRestricted`, {})} />,
+      editModeContent: <Checkbox {...register('notIsProdKybPlaybookRestricted', {})} />,
     },
     {
       title: 'Auth playbooks',
       content: checkbox(!tenant.isProdAuthPlaybookRestricted),
-      editModeContent: <Checkbox {...register(`notIsProdAuthPlaybookRestricted`, {})} />,
+      editModeContent: <Checkbox {...register('notIsProdAuthPlaybookRestricted', {})} />,
     },
   ];
 

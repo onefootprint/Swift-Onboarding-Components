@@ -1,4 +1,4 @@
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash16 } from '@onefootprint/icons';
 import { Button, LinkButton, Stack } from '@onefootprint/ui';
 import { useEffect, useRef, useState } from 'react';

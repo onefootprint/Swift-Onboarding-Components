@@ -4,7 +4,8 @@ import type { NextToast } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../../../utils/logger';

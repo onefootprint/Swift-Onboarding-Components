@@ -1,4 +1,4 @@
-import { UIState } from '@onefootprint/design-tokens';
+import type { UIState } from '@onefootprint/design-tokens';
 import { FilingStatus } from '@onefootprint/types';
 
 const statusVariant: Record<FilingStatus, UIState> = {

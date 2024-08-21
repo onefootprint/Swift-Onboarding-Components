@@ -1,5 +1,5 @@
 import { IcoArrowTopRight16 } from '@onefootprint/icons';
-import { SOSFiling } from '@onefootprint/types';
+import type { SOSFiling } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

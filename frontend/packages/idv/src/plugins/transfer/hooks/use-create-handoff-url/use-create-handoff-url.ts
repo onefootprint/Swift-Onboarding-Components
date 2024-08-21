@@ -33,7 +33,7 @@ const useCreateHandoffUrl = ({
       } else if (isAppClipEnabled) {
         newUrl.pathname = `appclip/${appClipExperienceId}`;
       } else if (isInstantAppEnabled) {
-        newUrl.pathname = `instant-app`;
+        newUrl.pathname = 'instant-app';
       }
     }
 

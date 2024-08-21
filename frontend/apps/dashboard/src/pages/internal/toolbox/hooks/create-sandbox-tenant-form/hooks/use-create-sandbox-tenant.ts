@@ -18,7 +18,7 @@ type CreateSandboxTenantResponse = {
 const submitCreateSandboxTenantRequest = async (authHeaders: AuthHeaders, data: CreateSandboxTenantRequest) => {
   const response = await request<CreateSandboxTenantResponse>({
     method: 'POST',
-    url: `/private/sandbox_tenant`,
+    url: '/private/sandbox_tenant',
     headers: authHeaders,
     data,
   });

@@ -1,7 +1,7 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 import type { AppearanceOptions } from '../../appearence.types';
 import AppearanceContext from './appearance-context';

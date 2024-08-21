@@ -78,7 +78,7 @@ export default async function handler(req: NextRequest) {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } catch (e: any) {
     console.log(`${e.message}`); // eslint-disable-line no-console
-    return new Response(`Failed to generate the image`, {
+    return new Response('Failed to generate the image', {
       status: 500,
     });
   }

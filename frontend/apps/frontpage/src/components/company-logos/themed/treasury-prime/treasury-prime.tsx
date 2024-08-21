@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const TreasuryPrime = ({ color = '#000' }: Logo) => (
   <StyledSvg viewBox="0 0 522.58 139.25" xmlns="http://www.w3.org/2000/svg">

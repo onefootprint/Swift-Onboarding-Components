@@ -1,6 +1,11 @@
 import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import useSession from 'src/hooks/use-session';
-import { ApiArticle, ContentSchema, ContentSchemaNoRef, SecurityTypes } from '../../api-reference/api-reference.types';
+import {
+  type ApiArticle,
+  type ContentSchema,
+  type ContentSchemaNoRef,
+  SecurityTypes,
+} from '../../api-reference/api-reference.types';
 import { evaluateSchemaRef } from '../utils/get-schemas';
 
 type AdditionalArticleProps = {

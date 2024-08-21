@@ -1,10 +1,10 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import {
-  type CopyPlaybookRequest,
-  type CopyPlaybookResponse,
-  type OnboardingConfig,
-  type OrgAssumeRoleResponse,
+import type {
+  CopyPlaybookRequest,
+  CopyPlaybookResponse,
+  OnboardingConfig,
+  OrgAssumeRoleResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

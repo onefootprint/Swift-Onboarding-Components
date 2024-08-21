@@ -1,5 +1,5 @@
 import SignInMethods from '@/create-playbook/components/router/components/step-auth/components/sign-in-methods/sign-in-methods';
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Button, Stack } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,6 @@
 import { Wrapper, mockRequest } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
-import React from 'react';
+import type React from 'react';
 
 import { MachineProvider } from '../../components/machine-provider';
 import type { InitMachineArgs } from '../../utils/state-machine/machine';

@@ -24,7 +24,7 @@ const getMediaStream = (options: MediaStreamConstraints): Promise<MediaStream> =
     return Promise.reject(new Error('navigator is not defined'));
   }
 
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  if (navigator.mediaDevices?.getUserMedia) {
     return navigator.mediaDevices.getUserMedia(options);
   }
 

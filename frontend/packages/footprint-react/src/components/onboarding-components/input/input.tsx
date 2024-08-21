@@ -1,10 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
 import Cleave from 'cleave.js';
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 
 import { useFormContext } from 'react-hook-form';
-import useFieldProps, { FormInputProps } from '../hooks/use-field-props';
+import useFieldProps, { type FormInputProps } from '../hooks/use-field-props';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 

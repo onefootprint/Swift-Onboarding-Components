@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { type EditRulesRequest, type EditRulesResponse } from '@onefootprint/types';
+import type { EditRulesRequest, EditRulesResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { GET_QUERY_KEY } from 'src/components/playbook-details/components/content/components/collection-and-scopes/components/rules/hooks/use-rules';
 import type { AuthHeaders } from 'src/hooks/use-session';

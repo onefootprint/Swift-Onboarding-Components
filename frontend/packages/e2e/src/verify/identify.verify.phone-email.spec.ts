@@ -13,7 +13,7 @@ import {
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_ID_PHONE_EMAIL || 'pb_test_s1295ljZR1lZ0ZZr42iDzO';
 
-const email: 'sandbox@onefootprint.com' = 'sandbox@onefootprint.com';
+const email = 'sandbox@onefootprint.com' as const;
 const phoneNumber = '5555550100';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {

@@ -1,5 +1,5 @@
 import { Dialog } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type FormDialogProps = {

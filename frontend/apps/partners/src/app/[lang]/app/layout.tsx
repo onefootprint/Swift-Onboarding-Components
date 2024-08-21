@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import type { LangProp } from '@/app/types';
 import type { Namespaces } from '@/i18n';

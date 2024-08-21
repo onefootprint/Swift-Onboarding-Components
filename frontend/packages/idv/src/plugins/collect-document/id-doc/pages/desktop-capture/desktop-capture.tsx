@@ -1,6 +1,6 @@
 import type { IdDocImageUploadError } from '@onefootprint/types';
-import { IdDocImageTypes } from '@onefootprint/types';
-import { ComponentProps } from 'react';
+import type { IdDocImageTypes } from '@onefootprint/types';
+import type { ComponentProps } from 'react';
 
 import { NavigationHeader } from '../../../../../components';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';

@@ -2,10 +2,10 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import { UsLegalStatus } from '@onefootprint/types';
 
 export enum CitizenshipsValidationError {
-  REQUIRED,
-  SHOULD_BE_EMPTY,
-  US_CITIZENSHIP,
-  INVALID,
+  REQUIRED = 0,
+  SHOULD_BE_EMPTY = 1,
+  US_CITIZENSHIP = 2,
+  INVALID = 3,
 }
 
 type ValidationError = {

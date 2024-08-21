@@ -22,7 +22,7 @@ export const FormFieldByDI: Partial<Record<CardDIField, FormKeys>> = {
 
 const processFieldErrors = (error: Object): Partial<Record<FormKeys, string>> | undefined => {
   if (typeof error !== 'object') {
-    logError(`Unexpected error while vaulting field`, error);
+    logError('Unexpected error while vaulting field', error);
     return undefined;
   }
 

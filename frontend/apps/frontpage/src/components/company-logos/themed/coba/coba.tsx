@@ -1,4 +1,4 @@
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const CobaLogo = ({ color }: Logo) => (
   <svg fill="none" height="22" viewBox="0 0 82 22" width="82" xmlns="http://www.w3.org/2000/svg">

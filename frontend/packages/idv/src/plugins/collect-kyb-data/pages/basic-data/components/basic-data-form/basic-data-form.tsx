@@ -38,7 +38,7 @@ const getFormHints = (list: FormProps, errors: FormErrors): FormHints => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.basic-data.form' });
   return list.reduce<FormHints>((hints, prop) => {
     const error = errors[prop];
-    if (error && error?.message) {
+    if (error?.message) {
       hints[prop] = error.message; // eslint-disable-line no-param-reassign
     } else if (prop === 'tin') {
       hints[prop] = t('must-be-ein');

@@ -1,5 +1,6 @@
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import type { CardNumberInputProps } from './card-number-input';
 import CardNumberInput from './card-number-input';

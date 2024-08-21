@@ -1,4 +1,4 @@
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const FindigsLogo = ({ color }: Logo) => (
   <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">

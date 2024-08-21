@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
-import { SOSFiling } from '@onefootprint/types';
-import { Stack, Table, TableRow } from '@onefootprint/ui';
+import type { SOSFiling } from '@onefootprint/types';
+import { Stack, Table, type TableRow } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import DrawerFilter from './components/drawer-filter';
 import Row from './components/row';

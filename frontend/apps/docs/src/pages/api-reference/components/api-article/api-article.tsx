@@ -2,9 +2,9 @@ import { Stack, Text, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
+import type { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 
-import { ApiArticleContent } from '../articles';
+import type { ApiArticleContent } from '../articles';
 import SideBySideElement from '../side-by-side-element';
 import TypeBadge from '../type-badge/type-badge';
 import DemoCode from './components/demo-code';

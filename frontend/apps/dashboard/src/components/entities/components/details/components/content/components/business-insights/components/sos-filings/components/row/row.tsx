@@ -1,4 +1,4 @@
-import { SOSFiling } from '@onefootprint/types';
+import type { SOSFiling } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
 import useFilingStatusText from '../../../../hooks/use-filing-status-text';
 import statusVariant from '../../constants';

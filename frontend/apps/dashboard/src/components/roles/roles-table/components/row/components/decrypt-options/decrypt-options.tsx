@@ -1,6 +1,6 @@
 import { Tooltip } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DecryptOption } from 'src/components/roles';
 
@@ -15,7 +15,7 @@ const DecryptOptions = <T extends React.ElementType>({ options, as }: DecryptOpt
   if (options.length === 1) {
     return (
       <Component>
-        {t(`scopes.decrypt_fields_one`, {
+        {t('scopes.decrypt_fields_one', {
           count: 1,
           field: t(`scopes.decrypt.${options[0]}` as ParseKeys<'common'>),
         })}
@@ -26,7 +26,7 @@ const DecryptOptions = <T extends React.ElementType>({ options, as }: DecryptOpt
     return (
       <Tooltip text={options.map(scope => t(`scopes.decrypt.${scope}` as ParseKeys<'common'>)).join(', ')}>
         <Component>
-          {t(`scopes.decrypt_fields_other`, {
+          {t('scopes.decrypt_fields_other', {
             count: options.length,
           })}
         </Component>

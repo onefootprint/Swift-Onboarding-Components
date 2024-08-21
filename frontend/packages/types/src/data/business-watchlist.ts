@@ -1,4 +1,4 @@
-import { EntityKind } from './entity';
+import type { EntityKind } from './entity';
 
 export type RawBusinessWatchlist = {
   hitCount: number;

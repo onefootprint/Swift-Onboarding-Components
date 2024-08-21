@@ -4,7 +4,8 @@ import type {
   FootprintVerifyProps,
 } from '@onefootprint/footprint-js';
 import footprint from '@onefootprint/footprint-js';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 
 import { getBaseAuthProps, getBaseUpdateLoginMethodsProps, getBaseVerifyProps } from './base-props';
 import {

@@ -2,7 +2,8 @@ import type { Color } from '@onefootprint/design-tokens';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import { Stack, createFontStyles } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 

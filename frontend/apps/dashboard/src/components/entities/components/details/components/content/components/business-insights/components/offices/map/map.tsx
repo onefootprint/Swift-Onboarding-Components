@@ -6,7 +6,7 @@ import type { MapRef } from 'react-map-gl';
 import { Map as MapboxMap, Marker } from 'react-map-gl';
 import styled, { useTheme as useStyledTheme } from 'styled-components';
 
-import { BusinessAddress } from '@onefootprint/types';
+import type { BusinessAddress } from '@onefootprint/types';
 import GoogleMapsLoader from '../content/utils/google-maps-loader';
 import type { MapMarkerProps } from './components/map-marker';
 

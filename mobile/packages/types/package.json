@@ -7,7 +7,7 @@
   "license": "MIT",
   "files": ["dist/**"],
   "scripts": {
-    "lint": "biome check src --fix",
+    "lint": "biome check src --fix --unsafe",
     "lint:ci": "biome ci src",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"

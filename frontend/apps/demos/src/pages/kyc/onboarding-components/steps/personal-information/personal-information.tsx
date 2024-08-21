@@ -1,8 +1,8 @@
-import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Divider, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import EncryptedInput from '../../components/encrypted-input';
-import { FormStates, StepProps } from '../../kyc.types';
+import type { FormStates, StepProps } from '../../kyc.types';
 
 const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
   const [formState, setFormState] = useState<FormStates>('default');

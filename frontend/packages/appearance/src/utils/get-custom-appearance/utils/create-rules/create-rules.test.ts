@@ -99,7 +99,7 @@ describe('createAppearanceRules', () => {
       };
       const result = createStylesFromRules(rules);
       expect(result).toEqual(
-        `.fp-custom-appearance.fp-button{background-color:red;} .fp-custom-appearance.fp-button:hover{text-decoration:underline;}`,
+        '.fp-custom-appearance.fp-button{background-color:red;} .fp-custom-appearance.fp-button:hover{text-decoration:underline;}',
       );
     });
   });

@@ -32,7 +32,7 @@ const birdVariants = {
     transition: {
       type: 'spring',
       stiffness: 50,
-      repeat: Infinity,
+      repeat: Number.POSITIVE_INFINITY,
       duration: 2,
     },
   },

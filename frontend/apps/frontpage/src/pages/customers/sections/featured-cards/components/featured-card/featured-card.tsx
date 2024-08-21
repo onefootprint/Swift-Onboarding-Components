@@ -2,7 +2,8 @@ import { IcoChevronRight24 } from '@onefootprint/icons';
 import { Box, Stack, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useHover } from 'usehooks-ts';
 

@@ -10,7 +10,7 @@ import { OverallOutcome } from '@onefootprint/types';
 import ContentLayout from './components/content-layout';
 import Header from './components/header';
 import GlobalStyles from './kyc.styles';
-import { EventVariant, GeolocationEventProps, InputEventProps, NativeEvent } from './kyc.types';
+import { EventVariant, type GeolocationEventProps, type InputEventProps, type NativeEvent } from './kyc.types';
 import Confirmation from './steps/confirmation';
 import Identify from './steps/identify';
 import PersonalInformation from './steps/personal-information';
@@ -35,7 +35,7 @@ const steps = [
 
 const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_DOBM63fG6uDzNUj62SRJkF';
 const LOCATION_API_URL = 'https://ipapi.co/json/';
-const TOAST_OPTIONS = { duration: Infinity, dismissible: false };
+const TOAST_OPTIONS = { duration: Number.POSITIVE_INFINITY, dismissible: false };
 
 const outcomeMap = {
   s: OverallOutcome.success,

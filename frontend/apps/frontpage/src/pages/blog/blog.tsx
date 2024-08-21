@@ -9,7 +9,7 @@ import { PostType, getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
 import { motion } from 'framer-motion';
-import { ParseKeys } from 'i18next';
+import type { ParseKeys } from 'i18next';
 import SEO from '../../components/seo';
 import type { Post } from '../../utils/ghost/types';
 import PostPreview from './components/post-preview';

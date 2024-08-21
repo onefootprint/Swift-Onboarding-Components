@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { EDIT_VAULT_FORM_ID } from '@/entity/constants';

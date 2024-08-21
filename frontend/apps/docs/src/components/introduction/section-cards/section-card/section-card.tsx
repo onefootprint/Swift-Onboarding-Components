@@ -2,7 +2,8 @@ import type { Icon } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 type SectionCardProps = {

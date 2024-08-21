@@ -87,7 +87,7 @@ const useFilters = () => {
       cursor: queryToArray(filters.query.cursor),
       dateRange: queryToArray(filters.query.date_range),
       labels: queryToArray(filters.query.labels),
-      pageSize: filters.query.page_size ? parseInt(filters.query.page_size, 10) : 15,
+      pageSize: filters.query.page_size ? Number.parseInt(filters.query.page_size, 10) : 15,
       search: filters.query.search,
       watchlist_hit: queryToBoolean(filters.query.watchlist_hit),
       has_outstanding_workflow_request: queryToBoolean(filters.query.has_outstanding_workflow_request),
@@ -102,7 +102,7 @@ const useFilters = () => {
   const lastCursor = last(values.cursor);
   // requestParams is the object actually sent to the backend
   const requestParams = {
-    cursor: lastCursor ? parseInt(lastCursor, 10) : undefined,
+    cursor: lastCursor ? Number.parseInt(lastCursor, 10) : undefined,
     search: values.search,
     labels: values.labels,
     pageSize: values.pageSize,

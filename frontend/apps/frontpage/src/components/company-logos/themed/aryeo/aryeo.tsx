@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const Aryeo = ({ color }: Logo) => {
   return (

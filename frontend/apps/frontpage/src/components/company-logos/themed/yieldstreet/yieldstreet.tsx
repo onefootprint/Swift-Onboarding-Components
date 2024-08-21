@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const YieldStreet = ({ color }: Logo) => (
   <StyledSvg enableBackground="new 0 0 500.9 75" viewBox="0 0 500.9 75" xmlns="http://www.w3.org/2000/svg">

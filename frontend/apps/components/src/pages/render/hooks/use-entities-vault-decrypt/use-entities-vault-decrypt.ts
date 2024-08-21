@@ -8,7 +8,7 @@ const entitiesVaultDecrypt = async (payload: EntitiesVaultDecryptRequest) => {
   const { authToken, field } = payload;
   const response = await requestWithoutCaseConverter<EntitiesVaultDecryptResponse>({
     method: 'POST',
-    url: `/entities/vault/decrypt`,
+    url: '/entities/vault/decrypt',
     data: {
       fields: [field],
     },

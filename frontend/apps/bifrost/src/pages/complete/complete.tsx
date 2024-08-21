@@ -19,7 +19,7 @@ const Complete = () => {
 
   const handleComplete = (delay?: number) => {
     Logger.info('IDV flow is complete, sending validation token back to the tenant from Bifrost completion page');
-    if (idvCompletePayload && idvCompletePayload.validationToken) {
+    if (idvCompletePayload?.validationToken) {
       fpProvider.complete({
         validationToken: idvCompletePayload.validationToken,
         deviceResponse: idvCompletePayload.deviceResponseJson,

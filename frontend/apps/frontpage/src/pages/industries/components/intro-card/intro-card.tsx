@@ -1,6 +1,6 @@
 import { IcoSparkles24 } from '@onefootprint/icons';
 import { Container, Stack, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 const IntroCard = ({ children }: { children: React.ReactNode }) => (

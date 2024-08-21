@@ -1,4 +1,5 @@
-import React, { useId } from 'react';
+import type React from 'react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ActionMeta, GroupBase, InputActionMeta, OptionsOrGroups, PropsValue } from 'react-select';
 import Select from 'react-select';

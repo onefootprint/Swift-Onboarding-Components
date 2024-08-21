@@ -9,7 +9,7 @@ const Loading = () => (
       animate={{ opacity: [0, 1, 0] }}
       transition={{
         duration: 4,
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         repeatType: 'loop',
       }}
     >

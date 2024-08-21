@@ -1,7 +1,8 @@
 import type { InvestorProfileData } from '@onefootprint/types';
 import { InvestorProfileDI, InvestorProfileFundingSources } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

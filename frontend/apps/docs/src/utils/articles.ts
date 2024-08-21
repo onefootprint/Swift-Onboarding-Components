@@ -41,9 +41,8 @@ const replaceContent = (content: string) => {
         .map(s => s.id)
         .join('-');
       return `${line} [[id=${nestedId}]]`;
-    } else {
-      return line;
     }
+    return line;
   });
   return outputLines.join('\n');
 };

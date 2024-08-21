@@ -35,7 +35,7 @@ export const getIconForVariant = (variant: InlineAlertVariant) => {
 export const createVariantStyles = (variant: InlineAlertVariant) => {
   const style = inlineAlertVariantStyles[variant];
   if (!style) {
-    return ``;
+    return '';
   }
   const { backgroundColor, color } = style;
 

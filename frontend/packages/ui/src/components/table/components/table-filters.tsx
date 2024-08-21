@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 

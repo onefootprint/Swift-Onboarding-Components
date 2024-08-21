@@ -13,7 +13,7 @@
     "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -lng en -dep ui,request",
     "i18n:copy": "yarn i18n:copy-en",
     "lint:ci": "biome check --files-max-size=1364000 src",
-    "lint": "biome check --files-max-size=1364000 --fix src",
+    "lint": "biome check --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3009",
     "typecheck": "yarn tsc --noEmit"

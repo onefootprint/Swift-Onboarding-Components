@@ -16,7 +16,7 @@ type CleanUpResponse = {
 const submitCleanUpRqequest = async (authHeaders: AuthHeaders, data: CleanupRequest) => {
   const response = await request<CleanUpResponse>({
     method: 'POST',
-    url: `/private/cleanup`,
+    url: '/private/cleanup',
     headers: authHeaders,
     data,
   });

@@ -14,7 +14,7 @@ const rightFootVariants = {
     rotate: [0, 8, -8, 0, 8, -8, 0],
     y: [0, 5, -5, 0, 5, -5, 0],
     transition: {
-      repeat: Infinity,
+      repeat: Number.POSITIVE_INFINITY,
       duration: 0.5,
       repeatDelay: 5,
       ease: 'easeInOut',

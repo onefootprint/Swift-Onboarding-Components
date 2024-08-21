@@ -1,4 +1,4 @@
-import { BusinessDetail, BusinessDetails } from '@onefootprint/types';
+import { BusinessDetail, type BusinessDetails } from '@onefootprint/types';
 import { Badge, Stack } from '@onefootprint/ui';
 import isNull from 'lodash/isNull';
 import { useTranslation } from 'react-i18next';

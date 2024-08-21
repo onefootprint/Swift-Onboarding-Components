@@ -36,7 +36,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const canDecrypt = !!entity.decryptableAttributes.length;
 
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
-  const [timesOpened, setTimesOpened] = useState(parseInt(localStorage.getItem('timesOpened') || '0', 10));
+  const [timesOpened, setTimesOpened] = useState(Number.parseInt(localStorage.getItem('timesOpened') || '0', 10));
 
   const shouldRenderManualReview = entityData && entityData.status !== EntityStatus.none;
 

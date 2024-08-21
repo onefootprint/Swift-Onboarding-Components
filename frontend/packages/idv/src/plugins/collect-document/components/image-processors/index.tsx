@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import type React from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import useImportHeic2Any from '../../hooks/use-import-heic2any';
 import type { Heic2AnyModule } from '../../types';

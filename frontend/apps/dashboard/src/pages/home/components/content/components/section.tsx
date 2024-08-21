@@ -4,7 +4,7 @@ import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { OrgMetrics } from '@onefootprint/types/src/data';
+import type { OrgMetrics } from '@onefootprint/types/src/data';
 
 type SectionProps = {
   metrics: OrgMetrics;

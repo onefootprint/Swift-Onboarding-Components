@@ -1,7 +1,7 @@
 import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { asAdminUser, asAdminUserRestrictedToSandbox } from 'src/config/tests';
 
-import { type CopyProps } from './copy';
+import type { CopyProps } from './copy';
 import {
   CopyWithButton,
   authRolesFixture,

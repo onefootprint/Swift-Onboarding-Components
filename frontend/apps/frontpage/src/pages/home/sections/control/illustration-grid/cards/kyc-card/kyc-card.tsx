@@ -1,5 +1,6 @@
 import { Toggle } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardAppearContent from '../../components/card-appear-content/card-appear-content';

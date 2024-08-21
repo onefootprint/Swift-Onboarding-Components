@@ -1,4 +1,4 @@
-import { ApiKey } from '@onefootprint/types';
+import type { ApiKey } from '@onefootprint/types';
 import { CodeInline, Shimmer } from '@onefootprint/ui';
 
 type KeyCellProps = {

@@ -2,32 +2,32 @@ import { STATES } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
 import {
-  BusinessAddress,
+  type BusinessAddress,
   BusinessDetail,
-  BusinessDetailPhoneNumber,
-  BusinessDetailTin,
-  BusinessDetailWebsite,
-  BusinessDetails,
-  BusinessName,
-  BusinessNameKind,
-  BusinessPerson,
-  BusinessWatchlist,
+  type BusinessDetailPhoneNumber,
+  type BusinessDetailTin,
+  type BusinessDetailWebsite,
+  type BusinessDetails,
+  type BusinessName,
+  type BusinessNameKind,
+  type BusinessPerson,
+  type BusinessWatchlist,
   EntityKind,
-  FilingStatus,
-  GetBusinessInsightsResponse,
-  RawBusinessAddress,
-  RawBusinessName,
-  RawBusinessPerson,
-  RawBusinessWatchlist,
-  RawSOSFiling,
-  SOSFiling,
-  WatchlistHit,
+  type FilingStatus,
+  type GetBusinessInsightsResponse,
+  type RawBusinessAddress,
+  type RawBusinessName,
+  type RawBusinessPerson,
+  type RawBusinessWatchlist,
+  type RawSOSFiling,
+  type SOSFiling,
+  type WatchlistHit,
 } from '@onefootprint/types';
-import { RawBusinessDetails } from '@onefootprint/types/src/data/business-details';
+import type { RawBusinessDetails } from '@onefootprint/types/src/data/business-details';
 import { useQuery } from '@tanstack/react-query';
 import capitalize from 'lodash/capitalize';
 import upperFirst from 'lodash/upperFirst';
-import useSession, { AuthHeaders } from 'src/hooks/use-session';
+import useSession, { type AuthHeaders } from 'src/hooks/use-session';
 import formatState from '../components/content/components/business-insights/utils/format-state/format-state';
 
 type RawBusinesDetailValue = string | BusinessDetailPhoneNumber[] | BusinessDetailTin | BusinessDetailWebsite | null;
@@ -74,7 +74,7 @@ const useEntityBusinessInsights = (id: string) => {
             registrationDate: registrationDate ? formatUtcDate(new Date(registrationDate as string)) : EMPTY_VALUE,
             registeredAgent: registeredAgent ?? EMPTY_VALUE,
             officers,
-            addresses: addresses && addresses.length ? addresses : [EMPTY_VALUE],
+            addresses: addresses?.length ? addresses : [EMPTY_VALUE],
             entityType: entityType ? capitalize(entityType) : EMPTY_VALUE,
             status: (status as FilingStatus) ?? status,
             subStatus: subStatus ? capitalize(subStatus) : EMPTY_VALUE,

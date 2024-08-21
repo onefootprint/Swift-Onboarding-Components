@@ -1,6 +1,7 @@
 import { IcoImages24 } from '@onefootprint/icons';
 import { useToast } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Logger } from '../../../../../../utils/logger';
@@ -61,7 +62,7 @@ const UploadButton = ({
       logWarn('Uploaded file is not an image');
       toast.show({
         title: 'Uh-oh',
-        description: `Only image files are supported. Please try again.`,
+        description: 'Only image files are supported. Please try again.',
       });
       onProcessingDone();
       return;

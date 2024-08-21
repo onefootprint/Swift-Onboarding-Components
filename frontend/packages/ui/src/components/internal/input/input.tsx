@@ -1,7 +1,8 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
 import type { CleaveOptions } from 'cleave.js/options';
 import type { InputHTMLAttributes } from 'react';
-import React, { forwardRef, useId } from 'react';
+import type React from 'react';
+import { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../../hooks/use-sx';

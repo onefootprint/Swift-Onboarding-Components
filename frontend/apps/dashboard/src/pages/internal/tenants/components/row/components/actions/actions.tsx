@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Tenant } from '@onefootprint/types';
+import type { Tenant } from '@onefootprint/types';
 import { AnimatedLoadingSpinner, Dropdown, useToast } from '@onefootprint/ui';
 import useGenerateInvoice from './hooks/use-generate-invoice';
 

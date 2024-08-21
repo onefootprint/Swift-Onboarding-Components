@@ -1,5 +1,5 @@
 import { media } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';
 

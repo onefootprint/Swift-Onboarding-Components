@@ -62,7 +62,7 @@ const BackPhotoCapture = () => {
         camera: cameraTitle,
         preview: previewTitle,
       }}
-      subtitle={{ preview: t(`subtitle.preview`) }}
+      subtitle={{ preview: t('subtitle.preview') }}
       onComplete={onComplete}
       onBack={handleClickBack}
       onCameraStuck={handleCameraStuck}

@@ -24,7 +24,7 @@ const parseBiometricChallenge = (str: string): BiometricLoginChallengeJson | Err
   } catch (err: unknown) {
     return err instanceof Error
       ? new Error(`Error parsing biometric challenge: ${err.message}`)
-      : new Error(`Error parsing biometric challenge`);
+      : new Error('Error parsing biometric challenge');
   }
 };
 

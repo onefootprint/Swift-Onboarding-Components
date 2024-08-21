@@ -1,5 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import React, { createContext, useContext } from 'react';
+import type React from 'react';
+import { createContext, useContext } from 'react';
 
 export type L10nContextProviderProps = {
   children: React.ReactNode;

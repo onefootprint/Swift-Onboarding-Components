@@ -1,6 +1,6 @@
 import { Stack } from '@onefootprint/ui';
 import TypeBadge from 'src/pages/api-reference/components/type-badge';
-import { HydratedApiArticle } from 'src/pages/api-reference/hooks/use-hydrate-articles';
+import type { HydratedApiArticle } from 'src/pages/api-reference/hooks/use-hydrate-articles';
 import styled from 'styled-components';
 
 type ApiTitleProps = {

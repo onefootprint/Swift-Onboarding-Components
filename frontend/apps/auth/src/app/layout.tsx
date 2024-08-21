@@ -3,7 +3,7 @@ import '../static/globals.css';
 import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
 import Script from 'next/script';
-import React from 'react';
+import type React from 'react';
 
 import { COMMIT_SHA, DEPLOYMENT_URL, GOOGLE_MAPS_KEY } from '../config/constants';
 

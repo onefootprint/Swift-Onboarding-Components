@@ -4,7 +4,7 @@ import { STATES } from '@onefootprint/global-constants';
 import { CorporationType } from '@onefootprint/types';
 import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import {
-  BootstrapIgnoredBusinessDI,
+  type BootstrapIgnoredBusinessDI,
   BusinessDI,
   IdDI,
   UsLegalStatus,

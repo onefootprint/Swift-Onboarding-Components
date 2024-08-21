@@ -12,7 +12,7 @@ import type {
   NavigatedToPrevPage,
   TransitionsFor,
 } from './types';
-import { IdentifyMachineArgs, SuccessfulIdentifier } from './types';
+import { type IdentifyMachineArgs, SuccessfulIdentifier } from './types';
 import {
   getMachineArgs,
   hasSingleRequiredAuthMethod,

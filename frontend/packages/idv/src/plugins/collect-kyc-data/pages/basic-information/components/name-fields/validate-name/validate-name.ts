@@ -1,6 +1,6 @@
 export enum NameValidationError {
-  SPECIAL_CHARS,
-  EMPTY,
+  SPECIAL_CHARS = 0,
+  EMPTY = 1,
 }
 
 const validateName = (name?: string): NameValidationError | undefined => {

@@ -40,17 +40,17 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
     {
       title: 'Idology Enabled',
       content: checkbox(tvc?.idologyEnabled),
-      editModeContent: <Checkbox {...register(`idologyEnabled`, {})} />,
+      editModeContent: <Checkbox {...register('idologyEnabled', {})} />,
     },
     {
       title: 'Experian Enabled',
       content: checkbox(tvc?.experianEnabled),
-      editModeContent: <Checkbox {...register(`experianEnabled`, {})} />,
+      editModeContent: <Checkbox {...register('experianEnabled', {})} />,
     },
     {
       title: 'Lexis Enabled',
       content: checkbox(tvc?.lexisEnabled),
-      editModeContent: <Checkbox {...register(`lexisEnabled`, {})} />,
+      editModeContent: <Checkbox {...register('lexisEnabled', {})} />,
     },
     {
       title: 'Experian Subscriber Code',

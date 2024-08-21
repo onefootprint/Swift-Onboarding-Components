@@ -1,7 +1,7 @@
 import { Box, Divider, Radio, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { type VerificationChecksFormData } from 'src/pages/playbooks/utils/machine/types';
+import type { VerificationChecksFormData } from 'src/pages/playbooks/utils/machine/types';
 
 export type KybChecksProps = {
   canRunFullKyb: boolean;

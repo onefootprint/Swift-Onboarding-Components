@@ -41,7 +41,7 @@ describe('<List />', () => {
         name: 'SSN List',
         alias: 'my_list2',
       },
-    ])(`should render the name and alias`, async ({ name, alias }) => {
+    ])('should render the name and alias', async ({ name, alias }) => {
       await renderListAndWait();
 
       const rowName = screen.getByText(name);

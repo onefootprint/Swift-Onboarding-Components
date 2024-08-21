@@ -3,7 +3,7 @@ const parse = (params: string) => {
     const parsed = JSON.parse(decodeURIComponent(params));
     return parsed;
   } catch (_) {
-    console.warn(`Could not parse appearance rules. They will be ignored.`);
+    console.warn('Could not parse appearance rules. They will be ignored.');
     return null;
   }
 };

@@ -1,7 +1,7 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { Property } from 'csstype';
 import times from 'lodash/times';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import type * as CSS from 'csstype';

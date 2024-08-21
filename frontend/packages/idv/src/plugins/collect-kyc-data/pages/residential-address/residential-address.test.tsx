@@ -42,7 +42,7 @@ describe('<ResidentialAddress />', () => {
         address
         ${'2343 Adams Street'}
         ${'Main Street 343'}
-      `(`for $address should not show error`, async ({ address }) => {
+      `('for $address should not show error', async ({ address }) => {
         const initialContext = getInitialContext({
           data: {
             [IdDI.addressLine1]: {
@@ -77,7 +77,7 @@ describe('<ResidentialAddress />', () => {
         ${'p.o. BOX 2323'}
         ${'pobox 234'}
         ${'pobox12321'}
-      `(`for $poBoxAddress should show error`, async ({ poBoxAddress }) => {
+      `('for $poBoxAddress should show error', async ({ poBoxAddress }) => {
         const initialContext = getInitialContext({
           data: {
             [IdDI.addressLine1]: {

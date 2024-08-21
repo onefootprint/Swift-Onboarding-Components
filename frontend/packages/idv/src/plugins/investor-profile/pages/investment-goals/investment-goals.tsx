@@ -1,5 +1,5 @@
 import { InvestorProfileDI } from '@onefootprint/types';
-import React from 'react';
+import type React from 'react';
 
 import { getLogger } from '../../../../utils/logger';
 import ContinueButton from '../../components/form-with-error-footer/components/continue-button';

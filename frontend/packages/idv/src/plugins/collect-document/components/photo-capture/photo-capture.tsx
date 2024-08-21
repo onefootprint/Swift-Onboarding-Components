@@ -9,7 +9,7 @@ import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../com
 import useHandleCameraError from '../../../../plugins/collect-document/hooks/use-handle-camera-error';
 import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
-import { CaptureKind, ReceivedImagePayload } from '../../types';
+import type { CaptureKind, ReceivedImagePayload } from '../../types';
 import { bytesToMegabytes, isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';

@@ -2,7 +2,8 @@
 
 import type { Spacing } from '@onefootprint/design-tokens';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
-import React, { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 

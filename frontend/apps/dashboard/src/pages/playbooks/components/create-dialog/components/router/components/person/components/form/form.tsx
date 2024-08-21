@@ -1,7 +1,8 @@
-import { type DataToCollectFormData, type DataToCollectMeta } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData, DataToCollectMeta } from '@/playbooks/utils/machine/types';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import { Button, Checkbox, Radio, Stack, Text, Toggle } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { isKyb, isKyc } from 'src/pages/playbooks/utils/kind';

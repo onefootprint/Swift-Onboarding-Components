@@ -6,7 +6,7 @@ import NavigationLogo from 'src/components/navigation-logo';
 import styled, { css } from 'styled-components';
 
 import SectionNav from '../components/section-nav';
-import { PageNavProps } from '../nav.types';
+import type { PageNavProps } from '../nav.types';
 
 const PageNav = ({ sections }: PageNavProps) => {
   const navInnerScrollRef = useRef<HTMLDivElement>(null);

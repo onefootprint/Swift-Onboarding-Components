@@ -2,7 +2,7 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Divider, Stack, Table, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import useGetPreviewInvoice, { InvoiceItem } from './hooks/use-get-preview-invoice';
+import useGetPreviewInvoice, { type InvoiceItem } from './hooks/use-get-preview-invoice';
 
 const dollarAmountFromCents = (v: number) => {
   const vString = (v / 100).toFixed(2).toString();
@@ -44,7 +44,7 @@ const Billing = () => {
               <td>{item.description}</td>
               <QuantityTd>{withCommas(item.quantity.toString())}</QuantityTd>
               <QuantityTd>
-                {dollarAmountFromCents(item.unitPriceCents ? parseFloat(item.unitPriceCents) : 0)}
+                {dollarAmountFromCents(item.unitPriceCents ? Number.parseFloat(item.unitPriceCents) : 0)}
               </QuantityTd>
               <QuantityTd>{dollarAmountFromCents(item.notionalCents)}</QuantityTd>
             </>

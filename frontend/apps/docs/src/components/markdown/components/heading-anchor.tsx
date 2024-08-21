@@ -1,4 +1,4 @@
-import { FontVariant } from '@onefootprint/design-tokens';
+import type { FontVariant } from '@onefootprint/design-tokens';
 import { IcoLink16 } from '@onefootprint/icons';
 import { Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';

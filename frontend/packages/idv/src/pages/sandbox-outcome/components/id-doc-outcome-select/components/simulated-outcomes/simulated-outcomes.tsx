@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { IcoWarning16 } from '@onefootprint/icons';
 import { IdDocOutcome } from '@onefootprint/types';
 import useSandboxOutcomeOptions from '../../../../hooks/use-sandbox-outcome-options';
-import { SandboxOutcomeFormData } from '../../../../types';
+import type { SandboxOutcomeFormData } from '../../../../types';
 
 const SimulatedOutcomes = () => {
   const { t } = useTranslation('idv', {

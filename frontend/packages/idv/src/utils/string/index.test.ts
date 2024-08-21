@@ -17,7 +17,7 @@ describe('strInputToUSDate', () => {
     ${'es-MX'} | ${'25/12/1997'} | ${'12/25/1997'}
     ${'es-MX'} | ${'12/12/1997'} | ${'12/12/1997'}
     ${'es-MX'} | ${'14/07/1997'} | ${'07/14/1997'}
-  `(`for $locale, $str = $output`, ({ locale, str, output }) => {
+  `('for $locale, $str = $output', ({ locale, str, output }) => {
     expect(strInputToUSDate(locale, str)).toBe(output);
   });
 });
@@ -37,7 +37,7 @@ describe('fromUSDateToISO8601Format', () => {
     ${'01/2/1997'}  | ${'1997-01-02'}
     ${'12/12/1997'} | ${'1997-12-12'}
     ${'12/25/1997'} | ${'1997-12-25'}
-  `(`for return ISO 8601 Format = $output`, ({ date, output }) => {
+  `('for return ISO 8601 Format = $output', ({ date, output }) => {
     expect(fromUSDateToISO8601Format(date)).toBe(output);
   });
 });

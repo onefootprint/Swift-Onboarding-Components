@@ -1,10 +1,11 @@
 import { IdDI } from '@onefootprint/types';
 import { Grid, Stack, useConfirmationDialog } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';

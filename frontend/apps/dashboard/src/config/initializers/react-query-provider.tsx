@@ -1,6 +1,6 @@
 import { isLogoutError } from '@onefootprint/request';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import type React from 'react';
 import useSession from 'src/hooks/use-session';
 
 type ReactQueryProviderProps = {

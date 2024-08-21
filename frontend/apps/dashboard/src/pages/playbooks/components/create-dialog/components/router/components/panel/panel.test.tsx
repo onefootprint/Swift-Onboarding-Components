@@ -1,5 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
-import Panel, { PanelProps } from './panel';
+import Panel, { type PanelProps } from './panel';
 
 const defaultProps: PanelProps = {
   children: <div>Child content</div>,

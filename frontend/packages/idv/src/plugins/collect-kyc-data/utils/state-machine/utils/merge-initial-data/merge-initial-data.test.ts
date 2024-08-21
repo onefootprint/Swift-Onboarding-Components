@@ -51,7 +51,7 @@ describe('isEqArray', () => {
     ${['a']}      | ${['a']}      | ${true}
     ${['a']}      | ${['a', 'b']} | ${false}
     ${['b', 'a']} | ${['a', 'b']} | ${true}
-  `(`for $arrB`, ({ arrA, arrB, output }) => {
+  `('for $arrB', ({ arrA, arrB, output }) => {
     expect(isEqArray(arrA, arrB)).toBe(output);
   });
 });

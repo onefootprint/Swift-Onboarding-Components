@@ -59,16 +59,15 @@ const Cmd = ({ navigation }: CmdProps) => {
         </InputContainer>
         <List>
           <EmptyState>{t('no-results')}</EmptyState>
-          {navigation &&
-            navigation.map(section => (
-              <Group heading={section.name} key={section.name}>
-                {section.items.map(item => (
-                  <Option key={item.title} onSelect={() => handleSelect(item)}>
-                    {item.title}
-                  </Option>
-                ))}
-              </Group>
-            ))}
+          {navigation?.map(section => (
+            <Group heading={section.name} key={section.name}>
+              {section.items.map(item => (
+                <Option key={item.title} onSelect={() => handleSelect(item)}>
+                  {item.title}
+                </Option>
+              ))}
+            </Group>
+          ))}
         </List>
         <Footer />
       </DialogContainer>

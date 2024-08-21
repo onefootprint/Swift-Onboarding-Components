@@ -1,5 +1,5 @@
-import { SupportedLocale, VaultValue } from '@onefootprint/types';
-import { FormValues } from '../../../types';
+import type { SupportedLocale, VaultValue } from '@onefootprint/types';
+import type { FormValues } from '../../../types';
 import { fromUSDateToISO8601Format, strInputToUSDate } from './date-formatter';
 
 export const removeEmpty = (

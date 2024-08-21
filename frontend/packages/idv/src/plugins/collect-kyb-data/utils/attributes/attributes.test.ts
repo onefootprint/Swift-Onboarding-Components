@@ -1,7 +1,7 @@
 import { BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 
-import { BusinessData } from 'src/types';
-import { MachineContext } from '../state-machine/types';
+import type { BusinessData } from 'src/types';
+import type { MachineContext } from '../state-machine/types';
 import {
   extractBootstrapBusinessDataValues,
   extractBusinessOwnerValuesFromBootstrapUserData,

@@ -1,14 +1,14 @@
 import {
   BusinessDI,
-  BusinessDIData,
+  type BusinessDIData,
   CollectedKybDataOption,
-  DecryptUserResponse,
-  SupportedLocale,
+  type DecryptUserResponse,
+  type SupportedLocale,
 } from '@onefootprint/types';
 import isEqual from 'lodash/isEqual';
 import { isObject, isStringValid } from '../../../utils';
 import { fromUSDateToISO8601Format, isISO8601Format, strInputToUSDate } from '../../../utils/string';
-import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields, IdField } from './constants';
+import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields, type IdField } from './constants';
 
 export const omitNullAndUndefined = <T extends object>(data: T): T =>
   Object.entries(data).reduce((response, [key, value]) => {

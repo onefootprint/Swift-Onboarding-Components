@@ -31,7 +31,7 @@ const PasskeysIllustration = () => {
             scale: 1,
             transition: {
               type: 'spring',
-              repeat: Infinity,
+              repeat: Number.POSITIVE_INFINITY,
               repeatType: 'reverse',
               duration: 1,
               delay: 2,

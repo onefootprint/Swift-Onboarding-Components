@@ -1,7 +1,8 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Box, Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

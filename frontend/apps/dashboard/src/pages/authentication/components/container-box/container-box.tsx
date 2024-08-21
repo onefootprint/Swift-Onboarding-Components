@@ -1,5 +1,5 @@
 import { Stack } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type ContainerBoxProps = {
   children: React.ReactNode;

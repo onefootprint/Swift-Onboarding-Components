@@ -4,7 +4,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 import { defaultNameFormData } from '@/playbooks/utils/machine/types';
 
-import Name, { StepNameProps } from './step-name';
+import Name, { type StepNameProps } from './step-name';
 
 const defaultProps: StepNameProps = {
   defaultValues: defaultNameFormData,

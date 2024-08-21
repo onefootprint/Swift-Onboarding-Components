@@ -1,4 +1,4 @@
-import { DocumentUploadSettings, IdDocImageTypes } from '@onefootprint/types';
+import { DocumentUploadSettings, type IdDocImageTypes } from '@onefootprint/types';
 
 import { Stack } from '@onefootprint/ui';
 import { NavigationHeader } from '../../../../../components';

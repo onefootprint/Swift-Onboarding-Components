@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import type React from 'react';
 import { useContext } from 'react';
 
-import { SupportedLocale } from '@onefootprint/types';
+import type { SupportedLocale } from '@onefootprint/types';
 import { useFormContext } from 'react-hook-form';
 import fieldContext from '../field-context';
 import { Context } from '../provider';

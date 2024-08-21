@@ -1,7 +1,7 @@
 import type { TenantBillingProfile, TenantBillingProfilePrices } from '@onefootprint/types/src/api/get-tenants';
 import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 
-import { UpdateTenantBillingProfile } from '../../../hooks/use-update-tenant';
+import type { UpdateTenantBillingProfile } from '../../../hooks/use-update-tenant';
 import { ifChanged, strOrNull } from '../../../utils/form-data-utils';
 
 export type BillingProfileFormData = {

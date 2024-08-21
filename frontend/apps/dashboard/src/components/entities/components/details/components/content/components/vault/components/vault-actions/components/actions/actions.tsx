@@ -19,13 +19,13 @@ import UploadDocDialog from '../upload-doc-dialog';
 import ViewHistoricalDataDialog from '../view-historical-data-dialog';
 
 enum ActionDialog {
-  auth,
-  requestMoreInfo,
-  addToList,
-  historicalData,
-  summarize,
-  uploadDoc,
-  editTags,
+  auth = 0,
+  requestMoreInfo = 1,
+  addToList = 2,
+  historicalData = 3,
+  summarize = 4,
+  uploadDoc = 5,
+  editTags = 6,
 }
 
 const Actions = ({ entity }: WithEntityProps) => {

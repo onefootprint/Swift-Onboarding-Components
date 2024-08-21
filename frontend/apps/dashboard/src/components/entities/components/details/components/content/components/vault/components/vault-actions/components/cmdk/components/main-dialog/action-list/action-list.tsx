@@ -20,24 +20,23 @@ const ActionList = ({ actionsArray, setOpen, hasReview }: ActionListProps) => {
   return (
     <List>
       <EmptyState>{t('no-results')}</EmptyState>
-      {actionsArray &&
-        actionsArray.map(({ title, actions, type }) =>
-          !hasReview && type === ActionType.REVIEW ? null : (
-            <Group key={title} heading={title}>
-              {actions.map(({ label, value, onSelect, closeAfterSelect, disabled }) => (
-                <Option
-                  key={value}
-                  value={value}
-                  onSelect={handleOnSelect(onSelect, closeAfterSelect)}
-                  disabled={disabled}
-                >
-                  {label}
-                  <span>{disabled && t('disabled')}</span>
-                </Option>
-              ))}
-            </Group>
-          ),
-        )}
+      {actionsArray?.map(({ title, actions, type }) =>
+        !hasReview && type === ActionType.REVIEW ? null : (
+          <Group key={title} heading={title}>
+            {actions.map(({ label, value, onSelect, closeAfterSelect, disabled }) => (
+              <Option
+                key={value}
+                value={value}
+                onSelect={handleOnSelect(onSelect, closeAfterSelect)}
+                disabled={disabled}
+              >
+                {label}
+                <span>{disabled && t('disabled')}</span>
+              </Option>
+            ))}
+          </Group>
+        ),
+      )}
     </List>
   );
 };

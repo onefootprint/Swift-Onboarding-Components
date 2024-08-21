@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const Goodfin = ({ color }: Logo) => (
   <StyledSvg width="138" height="32" viewBox="0 0 138 32" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getExample } from '@/api-reference/utils/get-schemas';
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
-import { HydratedArticle } from 'src/pages/api-reference/hooks';
+import type { HydratedArticle } from 'src/pages/api-reference/hooks';
 import useComputeExampleCurlRequest from 'src/pages/api-reference/hooks/use-compute-example-curl-request';
 
 export type DemoCodeProps = {

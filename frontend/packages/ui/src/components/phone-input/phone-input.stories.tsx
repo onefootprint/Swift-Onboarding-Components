@@ -1,5 +1,6 @@
 import type { Meta, Story } from '@storybook/react';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import PhoneInput from './phone-input';
 import type { PhoneInputProps } from './phone-input.types';

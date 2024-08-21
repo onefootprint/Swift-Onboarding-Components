@@ -2,7 +2,7 @@ import type { Entity } from '@onefootprint/types';
 import { EntityKind } from '@onefootprint/types';
 import { Pagination, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React from 'react';
+import type React from 'react';
 import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../hooks/use-filters';

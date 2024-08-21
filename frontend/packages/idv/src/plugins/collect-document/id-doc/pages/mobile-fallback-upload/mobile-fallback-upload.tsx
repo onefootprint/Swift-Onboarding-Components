@@ -1,7 +1,7 @@
 import { IcoClock40 } from '@onefootprint/icons';
 import { useTranslation } from 'react-i18next';
 
-import { DocumentUploadSettings, IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import { DocumentUploadSettings, type IdDocImageTypes, type SupportedIdDocTypes } from '@onefootprint/types';
 import { motion } from 'framer-motion';
 import { css, styled } from 'styled-components';
 import { HeaderTitle, NavigationHeader } from '../../../../../components';

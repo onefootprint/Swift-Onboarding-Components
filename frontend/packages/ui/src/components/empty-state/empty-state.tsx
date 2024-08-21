@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import React from 'react';
+import type React from 'react';
 
 import Box from '../box';
 import Button from '../button';

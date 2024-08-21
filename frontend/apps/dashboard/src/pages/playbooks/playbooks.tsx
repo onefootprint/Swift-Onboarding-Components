@@ -43,7 +43,7 @@ const Playbooks = () => {
     animate: {
       opacity: 0,
       transform: 'scale(2.5)',
-      transition: { duration: 5, ease: 'easeInOut', repeat: Infinity },
+      transition: { duration: 5, ease: 'easeInOut', repeat: Number.POSITIVE_INFINITY },
       borderRadius: '10px',
     },
   };

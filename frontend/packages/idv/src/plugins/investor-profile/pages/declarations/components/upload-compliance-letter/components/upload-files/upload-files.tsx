@@ -1,6 +1,7 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Button, Divider, Grid, Stack, Text } from '@onefootprint/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

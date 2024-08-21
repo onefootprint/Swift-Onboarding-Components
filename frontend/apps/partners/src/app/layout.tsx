@@ -3,7 +3,7 @@ import './app.css';
 import { dir } from 'i18next';
 import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
-import React from 'react';
+import type React from 'react';
 
 import ClientProviders from '@/components/client-providers';
 import { COMMIT_SHA, DEPLOYMENT_URL } from '@/config/constants';

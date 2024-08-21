@@ -15,8 +15,9 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "a11y": {
+        "noSvgWithoutTitle": "off",
         "noAccessKey": "error",
         "noAriaUnsupportedElements": "error",
         "noAutofocus": "error",
@@ -53,6 +54,7 @@
         "useValidLang": "error"
       },
       "complexity": {
+        "noBannedTypes": "off",
         "noExtraBooleanCast": "error",
         "noForEach": "off",
         "noMultipleSpacesInRegularExpressionLiterals": "error",
@@ -69,6 +71,8 @@
         "useRegexLiterals": "error"
       },
       "correctness": {
+        "noVoidTypeReturn": "off",
+        "useExhaustiveDependencies": "off",
         "noUnusedImports": "error",
         "noChildrenProp": "error",
         "noConstAssign": "error",
@@ -108,6 +112,8 @@
         "noGlobalEval": "error"
       },
       "style": {
+        "useNodejsImportProtocol": "off",
+        "noNonNullAssertion": "off",
         "noArguments": "error",
         "noCommaOperator": "error",
         "noDefaultExport": "off",
@@ -194,6 +200,10 @@
         "useTemplate": "error"
       },
       "suspicious": {
+        "noExportsInTest": "off",
+        "noDuplicateTestHooks": "off",
+        "noAssignInExpressions": "off",
+        "noImplicitAnyLet": "off",
         "noArrayIndexKey": "error",
         "noAsyncPromiseExecutor": "error",
         "noCatchAssign": "error",
@@ -225,6 +235,9 @@
         "useDefaultSwitchClauseLast": "error",
         "useGetterReturn": "error",
         "useValidTypeof": "error"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off"
       }
     }
   },

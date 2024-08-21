@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import DesktopHeader from './components/desktop-header';

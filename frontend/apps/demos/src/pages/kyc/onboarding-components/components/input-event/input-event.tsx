@@ -1,7 +1,7 @@
 import { IcoPencil16 } from '@onefootprint/icons';
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { format } from 'date-fns';
-import { InputEventProps } from 'src/pages/kyc/onboarding-components/kyc.types';
+import type { InputEventProps } from 'src/pages/kyc/onboarding-components/kyc.types';
 
 const InputEvent = ({ event }: { event: InputEventProps }) => {
   return (

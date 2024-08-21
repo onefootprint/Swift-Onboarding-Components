@@ -1,4 +1,4 @@
-import { AuthMethodKind } from '../data/auth-method';
+import type { AuthMethodKind } from '../data/auth-method';
 
 export type UserAuthMethodsResponse = {
   canUpdate?: boolean;

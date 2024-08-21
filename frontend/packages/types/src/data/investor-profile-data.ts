@@ -1,5 +1,5 @@
 import { InvestorProfileDI } from './di';
-import {
+import type {
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,
   InvestorProfileFundingSources,

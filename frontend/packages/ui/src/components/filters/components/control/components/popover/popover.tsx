@@ -1,5 +1,6 @@
 import FocusTrap from 'focus-trap-react';
-import React, { useId, useRef } from 'react';
+import type React from 'react';
+import { useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';

@@ -1,7 +1,7 @@
 import { IcoCheck16, IcoChevronDown16 } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 export type Option<T> = {
@@ -34,20 +34,19 @@ const DropdownSelector = <T,>({
     </Trigger>
     <Content position="popper" sideOffset={5}>
       <Select.Viewport>
-        {options &&
-          options.map(option => (
-            <Item value={option.id} textValue={option.name} key={option.id}>
-              <Select.ItemText asChild>
-                <ItemText>
-                  <Name>{option.name}</Name>
-                  {renderCustomData?.(option)}
-                </ItemText>
-              </Select.ItemText>
-              <Select.ItemIndicator>
-                <IcoCheck16 />
-              </Select.ItemIndicator>
-            </Item>
-          ))}
+        {options?.map(option => (
+          <Item value={option.id} textValue={option.name} key={option.id}>
+            <Select.ItemText asChild>
+              <ItemText>
+                <Name>{option.name}</Name>
+                {renderCustomData?.(option)}
+              </ItemText>
+            </Select.ItemText>
+            <Select.ItemIndicator>
+              <IcoCheck16 />
+            </Select.ItemIndicator>
+          </Item>
+        ))}
       </Select.Viewport>
       <Select.ScrollDownButton />
     </Content>

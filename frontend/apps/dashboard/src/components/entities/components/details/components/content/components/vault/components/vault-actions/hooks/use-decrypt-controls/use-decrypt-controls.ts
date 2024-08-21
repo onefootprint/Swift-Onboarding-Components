@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { DataIdentifier, EntityVault, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
+import { type DataIdentifier, type EntityVault, SupportedIdDocTypes, type VaultValue } from '@onefootprint/types';
 
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';

@@ -1,7 +1,8 @@
 'use client';
 
 import { IcoCopy16, IcoCopy24 } from '@onefootprint/icons';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

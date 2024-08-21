@@ -1,6 +1,6 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Container, createFontStyles } from '@onefootprint/ui';
-import { ParseKeys } from 'i18next';
+import type { ParseKeys } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -44,7 +44,7 @@ const Table = () => {
         <TableContent>
           <thead>
             <Header>
-              <HeaderItem></HeaderItem>
+              <HeaderItem />
               <HeaderItem>Footprint</HeaderItem>
               <HeaderItem>Alloy</HeaderItem>
               <HeaderItem>Persona</HeaderItem>

@@ -1,6 +1,6 @@
 import type { LinkButtonProps } from '@onefootprint/ui';
 import { LinkButton, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 export type FieldsetProps = {

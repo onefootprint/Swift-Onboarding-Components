@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import getSectionMeta from 'src/utils/section';
 import useHydrateArticles from '.';
-import { ApiReferenceArticle } from '../../api-reference/index.page';
+import type { ApiReferenceArticle } from '../../api-reference/index.page';
 import getArticles from '../../api-reference/utils/get-articles';
 import staticApiData from '../assets/public-api-docs.json';
-import { ApiArticleSection } from '../components/articles';
+import type { ApiArticleSection } from '../components/articles';
 
 /** The open API spec for all public-facing APIs, exported by the backend. */
 const staticApiArticles = getArticles(staticApiData);

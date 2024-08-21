@@ -45,7 +45,7 @@ const vanillaIntegration = (footprint: Footprint) => {
     try {
       props = JSON.parse(propsAttribute);
     } catch (_) {
-      throw Error(`Could not parse \`data-props\` for footprint.`);
+      throw Error('Could not parse `data-props` for footprint.');
     }
     if (!isObject(props)) {
       throw Error('`data-props` on the footprint element has to be a valid JSON object stringified.');

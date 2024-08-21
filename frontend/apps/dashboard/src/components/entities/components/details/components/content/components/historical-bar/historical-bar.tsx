@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { WithEntityProps } from '@/entities/components/details/components/with-entity';
+import type { WithEntityProps } from '@/entities/components/details/components/with-entity';
 import useCurrentEntityTimeline from '@/entities/components/details/hooks/use-current-entity-timeline';
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
-import useEntityVault, { VaultType } from '@/entities/hooks/use-entity-vault';
+import useEntityVault, { type VaultType } from '@/entities/hooks/use-entity-vault';
 
 import TimelineItemTime from 'src/components/timeline-item-time';
 import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';

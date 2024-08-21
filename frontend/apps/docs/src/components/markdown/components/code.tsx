@@ -9,14 +9,14 @@ type CodeProps = {
 };
 
 const Code = ({ children, className, filename, highlight = '', inline }: CodeProps) => {
-  const language = className && className.replace('lang-', '');
+  const language = className?.replace('lang-', '');
   const highlightLines = highlight.split(',');
 
   return inline || !language ? (
     <CodeInline disabled>{children}</CodeInline>
   ) : (
     <CodeBlock
-      highlightedLines={highlightLines.map(line => parseInt(line, 10))}
+      highlightedLines={highlightLines.map(line => Number.parseInt(line, 10))}
       language={language}
       showLineNumbers
       title={filename}

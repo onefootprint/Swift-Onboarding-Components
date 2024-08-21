@@ -6,7 +6,7 @@ import useSession from 'src/hooks/use-session';
 const generateInvoice = async (authHeaders: AuthHeaders, id: string) => {
   const response = await request<{}>({
     method: 'POST',
-    url: `/private/invoice`,
+    url: '/private/invoice',
     headers: authHeaders,
     data: {
       tenantId: id,

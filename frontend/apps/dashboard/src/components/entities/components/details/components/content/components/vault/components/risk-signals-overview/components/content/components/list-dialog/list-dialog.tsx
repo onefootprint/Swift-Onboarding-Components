@@ -1,7 +1,8 @@
 import type { RiskSignal } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
 import { Box, Dialog, Table, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Row from './components/row';

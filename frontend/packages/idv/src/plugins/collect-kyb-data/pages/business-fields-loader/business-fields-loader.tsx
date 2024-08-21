@@ -1,5 +1,5 @@
-import { BusinessDIData, CollectedKybDataOption, DecryptUserResponse } from '@onefootprint/types';
-import React from 'react';
+import { type BusinessDIData, CollectedKybDataOption, type DecryptUserResponse } from '@onefootprint/types';
+import type React from 'react';
 import useEffectOnceStrict from '../../../../components/identify/hooks/use-effect-once-strict';
 import { useDecryptBusiness, useDecryptUser } from '../../../../queries';
 import type { UserData } from '../../../../types';

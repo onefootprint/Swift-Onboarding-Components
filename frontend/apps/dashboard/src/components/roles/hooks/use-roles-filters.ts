@@ -16,7 +16,7 @@ const useRolesFilters = () => {
   const filters = useFilters<RolesQuery>(defaultQueryParams);
   const { query } = filters;
   const values = {
-    page: query.roles_page ? parseInt(query.roles_page, 10) : 0,
+    page: query.roles_page ? Number.parseInt(query.roles_page, 10) : 0,
     pageSize: query.roles_page_size,
     search: query.roles_search,
   };

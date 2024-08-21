@@ -1,4 +1,4 @@
-import { type DataIdentifier, type Entity, type VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
 import { Box, Checkbox, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

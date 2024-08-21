@@ -1,4 +1,4 @@
-import { type DataToCollectFormData, type DataToCollectMeta } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData, DataToCollectMeta } from '@/playbooks/utils/machine/types';
 import { InlineAlert, Stack } from '@onefootprint/ui';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

@@ -1,4 +1,4 @@
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const FlexcarLogo = ({ color }: Logo) => (
   <svg width="89" height="17" viewBox="0 0 89 17" fill="none" xmlns="http://www.w3.org/2000/svg">

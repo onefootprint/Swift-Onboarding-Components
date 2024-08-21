@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import BlankLayout from './components/blank-layout';
 import DefaultLayout from './components/default-layout';

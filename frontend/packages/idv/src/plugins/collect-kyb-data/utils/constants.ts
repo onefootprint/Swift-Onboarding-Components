@@ -1,4 +1,4 @@
-import { BeneficialOwnerDataAttribute, BusinessDI } from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, type BusinessDI } from '@onefootprint/types';
 
 export type IdField = 'id.first_name' | 'id.last_name' | 'id.email' | 'id.phone_number';
 

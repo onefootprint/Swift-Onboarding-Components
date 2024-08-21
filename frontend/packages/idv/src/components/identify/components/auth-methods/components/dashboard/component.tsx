@@ -1,7 +1,7 @@
 import { IcoEmail24, IcoFaceid16, IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Shimmer, Stack } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
-import React from 'react';
+import type React from 'react';
 
 import type { HeaderProps } from '../../../../types';
 import EditButton from './edit-button';
@@ -48,7 +48,7 @@ const Component = ({ children, cta, entryEmail, entryPasskey, entryPhone, Header
       <Header subtitle={texts.headerSubtitle} title={texts.headerTitle} />
     </Stack>
     <Stack direction="column" gap={5} marginBottom={7}>
-      {entryEmail && entryEmail.isLoading ? <ButtonLoading /> : null}
+      {entryEmail?.isLoading ? <ButtonLoading /> : null}
       {entryEmail && !entryEmail.isLoading ? (
         <EditButton
           label={entryEmail.label}
@@ -60,7 +60,7 @@ const Component = ({ children, cta, entryEmail, entryPasskey, entryPhone, Header
         />
       ) : null}
 
-      {entryPhone && entryPhone.isLoading ? <ButtonLoading /> : null}
+      {entryPhone?.isLoading ? <ButtonLoading /> : null}
       {entryPhone && !entryPhone.isLoading ? (
         <EditButton
           label={entryPhone.label}

@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
-import React from 'react';
+import type React from 'react';
 
 import { useFormContext } from 'react-hook-form';
-import useFieldProps, { FormSelectProps } from '../hooks/use-field-props';
+import useFieldProps, { type FormSelectProps } from '../hooks/use-field-props';
 
 export type StringOrNumber = string | number;
 

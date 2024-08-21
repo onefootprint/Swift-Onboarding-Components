@@ -1,5 +1,6 @@
 import { useServerInsertedHTML } from 'next/navigation';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 
 const StyledComponentsRegistry = ({ children }: React.PropsWithChildren) => {

@@ -8,7 +8,7 @@ import useSession from 'src/hooks/use-session';
 const updateDomains = async (authHeaders: AuthHeaders, data: UpdateClientSecurityConfigRequest) => {
   const response = await request<UpdateClientSecurityConfigResponse>({
     method: 'PATCH',
-    url: `/org/client_security_config`,
+    url: '/org/client_security_config',
     data,
     headers: authHeaders,
   });

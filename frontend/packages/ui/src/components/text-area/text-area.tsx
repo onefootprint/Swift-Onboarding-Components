@@ -1,5 +1,6 @@
 import type { TextareaHTMLAttributes } from 'react';
-import React, { forwardRef, useId } from 'react';
+import type React from 'react';
+import { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils';

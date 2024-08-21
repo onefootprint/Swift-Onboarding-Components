@@ -1,6 +1,7 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Stack, media } from '@onefootprint/ui';
-import React, { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LAYOUT_CONTAINER_ID } from '../../constants';

@@ -307,7 +307,7 @@ describe.skip('<CollectKybData />', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(`Basic Data`)).toBeInTheDocument();
+        expect(screen.getByText('Basic Data')).toBeInTheDocument();
       });
 
       firstName = screen.getByLabelText('First name');

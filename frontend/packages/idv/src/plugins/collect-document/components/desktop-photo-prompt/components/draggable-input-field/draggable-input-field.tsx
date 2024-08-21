@@ -1,6 +1,7 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { IdDocImageUploadError } from '@onefootprint/types';
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProcessImage from '../../../../hooks/use-process-image';

@@ -34,7 +34,7 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
         <CustomDropdownTrigger aria-label="Open card options">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
-            <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : `••••`}</Text>
+            <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
             <Text variant="body-4">({selectedCard.alias})</Text>
           </CardLine>
           <IcoChevronDown24 className="dropdown-trigger-icon" />
@@ -45,7 +45,7 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
               <CardDropdownElement key={`${card?.number_last4}-${card.alias}`} onClick={() => changeCard(card)}>
                 <CardAndNumber>
                   <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
-                  <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : `••••`}</Text>
+                  <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
                 </CardAndNumber>
                 <AliasAndCheckmark>
                   {card.alias}

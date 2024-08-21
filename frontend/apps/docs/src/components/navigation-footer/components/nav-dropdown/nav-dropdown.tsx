@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
-import useSession, { User } from 'src/hooks/use-session';
+import useSession, { type User } from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 type NavDropdownProps = {

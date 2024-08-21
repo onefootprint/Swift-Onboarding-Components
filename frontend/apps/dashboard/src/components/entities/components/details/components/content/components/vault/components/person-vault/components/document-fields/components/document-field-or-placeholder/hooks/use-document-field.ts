@@ -1,4 +1,4 @@
-import { DataIdentifier, Entity, SupportedIdDocTypes, isVaultDataDecrypted } from '@onefootprint/types';
+import { type DataIdentifier, type Entity, type SupportedIdDocTypes, isVaultDataDecrypted } from '@onefootprint/types';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import useCurrentEntityDocuments from '@/entity/hooks/use-current-entity-documents';

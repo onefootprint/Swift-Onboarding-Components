@@ -1,7 +1,8 @@
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types';
 import { Box, Button, Dialog, Text, TextInput } from '@onefootprint/ui';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import type React from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

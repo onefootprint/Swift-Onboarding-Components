@@ -6,7 +6,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
-import { StateValue } from 'xstate';
+import type { StateValue } from 'xstate';
 import type { BootstrapBusinessData, UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 

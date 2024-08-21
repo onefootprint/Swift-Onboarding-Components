@@ -1,7 +1,7 @@
 import '../../../../config/initializers/i18next-test';
 
 import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import * as React from 'react';
+import type * as React from 'react';
 
 import { Layout } from '../../../layout';
 import AuthMethods from './auth-methods';

@@ -15,7 +15,7 @@
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "lint:ci": "biome ci src",
-    "lint": "biome check --fix src",
+    "lint": "biome check src --fix --unsafe",
     "dev": "tsup --watch",
     "pretest:ci:bun": "cd ../footprint-js && bun run tsup",
     "publish:local": "yarn && yarn build && yalc publish",

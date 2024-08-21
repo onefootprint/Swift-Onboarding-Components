@@ -1,6 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Layout as AppLayout } from '@onefootprint/idv';
-import React from 'react';
+import type React from 'react';
 
 import { useHandoffMachine } from '../machine-provider';
 

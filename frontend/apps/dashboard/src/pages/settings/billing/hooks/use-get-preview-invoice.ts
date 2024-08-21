@@ -21,7 +21,7 @@ const getPreviewInvoice = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<PreviewInvoice>({
     headers: authHeaders,
     method: 'GET',
-    url: `/org/invoice_preview`,
+    url: '/org/invoice_preview',
   });
 
   return response;

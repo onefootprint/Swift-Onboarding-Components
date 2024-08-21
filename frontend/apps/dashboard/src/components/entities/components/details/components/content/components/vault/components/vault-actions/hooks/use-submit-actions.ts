@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { EntityActionsRequest, EntityActionsResponse } from '@onefootprint/types/src/api/entity-actions';
+import type { EntityActionsRequest, EntityActionsResponse } from '@onefootprint/types/src/api/entity-actions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';

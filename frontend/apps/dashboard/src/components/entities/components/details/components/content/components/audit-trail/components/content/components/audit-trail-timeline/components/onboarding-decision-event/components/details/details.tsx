@@ -5,7 +5,7 @@ import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import { OnboardingDecisionEventData } from '@onefootprint/types';
+import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import RuleSetResults from '../../../rule-set-results';
 import useEntityRuleSetResult from '../../../rule-set-results/hooks/use-entity-rule-set-result';
 import FieldValidations from './components/field-validations';

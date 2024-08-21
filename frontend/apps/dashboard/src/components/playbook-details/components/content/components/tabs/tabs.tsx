@@ -1,5 +1,5 @@
 import { tabsRouterSchema } from '@/playbooks/utils/schema';
-import { PlaybookTabs } from '@/playbooks/utils/schema/schema';
+import type { PlaybookTabs } from '@/playbooks/utils/schema/schema';
 import { type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
 import { Tabs as UITabs } from '@onefootprint/ui';
 import { useRouter } from 'next/router';

@@ -2,7 +2,8 @@ import { Combobox, ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit
 import { Text, createFontStyles, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { matchSorter } from 'match-sorter';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ListRowProps } from 'react-virtualized';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';

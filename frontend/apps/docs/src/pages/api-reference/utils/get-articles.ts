@@ -45,7 +45,7 @@ const getSectionTitle = (entry: unknown) => {
 const METHOD_PRIORITY = ['get', 'post', 'patch', 'delete'];
 const methodPriority = (method: string) => {
   const prio = METHOD_PRIORITY.indexOf(method.toLowerCase());
-  return prio !== undefined ? prio : Infinity;
+  return prio !== undefined ? prio : Number.POSITIVE_INFINITY;
 };
 
 const sectionPriority = (section: string) => section.toLowerCase().replace(' ', '-');

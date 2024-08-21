@@ -11,13 +11,13 @@ const getUrl = ({ bootstrapData, options, l10n }: GetUrlArg) => {
   }
   if (options) {
     if (fragment) {
-      fragment += `__`;
+      fragment += '__';
     }
     fragment += `${encodeURIComponent(JSON.stringify(options))}`;
   }
   if (l10n) {
     if (fragment) {
-      fragment += `__`;
+      fragment += '__';
     }
     fragment += `${encodeURIComponent(JSON.stringify(l10n))}`;
   }

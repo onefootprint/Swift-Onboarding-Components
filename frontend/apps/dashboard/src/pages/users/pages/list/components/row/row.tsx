@@ -1,5 +1,5 @@
 import Labels from '@/entities/components/labels';
-import { type Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { CodeInline, Text } from '@onefootprint/ui';
 import { StatusBadge } from 'src/components';
 import getTruncatedName from 'src/utils/get-truncated-name';

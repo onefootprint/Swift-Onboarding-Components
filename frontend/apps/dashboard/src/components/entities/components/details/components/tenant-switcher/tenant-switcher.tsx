@@ -1,5 +1,5 @@
 import { Box } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import useSession from 'src/hooks/use-session';
 
 import useAssumeToViewEntity from './hooks/use-assume-to-view-entity';

@@ -1,5 +1,5 @@
 import { IcoChevronDown16, IcoFlag16, IcoInfo16, IcoPlusSmall16 } from '@onefootprint/icons';
-import { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/types';
 import { Dropdown, Stack, Tooltip, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

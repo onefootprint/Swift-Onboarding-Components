@@ -1,4 +1,4 @@
-import { Organization, RoleScope } from '@onefootprint/types';
+import type { Organization, RoleScope } from '@onefootprint/types';
 
 export type Session = {
   authToken?: string;

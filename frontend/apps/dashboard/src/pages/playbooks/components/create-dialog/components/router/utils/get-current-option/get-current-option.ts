@@ -1,5 +1,5 @@
 import type { StepperOption } from '@onefootprint/ui';
-import { StateValue } from 'xstate';
+import type { StateValue } from 'xstate';
 
 type GetStepProps = {
   value: StateValue;

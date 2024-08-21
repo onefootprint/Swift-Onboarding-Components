@@ -1,6 +1,6 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import React from 'react';
+import type React from 'react';
 
 import Content from './components/content';
 import FullHeightContainer from './components/full-height-container';

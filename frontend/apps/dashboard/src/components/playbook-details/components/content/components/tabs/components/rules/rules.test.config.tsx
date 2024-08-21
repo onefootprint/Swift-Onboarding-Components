@@ -1,5 +1,5 @@
 import { fireEvent, mockRequest, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import { AuthMethodKind, OnboardingConfig, Rule, RuleBacktestingData } from '@onefootprint/types';
+import { AuthMethodKind, type OnboardingConfig, type Rule, type RuleBacktestingData } from '@onefootprint/types';
 import {
   ActorKind,
   IdDI,
@@ -353,7 +353,7 @@ export const withAddRule = (response: Rule, playbookId: string = kycPlaybookFixt
 export const withRiskSignals = () => {
   mockRequest({
     method: 'get',
-    path: `/org/risk_signals`,
+    path: '/org/risk_signals',
     response: [
       {
         id: '1',

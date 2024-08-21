@@ -107,7 +107,7 @@ const videoElementStateListener =
             onPlayNotAllowed();
             logWarn('Video play event: not allowed - prompting user interaction', err);
           } else {
-            logError(`Video play event: error`, err);
+            logError('Video play event: error', err);
           }
         });
     }
@@ -161,7 +161,7 @@ const getVideoTrackSettings = (stream?: MediaStream | null): MediaTrackSettings 
 
 const getVideoResolution = (stream?: MediaStream | null): Resolution | undefined => {
   const settings = getVideoTrackSettings(stream);
-  return settings && settings.width && settings.height ? { width: settings.width, height: settings.height } : undefined;
+  return settings?.width && settings.height ? { width: settings.width, height: settings.height } : undefined;
 };
 
 const Camera = ({
@@ -238,7 +238,7 @@ const Camera = ({
       if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
       logWarn('video play: not allowed - prompting user interaction', err);
     } else {
-      logError(`video play: error`, err);
+      logError('video play: error', err);
     }
   };
 
@@ -283,7 +283,7 @@ const Camera = ({
       }
       if (!videoRef.current.srcObject) {
         logWarn('(interval) video src object not set');
-        if (mediaStream && mediaStream.active) {
+        if (mediaStream?.active) {
           logInfo('(interval) setting video src object');
           videoRef.current.srcObject = mediaStream;
         }

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import type React from 'react';
 import useSession from 'src/hooks/use-session';
 
 import { DOCS_SITE_LOGIN_ROUTE, TRANSITION_ROUTES } from '../../config/constants';

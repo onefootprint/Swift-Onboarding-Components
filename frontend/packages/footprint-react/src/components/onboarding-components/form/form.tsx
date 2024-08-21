@@ -2,8 +2,8 @@
 import cx from 'classnames';
 import isPlainObject from 'lodash/isPlainObject';
 import type { FormHTMLAttributes } from 'react';
-import React from 'react';
-import { FieldErrors, FormProvider, useForm } from 'react-hook-form';
+import type React from 'react';
+import { type FieldErrors, FormProvider, useForm } from 'react-hook-form';
 
 import type { FormValues } from '../../../types';
 

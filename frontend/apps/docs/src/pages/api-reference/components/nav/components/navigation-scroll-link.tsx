@@ -1,5 +1,5 @@
 import { createFontStyles } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import { Link } from 'react-scroll';
 import styled, { css } from 'styled-components';
 import { ARTICLES_CONTAINER_ID } from '../../articles';

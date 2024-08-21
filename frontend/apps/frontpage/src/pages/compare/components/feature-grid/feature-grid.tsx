@@ -1,6 +1,6 @@
 import { Box, Container, Text, media } from '@onefootprint/ui';
-import { ParseKeys } from 'i18next';
-import React from 'react';
+import type { ParseKeys } from 'i18next';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import FeatureCard from './components/feature-card';

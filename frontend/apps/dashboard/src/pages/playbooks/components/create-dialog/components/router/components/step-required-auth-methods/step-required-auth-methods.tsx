@@ -1,5 +1,5 @@
 import Footer from '@/create-playbook/components/router/components/footer';
-import { DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Stack } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,6 @@
 import { IcoCamera40, IcoClose24, IcoImages24 } from '@onefootprint/icons';
 import { Box, Button, IconButton, Text, media, useToast } from '@onefootprint/ui';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
 import { getLogger, trackAction } from '../../../../utils/logger';
@@ -18,7 +18,7 @@ const { logError } = getLogger({ location: 'camera-access-request' });
 
 const showFeedbackToast = (t: T, toast: (str: string) => string, err: unknown): unknown => {
   if (!(err instanceof Error)) {
-    logError(`Unknown MediaStream error`, err);
+    logError('Unknown MediaStream error', err);
     return err;
   }
 

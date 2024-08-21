@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Logo } from '../logo.type';
+import type { Logo } from '../logo.type';
 
 const BloomLogo = ({ color }: Logo) => (
   <StyledSvg width="361" height="102" viewBox="0 0 361 102" fill="none" xmlns="http://www.w3.org/2000/svg">

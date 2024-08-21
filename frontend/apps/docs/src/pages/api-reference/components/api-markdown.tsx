@@ -1,4 +1,4 @@
-import { MarkdownToJSX } from 'markdown-to-jsx';
+import type { MarkdownToJSX } from 'markdown-to-jsx';
 import BaseMarkdown from 'src/components/markdown';
 import ScrollLink from 'src/pages/api-reference/components/scroll-link';
 import ErrorSchema from './error-schema';

@@ -13,7 +13,7 @@
     "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep idv,ui,request",
     "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
     "lint:ci": "biome ci src",
-    "lint": "biome check src --fix",
+    "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3000",
     "test:ci": "jest --ci --bail --runInBand",

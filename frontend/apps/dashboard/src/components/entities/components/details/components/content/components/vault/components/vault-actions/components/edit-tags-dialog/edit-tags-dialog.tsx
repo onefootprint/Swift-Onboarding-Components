@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
-import { Tag } from '@onefootprint/types';
+import type { Tag } from '@onefootprint/types';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import { useState } from 'react';
-import { WithEntityProps } from 'src/components/entities/components/details/components/with-entity';
+import type { WithEntityProps } from 'src/components/entities/components/details/components/with-entity';
 import useSession from 'src/hooks/use-session';
 import EditableTag from './components/editable-tag';
 import { EditableTagKind } from './types';

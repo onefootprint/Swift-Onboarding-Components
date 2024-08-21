@@ -39,7 +39,7 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
       }
     }
 
-    if (media && media.length) sortedHit.push({ key: 'relevantMedia', value: media });
+    if (media?.length) sortedHit.push({ key: 'relevantMedia', value: media });
 
     return sortedHit;
   };

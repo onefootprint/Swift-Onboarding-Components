@@ -1,4 +1,4 @@
-import { IdDocOutcome, IdVerificationOutcome, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
+import { IdDocOutcome, IdVerificationOutcome, OverallOutcome, type PublicOnboardingConfig } from '@onefootprint/types';
 import { Box, Button, Stack } from '@onefootprint/ui';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

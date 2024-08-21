@@ -8,7 +8,7 @@ import useSession from 'src/hooks/use-session';
 const getOrgFrequentNotes = async (kind: OrgFrequentNoteKind, authHeaders: AuthHeaders) => {
   const response = await request<GetOrgFrequentNotesResponse>({
     method: 'GET',
-    url: `/org/frequent_notes`,
+    url: '/org/frequent_notes',
     params: {
       kind,
     },

@@ -1,5 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import React from 'react';
+import type React from 'react';
 
 import useCurrentEntity from '../../hooks/use-current-entity';
 

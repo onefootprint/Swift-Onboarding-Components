@@ -7,7 +7,7 @@ describe('getCountryCodeFromLocale', () => {
     ${'ab-cd'} | ${'CD'}
     ${'ab_CD'} | ${'CD'}
     ${'ab_cd'} | ${'CD'}
-  `(`should return $output`, ({ locale, output }) => {
+  `('should return $output', ({ locale, output }) => {
     expect(getCountryCodeFromLocale(locale)).toBe(output);
   });
 });

@@ -1,7 +1,7 @@
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import type { render as TestingLibraryRender } from '@testing-library/react';
-import React from 'react';
+import type React from 'react';
 
 import { TranslationsProvider, initTranslations } from '@/i18n';
 

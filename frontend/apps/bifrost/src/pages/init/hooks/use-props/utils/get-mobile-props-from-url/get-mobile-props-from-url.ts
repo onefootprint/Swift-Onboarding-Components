@@ -11,7 +11,7 @@ const getParsedProps = (props?: string): Record<string, unknown> | undefined => 
   try {
     parsedProps = JSON.parse(decodeURIComponent(props));
   } catch (_) {
-    Logger.warn(`Could not parse props from url. They will be ignored.`, {
+    Logger.warn('Could not parse props from url. They will be ignored.', {
       location: 'bifrost-use-props',
     });
   }

@@ -1,10 +1,10 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import { BusinessDI, BusinessDIData } from '@onefootprint/types';
+import { BusinessDI, type BusinessDIData } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box } from '@onefootprint/ui';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import type { SectionAction } from '../../../../../../components/confirm-collected-data';
 import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import type { SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';

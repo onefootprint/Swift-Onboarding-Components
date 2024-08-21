@@ -1,8 +1,8 @@
-import { GetStaticProps } from 'next';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
+import type { GetStaticProps } from 'next';
+import type { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { getAllMarkdownFiles } from 'src/utils/articles';
 import { getSectionId } from 'src/utils/section';
-import { ApiReferenceProps } from './api-reference';
+import type { ApiReferenceProps } from './api-reference';
 
 export type ApiArticleProps = {
   method: string;

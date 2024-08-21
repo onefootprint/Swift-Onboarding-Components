@@ -31,7 +31,7 @@ type BasicInformationProps = {
   verifiedMethods?: VerifiedMethods;
 };
 
-const keyPrefix: 'kyc.pages.basic-information' = 'kyc.pages.basic-information';
+const keyPrefix = 'kyc.pages.basic-information' as const;
 const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
   [IdDI.firstName]: 'firstName',
   [IdDI.middleName]: 'middleName',

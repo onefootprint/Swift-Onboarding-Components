@@ -1,13 +1,13 @@
 import {
   BusinessDI,
-  BusinessDIData,
+  type BusinessDIData,
   CollectedKybDataOption,
   CollectedKybDataOptionToRequiredAttributes,
 } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import { getLogger } from '../../../../utils/logger';
 import CollectKybDataNavigationHeader from '../../components/collect-kyb-data-navigation-header';
@@ -83,8 +83,11 @@ const BasicData = ({ ctaLabel, hideHeader, hideInputTin, onCancel, onComplete }:
         attr === CollectedKybDataOption.phoneNumber ||
         attr === CollectedKybDataOption.website,
     )
-    .map(attr => CollectedKybDataOptionToRequiredAttributes[attr])
-    .flat() as (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
+    .flatMap(attr => CollectedKybDataOptionToRequiredAttributes[attr]) as (
+    | BusinessDI.corporationType
+    | BusinessDI.phoneNumber
+    | BusinessDI.website
+  )[];
 
   return (
     <Stack direction="column" gap={7} width="100%">

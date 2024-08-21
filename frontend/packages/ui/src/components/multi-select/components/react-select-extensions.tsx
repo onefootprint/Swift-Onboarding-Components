@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { IcoChevronDown16, IcoCloseSmall16 } from '@onefootprint/icons';
 import noop from 'lodash/noop';
-import React from 'react';
+import type React from 'react';
 import type {
   ClearIndicatorProps,
   DropdownIndicatorProps,

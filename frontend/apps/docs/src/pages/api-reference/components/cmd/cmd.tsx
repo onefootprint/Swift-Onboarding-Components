@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { scroller } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
-import { ContentSchemaNoRef } from '../../api-reference.types';
+import type { ContentSchemaNoRef } from '../../api-reference.types';
 import { ARTICLES_CONTAINER_ID } from '../articles';
 import type { PageNavProps } from '../nav/nav.types';
 import Footer from './components/footer/footer';

@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { CollectedKycDataOption } from '@onefootprint/types';
+import type { CollectedKycDataOption } from '@onefootprint/types';
 import type { UserTokenResponse } from '@onefootprint/types';
 import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 

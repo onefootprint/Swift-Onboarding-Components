@@ -1,4 +1,4 @@
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 const useFormValues = () => {

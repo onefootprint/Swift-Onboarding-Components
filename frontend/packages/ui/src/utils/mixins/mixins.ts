@@ -23,7 +23,7 @@ const convertDeprecatedTypography = (typography: DeprecatedTypography): Typograp
   if (parts.length < 2) {
     throw new Error('Invalid typography');
   }
-  const fontWeight = parseInt(parts[0], 10) as CSS.Property.FontWeight;
+  const fontWeight = Number.parseInt(parts[0], 10) as CSS.Property.FontWeight;
   const [fontSize, lineHeight] = parts[1].split('/');
   return {
     fontWeight,

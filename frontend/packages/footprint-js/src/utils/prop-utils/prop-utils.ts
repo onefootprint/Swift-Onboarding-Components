@@ -39,13 +39,13 @@ export const isObject = (o: unknown): o is Obj => o != null && typeof o === 'obj
 
 const hasObjKeys = (o: unknown): o is Obj => isObject(o) && Object.keys(o).length > 0;
 
-const validateContainerIdForVariant = (variant: Variant, containerId?: string): void | never => {
+const validateContainerIdForVariant = (variant: Variant, containerId?: string): undefined | never => {
   if (variant === 'inline' && !containerId) {
     throw new Error(`Inline component requires a containerId. Received ${containerId}`);
   }
 };
 
-export const validateComponentVariant = (kind: `${ComponentKind}`, variant?: Variant): void | never => {
+export const validateComponentVariant = (kind: `${ComponentKind}`, variant?: Variant): undefined | never => {
   if (!variant) {
     return;
   }
@@ -67,7 +67,7 @@ export const getDefaultVariantForKind = (kind: `${ComponentKind}`): Variant | ne
   return supportedVariants[0];
 };
 
-export const validateComponentKind = (kind: `${ComponentKind}`): void | never => {
+export const validateComponentKind = (kind: `${ComponentKind}`): undefined | never => {
   if (!kind) {
     throw new Error('Kind is required');
   }

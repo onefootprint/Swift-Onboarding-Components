@@ -1,11 +1,11 @@
 import {
   DocumentRequestKind,
-  DocumentRequirement,
+  type DocumentRequirement,
   DocumentUploadSettings,
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
-  IdDocRequirementConfig,
+  type IdDocRequirementConfig,
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';

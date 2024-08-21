@@ -1,6 +1,6 @@
 import {
   DocumentRequestKind,
-  DocumentRequirement,
+  type DocumentRequirement,
   DocumentUploadSettings,
   IdDocImageProcessingError,
   IdDocImageUploadError,

@@ -50,7 +50,7 @@ const VerticalBeam = ({
             x2: [width, width],
           }}
           transition={{
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
             ease: 'easeInOut',
             duration: speed,
             delay,
@@ -72,7 +72,7 @@ const VerticalBeam = ({
             x2: [width, width],
           }}
           transition={{
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
             ease: 'easeInOut',
             duration: speed * 1.1,
             delay,

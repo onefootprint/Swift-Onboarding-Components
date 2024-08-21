@@ -2,7 +2,7 @@ import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI, isVaultDataDecrypted, isVaultDataEmpty } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 

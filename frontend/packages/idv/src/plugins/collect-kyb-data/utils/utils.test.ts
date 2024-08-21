@@ -1,4 +1,4 @@
-import { BusinessDI, BusinessDIData, SupportedLocale } from '@onefootprint/types';
+import { BusinessDI, type BusinessDIData, type SupportedLocale } from '@onefootprint/types';
 import { buildBeneficialOwner, formatPayload, omitEqualData } from './utils';
 
 describe('buildBeneficialOwner', () => {

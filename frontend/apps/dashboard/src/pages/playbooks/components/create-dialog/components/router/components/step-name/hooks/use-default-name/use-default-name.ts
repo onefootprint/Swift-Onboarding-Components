@@ -1,5 +1,5 @@
 import usePlaybookKindText from '@/playbooks/hooks/use-playbook-kind-text';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import type { PlaybookKind } from '@/playbooks/utils/machine/types';
 import useSession from 'src/hooks/use-session';
 
 const useDefaultName = ({ kind }: { kind: PlaybookKind }) => {

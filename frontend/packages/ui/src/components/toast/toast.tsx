@@ -1,5 +1,5 @@
 import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
-import React from 'react';
+import type React from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
 import styled, { css, keyframes } from 'styled-components';

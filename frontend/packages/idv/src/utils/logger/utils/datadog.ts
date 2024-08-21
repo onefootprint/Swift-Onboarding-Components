@@ -2,7 +2,7 @@ import type { LogsEvent } from '@datadog/browser-logs';
 import { datadogLogs } from '@datadog/browser-logs';
 import type { RumEvent, RumEventDomainContext } from '@datadog/browser-rum';
 import { datadogRum } from '@datadog/browser-rum';
-import { RumInitConfiguration } from '@datadog/browser-rum-core';
+import type { RumInitConfiguration } from '@datadog/browser-rum-core';
 
 type BaseConfig = { applicationId: string; clientToken: string; env: string; service: string };
 
@@ -65,19 +65,22 @@ const hasUrlToOmit = (log?: string) =>
     str => log?.includes(str),
   );
 
-const getDataDogConfig = (appName: string): void | BaseConfig => {
+const getDataDogConfig = (appName: string): undefined | BaseConfig => {
   const app = appServiceMap[appName];
   const isTest = NODE_ENV === 'test';
   const baseError = 'Datadog not initialized';
 
   if (isTest || !IS_DDOG_ENABLED) {
-    return console.warn(baseError);
+    console.warn(baseError);
+    return;
   }
   if (!app || !app.service || !app.id || !app.token) {
-    return console.warn(`${baseError}: ${appName} is not configured`);
+    console.warn(`${baseError}: ${appName} is not configured`);
+    return;
   }
   if (!VERCEL_ENV) {
-    return console.warn(`${baseError}: VERCEL_ENV is not defined`);
+    console.warn(`${baseError}: VERCEL_ENV is not defined`);
+    return;
   }
 
   return {

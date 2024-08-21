@@ -1,7 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoTrash16 } from '@onefootprint/icons';
 import { Box, Button, Divider, IconButton, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

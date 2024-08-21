@@ -1,6 +1,6 @@
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 import { IcoArrowUpRight16, IcoLightBulb16 } from '@onefootprint/icons';
-import { type OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Box, LinkButton, Stack, Text, Toggle } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

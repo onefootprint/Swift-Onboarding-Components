@@ -8,7 +8,7 @@ const getAllowedDomains = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<GetClientSecurityResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: `/org/client_security_config`,
+    url: '/org/client_security_config',
   });
 
   return response;

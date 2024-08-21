@@ -3,7 +3,7 @@ import { Box, IconButton, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import { Trans, useTranslation } from 'react-i18next';
 import { createGlobalStyle, styled } from 'styled-components';
-import { DeviceInfo } from '../../../../hooks';
+import type { DeviceInfo } from '../../../../hooks';
 import { isAndroid, isChrome, isIOS, isMobileKind, isSafari } from '../../utils/capture';
 import IcoArrowCustom from './ico-arrow-custom';
 

@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { type OnboardingConfigKind } from '@onefootprint/types';
+import type { OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, media, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import { useTranslation } from 'react-i18next';

@@ -1,9 +1,7 @@
 import type { ListOptions, Option, Product } from './examples.types';
 
 const getAllLinksAndRemovedDuplicated = (listOptions: ListOptions) => {
-  const links = Object.entries(listOptions)
-    .map(([, value]) => value.links)
-    .flat();
+  const links = Object.entries(listOptions).flatMap(([, value]) => value.links);
   return [...new Map(links.map(item => [item.name, item])).values()];
 };
 

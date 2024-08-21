@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 const useGetQueryParam = <T extends z.Schema>(querySchema: T) => {
   const { query } = useRouter();

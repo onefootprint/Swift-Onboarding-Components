@@ -1,45 +1,45 @@
 {
-	"name": "@onefootprint/icons",
-	"private": true,
-	"version": "0.0.0",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"license": "MIT",
-	"scripts": {
-		"build": "tsup",
-		"clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-		"dev": "tsup --watch",
-		"lint": "biome check src --fix",
-		"lint:ci": "biome ci src",
-		"typecheck": "yarn tsc --noEmit",
-		"generate": "node ./src/scripts/icos/generate.js",
-		"postgenerate": "yarn lint:fix"
-	},
-	"dependencies": {
-		"@onefootprint/design-tokens": "*",
-		"styled-components": "6.1.1",
-		"react": "^18.2.0",
-		"react-native": "0.71.15",
-		"react-native-svg": "^13.9.0"
-	},
-	"devDependencies": {
-		"@svgr/core": "^6.2.1",
-		"@svgr/plugin-jsx": "^6.2.1",
-		"@svgr/plugin-prettier": "^6.1.2",
-		"@svgr/plugin-svgo": "^6.2.0",
-		"@types/glob": "^7.2.0",
-		"csstype": "^3.1.2",
-		"glob": "^8.0.3",
-		"jest-expo": "^48.0.2",
-		"lodash": "^4.17.21",
-		"react-native-svg-transformer": "^1.0.0",
-		"tsconfig": "*",
-		"typescript": "^5.5.2"
-	},
-	"jest": {
-		"preset": "jest-expo",
-		"transformIgnorePatterns": [
-			"node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-		]
-	}
+  "name": "@onefootprint/icons",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "dev": "tsup --watch",
+    "lint": "biome check src --fix --unsafe",
+    "lint:ci": "biome ci src",
+    "typecheck": "yarn tsc --noEmit",
+    "generate": "node ./src/scripts/icos/generate.js",
+    "postgenerate": "yarn lint:fix"
+  },
+  "dependencies": {
+    "@onefootprint/design-tokens": "*",
+    "styled-components": "6.1.1",
+    "react": "^18.2.0",
+    "react-native": "0.71.15",
+    "react-native-svg": "^13.9.0"
+  },
+  "devDependencies": {
+    "@svgr/core": "^6.2.1",
+    "@svgr/plugin-jsx": "^6.2.1",
+    "@svgr/plugin-prettier": "^6.1.2",
+    "@svgr/plugin-svgo": "^6.2.0",
+    "@types/glob": "^7.2.0",
+    "csstype": "^3.1.2",
+    "glob": "^8.0.3",
+    "jest-expo": "^48.0.2",
+    "lodash": "^4.17.21",
+    "react-native-svg-transformer": "^1.0.0",
+    "tsconfig": "*",
+    "typescript": "^5.5.2"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ]
+  }
 }

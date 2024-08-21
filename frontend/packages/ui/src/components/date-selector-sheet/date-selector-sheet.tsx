@@ -11,7 +11,8 @@ import {
   startOfToday,
 } from 'date-fns';
 import { motion } from 'framer-motion';
-import React, { forwardRef, useMemo, useState } from 'react';
+import type React from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Stack from '../stack';

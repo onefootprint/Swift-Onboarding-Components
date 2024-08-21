@@ -1,10 +1,10 @@
 import { Box, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-scroll';
-import { HttpMethod } from 'src/pages/api-reference/api-reference.types';
+import type { HttpMethod } from 'src/pages/api-reference/api-reference.types';
 import { COLOR_FOR_METHOD } from 'src/pages/api-reference/components/type-badge/type-badge';
 import styled, { css } from 'styled-components';
-import { ARTICLES_CONTAINER_ID, ApiArticleContent } from './articles';
+import { ARTICLES_CONTAINER_ID, type ApiArticleContent } from './articles';
 
 type EndpointsOverviewProps = {
   apiArticles: ApiArticleContent[];

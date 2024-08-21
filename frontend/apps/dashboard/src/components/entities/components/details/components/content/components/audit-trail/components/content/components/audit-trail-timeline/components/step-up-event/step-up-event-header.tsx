@@ -1,4 +1,4 @@
-import { type StepUpEventData } from '@onefootprint/types';
+import type { StepUpEventData } from '@onefootprint/types';
 import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { Trans } from 'react-i18next';
 import useSession from 'src/hooks/use-session';

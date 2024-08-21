@@ -87,12 +87,16 @@ const fakeSdk = (() => ({
     };
 
     return {
-      render: once(async (appUrl?: string): Promise<void | Postmate.ParentAPI | null> => {
-        if (isRendered) return console.error('Already rendered');
+      render: once(async (appUrl?: string): Promise<undefined | Postmate.ParentAPI | null> => {
+        if (isRendered) {
+          console.error('Already rendered');
+          return;
+        }
 
         if (!appUrl) {
           destroy();
-          return console.error('No app url provided');
+          console.error('No app url provided');
+          return;
         }
         isRendered = true;
         const container = hasOverlay ? appendOverlayContainer(uId) : appendInlineContainer(uId, containerId);
@@ -106,7 +110,8 @@ const fakeSdk = (() => ({
         const token = await sendSdkArgs(props);
         if (!token) {
           destroy();
-          return console.error('Failed to send sdk args');
+          console.error('Failed to send sdk args');
+          return;
         }
 
         const base = isUpdateLoginMethods(props) ? `${appUrl}/user` : appUrl;

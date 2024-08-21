@@ -1,4 +1,4 @@
-import { DocumentRequestKind, DocumentRequirement, IdDocRequirementConfig } from '@onefootprint/types';
+import { DocumentRequestKind, type DocumentRequirement, type IdDocRequirementConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import { trackAction } from '../../utils/logger';

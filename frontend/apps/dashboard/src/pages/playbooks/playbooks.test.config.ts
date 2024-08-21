@@ -1,5 +1,10 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { AuthMethodKind, OnboardingConfig, OnboardingConfigKind, OnboardingConfigStatus } from '@onefootprint/types';
+import {
+  AuthMethodKind,
+  type OnboardingConfig,
+  OnboardingConfigKind,
+  OnboardingConfigStatus,
+} from '@onefootprint/types';
 
 export const playbooksFixture: OnboardingConfig[] = [
   {

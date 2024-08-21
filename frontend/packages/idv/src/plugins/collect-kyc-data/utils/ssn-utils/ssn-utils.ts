@@ -59,7 +59,8 @@ export const getTypeOfTaxId = (kind?: TaxIdKind, rawStr?: string): TaxIdKind | u
     if (getTaxIdInputPattern('itin').test(formattedStr)) return 'itin';
     if (getTaxIdInputPattern('ssn9').test(formattedStr)) return 'ssn9';
     return undefined;
-  } else if (kind === 'ssn9') {
+  }
+  if (kind === 'ssn9') {
     return getTaxIdInputPattern('ssn9').test(formattedStr) ? 'ssn9' : undefined;
   }
 

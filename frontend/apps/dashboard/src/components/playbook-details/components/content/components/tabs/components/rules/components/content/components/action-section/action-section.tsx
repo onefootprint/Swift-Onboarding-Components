@@ -38,7 +38,7 @@ const ActionSection = ({
   onDeleteAdd,
 }: ActionSectionProps) => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: `details.rules.action-section`,
+    keyPrefix: 'details.rules.action-section',
   });
   const [addedRules, setAddedRules] = useState<AddedRuleWithId[]>([]);
 

@@ -64,7 +64,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
 
   const isLoading = getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
   const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
-  const showSave = !(notes && notes.find(n => n.content === value)) && value;
+  const showSave = !notes?.find(n => n.content === value) && value;
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const handleOptionClick = (body: string) => {
@@ -166,28 +166,27 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
               </Stack>
               {error && <ErrorComponent message={getErrorMessage(error)} />}
               <AnimatePresence initial={false}>
-                {notes &&
-                  notes.map(note => (
-                    <motion.span
-                      variants={appearHorizontal}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      transition={{ duration: 0.15 }}
-                      key={note.id}
+                {notes?.map(note => (
+                  <motion.span
+                    variants={appearHorizontal}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{ duration: 0.15 }}
+                    key={note.id}
+                  >
+                    <Option
+                      value={note.id}
+                      onClick={handleOptionClick}
+                      isEdit={isEdit}
+                      onDelete={() => {
+                        deleteFrequentNote(note.id);
+                      }}
                     >
-                      <Option
-                        value={note.id}
-                        onClick={handleOptionClick}
-                        isEdit={isEdit}
-                        onDelete={() => {
-                          deleteFrequentNote(note.id);
-                        }}
-                      >
-                        {note.content}
-                      </Option>
-                    </motion.span>
-                  ))}
+                      {note.content}
+                    </Option>
+                  </motion.span>
+                ))}
               </AnimatePresence>
             </Stack>
           </motion.span>

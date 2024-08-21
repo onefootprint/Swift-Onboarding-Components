@@ -6,7 +6,7 @@ import type { DeviceInfo as Device } from '../../../hooks';
 import { getRandomID } from '../../../utils';
 import validateBootstrapData from '../utils/validate-bootstrap-data';
 import type { IdentifyMachineContext as Context, IdentifyContext } from './types';
-import { IdentifyMachineArgs, IdentifyVariant } from './types';
+import { type IdentifyMachineArgs, IdentifyVariant } from './types';
 
 type User = IdentifyContext['user'];
 

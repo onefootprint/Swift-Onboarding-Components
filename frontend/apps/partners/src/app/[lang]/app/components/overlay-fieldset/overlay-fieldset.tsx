@@ -1,6 +1,7 @@
 import { IcoPencil16 } from '@onefootprint/icons';
 import { IconButton, LinkButton, Stack, Text } from '@onefootprint/ui';
-import React, { useId, useState } from 'react';
+import type React from 'react';
+import { useId, useState } from 'react';
 
 import DialogWrapper from '../dialog-wrapper';
 

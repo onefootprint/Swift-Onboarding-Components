@@ -2,10 +2,10 @@ import { UsLegalStatus } from '@onefootprint/types';
 import { isValid } from 'date-fns';
 
 export enum VisaExpirationValidationError {
-  SHOULD_BE_EMPTY,
-  REQUIRED,
-  INVALID,
-  INVALID_TIMEFRAME,
+  SHOULD_BE_EMPTY = 0,
+  REQUIRED = 1,
+  INVALID = 2,
+  INVALID_TIMEFRAME = 3,
 }
 
 const validateVisaKind = (visaExpiration: string, legalStatus: string): VisaExpirationValidationError | undefined => {

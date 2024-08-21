@@ -1,5 +1,5 @@
 import { Box, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type SectionSubtitleProps = {
   $maxWidth?: string;

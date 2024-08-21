@@ -1,6 +1,7 @@
 import type { CountryCode } from '@onefootprint/types';
 import Cleave from 'cleave.js/react';
-import React, { forwardRef, useId, useRef, useState } from 'react';
+import type React from 'react';
+import { forwardRef, useId, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 

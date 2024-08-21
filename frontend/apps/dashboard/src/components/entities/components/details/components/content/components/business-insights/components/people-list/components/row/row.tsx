@@ -1,5 +1,5 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import { BusinessPerson } from '@onefootprint/types';
+import type { BusinessPerson } from '@onefootprint/types';
 import { Badge, Stack, Tag, Tooltip } from '@onefootprint/ui';
 import isNull from 'lodash/isNull';
 import { useTranslation } from 'react-i18next';

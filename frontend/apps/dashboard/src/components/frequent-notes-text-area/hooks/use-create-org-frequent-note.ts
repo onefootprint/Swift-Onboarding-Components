@@ -9,7 +9,7 @@ import { getOrgFrequentNotesQueryKey } from './use-org-frequent-notes';
 const createOrgFrequentNote = async (data: CreateOrgFrequentNoteRequest, authHeaders: AuthHeaders) => {
   const response = await request<CreateOrgFrequentNoteResponse>({
     method: 'POST',
-    url: `/org/frequent_notes`,
+    url: '/org/frequent_notes',
     data,
     headers: authHeaders,
   });

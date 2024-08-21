@@ -26,7 +26,7 @@ const Wave = ({ initialDiameter, finalDiameter, duration, delay, $zIndex }: Wave
     transition={{
       duration,
       delay,
-      repeat: Infinity,
+      repeat: Number.POSITIVE_INFINITY,
     }}
   />
 );

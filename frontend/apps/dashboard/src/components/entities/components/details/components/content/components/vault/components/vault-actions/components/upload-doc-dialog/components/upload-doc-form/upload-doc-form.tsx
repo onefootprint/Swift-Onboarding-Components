@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Form, LinkButton, Stack, Text, TextInput } from '@onefootprint/ui';
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

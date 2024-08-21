@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { OrgMemberResponse } from '@onefootprint/types';
+import type { OrgMemberResponse } from '@onefootprint/types';
 import type { Session, SessionState } from './use-session.types';
 import { defaultSession } from './use-session.types';
 

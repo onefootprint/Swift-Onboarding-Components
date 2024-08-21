@@ -1,6 +1,6 @@
 import { Grid } from '@onefootprint/ui';
 import type { FormHTMLAttributes } from 'react';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import ErrorComponent from './components/error';

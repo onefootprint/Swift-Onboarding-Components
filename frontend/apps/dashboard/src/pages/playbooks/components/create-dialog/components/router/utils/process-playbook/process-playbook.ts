@@ -1,9 +1,9 @@
-import { AuthMethodKind, CollectedDataOption, CustomDI } from '@onefootprint/types';
+import { AuthMethodKind, type CollectedDataOption, type CustomDI } from '@onefootprint/types';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
-  DocumentRequestConfig,
+  type DocumentRequestConfig,
   DocumentRequestKind,
 } from '@onefootprint/types';
 

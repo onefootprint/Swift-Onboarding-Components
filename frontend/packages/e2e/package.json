@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "lint:ci": "biome ci src",
-    "lint": "biome check --fix src",
+    "lint": "biome check src --fix --unsafe",
     "postinstall": "npx playwright install",
     "test:e2e:debug": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#debug\"",
     "test:e2e:generate": "npx playwright codegen http://localhost:3002/e2e?ob_key=ob_test_yHlPBcaJ6lnxwkkD1YLStx&locale=es-MX",

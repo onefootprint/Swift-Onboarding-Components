@@ -1,5 +1,5 @@
 import { Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type TitleProps = {
   children: React.ReactNode;

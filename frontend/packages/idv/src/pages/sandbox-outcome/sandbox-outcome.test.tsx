@@ -1,12 +1,12 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, within } from '@onefootprint/test-utils';
-import { IdVerificationOutcome, PublicOnboardingConfig } from '@onefootprint/types';
+import { IdVerificationOutcome, type PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OnboardingConfigStatus, OverallOutcome } from '@onefootprint/types';
 
 import { Layout } from '../../components';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
-import { SandboxOutcomeFormData } from './types';
+import type { SandboxOutcomeFormData } from './types';
 
 const getOnboardingConfig = (
   requiresIdDoc = true,

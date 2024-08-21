@@ -1,5 +1,5 @@
 import type { Props } from '../../types/components';
-import { ComponentKind, ComponentsSdkProps } from '../../types/components';
+import { ComponentKind, type ComponentsSdkProps } from '../../types/components';
 
 const isAuth = (x: unknown): x is ComponentKind.Auth => x === ComponentKind.Auth;
 

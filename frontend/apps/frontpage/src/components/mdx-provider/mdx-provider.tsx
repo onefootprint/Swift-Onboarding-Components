@@ -1,5 +1,5 @@
 import { MDXProvider as ReactMDXProvider } from '@mdx-js/react';
-import React from 'react';
+import type React from 'react';
 
 import A from './components/a';
 import H2 from './components/h2';

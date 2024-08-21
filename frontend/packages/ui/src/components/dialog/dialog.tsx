@@ -2,7 +2,8 @@
 
 import { IcoClose24 } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useElementSize, useLockedBody } from 'usehooks-ts';
@@ -201,17 +202,16 @@ const getSize = (size: DialogSize, isConfirmation: boolean) => {
       default:
         return '650px';
     }
-  } else {
-    switch (size) {
-      case 'compact':
-        return '500px';
-      case 'large':
-        return '800px';
-      case 'full-screen':
-        return '100vw';
-      default:
-        return '650px';
-    }
+  }
+  switch (size) {
+    case 'compact':
+      return '500px';
+    case 'large':
+      return '800px';
+    case 'full-screen':
+      return '100vw';
+    default:
+      return '650px';
   }
 };
 

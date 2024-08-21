@@ -1,5 +1,6 @@
 import { isEqual, isValid, set } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../../utils';
@@ -28,9 +29,9 @@ const DateInput = ({ autoFocus, value, hasError, onChange, onFocus }: DateInputP
 
   const submit = () => {
     const newDate = set(value, {
-      year: parseInt(year, 10),
-      month: parseInt(month, 10) - 1,
-      date: parseInt(day, 10),
+      year: Number.parseInt(year, 10),
+      month: Number.parseInt(month, 10) - 1,
+      date: Number.parseInt(day, 10),
     });
 
     if (!isValid(newDate)) {
@@ -56,19 +57,19 @@ const DateInput = ({ autoFocus, value, hasError, onChange, onFocus }: DateInputP
   };
 
   const handleMonthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let monthValue = parseInt(event.target.value, 10);
+    let monthValue = Number.parseInt(event.target.value, 10);
     monthValue = Math.max(1, Math.min(12, monthValue));
     setMonth(monthValue.toString().padStart(2, '0'));
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let dateValue = parseInt(event.target.value, 10);
+    let dateValue = Number.parseInt(event.target.value, 10);
     dateValue = Math.max(1, Math.min(31, dateValue));
     setDay(dateValue.toString().padStart(2, '0'));
   };
 
   const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const yearValue = parseInt(event.target.value, 10);
+    const yearValue = Number.parseInt(event.target.value, 10);
     if (yearValue > 0) {
       setYear(yearValue.toString());
     }

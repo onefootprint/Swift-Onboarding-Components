@@ -3,8 +3,8 @@ import styled, { css } from 'styled-components';
 import { media } from '@onefootprint/ui';
 import ApiArticle from 'src/pages/api-reference/components/api-article';
 import SideBySideElement from 'src/pages/api-reference/components/side-by-side-element';
-import { HydratedArticle } from 'src/pages/api-reference/hooks';
-import { IntroductionArticle } from '../index.page';
+import type { HydratedArticle } from 'src/pages/api-reference/hooks';
+import type { IntroductionArticle } from '../index.page';
 import ApiMarkdown from './api-markdown';
 import EndpointsOverview from './endpoints-overview';
 

@@ -1,7 +1,7 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 
-import React from 'react';
+import type React from 'react';
 import { HostedMachineProvider } from 'src/components/hosted-machine-provider';
 
 import configureI18n from '../../config/initializers/i18next';

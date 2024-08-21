@@ -1,5 +1,5 @@
 import constate from 'constate';
-import React from 'react';
+import type React from 'react';
 
 import Dialog from '../../components/dialog';
 import Text from '../../components/text';

@@ -8,9 +8,9 @@ import DesktopPageNav from './components/nav/desktop-page-nav';
 import MobilePageNav from './components/nav/mobile-page-nav';
 
 import Articles from './components/articles';
-import { PageNavSection } from './components/nav/nav.types';
+import type { PageNavSection } from './components/nav/nav.types';
 import useParseApiSections from './hooks/use-parse-api-sections';
-import { ApiReferenceArticle, IntroductionArticle } from './index.page';
+import type { ApiReferenceArticle, IntroductionArticle } from './index.page';
 
 export type ApiReferenceProps = {
   introductionSections: IntroductionArticle[];
@@ -80,7 +80,7 @@ const Layout = styled.div`
 
     ${media.greaterThan('md')`
       overflow: hidden;
-      grid-template-columns: ${`var(--page-aside-nav-api-reference-width-small)`} minmax(0, 1fr);
+      grid-template-columns: ${'var(--page-aside-nav-api-reference-width-small)'} minmax(0, 1fr);
       grid-template-areas: 'nav content';
       transition: grid-template-columns 0.3s ease-in-out;
       width: 100%;

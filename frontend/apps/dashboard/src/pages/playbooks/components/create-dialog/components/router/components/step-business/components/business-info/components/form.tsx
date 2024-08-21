@@ -1,4 +1,4 @@
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { Button, Checkbox, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';

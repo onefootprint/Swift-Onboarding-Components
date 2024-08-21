@@ -3,7 +3,7 @@ import { NativeSelect, Stack, Text } from '@onefootprint/ui';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSandboxOutcomeOptions from '../../../sandbox-outcome/hooks/use-sandbox-outcome-options';
-import { SandboxOutcomeFormData } from '../../../sandbox-outcome/types';
+import type { SandboxOutcomeFormData } from '../../../sandbox-outcome/types';
 import SimulatedOutcomes from './components/simulated-outcomes';
 
 type IdDocOutcomeSelectProps = {

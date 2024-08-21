@@ -1,6 +1,6 @@
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 type GroupProps = {
   title: string;

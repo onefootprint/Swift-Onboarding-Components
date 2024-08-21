@@ -37,7 +37,7 @@ const marqueeContainerVariants = {
   animate: {
     transition: {
       staggerChildren: 0.2,
-      repeat: Infinity,
+      repeat: Number.POSITIVE_INFINITY,
       repeatType: 'loop' as const,
     },
   },

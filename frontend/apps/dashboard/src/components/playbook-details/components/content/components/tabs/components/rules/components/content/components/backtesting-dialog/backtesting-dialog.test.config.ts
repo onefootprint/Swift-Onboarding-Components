@@ -1,5 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import { AuthMethodKind, OnboardingConfig, RuleBacktestingData } from '@onefootprint/types';
+import { AuthMethodKind, type OnboardingConfig, type RuleBacktestingData } from '@onefootprint/types';
 import { OnboardingConfigKind, OnboardingConfigStatus, OnboardingStatus } from '@onefootprint/types';
 import { OnboardingDecisionRuleAction } from '@onefootprint/types/src/data/rule';
 

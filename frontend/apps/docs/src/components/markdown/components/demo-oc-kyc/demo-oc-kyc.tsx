@@ -1,8 +1,9 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import Styles from './demo-oc-kyc-styles';
 

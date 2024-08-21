@@ -62,7 +62,7 @@ const GlobalSupport = () => {
             transition={{
               duration: 2,
               delay: index * 0.2,
-              repeat: Infinity,
+              repeat: Number.POSITIVE_INFINITY,
               repeatDelay: countries.length * 0.2,
             }}
           >

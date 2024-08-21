@@ -2,7 +2,7 @@ import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { useRouter } from 'next/router';
-import React from 'react';
+import type React from 'react';
 
 type CustomDesignSystemProviderProps = {
   children: React.ReactNode;

@@ -1,5 +1,5 @@
 import { Button, Stack } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../layout/components/header-title';

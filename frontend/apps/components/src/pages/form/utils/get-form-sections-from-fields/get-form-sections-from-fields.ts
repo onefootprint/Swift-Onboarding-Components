@@ -24,7 +24,7 @@ const getFormSectionsFromFields = (vaultFields?: string[]): FormSection[] => {
   Object.keys(SectionsByFields).forEach(key => {
     const section = key as FormSection;
     const fields = SectionsByFields[section];
-    const isSectionInVault = fields && fields.every(field => vaultFieldNames.includes(field));
+    const isSectionInVault = fields?.every(field => vaultFieldNames.includes(field));
     if (isSectionInVault) {
       sections.push(section);
     }

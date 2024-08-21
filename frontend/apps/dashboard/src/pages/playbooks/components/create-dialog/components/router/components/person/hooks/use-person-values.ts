@@ -1,4 +1,4 @@
-import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import { useFormContext } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';

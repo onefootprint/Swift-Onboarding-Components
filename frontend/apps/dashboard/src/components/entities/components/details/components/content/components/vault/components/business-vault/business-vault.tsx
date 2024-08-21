@@ -2,7 +2,7 @@ import { Grid } from '@onefootprint/ui';
 import styled from 'styled-components';
 
 import useBusinessOwners from '@/entity/hooks/use-business-owners';
-import { Entity, hasEntityCustomData } from '@onefootprint/types';
+import { type Entity, hasEntityCustomData } from '@onefootprint/types';
 import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';

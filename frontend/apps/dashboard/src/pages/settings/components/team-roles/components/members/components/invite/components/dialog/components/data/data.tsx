@@ -72,7 +72,7 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
         <AddButton onClick={handleAddMore} />
         {user?.isFirmEmployee && (
           <Box marginTop={5}>
-            <Checkbox label="Omit sending email invite" {...register(`omitEmailInvite`, {})} />
+            <Checkbox label="Omit sending email invite" {...register('omitEmailInvite', {})} />
           </Box>
         )}
       </FormProvider>

@@ -1,5 +1,5 @@
 import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth, OverallOutcome } from '@onefootprint/types';
-import { BusinessDI, IdDI } from '@onefootprint/types';
+import { type BusinessDI, IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks';

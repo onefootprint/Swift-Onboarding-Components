@@ -1,6 +1,6 @@
 import { ToastProvider } from '@onefootprint/ui';
 import type { ReactNode } from 'react';
-import React from 'react';
+import type React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import configureReactI18next from 'src/config/initializers/react-i18next';
 

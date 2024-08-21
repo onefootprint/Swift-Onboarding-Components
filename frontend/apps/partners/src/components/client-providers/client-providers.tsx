@@ -2,7 +2,7 @@
 
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 
 import StyledComponentsRegistry from './components/styled-registry';
 

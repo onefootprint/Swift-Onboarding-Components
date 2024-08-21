@@ -3,10 +3,10 @@ import {
   AuthMethodKind,
   BusinessDI,
   CollectedKycDataOption,
-  Entity,
+  type Entity,
   EntityKind,
   EntityStatus,
-  GetOnboardingConfigsResponse,
+  type GetOnboardingConfigsResponse,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';

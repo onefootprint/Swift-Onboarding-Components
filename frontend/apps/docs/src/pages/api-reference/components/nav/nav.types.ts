@@ -1,4 +1,4 @@
-import { HydratedApiArticle } from '../../hooks/use-hydrate-articles';
+import type { HydratedApiArticle } from '../../hooks/use-hydrate-articles';
 
 export type PageNavProps = {
   sections: PageNavSection[];

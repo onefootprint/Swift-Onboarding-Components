@@ -3,10 +3,10 @@ import { isFuture, isValid } from 'date-fns';
 export const MIN_VALID_AGE = 18;
 
 export enum DobValidationError {
-  INVALID,
-  FUTURE_DATE,
-  TOO_YOUNG,
-  TOO_OLD,
+  INVALID = 0,
+  FUTURE_DATE = 1,
+  TOO_YOUNG = 2,
+  TOO_OLD = 3,
 }
 
 const validateDob = (dob: string): DobValidationError | undefined => {

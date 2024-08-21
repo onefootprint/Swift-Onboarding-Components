@@ -67,7 +67,7 @@ const HorizontalBeam = ({
           gradientUnits="userSpaceOnUse"
           animate={controls}
           transition={{
-            repeat: Infinity,
+            repeat: Number.POSITIVE_INFINITY,
             ease: 'easeInOut',
             duration: speed,
             delay,

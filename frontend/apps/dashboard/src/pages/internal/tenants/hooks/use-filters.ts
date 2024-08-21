@@ -16,7 +16,7 @@ const useFilters = () => {
   const filters = useBaseFilters<TenantsQuery>(defaultQueryParams);
   const { query } = filters;
   const values = {
-    page: query.tenants_page ? parseInt(query.tenants_page, 10) : undefined,
+    page: query.tenants_page ? Number.parseInt(query.tenants_page, 10) : undefined,
     pageSize: 15,
     search: query.tenants_search || '',
   };

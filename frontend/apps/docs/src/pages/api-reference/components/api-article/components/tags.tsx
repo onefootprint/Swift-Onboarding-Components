@@ -2,8 +2,8 @@ import type { UIState } from '@onefootprint/design-tokens';
 import { IcoInfo16 } from '@onefootprint/icons';
 import { Badge, Stack, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useSession, { User } from 'src/hooks/use-session';
-import { HydratedArticle } from 'src/pages/api-reference/hooks';
+import useSession, { type User } from 'src/hooks/use-session';
+import type { HydratedArticle } from 'src/pages/api-reference/hooks';
 import { ArticleTag } from 'src/pages/api-reference/hooks/use-hydrate-articles';
 import styled, { css } from 'styled-components';
 

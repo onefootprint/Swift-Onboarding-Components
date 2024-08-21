@@ -2,11 +2,11 @@ import { mockRequest } from '@onefootprint/test-utils';
 import {
   AuthMethodKind,
   CollectedKycDataOption,
-  GetAuthRoleResponse,
-  OnboardingConfig,
+  type GetAuthRoleResponse,
+  type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
-  OrgAssumeRoleResponse,
+  type OrgAssumeRoleResponse,
   RoleKind,
   RoleScopeKind,
 } from '@onefootprint/types';

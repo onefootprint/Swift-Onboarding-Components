@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 
 type SparkleProps = {

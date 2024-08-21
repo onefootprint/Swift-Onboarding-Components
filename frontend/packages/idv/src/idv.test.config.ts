@@ -302,7 +302,7 @@ export const identifyNewUser = async () => {
 
 export const completeKyc = async () => {
   await waitFor(() => {
-    expect(screen.getByText(`Basic Data`)).toBeInTheDocument();
+    expect(screen.getByText('Basic Data')).toBeInTheDocument();
   });
   const firstName = screen.getByLabelText('First name');
   await userEvent.type(firstName, 'Piip');

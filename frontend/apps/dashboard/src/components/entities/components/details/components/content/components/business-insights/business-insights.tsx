@@ -7,8 +7,8 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 import {
   BusinessDI,
   DecisionStatus,
-  EntityVault,
-  OnboardingDecisionEvent,
+  type EntityVault,
+  type OnboardingDecisionEvent,
   TimelineEventKind,
   WorkflowKind,
   isVaultDataDecrypted,

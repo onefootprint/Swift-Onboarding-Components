@@ -21,7 +21,7 @@ export const CustomToggle = ({ onChange, activeSection, sections, className }: C
     <Container className={className}>
       <AnimatePresence>
         {sections.map(section => (
-          <StyledOption as="button" onClick={() => onChange && onChange(section.value)} key={section.value}>
+          <StyledOption as="button" onClick={() => onChange?.(section.value)} key={section.value}>
             {activeSection === section.value && (
               <SelectedMarker
                 initial={{ opacity: 0 }}

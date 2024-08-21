@@ -56,7 +56,7 @@ export const convertObjectToCSS = (rules: Record<string, any>) => {
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const createStylesFromRules = (rules: Record<string, any>) => {
-  let styles = ` `;
+  let styles = ' ';
   Object.entries(rules).forEach(([selector, stylesObject]) => {
     const fpSelector = getSelector(selector);
     const css = convertObjectToCSS(stylesObject);

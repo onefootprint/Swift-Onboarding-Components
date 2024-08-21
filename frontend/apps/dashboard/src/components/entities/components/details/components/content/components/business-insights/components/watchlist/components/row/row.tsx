@@ -1,5 +1,5 @@
 import { IcoArrowTopRight16, IcoInfo16 } from '@onefootprint/icons';
-import { WatchlistHit } from '@onefootprint/types';
+import type { WatchlistHit } from '@onefootprint/types';
 import { LinkButton, Stack, Tooltip } from '@onefootprint/ui';
 
 type RowProps = {

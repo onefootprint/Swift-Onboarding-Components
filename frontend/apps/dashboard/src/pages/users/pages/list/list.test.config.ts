@@ -2,10 +2,10 @@ import { mockRequest } from '@onefootprint/test-utils';
 import {
   AuthMethodKind,
   CollectedKycDataOption,
-  Entity,
+  type Entity,
   EntityKind,
   EntityStatus,
-  GetOnboardingConfigsResponse,
+  type GetOnboardingConfigsResponse,
   IdDI,
   OnboardingConfigStatus,
 } from '@onefootprint/types';

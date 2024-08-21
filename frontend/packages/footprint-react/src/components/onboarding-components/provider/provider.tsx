@@ -1,7 +1,8 @@
 import type { FootprintComponent, SandboxOutcome } from '@onefootprint/footprint-js';
 import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { createContext, useEffect, useMemo, useState } from 'react';
 
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';

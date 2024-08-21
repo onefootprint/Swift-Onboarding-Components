@@ -1,4 +1,4 @@
-import { Document, Entity, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
+import type { Document, Entity, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, Text, Tooltip } from '@onefootprint/ui';
 
 import { useFormContext } from 'react-hook-form';

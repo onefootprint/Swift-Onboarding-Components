@@ -1,6 +1,6 @@
-import useEntityVault, { VaultType } from '@/entities/hooks/use-entity-vault';
+import useEntityVault, { type VaultType } from '@/entities/hooks/use-entity-vault';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { Attribute } from '@onefootprint/types/src/data/entity';
+import type { Attribute } from '@onefootprint/types/src/data/entity';
 import useEntity from './use-entity';
 import useEntityId from './use-entity-id';
 import useEntitySeqno from './use-entity-seqno';

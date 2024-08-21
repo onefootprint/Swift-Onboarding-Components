@@ -1,7 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import React, { forwardRef, useId, useRef } from 'react';
+import type React from 'react';
+import { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 

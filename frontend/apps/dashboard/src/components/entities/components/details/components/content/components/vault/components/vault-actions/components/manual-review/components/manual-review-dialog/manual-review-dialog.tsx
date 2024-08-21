@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { ActionRequest, ActionRequestKind, OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
+import { type ActionRequest, ActionRequestKind, OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 

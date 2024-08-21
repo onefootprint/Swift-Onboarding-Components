@@ -52,7 +52,7 @@ describe('<Actions />', () => {
     withData();
     mockRequest({
       method: 'get',
-      path: `/org/onboarding_configs`,
+      path: '/org/onboarding_configs',
       statusCode: 200,
       response: {
         data: [

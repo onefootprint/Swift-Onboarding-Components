@@ -1,6 +1,6 @@
 import { Grid, Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import React from 'react';
+import type React from 'react';
 import { MAIN_PAGE_ID } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 

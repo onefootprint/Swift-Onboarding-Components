@@ -38,7 +38,7 @@ const getLongNamesByKeys = ([key, ...keys]: string[], list: AddressComponent[], 
   if (!key) return acc;
 
   const item = list.find(c => c.types.includes(key));
-  if (item && item.long_name && !acc.includes(item.long_name)) {
+  if (item?.long_name && !acc.includes(item.long_name)) {
     acc.push(item.long_name);
   }
 

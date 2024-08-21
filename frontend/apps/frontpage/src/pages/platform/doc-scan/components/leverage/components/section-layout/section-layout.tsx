@@ -1,8 +1,8 @@
 import { Box, Button, Container, media } from '@onefootprint/ui';
 import { Stack, Text } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
-import FeatureCard, { FeatureCardProps } from './components/feature-card';
+import FeatureCard, { type FeatureCardProps } from './components/feature-card';
 
 type MainProps = {
   title: string;
@@ -45,7 +45,7 @@ export const SectionLayout = ({ main, illustration, featureCards, $inverted }: S
                   {main.mainCta.label}
                 </Button>
               )}
-              {main.secondaryCta && main.secondaryCta.href ? (
+              {main.secondaryCta?.href ? (
                 <Button
                   variant="secondary"
                   onClick={() => {

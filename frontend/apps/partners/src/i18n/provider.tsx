@@ -1,7 +1,7 @@
 'use client';
 
 import { createInstance } from 'i18next';
-import React from 'react';
+import type React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import type { Langs, Namespaces } from './config';

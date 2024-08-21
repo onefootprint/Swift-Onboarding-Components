@@ -1,4 +1,4 @@
-import { BusinessDI, BusinessDIData, CdoToAllDisMap, DecryptUserResponse } from '@onefootprint/types';
+import { BusinessDI, type BusinessDIData, CdoToAllDisMap, type DecryptUserResponse } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import pickBy from 'lodash/pickBy';
 import { isStringValid } from '../../../../utils';

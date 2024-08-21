@@ -1,5 +1,5 @@
-import { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
-import React from 'react';
+import type { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
+import type React from 'react';
 import useEffectOnceStrict from '../../../../../src/components/identify/hooks/use-effect-once-strict';
 import { useDecryptUser } from '../../../../queries';
 

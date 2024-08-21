@@ -1,5 +1,5 @@
 import useBaseFilters from 'src/hooks/use-filters';
-import { PlaybooksConfigQuery } from '../../utils/schema/schema';
+import type { PlaybooksConfigQuery } from '../../utils/schema/schema';
 
 const defaultQueryParams: PlaybooksConfigQuery = {
   onboarding_config_id: undefined,
@@ -13,7 +13,7 @@ const useFilters = () => {
   const { query } = filters;
   const values = {
     status: query.onboarding_configs_status,
-    page: query.onboarding_configs_page ? parseInt(query.onboarding_configs_page, 10) : 0,
+    page: query.onboarding_configs_page ? Number.parseInt(query.onboarding_configs_page, 10) : 0,
     id: query.onboarding_config_id,
     search: query.onboarding_configs_search,
   };

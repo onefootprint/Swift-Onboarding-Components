@@ -1,5 +1,5 @@
 import { IcoChevronLeft16 } from '@onefootprint/icons';
-import React from 'react';
+import type React from 'react';
 import styled, { css } from 'styled-components';
 
 type ContainerWithToggleProps = {

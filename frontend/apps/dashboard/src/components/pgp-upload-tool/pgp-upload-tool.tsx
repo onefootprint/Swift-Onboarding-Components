@@ -1,7 +1,8 @@
 import { Button, Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import * as openpgp from 'openpgp';
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

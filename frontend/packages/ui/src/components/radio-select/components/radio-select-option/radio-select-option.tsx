@@ -1,7 +1,7 @@
 'use client';
 
 import type { Icon } from '@onefootprint/icons';
-import React from 'react';
+import type React from 'react';
 
 import Tooltip from '../../../tooltip';
 import Content from './components/content';

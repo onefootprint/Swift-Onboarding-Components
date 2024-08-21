@@ -1,4 +1,4 @@
-import { type OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Info from '../info';

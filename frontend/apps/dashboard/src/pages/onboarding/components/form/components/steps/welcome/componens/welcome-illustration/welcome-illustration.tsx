@@ -21,7 +21,7 @@ const WelcomeIllustration = () => {
         transition={{
           duration: 130,
           ease: 'linear',
-          repeat: Infinity,
+          repeat: Number.POSITIVE_INFINITY,
           repeatType: 'reverse',
         }}
       >
@@ -34,7 +34,7 @@ const WelcomeIllustration = () => {
         transition={{
           duration: 130,
           ease: 'linear',
-          repeat: Infinity,
+          repeat: Number.POSITIVE_INFINITY,
           repeatType: 'reverse',
         }}
       >
@@ -47,7 +47,7 @@ const WelcomeIllustration = () => {
         transition={{
           duration: 180,
           ease: 'linear',
-          repeat: Infinity,
+          repeat: Number.POSITIVE_INFINITY,
           repeatType: 'reverse',
         }}
       >

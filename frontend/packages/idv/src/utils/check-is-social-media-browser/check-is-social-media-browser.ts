@@ -54,9 +54,7 @@ export const socialMediaCheck = ({ ua, browserName, browserVersion, isMobile, is
   }
 
   const isWebview =
-    lowUserAgent.includes('webview') ||
-    (lowBrowserName && lowBrowserName.includes('webview')) ||
-    (browserVersion && browserVersion.includes('webview'));
+    lowUserAgent.includes('webview') || lowBrowserName?.includes('webview') || browserVersion?.includes('webview');
 
   // If running inside an iframe and the user agent has webview on mobile, it's
   // likely a social media browser (cannot be both a webview and iframe, so this

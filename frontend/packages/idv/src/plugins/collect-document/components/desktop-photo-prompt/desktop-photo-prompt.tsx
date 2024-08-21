@@ -2,11 +2,12 @@ import { IcoClock40 } from '@onefootprint/icons';
 import type { CountryCode } from '@onefootprint/types';
 import { IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
 import { Box, Button, Stack, Text, media } from '@onefootprint/ui';
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types/src/api/onboarding-status';
+import { type DocumentRequirement, DocumentUploadSettings } from '@onefootprint/types/src/api/onboarding-status';
 import upperFirst from 'lodash/upperFirst';
 import { HeaderTitle } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';

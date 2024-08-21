@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, useToast } from '@onefootprint/ui';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import type { SectionAction } from '../../../../../../components/confirm-collected-data';
 import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import { useStepUp } from '../../../../../../hooks';

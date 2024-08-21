@@ -53,7 +53,7 @@ const NavigationFooter = () => {
 
   return (
     <Container>
-      {user && user.tenant.name && (
+      {user?.tenant.name && (
         <Stack direction="row" justify="space-between" height="56px" align="center" padding={5} width="100%">
           <CompanyName name={user.tenant.name} image={user.tenant.logoUrl} />
           <NavDropdown user={user} isApiReference={isApiReference} handleOpenSupportDialog={handleOpenSupportDialog} />

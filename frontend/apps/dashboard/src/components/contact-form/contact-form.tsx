@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { PopupModal } from 'react-calendly';
 import useSession from 'src/hooks/use-session';
 import styled from 'styled-components';

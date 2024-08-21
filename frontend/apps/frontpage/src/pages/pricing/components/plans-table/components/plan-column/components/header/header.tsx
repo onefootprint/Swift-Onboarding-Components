@@ -2,7 +2,7 @@ import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { type HeaderProps } from '../../../../plans-table-types';
+import type { HeaderProps } from '../../../../plans-table-types';
 
 const Header = ({ title, price }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });

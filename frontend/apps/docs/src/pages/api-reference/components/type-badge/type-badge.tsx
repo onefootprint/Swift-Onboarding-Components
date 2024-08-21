@@ -1,7 +1,7 @@
-import { UIStates } from '@onefootprint/design-tokens';
+import type { UIStates } from '@onefootprint/design-tokens';
 import { Badge, createFontStyles } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
-import { HttpMethod } from '../../../api-reference/api-reference.types';
+import type { HttpMethod } from '../../../api-reference/api-reference.types';
 
 type TypeBadgeProps = {
   type: HttpMethod;

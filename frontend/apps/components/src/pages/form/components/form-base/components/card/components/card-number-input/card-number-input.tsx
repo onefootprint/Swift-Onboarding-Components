@@ -2,7 +2,8 @@
 import type { InputProps } from '@onefootprint/ui';
 import { InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
-import React, { forwardRef, useState } from 'react';
+import type React from 'react';
+import { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardIcon from './components/card-icon';

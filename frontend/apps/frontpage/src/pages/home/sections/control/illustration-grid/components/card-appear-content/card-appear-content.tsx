@@ -1,7 +1,8 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import { Divider, Stack, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 const cardVariants = {

@@ -3,7 +3,8 @@
 import { IcoClose24 } from '@onefootprint/icons';
 import { Button, IconButton, Stack, Text, useToast } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 

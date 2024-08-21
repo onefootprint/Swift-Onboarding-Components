@@ -1,25 +1,25 @@
 {
-	"name": "@onefootprint/design-tokens",
-	"private": true,
-	"version": "0.0.0",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"scripts": {
-		"build": "tsup",
-		"dev": "tsup --watch",
-		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-		"lint": "biome check src --fix",
-		"lint:ci": "biome ci src",
-		"typecheck": "yarn tsc --noEmit"
-	},
-	"devDependencies": {
-		"@types/color": "^3.0.3",
-		"color": "^4.2.3",
-		"csstype": "^3.1.2",
-		"polished": "^4.2.2",
-		"style-dictionary": "^3.7.1",
-		"token-transformer": "^0.0.27",
-		"tsconfig": "*",
-		"typescript": "^5.5.2"
-	}
+  "name": "@onefootprint/design-tokens",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "lint": "biome check src --fix --unsafe",
+    "lint:ci": "biome ci src",
+    "typecheck": "yarn tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/color": "^3.0.3",
+    "color": "^4.2.3",
+    "csstype": "^3.1.2",
+    "polished": "^4.2.2",
+    "style-dictionary": "^3.7.1",
+    "token-transformer": "^0.0.27",
+    "tsconfig": "*",
+    "typescript": "^5.5.2"
+  }
 }

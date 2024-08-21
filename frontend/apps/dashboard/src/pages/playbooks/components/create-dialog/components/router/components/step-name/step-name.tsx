@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import Header from '../header';
 
 import type { NameFormData } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
+import type { PlaybookKind } from '@/playbooks/utils/machine/types';
 import useDefaultName from './hooks/use-default-name';
 
 export type StepNameProps = {

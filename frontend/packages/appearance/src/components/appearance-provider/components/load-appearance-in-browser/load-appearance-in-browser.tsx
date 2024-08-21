@@ -2,7 +2,8 @@ import type { Theme } from '@onefootprint/design-tokens';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import { HostedUrlType } from '@onefootprint/types';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import type { AppearanceOptions } from '../../../../appearence.types';
 import getCustomAppearance from '../../../../utils/get-custom-appearance';

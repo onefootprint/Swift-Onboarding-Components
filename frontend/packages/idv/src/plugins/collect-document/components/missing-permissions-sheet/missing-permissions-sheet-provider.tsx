@@ -1,5 +1,5 @@
 import constate from 'constate';
-import React from 'react';
+import type React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
 import useLocalSheet from './hooks/use-local-sheet';

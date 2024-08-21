@@ -1,4 +1,4 @@
-import { Organization, OrganizationSize } from '@onefootprint/types';
+import { type Organization, OrganizationSize } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Button, Select, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';

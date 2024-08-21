@@ -1,4 +1,4 @@
-import { Select, SelectOption, Text, TextInput, useToast } from '@onefootprint/ui';
+import { Select, type SelectOption, Text, TextInput, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
@@ -45,7 +45,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
       onSuccess: async ({ token }) => {
         toast.show({
           title: 'Success',
-          description: `Created tenant`,
+          description: 'Created tenant',
         });
         await logIn({ auth: token, newIsLive: false });
         router.push('/settings');

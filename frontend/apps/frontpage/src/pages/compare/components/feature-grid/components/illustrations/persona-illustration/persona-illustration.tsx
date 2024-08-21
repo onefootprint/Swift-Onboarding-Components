@@ -1,5 +1,5 @@
 import { Box, media } from '@onefootprint/ui';
-import React from 'react';
+import type React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import ColorSelection from './components/color-selection';

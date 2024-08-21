@@ -2,7 +2,8 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import type { ButtonHTMLAttributes } from 'react';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils/mixins';
