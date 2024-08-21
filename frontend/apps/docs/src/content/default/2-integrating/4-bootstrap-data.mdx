@@ -55,27 +55,27 @@ const launchFootprint = () => {
 
 ### Available user data
 
-| Variable                  | Description                                                                                                                       |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `id.email`                | User email (e.g `jane.doe@acme.com`)                                                                                              |
-| `id.phone_number`         | User phone. Must be in the [E.164](https://www.twilio.com/docs/glossary/what-e164) format (e.g `+12025550179`)                    |
-| `id.first_name`           | User's first name.                                                                                                                |
-| `id.middle_name`          | User's middle name.                                                                                                               |
-| `id.last_name`            | User's last name.                                                                                                                 |
-| `id.dob`                  | User's date of birth. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                             |
-| `id.ssn9`                 | User's 9-digit SSN number. (e.g. 123456789)                                                                                       |
-| `id.ssn4`                 | The last 4 digits of user's SSN. (e.g. 1234)                                                                                      |
-| `id.address_line1`        | The first line of user's residential address.                                                                                     |
-| `id.address_line2`        | Additional address information, like apartment or suite number. Must be a string.                                                 |
-| `id.city`                 | User's residential city. Must be a string.                                                                                        |
-| `id.state`                | User's residential state. Must be in 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format. (e.g. CA)               |
-| `id.country`              | User's residential country. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                       |
-| `id.zip`                  | User's residential zip. Must be a string.                                                                                         |
-| `id.us_legal_status`      | User's legal status in the U.S. Must be one of `'citizen'`, `'permanent_resident'`, or `'visa'`.                                  |
-| `id.nationality`          | User's nationality. Must be in [Alpha-2 Code](https://www.iban.com/country-codes) format. (e.g. US)                               |
-| `id.citizenships`         | User's citizenships. Must be an array of [Alpha-2 Codes](https://www.iban.com/country-codes). (e.g. `['BR', 'IT', 'HK']`)         |
-| `id.visa_kind`            | Type of visa the user has. Must be one of `'e1'`, `'e2'`, `'e3'`, `'f1'`, `'g4'`, `'h1b'`, `'l1'`, `'o1'`, `'tn1'`, or `'other'`. |
-| `id.visa_expiration_date` | User's visa expiration date. Must be in MM/DD/YYYY format. (e.g. 01/01/2001)                                                      |
+| Variable                  | Description                                              | Format                                                                                 |
+| ------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `id.phone_number`         | Primary phone number                                     | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number         |
+| `id.email`                | Primary email address                                    | [Email address](https://datatracker.ietf.org/doc/html/rfc3696)                         |
+| `id.first_name`           | First name                                               | Any valid UTF-8 string <1KB                                                            |
+| `id.middle_name`          | Middle name                                              | Any valid UTF-8 string <1KB                                                            |
+| `id.last_name`            | Last name                                                | Any valid UTF-8 string <1KB                                                            |
+| `id.ssn9`                 | Full SSN                                                 | 9-digit string (hyphens will be ignored and stripped out)                              |
+| `id.ssn4`                 | Last four of the SSN                                     | 4-digit string                                                                         |
+| `id.dob`                  | Date of birth                                            | Formatted as `MM/DD/YYYY`                                                              |
+| `id.address_line1`        | First line of the user's street address                  | Any valid UTF-8 string <1KB                                                            |
+| `id.address_line2`        | Second line of the user's street address                 | Any valid UTF-8 string <1KB                                                            |
+| `id.city`                 | City of the user's street address                        | Any valid UTF-8 string <1KB                                                            |
+| `id.state`                | State of the user's street address                       | 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format for US addresses   |
+| `id.zip`                  | Postal code for the user's street address                | Postal code `^([A-Za-z0-9\- ]*)$`                                                      |
+| `id.country`              | Country for the user's street address                    | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)        |
+| `id.us_legal_status`      | The user's legal status in the US                        | `citizen`, `permanent_resident`, or `visa`                                             |
+| `id.nationality`          | The user's nationality                                   | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)        |
+| `id.citizenships`         | A list of countries for which the user holds citizenship | A list of valid [ISO3166-alpha-2 Country Codes](https://datahub.io/core/country-codes) |
+| `id.visa_kind`            | The type of US visa held by the user                     | One of `e1`, `e2`, `e3`, `f1`, `g4`, `h1b`, `l1`, `o1`, `tn1`, or `other`              |
+| `id.visa_expiration_date` | The expiration date of the user's visa                   | Formatted as `MM/DD/YYYY`                                                              |
 
 <inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
 
@@ -110,19 +110,19 @@ const launchFootprint = () => {
 
 ### Available business data
 
-| Variable                    | Description                                                                                                                                             |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `business.name`             | Name of the business                                                                                                                                    |
-| `business.dba`              | Doing-business-as alias                                                                                                                                 |
-| `business.tin`              | Taxpayer identification number, 9-digit string (hyphens will be ignored and stripped out)                                                               |
-| `business.website`          | Website of the business                                                                                                                                 |
-| `business.phone_number`     | Phone number                                                                                                                                            |
-| `business.address_line1`    | First line of the business's street address                                                                                                             |
-| `business.address_line2`    | Second line of the business's street address                                                                                                            |
-| `business.city`             | City of the business's street address                                                                                                                   |
-| `business.state`            | State of the business's street address                                                                                                                  |
-| `business.zip`              | Postal code for the business's street address                                                                                                           |
-| `business.country`          | Country for the business's street address                                                                                                               |
-| `business.corporation_type` | One of `c_corporation`, `s_corporation`, `b_corporation`, `llc`, `llp`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent` |
+| Variable                    | Description                                   | Format                                                                                                                                                  |
+| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `business.name`             | Name of the business                          | Any valid UTF-8 string <1KB                                                                                                                             |
+| `business.dba`              | Doing-business-as alias                       | Any valid UTF-8 string <1KB                                                                                                                             |
+| `business.website`          | Website of the business                       | A valid absolute URL.                                                                                                                                   |
+| `business.phone_number`     | Phone number                                  | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                          |
+| `business.tin`              | Taxpayer identification number                | 9-digit string (hyphens will be ignored and stripped out)                                                                                               |
+| `business.address_line1`    | First line of the business's street address   | Any valid UTF-8 string <1KB                                                                                                                             |
+| `business.address_line2`    | Second line of the business's street address  | Any valid UTF-8 string <1KB                                                                                                                             |
+| `business.city`             | City of the business's street address         | Any valid UTF-8 string <1KB                                                                                                                             |
+| `business.state`            | State of the business's street address        | 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format for US addresses                                                                    |
+| `business.zip`              | Postal code for the business's street address | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                       |
+| `business.country`          | Country for the business's street address     | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                         |
+| `business.corporation_type` | The type of corporation                       | One of `c_corporation`, `s_corporation`, `b_corporation`, `llc`, `llp`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent` |
 
 <inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
