@@ -65,8 +65,8 @@ impl Fingerprints {
                 let fps = fps
                     .iter()
                     .filter(|(salt, _)| salt.di() == vd.kind)
-                    // Don't save partial fingerprints to the database
-                    .filter_map(|(salt, fp)| salt.kind().map(|scope| (salt, scope, fp)))
+                    // Don't save transient fingerprints to the database
+                    .filter_map(|(salt, fp)| salt.scope().map(|scope| (salt, scope, fp)))
                     .map(|(salt, scope, fp)| FingerprintData {
                         kind: salt.di().into(),
                         data: fp.clone().into(),
@@ -96,7 +96,7 @@ impl Fingerprints {
             });
 
         //
-        // Create composite fingerprints out of pre-computed partial fingerprints
+        // Create composite fingerprints out of pre-computed transient fingerprints
         //
         let fps: HashMap<_, _> = fps.into_iter().collect();
         let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
@@ -106,7 +106,7 @@ impl Fingerprints {
             .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
             .map(|cfp| -> FpResult<_> {
                 // For each Composite FPK that has any DI represented in this data update, generate
-                // the new composite fingerprint out of the pre-computed partial fingerprints
+                // the new composite fingerprint out of the pre-computed transient fingerprints
                 let sh_data = match cfp.compute(&fps) {
                     Ok(sh_data) => sh_data,
                     Err(MissingFingerprint(salt)) => {
@@ -130,7 +130,7 @@ impl Fingerprints {
                     cfp.salts().into_iter().flat_map(|salt| salt_to_dl_id.get(&salt));
                 let lifetime_ids = chain(new_vd_lifetime_ids, existing_vd_lifetime_ids).collect_vec();
                 if lifetime_ids.len() != cfp.salts().len() {
-                    return AssertionError("Need exactly one lifetime ID for each partial fingerprint")
+                    return AssertionError("Need exactly one lifetime ID for each transient fingerprint")
                         .into();
                 }
                 let cfpk = CompositeFingerprintKind::from(&cfp);
@@ -145,14 +145,14 @@ impl Fingerprints {
             .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .flatten();
-        // We are susceptible to a race condition... Our partial fingerprints may be stale if the
+        // We are susceptible to a race condition... Our transient fingerprints may be stale if the
         // vault data changed since we computed them. This may happen since we cannot lock the
-        // vault while computing partial fingerprints.
-        // If the partial fingeprints are stale, we've made the arbitrary decision to error.
+        // vault while computing transient fingerprints.
+        // If the transient fingeprints are stale, we've made the arbitrary decision to error.
         for (salt, dl_id) in salt_to_dl_id.iter() {
             let new_dl_id = vw.get_lifetime(&salt.di()).map(|dl| &dl.id);
             if new_dl_id != Some(dl_id) {
-                tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale partial fingerprint");
+                tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale transient fingerprint");
                 return ValidationError(
                     "Operation aborted due to a concurrent update on this user. Please retry this request",
                 )

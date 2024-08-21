@@ -146,7 +146,7 @@ pub async fn parse_search(
         .into_iter()
         .flat_map(|((fpk, _), fps)| match fpk {
             FingerprintKind::DI(_) => fps.into_iter().map(|(_, fp)| fp).next(),
-            // Compute the composite fingerprint from partial fingerprints if needed
+            // Compute the composite fingerprint from transient fingerprints if needed
             FingerprintKind::Composite(cfpk) => match cfpk {
                 CompositeFingerprintKind::Name => CompositeFingerprint::Name(tenant_id.clone())
                     .compute(&fps.into_iter().collect())

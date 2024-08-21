@@ -1,7 +1,7 @@
 use crate::fingerprint_salt::FingerprintSalt;
 use crate::fingerprint_salt::GlobalFingerprintKind;
-use crate::fingerprint_salt::PartialFingerprintKind;
-use crate::fingerprint_salt::PartialTenantFingerprintKind;
+use crate::fingerprint_salt::TransientGlobalFingerprintKind;
+use crate::fingerprint_salt::TransientTenantFingerprintKind;
 use crate::util::impl_enum_string_diesel;
 use crate::DataIdentifier;
 use crate::Fingerprint;
@@ -125,9 +125,9 @@ impl CompositeFingerprint {
     pub fn salts(&self) -> Vec<FingerprintSalt> {
         match self {
             Self::NameDob => vec![
-                PartialFingerprintKind::FirstName.into(),
-                PartialFingerprintKind::LastName.into(),
-                PartialFingerprintKind::Dob.into(),
+                TransientGlobalFingerprintKind::FirstName.into(),
+                TransientGlobalFingerprintKind::LastName.into(),
+                TransientGlobalFingerprintKind::Dob.into(),
             ],
             Self::Name(tenant_id) => vec![
                 FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
@@ -136,11 +136,11 @@ impl CompositeFingerprint {
             Self::NameSsn4(tenant_id) => vec![
                 FingerprintSalt::Tenant(IDK::FirstName.into(), tenant_id.clone()),
                 FingerprintSalt::Tenant(IDK::LastName.into(), tenant_id.clone()),
-                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, tenant_id.clone()),
+                FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Ssn4, tenant_id.clone()),
             ],
             Self::DobSsn4(tenant_id) => vec![
-                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Dob, tenant_id.clone()),
-                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, tenant_id.clone()),
+                FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Dob, tenant_id.clone()),
+                FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Ssn4, tenant_id.clone()),
             ],
         }
     }
@@ -158,7 +158,7 @@ impl CompositeFingerprint {
     }
 
     /// Given the partial FPs from which this composite FP is composed, compute the composite FP.
-    /// Returns an Err with the PartialFingerprintKind if a partial fingerprint is missing.
+    /// Returns an Err with the FingerprintSalt if a constituent fingerprint is missing.
     pub fn compute(
         &self,
         fps: &HashMap<FingerprintSalt, Fingerprint>,
@@ -168,7 +168,7 @@ impl CompositeFingerprint {
             .into_iter()
             .map(|salt| fps.get(&salt).ok_or(MissingFingerprint(salt)))
             .collect::<Result<Vec<_>, _>>()?;
-        // A composite fingerprint is computed by taking the sha256 of each partial fingerprint
+        // A composite fingerprint is computed by taking the sha256 of each constituent fingerprint
         // concatenated, in order
         let sh_data = chain(
             sh_datas.into_iter().flat_map(|sh| &sh.0),
@@ -198,8 +198,8 @@ pub struct MissingFingerprint(pub FingerprintSalt);
 #[cfg(test)]
 mod test {
     use crate::fingerprint_salt::FingerprintSalt;
-    use crate::fingerprint_salt::PartialFingerprintKind;
-    use crate::fingerprint_salt::PartialTenantFingerprintKind;
+    use crate::fingerprint_salt::TransientGlobalFingerprintKind;
+    use crate::fingerprint_salt::TransientTenantFingerprintKind;
     use crate::CompositeFingerprint;
     use crate::DataIdentifier;
     use crate::Fingerprint;
@@ -214,12 +214,18 @@ mod test {
     fn test_composite_fingerprint() {
         let test_tenant_id = || TenantId::test_data("org_hello_world".into());
         // Make sure each composite fingerprint's computation method doesn't change over time.
-        // This protects against accidental reordering of partial fingerprints or adding/changing
-        // the partial fingerprints that make up a composite fingerprint.
+        // This protects against accidental reordering of constituent fingerprints or adding/changing
+        // the constituent fingerprints that make up a composite fingerprint.
         let fingerprints: HashMap<_, _> = [
-            (PartialFingerprintKind::FirstName.into(), Fingerprint(vec![1])),
-            (PartialFingerprintKind::LastName.into(), Fingerprint(vec![2])),
-            (PartialFingerprintKind::Dob.into(), Fingerprint(vec![3])),
+            (
+                TransientGlobalFingerprintKind::FirstName.into(),
+                Fingerprint(vec![1]),
+            ),
+            (
+                TransientGlobalFingerprintKind::LastName.into(),
+                Fingerprint(vec![2]),
+            ),
+            (TransientGlobalFingerprintKind::Dob.into(), Fingerprint(vec![3])),
             (
                 FingerprintSalt::Tenant(IDK::FirstName.into(), test_tenant_id()),
                 Fingerprint(vec![4]),
@@ -229,11 +235,11 @@ mod test {
                 Fingerprint(vec![5]),
             ),
             (
-                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Ssn4, test_tenant_id()),
+                FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Ssn4, test_tenant_id()),
                 Fingerprint(vec![6]),
             ),
             (
-                FingerprintSalt::PartialTenant(PartialTenantFingerprintKind::Dob, test_tenant_id()),
+                FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Dob, test_tenant_id()),
                 Fingerprint(vec![7]),
             ),
         ]
@@ -269,15 +275,21 @@ mod test {
     #[test]
     fn test_composite_fingerprint_err() {
         let fingerprints: HashMap<_, _> = [
-            (PartialFingerprintKind::FirstName.into(), Fingerprint(vec![1])),
-            (PartialFingerprintKind::LastName.into(), Fingerprint(vec![2])),
+            (
+                TransientGlobalFingerprintKind::FirstName.into(),
+                Fingerprint(vec![1]),
+            ),
+            (
+                TransientGlobalFingerprintKind::LastName.into(),
+                Fingerprint(vec![2]),
+            ),
         ]
         .into_iter()
         .collect();
         let result = CompositeFingerprint::NameDob.compute(&fingerprints);
         assert_eq!(
             result,
-            Err(MissingFingerprint(PartialFingerprintKind::Dob.into()))
+            Err(MissingFingerprint(TransientGlobalFingerprintKind::Dob.into()))
         );
     }
 

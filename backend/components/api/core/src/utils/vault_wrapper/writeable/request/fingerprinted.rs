@@ -60,7 +60,7 @@ impl FingerprintedDataRequest {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new FingerprintedDataRequest.
     /// This method should _only_ be used when creating a new user, as it won't generate any
-    /// partial fingerprints for existing data that are needed to create compsite fingerprints.
+    /// transient fingerprints for existing data that are needed to create compsite fingerprints.
     #[tracing::instrument("FingerprintedDataRequest::build_for_new_user", skip_all)]
     pub async fn build_for_new_user(
         state: &State,

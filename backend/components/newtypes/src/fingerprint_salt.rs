@@ -26,14 +26,14 @@ impl DataIdentifier {
             .ok()
             .map(FingerprintSalt::from);
         // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
-        let transient_global_salt = PartialFingerprintKind::try_from(self)
+        let transient_global_salt = TransientGlobalFingerprintKind::try_from(self)
             .ok()
             .map(FingerprintSalt::from);
         // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
-        let transient_tenant_salt = PartialTenantFingerprintKind::try_from(self)
+        let transient_tenant_salt = TransientTenantFingerprintKind::try_from(self)
             .ok()
             .zip(tenant_id)
-            .map(|(s, t_id)| FingerprintSalt::PartialTenant(s, t_id.clone()));
+            .map(|(s, t_id)| FingerprintSalt::TransientTenant(s, t_id.clone()));
         chain!(
             global_salt,
             tenant_salt,
@@ -53,24 +53,24 @@ pub enum FingerprintSalt {
     Global(GlobalFingerprintKind),
     /// Searchable within a tenant
     Tenant(DataIdentifier, TenantId),
-    /// Represents pieces of data that are fingerprinted in order to build a composite fingerprint.
-    /// These are not saved to the database.
-    // TODO rename TransientGlobal,
-    Partial(PartialFingerprintKind),
-    // TODO rename TransientTenant,
-    PartialTenant(PartialTenantFingerprintKind, TenantId),
+    /// Represents pieces of data that are fingerprinted at a global scope in order to build a
+    /// composite fingerprint. These are not saved to the database.
+    TransientGlobal(TransientGlobalFingerprintKind),
+    /// Represents pieces of data that are fingerprinted at a tenant scopein order to build a
+    /// composite fingerprint. These are not saved to the database.
+    TransientTenant(TransientTenantFingerprintKind, TenantId),
 }
 
 impl FingerprintSalt {
-    const PARTIAL_FINGERPRINT_SALT: &'static [u8] = &[112, 97, 114, 116, 105, 97, 108];
+    const TRANSIENT_FINGERPRINT_SALT: &'static [u8] = &[112, 97, 114, 116, 105, 97, 108];
 
     /// The fingerprint scope is used to salt fingerprints in the enclave.
     /// This returns the salt we send to the enclave when generating fingerprints.
     pub fn salt_bytes(&self) -> Vec<u8> {
         match self {
             Self::Global(s) => crypto::sha256(s.di().to_string().as_bytes()).to_vec(),
-            Self::Partial(s) => {
-                crypto::sha256(&[s.di().to_string().as_bytes(), Self::PARTIAL_FINGERPRINT_SALT].concat())
+            Self::TransientGlobal(s) => {
+                crypto::sha256(&[s.di().to_string().as_bytes(), Self::TRANSIENT_FINGERPRINT_SALT].concat())
                     .to_vec()
             }
             Self::Tenant(di, tenant_id) => crypto::sha256(
@@ -81,11 +81,11 @@ impl FingerprintSalt {
                 .concat(),
             )
             .to_vec(),
-            Self::PartialTenant(s, tenant_id) => crypto::sha256(
+            Self::TransientTenant(s, tenant_id) => crypto::sha256(
                 &[
                     &crypto::sha256(s.di().to_string().as_bytes()),
                     &crypto::sha256(tenant_id.to_string().as_bytes()),
-                    Self::PARTIAL_FINGERPRINT_SALT,
+                    Self::TRANSIENT_FINGERPRINT_SALT,
                 ]
                 .concat(),
             )
@@ -95,13 +95,12 @@ impl FingerprintSalt {
 
     /// Returns the FingerprintVariant for this salt, if exists.
     /// Only FingerprintSalts with a corresponding variant are saved into the database.
-    // TODO rename
-    pub fn kind(&self) -> Option<FingerprintScope> {
+    pub fn scope(&self) -> Option<FingerprintScope> {
         match self {
             Self::Global(_) => Some(FingerprintScope::Global),
             Self::Tenant(_, _) => Some(FingerprintScope::Tenant),
-            Self::Partial(_) => None,
-            Self::PartialTenant(_, _) => None,
+            Self::TransientGlobal(_) => None,
+            Self::TransientTenant(_, _) => None,
         }
     }
 
@@ -109,8 +108,8 @@ impl FingerprintSalt {
         match self {
             Self::Global(s) => s.di(),
             Self::Tenant(di, _) => (*di).clone(),
-            Self::Partial(s) => s.di(),
-            Self::PartialTenant(s, _) => s.di(),
+            Self::TransientGlobal(s) => s.di(),
+            Self::TransientTenant(s, _) => s.di(),
         }
     }
 }
@@ -153,32 +152,31 @@ impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
 #[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
 #[strum(serialize_all = "snake_case")]
 /// Represents pieces of data that are globally fingerprinted in order to build a composite
-/// fingerprint. These are not saved to the database.
-// TODO rename
-pub enum PartialFingerprintKind {
+/// fingerprint. These are NOT saved to the database.
+pub enum TransientGlobalFingerprintKind {
     Dob,
     FirstName,
     LastName,
 }
 
-impl PartialFingerprintKind {
+impl TransientGlobalFingerprintKind {
     pub fn di(&self) -> DataIdentifier {
         match self {
-            PartialFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
-            PartialFingerprintKind::FirstName => DataIdentifier::from(IDK::FirstName),
-            PartialFingerprintKind::LastName => DataIdentifier::from(IDK::LastName),
+            TransientGlobalFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
+            TransientGlobalFingerprintKind::FirstName => DataIdentifier::from(IDK::FirstName),
+            TransientGlobalFingerprintKind::LastName => DataIdentifier::from(IDK::LastName),
         }
     }
 }
 
-impl<'a> TryFrom<&'a DataIdentifier> for PartialFingerprintKind {
+impl<'a> TryFrom<&'a DataIdentifier> for TransientGlobalFingerprintKind {
     type Error = crate::Error;
 
     fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
         Self::iter()
             .find(|g| &g.di() == value)
             .ok_or(crate::Error::Custom(
-                "Data is not partially globally fingerprintable as a composite fingerprint".into(),
+                "Cannot make transient global-scoped fingerprint from data".into(),
             ))
     }
 }
@@ -186,29 +184,29 @@ impl<'a> TryFrom<&'a DataIdentifier> for PartialFingerprintKind {
 #[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
 #[strum(serialize_all = "snake_case")]
 /// Represents pieces of data that are fingerprinted at the tenant scope in order to build a
-/// composite fingerprint. These are not saved to the database.
-pub enum PartialTenantFingerprintKind {
+/// composite fingerprint. These are NOT saved to the database.
+pub enum TransientTenantFingerprintKind {
     Ssn4,
     Dob,
 }
 
-impl PartialTenantFingerprintKind {
+impl TransientTenantFingerprintKind {
     pub fn di(&self) -> DataIdentifier {
         match self {
-            PartialTenantFingerprintKind::Ssn4 => DataIdentifier::from(IDK::Ssn4),
-            PartialTenantFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
+            TransientTenantFingerprintKind::Ssn4 => DataIdentifier::from(IDK::Ssn4),
+            TransientTenantFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
         }
     }
 }
 
-impl<'a> TryFrom<&'a DataIdentifier> for PartialTenantFingerprintKind {
+impl<'a> TryFrom<&'a DataIdentifier> for TransientTenantFingerprintKind {
     type Error = crate::Error;
 
     fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
         Self::iter()
             .find(|g| &g.di() == value)
             .ok_or(crate::Error::Custom(
-                "Data is not partially tenant fingerprintable as a composite fingerprint".into(),
+                "Cannot make transient tenant-scoped fingerprint from data".into(),
             ))
     }
 }
@@ -217,7 +215,7 @@ impl<'a> TryFrom<&'a DataIdentifier> for PartialTenantFingerprintKind {
 mod tests {
     use super::FingerprintSalt;
     use crate::fingerprint_salt::GlobalFingerprintKind;
-    use crate::fingerprint_salt::PartialFingerprintKind;
+    use crate::fingerprint_salt::TransientGlobalFingerprintKind;
     use crate::IdentityDataKind as IDK;
     use crate::TenantId;
     use test_case::test_case;
@@ -232,8 +230,8 @@ mod tests {
     #[test_case(FingerprintSalt::Tenant(IDK::PhoneNumber.into(), test_org_id()) => "6f930e083b99ac46ef5ce0acfe28ea15454fd8c0f035b41fe866ddc521ab3d0b".to_string())]
     #[test_case(FingerprintSalt::Tenant(IDK::Email.into(), test_org_id()) => "ff41f7640520c8fe77574f839706cdde2eafbd1d852c507cf76662ef3380cf52".to_string())]
     #[test_case(FingerprintSalt::Tenant(IDK::FirstName.into(), test_org_id()) => "618954b917c536cd90cdb556f0f8153a63d89048dba2894f00895169414a30db".to_string())]
-    #[test_case(PartialFingerprintKind::Dob.into() => "c4729af039e10bf709bb34f347c9d02e4eecb8883c5a11110f73e1556cdda130")]
-    #[test_case(PartialFingerprintKind::FirstName.into() => "fc1cb06526ec348cd2c3061c46c5169ece69568e15bd91ae5b3829515370f1fe")]
+    #[test_case(TransientGlobalFingerprintKind::Dob.into() => "c4729af039e10bf709bb34f347c9d02e4eecb8883c5a11110f73e1556cdda130")]
+    #[test_case(TransientGlobalFingerprintKind::FirstName.into() => "fc1cb06526ec348cd2c3061c46c5169ece69568e15bd91ae5b3829515370f1fe")]
     fn test_unchanged_fingerprint_salt_bytes(scope: FingerprintSalt) -> String {
         // If this test fails, it means you've changed the way we compute the salt for the tested
         // fingerprint scopes, which will in turn modify ever fingerprint generated with this salt.
