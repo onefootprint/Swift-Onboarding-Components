@@ -1,10 +1,11 @@
 import { i18nRouter } from 'next-i18n-router';
 import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
 
 import { i18nConfig } from '@/i18n/config';
 
 import { DEFAULT_PUBLIC_ROUTE } from './config/constants';
+
+type NextRequest = Parameters<typeof i18nRouter>[0];
 
 export function middleware(request: NextRequest) {
   const authToken = cookies().get('token')?.value;

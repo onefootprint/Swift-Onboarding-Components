@@ -3,6 +3,7 @@ import { IdDI, SessionStatus } from '@onefootprint/types';
 import { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { getErrorMessage } from '@onefootprint/request';
 import GenericErrorPage from '../../../src/components/gerenic-error-page/generic-error-page';
 import { IDV_SESSION_RETRY_LIMIT } from '../../../src/config/constants';
 import { AppErrorBoundary, SessionExpired } from '../../components';
@@ -61,10 +62,11 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
         if (sessionStatus !== SessionStatus.active) {
           send({ type: 'expireSession' });
           trackAction('expired:check_session');
+          logWarn(`Session status: ${sessionStatus}`);
         }
       },
       onError: error => {
-        logWarn('Validating user session failed with error: ', error);
+        logWarn(`Validating user session failed with error: ${getErrorMessage(error)}`, error);
       },
     },
   );

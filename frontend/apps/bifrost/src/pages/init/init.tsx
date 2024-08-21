@@ -7,7 +7,6 @@ import {
   getLogger,
   useGetOnboardingConfig,
 } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocOutcome, IdvBootstrapData, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
@@ -87,7 +86,7 @@ const Init = () => {
         });
       },
       onError: err => {
-        logError(`Fetching onboarding config failed: ${getErrorMessage(err)}`, err);
+        logError('Fetching onboarding config failed', err);
         send({ type: 'configRequestFailed' });
       },
     },
@@ -123,7 +122,7 @@ const Init = () => {
       });
     },
     (error: unknown) => {
-      logError(`Failed to fetch initial properties ${getErrorMessage(error)}`, error);
+      logError('Failed to fetch initial properties', error);
       send({ type: 'initError' });
     },
   );

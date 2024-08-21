@@ -103,7 +103,7 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
 
     const filteredExtra = filterNonEmptyTraits(extra || {});
-    const errorMessage = msg || getErrorMessage(err);
+    const errorMessage = [msg, getErrorMessage(err)].filter(Boolean).join(' ');
     const errorObj: Error = err instanceof Error ? err : new Error(errorMessage);
 
     if (isDDLogsEnabled) {

@@ -41,16 +41,22 @@ const Init = () => {
         });
       },
       onError: error => {
-        trackAction('onboarding:started-failed', { error: getErrorMessage(error) });
-        logError(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, error);
         const errorCode = getErrorCode(error);
         const errorStatusCode = getErrorStatusCode(error);
+
+        trackAction('onboarding:started-failed', { error: getErrorMessage(error) });
+        logError(
+          `Fetching onboarding config in IDV init page failed errorCode:${errorCode}, errorStatusCode:${errorStatusCode}`,
+          error,
+        );
+
         let reason: ConfigRequestFailureReason = ConfigRequestFailureReason.other;
         if (errorCode === 'E118') {
           reason = ConfigRequestFailureReason.sessionExpired;
-        } else if (errorStatusCode === 401 || errorStatusCode === 404) {
+        } else if (/*errorStatusCode === 401 || */ errorStatusCode === 404) {
           reason = ConfigRequestFailureReason.invalidConfig;
         }
+
         send({
           type: 'configRequestFailed',
           payload: {
