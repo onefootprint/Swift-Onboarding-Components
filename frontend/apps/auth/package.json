@@ -36,7 +36,7 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-locales-sync": "^2.0.1",
     "lodash": "^4.17.21",
-    "next": "^14.2.4",
+    "next": "^14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
