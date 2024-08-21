@@ -4,9 +4,9 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import Box from '../box';
 import CopyButton from '../copy-button';
 import Stack from '../stack';
+import Text from '../text';
 
 export type CodeBlockProps = {
   ariaLabel?: string;
@@ -37,25 +37,37 @@ const CodeBlock = ({
   return (
     <Container>
       <Stack
-        justifyContent="space-between"
         backgroundColor="secondary"
         borderBottomWidth={1}
-        borderStyle="solid"
         borderColor="tertiary"
-        width="100%"
+        borderStyle="solid"
+        height="40px"
+        justifyContent="space-between"
         paddingInline={5}
-        height="48px"
+        width="100%"
       >
-        <Title tag="h5">{title || language}</Title>
-        {!disableCopy && (
+        <Text
+          alignItems="center"
+          color="secondary"
+          display="flex"
+          gap={3}
+          justifyContent="center"
+          maxWidth="100%"
+          overflow="hidden"
+          tag="h5"
+          variant="label-3"
+        >
+          {title || language}
+        </Text>
+        {disableCopy ? null : (
           <CopyButton
-            size="compact"
+            ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
             contentToCopy={children}
+            size="compact"
             tooltipText={tooltipText ?? t('components.code-block.tooltip-text-default')}
             tooltipTextConfirmation={
               tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')
             }
-            ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
           />
         )}
       </Stack>
@@ -65,7 +77,7 @@ const CodeBlock = ({
           showLineNumbers={showLineNumbers}
           style={theme.codeHighlight}
           wrapLines
-          lineNumberStyle={{ color: theme.color.tertiary }}
+          lineNumberStyle={{ color: theme.color.tertiary, WebkitUserSelect: 'none' }}
           lineProps={lineNumber => {
             if (highlightedLines.includes(lineNumber)) {
               return {
@@ -100,20 +112,6 @@ const Container = styled.div`
     justify-content: center;
     overflow: hidden;
   `}
-`;
-
-const Title = styled(Box)`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-1')};
-    color: ${theme.color.secondary};
-    gap: ${theme.spacing[3]};
-    max-width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `}
-
 `;
 
 const Content = styled.div`
