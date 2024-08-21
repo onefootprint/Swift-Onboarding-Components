@@ -5098,10 +5098,15 @@
                         "description": "Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be\n at least 1 minute, at most 1 day",
                         "type": "integer",
                         "format": "int32"
+                    },
+                    "use_implicit_auth": {
+                        "description": "[gated(implicit_auth)]: <>\nWhen true, will not require physical authentication from the user if they have logged into\n your organization recently.\n This may be useful if a user is running through multiple playbooks and has already recently\n logged in.",
+                        "type": "boolean"
                     }
                 },
                 "required": [
-                    "kind"
+                    "kind",
+                    "use_implicit_auth"
                 ]
             },
             "CreateTokenResponse": {

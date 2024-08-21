@@ -54,8 +54,8 @@ pub struct CreateTokenRequest {
     /// This may be useful if a user is running through multiple playbooks and has already recently
     /// logged in.
     #[serde(default)]
-    #[openapi(skip)]
     #[openapi(required)]
+    #[openapi(gated = "implicit_auth")]
     pub use_implicit_auth: Option<bool>,
 
     /// When true, you attest that this user has already authenticated to your platform. Footprint
