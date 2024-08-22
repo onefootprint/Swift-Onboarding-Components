@@ -4,7 +4,7 @@ use newtypes::TenantId;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Short-lived session representing an ob config, instead of using the long-lived publishable keys
-pub struct OnboardingSession {
+pub struct DeprecatedOnboardingSession {
     pub tenant_id: TenantId,
     pub ob_config_id: ObConfigurationId,
     pub is_live: bool,

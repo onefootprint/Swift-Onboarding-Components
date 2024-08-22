@@ -4,7 +4,7 @@ use crate::types::ApiResponse;
 use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
-use api_core::auth::session::ob_config::OnboardingSession;
+use api_core::auth::session::ob_config::DeprecatedOnboardingSession;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use db::models::ob_configuration::ObConfiguration;
@@ -52,7 +52,7 @@ pub async fn post(
         })
         .await?;
 
-    let session_data = AuthSessionData::OnboardingSession(OnboardingSession {
+    let session_data = AuthSessionData::DeprecatedOnboardingSession(DeprecatedOnboardingSession {
         ob_config_id: ob_config.id,
         tenant_id: tenant.id,
         is_live,

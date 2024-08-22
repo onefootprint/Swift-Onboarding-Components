@@ -47,7 +47,8 @@ pub enum AuthSessionData {
     ValidateUserToken(user::ValidateUserToken),
 
     /// Used to provide a single use onboarding session token for bifrost initialization
-    OnboardingSession(ob_config::OnboardingSession),
+    /// TODO deprecate
+    DeprecatedOnboardingSession(ob_config::DeprecatedOnboardingSession),
 
     /// Used to initialize an onboarding session to KYC an owner of a business
     BusinessOwner(ob_config::BoSession),
@@ -66,7 +67,7 @@ impl AuthSessionData {
             Self::User(_) => "u",
             Self::EmailVerify(_) => "ev",
             Self::ValidateUserToken(_) => "v",
-            Self::OnboardingSession(_) => "ob",
+            Self::DeprecatedOnboardingSession(_) => "ob",
             Self::BusinessOwner(_) => "bo",
             Self::SdkArgs(_) => "sdk",
             Self::TenantRb(d) if d.purpose == TenantSessionPurpose::Docs => "d",
@@ -88,7 +89,7 @@ impl HasSessionKind for AuthSessionData {
             Self::User(_) => SessionKind::User,
             Self::EmailVerify(_) => SessionKind::EmailVerify,
             Self::ValidateUserToken(_) => SessionKind::ValidateUserToken,
-            Self::OnboardingSession(_) => SessionKind::OnboardingSession,
+            Self::DeprecatedOnboardingSession(_) => SessionKind::DeprecatedOnboardingSession,
             Self::BusinessOwner(_) => SessionKind::BusinessOwner,
             Self::SdkArgs(_) => SessionKind::SdkArgs,
         }

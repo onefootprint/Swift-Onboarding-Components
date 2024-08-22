@@ -39,7 +39,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         _: RequestInfo,
     ) -> FpResult<Self> {
         let data = match auth_session {
-            AuthSessionData::OnboardingSession(data) => data,
+            AuthSessionData::DeprecatedOnboardingSession(data) => data,
             _ => {
                 return Err(AuthError::SessionTypeError.into());
             }

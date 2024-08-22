@@ -42,7 +42,7 @@ pub enum SessionKind {
     User,
     EmailVerify,
     ValidateUserToken,
-    OnboardingSession,
+    DeprecatedOnboardingSession,
     BusinessOwner,
     SdkArgs,
 }
