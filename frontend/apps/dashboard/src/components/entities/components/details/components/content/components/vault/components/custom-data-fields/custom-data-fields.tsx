@@ -74,8 +74,8 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
           )}
         </Header>
         <Grid.Container
-          columnGap={12}
-          gap={4}
+          columnGap={10}
+          rowGap={4}
           width="100%"
           columns={['repeat(2, 1fr)']}
           paddingTop={5}

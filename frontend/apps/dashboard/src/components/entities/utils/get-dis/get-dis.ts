@@ -37,7 +37,9 @@ const sort = (attributes: DataIdentifier[]) =>
 
 export const getCustomDIs = (data: EntityVault) => {
   const attributes = Object.keys(data);
-  const filtered = attributes.filter(attr => attr.startsWith('custom') || attr.startsWith('document.custom'));
+  const filtered = attributes
+    .filter(attr => attr.startsWith('custom') || attr.startsWith('document.custom'))
+    .sort((a, b) => a.localeCompare(b));
   return filtered as DataIdentifier[];
 };
 
