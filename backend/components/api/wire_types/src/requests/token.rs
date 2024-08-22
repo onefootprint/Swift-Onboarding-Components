@@ -4,6 +4,7 @@ use newtypes::ContactInfoKind;
 use newtypes::FpId;
 use newtypes::ObConfigurationKey;
 use newtypes::PiiString;
+use newtypes::PreviewApi;
 use newtypes::SessionAuthToken;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
@@ -55,7 +56,7 @@ pub struct CreateTokenRequest {
     /// logged in.
     #[serde(default)]
     #[openapi(required)]
-    #[openapi(gated = "implicit_auth")]
+    #[openapi(gated = "PreviewApi::ImplicitAuth")]
     pub use_implicit_auth: Option<bool>,
 
     /// When true, you attest that this user has already authenticated to your platform. Footprint

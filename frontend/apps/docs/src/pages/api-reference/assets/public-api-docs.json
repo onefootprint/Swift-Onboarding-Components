@@ -5100,7 +5100,8 @@
                         "format": "int32"
                     },
                     "use_implicit_auth": {
-                        "description": "[gated(implicit_auth)]: <>\nWhen true, will not require physical authentication from the user if they have logged into\n your organization recently.\n This may be useful if a user is running through multiple playbooks and has already recently\n logged in.",
+                        "description": "When true, will not require physical authentication from the user if they have logged into\n your organization recently.\n This may be useful if a user is running through multiple playbooks and has already recently\n logged in.",
+                        "x_fp_preview_gate": "implicit_auth",
                         "type": "boolean"
                     }
                 },

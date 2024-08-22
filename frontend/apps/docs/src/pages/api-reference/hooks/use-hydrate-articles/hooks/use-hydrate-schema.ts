@@ -1,13 +1,5 @@
-import type { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import type { ContentSchema, ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 import useCanAccessPreviewApi from './use-can-access-preview-api';
-
-// TODO unit tests
-/** The backend serializes when fields are gated by preview APIs inside markdown comments. Here, we extract out if a given field's description indicates that the field should only be displayed behind a TenantPreviewApi gate. */
-export const getPreviewApiGateFromDescription = (description: string) => {
-  const gatedRegex = /gated\(([A-Za-z_-]+)\)/;
-  return gatedRegex.exec(description)?.[1] as TenantPreviewApi | undefined;
-};
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const useHydrateSchema = (openApiSpec: any) => {
@@ -44,8 +36,7 @@ const useHydrateSchema = (openApiSpec: any) => {
     if (!properties) return undefined;
     return Object.fromEntries(
       Object.entries(properties).flatMap(([name, schema]) => {
-        const requiredPreviewApi = getPreviewApiGateFromDescription(schema.description || '');
-        if (requiredPreviewApi && !canAccessPreviewApi(requiredPreviewApi)) {
+        if (schema.x_fp_preview_gate && !canAccessPreviewApi(schema.x_fp_preview_gate)) {
           return [];
         }
         return [[name, schema]];
