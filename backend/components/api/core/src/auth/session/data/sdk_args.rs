@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use strum_macros::Display;
 use strum_macros::EnumDiscriminants;
 
-pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
+pub type UserDataV1 = HashMap<String, PiiJsonValue>;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct L10nV1 {

@@ -11,6 +11,16 @@ def test_onboarding_token(sandbox_tenant):
             key=sandbox_tenant.default_ob_config.key.value,
             bootstrap_data={**ID_DATA, **BUSINESS_DATA},
         ),
+        dict(
+            key=sandbox_tenant.default_ob_config.key.value,
+            bootstrap_data={
+                **ID_DATA,
+                "business.owners": [
+                    {"first_name": "Piip", "last_name": "Penguin"},
+                    {"first_name": "Percy", "last_name": "Penguin"},
+                ],
+            },
+        ),
     ]
     for data in TESTS:
         body = post("onboarding/session", data, sandbox_tenant.s_sk)
