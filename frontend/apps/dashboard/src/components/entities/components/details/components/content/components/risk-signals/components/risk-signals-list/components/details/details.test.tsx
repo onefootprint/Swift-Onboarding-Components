@@ -222,7 +222,7 @@ describe('<Details />', () => {
         });
       });
 
-      it.skip('should show aml media data after clicking See more', async () => {
+      it('should show aml media data after clicking See more', async () => {
         withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
