@@ -15,12 +15,14 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignMissingRequirements: 'onboardingRequirementsReceived';
-    markLastHandledRequirement: 'error' | 'xstate.stop';
+    markLastHandledRequirement: 'continueOnMobile' | 'error' | 'xstate.stop';
+    setContinueOnDesktop: 'continueOnDesktop';
+    setContinueOnMobile: 'continueOnMobile';
     setInvestorProfileCollected: 'error' | 'xstate.stop';
     setKybDataCollected: 'error' | 'xstate.stop';
     setKycDataCollected: 'error' | 'xstate.stop';
     setRequirementRouterVisited: 'error' | 'xstate.stop';
-    setTransferVisited: 'error' | 'xstate.stop';
+    setTransferVisited: 'continueOnDesktop' | 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

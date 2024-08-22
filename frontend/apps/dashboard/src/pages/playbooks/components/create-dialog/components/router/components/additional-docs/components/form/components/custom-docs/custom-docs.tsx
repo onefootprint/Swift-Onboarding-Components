@@ -1,10 +1,10 @@
 import type { CustomDoc, DataToCollectFormData } from '@/playbooks/utils/machine/types';
-import { IcoPlusSmall16 } from '@onefootprint/icons';
+import { IcoPencil16, IcoPlusSmall16 } from '@onefootprint/icons';
 import { Box, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import CustomDocsForm from './components/custom-docs-form';
+import { CustomDocsForm, CustomDocsPreview } from '../../../../../custom-docs';
 
 const CustomDocs = () => {
   const { t } = useTranslation('playbooks', {
@@ -20,7 +20,7 @@ const CustomDocs = () => {
 
   const handleAdd = () => {
     const length = fields.length;
-    append({ name: '', description: '', identifier: '' });
+    append({ name: '', description: '', identifier: '', uploadSettings: 'prefer_upload' });
     setFormIndex(length);
   };
 
@@ -46,7 +46,7 @@ const CustomDocs = () => {
   };
 
   return (
-    <Stack gap={3} direction="column">
+    <Stack gap={5} direction="column">
       <Stack gap={2} direction="column">
         <Text variant="body-3">{t('title')}</Text>
         <Text variant="body-3" color="tertiary">
@@ -56,38 +56,47 @@ const CustomDocs = () => {
       {formIndex == null ? (
         <Stack direction="column" gap={5}>
           {fields.map((field, index) => (
-            <Stack key={field.id} justifyContent="space-between" gap={5}>
-              <Stack gap={3} alignItems="center" overflow="hidden">
-                <Text variant="label-4">{field.name}</Text>
-                <Box
-                  backgroundColor="secondary"
-                  borderColor="tertiary"
-                  borderRadius="sm"
-                  borderStyle="solid"
-                  borderWidth={1}
-                  overflow="hidden"
-                  paddingBlock={1}
-                  paddingInline={2}
-                  textOverflow="ellipsis"
-                  userSelect="none"
-                  whiteSpace="nowrap"
-                >
-                  <Text variant="snippet-2" color="tertiary" truncate>
-                    document.custom.{field.identifier}
-                  </Text>
-                </Box>
+            <Box
+              borderRadius="sm"
+              borderWidth={1}
+              padding={5}
+              borderStyle="solid"
+              borderColor="tertiary"
+              key={field.id}
+            >
+              <Stack gap={5} flexDirection="column">
+                <Stack gap={3} alignItems="center" justifyContent="space-between">
+                  <Text variant="label-3">{t('form.title')}</Text>
+                  <LinkButton
+                    variant="label-4"
+                    onClick={handleEdit(index)}
+                    iconPosition="left"
+                    iconComponent={IcoPencil16}
+                  >
+                    {allT('edit')}
+                  </LinkButton>
+                </Stack>
+                <CustomDocsPreview
+                  identifier={field.identifier}
+                  uploadSettings={field.uploadSettings}
+                  name={field.name}
+                  gap={3}
+                />
               </Stack>
-              <LinkButton variant="label-4" onClick={handleEdit(index)}>
-                {allT('edit')}
-              </LinkButton>
-            </Stack>
+            </Box>
           ))}
           <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" variant="label-4" onClick={handleAdd}>
             {allT('add')}
           </LinkButton>
         </Stack>
       ) : (
-        <CustomDocsForm index={formIndex} onCancel={handleCancel} onDelete={handleDelete} onSubmit={handleSubmit} />
+        <CustomDocsForm
+          formName="person.docs.additional.custom"
+          index={formIndex}
+          onCancel={handleCancel}
+          onDelete={handleDelete}
+          onSubmit={handleSubmit}
+        />
       )}
     </Stack>
   );

@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { forwardRef, useId, useRef } from 'react';
+import React, { type Ref, useRef, useId, type ReactElement } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
@@ -9,7 +8,7 @@ import { createFontStyles } from '../../utils/mixins';
 import Grid from '../grid';
 import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
-export type RadioProps = {
+export type RadioProps<T extends string = string> = {
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -19,77 +18,75 @@ export type RadioProps = {
   label: string;
   name?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: React.ChangeEvent<Omit<HTMLInputElement, 'value'> & { value: T }>) => void;
   readOnly?: boolean;
   required?: boolean;
   testID?: string;
-  value?: string;
+  value?: T;
 };
 
-const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  (
-    {
-      checked,
-      defaultChecked,
-      disabled,
-      hasError,
-      hint,
-      id: possibleId,
-      label,
-      name,
-      onBlur,
-      onChange,
-      readOnly,
-      required,
-      testID,
-      value,
-    }: RadioProps,
-    ref,
-  ) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const internalId = useId();
-    const id = possibleId || internalId;
+const Radio = <T extends string = string>(
+  {
+    checked,
+    defaultChecked,
+    disabled,
+    hasError,
+    hint,
+    id: possibleId,
+    label,
+    name,
+    onBlur,
+    onChange,
+    readOnly,
+    required,
+    testID,
+    value,
+  }: RadioProps<T>,
+  ref: Ref<HTMLInputElement>,
+) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const internalId = useId();
+  const id = possibleId || internalId;
 
-    return (
-      <Container>
-        <Label aria-describedby={hint && `${id}-hint`} data-testid={testID} data-has-error={hasError} htmlFor={id}>
-          <Input
-            aria-checked={checked}
-            aria-disabled={disabled}
-            aria-required={required}
-            as="input"
-            checked={checked}
-            data-has-error={hasError}
-            defaultChecked={defaultChecked}
-            disabled={disabled}
-            id={id}
-            name={name}
-            onBlur={onBlur}
-            onChange={onChange}
-            readOnly={readOnly}
-            ref={mergeRefs([inputRef, ref])}
-            required={required}
-            tabIndex={disabled ? undefined : 0}
-            type="radio"
-            value={value}
-          />
-          {label}
-        </Label>
-        {hint && (
-          <Hint
-            data-has-error={hasError}
-            id={`${id}-hint`}
-            onClick={() => {
-              inputRef.current?.click();
-            }}
-          >
-            {hint}
-          </Hint>
-        )}
-      </Container>
-    );
-  },
-);
+  return (
+    <Container>
+      <Label aria-describedby={hint && `${id}-hint`} data-testid={testID} data-has-error={hasError} htmlFor={id}>
+        <Input
+          aria-checked={checked}
+          aria-disabled={disabled}
+          aria-required={required}
+          as="input"
+          checked={checked}
+          data-has-error={hasError}
+          defaultChecked={defaultChecked}
+          disabled={disabled}
+          id={id}
+          name={name}
+          onBlur={onBlur}
+          onChange={onChange}
+          readOnly={readOnly}
+          ref={mergeRefs([inputRef, ref])}
+          required={required}
+          tabIndex={disabled ? undefined : 0}
+          type="radio"
+          value={value}
+        />
+        {label}
+      </Label>
+      {hint && (
+        <Hint
+          data-has-error={hasError}
+          id={`${id}-hint`}
+          onClick={() => {
+            inputRef.current?.click();
+          }}
+        >
+          {hint}
+        </Hint>
+      )}
+    </Container>
+  );
+};
 
 const Container = styled.div``;
 
@@ -192,4 +189,7 @@ const Hint = styled.div`
     `;
   }}
 `;
-export default Radio;
+
+type ForwardRef = <T extends string = string>(p: RadioProps<T> & { ref?: Ref<HTMLDivElement> }) => ReactElement;
+
+export default React.forwardRef(Radio) as ForwardRef;

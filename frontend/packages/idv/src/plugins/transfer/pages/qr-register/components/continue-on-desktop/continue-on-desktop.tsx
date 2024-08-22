@@ -2,6 +2,7 @@ import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import useOnboardingRequirementsMachine from '../../../../../../pages/onboarding/pages/requirements/hooks/use-onboarding-requirements-machine';
 import useTransferMachine from '../../../../hooks/use-machine';
 
 const ContinueOnDesktop = () => {
@@ -9,11 +10,13 @@ const ContinueOnDesktop = () => {
     keyPrefix: 'transfer.pages.qr-register',
   });
   const [, send] = useTransferMachine();
+  const [, sendOnboardingRequirements] = useOnboardingRequirementsMachine();
 
   const handleContinueOnDesktop = () => {
     send({
       type: 'continueOnDesktop',
     });
+    sendOnboardingRequirements({ type: 'continueOnDesktop' });
   };
 
   return (

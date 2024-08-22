@@ -289,6 +289,8 @@ export type {
   DecryptRoleScope,
   Document,
   DocumentRequestConfig,
+  CustomDocumentRequestData,
+  CustomDocumentUploadSettings,
   DocumentUpload,
   DocumentUploadedEvent,
   DocumentUploadedEventData,

@@ -39,6 +39,7 @@ const createOnboardingRequirementsMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
+        continueOnMobile: false,
         idvContext,
         onboardingContext: {
           config,
@@ -110,7 +111,12 @@ const createOnboardingRequirementsMachine = ({
         },
         transfer: {
           exit: ['setTransferVisited'],
-          on: RequirementCompletedTransition,
+          on: {
+            ...RequirementCompletedTransition,
+            continueOnDesktop: {
+              actions: 'setContinueOnDesktop',
+            },
+          },
         },
         liveness: {
           exit: ['markLastHandledRequirement'],
@@ -118,7 +124,13 @@ const createOnboardingRequirementsMachine = ({
         },
         idDoc: {
           exit: ['markLastHandledRequirement'],
-          on: RequirementCompletedTransition,
+          on: {
+            ...RequirementCompletedTransition,
+            continueOnMobile: {
+              target: 'checkRequirements',
+              actions: 'setContinueOnMobile',
+            },
+          },
         },
         authorize: {
           exit: ['markLastHandledRequirement'],
@@ -156,6 +168,8 @@ const createOnboardingRequirementsMachine = ({
         setKycDataCollected: assign(ctx => ({ ...ctx, isKycDataCollected: true })),
         setKybDataCollected: assign(ctx => ({ ...ctx, isKybDataCollected: true })),
         setRequirementRouterVisited: assign(ctx => ({ ...ctx, isRequirementRouterVisited: true })),
+        setContinueOnMobile: assign(ctx => ({ ...ctx, continueOnMobile: true })),
+        setContinueOnDesktop: assign(ctx => ({ ...ctx, continueOnMobile: false })),
       },
     },
   );

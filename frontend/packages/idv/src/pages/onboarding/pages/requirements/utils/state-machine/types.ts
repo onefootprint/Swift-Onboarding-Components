@@ -40,10 +40,15 @@ export type MachineContext = {
 
   /** We have a feature flag to disable transfers on desktops for some customers */
   isTransferOnDesktopDisabled?: boolean;
+
+  /** Record whether the user decided to proceed with capturing the docs on mobile (only applicable for the desktop flow) */
+  continueOnMobile: boolean;
 };
 
 export type MachineEvents =
   | { type: 'error' }
   | { type: 'initialized' }
   | { type: 'onboardingRequirementsReceived'; payload: OnboardingRequirement[] }
-  | { type: 'requirementCompleted' };
+  | { type: 'requirementCompleted' }
+  | { type: 'continueOnMobile' }
+  | { type: 'continueOnDesktop' };

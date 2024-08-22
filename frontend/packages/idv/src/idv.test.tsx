@@ -75,7 +75,7 @@ export const idDocRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.document,
   isMet: false,
   documentRequestId: 'id',
-  uploadSettings: DocumentUploadSettings.preferUpload,
+  uploadSettings: DocumentUploadSettings.preferCapture,
   config: {
     kind: DocumentRequestKind.Identity,
     shouldCollectConsent: false,

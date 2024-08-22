@@ -1,75 +1,60 @@
 import type { CustomDoc, DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash16 } from '@onefootprint/icons';
-import { Button, Form, LinkButton, Stack, TextArea, TextInput } from '@onefootprint/ui';
+import type { CustomDocumentUploadSettings } from '@onefootprint/types';
+import { Button, Divider, Form, LinkButton, Radio, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
 import get from 'lodash/get';
 import { useId, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { type UseFieldArrayProps, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 type CustomDocsFormProps = {
   index?: number;
+  formName: UseFieldArrayProps<DataToCollectFormData, 'person.docs.additional.custom' | 'business.docs.custom'>['name'];
   onCancel: (index: number, meta: { isCreating: boolean; isValid: boolean }) => void;
   onDelete: (index: number) => void;
   onSubmit: (index: number, customDoc: CustomDoc) => void;
 };
 
-const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsFormProps) => {
+const CustomDocsForm = ({ index = 0, formName, onDelete, onCancel, onSubmit }: CustomDocsFormProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'create.custom-docs.form',
   });
   const id = useId();
-  const { formState, register, trigger, setFocus, getValues, setValue } = useFormContext<DataToCollectFormData>();
+  const { formState, register, trigger, setValue } = useFormContext<DataToCollectFormData>();
   const nameAttrs = {
-    name: `business.docs.custom.${index}.name`,
-    identifier: `business.docs.custom.${index}.identifier`,
-    description: `business.docs.custom.${index}.description`,
+    name: `${formName}.${index}.name`,
+    identifier: `${formName}.${index}.identifier`,
+    description: `${formName}.${index}.description`,
+    uploadSettings: `${formName}.${index}.uploadSettings`,
   } as const;
-
-  const [originalValues] = useState(() => {
-    const [name, identifier, description] = getValues([nameAttrs.name, nameAttrs.identifier, nameAttrs.description]);
-    return { name, identifier, description };
+  const [name, identifier, description, uploadSettings] = useWatch({
+    name: [nameAttrs.name, nameAttrs.identifier, nameAttrs.description, nameAttrs.uploadSettings],
   });
+  const [originalValues] = useState(() => ({ name, identifier, description, uploadSettings }));
   const isCreating = !originalValues.name && !originalValues.identifier && !originalValues.description;
-  const formErrors = get(formState.errors, `business.docs.custom.${index}`);
-
-  const focusOnFirstInvalidField = () => {
-    if (typeof formErrors === 'object') {
-      const [name] = Object.keys(formErrors);
-      if (name === 'name') {
-        setFocus(nameAttrs.name);
-      }
-      if (name === 'identifier') {
-        setFocus(nameAttrs.identifier);
-      }
-    }
-  };
+  const formErrors = get(formState.errors, `${formName}.${index}`);
 
   const resetToOriginalValues = () => {
-    setValue(nameAttrs.name, originalValues.name);
-    setValue(nameAttrs.identifier, originalValues.identifier);
-    setValue(nameAttrs.description, originalValues.description);
+    setValue(`${formName}.${index}`, originalValues);
   };
 
   const getValuesAndSubmit = () => {
-    const [name, identifier, description] = getValues([nameAttrs.name, nameAttrs.identifier, nameAttrs.description]);
-    onSubmit(index, { name, identifier, description });
+    onSubmit(index, { name, identifier, description, uploadSettings });
   };
 
   const handleCancel = async () => {
     resetToOriginalValues();
-    const isValid = await trigger([nameAttrs.name, nameAttrs.identifier]);
+    const isValid = await trigger([nameAttrs.name, nameAttrs.identifier], { shouldFocus: true });
     const meta = { isValid, isCreating };
 
     onCancel(index, meta);
   };
 
   const handleSubmit = async () => {
-    const isValid = await trigger([nameAttrs.name, nameAttrs.identifier]);
+    const isValid = await trigger([nameAttrs.name, nameAttrs.identifier], { shouldFocus: true });
     if (isValid) {
       getValuesAndSubmit();
-    } else {
-      focusOnFirstInvalidField();
     }
   };
 
@@ -100,7 +85,6 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
             id={`name-${id}`}
             placeholder={t('name.placeholder')}
             size="compact"
-            hasError={!!formErrors?.name}
             autoFocus
             {...register(nameAttrs.name, {
               required: t('name.errors.required'),
@@ -122,7 +106,6 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
             <TextInput
               id={`identifier-${id}`}
               placeholder=""
-              hasError={!!formErrors?.identifier}
               size="compact"
               {...register(nameAttrs.identifier, {
                 required: t('identifier.errors.required'),
@@ -148,6 +131,26 @@ const CustomDocsForm = ({ index = 0, onDelete, onCancel, onSubmit }: CustomDocsF
           </Form.Label>
           <TextArea id={`description-${id}`} {...register(nameAttrs.description)} />
         </Form.Field>
+      </Stack>
+      <Stack flexDirection="column" paddingInline={5} paddingBottom={5}>
+        <Divider variant="secondary" />
+        <Stack flexDirection="column" gap={5} paddingTop={5}>
+          <Text variant="label-3"> {t('collection-method.title')}</Text>
+          <Stack flexDirection="column" gap={3}>
+            <Radio<CustomDocumentUploadSettings>
+              hint={t('collection-method.prefer-upload.hint')}
+              label={t('collection-method.prefer-upload.label')}
+              value="prefer_upload"
+              {...register(nameAttrs.uploadSettings)}
+            />
+            <Radio<CustomDocumentUploadSettings>
+              hint={t('collection-method.prefer-capture.hint')}
+              label={t('collection-method.prefer-capture.label')}
+              value="prefer_capture"
+              {...register(nameAttrs.uploadSettings)}
+            />
+          </Stack>
+        </Stack>
       </Stack>
       <Stack
         borderColor="tertiary"

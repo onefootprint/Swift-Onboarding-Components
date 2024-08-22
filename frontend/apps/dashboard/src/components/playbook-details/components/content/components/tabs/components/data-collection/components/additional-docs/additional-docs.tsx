@@ -1,6 +1,10 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
-import { IcoCode216, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
-import { type DocumentRequestConfig, DocumentRequestKind } from '@onefootprint/types';
+import { IcoCode216, IcoFileText16, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
+import {
+  type CustomDocumentUploadSettings,
+  type DocumentRequestConfig,
+  DocumentRequestKind,
+} from '@onefootprint/types';
 import { Box, Popover, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -15,25 +19,28 @@ const AdditionalDocs = ({ docs }: AdditionalDocsProps) => {
     if (doc.kind === DocumentRequestKind.ProofOfSsn) {
       return {
         label: t('possn.title'),
-        identifier: null,
+        identifier: undefined,
         description: t('possn.description'),
         requiresHumanReview: doc.data.requiresHumanReview,
+        uploadSettings: undefined,
       };
     }
     if (doc.kind === DocumentRequestKind.ProofOfAddress) {
       return {
         label: t('poa.title'),
-        identifier: null,
+        identifier: undefined,
         description: t('poa.description'),
         requiresHumanReview: doc.data.requiresHumanReview,
+        uploadSettings: undefined,
       };
     }
     if (doc.kind === DocumentRequestKind.Custom) {
       return {
         label: doc.data.name,
         identifier: doc.data.identifier,
-        description: doc.data.description || null,
+        description: doc.data.description,
         requiresHumanReview: doc.data.requiresHumanReview,
+        uploadSettings: doc.data.uploadSettings,
       };
     }
     throw new Error('Unknown document type');
@@ -46,6 +53,7 @@ const AdditionalDocs = ({ docs }: AdditionalDocsProps) => {
         <Stack gap={3} flexDirection="column">
           {list.map(doc => (
             <DocItem
+              uploadSettings={doc.uploadSettings}
               description={doc.description}
               identifier={doc.identifier}
               key={doc.label}
@@ -64,19 +72,34 @@ const AdditionalDocs = ({ docs }: AdditionalDocsProps) => {
 };
 
 type DocItemProps = {
-  description: string | null;
-  identifier: string | null;
+  uploadSettings: CustomDocumentUploadSettings | undefined;
+  description: string | undefined;
+  identifier: string | undefined;
   label: string;
   requiresHumanReview: boolean;
 };
 
-const PopoverContent = ({ identifier, description, requiresHumanReview }: Omit<DocItemProps, 'label'>) => {
+const PopoverContent = ({
+  identifier,
+  description,
+  requiresHumanReview,
+  uploadSettings,
+}: Omit<DocItemProps, 'label'>) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
 
   const contentItems = [
-    { condition: identifier, icon: <IcoCode216 />, text: identifier, variant: 'snippet-2' },
-    { condition: description, icon: <IcoWriting16 />, text: description, variant: 'body-4' },
+    { condition: !!identifier, icon: <IcoCode216 />, text: identifier, variant: 'snippet-2' },
+    { condition: !!description, icon: <IcoWriting16 />, text: description, variant: 'body-4' },
     { condition: requiresHumanReview, icon: <IcoFlag16 />, text: t('requires-manual-review'), variant: 'body-4' },
+    {
+      condition: !!uploadSettings,
+      icon: <IcoFileText16 />,
+      text:
+        uploadSettings === 'prefer_upload'
+          ? t('collection-method.prefer-upload')
+          : t('collection-method.prefer-capture'),
+      variant: 'body-4',
+    },
   ];
 
   return (
@@ -98,7 +121,7 @@ const PopoverContent = ({ identifier, description, requiresHumanReview }: Omit<D
   );
 };
 
-const DocItem = ({ label, identifier, description, requiresHumanReview }: DocItemProps) => {
+const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSettings }: DocItemProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
   return (
     <Stack gap={2} alignItems="center">
@@ -113,6 +136,7 @@ const DocItem = ({ label, identifier, description, requiresHumanReview }: DocIte
           <Popover
             content={
               <PopoverContent
+                uploadSettings={uploadSettings}
                 identifier={identifier}
                 description={description}
                 requiresHumanReview={requiresHumanReview}

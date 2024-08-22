@@ -1278,6 +1278,7 @@
           "retry-limit-exceeded": "Desafortunadamente no podemos completar tu solicitud en este momento. Por favor, inténtalo de nuevo más tarde."
         },
         "document-prompt": {
+          "continue-on-mobile": "Continuar en el móvil",
           "guidelines": {
             "gas-water-electricity-bill": "Facturas recientes de gas, agua o electricidad",
             "bank-credit-card-statement": "Extractos bancarios o de tarjeta de crédito recientes",

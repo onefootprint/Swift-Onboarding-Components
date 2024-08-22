@@ -8,6 +8,8 @@ type AuthProps = Pick<OnboardingConfig, 'mustCollectData' | 'requiredAuthMethods
 const Auth = ({ requiredAuthMethods, mustCollectData, allowUsTerritoryResidents }: AuthProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
 
+  const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods.length > 0;
+
   return (
     <Stack direction="column" gap={5}>
       <CollectedInformation
@@ -17,14 +19,16 @@ const Auth = ({ requiredAuthMethods, mustCollectData, allowUsTerritoryResidents 
           phoneNumber: mustCollectData.includes('phone_number'),
         }}
       />
-      <CollectedInformation
-        title={t('sign-in')}
-        options={{
-          phoneOTP: requiredAuthMethods?.includes(AuthMethodKind.phone),
-          emailOTP: requiredAuthMethods?.includes(AuthMethodKind.email),
-        }}
-      />
-      {allowUsTerritoryResidents && (
+      {hasAnyRequiredAuthMethods ? (
+        <CollectedInformation
+          title={t('sign-in')}
+          options={{
+            phoneOTP: requiredAuthMethods?.includes(AuthMethodKind.phone),
+            emailOTP: requiredAuthMethods?.includes(AuthMethodKind.email),
+          }}
+        />
+      ) : null}
+      {allowUsTerritoryResidents ? (
         <footer>
           <Box marginTop={5} marginBottom={5}>
             <Divider variant="secondary" />
@@ -36,7 +40,7 @@ const Auth = ({ requiredAuthMethods, mustCollectData, allowUsTerritoryResidents 
             </Text>
           </Text>
         </footer>
-      )}
+      ) : null}
     </Stack>
   );
 };

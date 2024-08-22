@@ -31,7 +31,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = kind === 'kyb';
   const isAuth = kind === 'auth';
-  const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods?.length > 0;
+  const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods.length > 0;
 
   const kycOnlyPrimaryBusinessOwner = mustCollectData.includes('business_beneficial_owners');
   const kycAllBusinessOwners = mustCollectData.includes('business_kyced_beneficial_owners');

@@ -103,6 +103,7 @@
         "title": "Additional documents",
         "description": "Additional proofs that may help you analyze the user",
         "form": {
+          "title": "Your custom document",
           "custom": {
             "label": "Custom"
           }
@@ -190,6 +191,7 @@
       "title": "Custom",
       "description": "Specify extra documents required to meet specific onboarding criteria.",
       "form": {
+        "title": "Your custom document",
         "name": {
           "label": "Document label",
           "placeholder": "City verification",
@@ -210,6 +212,19 @@
         "description": {
           "label": "Description (optional)",
           "hint": "Describe the documents the user should submit. This information will be displayed to assist users in selecting the appropriate files."
+        },
+        "collection-method": {
+          "title": "Preferred method for document collection",
+          "prefer-upload": {
+            "label": "Prefer upload",
+            "hint": "First prompt the user to upload a file before allowing them to capture the document.",
+            "preview": "Upload"
+          },
+          "prefer-capture": {
+            "label": "Prefer capture",
+            "hint": "First prompt the user to capture the document before allowing them to upload a file.",
+            "preview": "Capture"
+          }
         }
       }
     },
@@ -516,7 +531,11 @@
           "description": "Scan of Social Security card or official document displaying your name and Social Security Number."
         },
         "requires-manual-review": "After upload, user will be marked for manual review.",
-        "more-details": "More details"
+        "more-details": "More details",
+        "collection-method": {
+          "prefer-upload": "Prefer upload",
+          "prefer-capture": "Prefer capture"
+        }
       }
     },
     "passkeys": {

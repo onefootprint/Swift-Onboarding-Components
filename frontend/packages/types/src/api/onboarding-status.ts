@@ -1,4 +1,4 @@
-import type { AuthMethodKind, CountryCode, DocumentRequestKind } from '..';
+import type { AuthMethodKind, CountryCode, CustomDocumentUploadSettings, DocumentRequestKind } from '..';
 import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -97,6 +97,7 @@ export type CustomDocumentRequirementConfig = {
   kind: DocumentRequestKind.Custom;
   name: string;
   description?: string;
+  uploadSettings: CustomDocumentUploadSettings;
 };
 
 export type DocumentRequirementConfig =

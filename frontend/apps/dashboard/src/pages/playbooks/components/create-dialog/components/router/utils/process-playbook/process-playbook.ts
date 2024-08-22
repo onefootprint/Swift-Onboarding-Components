@@ -146,6 +146,7 @@ const createPersonAdditionalDocsPayload = (formData: DataToCollectFormData, kind
             identifier: `document.custom.${doc.identifier}` as CustomDI,
             name: doc.name,
             requiresHumanReview: !!requireManualReview,
+            uploadSettings: doc.uploadSettings,
           },
         });
       });
@@ -271,6 +272,7 @@ const createBusinessCustomDocsPayload = (formData: DataToCollectFormData, kind: 
           identifier: `document.custom.${doc.identifier}` as CustomDI,
           name: doc.name,
           requiresHumanReview: true,
+          uploadSettings: doc.uploadSettings,
         },
       });
     });

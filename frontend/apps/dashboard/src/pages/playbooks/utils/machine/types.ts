@@ -1,5 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { CountryCode } from '@onefootprint/types';
+import type { CountryCode, CustomDocumentUploadSettings } from '@onefootprint/types';
 import { CollectedDocumentDataOption, CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 
 export enum PlaybookKind {
@@ -162,6 +162,7 @@ export type CustomDoc = {
   name: string;
   identifier: string;
   description?: string;
+  uploadSettings: CustomDocumentUploadSettings;
 };
 
 export type AdditionalDocs = {

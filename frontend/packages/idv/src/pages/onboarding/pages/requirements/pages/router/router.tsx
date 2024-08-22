@@ -15,6 +15,7 @@ import { getLogger } from '../../../../../../utils/logger';
 import ErrorComponent from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
+import { getPreferUploadDoc } from '../../utils/state-machine/machine.utils';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 import Process from '../process';
@@ -124,7 +125,8 @@ const Router = ({ onDone }: RouterProps) => {
       <CollectDocument
         idvContext={idvContext}
         context={{
-          requirement: idDocReqs[0],
+          // If we have a custom document with upload settings set as "prefer_upload", we should first request the user to upload the document before transferring
+          requirement: getPreferUploadDoc(idDocReqs) || idDocReqs[0],
           sandboxOutcome: idDocOutcome,
           obConfigSupportedCountries: config.supportedCountries,
           orgId,

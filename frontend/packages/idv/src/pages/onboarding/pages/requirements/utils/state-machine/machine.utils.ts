@@ -1,8 +1,14 @@
-import { OnboardingRequirementKind } from '@onefootprint/types';
+import { type OnboardingRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
 import { ComponentsSdkTypes } from '@onefootprint/idv/src/utils/state-machine/types';
 import type { MachineContext, MachineEvents } from './types';
+
+export const getPreferUploadDoc = <K extends OnboardingRequirement>(docRequirement: K[]) =>
+  docRequirement.find(
+    requirement =>
+      requirement.kind === OnboardingRequirementKind.document && requirement.uploadSettings === 'prefer_upload',
+  );
 
 const getFirstKind = (c: MachineContext): OnboardingRequirementKind | undefined => c.requirements[0]?.kind;
 
@@ -45,8 +51,13 @@ const shouldRunTransfer = (ctx: MachineContext): boolean => {
   if (ctx.isTransferOnDesktopDisabled && !isDeviceMobile(ctx)) return false;
 
   if (isNoPhoneFlow(ctx)) return false;
-  if (ctx.isTransferVisited) return false;
+  // If the user has clicked on "Continue on mobile" button, we should allow them to continue with the transfer
+  if (!ctx.continueOnMobile && ctx.isTransferVisited) return false;
   if (isTransfer(ctx)) return false;
+
+  // If we have a custom document with upload settings set as "prefer_upload",
+  // we should first request the user to upload the document before transferring
+  if (!ctx.continueOnMobile && getPreferUploadDoc(ctx.requirements)) return false;
 
   const nextRequirementIsLiveness = isRegisterPasskey(getFirstKind(ctx));
   const nextRequirementIsIdDoc = isCollectDoc(getFirstKind(ctx));

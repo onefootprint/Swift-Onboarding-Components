@@ -1277,6 +1277,7 @@
           "retry-limit-exceeded": "Unfortunately we can't complete your request at this time. Please try again later."
         },
         "document-prompt": {
+          "continue-on-mobile": "Continue on mobile instead",
           "guidelines": {
             "gas-water-electricity-bill": "Recent gas, water or electricity bills",
             "bank-credit-card-statement": "Recent bank or credit card statements",

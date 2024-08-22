@@ -1,5 +1,15 @@
 import type { DataIdentifier } from './di';
 
+export type CustomDocumentUploadSettings = 'prefer_upload' | 'prefer_capture';
+
+export type CustomDocumentRequestData = {
+  name: string;
+  identifier: DataIdentifier;
+  description?: string;
+  requiresHumanReview: boolean;
+  uploadSettings?: CustomDocumentUploadSettings;
+};
+
 export type DocumentRequestConfig =
   | {
       kind: DocumentRequestKind.Identity;
@@ -21,12 +31,7 @@ export type DocumentRequestConfig =
     }
   | {
       kind: DocumentRequestKind.Custom;
-      data: {
-        name: string;
-        identifier: DataIdentifier;
-        description?: string;
-        requiresHumanReview: boolean;
-      };
+      data: CustomDocumentRequestData;
     };
 
 export enum DocumentRequestKind {
