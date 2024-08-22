@@ -16,6 +16,7 @@ import * as neon_db from './db_neon';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
 import * as s3 from './s3';
+import * as idCdn from './id_cdn'
 import {
   GetStackMetadata,
   StackEnvironment,
@@ -135,6 +136,12 @@ export default async function main() {
     s3Buckets.assetsBucket,
   );
 
+  // Create our id2 CDN
+  const id2Cdn = await idCdn.CreateId2CloudfrontDistribution(
+    constants,
+    stackMetadata
+  );
+
   const globalState: GlobalState = {
     vpc,
     region,
@@ -165,6 +172,7 @@ export default async function main() {
     apiUrl: `https://${dnsConfig.apiDomain}`,
     databaseUrl: database.databaseUrl,
     shortStackName: stackMetadata.shortStackName,
+    id2CdnDomain: id2Cdn.domainName
   };
 }
 

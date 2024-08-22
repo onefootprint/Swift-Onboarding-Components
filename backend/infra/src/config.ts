@@ -23,6 +23,9 @@ export interface Domains {
   prefix: string;
   frontendBase: string;
   assets: string;
+  id2Base: string;
+  id2Prefix: string;
+  idOrigin: string;
 }
 
 export interface Resources {

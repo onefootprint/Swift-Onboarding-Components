@@ -15,13 +15,13 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-    - args:
-      - create-overdue-watchlist-check-tasks
-      - --limit=1000
-      cpuUnits: 512
-      memoryMB: 1024
-      name: overdue-watchlist
-      schedule: cron(0 17 * * ? *)
+      - args:
+          - create-overdue-watchlist-check-tasks
+          - --limit=1000
+        cpuUnits: 512
+        memoryMB: 1024
+        name: overdue-watchlist
+        schedule: cron(0 17 * * ? *)
     db:
       deletionProtection: false
       maxAcus: 16
@@ -31,6 +31,9 @@ config:
       base: dev.onefootprint.com
       frontendBase: preview.onefootprint.com
       prefix: api.
+      id2Base: dev.onefootprint.com
+      id2Prefix: id2.
+      idOrigin: id.preview.onefootprint.com
     elastic:
       apiKey:
         secure: v1:kY0kR444OvfOf2Cr:gpD4whb9fFctHbhO+WxwZmXLo9Na0wc+zbkMtGUUIIlfr0FGEnM=
@@ -185,20 +188,20 @@ config:
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     workerTasks:
-    - args:
-      - execute-tasks
-      - --batch-size=100
-      - --poll-period-ms=1000
-      cpuUnits: 512
-      memoryMB: 1024
-      name: execute-tasks
-    - args:
-      - vault-dr-worker
-      - --batch-size=1000
-      - --poll-period-ms=5000
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: vault-dr
+      - args:
+          - execute-tasks
+          - --batch-size=100
+          - --poll-period-ms=1000
+        cpuUnits: 512
+        memoryMB: 1024
+        name: execute-tasks
+      - args:
+          - vault-dr-worker
+          - --batch-size=1000
+          - --poll-period-ms=5000
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: vault-dr
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

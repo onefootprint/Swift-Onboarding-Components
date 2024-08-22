@@ -15,19 +15,19 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-    - args:
-      - create-overdue-watchlist-check-tasks
-      - --limit=1000
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: overdue-watchlist
-      schedule: cron(0 0/4 * * ? *)
-    - args:
-      - generate-invoices
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: generate-invoices
-      schedule: cron(0 * * * ? *)
+      - args:
+          - create-overdue-watchlist-check-tasks
+          - --limit=1000
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: overdue-watchlist
+        schedule: cron(0 0/4 * * ? *)
+      - args:
+          - generate-invoices
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: generate-invoices
+        schedule: cron(0 * * * ? *)
     db:
       deletionProtection: true
       maxAcus: 128
@@ -37,6 +37,9 @@ config:
       base: api.onefootprint.com
       frontendBase: onefootprint.com
       prefix: ""
+      id2Base: id2.onefootprint.com
+      id2Prefix: ""
+      idOrigin: id.onefootprint.com
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -189,20 +192,20 @@ config:
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     workerTasks:
-    - args:
-      - execute-tasks
-      - --batch-size=50
-      - --poll-period-ms=500
-      cpuUnits: 1024
-      memoryMB: 2048
-      name: execute-tasks
-    - args:
-      - vault-dr-worker
-      - --batch-size=1000
-      - --poll-period-ms=5000
-      cpuUnits: 2048
-      memoryMB: 4096
-      name: vault-dr
+      - args:
+          - execute-tasks
+          - --batch-size=50
+          - --poll-period-ms=500
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: execute-tasks
+      - args:
+          - vault-dr-worker
+          - --batch-size=1000
+          - --poll-period-ms=5000
+        cpuUnits: 2048
+        memoryMB: 4096
+        name: vault-dr
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
