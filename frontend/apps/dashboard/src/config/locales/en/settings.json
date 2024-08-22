@@ -21,6 +21,7 @@
       }
     },
     "team-roles": {
+      "title": "Team & Roles",
       "page-title": "Footprint | Settings - Members",
       "meta-title": "Settings",
       "header": {
@@ -34,6 +35,7 @@
       }
     },
     "business-profile": {
+      "title": "Business profile",
       "meta-title": "Settings",
       "page-title": "Footprint | Settings - Business Profile",
       "loading-aria": "Business profile loading...",

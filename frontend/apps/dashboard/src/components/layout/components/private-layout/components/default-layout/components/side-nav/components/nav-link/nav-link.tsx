@@ -65,7 +65,7 @@ const Container = styled(Link)<{ selected: boolean }>`
 
 const Label = styled.span<{ selected: boolean }>`
   ${({ selected, theme }) => css`
-    ${createFontStyles(selected ? 'label-3' : 'body-3')}
+    ${createFontStyles(selected ? 'label-4' : 'body-4')}
     color: ${selected ? theme.color.primary : theme.color.tertiary};
   `}
 `;

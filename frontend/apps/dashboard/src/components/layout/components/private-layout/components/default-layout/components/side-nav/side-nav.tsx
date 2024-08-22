@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import CompanyName from './components/company-name';
 import NavDropdown from './components/nav-dropdown';
 import NavLink from './components/nav-link';
+import SettingsDropdown from './components/settings-dropdown';
 import useRoutes from './hooks/use-routes/use-routes';
 import moveTenantToFront from './utils/move-tenant-to-front';
 
@@ -49,17 +50,28 @@ const Nav = () => {
           .map(({ title, items }) => (
             <TabGroup key={title}>
               {title && <Title>{title}</Title>}
-              {items.map(({ text, href, Icon, badgeCount }) => (
-                <Element key={text} asChild>
-                  <NavLink
+              {items.map(({ text, href, Icon, badgeCount }) =>
+                href === '/settings' ? (
+                  <SettingsDropdown
+                    key={text}
                     badgeCount={badgeCount}
                     href={href}
                     icon={Icon}
                     selected={router.pathname.startsWith(href)}
                     text={text}
                   />
-                </Element>
-              ))}
+                ) : (
+                  <Element key={text} asChild>
+                    <NavLink
+                      badgeCount={badgeCount}
+                      href={href}
+                      icon={Icon}
+                      selected={router.pathname.startsWith(href)}
+                      text={text}
+                    />
+                  </Element>
+                ),
+              )}
             </TabGroup>
           ))}
       </Links>
@@ -116,7 +128,7 @@ const TabGroup = styled(NavigationMenu.List)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[2]};
+    gap: ${theme.spacing[1]};
     margin-bottom: ${theme.spacing[8]};
   `};
 `;
