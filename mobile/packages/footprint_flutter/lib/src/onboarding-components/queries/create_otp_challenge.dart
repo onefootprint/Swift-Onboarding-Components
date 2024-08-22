@@ -11,7 +11,8 @@ typedef OtpChallengeRequest = ({
   String? email,
   String? phoneNumber,
   String obConfig,
-  String? sandboxId
+  String? sandboxId,
+  List<AuthMethodKind>? requiredAuthMethods,
 });
 
 Future<IdentifyResponse> identify(OtpChallengeRequest requestData) async {
@@ -28,7 +29,7 @@ Future<IdentifyResponse> identify(OtpChallengeRequest requestData) async {
     headers: headers,
     body: jsonEncode({
       'email': requestData.email,
-      'phoneNumber': requestData.phoneNumber,
+      'phone_number': requestData.phoneNumber,
       "scope": "onboarding",
     }),
   );
@@ -59,6 +60,16 @@ Future<ChallengeResponse> loginChallenge(
 
 Future<ChallengeResponse> signupChallenge(
     OtpChallengeRequest requestData) async {
+  String? preferredAuthMethod;
+  if (requestData.requiredAuthMethods != null) {
+    if (requestData.requiredAuthMethods!.contains(AuthMethodKind.phone)) {
+      preferredAuthMethod = "sms";
+    } else if (requestData.requiredAuthMethods!
+        .contains(AuthMethodKind.email)) {
+      preferredAuthMethod = "email";
+    }
+  }
+
   final headers = {
     'Content-Type': 'application/json',
     'X-Onboarding-Config-Key': requestData.obConfig,
@@ -71,6 +82,7 @@ Future<ChallengeResponse> signupChallenge(
     Uri.parse('$apiBaseUrl/hosted/identify/signup_challenge'),
     headers: headers,
     body: jsonEncode({
+      'challenge_kind': preferredAuthMethod,
       'email': {
         "value": requestData.email,
         "is_bootstrapped": false,
@@ -103,10 +115,20 @@ Future<ChallengeResponse> createOtpChallenge(
     final hasPhone = identifyResponse.user!.authMethods!.any(
       (e) => e.kind == AuthMethodKind.phone && e.isVerified,
     );
+    final hasEmail = identifyResponse.user!.authMethods!.any(
+      (e) => e.kind == AuthMethodKind.email && e.isVerified,
+    );
+    // TODO: Allow user to pick preferred method in the future
     if (hasPhone) {
       final loginChallengeResponse =
           await loginChallenge(token: identifyResponse.user!.token!);
       return loginChallengeResponse;
+    } else if (hasEmail) {
+      final loginChallengeResponse = await loginChallenge(
+          kind: "email", token: identifyResponse.user!.token!);
+      return loginChallengeResponse;
+    } else {
+      throw InlineOtpNotSupportedException("No supported auth method found");
     }
   }
   final signupChallengeResponse = await signupChallenge(requestData);

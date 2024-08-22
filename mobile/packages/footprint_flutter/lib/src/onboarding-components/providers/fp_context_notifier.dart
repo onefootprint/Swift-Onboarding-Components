@@ -3,6 +3,7 @@ import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'fp_context_notifier.g.dart';
 
@@ -20,6 +21,7 @@ class FpContextNotifier extends _$FpContextNotifier {
       vaultingToken: null,
       redirectUrl: '',
       sandboxId: null,
+      sandboxOutcome: null,
     );
   }
 
@@ -60,6 +62,40 @@ class FpContextNotifier extends _$FpContextNotifier {
 
   void updateRedirectUrl(String redirectUrl) {
     state = state.copyWith(redirectUrl: redirectUrl);
+  }
+
+  void updateSandboxId(String sandboxId) {
+    state = state.copyWith(sandboxId: sandboxId);
+  }
+
+  void updateSandboxOutcome(SandboxOutcome sandboxOutcome) {
+    state = state.copyWith(sandboxOutcome: sandboxOutcome);
+  }
+
+  void update({
+    FootprintAppearance? appearance,
+    FootprintSupportedLocale? locale,
+    OnboardingConfig? onboardingConfig,
+    OnboardingStep? step,
+    String? authToken,
+    String? vaultingToken,
+    String? publicKey,
+    String? redirectUrl,
+    String? sandboxId,
+    SandboxOutcome? sandboxOutcome,
+  }) {
+    state = state.copyWith(
+      appearance: appearance,
+      locale: locale,
+      onboardingConfig: onboardingConfig,
+      step: step,
+      authToken: authToken,
+      vaultingToken: vaultingToken,
+      publicKey: publicKey,
+      redirectUrl: redirectUrl,
+      sandboxId: sandboxId,
+      sandboxOutcome: sandboxOutcome,
+    );
   }
 
   void reset() {

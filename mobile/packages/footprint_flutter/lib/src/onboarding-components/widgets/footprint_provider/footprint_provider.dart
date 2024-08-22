@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_provider/wrapper.dart';
 
 class FootprintProvider extends StatelessWidget {
@@ -12,6 +13,7 @@ class FootprintProvider extends StatelessWidget {
   final FootprintSupportedLocale? locale;
   final String redirectUrl;
   final String? sandboxId;
+  final SandboxOutcome? sandboxOutcome;
 
   const FootprintProvider({
     super.key,
@@ -22,6 +24,7 @@ class FootprintProvider extends StatelessWidget {
     this.authToken,
     this.locale,
     this.sandboxId,
+    this.sandboxOutcome,
   });
 
   @override
@@ -34,6 +37,7 @@ class FootprintProvider extends StatelessWidget {
       locale: locale,
       redirectUrl: redirectUrl,
       sandboxId: sandboxId,
+      sandboxOutcome: sandboxOutcome,
       child: child,
     ));
   }

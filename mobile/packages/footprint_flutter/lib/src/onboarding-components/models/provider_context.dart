@@ -2,6 +2,7 @@ import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 
 class ProviderContext {
   final String publicKey;
@@ -13,6 +14,7 @@ class ProviderContext {
   final OnboardingConfig? onboardingConfig;
   final String redirectUrl;
   final String? sandboxId;
+  final SandboxOutcome? sandboxOutcome;
 
   ProviderContext({
     required this.publicKey,
@@ -24,6 +26,7 @@ class ProviderContext {
     this.locale,
     this.onboardingConfig,
     this.sandboxId,
+    this.sandboxOutcome,
   });
 
   ProviderContext copyWith({
@@ -36,6 +39,7 @@ class ProviderContext {
     OnboardingConfig? onboardingConfig,
     String? redirectUrl,
     String? sandboxId,
+    SandboxOutcome? sandboxOutcome,
   }) {
     return ProviderContext(
       publicKey: publicKey ?? this.publicKey,
@@ -47,6 +51,7 @@ class ProviderContext {
       onboardingConfig: onboardingConfig ?? this.onboardingConfig,
       redirectUrl: redirectUrl ?? this.redirectUrl,
       sandboxId: sandboxId ?? this.sandboxId,
+      sandboxOutcome: sandboxOutcome ?? this.sandboxOutcome,
     );
   }
 }

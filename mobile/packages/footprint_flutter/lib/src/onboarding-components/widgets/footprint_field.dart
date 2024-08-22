@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_field_props.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_form.dart';
 
 class FootprintField extends ConsumerWidget {
   final String name;

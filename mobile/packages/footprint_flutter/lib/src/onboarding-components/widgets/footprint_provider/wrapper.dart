@@ -4,6 +4,7 @@ import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
@@ -17,6 +18,7 @@ class Wrapper extends ConsumerStatefulWidget {
   final FootprintSupportedLocale? locale;
   final String redirectUrl;
   final String? sandboxId;
+  final SandboxOutcome? sandboxOutcome;
 
   const Wrapper({
     super.key,
@@ -27,6 +29,7 @@ class Wrapper extends ConsumerStatefulWidget {
     this.authToken,
     this.locale,
     this.sandboxId,
+    this.sandboxOutcome,
   });
 
   @override
@@ -53,6 +56,7 @@ class _WrapperState extends ConsumerState<Wrapper> {
               vaultingToken: null,
               redirectUrl: widget.redirectUrl,
               sandboxId: widget.sandboxId,
+              sandboxOutcome: widget.sandboxOutcome,
             ),
           );
       getOnboardingConfig(widget.publicKey).then((config) {
@@ -65,6 +69,7 @@ class _WrapperState extends ConsumerState<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(fpContextNotifierProvider);
     final (:launchIdentify, :save, :handoff) =
         getFootprintService(context, ref);
     return FootprintService(

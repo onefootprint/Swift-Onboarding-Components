@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/footprint_flutter.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
+import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_form.dart';
 
 typedef CustomTextInputProps = ({
   TextInputType? keyboardType,
