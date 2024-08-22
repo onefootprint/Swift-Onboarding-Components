@@ -1,9 +1,10 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoInfo16 } from '@onefootprint/icons';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-
 import { createText } from '../../utils';
 import Tooltip from '../tooltip';
+import formFieldContext from './form-field-context';
 
 type LabelTooltipProps = {
   text: string;
@@ -27,27 +28,34 @@ const FormLabel = ({
   id,
   size = 'default',
   tooltip = undefined,
-}: FormLabelLabelProps) => (
-  <LabelContainer>
-    <StyledLabel
-      /** Do not change/remove these classes */
-      className="fp-label fp-custom-appearance"
-      data-has-error={hasError}
-      data-size={size}
-      htmlFor={htmlFor}
-      id={id}
-    >
-      {children}
-    </StyledLabel>
-    {tooltip && (
-      <Tooltip text={tooltip.text} alignment="center" position="bottom">
-        <InfoButton aria-label={tooltip?.triggerAriaLabel ?? tooltip?.text}>
-          {tooltip?.iconComponent ? <tooltip.iconComponent /> : <IcoInfo16 />}
-        </InfoButton>
-      </Tooltip>
-    )}
-  </LabelContainer>
-);
+}: FormLabelLabelProps) => {
+  const { id: contextId } = useContext(formFieldContext);
+  if (!contextId) {
+    throw new Error('Label must be used inside a Field component');
+  }
+
+  return (
+    <LabelContainer>
+      <StyledLabel
+        /** Do not change/remove these classes */
+        className="fp-label fp-custom-appearance"
+        data-has-error={hasError}
+        data-size={size}
+        htmlFor={htmlFor || contextId}
+        id={id}
+      >
+        {children}
+      </StyledLabel>
+      {tooltip && (
+        <Tooltip text={tooltip.text} alignment="center" position="bottom">
+          <InfoButton aria-label={tooltip?.triggerAriaLabel ?? tooltip?.text}>
+            {tooltip?.iconComponent ? <tooltip.iconComponent /> : <IcoInfo16 />}
+          </InfoButton>
+        </Tooltip>
+      )}
+    </LabelContainer>
+  );
+};
 
 const InfoButton = styled.button`
   ${({ theme }) => css`

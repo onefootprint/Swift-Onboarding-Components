@@ -63,7 +63,10 @@
         "not-allowed": "You are not allowed to change the organization logo"
       },
       "id": {
-        "label": "Organization ID"
+        "label": "Organization ID",
+        "form": {
+          "placeholder": "Organization ID"
+        }
       },
       "parent": {
         "name": "Parent Organization",

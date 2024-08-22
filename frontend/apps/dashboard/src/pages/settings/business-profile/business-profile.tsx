@@ -5,14 +5,16 @@ import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';
 import styled, { css } from 'styled-components';
 
+import { getErrorMessage } from '@onefootprint/request';
 import Content from './components/content';
+import ErrorDisplay from './components/error-display';
 import Loading from './components/loading';
 
 const BusinessProfile = () => {
   const { t } = useTranslation('settings', {
     keyPrefix: 'pages.business-profile',
   });
-  const { isLoading, data } = useOrg();
+  const { isLoading, data, error } = useOrg();
 
   return (
     <>
@@ -31,6 +33,7 @@ const BusinessProfile = () => {
         </Box>
         <Container aria-busy={isLoading} aria-live="polite">
           <>
+            {error && <ErrorDisplay message={getErrorMessage(error)} />}
             {isLoading && <Loading />}
             {data && <Content organization={data} />}
           </>

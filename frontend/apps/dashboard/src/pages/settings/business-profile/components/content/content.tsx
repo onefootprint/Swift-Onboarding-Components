@@ -1,67 +1,57 @@
-import { Button, CopyButton, LinkButton, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
+import { RoleScopeKind } from '@onefootprint/types';
+import { Button, CopyButton, Form, LinkButton, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-
-import styled from 'styled-components';
-
-import { useRequestErrorToast } from '@onefootprint/hooks';
-import { RoleScopeKind } from '@onefootprint/types';
 import usePermissions from 'src/hooks/use-permissions';
 import useUpdateOrg from 'src/hooks/use-update-org';
+import styled from 'styled-components';
+import BusinessProfileInput from './components/business-profile-input';
 import HelpDialog from './components/help-dialog';
 import Logo from './components/logo';
 import type { ContentProps } from './content.types';
 
 type FormData = {
-  name?: string;
-  websiteUrl?: string;
-  id?: string | null;
-  supportEmail?: string;
-  supportPhone?: string;
-  supportWebsite?: string;
+  name: string;
+  websiteUrl: string;
+  id: string;
+  supportEmail: string;
+  supportPhone: string;
+  supportWebsite: string;
 };
 
 const Content = ({ organization }: ContentProps) => {
-  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const { t } = useTranslation('settings', {
     keyPrefix: 'pages.business-profile',
   });
+  const updateOrgMutation = useUpdateOrg();
+  const toast = useToast();
   const { hasPermission } = usePermissions();
+  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const canEdit = hasPermission(RoleScopeKind.orgSettings);
-
   const { register, handleSubmit } = useForm<FormData>({
     defaultValues: {
-      name: organization.name ?? '',
-      websiteUrl: organization.websiteUrl ?? '',
-      id: organization.id ?? '',
-      supportEmail: organization.supportEmail ?? '',
-      supportPhone: organization.supportPhone ?? '',
-      supportWebsite: organization.supportWebsite ?? '',
+      name: organization.name || '',
+      websiteUrl: organization.websiteUrl || '',
+      id: organization.id || '',
+      supportEmail: organization.supportEmail || '',
+      supportPhone: organization.supportPhone || '',
+      supportWebsite: organization.supportWebsite || '',
     },
   });
-  const updateOrgMutation = useUpdateOrg();
-  const requestErrorToast = useRequestErrorToast();
-  const toast = useToast();
-  const onSubmit = (data: FormData) => {
-    updateOrgMutation.mutate(
-      {
-        name: data.name,
-        websiteUrl: data.websiteUrl,
-        supportEmail: data.supportEmail,
-        supportPhone: data.supportPhone,
-        supportWebsite: data.supportWebsite,
+
+  const onSubmit = async (data: FormData) => {
+    // no id mutation because it will stay the same
+    const { id, ...updateData } = data;
+    updateOrgMutation.mutate(updateData, {
+      onSuccess: () => {
+        toast.show({
+          title: t('form.success.title'),
+          description: t('form.success.description'),
+        });
       },
-      {
-        onSuccess: () => {
-          toast.show({
-            title: t('form.success.title'),
-            description: t('form.success.description'),
-          });
-        },
-        onError: requestErrorToast,
-      },
-    );
+      // no error toast here because updateOrgMutation already handles
+    });
   };
 
   const handleHelpDialogClose = () => {
@@ -79,99 +69,84 @@ const Content = ({ organization }: ContentProps) => {
           <Logo organization={organization} />
           <Stack direction="column" gap={10}>
             <Stack direction="column" gap={5} style={{ maxWidth: '640px' }}>
-              <Stack direction="row" justify="space-between" align="center">
-                <Text variant="label-4">{t('name.label')}</Text>
-                <InputContainer direction="column">
-                  <StyledTextInput
-                    size="compact"
-                    {...register('name', { required: true })}
-                    type="text"
-                    placeholder={t('name.form.placeholder')}
-                    disabled={!canEdit}
-                  />
-                </InputContainer>
-              </Stack>
-              <Stack direction="row" justify="space-between" align="center">
-                <Text variant="label-4">{t('website.label')}</Text>
-                <InputContainer direction="column">
-                  <StyledTextInput
-                    size="compact"
-                    {...register('websiteUrl', { required: true })}
-                    type="url"
-                    placeholder={t('website.form.placeholder')}
-                    disabled={!canEdit}
-                  />
-                </InputContainer>
-              </Stack>
-              <Stack direction="row" justify="space-between" align="center">
-                <Text variant="label-4">{t('id.label')}</Text>
+              <Form.Field variant="horizontal">
+                <Form.Label>{t('name.label')}</Form.Label>
+                <BusinessProfileInput
+                  {...register('name')}
+                  type="text"
+                  placeholder={t('name.form.placeholder')}
+                  disabled={!canEdit}
+                />
+              </Form.Field>
+              <Form.Field variant="horizontal">
+                <Form.Label>{t('website.label')}</Form.Label>
+                <BusinessProfileInput
+                  {...register('websiteUrl')}
+                  type="url"
+                  placeholder={t('website.form.placeholder')}
+                  disabled={!canEdit}
+                />
+              </Form.Field>
+              <Form.Field variant="horizontal">
+                <Form.Label>{t('id.label')}</Form.Label>
                 <InputContainer direction="column">
                   <Stack direction="row" gap={4}>
                     <StyledTextInput
+                      {...register('id')}
                       size="compact"
                       disabled
-                      {...register('id')}
                       type="text"
                       readOnly
-                      placeholder={organization.id ?? ''}
+                      placeholder={t('id.form.placeholder')}
                     />
                     <CopyButton contentToCopy={organization.id} />
                   </Stack>
                 </InputContainer>
-              </Stack>
+              </Form.Field>
             </Stack>
             <Stack direction="column" gap={7} style={{ maxWidth: '640px' }}>
               <Stack direction="column" gap={3}>
                 <Text variant="label-2">{t('support-links.title')}</Text>
                 <Stack direction="row" inline gap={2} align="center">
-                  <Text variant="body-3">{t('support-links.subtitle')}</Text>
+                  <Text variant="body-4">{t('support-links.subtitle')}</Text>
                   <LinkButton onClick={handleHelpDialogOpen}>{t('support-links.more-details')}</LinkButton>
                   <HelpDialog open={helpDialogOpen} onClose={handleHelpDialogClose} />
                 </Stack>
               </Stack>
               <Stack gap={5} direction="column">
-                <Stack direction="row" justify="space-between" align="center">
-                  <Text variant="label-4">{t('support-email.label')}</Text>
-                  <InputContainer direction="column">
-                    <StyledTextInput
-                      size="compact"
-                      {...register('supportEmail')}
-                      type="email"
-                      placeholder={t('support-email.form.placeholder')}
-                      disabled={!canEdit}
-                    />
-                  </InputContainer>
-                </Stack>
-                <Stack direction="row" justify="space-between" align="center">
-                  <Text variant="label-4">{t('support-phone.label')}</Text>
-                  <InputContainer direction="column">
-                    <StyledTextInput
-                      size="compact"
-                      {...register('supportPhone')}
-                      placeholder={t('support-phone.form.placeholder')}
-                      type="tel"
-                      disabled={!canEdit}
-                    />
-                  </InputContainer>
-                </Stack>
-                <Stack direction="row" justify="space-between" align="center">
-                  <Text variant="label-4">{t('support-website.label')}</Text>
-                  <InputContainer direction="column">
-                    <StyledTextInput
-                      size="compact"
-                      {...register('supportWebsite')}
-                      type="url"
-                      placeholder={t('support-website.form.placeholder')}
-                      disabled={!canEdit}
-                    />
-                  </InputContainer>
-                </Stack>
+                <Form.Field variant="horizontal">
+                  <Form.Label>{t('support-email.label')}</Form.Label>
+                  <BusinessProfileInput
+                    {...register('supportEmail')}
+                    type="email"
+                    placeholder={t('support-email.form.placeholder')}
+                    disabled={!canEdit}
+                  />
+                </Form.Field>
+                <Form.Field variant="horizontal">
+                  <Form.Label>{t('support-phone.label')}</Form.Label>
+                  <BusinessProfileInput
+                    {...register('supportPhone')}
+                    type="tel"
+                    placeholder={t('support-phone.form.placeholder')}
+                    disabled={!canEdit}
+                  />
+                </Form.Field>
+                <Form.Field variant="horizontal">
+                  <Form.Label>{t('support-website.label')}</Form.Label>
+                  <BusinessProfileInput
+                    {...register('supportWebsite')}
+                    type="url"
+                    placeholder={t('support-website.form.placeholder')}
+                    disabled={!canEdit}
+                  />
+                </Form.Field>
               </Stack>
             </Stack>
           </Stack>
         </Stack>
         <div>
-          <Button variant="primary" type="submit" size="default" loading={updateOrgMutation.isLoading}>
+          <Button type="submit" loading={updateOrgMutation.isLoading} disabled={!canEdit}>
             {t('save-changes')}
           </Button>
         </div>
