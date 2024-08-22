@@ -1,4 +1,3 @@
-import Labels from '@/entities/components/labels';
 import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +5,7 @@ import StatusBadge from 'src/components/status-badge';
 import styled, { css } from 'styled-components';
 import Tags from './components/tags';
 
+import Labels from '@/entities/components/labels';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';

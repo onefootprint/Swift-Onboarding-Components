@@ -1,6 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import type { Entity } from '@onefootprint/types';
-import { CopyButton, Dropdown, Stack, Text, createFontStyles, useToast } from '@onefootprint/ui';
+import { CopyButton, Dropdown, Stack, Text, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -44,7 +44,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
   return (
     <Container>
       <Main>
-        {mainId?.value}
+        <Text variant="snippet-3">{mainId?.value}</Text>
         <CopyButton size="compact" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
       </Main>
       {hasSingleId ? null : (
@@ -75,17 +75,16 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
 
 const Container = styled(Stack)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.full};
-    display: flex;
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
-    height: ${theme.spacing[8]};
+    border-radius: ${theme.borderRadius.full};
+    display: flex;
+    height: 24px;
   `}
 `;
 
 const Main = styled(Stack)`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
     padding-left: calc(${theme.spacing[4]} - ${theme.spacing[1]});
     align-items: center;
   `}

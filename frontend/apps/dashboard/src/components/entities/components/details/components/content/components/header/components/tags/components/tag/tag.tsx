@@ -1,4 +1,4 @@
-import { Box, createFontStyles } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 type TagProps = {
@@ -8,8 +8,12 @@ type TagProps = {
 const Tag = ({ text }: TagProps) => {
   return (
     <Container>
-      <PoundSymbol>#</PoundSymbol>
-      <Content>{text}</Content>
+      <Text variant="snippet-2" color="tertiary">
+        #
+      </Text>
+      <Text variant="snippet-2" color="primary">
+        {text}
+      </Text>
     </Container>
   );
 };
@@ -20,20 +24,6 @@ const Container = styled(Box)`
     align-items: center;
     gap: ${theme.spacing[2]};
     padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  `}
-`;
-
-const PoundSymbol = styled(Box)`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
-    color: ${theme.color.tertiary};
-  `}
-`;
-
-const Content = styled(Box)`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
-    color: ${theme.color.primary};
   `}
 `;
 

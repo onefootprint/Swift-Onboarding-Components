@@ -44,7 +44,7 @@ const SB = styled.div<
   }
 >`
   ${({ theme, $center, $styleProps, $typography }) => css`
-    ${$typography && createFontStyles($typography)};
+    ${$typography && createFontStyles($typography, $typography.startsWith('snippet') ? 'code' : 'default')};
     ${$center && 'display: flex; justify-content: center; align-items: center;'}
     ${Object.keys($styleProps)
       .map(prop => {

@@ -10,12 +10,13 @@ export type TagProps = {
 const Tag = styled.span<TagProps>`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
-    color: ${theme.color.neutral};
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     border-radius: ${theme.borderRadius.full};
-    white-space: nowrap;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+    color: ${theme.color.neutral};
+    height: 24px;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
     user-select: none;
+    white-space: nowrap;
   `};
 `;
 

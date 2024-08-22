@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 const Tag = styled.p`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
+    ${createFontStyles('snippet-2', 'code')}
     font-family: ${theme.fontFamily.code};
     color: ${primitives.Gray0};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};

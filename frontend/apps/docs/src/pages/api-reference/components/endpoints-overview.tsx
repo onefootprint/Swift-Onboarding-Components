@@ -97,6 +97,7 @@ const Content = styled.div`
       display: table-cell;
       ${createFontStyles('snippet-2', 'code')};
     }
+    
     a > *:first-child {
       width:auto;
       text-align:right;

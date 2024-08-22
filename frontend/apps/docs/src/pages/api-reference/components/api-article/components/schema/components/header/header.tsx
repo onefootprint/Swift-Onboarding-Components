@@ -47,7 +47,7 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
 
 const StyledStack = styled(Stack)`
   ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
+    ${createFontStyles('snippet-2', 'code')}
     padding: ${theme.spacing[3]} 0;
     background: ${theme.backgroundColor.primary};
   `}
