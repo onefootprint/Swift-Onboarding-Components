@@ -981,6 +981,32 @@
                 ]
             }
         },
+        "/hosted/onboarding/session": {
+            "get": {
+                "tags": [
+                    "Onboarding",
+                    "Hosted"
+                ],
+                "description": "Fetch information from an existing onboarding session token.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingSessionResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Onboarding token": []
+                    }
+                ]
+            }
+        },
         "/hosted/onboarding/skip_passkey_register": {
             "post": {
                 "tags": [
@@ -2112,6 +2138,12 @@
                 "in": "header",
                 "name": "X-Onboarding-Session-Token",
                 "description": "Short-lived token representing an onboarding configuration."
+            },
+            "Onboarding token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Ob-Token",
+                "description": "Short-lived token representing onboarding arguments."
             },
             "SDK Args Token": {
                 "type": "apiKey",
@@ -4359,6 +4391,20 @@
                 },
                 "required": [
                     "onboarding_config"
+                ]
+            },
+            "OnboardingSessionResponse": {
+                "type": "object",
+                "properties": {
+                    "bootstrap_data": {
+                        "type": "object"
+                    },
+                    "key": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "bootstrap_data"
                 ]
             },
             "OnboardingStatusResponse": {

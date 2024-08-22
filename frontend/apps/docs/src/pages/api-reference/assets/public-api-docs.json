@@ -727,10 +727,9 @@
             "post": {
                 "tags": [
                     "Onboarding",
-                    "PhasedOut",
+                    "Preview",
                     "HideWhenLocked"
                 ],
-                "description": "Generates a single-use session token for a playbook.",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -747,7 +746,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ObConfigSessionToken"
+                                    "$ref": "#/components/schemas/CreateOnboardingSessionResponse"
                                 }
                             }
                         }
@@ -759,7 +758,8 @@
                             "preview:onboarding_session_token"
                         ]
                     }
-                ]
+                ],
+                "description": ""
             }
         },
         "/onboarding/session/validate": {
@@ -5036,12 +5036,39 @@
             "CreateOnboardingSessionRequest": {
                 "type": "object",
                 "properties": {
+                    "bootstrap_data": {
+                        "example": {
+                            "id.first_name": "Jane",
+                            "id.last_name": "Doe"
+                        },
+                        "description": "Optionally, any bootstrap data that you would like to pass into the onboarding flow.",
+                        "type": "object"
+                    },
                     "key": {
+                        "description": "Optionally, the playbook key that should be used for the onboarding.",
                         "type": "string"
                     }
                 },
                 "required": [
-                    "key"
+                    "bootstrap_data"
+                ]
+            },
+            "CreateOnboardingSessionResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "session_token": {
+                        "example": "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "description": "A short-lived onboarding session token that can be passed into the frontend SDK as an\n `authToken`. This token contains all information on the provided public key and/or bootstrap\n data provided.\n NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "session_token"
                 ]
             },
             "CreateTagRequest": {
@@ -11619,19 +11646,6 @@
                 "required": [
                     "fp_id",
                     "ownership_stake"
-                ]
-            },
-            "ObConfigSessionToken": {
-                "type": "object",
-                "properties": {
-                    "session_token": {
-                        "example": "tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
-                        "description": "a one-time use session token for onboarding a new user",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "session_token"
                 ]
             },
             "OffsetPaginatedBusinessOwner": {

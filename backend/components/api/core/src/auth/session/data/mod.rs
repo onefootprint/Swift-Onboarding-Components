@@ -1,4 +1,4 @@
-pub mod ob_config;
+pub mod onboarding;
 pub mod sdk_args;
 pub mod tenant;
 pub mod user;
@@ -48,13 +48,15 @@ pub enum AuthSessionData {
 
     /// Used to provide a single use onboarding session token for bifrost initialization
     /// TODO deprecate
-    DeprecatedOnboardingSession(ob_config::DeprecatedOnboardingSession),
+    DeprecatedOnboardingSession(onboarding::DeprecatedOnboardingSession),
 
     /// Used to initialize an onboarding session to KYC an owner of a business
-    BusinessOwner(ob_config::BoSession),
+    BusinessOwner(onboarding::BoSession),
 
     /// Used to pass information into bifrost from the Footprint.js SDK
     SdkArgs(sdk_args::SdkArgsData),
+
+    OnboardingSession(onboarding::OnboardingSession),
 }
 
 impl AuthSessionData {
@@ -67,7 +69,7 @@ impl AuthSessionData {
             Self::User(_) => "u",
             Self::EmailVerify(_) => "ev",
             Self::ValidateUserToken(_) => "v",
-            Self::DeprecatedOnboardingSession(_) => "ob",
+            Self::DeprecatedOnboardingSession(_) => "dob",
             Self::BusinessOwner(_) => "bo",
             Self::SdkArgs(_) => "sdk",
             Self::TenantRb(d) if d.purpose == TenantSessionPurpose::Docs => "d",
@@ -75,6 +77,7 @@ impl AuthSessionData {
             // These two are very similar purpose and are basically interchangible.
             Self::TenantRb(_) => "db",
             Self::FirmEmployee(_) => "db",
+            Self::OnboardingSession(_) => "ob",
         }
     }
 }
@@ -92,6 +95,7 @@ impl HasSessionKind for AuthSessionData {
             Self::DeprecatedOnboardingSession(_) => SessionKind::DeprecatedOnboardingSession,
             Self::BusinessOwner(_) => SessionKind::BusinessOwner,
             Self::SdkArgs(_) => SessionKind::SdkArgs,
+            Self::OnboardingSession(_) => SessionKind::OnboardingSession,
         }
     }
 }

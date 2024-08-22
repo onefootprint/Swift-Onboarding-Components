@@ -1,12 +1,14 @@
-use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
-use api_core::auth::session::ob_config::DeprecatedOnboardingSession;
+use api_core::auth::session::onboarding::OnboardingSession;
+use api_core::auth::session::sdk_args::UserDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::preview_api;
 use newtypes::ObConfigurationKey;
@@ -20,43 +22,56 @@ use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
-    pub key: ObConfigurationKey,
+    /// Optionally, the playbook key that should be used for the onboarding.
+    pub key: Option<ObConfigurationKey>,
+    /// Optionally, any bootstrap data that you would like to pass into the onboarding flow.
+    #[serde(default)]
+    #[openapi(example = r#"{"id.first_name": "Jane", "id.last_name": "Doe"}"#)]
+    // TODO this should be optional
+    #[openapi(optional)]
+    pub bootstrap_data: UserDataV1,
 }
 
 #[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
-pub struct ObConfigSessionToken {
-    /// a one-time use session token for onboarding a new user
-    #[openapi(example = "tok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
+pub struct CreateOnboardingSessionResponse {
+    /// A short-lived onboarding session token that can be passed into the frontend SDK as an
+    /// `authToken`. This token contains all information on the provided public key and/or bootstrap
+    /// data provided.
+    /// NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.
+    #[openapi(example = "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub session_token: SessionAuthToken,
+    pub expires_at: DateTime<Utc>,
 }
 
-#[api_v2_operation(
-    description = "Generates a single-use session token for a playbook.",
-    tags(Onboarding, PhasedOut, HideWhenLocked)
-)]
+#[api_v2_operation(tags(Onboarding, Preview, HideWhenLocked))]
 #[post("/onboarding/session")]
 pub async fn post(
     state: web::Data<State>,
     auth: TenantApiKeyGated<preview_api::OnboardingSessionToken>,
     request: Json<CreateOnboardingSessionRequest>,
-) -> ApiResponse<ObConfigSessionToken> {
+) -> ApiResponse<CreateOnboardingSessionResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
+    let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
 
-    let (ob_config, tenant) = state
+    let sealing_key = state.session_sealing_key.clone();
+    let (session_token, session) = state
         .db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
-            let result = ObConfiguration::get_enabled(conn, (&request.key, &tenant.id, is_live))?;
-            Ok(result)
+        .db_query(move |conn| -> FpResult<_> {
+            if let Some(key) = key.clone() {
+                // Check ownership of Playbook
+                ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
+            }
+            let data = OnboardingSession { key, bootstrap_data };
+            let expires_in = chrono::Duration::hours(1);
+            let session = AuthSession::create_sync(conn, &sealing_key, data, expires_in)?;
+            Ok(session)
         })
         .await?;
 
-    let session_data = AuthSessionData::DeprecatedOnboardingSession(DeprecatedOnboardingSession {
-        ob_config_id: ob_config.id,
-        tenant_id: tenant.id,
-        is_live,
-    });
-    let session_token = AuthSession::create(&state, session_data, chrono::Duration::hours(1)).await?;
-    Ok(ObConfigSessionToken { session_token })
+    Ok(CreateOnboardingSessionResponse {
+        session_token,
+        expires_at: session.expires_at,
+    })
 }

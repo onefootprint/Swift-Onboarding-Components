@@ -88,6 +88,10 @@ class SessionId(BaseAuth):
     HEADER_NAME = "x-fp-session-id"
 
 
+class ObToken(BaseAuth):
+    HEADER_NAME = "x-fp-ob-token"
+
+
 class VaultVersion(BaseAuth):
     HEADER_NAME = "x-fp-vault-version"
 

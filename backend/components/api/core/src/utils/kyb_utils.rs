@@ -1,5 +1,5 @@
 use super::vault_wrapper::BusinessOwnerInfo;
-use crate::auth::session::ob_config::BoSession;
+use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
 use crate::decision::state::Authorize;
 use crate::decision::state::BoKycCompleted;

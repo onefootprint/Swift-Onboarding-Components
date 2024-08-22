@@ -8,6 +8,7 @@ mod index;
 mod neuro_id;
 mod pat;
 mod process;
+mod session;
 mod skip_passkey_register;
 mod socure_device;
 mod status;
@@ -31,6 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(stytch::post)
         .service(neuro_id::get)
         .service(timeline::post)
+        .service(session::get)
         .service(config::get);
 
     config::configure_get_aliases(config);

@@ -45,6 +45,7 @@ pub enum SessionKind {
     DeprecatedOnboardingSession,
     BusinessOwner,
     SdkArgs,
+    OnboardingSession,
 }
 
 impl_enum_str_diesel!(SessionKind);
