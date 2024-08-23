@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import usePermissions from 'src/hooks/use-permissions';
+import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 import { useTheme } from 'styled-components';
 import NavLink from '../nav-link';
 
-type SettingsDropdownProps = {
+export type SettingsDropdownProps = {
   href: string;
   text: string;
   icon: Icon;
@@ -23,12 +25,20 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
   const { t } = useTranslation('settings');
   const router = useRouter();
   const theme = useTheme();
+  const {
+    data: { user, org },
+  } = useSession();
+  const { isAdmin } = usePermissions();
 
   const subLinks = [
     { href: `${href}/business-profile`, text: t('pages.business-profile.title') },
     { href: `${href}/team-roles`, text: t('pages.team-roles.title') },
-    { href: `${href}/billing`, text: t('pages.billing.title') },
   ];
+
+  const shouldShowBilling = (org?.id === 'org_AiK8peOw9mrqsb6yeHWEG8' && isAdmin) || user?.isFirmEmployee;
+  if (shouldShowBilling) {
+    subLinks.push({ href: `${href}/billing`, text: t('pages.billing.title') });
+  }
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 

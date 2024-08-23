@@ -2,6 +2,8 @@ import { IcoInfo16 } from '@onefootprint/icons';
 import { Box, Divider, Stack, Table, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
+import usePermissions from 'src/hooks/use-permissions';
+import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 import useGetPreviewInvoice, { type InvoiceItem } from './hooks/use-get-preview-invoice';
 
@@ -14,6 +16,10 @@ const withCommas = (v: string) => v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const Billing = () => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.billing' });
   const { data: invoice, isLoading, isError } = useGetPreviewInvoice();
+  const {
+    data: { user, org },
+  } = useSession();
+  const { isAdmin } = usePermissions();
 
   const columns = [
     { text: t('table.header.description'), width: '40%' },
@@ -24,6 +30,11 @@ const Billing = () => {
 
   const totalAmountDue = invoice?.lineItems?.map(li => li.notionalCents || 0).reduce((a, b) => a + b, 0);
   const lastUpdatedAt = invoice?.lastUpdatedAt || '-';
+  const shouldShowBilling = (org?.id === 'org_AiK8peOw9mrqsb6yeHWEG8' && isAdmin) || user?.isFirmEmployee;
+
+  if (!shouldShowBilling || !org?.id) {
+    return null;
+  }
 
   return (
     <>

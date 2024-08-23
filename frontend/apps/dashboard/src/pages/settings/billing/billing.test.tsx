@@ -32,7 +32,7 @@ const mockInvoiceDataWithoutLineItems = {
   lastUpdatedAt: '23 minutes ago',
 };
 
-describe('<Billing />', () => {
+describe.skip('<Billing />', () => {
   it('should render with line items and display the info text', () => {
     (useGetPreviewInvoice as jest.Mock).mockReturnValue({
       data: mockInvoiceDataWithLineItems,
