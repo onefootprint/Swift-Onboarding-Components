@@ -25,6 +25,9 @@ use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::ops::Not;
+use std::result::Result as StdResult;
+
+pub(crate) const API_KEY_ENV_VAR: &str = "FOOTPRINT_API_KEY";
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub(crate) enum IsLive {
@@ -155,6 +158,27 @@ impl VaultDrApiClient {
             .with_context(|| "Failed to save API key to keyring")
     }
 
+    pub(crate) async fn try_from_env(api_root: &Url, is_live: IsLive) -> Result<Option<Self>> {
+        let StdResult::Ok(secret_key) = env::var(API_KEY_ENV_VAR) else {
+            return Ok(None);
+        };
+
+        let client = Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))?;
+
+        // Check that the credentials are valid.
+        let status = client.get_status().await?;
+        if IsLive::from(status.is_live) != is_live {
+            bail!(
+                "The given {} environment variable is for the {} environment, not the {} environment",
+                API_KEY_ENV_VAR,
+                IsLive::from(status.is_live),
+                is_live,
+            );
+        }
+
+        Ok(Some(client))
+    }
+
     fn request(&self, method: Method, path: &str) -> Result<RequestBuilder> {
         log::debug!("{} {}", method, path);
         Ok(self.client.request(method, self.api_root.join(path)?))
@@ -229,6 +253,13 @@ impl VaultDrApiClient {
 }
 
 pub(crate) async fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<VaultDrApiClient> {
+    let client = VaultDrApiClient::try_from_env(api_root, is_live).await?;
+
+    if let Some(client) = client {
+        log::debug!("Using API key from environment variable");
+        return Ok(client);
+    }
+
     let client = VaultDrApiClient::try_from_keyring(api_root, is_live)
         .await
         .map_err(|err| {
@@ -240,5 +271,6 @@ pub(crate) async fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<Va
             )
         })?;
 
+    log::debug!("Using API key from keyring");
     Ok(client)
 }

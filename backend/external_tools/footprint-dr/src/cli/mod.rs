@@ -303,3 +303,18 @@ pub(crate) fn confirm(prompt: &str) -> Result<bool> {
         }
     }
 }
+
+#[macro_export]
+macro_rules! warnln {
+    ($($arg:tt)*) => {
+        use termcolor::WriteColor as _;
+        let mut stdout = termcolor::StandardStream::stdout(termcolor::ColorChoice::Auto);
+        stdout.set_color(termcolor::ColorSpec::new().set_fg(Some(termcolor::Color::Yellow)))?;
+        writeln!(
+            &mut stdout,
+            $($arg)*
+        )?;
+        stdout.reset()?;
+        println!();
+    }
+}

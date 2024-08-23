@@ -2,20 +2,25 @@ use super::api_client::ApiKey;
 use super::api_client::IsLive;
 use super::api_client::VaultDrApiClient;
 use super::confirm;
+use crate::cli::api_client::API_KEY_ENV_VAR;
+use crate::warnln;
 use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Context;
 use anyhow::Result;
 use log::debug;
 use reqwest::Url;
+use std::env;
 use std::io::Write;
-use termcolor::Color;
-use termcolor::ColorChoice;
-use termcolor::ColorSpec;
-use termcolor::StandardStream;
-use termcolor::WriteColor;
 
 pub async fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
+    if env::var(API_KEY_ENV_VAR).is_ok() {
+        warnln!(
+            "Warning: Ignoring {} environment variable and logging in using system keyring",
+            API_KEY_ENV_VAR,
+        );
+    }
+
     let prompt = format!("Enter Footprint {} API key: ", is_live);
     let api_key = ApiKey::new(
         rpassword::prompt_password(prompt).with_context(|| "failed to read password from stdin")?,
@@ -42,18 +47,14 @@ pub async fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         let other_status = client.get_status().await?;
 
         if status.org_id != other_status.org_id {
-            let mut stdout = StandardStream::stdout(ColorChoice::Auto);
-            stdout.set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
             println!();
-            writeln!(
-                &mut stdout,
+            warnln!(
                 "Warning: Given {} API key is for {}, but existing {} API key is for a different organization, {}",
                 is_live,
                 status.org_name,
                 other_login_slot,
                 other_status.org_name,
-            )?;
-            stdout.reset()?;
+            );
 
             if !confirm(&format!(
                 "Continue logging in to {} ({})?",

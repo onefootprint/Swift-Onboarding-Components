@@ -13,7 +13,8 @@ from tests.constants import VDR_AGE_KEYS
 
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
-def footprint_dr(*args, api_root=None):
+
+def footprint_dr(*args, api_root=None, api_key=None):
     api_root = api_root or os.environ["TEST_URL"]
 
     return pexpect.spawn(
@@ -21,11 +22,19 @@ def footprint_dr(*args, api_root=None):
         list(args),
         timeout=10,
         logfile=sys.stdout.buffer,
-        env=os.environ | {
+        env=os.environ
+        | {
             "LOG_LEVEL": "debug",
             "FOOTPRINT_API_ROOT": api_root,
             "AWS_PROFILE": "localstack",
-        },
+        }
+        | (
+            {
+                "FOOTPRINT_API_KEY": api_key,
+            }
+            if api_key
+            else {}
+        ),
     )
 
 
@@ -84,17 +93,11 @@ def create_iam_role(session, bucket_name, external_id, randomize=True):
         "Statement": [
             {
                 "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::725896863556:root"
-                },
+                "Principal": {"AWS": "arn:aws:iam::725896863556:root"},
                 "Action": "sts:AssumeRole",
-                "Condition": {
-                    "StringEquals": {
-                        "sts:ExternalId": external_id
-                    }
-                }
+                "Condition": {"StringEquals": {"sts:ExternalId": external_id}},
             }
-        ]
+        ],
     }
 
     suffix = ""
@@ -104,8 +107,7 @@ def create_iam_role(session, bucket_name, external_id, randomize=True):
     role_name = "fp-vault-data-management" + suffix
     try:
         role_response = iam.create_role(
-            RoleName=role_name,
-            AssumeRolePolicyDocument=json.dumps(assume_role_policy)
+            RoleName=role_name, AssumeRolePolicyDocument=json.dumps(assume_role_policy)
         )
     except iam.exceptions.EntityAlreadyExistsException as e:
         if randomize:
@@ -117,34 +119,28 @@ def create_iam_role(session, bucket_name, external_id, randomize=True):
             {
                 "Sid": "AllowFootprintWriteObjects",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:PutObject"
-                ],
-                "Resource": f"arn:aws:s3:::{bucket_name}/*"
+                "Action": ["s3:PutObject"],
+                "Resource": f"arn:aws:s3:::{bucket_name}/*",
             },
             {
                 "Sid": "AllowFootprintListObjects",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:ListBucket"
-                ],
+                "Action": ["s3:ListBucket"],
                 "Resource": f"arn:aws:s3:::{bucket_name}",
             },
             {
                 "Sid": "AllowFootprintGetBucketLocation",
                 "Effect": "Allow",
-                "Action": [
-                    "s3:GetBucketLocation"
-                ],
+                "Action": ["s3:GetBucketLocation"],
                 "Resource": f"arn:aws:s3:::{bucket_name}",
-            }
-        ]
+            },
+        ],
     }
 
     iam.put_role_policy(
         RoleName=role_name,
         PolicyName="fp-vault-data-management",
-        PolicyDocument=json.dumps(inline_policy)
+        PolicyDocument=json.dumps(inline_policy),
     )
 
     return role_name
@@ -190,7 +186,6 @@ class EnrollmentConfig:
         )
 
 
-
 # Idempotently enroll a tenant Vault Disaster Recovery (live mode)
 def enroll_tenant_in_live_vdr(tenant):
     login_live(tenant)
@@ -221,7 +216,6 @@ def enroll_tenant_in_live_vdr(tenant):
         aws_account_id=aws_account_id,
         aws_role_name=iam_role_name,
         s3_bucket_name=bucket_name,
-
         # Won't be used in comparison.
         namespace="unknown",
     )
@@ -239,10 +233,12 @@ def enroll_tenant_in_live_vdr(tenant):
 
     # Otherwise, re-enroll the tenant in Vault Disaster Recovery.
     with footprint_dr("enroll", "--live") as cmd:
-        i = cmd.expect_exact([
-            r"Re-enrolling will deactivate the current configuration",
-            f"Enrolling {tenant.name} (Live) in Vault Disaster Recovery",
-        ])
+        i = cmd.expect_exact(
+            [
+                r"Re-enrolling will deactivate the current configuration",
+                f"Enrolling {tenant.name} (Live) in Vault Disaster Recovery",
+            ]
+        )
         if i == 0:
             cmd.expect("Type .+ to continue, or anything else to cancel: ")
             cmd.sendline("restart live-mode Vault Disaster Recovery from scratch")
@@ -250,7 +246,9 @@ def enroll_tenant_in_live_vdr(tenant):
         cmd.expect_exact("Enter org public key (age recipient): ")
         cmd.sendline(cfg.org_public_keys[0])
 
-        cmd.expect_exact("Are you sure you don't want the benefits of a hardware security token?")
+        cmd.expect_exact(
+            "Are you sure you don't want the benefits of a hardware security token?"
+        )
         cmd.sendline("y")
 
         cmd.expect_exact("Add another org public key? [y/n] ")
@@ -259,7 +257,9 @@ def enroll_tenant_in_live_vdr(tenant):
         cmd.expect_exact("Enter org public key (age recipient): ")
         cmd.sendline(cfg.org_public_keys[1])
 
-        cmd.expect_exact("Are you sure you don't want the benefits of a hardware security token?")
+        cmd.expect_exact(
+            "Are you sure you don't want the benefits of a hardware security token?"
+        )
         cmd.sendline("y")
 
         cmd.expect_exact("Add another org public key? [y/n] ")
