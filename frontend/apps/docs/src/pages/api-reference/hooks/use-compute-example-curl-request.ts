@@ -7,7 +7,7 @@ import type { HydratedArticle } from 'src/pages/api-reference/hooks';
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const useComputeExampleCurlRequest = (article: HydratedArticle) => {
-  const requestSchema = article.requestBody;
+  const requestSchema = article.requestBody?.content;
 
   // TODO look how stripe chooses which of your API keys to use. Should we just use the active admin key?
   return useMemo(() => {

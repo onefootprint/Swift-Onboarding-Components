@@ -1,13 +1,13 @@
 import { Box, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
+import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
 import Description from '../description';
 import Schema from '../schema';
 
 export type ResponsesProps = {
-  responses: Record<string, ContentSchemaNoRef>;
+  responses: Record<string, RequestOrResponse<ContentSchemaNoRef>>;
 };
 
 const Responses = ({ responses }: ResponsesProps) => {
@@ -19,17 +19,17 @@ const Responses = ({ responses }: ResponsesProps) => {
     // We have an assertion in update_open_api.py that we only have one response per API
     console.error('Multiple responses for API');
   }
-  const [_, schema] = Object.entries(responses)[0];
+  const [_, response] = Object.entries(responses)[0];
 
-  if (!schema) {
+  if (!response) {
     return;
   }
   return (
     <Stack direction="column" gap={3}>
       <Text variant="heading-3">{t('response')}</Text>
-      {schema.description && <Description>{schema.description}</Description>}
+      {response.content.description && <Description>{response.content.description}</Description>}
       <Box marginLeft={3}>
-        <Schema schema={schema} isInBrackets />
+        <Schema schema={response.content} isInBrackets />
       </Box>
     </Stack>
   );

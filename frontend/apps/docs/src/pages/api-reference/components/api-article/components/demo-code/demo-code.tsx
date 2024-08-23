@@ -43,8 +43,8 @@ const DemoCode = ({ article }: DemoCodeProps) => {
         {exampleCurlRequest}
       </CodeBlock>
       {responses &&
-        Object.entries(responses).map(([code, schema]) => {
-          return <Block key={code} title={t('response-example')} schema={schema} />;
+        Object.entries(responses).map(([code, response]) => {
+          return <Block key={code} title={t('response-example')} schema={response.content} />;
         })}
     </Stack>
   );

@@ -1,19 +1,23 @@
 import type { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 
-export type Content = {
-  description?: string;
-  content: {
-    'application/json': {
-      // TODO these always have a "$ref", not a normal ContentSchema
-      schema: ContentSchema;
-    };
+type Content = {
+  'application/json': {
+    // TODO these always have a "$ref", not a normal ContentSchema
+    schema: ContentSchema;
   };
+};
+
+export type RequestOrResponse<TContent = Content> = {
+  description?: string;
+  headers?: Record<string, ResponseHeaderProps>;
+  content: TContent;
   required?: boolean;
 };
 
-export type PathProps = {
-  url: string;
-  type: string;
+type ResponseHeaderProps = FpExtensions & {
+  description: string;
+  style: 'simple';
+  content: {};
 };
 
 export enum SecurityTypes {
@@ -34,14 +38,16 @@ export type ParameterProps = {
 
 export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
 
+type HttpStatusCode = '200' | '201' | '400' | '401' | '404' | string;
+
 /***
  * Information from the open API spec about a single backend API: its method, path, and request / response types.
  */
 export type ApiArticle<TContent = Content> = {
   description?: string;
   parameters?: ParameterProps[];
-  responses?: Record<string, TContent>;
-  requestBody?: TContent;
+  responses?: Record<HttpStatusCode, RequestOrResponse<TContent>>;
+  requestBody?: RequestOrResponse<TContent>;
   security?: Record<SecurityTypes, string[]>[];
   tags?: string[];
   // These are added on top of the open API spec
@@ -62,9 +68,6 @@ export type ContentSchema = FpExtensions & {
   type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'integer';
   format?: string;
   $ref?: string;
-
-  /** Added as an extension by our rust library that autogenerates open API schemas */
-  x_fp_preview_gate?: TenantPreviewApi;
 };
 
 // Same as above, omitting "$ref". Can definitely be cleaned up

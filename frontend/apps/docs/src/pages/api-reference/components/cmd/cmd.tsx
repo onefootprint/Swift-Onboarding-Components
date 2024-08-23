@@ -90,7 +90,7 @@ const Cmd = ({ sections }: PageNavProps) => {
           ))}
           <Group heading="Requests">
             {allSubsections.map(({ api, title, id }) =>
-              extractSchemaProperties(api?.requestBody).map(propertyName => (
+              extractSchemaProperties(api?.requestBody?.content).map(propertyName => (
                 <Option onSelect={() => handleScroll(id)} key={`request-${id}-${propertyName}`}>
                   <ScrollOption title={propertyName} parentTitle={`${title} request`} />
                 </Option>
@@ -100,7 +100,7 @@ const Cmd = ({ sections }: PageNavProps) => {
           <Group heading="Responses">
             {allSubsections.map(({ api, title, id }) =>
               Object.values(api?.responses || {})
-                .flatMap(response => extractSchemaProperties(response))
+                .flatMap(response => extractSchemaProperties(response.content))
                 .map(propertyName => (
                   <Option onSelect={() => handleScroll(id)} key={`response-${id}-${propertyName}`}>
                     <ScrollOption title={propertyName} parentTitle={`${title} response`} />

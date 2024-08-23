@@ -1,5 +1,10 @@
 import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
-import { type ApiArticle, type ContentSchemaNoRef, SecurityTypes } from '../../api-reference.types';
+import {
+  type ApiArticle,
+  type ContentSchemaNoRef,
+  type RequestOrResponse,
+  SecurityTypes,
+} from '../../api-reference.types';
 import useCanAccessPreviewApi from './hooks/use-can-access-preview-api';
 import useHydrateSchema from './hooks/use-hydrate-schema';
 import getArticles from './utils/get-articles';
@@ -32,6 +37,15 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
 
   const articles = getArticles(rawArticles);
 
+  const hydrateRequestOrResponse = (r: RequestOrResponse): RequestOrResponse<ContentSchemaNoRef> => {
+    const { content, ...restOfR } = r;
+    const schemaRef = content['application/json'].schema;
+    return {
+      content: hydrateSchema(schemaRef),
+      ...restOfR,
+    };
+  };
+
   return articles.map(article => {
     const hasTag = (tag: string) => article.tags?.includes(tag) || false;
 
@@ -61,17 +75,11 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
     const hideWhenLocked = hasTag('HideWhenLocked');
     const isHidden = hideWhenLocked && !canAccessApi;
 
-    const requestBodyRef = article.requestBody?.content['application/json'].schema;
-    const requestBody = requestBodyRef
-      ? {
-          ...hydrateSchema(requestBodyRef),
-          isRequired: article.requestBody?.required || false,
-        }
-      : undefined;
+    const requestBody = article.requestBody ? hydrateRequestOrResponse(article.requestBody) : undefined;
+
     const responses = Object.fromEntries(
-      Object.entries(article.responses || {}).map(([code, content]) => {
-        const schemaRef = content.content['application/json'].schema;
-        return [code, hydrateSchema(schemaRef)];
+      Object.entries(article.responses || {}).map(([code, response]) => {
+        return [code, hydrateRequestOrResponse(response)];
       }),
     );
     const parameters = (article.parameters || [])?.filter(parameter =>
