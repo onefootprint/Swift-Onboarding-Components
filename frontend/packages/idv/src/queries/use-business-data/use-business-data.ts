@@ -4,9 +4,9 @@ import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const businessDataRequest = async (payload: BusinessDataRequest) => {
-  // Don't send null, undefined, 'decrypted', or falsy values
+  // Don't send null, undefined, 'scrubbed', or falsy values
   const data = Object.fromEntries(
-    Object.entries(payload.data).filter(([_key, value]) => !!value && value !== 'decrypted'),
+    Object.entries(payload.data).filter(([_key, value]) => !!value && value !== 'scrubbed'),
   );
 
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({

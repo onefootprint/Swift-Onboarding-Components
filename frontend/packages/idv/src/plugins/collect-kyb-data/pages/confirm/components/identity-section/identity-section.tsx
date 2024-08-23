@@ -11,7 +11,7 @@ import { useStepUp } from '../../../../../../hooks';
 import { useDecryptBusiness } from '../../../../../../queries';
 import { FPCustomEvents, getLogger, sendCustomEvent } from '../../../../../../utils';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
-import { formatTin, isDecrypted } from '../../../../utils/utils';
+import { formatTin, isScrubbed } from '../../../../utils/utils';
 import TaxIdentificationForm from './tax-identification-form';
 
 type T = TFunction<'idv', 'kyb.pages'>;
@@ -37,8 +37,8 @@ const IdentitySection = () => {
   const { data } = state.context;
   const tinValue = data[BusinessDI.tin];
 
-  const isTinNotDecrypted = !!tinValue && !isDecrypted(tinValue);
-  const isTinHidden = isHiding || isDecrypted(tinValue);
+  const isTinNotScrubbed = !!tinValue && !isScrubbed(tinValue);
+  const isTinHiddenOrScrubbed = isHiding || isScrubbed(tinValue);
 
   const stopEditing = () => setIsEditing(false);
 
@@ -53,7 +53,7 @@ const IdentitySection = () => {
       send({ type: 'stepUpAuthTokenCompleted', payload: newAuthToken });
       sendCustomEvent(FPCustomEvents.stepUpCompleted, { authToken: newAuthToken });
 
-      if (mutDecryptBusiness.isLoading || isTinNotDecrypted) return;
+      if (mutDecryptBusiness.isLoading || isTinNotScrubbed) return;
       mutDecryptBusiness.mutate(
         { authToken: newAuthToken, fields: [BusinessDI.tin] },
         {
@@ -76,17 +76,17 @@ const IdentitySection = () => {
 
   const actions: SectionAction[] = [];
   if (!isEditing) {
-    if (isServerAndDeviceReady && isDecrypted(tinValue)) {
+    if (isServerAndDeviceReady && isScrubbed(tinValue)) {
       actions.push({
         actionTestID: 'kyb-basic-data-reveal-btn',
         isLoading: isStepUpLoading,
         label: t('confirm.reveal'),
         onClick: () => {
-          if (isStepUpLoading || isTinNotDecrypted) return;
+          if (isStepUpLoading || isTinNotScrubbed) return;
           stepUp();
         },
       });
-    } else if (isTinNotDecrypted) {
+    } else if (isTinNotScrubbed) {
       actions.push({
         actionTestID: isHiding ? 'kyb-basic-data-show-btn' : 'kyb-basic-data-hide-btn',
         label: t(`${isHiding ? 'confirm.reveal' : 'confirm.hide'}`),
@@ -109,7 +109,10 @@ const IdentitySection = () => {
       content={
         !isEditing ? (
           <Box display="flex" flexDirection="column" gap={6}>
-            <SectionItem text={t('confirm.basic-data.tin')} subtext={isTinHidden ? '•••••••••' : formatTin(tinValue)} />
+            <SectionItem
+              text={t('confirm.basic-data.tin')}
+              subtext={isTinHiddenOrScrubbed ? '•••••••••' : formatTin(tinValue)}
+            />
           </Box>
         ) : (
           <TaxIdentificationForm ctaLabel={t('confirm.summary.save')} onComplete={stopEditing} onCancel={stopEditing} />

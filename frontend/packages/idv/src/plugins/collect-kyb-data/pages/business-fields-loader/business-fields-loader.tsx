@@ -62,7 +62,7 @@ const BusinessFieldsLoader = ({
           const payload = { ...vaultBusinessData };
 
           if (populatedAttributes?.includes(CollectedKybDataOption.tin)) {
-            payload['business.tin'] = 'decrypted';
+            payload['business.tin'] = 'scrubbed';
           }
 
           const allAttributes = (missingAttributes || []).concat(populatedAttributes || []);

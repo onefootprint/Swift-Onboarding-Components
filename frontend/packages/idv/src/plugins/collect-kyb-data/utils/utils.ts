@@ -95,7 +95,7 @@ export const formatPayload = (locale: SupportedLocale, data: BusinessDIData): Bu
   );
 };
 
-export const isDecrypted = (str: unknown): str is 'decrypted' => str === 'decrypted';
+export const isScrubbed = (str: unknown): str is 'scrubbed' => str === 'scrubbed';
 
 export const formatTin = (tin?: string): string => {
   if (!tin) return '';
@@ -104,5 +104,5 @@ export const formatTin = (tin?: string): string => {
 };
 
 export const getTinDefaultValue = (tin?: string): string => {
-  return !tin || isDecrypted(tin) ? '' : formatTin(tin);
+  return !tin || isScrubbed(tin) ? '' : formatTin(tin);
 };
