@@ -284,8 +284,54 @@ pip3 install -r ci/requirements.txt
 
 3. Now, you're ready to run your integration tests locally! You can point them at either an ephemeral environment OR a server running locally.
 
+First, activate your virtual env if you haven't already:
+```
+MONOREPO_DIR=../ python ci/scripts/update_open_api.py
+```
+
+Then, run tests:
 ```
 TEST_URL="http://localhost:8000" pytest -x ci/tests
+```
+
+## Maintaining the Footprint docs site
+We use our own [fork of paperclip](https://github.com/onefootprint/paperclip) to generate open API specs from the API request and response structs used in our code. Our open API spec is divided by [`update_open_api.py`](./ci/scripts/update_open_api.py) into into three different JSON files that correspond to our three API reference pages:
+
+- Our external, tenant-facing API reference: docs.onefootprint.com/api-reference
+- Our internal, dashboard-facing API reference: docs.onefootprint.com/internal-api/dashboard
+- Our internal, bifrost-facing API reference: docs.onefootprint.com/internal-api/hosted
+
+We're still working on improving our hygiene for API documentation for internal-facing APIs. But we do enforce good hygiene on tenant-facing APIs: if tenants can hit the API via API key, it should be documented.
+
+### Making changes to APIs
+
+When you've made changes to an API, you should run the following script (from the `backend` directory). You may need some python dependencies, in which case it's useful to reuse the virtual env you set up [for integration tests](#running-integration-tests).
+
+```
+MONOREPO_DIR=../ python ci/scripts/update_open_api.py
+```
+
+This generates three different files in the frontend `docs` app. You should commit each of these files to the repo - the docs site is rendered using these open API specs that are committed in the repo.
+
+### Adding a new tenant-facing API
+
+Our external docs site divides the external APIs into sections. Each section is composed of:
+- An informational introduction written in markdown
+- The (ordered) list of APIs that should be rendered in this section. The documentation for APIs themselves are rendered from their open API specs.
+
+Each of these sections are defined [here](../frontend/apps/docs/src/content/api-reference).
+
+![image](https://github.com/user-attachments/assets/daa4dd46-d733-4c29-bcf3-7bfbeea77a87)
+
+After you've [generated the open API spec](#making-changes-to-apis), you need to register the new API in one of the [sections](../frontend/apps/docs/src/content/api-reference) for it to be rendered on the docs site. Add your API to the yaml list of `apis` defined at the top of one of the `.mdx` files. The API is defined by its method and path - make sure it's exactly as shown in the open API documentation.
+
+For each API you add to the external docs site, please also write a `title` and markdown `description`.
+
+### Testing the docs site locally
+
+From the `../frontend` folder, you can run this command to serve the docs site locally. You can access the api reference at `http://localhost:3009/api-reference`.
+```
+yarn dev --filter=docs
 ```
 
 ## Testing Tracing Locally
