@@ -61,7 +61,9 @@ pub async fn post(
         onboarding_config_key,
         key,
         fixture_result,
+        force_reonboard,
     } = request.into_inner();
+    let force_reonboard = force_reonboard.unwrap_or(true);
     let fixture_result = fixture_result.map(WorkflowFixtureResult::from);
     // For backwards compatibility
     match onboarding_config_key {
@@ -143,7 +145,7 @@ pub async fn post(
                 wfr: None,
                 is_neuro_enabled: false,
             };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, true)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_reonboard)?;
 
             // Check requirements for this Business vault w.r.t the OBC
             let opts = RequirementOpts::default();

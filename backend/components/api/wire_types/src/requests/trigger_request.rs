@@ -50,4 +50,7 @@ pub struct TriggerKybRequest {
     /// (only valid for sandbox businesses) choose the desired KYB outcome
     #[openapi(example = "null")]
     pub fixture_result: Option<SimpleFixtureResult>,
+    /// Run the businesss through KYB on the provided playbook even if they have already onboarded
+    /// onto this playbook. Defaults to true.
+    pub force_reonboard: Option<bool>,
 }
