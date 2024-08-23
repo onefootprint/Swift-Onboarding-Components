@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import type { DropdownSelectorProps, Option } from '../dropdown-selector';
 import DropdownSelector from '../dropdown-selector';
-import ScopesList from '../team-roles/components/members/components/row/components/edit-role/components/scopes';
+import ScopesList from '../scopes';
 
 export const RoleDropdownSelector = ({
   onValueChange,

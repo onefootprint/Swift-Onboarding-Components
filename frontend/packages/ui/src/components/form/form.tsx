@@ -12,7 +12,7 @@ const Form = {
   Group: FormGroup,
   Addon: FormAddon,
   Errors: FormErrors,
-  FieldContext: FormFieldContext,
+  Context: FormFieldContext,
   Input: FormInput,
 };
 

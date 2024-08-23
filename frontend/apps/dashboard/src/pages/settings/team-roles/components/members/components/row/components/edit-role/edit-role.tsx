@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles';
 
-import RoleDropdownSelector from 'src/pages/settings/components/role-dropdown-selector/role-dropdown-selector';
+import RoleDropdownSelector from 'src/components/role-dropdown-selector';
 import useUpdateMember from './hooks/use-update-member';
 
 export type EditRoleProps = {
