@@ -155,6 +155,9 @@ export const createErrorModal = (container: HTMLElement) => {
   const closeButton = document.createElement('button');
   closeButton.setAttribute('aria-label', 'Close');
   closeButton.classList.add('modal-error-close-button');
+  closeButton.addEventListener('click', () => {
+    container.remove();
+  });
 
   const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svgIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');

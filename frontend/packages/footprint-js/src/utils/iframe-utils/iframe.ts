@@ -1,5 +1,4 @@
 import Postmate from '@onefootprint/postmate';
-
 import { version } from '../../../package.json';
 import type { FormRef, Props } from '../../types/components';
 import { ComponentKind } from '../../types/components';
@@ -20,7 +19,8 @@ import { logError, logWarn } from '../logger';
 import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
 import { SdkKindByComponentKind } from '../request-utils/constants';
 import sendSdkArgs from '../request-utils/send-sdk-args';
-import getURL, { getWindowUrl } from '../url-utils';
+import getURL from '../url-utils';
+import { getWindowUrl } from '../url-utils';
 import type { Iframe, OnDestroy, OnRenderSecondary } from './types';
 
 type ParentApi = Postmate.ParentAPI;
@@ -127,30 +127,7 @@ const initIframe = (rawProps: Props): Iframe => {
     props.getRef?.(formRef);
   };
 
-  const render = async () => {
-    if (isRendered) {
-      logWarn(SdkKindByComponentKind[props.kind], 'Footprint component is already rendered');
-      return;
-    }
-    const container = getOrCreateContainer();
-    if (!container) {
-      logWarn(SdkKindByComponentKind[props.kind], 'Unable to create container for Footprint component');
-      return;
-    }
-    if (container.hasChildNodes()) {
-      container.innerHTML = '';
-    }
-
-    isRendered = true;
-    setLoading(container, true);
-
-    const sdkArgsToken = await sendSdkArgs(props);
-    if (!sdkArgsToken) {
-      handleError('Unable to get SDK args token.', true);
-      return;
-    }
-
-    const url = getURL(props, sdkArgsToken || '');
+  const initializePostmate = async (container: HTMLElement, url: string) => {
     try {
       parentApi = await new Postmate({
         classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`, 'fp-hide'],
@@ -165,14 +142,70 @@ const initIframe = (rawProps: Props): Iframe => {
           sdkVersion: version || '',
         },
       });
+      return { success: true, parentApi };
     } catch (e) {
-      createErrorModal(container);
-      handleError(`Initializing iframe failed with error ${e}`);
+      handleError(`Initializing ${url} iframe failed with error ${e}`);
+      return { success: false };
+    }
+  };
+
+  const initIframe = async (container: HTMLElement, { url, fallbackUrl }: ReturnType<typeof getURL>) => {
+    setLoading(container, true);
+
+    const response = await initializePostmate(container, url);
+
+    if (response.success) {
+      setLoading(container, false);
+      return response.parentApi;
+    }
+
+    const responseFallback = await initializePostmate(container, fallbackUrl);
+    setLoading(container, false);
+
+    if (!responseFallback.success) {
+      throw new Error('Failed to initialize iframe');
+    }
+
+    return responseFallback.parentApi;
+  };
+
+  const render = async () => {
+    // this will clean up the iframe if it was already rendered.
+    // This is specially useful when the user clicks on the "X" button of the error modal
+    await destroy();
+
+    if (isRendered) {
+      logWarn(SdkKindByComponentKind[props.kind], 'Footprint component is already rendered');
+      return;
+    }
+    isRendered = true;
+
+    const container = getOrCreateContainer();
+
+    if (!container) {
+      logWarn(SdkKindByComponentKind[props.kind], 'Unable to create container for Footprint component');
       return;
     }
 
-    setLoading(container, false);
-    registerCallbackProps();
+    if (container.hasChildNodes()) {
+      container.innerHTML = '';
+    }
+
+    const sdkArgsToken = await sendSdkArgs(props);
+    if (!sdkArgsToken) {
+      handleError('Unable to get SDK args token.', true);
+      return;
+    }
+
+    const urls = getURL(props, sdkArgsToken || '');
+
+    try {
+      await initIframe(container, urls);
+      registerCallbackProps();
+    } catch (_) {
+      createErrorModal(container);
+    }
+
     parentApi?.on(started, () => setUpFormRefs());
     parentApi?.on(`${initId}:${started}`, setUpFormRefs);
 

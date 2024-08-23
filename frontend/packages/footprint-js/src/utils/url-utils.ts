@@ -22,24 +22,35 @@ export const getSearchParams = (props: Props, token: string): string => {
   return `${searchParams.toString()}#${token}`;
 };
 
-const getURL = (props: Props, token: string): string => {
+const getURL = (props: Props, token: string) => {
   const { kind } = props;
   const searchParams = getSearchParams(props, token);
   let url = `${process.env.COMPONENTS_URL}/${kind}`;
+  let fallbackUrl = `${process.env.COMPONENTS_FALLBACK_URL}/${kind}`;
 
   if (kind === ComponentKind.UpdateLoginMethods) {
     url = `${process.env.AUTH_URL}/user`;
+    fallbackUrl = `${process.env.AUTH_FALLBACK_URL}/user`;
   }
   if (kind === ComponentKind.Auth) {
     url = process.env.AUTH_URL as string;
+    fallbackUrl = process.env.AUTH_FALLBACK_URL as string;
   }
   if (kind === ComponentKind.Verify || kind === ComponentKind.VerifyButton || kind === ComponentKind.Components) {
     url = process.env.BIFROST_URL as string;
+    fallbackUrl = process.env.BIFROST_FALLBACK_URL as string;
   }
   if (!isValidString(url)) {
     throw new Error(`${kind}_URL environment variable is not defined.`);
   }
-  return `${url}?${searchParams}`.trim();
+
+  url += `?${searchParams}`.trim();
+  fallbackUrl += `?${searchParams}`.trim();
+
+  return {
+    url,
+    fallbackUrl,
+  };
 };
 
 export default getURL;

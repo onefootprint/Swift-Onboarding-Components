@@ -31,7 +31,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/idv": "*",
-    "@onefootprint/postmate": "2.1.1",
+    "@onefootprint/postmate": "2.1.2",
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
