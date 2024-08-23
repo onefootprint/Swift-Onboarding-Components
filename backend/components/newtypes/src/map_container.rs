@@ -44,7 +44,7 @@ pub mod declare_map_container {
                 }
 
                 fn update_response(op: &mut paperclip::v2::models::DefaultOperationRaw) {
-                    $crate::map_container::update_200_response::<Self>(op);
+                    $crate::map_container::update_200_response::<Self>(op, Default::default());
                 }
             }
         };
@@ -83,17 +83,16 @@ pub fn update_body_parameter<T: paperclip::v2::schema::Apiv2Schema>(
 
 pub fn update_200_response<T: paperclip::v2::schema::Apiv2Schema>(
     op: &mut paperclip::v2::models::DefaultOperationRaw,
+    headers: std::collections::BTreeMap<String, paperclip::v2::models::Header>,
 ) {
+    let mut schema = <T as paperclip::v2::schema::Apiv2Schema>::schema_with_ref();
+    schema.retain_ref();
     op.responses.insert(
         "200".into(),
         paperclip::v2::models::Either::Right(paperclip::v2::models::Response {
             description: Some("OK".into()),
-            schema: Some({
-                let mut def = <T as paperclip::v2::schema::Apiv2Schema>::schema_with_ref();
-                def.retain_ref();
-                def
-            }),
-            ..Default::default()
+            schema: Some(schema),
+            headers,
         }),
     );
 }

@@ -105,6 +105,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -565,6 +573,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -611,6 +627,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -669,6 +693,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -932,6 +964,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1020,6 +1060,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2685,6 +2733,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2731,6 +2787,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2789,6 +2853,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
