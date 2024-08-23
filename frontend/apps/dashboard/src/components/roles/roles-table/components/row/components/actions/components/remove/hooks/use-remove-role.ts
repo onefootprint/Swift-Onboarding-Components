@@ -16,8 +16,8 @@ const removeRoleRequest = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveRole = (name: string) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.remove',
+  const { t } = useTranslation('settings', {
+    keyPrefix: 'pages.members.roles.remove',
   });
   const toast = useToast();
   const session = useSession();

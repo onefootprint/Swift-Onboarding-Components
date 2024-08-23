@@ -20,10 +20,10 @@ export type EditProps = {
 const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.edit',
+    keyPrefix: 'pages.roles.edit',
   });
   const { t: scopesT } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.scopes',
+    keyPrefix: 'pages.roles.scopes',
   });
   const [open, setOpen] = useState(false);
   const editRoleMutation = useEditRole(role.id);

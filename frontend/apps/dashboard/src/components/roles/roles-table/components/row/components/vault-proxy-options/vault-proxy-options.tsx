@@ -11,7 +11,7 @@ export type VaultProxyOptionProps<T extends React.ElementType> = {
 };
 
 const VaultProxyOptions = <T extends React.ElementType>({ options, as }: VaultProxyOptionProps<T>) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
   const Component = as || 'span';
   if (options.length === 1) {
     if (options[0] === VaultProxyOptionKind.all) {

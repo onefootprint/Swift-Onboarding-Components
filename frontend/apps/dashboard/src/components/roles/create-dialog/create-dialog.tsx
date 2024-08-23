@@ -22,7 +22,7 @@ const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {
       onClose={handleClose}
       open={open}
       size="compact"
-      title={t('pages.settings.roles.create.title')}
+      title={t('pages.roles.create.title')}
       primaryButton={{
         form: 'roles-form',
         label: t('create'),

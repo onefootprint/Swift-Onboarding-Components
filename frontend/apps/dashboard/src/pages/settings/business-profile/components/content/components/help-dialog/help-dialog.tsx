@@ -9,8 +9,8 @@ export type HelpDialogProps = {
 };
 
 const HelpDialog = ({ open, onClose }: HelpDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.business-profile.support-links.dialog',
+  const { t } = useTranslation('settings', {
+    keyPrefix: 'pages.business-profile.support-links.dialog',
   });
 
   return (

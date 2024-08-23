@@ -100,7 +100,7 @@ type Group = {
 
 const useDecryptOptions = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.scopes',
+    keyPrefix: 'pages.roles.scopes',
   });
 
   const options: Group[] = [

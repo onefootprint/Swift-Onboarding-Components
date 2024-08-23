@@ -19,7 +19,7 @@ const updateRoleRequest = async (authHeaders: AuthHeaders, id: string, payload: 
 
 const useEditRole = (id: string) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.edit.notifications',
+    keyPrefix: 'pages.roles.edit.notifications',
   });
   const toast = useToast();
   const session = useSession();

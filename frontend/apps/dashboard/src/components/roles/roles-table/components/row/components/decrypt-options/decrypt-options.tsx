@@ -10,7 +10,7 @@ export type DecryptOptionProps<T extends React.ElementType> = {
 };
 
 const DecryptOptions = <T extends React.ElementType>({ options, as }: DecryptOptionProps<T>) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
   const Component = as || 'span';
   if (options.length === 1) {
     return (

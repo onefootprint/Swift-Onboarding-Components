@@ -73,7 +73,7 @@ const Actions = ({ member }: ActionsProps) => {
         >
           <Text variant="body-2" color="secondary" textAlign="center">
             <Trans
-              i18nKey="pages.settings.members.table.actions.remove.confirmation.description"
+              i18nKey="pages.members.table.actions.remove.confirmation.description"
               components={{
                 b: <Bold />,
               }}

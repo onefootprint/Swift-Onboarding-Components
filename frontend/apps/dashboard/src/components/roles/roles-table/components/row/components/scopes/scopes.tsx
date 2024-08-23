@@ -13,7 +13,7 @@ export type ScopesProps = {
 };
 
 const Scopes = ({ scopes }: ScopesProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
   const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(scopes);
 
   if (isAdmin) {

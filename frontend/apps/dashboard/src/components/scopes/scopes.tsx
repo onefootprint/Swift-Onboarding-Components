@@ -10,7 +10,7 @@ export type ScopesListProps = {
 };
 
 const ScopesList = ({ scopes }: ScopesListProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
   const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(scopes);
 
   return isAdmin ? (

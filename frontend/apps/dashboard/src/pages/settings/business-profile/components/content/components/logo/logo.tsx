@@ -13,8 +13,8 @@ type LogoProps = {
 };
 
 const Logo = ({ organization }: LogoProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.business-profile.logo',
+  const { t } = useTranslation('settings', {
+    keyPrefix: 'pages.business-profile.logo',
   });
   const updateOrgLogoMutation = useUpdateOrgLogo();
 

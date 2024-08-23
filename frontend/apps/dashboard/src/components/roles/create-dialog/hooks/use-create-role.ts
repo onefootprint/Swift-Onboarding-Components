@@ -19,7 +19,7 @@ const createRoleRequest = async (authHeaders: AuthHeaders, payload: CreateRoleRe
 
 const useCreateRole = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.create.notifications',
+    keyPrefix: 'pages.roles.create.notifications',
   });
   const toast = useToast();
   const session = useSession();

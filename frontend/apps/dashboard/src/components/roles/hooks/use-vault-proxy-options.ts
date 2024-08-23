@@ -40,7 +40,7 @@ type Option = {
 
 const useVaultProxyOptions = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.roles.scopes',
+    keyPrefix: 'pages.roles.scopes',
   });
   const { data } = useProxyConfigs({
     status: 'enabled',
