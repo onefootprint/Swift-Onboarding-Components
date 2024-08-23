@@ -60,15 +60,9 @@ impl paperclip::v2::schema::Apiv2Schema for ParsedClientTenantData {
             description: Some(
                 "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.".to_string(),
             ),
-            // Need to provide the schema again in order to provide an example
-            schema: Some(paperclip::v2::models::DefaultSchemaRaw {
-                name: Some("x-fp-authorization".to_owned()),
-                data_type: Some(paperclip::v2::models::DataType::String),
-                example: Some(serde_json::Value::String(
-                    "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH".to_owned(),
-                )),
-                ..Default::default()
-            }),
+            example: Some(serde_json::Value::String(
+                "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH".to_owned(),
+            )),
             ..Default::default()
         }]
     }

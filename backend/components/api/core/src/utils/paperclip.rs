@@ -107,12 +107,6 @@ macro_rules! api_headers_schema {
                                         $r_doc.trim(),
                                     )*].join(" ")
                                 ),
-                                schema: Some(paperclip::v2::models::DefaultSchemaRaw{
-                                    name: Some($r_header.to_owned()),
-                                    data_type: Some(paperclip::v2::models::DataType::String),
-                                    example: Some(serde_json::Value::String($example.to_owned())),
-                                    ..Default::default()
-                                }),
                                 data_type: {
                                     use paperclip::v2::schema::TypedData;
                                     Some(String::data_type())
@@ -121,6 +115,7 @@ macro_rules! api_headers_schema {
                                     use paperclip::v2::schema::TypedData;
                                     String::format()
                                 },
+                                example: Some(serde_json::Value::String($example.to_owned())),
                                 required: true,
                                 ..Default::default()
                             },
@@ -250,10 +245,10 @@ mod tests {
             test_header.description.clone().unwrap(),
             "test description".to_string()
         );
-        assert_eq!(test_header.schema.unwrap().example.unwrap(), json!("foo"));
+        assert_eq!(test_header.example.unwrap(), json!("foo"));
 
         let test_header2 = TestGroupParams::schema().into_iter().nth(1).unwrap();
-        assert_eq!(test_header2.schema.unwrap().example.unwrap(), json!("bar"));
+        assert_eq!(test_header2.example.unwrap(), json!("bar"));
 
         let test_header3 = TestGroupParams::schema().into_iter().nth(2).unwrap();
         assert_eq!(
