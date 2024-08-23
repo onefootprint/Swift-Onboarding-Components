@@ -37,7 +37,7 @@ export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineCon
 };
 
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
-  const cdos = [...(ctx.kybRequirement?.populatedAttributes || []), ...(ctx.kybRequirement?.missingAttributes || [])];
+  const cdos = [...(ctx.kybRequirement.populatedAttributes || []), ...(ctx.kybRequirement.missingAttributes || [])];
   const kybAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as BusinessDI[];
   const filteredBootstrapBusinessData = pickBy(ctx.bootstrapBusinessData, (_, key) =>
     kybAttributes.includes(key as BusinessDI),
@@ -49,7 +49,7 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
     ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
     ...ctx.data,
   };
-  if (ctx?.kybRequirement?.hasLinkedBos) {
+  if (ctx.kybRequirement.hasLinkedBos) {
     // If BOs are linked via API already, we don't support working with them in IDV.
     BO_FIELDS.forEach(di => {
       if (initialData[di]) {
