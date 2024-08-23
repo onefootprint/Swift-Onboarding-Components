@@ -644,6 +644,16 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-vault-version",
+                        "description": "When provided, specifies the vault version to use for the given request.",
+                        "schema": {
+                            "x_fp_preview_gate": "vault_versioning",
+                            "type": "string"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -994,7 +1004,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1043,7 +1052,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1118,7 +1126,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1405,7 +1412,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     },
                     {
@@ -2758,6 +2764,16 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-vault-version",
+                        "description": "When provided, specifies the vault version to use for the given request.",
+                        "schema": {
+                            "x_fp_preview_gate": "vault_versioning",
+                            "type": "string"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -3203,7 +3219,6 @@
                             "example": "https://acmebankprocessor.com/api/process_transaction",
                             "type": "string"
                         },
-                        "example": "https://acmebankprocessor.com/api/process_transaction",
                         "style": "simple"
                     },
                     {

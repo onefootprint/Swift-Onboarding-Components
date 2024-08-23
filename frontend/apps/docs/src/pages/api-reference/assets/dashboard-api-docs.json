@@ -351,7 +351,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -429,7 +428,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -477,7 +475,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -550,7 +547,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -836,7 +832,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     },
                     {
@@ -2713,6 +2708,16 @@
                         "name": "fp_id",
                         "required": true,
                         "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-vault-version",
+                        "description": "When provided, specifies the vault version to use for the given request.",
+                        "schema": {
+                            "x_fp_preview_gate": "vault_versioning",
                             "type": "string"
                         },
                         "style": "simple"

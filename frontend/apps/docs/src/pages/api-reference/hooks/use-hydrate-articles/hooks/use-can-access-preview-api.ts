@@ -5,8 +5,8 @@ const useCanAccessPreviewApi = () => {
   const {
     data: { user },
   } = useSession();
-  const canAccessPreviewApi = (previewApi: TenantPreviewApi) =>
-    user?.tenant?.allowedPreviewApis?.includes(previewApi) || user?.isFirmEmployee || false;
+  const canAccessPreviewApi = (previewApi?: TenantPreviewApi) =>
+    !previewApi || user?.tenant?.allowedPreviewApis?.includes(previewApi) || user?.isFirmEmployee || false;
   return canAccessPreviewApi;
 };
 

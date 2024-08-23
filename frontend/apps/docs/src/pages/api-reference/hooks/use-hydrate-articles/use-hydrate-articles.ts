@@ -47,7 +47,7 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
 
     const tag = Object.values(ArticleTag).filter(t => hasTag(t))[0];
     const requiredPreviewGate: TenantPreviewApi | undefined = requiredPreviewGates[0];
-    let canAccessApi = !requiredPreviewGate || canAccessPreviewApi(requiredPreviewGate);
+    let canAccessApi = canAccessPreviewApi(requiredPreviewGate);
 
     if (hasTag('ClientVaulting')) {
       // Client-vaulting APIs have some custom visibility logic.
@@ -74,9 +74,13 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
         return [code, hydrateSchema(schemaRef)];
       }),
     );
+    const parameters = (article.parameters || [])?.filter(parameter =>
+      canAccessPreviewApi(parameter.schema.x_fp_preview_gate),
+    );
 
     return {
       ...article,
+      parameters,
       hideWhenLocked,
       isHidden,
       canAccessApi,

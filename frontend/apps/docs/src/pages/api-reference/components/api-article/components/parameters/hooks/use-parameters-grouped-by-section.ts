@@ -10,10 +10,8 @@ const createSchema = (parameter: ParameterProps[], inValue: string): ContentSche
   params.forEach(param => {
     if (param.required) requiredForSchema.push(param.name);
     properties[param.name] = {
+      ...param.schema,
       isRequired: param.required || false,
-      type: param.schema.type,
-      items: param.schema.items,
-      enum: param.schema.enum,
       description: param.description,
     };
   });

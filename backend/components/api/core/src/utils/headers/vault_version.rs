@@ -4,7 +4,10 @@ use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
+use newtypes::PreviewApi;
 use newtypes::ScopedVaultVersionNumber;
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::Parameter;
 use paperclip::v2::schema::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
@@ -17,6 +20,24 @@ pub struct VaultVersion(pub Option<ScopedVaultVersionNumber>);
 impl Apiv2Schema for VaultVersion {
     fn required() -> bool {
         false
+    }
+
+    fn header_parameter_schema() -> Vec<Parameter<DefaultSchemaRaw>> {
+        let mut param = paperclip::v2::models::Parameter::<DefaultSchemaRaw> {
+            name: Self::HEADER_NAME.to_owned(),
+            in_: paperclip::v2::models::ParameterIn::Header,
+            description: Some(
+                "When provided, specifies the vault version to use for the given request.".into(),
+            ),
+            data_type: Some(paperclip::v2::models::DataType::String),
+            required: Self::required(),
+            ..Default::default()
+        };
+        param.extensions.insert(
+            "x_fp_preview_gate".to_string(),
+            PreviewApi::VaultVersioning.to_string().into(),
+        );
+        vec![param]
     }
 }
 impl paperclip::actix::OperationModifier for VaultVersion {}

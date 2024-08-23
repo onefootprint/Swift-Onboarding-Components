@@ -35,7 +35,7 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
 
     // Add required headers to curl request
     const headerParams = article.parameters?.filter(p => p.in === 'header').filter(p => p.required);
-    headerParams?.forEach(p => lines.push(`-H '${p.name}: ${p.example}'`));
+    headerParams?.forEach(p => lines.push(`-H '${p.name}: ${p.schema.example}'`));
 
     let httpMethodArgs = '';
     if (article.method === 'get') {
@@ -43,11 +43,11 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
       const querystringParms = article.parameters
         ?.filter(p => p.in === 'query')
         .filter(p => p.required)
-        .filter(p => !!p.example);
+        .filter(p => !!p.schema.example);
       if (querystringParms?.length) {
         httpMethodArgs = '-G';
       }
-      querystringParms?.forEach(p => lines.push(`-d ${p.name}=${p.example}`));
+      querystringParms?.forEach(p => lines.push(`-d ${p.name}=${p.schema.example}`));
     } else {
       // Add data fields to curl request
       httpMethodArgs = `-X ${article.method.toUpperCase()}`;

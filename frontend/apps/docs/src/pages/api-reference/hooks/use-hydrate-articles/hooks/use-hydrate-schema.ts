@@ -35,12 +35,7 @@ const useHydrateSchema = (openApiSpec: any) => {
   const filterVisibleProperties = (properties?: Record<string, ContentSchemaNoRef>) => {
     if (!properties) return undefined;
     return Object.fromEntries(
-      Object.entries(properties).flatMap(([name, schema]) => {
-        if (schema.x_fp_preview_gate && !canAccessPreviewApi(schema.x_fp_preview_gate)) {
-          return [];
-        }
-        return [[name, schema]];
-      }),
+      Object.entries(properties).filter(([_, schema]) => canAccessPreviewApi(schema.x_fp_preview_gate)),
     );
   };
 
