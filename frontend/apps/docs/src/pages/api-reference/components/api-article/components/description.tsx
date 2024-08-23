@@ -1,5 +1,5 @@
 import { CodeInline } from '@onefootprint/ui';
-import ApiMarkdown from '../../../api-markdown';
+import ApiMarkdown from '../../api-markdown';
 
 type DescriptionProps = {
   children: string;

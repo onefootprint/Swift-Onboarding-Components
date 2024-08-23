@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
-import Description from '../description';
-import Schema from '../schema';
+import Description from './description';
+import Schema from './schema';
 
 export type ResponsesProps = {
   responses: Record<string, RequestOrResponse<ContentSchemaNoRef>>;

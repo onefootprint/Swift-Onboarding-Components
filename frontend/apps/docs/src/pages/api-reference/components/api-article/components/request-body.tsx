@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 
 import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
-import Description from '../description';
-import Schema from '../schema';
+import Description from './description';
+import Schema from './schema';
 
 type RequestBodyProps = {
   requestBody: RequestOrResponse<ContentSchemaNoRef>;

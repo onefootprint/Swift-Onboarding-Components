@@ -6,8 +6,8 @@ import styled, { css } from 'styled-components';
 
 import type { ContentSchemaNoRef } from 'src/pages/api-reference/api-reference.types';
 
-import Description from '../../../../../description';
-import Enum from '../../../enum';
+import Description from '../../../../description';
+import Enum from '../../enum';
 
 export type PropertyProps = {
   isRequired?: boolean;
