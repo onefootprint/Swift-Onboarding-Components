@@ -17,7 +17,6 @@ export const removeDOMElements = async (uniqueId: string) => {
   await removeOverlayContainer(uniqueId);
 };
 
-/** @deprecated: import { appendOverlayContainer } from `@onefootprint/core` */
 export const createOverlayContainer = (uniqueId: string): HTMLElement => {
   const id = getOverlayContainerId(uniqueId);
   const possibleContainer = document.getElementById(id);
@@ -75,7 +74,6 @@ export const createInlineContainer = (uniqueId: string, clientParentContainer: H
   return inlineContainer;
 };
 
-/** @deprecated: import { removeInlineContainer } from `@onefootprint/core` */
 const removeInlineContainer = (uniqueId: string) => {
   const id = getDomElementId(INLINE_CONTAINER_ID_PREFIX, uniqueId);
   const inlineContainer = document.getElementById(id);
@@ -84,7 +82,6 @@ const removeInlineContainer = (uniqueId: string) => {
   }
 };
 
-/** @deprecated: import { removeLoadingIndicator } from `@onefootprint/core` */
 export const removeLoader = (uniqueId: string) => {
   const id = getDomElementId(LOADING_INDICATOR_ID_PREFIX, uniqueId);
   const loader = document.getElementById(id);
@@ -93,14 +90,12 @@ export const removeLoader = (uniqueId: string) => {
   }
 };
 
-/** @deprecated: import { appendLoadingIndicator } from `@onefootprint/core` */
 export const createLoader = (container: HTMLElement, uniqueId: string) => {
   const id = getDomElementId(LOADING_INDICATOR_ID_PREFIX, uniqueId);
   const loadingIndicator = createLoadingIndicator(id);
   container.appendChild(loadingIndicator);
 };
 
-/** @deprecated: import { appendOverlay } from `@onefootprint/core` */
 export const createOverlay = (container: HTMLElement, uniqueId: string) => {
   document.body.classList.add(BODY_LOCKED_CLASS);
   const overlay = document.createElement('div');
@@ -111,7 +106,6 @@ export const createOverlay = (container: HTMLElement, uniqueId: string) => {
   return overlay;
 };
 
-/** @deprecated: import { createLoadingIndicator } from `@onefootprint/core` */
 const createLoadingIndicator = (id: string) => {
   const container = document.createElement('div');
   container.setAttribute('id', id);
@@ -131,7 +125,6 @@ const createLoadingIndicator = (id: string) => {
   return container;
 };
 
-// TODO we could make these transitions prettier
 export const showContainer = (id: string) => {
   const container = document.getElementById(getOverlayContainerId(id));
   if (container) {
@@ -146,4 +139,71 @@ export const hideContainer = (id: string) => {
     container.style.opacity = '0';
     container.style.display = 'none';
   }
+};
+
+export const createErrorModal = (container: HTMLElement) => {
+  const modalContainer = document.createElement('div');
+  modalContainer.classList.add('modal-error-container');
+  modalContainer.setAttribute('role', 'dialog');
+  modalContainer.setAttribute('aria-modal', 'true');
+  modalContainer.setAttribute('aria-label', 'Oops! Something’s not quite right.');
+
+  const modalContent = document.createElement('div');
+  modalContent.classList.add('modal-error');
+
+  // Close button
+  const closeButton = document.createElement('button');
+  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.classList.add('modal-error-close-button');
+
+  const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svgIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svgIcon.setAttribute('width', '20');
+  svgIcon.setAttribute('height', '20');
+  svgIcon.setAttribute('viewBox', '0 0 20 20');
+  svgIcon.setAttribute('fill', 'none');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M5 5L15 15M15 5L5 15');
+  path.setAttribute('stroke', 'black');
+  path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('stroke-linecap', 'round');
+  svgIcon.appendChild(path);
+  closeButton.appendChild(svgIcon);
+
+  // Icon
+  const contentIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  contentIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  contentIcon.setAttribute('width', '40');
+  contentIcon.setAttribute('height', '40');
+  contentIcon.setAttribute('viewBox', '0 0 40 40');
+  contentIcon.setAttribute('fill', 'none');
+  contentIcon.setAttribute('class', 'error-icon');
+
+  const contentIconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  contentIconPath.setAttribute(
+    'd',
+    'M25 15L15 25M25 25L15 15M35 20C35 28.2843 28.2843 35 20 35C11.7157 35 5 28.2843 5 20C5 11.7157 11.7157 5 20 5C28.2843 5 35 11.7157 35 20Z',
+  );
+  contentIconPath.setAttribute('stroke', 'black');
+  contentIconPath.setAttribute('stroke-width', '3.33333');
+  contentIconPath.setAttribute('stroke-linecap', 'round');
+  contentIconPath.setAttribute('stroke-linejoin', 'round');
+  contentIcon.appendChild(contentIconPath);
+
+  // Texts
+  const heading = document.createElement('h2');
+  heading.textContent = 'Oops! Something’s not quite right.';
+
+  const paragraph = document.createElement('p');
+  paragraph.textContent =
+    'It looks like there was an issue loading the page. Try reloading and we’ll get things back on track.';
+
+  modalContent.appendChild(closeButton);
+  modalContent.appendChild(contentIcon);
+  modalContent.appendChild(heading);
+  modalContent.appendChild(paragraph);
+  modalContainer.appendChild(modalContent);
+
+  container.appendChild(modalContainer);
 };

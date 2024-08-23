@@ -4233,10 +4233,10 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
-"@onefootprint/postmate@2.1.0":
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/@onefootprint/postmate/-/postmate-2.1.0.tgz"
-  integrity sha512-XMofyVGx424NaAWbW5Np/yjQZo2eX4/r4Y2F4ON/Y5O7nt69g3WaO95SBBjrWNLNNZgLeUb/DjKg00DUV72NSw==
+"@onefootprint/postmate@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@onefootprint/postmate/-/postmate-2.1.1.tgz#8f6fd94166a8bfa7294c1591ab2611d52bde284d"
+  integrity sha512-fgh27JS7oe1GWrgbkMYFZTYeMDcyQsrpRD0cj/dRbflg2BM02iHkImWTX510oZ4fjrpViKnARxW7jif6u0oXoA==
 
 "@open-draft/deferred-promise@^2.2.0":
   version "2.2.0"

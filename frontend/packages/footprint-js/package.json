@@ -25,7 +25,7 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@onefootprint/postmate": "2.1.0"
+    "@onefootprint/postmate": "2.1.1"
   },
   "devDependencies": {
     "bun-types": "^1.0.25",

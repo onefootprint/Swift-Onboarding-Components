@@ -37,7 +37,7 @@
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 50000;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,7 +82,7 @@
   width: 100%;
   top: 0;
   right: 0;
-  z-index: 50001;
+  z-index: 10010;
   border: none;
 }
 
@@ -163,4 +163,84 @@
 .footprint-verify-button svg,
 .footprint-auth-button svg {
   margin-right: 8px;
+}
+
+.fp-hide {
+  display: none;
+}
+
+.modal-error-container {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1100;
+}
+
+.modal-error {
+  align-items: center;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0px 1px 12px 0px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  padding: 40px 32px;
+  position: relative;
+  text-align: center;
+  width: 480px;
+  height: 260px; 
+}
+
+@media only screen and (max-width: 768px) {
+  .modal-error {
+    height: 100vh;
+    border-radius: initial;
+  }
+}
+
+.modal-error-close-button {
+  align-items: center;
+  background: #FFF;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  left: 12px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 12px;
+  width: 32px;
+}
+
+.modal-error-close-button:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)), linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255))
+}
+
+.modal-error .error-icon {
+  margin-bottom: 8px;
+}
+
+.modal-error h2 {
+  color: #000000;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.modal-error p {
+  color: #2D2D2D;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
 }

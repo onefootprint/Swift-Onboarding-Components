@@ -5,6 +5,7 @@ import type { FormRef, Props } from '../../types/components';
 import { ComponentKind } from '../../types/components';
 import { PrivateEvent, PublicEvent } from '../../types/events';
 import {
+  createErrorModal,
   createInlineContainer,
   createLoader,
   createOverlay,
@@ -78,6 +79,7 @@ const initIframe = (rawProps: Props): Iframe => {
   const setLoading = (container: HTMLElement, isLoading: boolean) => {
     if (!isLoading) {
       removeLoader(initId);
+      parentApi?.frame.classList.remove('fp-hide');
       parentApi?.frame.classList.remove(`footprint-${variant}-loading`);
       parentApi?.frame.classList.add(`footprint-${variant}-loaded`);
       return;
@@ -151,7 +153,7 @@ const initIframe = (rawProps: Props): Iframe => {
     const url = getURL(props, sdkArgsToken || '');
     try {
       parentApi = await new Postmate({
-        classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
+        classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`, 'fp-hide'],
         container,
         name: `footprint-iframe-${initId}`,
         url,
@@ -164,7 +166,8 @@ const initIframe = (rawProps: Props): Iframe => {
         },
       });
     } catch (e) {
-      handleError(`Initializing iframe failed with error ${e}`, true);
+      createErrorModal(container);
+      handleError(`Initializing iframe failed with error ${e}`);
       return;
     }
 
