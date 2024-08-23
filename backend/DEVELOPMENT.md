@@ -301,11 +301,11 @@ We use our own [fork of paperclip](https://github.com/onefootprint/paperclip) to
 - Our internal, dashboard-facing API reference: [docs.onefootprint.com/internal-api/dashboard](https://docs.onefootprint.com/internal-api/dashboard)
 - Our internal, bifrost-facing API reference: [docs.onefootprint.com/internal-api/hosted](https://docs.onefootprint.com/internal-api/hosted)
 
-We're still working on improving our hygiene for API documentation for internal-facing APIs. But we do enforce good hygiene on tenant-facing APIs: if tenants can hit the API via API key, it should be documented.
+We're still working on improving our hygiene for API documentation for internal-facing APIs since our frontend team often uses the internal API reference pages when developing against our backend. But we do enforce good hygiene on tenant-facing APIs: if tenants can hit the API via API key, it should be documented.
 
 ### Making changes to APIs
 
-When you've made changes to an API, you should run the following script (from the `backend` directory). You may need some python dependencies, in which case it's useful to reuse the virtual env you set up [for integration tests](#running-integration-tests).
+When you've made changes to an API (whether internal or external), you should run the following script (from the `backend` directory). You may need some python dependencies, in which case it's useful to reuse the virtual env you set up [for integration tests](#running-integration-tests).
 
 ```
 MONOREPO_DIR=../ python ci/scripts/update_open_api.py
