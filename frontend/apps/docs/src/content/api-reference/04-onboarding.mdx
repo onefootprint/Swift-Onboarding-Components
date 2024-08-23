@@ -14,8 +14,13 @@ apis:
       The decision issued by the rules configured on your playbook will be returned inline. In rare cases where we are waiting on an asynchronous result from vendors, you will receive a status of `pending` from this API and the final decision will be delivered via webhook.
   - method: post
     path: /onboarding/session
-    title: Create a short-lived onboarding token
-    description: When you have bootstrap data available on your backend, generates a short-lived token that can be passed into the Footprint SDK to represent all data.
+    title: Create an onboarding session token
+    description: |
+      Allows you to bootstrap information into the frontend SDK using data that is readily available on your backend.
+      <br><br>
+      For example, if you have already collected existing user information on your backend and don't already have an existing `fp_id` for the user, you may create an onboarding session token to bootstrap the interactive onboarding flow with the user's information that you've already collected.
+      <br><br>
+      The `token` returned from this API should be passed into the `authToken` parameter of the Footprint SDK.
   - method: post
     path: /users/{fp_id}/decisions
     title: Create a manual decision for a user

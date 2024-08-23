@@ -5041,17 +5041,14 @@
                             "id.first_name": "Jane",
                             "id.last_name": "Doe"
                         },
-                        "description": "Optionally, any bootstrap data that you would like to pass into the onboarding flow.",
+                        "description": "Optionally, any user or business bootstrap data that you would like to pass into the\n onboarding flow.\n For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).",
                         "type": "object"
                     },
                     "key": {
                         "description": "Optionally, the playbook key that should be used for the onboarding.",
                         "type": "string"
                     }
-                },
-                "required": [
-                    "bootstrap_data"
-                ]
+                }
             },
             "CreateOnboardingSessionResponse": {
                 "type": "object",

@@ -124,7 +124,7 @@ deadpool = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118
 
 actix-web = "4.3.1"
 
-paperclip = { git = "https://github.com/onefootprint/paperclip", rev = "6293e2ded4c419f46b7729de2f5aecdae355f922", features = [
+paperclip = { git = "https://github.com/onefootprint/paperclip", rev = "f08316ef789f66c0750cd081231b23b4472f6581", features = [
     "actix4",
     "actix4-validator",
     "actix-multipart",

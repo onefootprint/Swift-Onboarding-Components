@@ -24,10 +24,11 @@ use paperclip::actix::Apiv2Schema;
 pub struct CreateOnboardingSessionRequest {
     /// Optionally, the playbook key that should be used for the onboarding.
     pub key: Option<ObConfigurationKey>,
-    /// Optionally, any bootstrap data that you would like to pass into the onboarding flow.
+    /// Optionally, any user or business bootstrap data that you would like to pass into the
+    /// onboarding flow.
+    /// For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).
     #[serde(default)]
     #[openapi(example = r#"{"id.first_name": "Jane", "id.last_name": "Doe"}"#)]
-    // TODO this should be optional
     #[openapi(optional)]
     pub bootstrap_data: UserDataV1,
 }
