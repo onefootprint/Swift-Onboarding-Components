@@ -21,6 +21,7 @@ ARG E2E_OB_KYC_ES ob_test_yHlPBcaJ6lnxwkkD1YLStx
 ARG E2E_OB_KYC_ITIN pb_test_84lqIB3DpsQUKgEQhAKGEt
 ARG E2E_OB_KYC_LEGAL_STATUS pb_test_jaZzYsm4aSPSY4YfH0qe7T
 ARG E2E_OB_KYC_NO_PHONE ob_test_h9Qp2W3Trk1pfIoI7dTD5q
+ARG E2E_YIELDSTREET pb_test_bH2tmxMPBCI8Gujjb90P3d
 
 ENV CI true
 ENV PATH /e2e/node_modules/.bin:$PATH
@@ -45,9 +46,10 @@ ENV E2E_OB_KYC_ITIN $E2E_OB_KYC_ITIN
 ENV E2E_OB_KYC_LEGAL_STATUS $E2E_OB_KYC_LEGAL_STATUS
 ENV E2E_OB_KYC_NO_PHONE $E2E_OB_KYC_NO_PHONE
 ENV E2E_UPDATE_UTOKEN $E2E_UPDATE_UTOKEN 
+ENV E2E_YIELDSTREET $E2E_YIELDSTREET 
 
 COPY --link ./packages/e2e /e2e
 
 RUN yarn install --pure-lockfile --link-duplicates
 
-CMD npx playwright test --workers=12 -g "#ci"
+CMD npx playwright test --workers=16 -g "#ci"

@@ -32,7 +32,7 @@ const onComplete = (token: string) => {
 
 const VerifyDemo = () => {
   const router = useRouter();
-  const { appUrl, bootstrapData, locale, publicKey } = getVerifyArgs(getQueryArgs(router));
+  const { appUrl, authToken, bootstrapData, locale, publicKey } = getVerifyArgs(getQueryArgs(router));
 
   const handleVerifyClick = () => {
     const component = fakeSdk.init({
@@ -44,7 +44,7 @@ const VerifyDemo = () => {
       onClose: () => console.log(`${FootprintComponentKind.Verify} onClose`),
       onComplete,
       options: { showLogo: false },
-      publicKey,
+      ...(authToken ? { authToken } : { publicKey }),
       variant: 'modal',
     });
     component.render(appUrl);
