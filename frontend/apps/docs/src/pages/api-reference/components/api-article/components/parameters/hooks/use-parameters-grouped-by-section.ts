@@ -6,12 +6,10 @@ const filterByIn = (parameters: ParameterProps[], inValue: string) =>
 const createSchema = (parameter: ParameterProps[], inValue: string): ContentSchemaNoRef => {
   const params = filterByIn(parameter, inValue);
   const properties: Record<string, ContentSchemaNoRef> = {};
-  const requiredForSchema: string[] = [];
+  const requiredForSchema: string[] = params.filter(param => param.required).map(param => param.name);
   params.forEach(param => {
-    if (param.required) requiredForSchema.push(param.name);
     properties[param.name] = {
       ...param.schema,
-      isRequired: param.required || false,
       description: param.description,
     };
   });

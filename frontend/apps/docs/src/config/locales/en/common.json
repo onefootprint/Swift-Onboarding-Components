@@ -212,7 +212,7 @@
       "path-parameters": "Path parameters",
       "query-parameters": "Query parameters",
       "header-parameters": "Headers",
-      "request-body": "Body",
+      "body": "Body",
       "response": "Response",
       "examples": "Examples",
       "response-example": "Response example",

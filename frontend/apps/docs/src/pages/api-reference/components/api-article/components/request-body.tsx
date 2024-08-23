@@ -19,7 +19,7 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
     <Stack direction="column" gap={2}>
       <Stack gap={2} alignItems="center">
         <Text variant="label-1" color="secondary">
-          {t('request-body')}
+          {t('body')}
         </Text>
         {isOptional && (
           <>

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { ContentSchemaNoRef, RequestOrResponse } from 'src/pages/api-reference/api-reference.types';
 
 import Description from './description';
+import ResponseHeaders from './response-headers';
 import Schema from './schema';
 
 export type ResponsesProps = {
@@ -24,13 +25,25 @@ const Responses = ({ responses }: ResponsesProps) => {
   if (!response) {
     return;
   }
+
+  const hasHeaders = Object.keys(response.headers || {}).length;
+
   return (
-    <Stack direction="column" gap={3}>
-      <Text variant="heading-3">{t('response')}</Text>
-      {response.content.description && <Description>{response.content.description}</Description>}
-      <Box marginLeft={3}>
-        <Schema schema={response.content} isInBrackets />
-      </Box>
+    <Stack direction="column" gap={5}>
+      <Stack direction="column" gap={4}>
+        <Text variant="heading-3">{t('response')}</Text>
+        {/* Add a body header when we're rendering both a body and headers */}
+        {hasHeaders ? (
+          <Text variant="label-1" color="secondary">
+            {t('body')}
+          </Text>
+        ) : null}
+        {response.content.description && <Description>{response.content.description}</Description>}
+        <Box marginLeft={3}>
+          <Schema schema={response.content} isInBrackets />
+        </Box>
+      </Stack>
+      <ResponseHeaders headers={response.headers} />
     </Stack>
   );
 };

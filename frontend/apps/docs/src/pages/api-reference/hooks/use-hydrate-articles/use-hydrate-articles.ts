@@ -37,15 +37,6 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
 
   const articles = getArticles(rawArticles);
 
-  const hydrateRequestOrResponse = (r: RequestOrResponse): RequestOrResponse<ContentSchemaNoRef> => {
-    const { content, ...restOfR } = r;
-    const schemaRef = content['application/json'].schema;
-    return {
-      content: hydrateSchema(schemaRef),
-      ...restOfR,
-    };
-  };
-
   return articles.map(article => {
     const hasTag = (tag: string) => article.tags?.includes(tag) || false;
 
@@ -62,6 +53,19 @@ const useHydrateArticles = (rawArticles: Record<string, unknown>): HydratedApiAr
     const tag = Object.values(ArticleTag).filter(t => hasTag(t))[0];
     const requiredPreviewGate: TenantPreviewApi | undefined = requiredPreviewGates[0];
     let canAccessApi = canAccessPreviewApi(requiredPreviewGate);
+
+    const hydrateRequestOrResponse = (r: RequestOrResponse): RequestOrResponse<ContentSchemaNoRef> => {
+      const { content, headers: rawHeaders, ...restOfR } = r;
+      const schemaRef = content['application/json'].schema;
+      const headers = Object.fromEntries(
+        Object.entries(rawHeaders || {}).filter(([_, header]) => canAccessPreviewApi(header.x_fp_preview_gate)),
+      );
+      return {
+        content: hydrateSchema(schemaRef),
+        headers,
+        ...restOfR,
+      };
+    };
 
     if (hasTag('ClientVaulting')) {
       // Client-vaulting APIs have some custom visibility logic.
