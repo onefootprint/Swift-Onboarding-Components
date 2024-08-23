@@ -39,7 +39,7 @@ pub struct CreateOnboardingSessionResponse {
     /// data provided.
     /// NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.
     #[openapi(example = "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
-    pub session_token: SessionAuthToken,
+    pub token: SessionAuthToken,
     pub expires_at: DateTime<Utc>,
 }
 
@@ -56,7 +56,7 @@ pub async fn post(
     let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
 
     let sealing_key = state.session_sealing_key.clone();
-    let (session_token, session) = state
+    let (token, session) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             if let Some(key) = key.clone() {
@@ -71,7 +71,7 @@ pub async fn post(
         .await?;
 
     Ok(CreateOnboardingSessionResponse {
-        session_token,
+        token,
         expires_at: session.expires_at,
     })
 }

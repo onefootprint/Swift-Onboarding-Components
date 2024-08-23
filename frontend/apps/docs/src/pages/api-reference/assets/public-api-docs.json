@@ -5060,7 +5060,7 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "session_token": {
+                    "token": {
                         "example": "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "description": "A short-lived onboarding session token that can be passed into the frontend SDK as an\n `authToken`. This token contains all information on the provided public key and/or bootstrap\n data provided.\n NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.",
                         "type": "string"
@@ -5068,7 +5068,7 @@
                 },
                 "required": [
                     "expires_at",
-                    "session_token"
+                    "token"
                 ]
             },
             "CreateTagRequest": {
