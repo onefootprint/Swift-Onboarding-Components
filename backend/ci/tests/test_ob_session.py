@@ -24,7 +24,7 @@ def test_onboarding_token(sandbox_tenant):
     ]
     for data in TESTS:
         body = post("onboarding/session", data, sandbox_tenant.s_sk)
-        token = ObToken(body["session_token"])
+        token = ObToken(body["token"])
         body = get("hosted/onboarding/session", None, token)
         assert body["key"] == data.get("key", None)
         assert body["bootstrap_data"] == data.get("bootstrap_data", {})
