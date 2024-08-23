@@ -22,7 +22,7 @@
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
-    "@onefootprint/footprint-react": "7.0.0-beta.10",
+    "@onefootprint/footprint-react": "7.0.0",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",

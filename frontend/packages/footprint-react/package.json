@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react",
   "private": false,
   "type": "module",
-  "version": "7.0.0-beta.10",
+  "version": "7.0.0",
   "main": "./dist/footprint-react.cjs",
   "module": "./dist/footprint-react.js",
   "unpkg": "./dist/footprint-react.js",
@@ -10,7 +10,9 @@
   "style": "./dist/footprint-react.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -48,7 +50,7 @@
     "react-i18next": "^14.1.0"
   },
   "peerDependencies": {
-    "@onefootprint/footprint-js": "> 3.12.0",
+    "@onefootprint/footprint-js": ">3.13.0",
     "react": "17 - 18",
     "react-dom": "17 - 18"
   },

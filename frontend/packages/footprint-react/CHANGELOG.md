@@ -1,5 +1,12 @@
 # @onefootprint/footprint-react
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [7012d9e9da]
+  - @onefootprint/footprint-js@3.13.0
+
 ## 7.0.0-beta.0
 
 ### Patch Changes
@@ -171,10 +178,10 @@
 
   ```js
   const userData = {
-    'id.email': 'jane.doe@acme.com',
-    'id.phone_number': '+12025550179',
+    "id.email": "jane.doe@acme.com",
+    "id.phone_number": "+12025550179",
     //...and so on for the rest of the data.
-    'id.nationality': 'US',
+    "id.nationality": "US",
   };
   ```
 

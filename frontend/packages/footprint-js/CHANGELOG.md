@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.13.0
+
+### Minor Changes
+
+- 7012d9e9da: Handle when iframe does not load
+
 ## 3.12.2
 
 ### Patch Changes
