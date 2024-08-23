@@ -16,11 +16,11 @@ receivers:
   prometheus:
     config:
       scrape_configs:
-        - job_name: 'prometheus-metrics'
+        - job_name: "prometheus-metrics"
           scrape_interval: 60s
-          metrics_path: '/${API_SERVER_METRICS_ENDPOINT_PATH}'
+          metrics_path: "/${API_SERVER_METRICS_ENDPOINT_PATH}"
           static_configs:
-            - targets: ['${API_SERVER_TARGET}']
+            - targets: ["${API_SERVER_TARGET}"]
 
 processors:
   memory_limiter:
@@ -56,46 +56,37 @@ processors:
     actions:
       - key: service.name
         action: upsert
-        value: '${DD_SERVICE}'
+        value: "${DD_SERVICE}"
 
 exporters:
-  otlphttp:
-    endpoint: 'https://collect.observeinc.com/v1/otel'
-    headers:
-      'Authorization': 'Bearer 189225732777 ds1BDO1OhDoXvlDOv6aY:9o_nM2E4K83AJuNMWkIKoRaEBlOaWFZr'
-
   otlp/honeycomb:
-    endpoint: 'api.honeycomb.io:443'
+    endpoint: "api.honeycomb.io:443"
     headers:
-      'x-honeycomb-team': '${HONEYCOMB_API_KEY}'
-      'x-honeycomb-dataset': 'fpc-otel'
+      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
+      "x-honeycomb-dataset": "fpc-otel"
 
   otlp/honeycombprom:
-    endpoint: 'api.honeycomb.io:443'
+    endpoint: "api.honeycomb.io:443"
     headers:
-      'x-honeycomb-team': '${HONEYCOMB_API_KEY}'
-      'x-honeycomb-dataset': 'fpc-prometheus'
+      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
+      "x-honeycomb-dataset": "fpc-prometheus"
 
   otlp/honeycombaws:
-    endpoint: 'api.honeycomb.io:443'
+    endpoint: "api.honeycomb.io:443"
     headers:
-      'x-honeycomb-team': '${HONEYCOMB_API_KEY}'
-      'x-honeycomb-dataset': 'fpc-aws-otel'
+      "x-honeycomb-team": "${HONEYCOMB_API_KEY}"
+      "x-honeycomb-dataset": "fpc-aws-otel"
 
   otlp/datadog:
     # Exporting to the Datdog agent's OTLP receiver. This makes it easier to
     # switch to the Datadog agent directly.
-    endpoint: 'http://127.0.0.1:${DD_OTEL_PORT}'
+    endpoint: "http://127.0.0.1:${DD_OTEL_PORT}"
     tls:
       # Connecting to local agent.
       insecure: true
 
 service:
   pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [memory_limiter, batch/traces]
-      exporters: [otlphttp]
     metrics/application:
       receivers: [otlp, prometheus]
       processors: [memory_limiter]
