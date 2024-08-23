@@ -297,9 +297,9 @@ TEST_URL="http://localhost:8000" pytest -x ci/tests
 ## Maintaining the Footprint docs site
 We use our own [fork of paperclip](https://github.com/onefootprint/paperclip) to generate open API specs from the API request and response structs used in our code. Our open API spec is divided by [`update_open_api.py`](./ci/scripts/update_open_api.py) into into three different JSON files that correspond to our three API reference pages:
 
-- Our external, tenant-facing API reference: [docs.onefootprint.com/api-reference](docs.onefootprint.com/api-reference)
-- Our internal, dashboard-facing API reference: [docs.onefootprint.com/internal-api/dashboard](docs.onefootprint.com/internal-api/dashboard)
-- Our internal, bifrost-facing API reference: [docs.onefootprint.com/internal-api/hosted](docs.onefootprint.com/internal-api/hosted)
+- Our external, tenant-facing API reference: [docs.onefootprint.com/api-reference](https://docs.onefootprint.com/api-reference)
+- Our internal, dashboard-facing API reference: [docs.onefootprint.com/internal-api/dashboard](https://docs.onefootprint.com/internal-api/dashboard)
+- Our internal, bifrost-facing API reference: [docs.onefootprint.com/internal-api/hosted](https://docs.onefootprint.com/internal-api/hosted)
 
 We're still working on improving our hygiene for API documentation for internal-facing APIs. But we do enforce good hygiene on tenant-facing APIs: if tenants can hit the API via API key, it should be documented.
 
