@@ -49,7 +49,7 @@ async fn post(
         // Don't make this a transaction since we return errors from here but still want to save
         // the session in the database
         .db_query(move |conn| -> FpResult<_> {
-            let duration = Duration::minutes(15);
+            let duration = Duration::hours(1);
             let err = data.validate();
             let obc = data.ob_config(conn);
             if let Ok(Some((obc, _, _, _))) = &obc {
