@@ -170,10 +170,6 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const render = async () => {
-    // this will clean up the iframe if it was already rendered.
-    // This is specially useful when the user clicks on the "X" button of the error modal
-    await destroy();
-
     if (isRendered) {
       logWarn(SdkKindByComponentKind[props.kind], 'Footprint component is already rendered');
       return;
@@ -204,6 +200,7 @@ const initIframe = (rawProps: Props): Iframe => {
       registerCallbackProps();
     } catch (_) {
       createErrorModal(container);
+      isRendered = false;
     }
 
     parentApi?.on(started, () => setUpFormRefs());
