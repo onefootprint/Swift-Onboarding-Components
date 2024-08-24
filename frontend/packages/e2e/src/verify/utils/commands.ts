@@ -224,6 +224,7 @@ export const confirmData = async (
   payload: {
     firstName: string;
     lastName: string;
+    email?: string;
     dob: string;
     addressLine1: string;
     addressLine2?: string;
@@ -242,6 +243,9 @@ export const confirmData = async (
   await expect(parent.getByText(payload.firstName).first()).toBeAttached();
   await expect(parent.getByText(payload.lastName).first()).toBeAttached();
   await expect(parent.getByText(payload.dob).first()).toBeAttached();
+  if (payload.email) {
+    await expect(parent.getByText(payload.email).first()).toBeAttached();
+  }
   await expect(parent.getByText(payload.addressLine1).first()).toBeAttached();
   if (payload.addressLine2) {
     await expect(parent.getByText(payload.addressLine2).first()).toBeAttached();

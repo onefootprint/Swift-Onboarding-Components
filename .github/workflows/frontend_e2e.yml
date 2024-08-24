@@ -57,6 +57,7 @@ jobs:
             --build-arg TURBO_TOKEN=${{ secrets.TURBO_TOKEN }} \
             --build-arg E2E_ACME_SECRET_API_KEY_DEV=${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }} \
             --build-arg E2E_ACME_SECRET_API_KEY_PROD=${{ secrets.E2E_ACME_SECRET_API_KEY_PROD }} \
+            --build-arg E2E_SECRET_API_KEY_DEV=${{ secrets.E2E_SECRET_API_KEY_DEV }} \
             --build-arg E2E_UPDATE_UTOKEN=${{ env.E2E_UPDATE_UTOKEN }} \
           && docker compose up --abort-on-container-exit --attach-dependencies --exit-code-from tester
 
