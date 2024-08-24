@@ -81,8 +81,6 @@ on:
         required: true
       PULUMI_CLOUD_URL:
         required: true
-      AIRPLANE_API_KEY:
-        required: true
       IMG_CACHE_AWS_ACCESS_KEY_ID:
         required: true
       IMG_CACHE_AWS_SECRET_ACCESS_KEY:
