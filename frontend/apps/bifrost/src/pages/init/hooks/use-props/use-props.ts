@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useGetSdkArgs from '../hooks/use-get-sdk-args';
+import useMergeOnboardingSession from '../hooks/use-merge-onboarding-session';
 import getMobilePropsFromUrl from './utils/get-mobile-props-from-url';
 import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 
@@ -17,7 +18,12 @@ import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 // TODO: delete when all customers migrate to v3.8.0+
 export const POST_MESSAGE_TIMEOUT = 1000;
 
-const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void, onError?: (error: unknown) => void) => {
+export type UsePropsProps = {
+  onSuccess: (props: FootprintVerifyDataProps) => void;
+  onError: (error: unknown) => void;
+};
+
+const useProps = ({ onSuccess, onError }: UsePropsProps) => {
   // For legacy web SDKs that only pass args via postMessage
   // TODO: delete when all customers migrate to v3.8.0+
   const fpProvider = useFootprintProvider();
@@ -27,6 +33,7 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void, onError?
   const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
   const sdkArgsQuery = useGetSdkArgs(sdkArgsToken, fpProvider);
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
+  const mergeOnboardingSession = useMergeOnboardingSession();
 
   const complete = (props: FootprintVerifyDataProps) => {
     // If already received props, ignore
@@ -51,12 +58,10 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void, onError?
       return noop;
     }
 
-    if (onError) {
-      if (sdkArgsQuery.error) {
-        onError(sdkArgsQuery.error);
-      } else if (hasInvalidHashFragment(router.asPath)) {
-        onError(new TypeError('Invalid URL fragment'));
-      }
+    if (sdkArgsQuery.error) {
+      onError(sdkArgsQuery.error);
+    } else if (hasInvalidHashFragment(router.asPath)) {
+      onError(new TypeError('Invalid URL fragment'));
     }
 
     // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)
@@ -65,7 +70,9 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void, onError?
       const {
         args: { data },
       } = sdkArgsData;
-      complete(data);
+      mergeOnboardingSession(data)
+        .then(mergedData => complete(mergedData))
+        .catch(onError);
       return noop;
     }
 

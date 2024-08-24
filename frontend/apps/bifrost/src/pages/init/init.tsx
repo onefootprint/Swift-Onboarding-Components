@@ -94,8 +94,8 @@ const Init = () => {
     },
   );
 
-  useProps(
-    (props: FootprintVerifyDataProps) => {
+  useProps({
+    onSuccess: (props: FootprintVerifyDataProps) => {
       if (isPropsSaved(state.context)) return;
 
       const {
@@ -111,7 +111,8 @@ const Init = () => {
       send({
         type: 'initContextUpdated',
         payload: {
-          authToken /** userData deprecated after 3.11.0 */,
+          authToken,
+          /** userData deprecated after 3.11.0 */
           bootstrapData: (props?.bootstrapData || props?.userData || {}) as IdvBootstrapData,
           isComponentsSdk,
           l10n,
@@ -123,7 +124,8 @@ const Init = () => {
         },
       });
     },
-    (error: unknown) => {
+    onError: (error: unknown) => {
+      console.error(error);
       const errorCode = getErrorCode(error);
       if (errorCode === 'E118') {
         send({ type: 'sessionExpired' });
@@ -132,7 +134,7 @@ const Init = () => {
 
       send({ type: 'initError' });
     },
-  );
+  });
 
   return <InitShimmer />;
 };
