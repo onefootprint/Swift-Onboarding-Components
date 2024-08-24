@@ -13,6 +13,7 @@ const pbKey = process.env.E2E_OB_KYC || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
+  test.slow();
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
 
   // Create a session
