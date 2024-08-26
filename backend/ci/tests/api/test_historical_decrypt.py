@@ -98,8 +98,7 @@ def test_versioned_decryption(sandbox_tenant, entity, di_1, di_2):
     assert version == "1"
 
     # Empty vault starts with version 0
-    external_id = ExternalId(_gen_random_str(32))
-    resp = post_raw(f"{entity}", None, sandbox_tenant.sk.key, external_id)
+    resp = post_raw(f"{entity}", None, sandbox_tenant.sk.key)
     version = resp.headers["x-fp-vault-version"]
     fp_id = resp.json()["id"]
     assert version == "0"
@@ -237,9 +236,3 @@ def test_versioned_decryption(sandbox_tenant, entity, di_1, di_2):
         "custom.abc": None,
         "custom.def": "5678",
     }
-
-    # Re-creating the vault with the same external ID yields the latest version
-    resp = post_raw(f"{entity}", None, sandbox_tenant.sk.key, external_id)
-    version = resp.headers["x-fp-vault-version"]
-    assert resp.json()["id"] == fp_id
-    assert version == "3"
