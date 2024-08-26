@@ -46,10 +46,9 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
     <Container>
       <DropdownHeader onClick={toggleDropdown} selected={selected}>
         <Element key={text} asChild>
-          {/* we initially want to navigate to /business-profile vs. settings itself */}
-          <NavLink badgeCount={badgeCount} href={subLinks[0].href} icon={icon} selected={selected} text={text} />
+          <NavLink badgeCount={badgeCount} icon={icon} selected={selected} text={text} href={href} />
         </Element>
-        <ChevronIcon isOpen={isOpen} />
+        <ChevronIcon isOpen={isOpen} color={isOpen ? 'primary' : 'tertiary'} />
       </DropdownHeader>
       <AnimatePresence>
         {isOpen && (
