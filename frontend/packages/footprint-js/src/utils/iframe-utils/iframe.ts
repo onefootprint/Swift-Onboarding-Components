@@ -150,17 +150,13 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const initIframe = async (container: HTMLElement, { url, fallbackUrl }: ReturnType<typeof getURL>) => {
-    setLoading(container, true);
-
     const response = await initializePostmate(container, url);
 
     if (response.success) {
-      setLoading(container, false);
       return response.parentApi;
     }
 
     const responseFallback = await initializePostmate(container, fallbackUrl);
-    setLoading(container, false);
 
     if (!responseFallback.success) {
       throw new Error('Failed to initialize iframe');
@@ -187,9 +183,12 @@ const initIframe = (rawProps: Props): Iframe => {
       container.innerHTML = '';
     }
 
+    setLoading(container, true);
+
     const sdkArgsToken = await sendSdkArgs(props);
     if (!sdkArgsToken) {
       handleError('Unable to get SDK args token.', true);
+      setLoading(container, false);
       return;
     }
 
@@ -202,6 +201,7 @@ const initIframe = (rawProps: Props): Iframe => {
       createErrorModal(container);
       isRendered = false;
     }
+    setLoading(container, false);
 
     parentApi?.on(started, () => setUpFormRefs());
     parentApi?.on(`${initId}:${started}`, setUpFormRefs);
