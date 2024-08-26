@@ -11,6 +11,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::ScopedVaultId;
 use newtypes::TagId;
+use newtypes::TagKind;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = scoped_vault_tag)]
@@ -21,7 +22,7 @@ pub struct ScopedVaultTag {
     pub created_seqno: DataLifetimeSeqno,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
     pub scoped_vault_id: ScopedVaultId,
-    pub kind: String,
+    pub kind: TagKind,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_by_actor: Option<DbActor>,
@@ -41,6 +42,16 @@ impl ScopedVaultTag {
     pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> Result<Vec<Self>, DbError> {
         let tags = scoped_vault_tag::table
             .filter(scoped_vault_tag::scoped_vault_id.eq(sv_id))
+            .filter(scoped_vault_tag::deactivated_seqno.is_null())
+            .order_by(scoped_vault_tag::created_at.asc())
+            .get_results(conn)?;
+        Ok(tags)
+    }
+
+    #[tracing::instrument("ScopedVaultTag::bulk_get_active", skip_all)]
+    pub fn bulk_get_active(conn: &mut PgConn, sv_ids: Vec<&ScopedVaultId>) -> Result<Vec<Self>, DbError> {
+        let tags = scoped_vault_tag::table
+            .filter(scoped_vault_tag::scoped_vault_id.eq_any(sv_ids))
             .filter(scoped_vault_tag::deactivated_seqno.is_null())
             .order_by(scoped_vault_tag::created_at.asc())
             .get_results(conn)?;

@@ -6,6 +6,7 @@ mod decisions;
 mod delete;
 mod detail;
 mod documents;
+mod duplicates;
 mod kyc;
 mod liveness;
 mod match_signals;
@@ -31,7 +32,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(auth_events::get)
         .service(detail::detail)
         .service(kyc::post)
-        .service(onboardings::get);
+        .service(onboardings::get)
+        .service(duplicates::get);
 
     delete::configure_delete_aliases(config);
 }

@@ -1,6 +1,8 @@
 use super::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::DbResult;
+use crate::NextPage;
+use crate::OffsetPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
@@ -280,5 +282,44 @@ impl Fingerprint {
             external,
         };
         Ok(res)
+    }
+
+    #[tracing::instrument("Fingerprint::get_internal_dupes", skip_all)]
+    pub fn get_internal_dupes(
+        conn: &mut PgConn,
+        sv: &ScopedVault,
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<Fingerprint>, NextPage)> {
+        let sh_datas = fingerprint::table
+            .filter(fingerprint::scoped_vault_id.eq(&sv.id))
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::is_hidden.eq(false))
+            .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
+            .filter(fingerprint::sh_data.is_not_null())
+            .select(fingerprint::sh_data.assume_not_null())
+            .get_results::<FingerprintData>(conn)?;
+
+        let q_dupes = fingerprint::table
+            .filter(fingerprint::sh_data.is_not_null())
+            .filter(fingerprint::sh_data.eq_any(&sh_datas))
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::is_hidden.eq(false))
+            .filter(fingerprint::is_live.eq(sv.is_live))
+            .filter(fingerprint::vault_id.ne(&sv.vault_id))
+            // TODO when we stop making unverified vaults after each signup challenge, remove this
+            // logic. It will be horribly slow
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::is_active.eq(true))
+            .select(fingerprint::all_columns);
+
+        let internal_matches = q_dupes
+            .clone()
+            .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
+            .offset(pagination.offset().unwrap_or_default())
+            .limit(pagination.limit())
+            .order_by(fingerprint::vault_id)
+            .get_results::<Self>(conn)?;
+
+        Ok(pagination.results(internal_matches))
     }
 }

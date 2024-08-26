@@ -45,6 +45,18 @@ impl ScopedVaultLabel {
         Ok(label)
     }
 
+    #[tracing::instrument("ScopedVaultLabel::bulk_get_active", skip_all)]
+    pub fn bulk_get_active(
+        conn: &mut PgConn,
+        sv_ids: Vec<&ScopedVaultId>,
+    ) -> DbResult<Vec<ScopedVaultLabel>> {
+        let labels = scoped_vault_label::table
+            .filter(scoped_vault_label::scoped_vault_id.eq_any(sv_ids))
+            .filter(scoped_vault_label::deactivated_seqno.is_null())
+            .get_results(conn)?;
+        Ok(labels)
+    }
+
     #[tracing::instrument("ScopedVaultLabel::get_bulk", skip_all)]
     pub fn get_bulk(conn: &mut PgConn, ids: Vec<LabelId>) -> DbResult<HashMap<LabelId, ScopedVaultLabel>> {
         let results = scoped_vault_label::table

@@ -70,6 +70,10 @@ pub enum PreviewApi {
     /// Not used to gate any access on the backend - the docs site uses this to hide client vaulting
     /// APIs
     ClientVaultingDocs,
+
+    // We don't want tenants being able to query duplicates without knowing their used case. While the
+    // duplicates API is in p0, we might want to keep this to tenants that absolutely need it.
+    ListDuplicateUsers,
 }
 
 impl_enum_string_diesel!(PreviewApi);
