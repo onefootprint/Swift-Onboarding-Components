@@ -1,7 +1,7 @@
 import { IdDI, OnboardingConfigStatus, type PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DIMetadata } from '../../../../../../types';
-import validateBootstrapData from './validate-bootstrap-data';
+import validateBootstrapData, { isBusinessOwnersValid } from './validate-bootstrap-data';
 
 const config: PublicOnboardingConfig = {
   isLive: true,
@@ -181,5 +181,66 @@ describe('validateBootstrapData', () => {
       [IdDI.state]: createDIMetadata('MA'),
       [IdDI.ssn9]: createDIMetadata('123-45-1234'),
     });
+  });
+});
+
+describe('isBusinessOwnersValid', () => {
+  it('should return false for empty owners array', () => {
+    expect(isBusinessOwnersValid([])).toBe(false);
+  });
+
+  it('should return false for empty owners', () => {
+    expect(isBusinessOwnersValid([{}])).toBe(false);
+  });
+
+  it('should return false for non-array owners', () => {
+    // @ts-expect-error: passing wrong type
+    expect(isBusinessOwnersValid('not an array')).toBe(false);
+  });
+
+  it('should return false for owners array with non-object elements', () => {
+    // @ts-expect-error: passing wrong type
+    expect(isBusinessOwnersValid([1, 2, 3])).toBe(false);
+  });
+
+  it('should return false for owners array with missing required fields', () => {
+    expect(isBusinessOwnersValid([{ first_name: 'John' }])).toBe(true);
+  });
+
+  it('should return false for owners array with invalid field values', () => {
+    // @ts-expect-error: passing number on first_name
+    expect(isBusinessOwnersValid([{ first_name: 123, last_name: 'Doe', email: 'invalid email' }])).toBe(false);
+  });
+
+  it('should return true for owners array with valid field values', () => {
+    expect(isBusinessOwnersValid([{ first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com' }])).toBe(true);
+  });
+
+  it('should convert the property names to snake_case and validate it', () => {
+    // @ts-expect-error: properties in camelCase
+    expect(isBusinessOwnersValid([{ firstName: 'John', lastName: 'Doe' }])).toBe(true);
+  });
+
+  it('should validate the entire list', () => {
+    expect(
+      isBusinessOwnersValid([
+        {
+          // @ts-expect-error: properties in camelCase
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john.doe@example.com',
+          ownershipStake: 0,
+          phoneNumber: '+4915206073699',
+        },
+        {
+          // @ts-expect-error: properties in camelCase
+          firstName: 'a',
+          lastName: 'c',
+          email: 'a@b.com',
+          ownershipStake: 100,
+          phoneNumber: '+4915206073999',
+        },
+      ]),
+    ).toBe(true);
   });
 });

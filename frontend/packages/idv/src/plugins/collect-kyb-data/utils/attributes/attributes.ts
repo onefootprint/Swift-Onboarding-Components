@@ -1,27 +1,63 @@
-import { BusinessDI, type BusinessDIData, CdoToAllDisMap, type DecryptUserResponse } from '@onefootprint/types';
+import {
+  BootstrapOnlyBusinessOwnersKey,
+  BusinessDI,
+  type BusinessDIData,
+  CdoToAllDisMap,
+  type DecryptUserResponse,
+} from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
+import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
+import type { BootstrapBusinessData } from '../../../../types';
 import { isStringValid } from '../../../../utils';
 import { BeneficialOwnerIdFields } from '../constants';
 import type { MachineContext } from '../state-machine/types';
 import { buildBeneficialOwner, getBoDi } from '../utils';
 
+type CustomBusinessDI = BusinessDI | typeof BootstrapOnlyBusinessOwnersKey;
+type BusinessOwners = BootstrapBusinessData[typeof BootstrapOnlyBusinessOwnersKey];
+
 export const BO_FIELDS: BusinessDI[] = [BusinessDI.beneficialOwners, BusinessDI.kycedBeneficialOwners];
 
-export const extractBootstrapBusinessDataValues = (obj: MachineContext['bootstrapBusinessData']): BusinessDIData =>
-  Object.fromEntries(
-    Object.entries(obj)
-      .filter(([_k, v]) => v.value != null)
+export const extractNonBoBootstrapValues = (filteredObj: MachineContext['bootstrapBusinessData']): BusinessDIData => {
+  const extendedBoFields = [...BO_FIELDS, BootstrapOnlyBusinessOwnersKey];
+
+  return Object.fromEntries(
+    Object.entries(filteredObj)
+      .filter(([k, v]) => v.value != null && !extendedBoFields.includes(k))
       .map(([k, v]) => [k, v.value] as const),
   );
+};
 
-export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineContext): BusinessDIData => {
-  /* Ignore when business owners kind are not missing */
-  const boDi = getBoDi(ctx?.kybRequirement?.missingAttributes);
+export const extractBoBootstrapValues = (ctx: MachineContext): BusinessDIData => {
+  const cdos = [...(ctx.kybRequirement.populatedAttributes || []), ...ctx.kybRequirement.missingAttributes];
+  const boDi = getBoDi(cdos);
+  const businessOwnersObj: BusinessOwners = ctx.bootstrapBusinessData[BootstrapOnlyBusinessOwnersKey];
+
   if (!boDi) return {};
 
-  /* Ignore when business owners kind are populated */
-  if (ctx?.data?.[boDi] != null) return {};
+  const fromKybBootstrap = {
+    [boDi]: businessOwnersObj?.value.map(owner => {
+      return Object.fromEntries(
+        Object.entries(owner)
+          .map(([key, value]) => {
+            if (key === 'firstName') return ['first_name', value] as const;
+            if (key === 'lastName') return ['last_name', value] as const;
+            if (key === 'ownershipStake') return ['ownership_stake', value] as const;
+
+            if (boDi === BusinessDI.kycedBeneficialOwners) {
+              if (key === 'email') return ['email', value] as const;
+              if (key === 'phoneNumber') return ['phone_number', value] as const;
+            }
+
+            return [undefined, undefined];
+          })
+          .filter(([_k, v]) => v != null),
+      );
+    }),
+  };
+
+  if (fromKybBootstrap?.[boDi] != null) return fromKybBootstrap;
 
   const userData: DecryptUserResponse = Object.fromEntries(
     Object.entries(ctx?.bootstrapUserData || {})
@@ -37,18 +73,23 @@ export const extractBusinessOwnerValuesFromBootstrapUserData = (ctx?: MachineCon
 };
 
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
-  const cdos = [...(ctx.kybRequirement.populatedAttributes || []), ...(ctx.kybRequirement.missingAttributes || [])];
-  const kybAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as BusinessDI[];
-  const filteredBootstrapBusinessData = pickBy(ctx.bootstrapBusinessData, (_, key) =>
-    kybAttributes.includes(key as BusinessDI),
-  );
+  const cdos = [...(ctx.kybRequirement.populatedAttributes || []), ...ctx.kybRequirement.missingAttributes];
+  const kybDiAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as CustomBusinessDI[];
 
-  // TODO i think some strange things will happen if the user data is bootstrapped AND the business.beneficial_owners is bootstrap
+  const filteredBootstrapBusinessData = pickBy(ctx.bootstrapBusinessData, (_, key) => {
+    const kybDiAttributesWithCustomBootstrap = kybDiAttributes.concat(BootstrapOnlyBusinessOwnersKey);
+    return kybDiAttributesWithCustomBootstrap.includes(key as CustomBusinessDI);
+  });
+
+  const nonBoValues = extractNonBoBootstrapValues(filteredBootstrapBusinessData);
+  const boValues = extractBoBootstrapValues(ctx);
+
   const initialData = /** This order is important */ {
-    ...extractBootstrapBusinessDataValues(filteredBootstrapBusinessData),
-    ...extractBusinessOwnerValuesFromBootstrapUserData(ctx),
+    ...nonBoValues,
+    ...boValues,
     ...ctx.data,
   };
+
   if (ctx.kybRequirement.hasLinkedBos) {
     // If BOs are linked via API already, we don't support working with them in IDV.
     BO_FIELDS.forEach(di => {
@@ -58,7 +99,8 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
       initialData[di] = undefined;
     });
   }
-  return initialData;
+
+  return omit(initialData, [BootstrapOnlyBusinessOwnersKey]);
 };
 
 const isMissingDataFromCollection = (ctx: MachineContext, cdos?: CollectedKybDataOption[]): boolean => {

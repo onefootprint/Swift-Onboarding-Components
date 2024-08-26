@@ -424,6 +424,7 @@ export {
   BusinessDI,
   CardDIField,
   CdoToAllDisMap,
+  BootstrapOnlyBusinessOwnersKey,
   ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
   CollectedDocumentDataOption,

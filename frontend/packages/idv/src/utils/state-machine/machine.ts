@@ -1,5 +1,5 @@
-import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth, OverallOutcome } from '@onefootprint/types';
-import { type BusinessDI, IdDI } from '@onefootprint/types';
+import type { BusinessDI, IdDocOutcome, IdvBootstrapData, ObConfigAuth, OverallOutcome } from '@onefootprint/types';
+import { BootstrapOnlyBusinessOwnersKey, IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks';
@@ -32,9 +32,11 @@ const getIdvMachineContext = (args: IdvMachineArgs): Readonly<MachineContext> =>
 
   if (bootstrapData) {
     for (const [key, value] of Object.entries(bootstrapData)) {
+      const checkedKey = key === 'businessOwners' ? BootstrapOnlyBusinessOwnersKey : (key as IdDI | BusinessDI);
+
       if (value) {
         // @ts-expect-error: Type 'any' is not assignable to type 'never'
-        obj[key as IdDI | BusinessDI] = { value, isBootstrap: true };
+        obj[checkedKey] = { value, isBootstrap: true };
       }
     }
   }

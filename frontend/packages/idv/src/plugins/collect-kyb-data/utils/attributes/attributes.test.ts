@@ -1,11 +1,16 @@
-import { BusinessDI, CollectedKybDataOption, IdDI, OnboardingRequirementKind } from '@onefootprint/types';
+import {
+  BusinessDI,
+  type CollectKybDataRequirement,
+  CollectedKybDataOption,
+  IdDI,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 
-import type { BusinessData } from 'src/types';
 import type { CommonIdvContext } from 'src/utils/state-machine';
 import type { MachineContext } from '../state-machine/types';
 import {
-  extractBootstrapBusinessDataValues,
-  extractBusinessOwnerValuesFromBootstrapUserData,
+  extractBoBootstrapValues,
+  extractNonBoBootstrapValues,
   getBusinessDataFromContext,
   isMissingAddressData,
   isMissingBasicData,
@@ -24,66 +29,120 @@ const idvContext = {
   authToken: 'string',
 } satisfies CommonIdvContext;
 
-describe('extractBootstrapBusinessDataValues', () => {
+const getKybRequirement = (
+  missing: CollectedKybDataOption[],
+  populated: CollectedKybDataOption[] = [],
+): CollectKybDataRequirement => {
+  return {
+    hasLinkedBos: false,
+    isMet: false,
+    kind: OnboardingRequirementKind.collectKybData,
+    missingAttributes: missing,
+    populatedAttributes: populated,
+  };
+};
+
+describe('extractNonBoBootstrapValues', () => {
   it('should return an empty object when the input is empty', () => {
-    const result = extractBootstrapBusinessDataValues({});
+    const result = extractNonBoBootstrapValues({});
     expect(result).toEqual({});
   });
 
-  it('should return an object with the correct keys and values when the input is not empty', () => {
+  it("should filter out 'business.beneficial_owners', 'business.kyced_beneficial_owners', 'business.owners'", () => {
     const input = {
-      [IdDI.firstName]: { value: 'John', isBootstrap: true },
-      [IdDI.lastName]: { value: 'Doe', isBootstrap: true },
-      [IdDI.email]: { value: 'john.doe@example.com', isBootstrap: true },
-    } as BusinessData;
+      'business.name': { value: 'Acme Bank Inc.', isBootstrap: true },
+      'business.dba': { value: 'Acme Bank', isBootstrap: true },
+      'business.tin': { value: '12-3456789', isBootstrap: true },
+      'business.website': { value: 'www.google.com', isBootstrap: true },
+      'business.phone_number': { value: '+12025550179', isBootstrap: true },
+      'business.corporation_type': { value: 'unknown', isBootstrap: true },
+      'business.address_line1': { value: '123 Main St', isBootstrap: true },
+      'business.address_line2': { value: 'Apt 123', isBootstrap: true },
+      'business.city': { value: 'Boston', isBootstrap: true },
+      'business.state': { value: 'MA', isBootstrap: true },
+      'business.zip': { value: '02117', isBootstrap: true },
+      'business.country': { value: 'US' as const, isBootstrap: true },
+      'business.owners': {
+        value: [
+          {
+            first_name: 'Owner',
+            last_name: 'Last',
+            email: 'owners@acme.com',
+            phone_number: '+12025550179',
+            ownership_stake: 50,
+          },
+        ],
+        isBootstrap: true,
+      },
+      'business.kyced_beneficial_owners': {
+        value: [
+          {
+            first_name: 'Owner',
+            last_name: 'Last',
+            email: 'owners@acme.com',
+            phone_number: '+12025550179',
+            ownership_stake: 50,
+          },
+        ],
+        isBootstrap: true,
+      },
+      'business.beneficial_owners': {
+        value: [
+          {
+            first_name: 'Owner',
+            last_name: 'Last',
+            email: 'owners@acme.com',
+            phone_number: '+12025550179',
+            ownership_stake: 50,
+          },
+        ],
+        isBootstrap: true,
+      },
+    };
 
-    const result = extractBootstrapBusinessDataValues(input);
+    const result = extractNonBoBootstrapValues(input);
     expect(result).toEqual({
-      [IdDI.firstName]: 'John',
-      [IdDI.lastName]: 'Doe',
-      [IdDI.email]: 'john.doe@example.com',
+      'business.address_line1': '123 Main St',
+      'business.address_line2': 'Apt 123',
+      'business.city': 'Boston',
+      'business.corporation_type': 'unknown',
+      'business.country': 'US',
+      'business.dba': 'Acme Bank',
+      'business.name': 'Acme Bank Inc.',
+      'business.phone_number': '+12025550179',
+      'business.state': 'MA',
+      'business.tin': '12-3456789',
+      'business.website': 'www.google.com',
+      'business.zip': '02117',
     });
   });
 
-  it('should ignore keys that have a null value', () => {
+  it('should filter out null and undefined values', () => {
     const input = {
-      [IdDI.firstName]: { value: 'John', isBootstrap: true },
-      [IdDI.lastName]: { value: 'Doe', isBootstrap: true },
-      [IdDI.email]: { value: null, isBootstrap: true },
-    } as BusinessData;
+      'business.name': { value: 'name', isBootstrap: true },
+      'business.dba': { value: undefined, isBootstrap: true },
+      'business.tin': { value: undefined, isBootstrap: true },
+      'business.website': { value: undefined, isBootstrap: true },
+      'business.phone_number': { value: undefined, isBootstrap: true },
+      'business.corporation_type': { value: undefined, isBootstrap: true },
+      'business.address_line1': { value: undefined, isBootstrap: true },
+      'business.address_line2': { value: undefined, isBootstrap: true },
+      'business.city': { value: undefined, isBootstrap: true },
+      'business.state': { value: undefined, isBootstrap: true },
+      'business.zip': { value: undefined, isBootstrap: true },
+      'business.country': { value: undefined, isBootstrap: true },
+    };
 
-    const result = extractBootstrapBusinessDataValues(input);
-    expect(result).toEqual({
-      [IdDI.firstName]: 'John',
-      [IdDI.lastName]: 'Doe',
-    });
-  });
-
-  it('should ignore keys that have an undefined value', () => {
-    const input = {
-      [IdDI.firstName]: { value: 'John', isBootstrap: true },
-      [IdDI.lastName]: { value: 'Doe', isBootstrap: true },
-      [IdDI.email]: { value: undefined, isBootstrap: true },
-    } as BusinessData;
-
-    const result = extractBootstrapBusinessDataValues(input);
-    expect(result).toEqual({
-      [IdDI.firstName]: 'John',
-      [IdDI.lastName]: 'Doe',
-    });
+    // @ts-expect-error: passing an invalid type intentionally
+    const result = extractNonBoBootstrapValues(input);
+    expect(result).toEqual({ 'business.name': 'name' });
   });
 });
 
 describe('getBusinessDataFromContext', () => {
   it('should build kyced_beneficial_owners from bootstrapUserData', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -101,13 +160,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should build business.beneficial_owners from bootstrapUserData', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -125,13 +178,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should respect the data already in the context', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -151,13 +198,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should merge bootstrapBusinessData and data properties', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.website],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
       idvContext: idvContext,
       bootstrapBusinessData: {
         'business.name': { value: 'Acme Inc', isBootstrap: true },
@@ -181,13 +222,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should not override data properties with bootstrapBusinessData', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.website],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
       idvContext: idvContext,
       bootstrapBusinessData: { 'business.name': { value: 'Bootstrapped name', isBootstrap: true } },
       bootstrapUserData: {},
@@ -200,13 +235,7 @@ describe('getBusinessDataFromContext', () => {
 
   it('should return an empty object when there is no data', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.website],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.name, CollectedKybDataOption.website]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -221,13 +250,7 @@ describe('getBusinessDataFromContext', () => {
 describe('isMissingRequiredData', () => {
   it('should return true when some required attributes are missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.name]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -241,13 +264,7 @@ describe('isMissingRequiredData', () => {
 
   it('should return false when some required attributes are present', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.name]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -261,17 +278,10 @@ describe('isMissingRequiredData', () => {
 
   it('should be true if TIN is missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.tin],
-        populatedAttributes: [
-          CollectedKybDataOption.name,
-          CollectedKybDataOption.kycedBeneficialOwners,
-          CollectedKybDataOption.address,
-        ],
-      },
+      kybRequirement: getKybRequirement(
+        [CollectedKybDataOption.tin],
+        [CollectedKybDataOption.name, CollectedKybDataOption.kycedBeneficialOwners, CollectedKybDataOption.address],
+      ),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -305,19 +315,13 @@ describe('isMissingRequiredData', () => {
 describe('isMissingBasicData', () => {
   it('should return true when all basic data attributes are missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [
-          CollectedKybDataOption.name,
-          CollectedKybDataOption.tin,
-          CollectedKybDataOption.corporationType,
-          CollectedKybDataOption.phoneNumber,
-          CollectedKybDataOption.website,
-        ],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([
+        CollectedKybDataOption.name,
+        CollectedKybDataOption.tin,
+        CollectedKybDataOption.corporationType,
+        CollectedKybDataOption.phoneNumber,
+        CollectedKybDataOption.website,
+      ]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -331,13 +335,11 @@ describe('isMissingBasicData', () => {
 
   it('should return false when required attributes are present', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.tin, CollectedKybDataOption.website],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([
+        CollectedKybDataOption.name,
+        CollectedKybDataOption.tin,
+        CollectedKybDataOption.website,
+      ]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -357,13 +359,7 @@ describe('isMissingBasicData', () => {
 describe('isMissingAddressData', () => {
   it('should return false when there are no missing address attributes', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.address],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -384,19 +380,13 @@ describe('isMissingAddressData', () => {
 
   it('should return false when optional addressLine2 is missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.address],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
       data: {
         [BusinessDI.addressLine1]: '123 Main St',
-        // [BusinessDI.addressLine2]: 'Apt 1',
+        // [BusinessDI.addressLine2]: 'Apt 1', - intentionally commented
         [BusinessDI.city]: 'New York',
         [BusinessDI.state]: 'NY',
         [BusinessDI.zip]: '10001',
@@ -411,18 +401,12 @@ describe('isMissingAddressData', () => {
 
   it('should return true when there is a missing address attribute', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.address],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
       data: {
-        // [BusinessDI.addressLine1]: '123 Main St',
+        // [BusinessDI.addressLine1]: '123 Main St', - intentionally commented
         [BusinessDI.addressLine2]: 'Apt 1',
         [BusinessDI.city]: 'New York',
         [BusinessDI.state]: 'NY',
@@ -438,13 +422,7 @@ describe('isMissingAddressData', () => {
 
   it('should return true when country is missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.address],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.address]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -467,13 +445,7 @@ describe('isMissingAddressData', () => {
 describe('isMissingBeneficialOwnersData', () => {
   it('should return false if beneficial owners is populated', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -494,13 +466,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return true when part of beneficial owners is missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -519,13 +485,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return false if kyced beneficial owners is populated', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -546,13 +506,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return true when part of kyced beneficial owners is missing', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -571,13 +525,7 @@ describe('isMissingBeneficialOwnersData', () => {
 
   it('should return false if all possible attributes are present', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {},
@@ -600,16 +548,10 @@ describe('isMissingBeneficialOwnersData', () => {
   });
 });
 
-describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
+describe('extractBoBootstrapValues', () => {
   it('should return an empty object when business.kyced_beneficial_owners is not populated', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {
         // @ts-expect-error: business.kyced_beneficial_owners type was removed from the bootstrap business data
@@ -621,19 +563,13 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
     } satisfies MachineContext;
 
     // @ts-expect-error: business.kyced_beneficial_owners type was removed from the bootstrap business data
-    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({});
   });
 
   it('should return an empty object when business.beneficial_owners is populated', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {
         // @ts-expect-error: business.beneficial_owners type was removed from the bootstrap business data
@@ -645,19 +581,13 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
     } satisfies MachineContext;
 
     // @ts-expect-error: business.beneficial_owners type was removed from the bootstrap business data
-    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({});
   });
 
   it('should return an empty object when missingAttributes is empty', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([]),
       idvContext: idvContext,
       bootstrapBusinessData: {
         [BusinessDI.name]: { value: 'Acme Inc', isBootstrap: true },
@@ -668,19 +598,13 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({});
   });
 
   it('should return an object with business.kyced_beneficial_owners when kycedBeneficialOwners is required', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.kycedBeneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -693,7 +617,7 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({
       'business.kyced_beneficial_owners': [
         {
@@ -708,13 +632,7 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
 
   it('should return an object with business.beneficial_owners when beneficialOwners is required', () => {
     const ctx = {
-      kybRequirement: {
-        hasLinkedBos: false,
-        isMet: false,
-        kind: OnboardingRequirementKind.collectKybData,
-        missingAttributes: [CollectedKybDataOption.beneficialOwners],
-        populatedAttributes: [],
-      },
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {},
       bootstrapUserData: {
@@ -727,12 +645,82 @@ describe('extractBusinessOwnerValuesFromBootstrapUserData', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    const result = extractBusinessOwnerValuesFromBootstrapUserData(ctx);
+    const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({
       'business.beneficial_owners': [
         {
           first_name: 'John',
           last_name: 'Doe',
+        },
+      ],
+    });
+  });
+
+  it('should ignore email and phoneNumber in business.beneficial_owners', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
+      idvContext: idvContext,
+      bootstrapBusinessData: {
+        'business.owners': {
+          value: [
+            {
+              // @ts-expect-error: the bootstrap values are camelCased
+              firstName: 'Owner',
+              lastName: 'Last',
+              email: 'owners@acme.com',
+              phoneNumber: '+12025550179',
+              ownershipStake: 50,
+            },
+          ],
+          isBootstrap: true,
+        },
+      },
+      bootstrapUserData: {},
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    // @ts-expect-error: the bootstrap values are camelCased
+    const result = extractBoBootstrapValues(ctx);
+    expect(result).toEqual({
+      'business.beneficial_owners': [{ first_name: 'Owner', last_name: 'Last', ownership_stake: 50 }],
+    });
+  });
+
+  it('should consider email and phoneNumber in business.kyced_beneficial_owners', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      idvContext: idvContext,
+      bootstrapBusinessData: {
+        'business.owners': {
+          value: [
+            {
+              // @ts-expect-error: the bootstrap values are camelCased
+              firstName: 'Owner',
+              lastName: 'Last',
+              email: 'owners@acme.com',
+              phoneNumber: '+12025550179',
+              ownershipStake: 50,
+            },
+          ],
+          isBootstrap: true,
+        },
+      },
+      bootstrapUserData: {},
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    // @ts-expect-error: the bootstrap values are camelCased
+    const result = extractBoBootstrapValues(ctx);
+    expect(result).toEqual({
+      'business.kyced_beneficial_owners': [
+        {
+          email: 'owners@acme.com',
+          first_name: 'Owner',
+          last_name: 'Last',
+          ownership_stake: 50,
+          phone_number: '+12025550179',
         },
       ],
     });

@@ -51,7 +51,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       }),
     });
 
-    const data = (await response.json()) as { id: string; sandbox_id: string; external_id: null };
+    const data = (await response.json()) as { id: string };
     return data;
   }, fpSKey);
 
@@ -75,7 +75,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       }),
     });
 
-    const data = (await response.json()) as { id: string; sandbox_id: string; external_id: null };
+    const data = (await response.json()) as { id: string };
     return data;
   }, fpSKey);
 
@@ -117,7 +117,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
         }),
       });
 
-      const data = (await response.json()) as { token: string; link: string; expires_at: null };
+      const data = (await response.json()) as { token: string };
       return data;
     },
     [fpSKey, pbKey, user.id, business.id],
@@ -232,4 +232,9 @@ test('KYB With linked beneficial owner #ci #debug', async ({ page, isMobile }) =
   await page.waitForLoadState();
 
   await expect(frame.getByText('Add a passkey')).toBeAttached();
+
+  await frame.getByRole('button').filter({ hasText: 'Continue on Desktop' }).first().click();
+  await page.waitForLoadState();
+
+  return expect(frame.getByTestId('result').innerText).toBeDefined();
 });

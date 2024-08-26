@@ -1,4 +1,4 @@
-import { BusinessDI, IdDI } from '@onefootprint/types';
+import { BootstrapOnlyBusinessOwnersKey, BusinessDI, IdDI } from '@onefootprint/types';
 import pickBy from 'lodash/pickBy';
 
 import type { BootstrapBusinessData, BusinessData, UserData } from '../../../../../../../types';
@@ -15,8 +15,9 @@ const BootstrapBusinessDIKeys: BusinessDI[] = Object.values(BusinessDI).filter(
     di !== BusinessDI.kycedBeneficialOwners,
 );
 
-const isKeyBusinessDI = (_: unknown, key: BusinessDI) => BootstrapBusinessDIKeys.includes(key);
 const isKeyIdDI = (_: unknown, key: IdDI) => Object.values(IdDI).includes(key);
+const isKeyBusinessDIallowedInBootstrap = (_: unknown, key: BusinessDI) =>
+  BootstrapBusinessDIKeys.concat(BootstrapOnlyBusinessOwnersKey as BusinessDI).includes(key);
 
 export const filterUserData = (inObj: UserData & BusinessData): UserData => {
   if (!isObject(inObj)) return {};
@@ -35,7 +36,7 @@ export const filterUserData = (inObj: UserData & BusinessData): UserData => {
 export const filterBusinessData = (inObj: UserData & BusinessData): BootstrapBusinessData => {
   if (!isObject(inObj)) return {};
 
-  const outObj = pickBy(inObj, isKeyBusinessDI); // Filter down to keys of the BusinessDI enum
+  const outObj = pickBy(inObj, isKeyBusinessDIallowedInBootstrap); // Filter down to keys of the BusinessDI enum + special case for "business.owners"
   const inKeys = Object.keys(inObj);
   const outKeys = Object.keys(outObj);
 

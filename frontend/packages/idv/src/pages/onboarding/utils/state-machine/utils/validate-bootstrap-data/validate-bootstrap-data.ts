@@ -1,17 +1,19 @@
 import { isAddressLine, isEmail, isName, isPhoneNumber, isSSN9Flexible, isSsn4, isURL } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
-import { CorporationType } from '@onefootprint/types';
+import { BootstrapOnlyBusinessOwnersKey, CorporationType } from '@onefootprint/types';
 import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import {
   type BootstrapIgnoredBusinessDI,
   BusinessDI,
   IdDI,
+  type IdvBootstrapData,
   UsLegalStatus,
   VisaKind,
   isCountryCode,
 } from '@onefootprint/types';
 import { isFuture } from 'date-fns';
+import snakeCase from 'lodash/snakeCase';
 
 import type { DIMetadata, UserData } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
@@ -19,8 +21,10 @@ import { getLogger } from '../../../../../../utils/logger';
 // TODO: Move fromUSDateToISO8601Format, strInputToUSDate to @onefootprint/core, it's being used in footprint-react too
 import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../../../utils/string';
 
-type UnvalidatedUserData = Partial<{ [K in IdDI]: DIMetadata<unknown> }>;
-type Predicate = (...args: string[]) => boolean;
+// biome-ignore lint/suspicious/noExplicitAny: This is intentional
+type Predicate = (...args: any[]) => boolean;
+type BusinessDICustom = Exclude<BusinessDI, BootstrapIgnoredBusinessDI> | typeof BootstrapOnlyBusinessOwnersKey;
+type NotValidatedUserData = Partial<{ [K in IdDI]: DIMetadata<unknown> }>;
 
 const { logWarn } = getLogger({ location: 'validate-bootstrap-data' });
 
@@ -84,18 +88,38 @@ const isCountryValid = (config: PublicOnboardingConfig, country: string): boolea
 const isCorporationTypeValid = (str: string): boolean =>
   isStringValid(str) && Object.values(CorporationType).includes(str as CorporationType);
 
+export const isBusinessOwnersValid = (owners: IdvBootstrapData[typeof BootstrapOnlyBusinessOwnersKey]) => {
+  if (!owners || !Array.isArray(owners) || owners.length < 1) return false;
+  if (owners.some(owner => !isObject(owner) || !Object.keys(owner).length)) return false;
+
+  const hasInvalidField = owners.some(owner =>
+    Object.entries(owner).some(([k, value]) => {
+      const key = snakeCase(k);
+      return (
+        (key === 'first_name' && (!isStringValid(value) || !isName(value))) ||
+        (key === 'last_name' && (!isStringValid(value) || !isName(value))) ||
+        (key === 'email' && (!isStringValid(value) || !isEmail(value))) ||
+        (key === 'phone_number' && (!isStringValid(value) || !isPhoneNumber(value))) ||
+        (key === 'ownership_stake' && (typeof value !== 'number' || value < 0 || value > 100))
+      );
+    }),
+  );
+
+  return !hasInvalidField;
+};
+
 const validateBootstrapData = ({
   bootstrapData,
   config,
   locale = 'en-US',
 }: {
-  bootstrapData: UnvalidatedUserData;
+  bootstrapData: NotValidatedUserData;
   config: PublicOnboardingConfig;
   locale?: SupportedLocale;
 }): UserData => {
   if (!isObject(bootstrapData)) return {};
 
-  const FieldsValidator: Record<IdDI | Exclude<BusinessDI, BootstrapIgnoredBusinessDI>, Predicate> = {
+  const FieldsValidator: Record<IdDI | BusinessDICustom, Predicate> = {
     [IdDI.addressLine1]: isAddressLine,
     [IdDI.addressLine2]: isStringValid,
     [IdDI.citizenships]: isCitizenshipsValid,
@@ -129,6 +153,7 @@ const validateBootstrapData = ({
     [BusinessDI.tin]: () => true, // TODO: Add real validators for this field
     [BusinessDI.website]: value => isURL(value),
     [BusinessDI.zip]: isStringValid,
+    [BootstrapOnlyBusinessOwnersKey]: owners => isBusinessOwnersValid(owners),
   };
 
   // Ignore null or undefined values or invalid keys

@@ -1,4 +1,4 @@
-import { BusinessDI, IdDI } from '@onefootprint/types';
+import { BootstrapOnlyBusinessOwnersKey, BusinessDI, IdDI } from '@onefootprint/types';
 import { filterBusinessData, filterUserData } from './get-kyc-user-data';
 
 jest.mock('../../../../../../../utils/logger', () => ({
@@ -108,6 +108,42 @@ describe('filterBusinessData', () => {
     // @ts-expect-error: Property 'formation_date' and other were removed from the static types
     const filteredData = filterBusinessData(data);
     expect(filteredData).toEqual({ [BusinessDI.corporationType]: { value: 'unknown', isBootstrap: true } });
+  });
+
+  it('should allow business.owners', () => {
+    const data = {
+      [BusinessDI.formationDate]: { value: '1999-12-25', isBootstrap: true },
+      [BusinessDI.formationState]: { value: 'MA', isBootstrap: true },
+      [BootstrapOnlyBusinessOwnersKey]: {
+        value: [
+          {
+            first_name: 'Jane',
+            last_name: 'Doe',
+            email: 'jane.doe@acme.com',
+            phone_number: '+12025550179',
+            ownership_stake: 50,
+          },
+        ],
+        isBootstrap: true,
+      },
+    };
+
+    // @ts-expect-error: Property 'formation_date' and other were removed from the static types
+    const filteredData = filterBusinessData(data);
+    expect(filteredData).toEqual({
+      [BootstrapOnlyBusinessOwnersKey]: {
+        value: [
+          {
+            first_name: 'Jane',
+            last_name: 'Doe',
+            email: 'jane.doe@acme.com',
+            phone_number: '+12025550179',
+            ownership_stake: 50,
+          },
+        ],
+        isBootstrap: true,
+      },
+    });
   });
 
   it('should reject non-objects', () => {
