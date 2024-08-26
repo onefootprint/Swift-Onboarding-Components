@@ -350,7 +350,7 @@ function dashboardKeyRateLimitRule(args: {name: string, priority: number}) {
     action: rateLimitExceededAction(),
     statement: {
       rateBasedStatement: {
-        limit: 100,
+        limit: 5000,
         evaluationWindowSec: 60,
         aggregateKeyType: 'CUSTOM_KEYS',
         customKeys: [
