@@ -14,6 +14,7 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::TfError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
+use api_core::types::WithVaultVersionHeader;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::onboarding::NewOnboardingArgs;
@@ -28,11 +29,13 @@ use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::SimpleFixtureResult;
 use api_wire_types::TriggerKycRequest;
+use db::models::data_lifetime::DataLifetime;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::models::workflow::Workflow;
 use db::DbError;
 use feature_flag::BoolFlag;
@@ -42,6 +45,7 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
+use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use newtypes::WorkflowSource;
 use paperclip::actix::api_v2_operation;
@@ -59,9 +63,10 @@ pub async fn post(
     request: web::Json<TriggerKycRequest>,
     auth: TenantApiKey,
     root_span: RootSpan,
-) -> ApiResponse<EntityValidateResponse> {
+) -> ApiResponse<WithVaultVersionHeader<EntityValidateResponse>> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
-    let tenant_id = auth.tenant().id.clone();
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let TriggerKycRequest {
@@ -90,12 +95,17 @@ pub async fn post(
         fixture_result
     };
 
-    let (uvw, sv) = state
+    let (uvw, sv, seqno, vault_version) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            Ok((uvw, sv))
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
+
+            let vault_version = ScopedVaultVersion::version_number_at_seqno(conn, &sv.id, seqno)?;
+
+            Ok((uvw, sv, seqno, vault_version))
         })
         .await?;
 
@@ -152,6 +162,7 @@ pub async fn post(
                 wfr_id: None,
                 force_create: force_reonboard,
                 sv: &sv,
+                seqno,
                 obc: &obc,
                 insight_event: None,
                 new_biz_args: None, // currently dont support KYB for NPV
@@ -226,9 +237,10 @@ pub async fn post(
         })
         .await?;
 
-    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+    let ww = WorkflowWrapper::init(&state, wf.clone(), seqno).await?;
     if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
-        ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+        ww.run(&state, WorkflowActions::Authorize(Authorize { seqno }))
+            .await?;
     } else {
         tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
@@ -242,7 +254,14 @@ pub async fn post(
         })
         .await?;
 
-    Ok(api_wire_types::EntityValidateResponse::from_db((
-        wf.status, sv, mrs, obc,
-    )))
+    let vault_version = if tenant.can_access_preview(&PreviewApi::VaultVersioning) {
+        Some(vault_version)
+    } else {
+        None
+    };
+
+    Ok(WithVaultVersionHeader::new(
+        api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc)),
+        vault_version,
+    ))
 }

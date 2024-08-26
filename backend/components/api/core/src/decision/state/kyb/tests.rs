@@ -1,5 +1,6 @@
 use crate::decision::state::actions::WorkflowActions;
 use crate::decision::state::kyb;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_idology;
 use crate::decision::state::test_utils::mock_middesk;
 use crate::decision::state::test_utils::mock_webhooks;
@@ -138,7 +139,9 @@ async fn run_kyc_for_bo(
         UserKind::Live => Some(OnboardingStatus::Pass),
     }
     .unwrap();
-    let ww = WorkflowWrapper::init(state, wf.clone()).await.unwrap();
+
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf.clone(), seqno).await.unwrap();
 
     // MOCKING
     let mut mock_ff_client = MockFFClient::new();
@@ -165,7 +168,7 @@ async fn run_kyc_for_bo(
     state.set_ff_client(mock_ff_client.into_mock());
 
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 
@@ -175,7 +178,7 @@ async fn run_kyc_for_bo(
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
@@ -200,7 +203,7 @@ async fn run_kyc_for_bo(
 
     // MakeDecision
     let (_, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -230,14 +233,15 @@ async fn run_kyc_for_bo(
 async fn authorize(state: &mut State) {
     let (wf, _, _, _) = setup(state, None, false).await;
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     assert!(matches!(
         ww.state,
         WorkflowKind::Kyb(kyb::KybState::DataCollection(_))
     ));
 
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
     assert!(matches!(
@@ -256,9 +260,10 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
     let (wf, tenant, obc, person_wf) = setup(state, Some(fixture_result), ein_only).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 
@@ -279,7 +284,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
     // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we
@@ -326,7 +331,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
     );
 
     let (_ww, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -382,9 +387,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     let obc1 = obc.clone();
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
     let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
@@ -426,7 +433,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     mock_middesk(state, &business_id);
 
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
     // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we

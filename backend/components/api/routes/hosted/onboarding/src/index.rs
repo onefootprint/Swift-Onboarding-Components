@@ -55,14 +55,15 @@ pub async fn post(
         .ob_configuration_id()
         .or(pk_obc_id)
         .ok_or(OnboardingError::NoObConfig)?;
-    let (scoped_user, ob_config, tenant, vw) = state
+    let (scoped_user, ob_config, tenant, vw, seqno) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
             let vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-            Ok((su, ob_config, tenant, vw))
+            let seqno = vw.seqno;
+            Ok((su, ob_config, tenant, vw, seqno))
         })
         .await?;
 
@@ -105,6 +106,7 @@ pub async fn post(
                 wfr_id: user_auth.wfr_id.clone(),
                 force_create,
                 sv: &scoped_user,
+                seqno,
                 obc: &obc,
                 insight_event: Some(insight_event.clone()),
                 new_biz_args: maybe_new_biz_args,

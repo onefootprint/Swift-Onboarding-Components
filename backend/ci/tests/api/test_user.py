@@ -8,6 +8,7 @@ from tests.utils import (
     get,
     create_ob_config,
     _gen_random_ssn,
+    post_raw,
 )
 
 
@@ -137,12 +138,18 @@ def test_kyc(sandbox_tenant, obc):
         "id.ssn9": _gen_random_ssn(),
         **ID_DATA,
     }
-    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    resp = post_raw("users/", vault_data, sandbox_tenant.sk.key)
+    create_version = resp.headers["x-fp-vault-version"]
+    body = resp.json()
     fp_id = body["id"]
 
     # run KYC
     data = dict(key=obc.key.value)
-    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
+    resp = post_raw(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
+    kyc_version = resp.headers["x-fp-vault-version"]
+    body = resp.json()
+
+    assert create_version == kyc_version
 
     assert body["requires_manual_review"] == False
     assert body["status"] == "pass"
@@ -175,8 +182,8 @@ def test_kyc_missing_requirement(sandbox_tenant, obc):
     data = dict(key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-            body["message"]
-            == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
+        body["message"]
+        == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
     )
     assert body["code"] == "T121"
 
@@ -195,10 +202,7 @@ def test_kyc_non_us_country_code(sandbox_tenant, obc):
 
     data = dict(key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
-    assert (
-            body["message"]
-            == "Validation error: Cannot trigger KYC on non-US addresses"
-    )
+    assert body["message"] == "Validation error: Cannot trigger KYC on non-US addresses"
 
 
 def test_kyc_missing_derypt_perms(sandbox_tenant):
@@ -215,8 +219,8 @@ def test_kyc_missing_derypt_perms(sandbox_tenant):
     data = dict(key=sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-            body["message"]
-            == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
+        body["message"]
+        == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
     )
 
 

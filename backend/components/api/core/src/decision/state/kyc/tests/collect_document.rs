@@ -1,5 +1,6 @@
 use crate::decision::state::actions::Authorize;
 use crate::decision::state::actions::MakeVendorCalls;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_idology;
 use crate::decision::state::test_utils::mock_incode_doc_collection;
 use crate::decision::state::test_utils::mock_webhooks;
@@ -92,8 +93,9 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
     let obc_id2 = obc.id.clone();
+    let seqno = get_current_seqno(state).await;
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     let doc_upload_failed = doc_outcome == DocUploadFailed;
     let doc_passed_with_review = doc_outcome == PassWithManualReview;
     let expected_status = if doc_passed_with_review {
@@ -181,7 +183,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     //
     // Authorize
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
     let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
@@ -190,7 +192,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
@@ -217,7 +219,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
 
     // MakeDecision
     let (_, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
     let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
@@ -315,7 +317,8 @@ async fn collect_ad_hoc_document(
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
-    let ww = WorkflowWrapper::init(state, wf.clone()).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf.clone(), seqno).await.unwrap();
 
     // MOCKING
     let mut mock_ff_client = MockFFClient::new();

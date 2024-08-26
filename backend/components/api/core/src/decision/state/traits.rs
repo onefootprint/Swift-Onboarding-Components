@@ -14,6 +14,7 @@ use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::TxnPgConn;
 use enum_dispatch::enum_dispatch;
+use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
 use newtypes::WorkflowId;
 use newtypes::WorkflowSource;
@@ -23,7 +24,7 @@ use newtypes::WorkflowSource;
 pub(super) trait WorkflowState: std::marker::Send + std::marker::Sync + 'static {
     fn name(&self) -> newtypes::WorkflowState;
 
-    fn default_action(&self) -> Option<WorkflowActions>;
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions>;
 }
 
 /// Implement this for a State to indicate that when in that State, the workflow responds to action
@@ -112,7 +113,7 @@ where
 /// Common functionality for all Workflows, which are bundles of WorkflowStates and the transistions
 /// between them
 pub trait Workflow: Clone + Into<WorkflowKind> + std::marker::Send + std::marker::Sync + 'static {
-    fn default_action(&self) -> Option<WorkflowActions>;
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions>;
 
     async fn action(
         self,

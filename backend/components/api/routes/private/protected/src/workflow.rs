@@ -6,10 +6,19 @@ use actix_web::web::Json;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::actions::WorkflowActionsKind;
 use api_core::decision::state::traits::Workflow as TWorkflow;
+use api_core::decision::state::AsyncVendorCallsCompleted;
+use api_core::decision::state::Authorize;
+use api_core::decision::state::BoKycCompleted;
+use api_core::decision::state::DocCollected;
+use api_core::decision::state::MakeDecision;
+use api_core::decision::state::MakeVendorCalls;
+use api_core::decision::state::MakeWatchlistCheckCall;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::ApiResponse;
 use api_core::ApiCoreError;
+use db::models::data_lifetime::DataLifetime;
 use db::models::workflow::Workflow;
+use db::DbResult;
 use newtypes::WorkflowId;
 use newtypes::WorkflowState;
 
@@ -35,19 +44,39 @@ async fn proceed(
         wf_action_kind,
     } = request.into_inner();
 
-    let wf = state
+    let (wf, seqno) = state
         .db_pool
-        .db_query(move |conn| Workflow::get(conn, &wf_id))
+        .db_query(move |conn| -> DbResult<_> {
+            let wf = Workflow::get(conn, &wf_id)?;
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+            Ok((wf, seqno))
+        })
         .await?;
 
-    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+    let ww = WorkflowWrapper::init(&state, wf.clone(), seqno).await?;
 
     let action = if let Some(wf_action_kind) = wf_action_kind {
-        WorkflowActions::try_from(wf_action_kind)?
+        match wf_action_kind {
+            WorkflowActionsKind::Authorize => WorkflowActions::Authorize(Authorize { seqno }),
+            WorkflowActionsKind::MakeVendorCalls => {
+                WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno })
+            }
+            WorkflowActionsKind::MakeDecision => WorkflowActions::MakeDecision(MakeDecision { seqno }),
+            WorkflowActionsKind::MakeWatchlistCheckCall => {
+                WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {})
+            }
+            WorkflowActionsKind::DocCollected => WorkflowActions::DocCollected(DocCollected {}),
+            WorkflowActionsKind::BoKycCompleted => WorkflowActions::BoKycCompleted(BoKycCompleted {}),
+            WorkflowActionsKind::AsyncVendorCallsCompleted => {
+                WorkflowActions::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {})
+            }
+        }
     } else {
-        ww.state.default_action().ok_or(ApiCoreError::AssertionError(
-            "Current state has no default action".to_string(),
-        ))?
+        ww.state
+            .default_action(seqno)
+            .ok_or(ApiCoreError::AssertionError(
+                "Current state has no default action".to_string(),
+            ))?
     };
 
     let ww = ww.run(&state, action).await?;

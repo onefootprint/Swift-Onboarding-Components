@@ -1,5 +1,6 @@
 use crate::decision::state::actions::Authorize;
 use crate::decision::state::actions::MakeVendorCalls;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_idology;
 use crate::decision::state::test_utils::mock_incode_doc_collection;
 use crate::decision::state::test_utils::mock_webhooks;
@@ -93,7 +94,8 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
         .await
         .unwrap();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // Mock vendor calls
     let ob_config_key = obc.key.clone();
@@ -113,19 +115,19 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     // TESTS
     //
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
     // MakeDecision
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -294,7 +296,8 @@ async fn test_multi_stage_step_up(state: &mut State) {
         .await
         .unwrap();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // Mock vendor calls
     let ob_config_key = obc.key.clone();
@@ -314,19 +317,19 @@ async fn test_multi_stage_step_up(state: &mut State) {
     // TESTS
     //
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
     // MakeDecision
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 

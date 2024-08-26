@@ -1,4 +1,5 @@
 use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_idology_pa_hit;
 use crate::decision::state::test_utils::mock_incode;
 use crate::decision::state::test_utils::query_data;
@@ -99,7 +100,8 @@ async fn test(
         _ => panic!("incorrect verification check for obc"),
     };
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // Mock Vendor Calls
     let mut mock_ff_client = MockFFClient::new();
@@ -127,7 +129,7 @@ async fn test(
 
     // TEST
     let _ww = ww
-        .run(state, WorkflowActions::Authorize(Authorize {}))
+        .run(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 

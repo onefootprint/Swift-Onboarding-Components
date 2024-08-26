@@ -123,7 +123,7 @@ impl<Type> VaultWrapper<Type> {
         Self::build(conn, args)
     }
 
-    #[tracing::instrument("VaultWrapper::build", skip_all)]
+    #[tracing::instrument("VaultWrapper::build", skip_all, fields(?args))]
     pub fn build(conn: &mut PgConn, args: VwArgs) -> FpResult<Self> {
         let (uv, sv_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(sv_id) = sv_id.as_ref() {

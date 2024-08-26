@@ -22,6 +22,7 @@ use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
+use db::models::data_lifetime::DataLifetime;
 use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
@@ -81,12 +82,14 @@ pub async fn post(
         return Err(OnboardingError::NoFixtureResultForSandboxUser.into());
     }
 
-    let (bvw, sb) = state
+    let (bvw, sb, seqno) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb.id))?;
-            Ok((bvw, sb))
+            let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sb.id, seqno))?;
+            Ok((bvw, sb, seqno))
         })
         .await?;
     if bvw.vault.kind != VaultKind::Business {
@@ -183,7 +186,7 @@ pub async fn post(
         })
         .await?;
 
-    api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone()).await?;
+    api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone(), seqno).await?;
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     let (wf, sv, mrs) = state

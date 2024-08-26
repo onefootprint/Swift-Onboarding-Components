@@ -20,11 +20,13 @@ use api_core::FpResult;
 use api_wire_types::ProcessRequest;
 use chrono::Duration;
 use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::task::Task;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::DbPool;
 use decision::state::Authorize;
 use itertools::Itertools;
+use newtypes::DataLifetimeSeqno;
 use newtypes::OnboardingRequirement;
 use newtypes::RunIncodeStuckWorkflowArgs;
 use newtypes::WorkflowFixtureResult;
@@ -80,13 +82,15 @@ pub async fn post(
         wf.clone()
     };
 
-    let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
+    let seqno = state.db_pool.db_query(DataLifetime::get_current_seqno).await?;
+
+    let ww = WorkflowWrapper::init(&state, wf.clone(), seqno).await?;
     // Since actions are typed right now, infer which action needs to be sent to the workflow
     // in order to make it proceed
     // First run the Authorize action since this generates a requirement for Bifrost.
     let (ww, _) = match ww.state {
         WorkflowKind::Kyc(KycState::DataCollection(_)) => {
-            ww.action(&state, WorkflowActions::Authorize(Authorize {}))
+            ww.action(&state, WorkflowActions::Authorize(Authorize { seqno }))
                 .await?
         }
         WorkflowKind::Kyc(KycState::DocCollection(_))
@@ -112,7 +116,7 @@ pub async fn post(
         }
     }
 
-    run_kyb_if_needed(&state, user_auth, fixture_result).await?;
+    run_kyb_if_needed(&state, user_auth, fixture_result, seqno).await?;
 
     Ok(api_wire_types::Empty)
 }
@@ -133,6 +137,7 @@ async fn run_kyb_if_needed(
     state: &State,
     user_auth: CheckUserWfAuthContext,
     fixture_result: Option<WorkflowFixtureResult>,
+    seqno: DataLifetimeSeqno,
 ) -> FpResult<()> {
     // Run KYB
     let tenant = user_auth.tenant().clone();
@@ -149,7 +154,7 @@ async fn run_kyb_if_needed(
                 .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, r))
                 .await?;
         }
-        api_core::utils::kyb_utils::run_kyb(state, &tenant, biz_wf).await?;
+        api_core::utils::kyb_utils::run_kyb(state, &tenant, biz_wf, seqno).await?;
     }
     Ok(())
 }

@@ -683,3 +683,11 @@ pub async fn mock_incode_doc_collection(
         .await
         .unwrap();
 }
+
+pub async fn get_current_seqno(state: &State) -> DataLifetimeSeqno {
+    state
+        .db_pool
+        .db_query(DataLifetime::get_current_seqno)
+        .await
+        .unwrap()
+}

@@ -1,4 +1,5 @@
 use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_incode_doc_collection;
 use crate::decision::state::test_utils::mock_webhooks;
 use crate::decision::state::test_utils::query_data;
@@ -78,8 +79,9 @@ async fn collect_doc_skip_kyc(
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = svid.clone();
+    let seqno = get_current_seqno(state).await;
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // MOCKING
     // No Idology/Experian KYC calls are mocked, we expect these to not be called because skip_kyc =
@@ -109,7 +111,7 @@ async fn collect_doc_skip_kyc(
     );
 
     let _ww = ww
-        .run(state, WorkflowActions::Authorize(Authorize {}))
+        .run(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 

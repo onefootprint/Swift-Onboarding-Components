@@ -350,7 +350,8 @@ pub(super) async fn post_inner(
                             }
                         }
                     };
-                    VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v_seqno).map(|vw| (v, vw))
+                    VaultWrapper::build_for_tenant_maybe_version(conn, &scoped_user.id, v_seqno)
+                        .map(|vw| (v, vw))
                 })
                 .collect::<FpResult<_>>()?;
             Ok(vws)

@@ -2,9 +2,12 @@ use self::kyb::KybState;
 use crate::FpResult;
 use crate::State;
 use api_errors::FpErrorCode;
+use db::models::data_lifetime::DataLifetime;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::workflow::Workflow as DbWorkflow;
+use db::DbResult;
 use enum_dispatch::enum_dispatch;
+use newtypes::DataLifetimeSeqno;
 use newtypes::WorkflowId;
 use std::time::Duration;
 use thiserror::Error;
@@ -98,21 +101,23 @@ impl From<&WorkflowKind> for newtypes::WorkflowState {
 pub struct WorkflowWrapper {
     pub state: WorkflowKind,
     pub workflow_id: WorkflowId,
+    pub seqno: DataLifetimeSeqno,
 }
 
 impl WorkflowWrapper {
     #[tracing::instrument("WorkflowWrapper::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, seqno: DataLifetimeSeqno) -> FpResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
-            newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow, seqno).await?.into(),
             newtypes::WorkflowState::AlpacaKyc(_) => todo!(), //throw an error
-            newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow).await?.into(),
-            newtypes::WorkflowState::Kyb(_) => KybState::init(state, workflow).await?.into(),
+            newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow, seqno).await?.into(),
+            newtypes::WorkflowState::Kyb(_) => KybState::init(state, workflow, seqno).await?.into(),
         };
         Ok(Self {
             state: s,
             workflow_id,
+            seqno,
         })
     }
 
@@ -125,14 +130,16 @@ impl WorkflowWrapper {
         let Self {
             state: wf_state,
             workflow_id,
+            seqno,
         } = self;
         tracing::info!(workflow_id=?workflow_id, wf_state=?wf_state, action=?action, "[WorkflowWrapper::action] Running action on workflow");
         let next_state = wf_state.action(state, action, workflow_id.clone()).await?;
-        let next_action = next_state.default_action();
+        let next_action = next_state.default_action(seqno);
         tracing::info!(workflow_id=?workflow_id, next_state=?next_state, next_action=?next_action, "[WorkflowWrapper::action] Action ran on workflow");
         let next = Self {
             state: next_state,
             workflow_id,
+            seqno,
         };
         Ok((next, next_action))
     }
@@ -159,10 +166,16 @@ pub async fn run_incode_machine_and_workflow(
     ww: WorkflowWrapper,
 ) -> FpResult<RunIncodeMachineAndWorkflowResult> {
     let wfid = ww.workflow_id.clone();
-    let ivs = state
+    let (ivs, seqno) = state
         .db_pool
-        // TODO this doesn't have to be a latest - there's only one active per workflow
-        .db_query(move |conn| IncodeVerificationSession::latest_for_workflow(conn, &wfid))
+        .db_query(move |conn| -> DbResult<_> {
+            // TODO this doesn't have to be a latest - there's only one active per workflow
+            let ivs = IncodeVerificationSession::latest_for_workflow(conn, &wfid)?;
+
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+
+            Ok((ivs, seqno))
+        })
         .await?;
 
     if let Some(ivs) = ivs {
@@ -193,7 +206,7 @@ pub async fn run_incode_machine_and_workflow(
         }
     }
 
-    let next_action = ww.state.default_action();
+    let next_action = ww.state.default_action(seqno);
     if let Some(next_action) = next_action {
         ww.run(state, next_action).await?;
     }

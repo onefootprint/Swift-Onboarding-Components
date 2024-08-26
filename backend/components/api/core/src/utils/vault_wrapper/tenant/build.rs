@@ -18,27 +18,36 @@ use std::collections::HashMap;
 impl<Type> VaultWrapper<Type> {
     // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
     pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<TenantVw<Type>> {
-        Self::build_for_tenant_version(conn, sv_id, None)
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        Self::build_for_tenant_version(conn, sv_id, seqno)
     }
 
     pub fn build_for_tenant_version(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-        version: Option<DataLifetimeSeqno>,
+        version: DataLifetimeSeqno,
     ) -> FpResult<TenantVw<Type>> {
         Self::build_inner(conn, sv_id, version)
+    }
+
+    pub fn build_for_tenant_maybe_version(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        version: Option<DataLifetimeSeqno>,
+    ) -> FpResult<TenantVw<Type>> {
+        if let Some(version) = version {
+            Self::build_for_tenant_version(conn, sv_id, version)
+        } else {
+            Self::build_for_tenant(conn, sv_id)
+        }
     }
 
     pub fn build_inner(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-        version: Option<DataLifetimeSeqno>,
+        version: DataLifetimeSeqno,
     ) -> FpResult<TenantVw<Type>> {
-        let args = match version {
-            Some(version) => VwArgs::Historical(sv_id, version),
-            None => VwArgs::Tenant(sv_id),
-        };
-        let uvw = Self::build(conn, args)?;
+        let uvw = Self::build(conn, VwArgs::Historical(sv_id, version))?;
         let workflows = Workflow::bulk_get_for_users(conn, vec![sv_id])?
             .remove(sv_id)
             .unwrap_or_default();

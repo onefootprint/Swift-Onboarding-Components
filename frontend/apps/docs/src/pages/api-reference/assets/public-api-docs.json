@@ -105,14 +105,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -573,14 +565,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -627,14 +611,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -668,16 +644,6 @@
                             "type": "string"
                         },
                         "style": "simple"
-                    },
-                    {
-                        "in": "header",
-                        "name": "x-fp-vault-version",
-                        "description": "When provided, specifies the vault version to use for the given request.",
-                        "schema": {
-                            "x_fp_preview_gate": "vault_versioning",
-                            "type": "string"
-                        },
-                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -693,14 +659,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -964,14 +922,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1044,6 +994,7 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1060,14 +1011,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1100,6 +1043,7 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1174,6 +1118,7 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1460,6 +1405,7 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
+                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     },
                     {
@@ -2733,14 +2679,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2787,14 +2725,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2828,16 +2758,6 @@
                             "type": "string"
                         },
                         "style": "simple"
-                    },
-                    {
-                        "in": "header",
-                        "name": "x-fp-vault-version",
-                        "description": "When provided, specifies the vault version to use for the given request.",
-                        "schema": {
-                            "x_fp_preview_gate": "vault_versioning",
-                            "type": "string"
-                        },
-                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -2853,14 +2773,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "headers": {
-                            "x-fp-vault-version": {
-                                "description": "The resulting version of the vault after applying any updates in this request.",
-                                "style": "simple",
-                                "content": {},
-                                "x_fp_preview_gate": "vault_versioning"
-                            }
-                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3291,6 +3203,7 @@
                             "example": "https://acmebankprocessor.com/api/process_transaction",
                             "type": "string"
                         },
+                        "example": "https://acmebankprocessor.com/api/process_transaction",
                         "style": "simple"
                     },
                     {

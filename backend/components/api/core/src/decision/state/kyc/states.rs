@@ -37,7 +37,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
-use db::models::data_lifetime::DataLifetime;
 use db::models::document_request::DocumentRequest;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
@@ -52,6 +51,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentRequestKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::KycConfig;
@@ -73,13 +73,19 @@ use twilio::response::lookup::LookupV2Response;
 /// ////////////////
 impl KycDataCollection {
     #[tracing::instrument("KycDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _: KycConfig,
+        seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDataCollection {
             wf_id: workflow.id,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
+            seqno,
         })
     }
 }
@@ -104,6 +110,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
+            seqno: self.seqno,
         }))
     }
 }
@@ -113,7 +120,7 @@ impl WorkflowState for KycDataCollection {
         newtypes::WorkflowState::from(newtypes::KycState::DataCollection)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -123,13 +130,19 @@ impl WorkflowState for KycDataCollection {
 /// ////////////////
 impl KycVendorCalls {
     #[tracing::instrument("KycVendorCalls::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _: KycConfig,
+        seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycVendorCalls {
             wf_id: workflow.id,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
+            seqno,
         })
     }
 }
@@ -153,7 +166,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeVendorCalls,
+        action: MakeVendorCalls,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
@@ -161,7 +174,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let (vw, obc, wf) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let (vw, obc) = common::get_vw_and_obc(conn, &svid, &wfid)?;
+                let (vw, obc) = common::get_vw_and_obc(conn, &svid, action.seqno, &wfid)?;
                 let wf = DbWorkflow::get(conn, &wfid)?;
 
                 Ok((vw, obc, wf))
@@ -283,7 +296,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             neuro_result,
             twilio_result,
         ) = *async_res;
-        let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
+        let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
 
         let curp_reason_codes = curp_result.map(|v| {
@@ -390,7 +403,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         };
 
         Ok(KycState::from(KycDecisioning::new(
-            self.wf_id, self.sv_id, self.t_id,
+            self.wf_id, self.sv_id, self.t_id, self.seqno,
         )))
     }
 }
@@ -400,8 +413,8 @@ impl WorkflowState for KycVendorCalls {
         newtypes::WorkflowState::from(newtypes::KycState::VendorCalls)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
-        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls))
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
     }
 }
 
@@ -410,13 +423,19 @@ impl WorkflowState for KycVendorCalls {
 /// ////////////////
 impl KycDecisioning {
     #[tracing::instrument("KycDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _: KycConfig,
+        seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDecisioning::new(
             workflow.id,
             workflow.scoped_vault_id.clone(),
             sv.tenant_id,
+            seqno,
         ))
     }
 }
@@ -435,7 +454,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeDecision,
+        action: MakeDecision,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
         let svid = self.sv_id.clone();
@@ -447,9 +466,9 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
-                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
-                                                                    // a new seqno inside the RSR write itself
-                let vw = VaultWrapper::<Any>::build_for_tenant_version(conn, &svid, Some(seqno))?;
+                // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
+                // a new seqno inside the RSR write itself
+                let vw = VaultWrapper::<Any>::build_for_tenant_version(conn, &svid, action.seqno)?;
 
                 let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
 
@@ -516,6 +535,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 wf_id: self.wf_id,
                 sv_id: self.sv_id,
                 t_id: self.t_id,
+                seqno: self.seqno,
             })),
         }
     }
@@ -526,8 +546,8 @@ impl WorkflowState for KycDecisioning {
         newtypes::WorkflowState::from(newtypes::KycState::Decisioning)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
-        Some(WorkflowActions::MakeDecision(MakeDecision))
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision { seqno }))
     }
 }
 
@@ -536,7 +556,12 @@ impl WorkflowState for KycDecisioning {
 /// ////////////////
 impl KycComplete {
     #[tracing::instrument("KycComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KycConfig) -> FpResult<Self> {
+    pub async fn init(
+        _state: &State,
+        _workflow: DbWorkflow,
+        _config: KycConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         Ok(KycComplete)
     }
 }
@@ -546,7 +571,7 @@ impl WorkflowState for KycComplete {
         newtypes::WorkflowState::from(newtypes::KycState::Complete)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -556,13 +581,19 @@ impl WorkflowState for KycComplete {
 /// ////////////////
 impl KycDocCollection {
     #[tracing::instrument("AlpacaKycDocCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _: KycConfig,
+        seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDocCollection {
             wf_id: workflow.id,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
+            seqno,
         })
     }
 }
@@ -591,7 +622,7 @@ impl OnAction<DocCollected, KycState> for KycDocCollection {
         _conn: &mut db::TxnPgConn,
     ) -> FpResult<KycState> {
         Ok(KycState::from(KycDecisioning::new(
-            self.wf_id, self.sv_id, self.t_id,
+            self.wf_id, self.sv_id, self.t_id, self.seqno,
         )))
     }
 }
@@ -601,7 +632,7 @@ impl WorkflowState for KycDocCollection {
         newtypes::WorkflowState::from(newtypes::KycState::DocCollection)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None // have to wait for doc collection flow to finish
     }
 }

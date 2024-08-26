@@ -23,6 +23,7 @@ use db::OffsetPagination;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
@@ -53,6 +54,7 @@ pub struct NewOnboardingArgs<'a> {
     pub wfr_id: Option<WorkflowRequestId>,
     pub force_create: bool,
     pub sv: &'a ScopedVault,
+    pub seqno: DataLifetimeSeqno,
     pub obc: &'a ObConfiguration,
     pub insight_event: Option<CreateInsightEvent>,
     // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could
@@ -68,6 +70,7 @@ pub struct NewOnboardingArgs<'a> {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[tracing::instrument("get_or_start_onboarding", skip_all)]
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     args: NewOnboardingArgs,
@@ -77,6 +80,7 @@ pub fn get_or_start_onboarding(
         wfr_id,
         force_create,
         sv,
+        seqno,
         obc,
         insight_event,
         new_biz_args,
@@ -106,7 +110,7 @@ pub fn get_or_start_onboarding(
     } else {
         // Make a new workflow. The workflow is created either for the playbook specified in the
         // auth token OR for the config specified in the WorkflowRequest
-        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_version(conn, &sv.id, seqno)?;
         let (wfs, _) = Workflow::list(conn, &sv.id, OffsetPagination::new(None, 10))?;
         let is_first_wf = wfs.is_empty();
         let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());

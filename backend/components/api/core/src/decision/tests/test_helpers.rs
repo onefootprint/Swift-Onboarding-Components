@@ -11,6 +11,7 @@ use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
+use db::models::data_lifetime::DataLifetime;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -89,6 +90,7 @@ pub async fn create_user_and_onboarding(
                 wfr_id: None,
                 force_create: false,
                 sv: &su,
+                seqno: DataLifetime::get_current_seqno(conn)?,
                 obc: &obc,
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
                 new_biz_args: biz_args,

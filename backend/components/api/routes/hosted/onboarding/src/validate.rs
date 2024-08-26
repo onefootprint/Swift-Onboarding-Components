@@ -1,5 +1,6 @@
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
+use api_core::auth::user::UserIdentifier;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::IsGuardMet;
 use api_core::errors::onboarding::OnboardingError;
@@ -55,9 +56,12 @@ pub async fn post(
             .scoped_user_id()
             .ok_or(ValidationError("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
+        let user_identifier = UserIdentifier::ScopedVault(sv_id);
         let reqs = state
             .db_pool
-            .db_query(move |conn| get_register_auth_method_requirements(conn, &obc, &sv_id, &auth_events))
+            .db_query(move |conn| {
+                get_register_auth_method_requirements(conn, &obc, user_identifier, &auth_events)
+            })
             .await?;
         let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
         if !unmet_reqs.is_empty() {

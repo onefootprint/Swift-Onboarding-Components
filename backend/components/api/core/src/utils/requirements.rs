@@ -376,7 +376,7 @@ pub fn get_requirements_inner(
 pub fn get_register_auth_method_requirements(
     conn: &mut PgConn,
     obc: &ObConfiguration,
-    sv_id: &ScopedVaultId,
+    user_identifier: UserIdentifier,
     auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let auth_events = load_auth_events(conn, auth_events)?;
@@ -391,8 +391,8 @@ pub fn get_register_auth_method_requirements(
         return Ok(vec![]);
     }
 
-    let identifier = UserIdentifier::ScopedVault(sv_id.clone());
-    let ctx = get_user_auth_methods(conn, identifier, None)?;
+    // let identifier = UserIdentifier::VersionedScopedVault(sv_id.clone(), seqno);
+    let ctx = get_user_auth_methods(conn, user_identifier, None)?;
     let verified_auth_methods = ctx
         .auth_methods
         .into_iter()
@@ -419,6 +419,7 @@ pub struct EntityInfo<'a> {
 
 /// Generates a requirement of the given kind `k`, if one exists.
 #[allow(clippy::too_many_arguments)]
+#[tracing::instrument("get_requirement_inner", skip_all, fields(kind = ?k))]
 fn get_requirement_inner(
     k: OnboardingRequirementKind,
     conn: &mut PgConn,
@@ -438,7 +439,8 @@ fn get_requirement_inner(
     } = opts;
     let req = match k {
         OnboardingRequirementKind::RegisterAuthMethod => {
-            get_register_auth_method_requirements(conn, obc, &wf.scoped_vault_id, auth_events)?
+            let user_identifier = UserIdentifier::VersionedScopedVault(wf.scoped_vault_id.clone(), vw.seqno);
+            get_register_auth_method_requirements(conn, obc, user_identifier, auth_events)?
         }
         OnboardingRequirementKind::CollectData => {
             obc.must_collect(DID::Id)

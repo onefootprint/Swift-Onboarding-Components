@@ -535,12 +535,13 @@ impl MiddeskState<PendingGetBusinessCall> {
 impl MiddeskState<Complete> {
     pub async fn run_kyb_decisioning(self, state: &State) -> FpResult<()> {
         let wfid = self.middesk_request.workflow_id.clone();
-        let (v, sv, wf) = state
+        let (v, sv, wf, seqno) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let (_, v) = Workflow::get_with_vault(conn, &wfid)?;
                 let (wf, sv) = Workflow::get_all(conn, &wfid)?;
-                Ok((v, sv, wf))
+                let seqno = DataLifetime::get_current_seqno(conn)?;
+                Ok((v, sv, wf, seqno))
             })
             .await?;
 
@@ -616,7 +617,7 @@ impl MiddeskState<Complete> {
             })
             .await?;
 
-        let ww = WorkflowWrapper::init(state, wf).await?;
+        let ww = WorkflowWrapper::init(state, wf, seqno).await?;
         let _ww = ww
             .run(
                 state,

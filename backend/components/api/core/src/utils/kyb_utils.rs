@@ -21,6 +21,7 @@ use itertools::Itertools;
 use newtypes::sms_message::SmsMessage;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerKind;
+use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
 use newtypes::PiiString;
 use newtypes::WorkflowState;
@@ -172,16 +173,21 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> FpResult<()> {
+pub async fn run_kyb(
+    state: &State,
+    tenant: &Tenant,
+    biz_wf: Workflow,
+    seqno: DataLifetimeSeqno,
+) -> FpResult<()> {
     let wf_id = biz_wf.id.clone();
 
     // First see if we have to run authorize
     if matches!(biz_wf.state, WorkflowState::Kyb(KybState::DataCollection)) {
         // Authorize is kind of a misnomer now - it doesn't actually mark the workflow as
         // authorized - it just does some processing that normally happens after authorize
-        let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
+        let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
         let _ = ww
-            .run(state, WorkflowActions::Authorize(Authorize {}))
+            .run(state, WorkflowActions::Authorize(Authorize { seqno }))
             .await
             .map_err(|err| tracing::error!(?err, "Error running Authorize on KYB workflow"));
     }
@@ -194,7 +200,7 @@ pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> FpResu
     let should_run_kyb = should_run_kyb(state, &biz_wf, tenant).await?;
     tracing::info!(should_run_kyb, "should_run_kyb");
     if should_run_kyb {
-        let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
+        let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
         let res = ww
             .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
             .await;

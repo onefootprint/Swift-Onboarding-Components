@@ -1,6 +1,7 @@
 use crate::decision::state::actions::Authorize;
 use crate::decision::state::actions::MakeVendorCalls;
 use crate::decision::state::kyc;
+use crate::decision::state::test_utils::get_current_seqno;
 use crate::decision::state::test_utils::mock_idology;
 use crate::decision::state::test_utils::mock_incode_doc_collection;
 use crate::decision::state::test_utils::mock_webhooks;
@@ -120,14 +121,15 @@ async fn valid_action(state: &mut State) {
     let wf = create_wf(state, KycState::DataCollection.into()).await;
     let wfid = wf.id.clone();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     assert!(matches!(
         ww.state,
         WorkflowKind::Kyc(kyc::KycState::DataCollection(_))
     ));
 
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
     assert!(matches!(
@@ -148,9 +150,10 @@ async fn invalid_action(state: &mut State) {
     let wf = create_wf(state, KycState::DataCollection.into()).await;
     let wfid = wf.id.clone();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
     let _e = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .err()
         .unwrap();
@@ -190,7 +193,8 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     let svid2 = svid.clone();
     let document_requested = doc_collection_kind.doc_requested();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // MOCKING
     let mut mock_ff_client = MockFFClient::new();
@@ -247,7 +251,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     // Authorize
     // Expect Webhook
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 
@@ -257,7 +261,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
@@ -288,7 +292,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     // MakeDecision
     let (_, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -400,7 +404,8 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     let svid2 = wf.scoped_vault_id.clone();
     let document_requested = doc_collection_kind.doc_requested();
 
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // MOCKING
     let mut mock_ff_client = MockFFClient::new();
@@ -460,7 +465,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     //
     // Authorize
     let (ww, _) = ww
-        .action(state, WorkflowActions::Authorize(Authorize {}))
+        .action(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
     let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
@@ -469,7 +474,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 
     // MakeVendorCalls
     let (ww, _) = ww
-        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
+        .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
         .await
         .unwrap();
 
@@ -502,7 +507,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 
     // MakeDecision
     let (_, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
+        .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
 
@@ -624,7 +629,8 @@ async fn redo_and_pass(
 
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
-    let ww = WorkflowWrapper::init(state, wf).await.unwrap();
+    let seqno = get_current_seqno(state).await;
+    let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // MOCKING
     let mut mock_ff_client = MockFFClient::new();
@@ -671,7 +677,7 @@ async fn redo_and_pass(
     );
 
     let _: WorkflowWrapper = ww
-        .run(state, WorkflowActions::Authorize(Authorize {}))
+        .run(state, WorkflowActions::Authorize(Authorize { seqno }))
         .await
         .unwrap();
 

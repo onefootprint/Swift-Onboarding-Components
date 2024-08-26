@@ -11,6 +11,7 @@ use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
 use newtypes::Locked;
 use newtypes::ScopedVaultId;
@@ -36,7 +37,12 @@ pub struct DocumentComplete;
 /// ////////////////
 impl DocumentDataCollection {
     #[tracing::instrument("DocumentDataCollection::init", skip_all)]
-    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
+    pub async fn init(
+        _: &State,
+        workflow: DbWorkflow,
+        _config: DocumentConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         Ok(DocumentDataCollection {
             sv_id: workflow.scoped_vault_id.clone(),
         })
@@ -75,7 +81,7 @@ impl WorkflowState for DocumentDataCollection {
         newtypes::DocumentState::DataCollection.into()
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -85,7 +91,12 @@ impl WorkflowState for DocumentDataCollection {
 /// ////////////////
 impl DocumentDecisioning {
     #[tracing::instrument("DocumentDecisioning::init", skip_all)]
-    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
+    pub async fn init(
+        _: &State,
+        workflow: DbWorkflow,
+        _config: DocumentConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         Ok(DocumentDecisioning {
             sv_id: workflow.scoped_vault_id.clone(),
         })
@@ -131,8 +142,8 @@ impl WorkflowState for DocumentDecisioning {
         newtypes::DocumentState::Decisioning.into()
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
-        Some(WorkflowActions::MakeDecision(MakeDecision))
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision { seqno }))
     }
 }
 
@@ -141,7 +152,12 @@ impl WorkflowState for DocumentDecisioning {
 /// ////////////////
 impl DocumentComplete {
     #[tracing::instrument("DocumentComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
+    pub async fn init(
+        _state: &State,
+        _workflow: DbWorkflow,
+        _config: DocumentConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         Ok(DocumentComplete)
     }
 }
@@ -151,7 +167,7 @@ impl WorkflowState for DocumentComplete {
         newtypes::DocumentState::Complete.into()
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }

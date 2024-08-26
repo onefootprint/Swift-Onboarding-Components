@@ -1,15 +1,24 @@
-use super::StateError;
+use newtypes::DataLifetimeSeqno;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumDiscriminants;
 use strum_macros::EnumString;
 
-#[derive(Debug)]
-pub struct Authorize;
-#[derive(Debug)]
-pub struct MakeVendorCalls;
-#[derive(Debug)]
-pub struct MakeDecision;
+#[derive(Clone, Debug)]
+pub struct Authorize {
+    pub seqno: DataLifetimeSeqno,
+}
+
+#[derive(Clone, Debug)]
+pub struct MakeVendorCalls {
+    pub seqno: DataLifetimeSeqno,
+}
+
+#[derive(Clone, Debug)]
+pub struct MakeDecision {
+    pub seqno: DataLifetimeSeqno,
+}
+
 #[derive(Debug)]
 pub struct MakeWatchlistCheckCall; // OFAC, PEP, Adverse Media
 #[derive(Debug)]
@@ -40,25 +49,5 @@ pub enum WorkflowActions {
 impl std::fmt::Debug for WorkflowActions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         WorkflowActionsKind::from(self).fmt(f)
-    }
-}
-
-impl TryFrom<WorkflowActionsKind> for WorkflowActions {
-    type Error = StateError;
-
-    fn try_from(value: WorkflowActionsKind) -> Result<Self, Self::Error> {
-        match value {
-            WorkflowActionsKind::Authorize => Ok(Self::Authorize(Authorize {})),
-            WorkflowActionsKind::MakeVendorCalls => Ok(Self::MakeVendorCalls(MakeVendorCalls {})),
-            WorkflowActionsKind::MakeDecision => Ok(Self::MakeDecision(MakeDecision {})),
-            WorkflowActionsKind::MakeWatchlistCheckCall => {
-                Ok(Self::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}))
-            }
-            WorkflowActionsKind::DocCollected => Ok(Self::DocCollected(DocCollected {})),
-            WorkflowActionsKind::BoKycCompleted => Ok(Self::BoKycCompleted(BoKycCompleted {})),
-            WorkflowActionsKind::AsyncVendorCallsCompleted => {
-                Ok(Self::AsyncVendorCallsCompleted(AsyncVendorCallsCompleted {}))
-            }
-        }
     }
 }

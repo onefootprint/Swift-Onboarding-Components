@@ -1,5 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::State;
+use api_core::auth::user::UserIdentifier;
 use api_core::auth::Any;
 use api_core::errors::ValidationError;
 use api_core::utils::requirements::get_register_auth_method_requirements;
@@ -30,11 +31,12 @@ pub async fn get(
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(ValidationError("No scoped user associated with session"))?;
+    let user_identifier = UserIdentifier::ScopedVault(sv_id);
 
     let requirements = state
         .db_pool
         .db_query(move |conn| {
-            get_register_auth_method_requirements(conn, &obc, &sv_id, &user_auth.auth_events)
+            get_register_auth_method_requirements(conn, &obc, user_identifier, &user_auth.auth_events)
         })
         .await?;
 

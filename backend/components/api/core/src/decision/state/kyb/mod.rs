@@ -15,6 +15,7 @@ use async_trait::async_trait;
 use db::models::rule_instance::IncludeRules;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
+use newtypes::DataLifetimeSeqno;
 use newtypes::RuleInstanceKind;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -81,7 +82,7 @@ pub enum KybState {
 }
 
 impl KybState {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, seqno: DataLifetimeSeqno) -> FpResult<Self> {
         let newtypes::WorkflowState::Kyb(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
@@ -90,30 +91,34 @@ impl KybState {
         };
 
         match s {
-            newtypes::KybState::DataCollection => KybDataCollection::init(state, workflow, c)
+            newtypes::KybState::DataCollection => KybDataCollection::init(state, workflow, c, seqno)
                 .await
                 .map(KybState::from),
-            newtypes::KybState::AwaitingBoKyc => KybAwaitingBoKyc::init(state, workflow, c)
+            newtypes::KybState::AwaitingBoKyc => KybAwaitingBoKyc::init(state, workflow, c, seqno)
                 .await
                 .map(KybState::from),
-            newtypes::KybState::VendorCalls => {
-                KybVendorCalls::init(state, workflow, c).await.map(KybState::from)
+            newtypes::KybState::VendorCalls => KybVendorCalls::init(state, workflow, c, seqno)
+                .await
+                .map(KybState::from),
+            newtypes::KybState::AwaitingAsyncVendors => {
+                KybAwaitingAsyncVendors::init(state, workflow, c, seqno)
+                    .await
+                    .map(KybState::from)
             }
-            newtypes::KybState::AwaitingAsyncVendors => KybAwaitingAsyncVendors::init(state, workflow, c)
+            newtypes::KybState::Decisioning => KybDecisioning::init(state, workflow, c, seqno)
                 .await
                 .map(KybState::from),
-            newtypes::KybState::Decisioning => {
-                KybDecisioning::init(state, workflow, c).await.map(KybState::from)
-            }
-            newtypes::KybState::Complete => KybComplete::init(state, workflow, c).await.map(KybState::from),
+            newtypes::KybState::Complete => KybComplete::init(state, workflow, c, seqno)
+                .await
+                .map(KybState::from),
         }
     }
 }
 
 #[async_trait]
 impl Workflow for KybState {
-    fn default_action(&self) -> Option<WorkflowActions> {
-        <Self as WorkflowState>::default_action(self)
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        <Self as WorkflowState>::default_action(self, seqno)
     }
 
     async fn action(

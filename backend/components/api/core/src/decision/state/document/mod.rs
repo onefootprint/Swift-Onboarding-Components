@@ -12,6 +12,7 @@ use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
 
 mod states;
+use newtypes::DataLifetimeSeqno;
 use newtypes::WorkflowId;
 pub use states::*;
 
@@ -24,7 +25,7 @@ pub enum DocumentState {
 }
 
 impl DocumentState {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, seqno: DataLifetimeSeqno) -> FpResult<Self> {
         let newtypes::WorkflowState::Document(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
@@ -33,13 +34,15 @@ impl DocumentState {
         };
         // TODO could get rid of this with enum_dispatch
         match s {
-            newtypes::DocumentState::DataCollection => DocumentDataCollection::init(state, workflow, c)
+            newtypes::DocumentState::DataCollection => {
+                DocumentDataCollection::init(state, workflow, c, seqno)
+                    .await
+                    .map(DocumentState::from)
+            }
+            newtypes::DocumentState::Decisioning => DocumentDecisioning::init(state, workflow, c, seqno)
                 .await
                 .map(DocumentState::from),
-            newtypes::DocumentState::Decisioning => DocumentDecisioning::init(state, workflow, c)
-                .await
-                .map(DocumentState::from),
-            newtypes::DocumentState::Complete => DocumentComplete::init(state, workflow, c)
+            newtypes::DocumentState::Complete => DocumentComplete::init(state, workflow, c, seqno)
                 .await
                 .map(DocumentState::from),
         }
@@ -48,8 +51,8 @@ impl DocumentState {
 
 #[async_trait]
 impl Workflow for DocumentState {
-    fn default_action(&self) -> Option<WorkflowActions> {
-        <Self as WorkflowState>::default_action(self)
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        <Self as WorkflowState>::default_action(self, seqno)
     }
 
     async fn action(

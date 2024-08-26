@@ -47,6 +47,7 @@ use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DecisionIntentKind;
 use newtypes::DeviceInsightOperation;
 use newtypes::FootprintReasonCode;
@@ -81,11 +82,12 @@ pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbRes
 pub fn get_vw_and_obc(
     conn: &mut PgConn,
     sv_id: &ScopedVaultId,
+    seqno: DataLifetimeSeqno,
     wf_id: &WorkflowId,
 ) -> FpResult<(VaultWrapper, ObConfiguration)> {
     let (obc, _) = ObConfiguration::get(conn, wf_id)?;
 
-    let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(sv_id))?;
+    let vw = VaultWrapper::<_>::build(conn, VwArgs::Historical(sv_id, seqno))?;
 
     Ok((vw, obc))
 }

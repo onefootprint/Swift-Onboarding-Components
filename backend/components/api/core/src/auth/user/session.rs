@@ -24,6 +24,7 @@ use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
+use newtypes::DataLifetimeSeqno;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
@@ -123,6 +124,7 @@ impl UserSessionContext {
 pub enum UserIdentifier {
     Vault(VaultId),
     ScopedVault(ScopedVaultId),
+    VersionedScopedVault(ScopedVaultId, DataLifetimeSeqno),
 }
 
 /// Nests a private UserSession and implements traits required to extract this session from an

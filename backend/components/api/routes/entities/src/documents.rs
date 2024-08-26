@@ -76,7 +76,7 @@ pub async fn get(
             // TODO we won't show historical versions of documents uploaded here, even though we
             // show multiple ID document sessions.
             // We'd need to support fetching even deactivated DLs from the database
-            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_version(conn, &sv.id, seqno)?;
+            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_maybe_version(conn, &sv.id, seqno)?;
             let api_docs = vw
                 .populated_dis()
                 .into_iter()

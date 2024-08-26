@@ -15,6 +15,7 @@ use newtypes::VaultId;
 ///     (via an authorized OB config)
 ///
 /// The VwArgs variants below are used to construct a VaultWrapper specific to the use case.
+#[derive(Debug)]
 pub enum VwArgs<'a> {
     /// Used to build a VW for a user that sees ALL portable data.
     /// This is generally used to autofill portable data into tenants during one-click and for
@@ -33,8 +34,9 @@ pub enum VwArgs<'a> {
 impl<'a> From<&'a UserIdentifier> for VwArgs<'a> {
     fn from(value: &'a UserIdentifier) -> Self {
         match value {
-            UserIdentifier::ScopedVault(sv_id) => Self::Tenant(sv_id),
             UserIdentifier::Vault(sv_id) => Self::Vault(sv_id),
+            UserIdentifier::ScopedVault(sv_id) => Self::Tenant(sv_id),
+            UserIdentifier::VersionedScopedVault(sv_id, seqno) => Self::Historical(sv_id, *seqno),
         }
     }
 }
@@ -59,8 +61,12 @@ impl<'a> VwArgs<'a> {
         };
         // It's often hard to have branching logic to compose for the current seqno, so if we're
         // not making a historical VW, let's just build it at the current seqno
-        let current_seqno = DataLifetime::get_current_seqno(conn)?;
-        let seqno = seqno.unwrap_or(current_seqno);
+        let seqno = if let Some(seqno) = seqno {
+            seqno
+        } else {
+            DataLifetime::get_current_seqno(conn)?
+        };
+
         tracing::info!(user_vault_id=%vault.id, sv_id=?sv_id, seqno=%seqno, "Building VaultWrapper");
         Ok((vault, sv_id, seqno))
     }

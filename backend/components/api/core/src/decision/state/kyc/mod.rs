@@ -17,6 +17,7 @@ use async_trait::async_trait;
 use db::models::rule_instance::IncludeRules;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
+use newtypes::DataLifetimeSeqno;
 use newtypes::RuleInstanceKind;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -30,6 +31,7 @@ pub struct KycDataCollection {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
+    seqno: DataLifetimeSeqno,
 }
 
 #[derive(Clone)]
@@ -37,6 +39,7 @@ pub struct KycVendorCalls {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
+    seqno: DataLifetimeSeqno,
 }
 
 #[derive(Clone)]
@@ -45,14 +48,16 @@ pub struct KycDecisioning {
     sv_id: ScopedVaultId,
     t_id: TenantId,
     include_rules: IncludeRules,
+    seqno: DataLifetimeSeqno,
 }
 impl KycDecisioning {
-    pub fn new(wf_id: WorkflowId, sv_id: ScopedVaultId, t_id: TenantId) -> Self {
+    pub fn new(wf_id: WorkflowId, sv_id: ScopedVaultId, t_id: TenantId, seqno: DataLifetimeSeqno) -> Self {
         Self {
             wf_id,
             sv_id,
             t_id,
             include_rules: IncludeRules::Kind(RuleInstanceKind::Person),
+            seqno,
         }
     }
 }
@@ -62,6 +67,7 @@ pub struct KycDocCollection {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
+    seqno: DataLifetimeSeqno,
 }
 
 #[derive(Clone)]
@@ -79,7 +85,7 @@ pub enum KycState {
 
 impl KycState {
     #[tracing::instrument(skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, seqno: DataLifetimeSeqno) -> FpResult<Self> {
         let newtypes::WorkflowState::Kyc(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
@@ -88,17 +94,19 @@ impl KycState {
         };
         // TODO could get rid of this with enum_dispatch
         match s {
-            newtypes::KycState::DataCollection => KycDataCollection::init(state, workflow, c)
+            newtypes::KycState::DataCollection => KycDataCollection::init(state, workflow, c, seqno)
                 .await
                 .map(KycState::from),
-            newtypes::KycState::VendorCalls => {
-                KycVendorCalls::init(state, workflow, c).await.map(KycState::from)
-            }
-            newtypes::KycState::Decisioning => {
-                KycDecisioning::init(state, workflow, c).await.map(KycState::from)
-            }
-            newtypes::KycState::Complete => KycComplete::init(state, workflow, c).await.map(KycState::from),
-            newtypes::KycState::DocCollection => KycDocCollection::init(state, workflow, c)
+            newtypes::KycState::VendorCalls => KycVendorCalls::init(state, workflow, c, seqno)
+                .await
+                .map(KycState::from),
+            newtypes::KycState::Decisioning => KycDecisioning::init(state, workflow, c, seqno)
+                .await
+                .map(KycState::from),
+            newtypes::KycState::Complete => KycComplete::init(state, workflow, c, seqno)
+                .await
+                .map(KycState::from),
+            newtypes::KycState::DocCollection => KycDocCollection::init(state, workflow, c, seqno)
                 .await
                 .map(KycState::from),
         }
@@ -107,8 +115,8 @@ impl KycState {
 
 #[async_trait]
 impl Workflow for KycState {
-    fn default_action(&self) -> Option<WorkflowActions> {
-        <Self as WorkflowState>::default_action(self)
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        <Self as WorkflowState>::default_action(self, seqno)
     }
 
     async fn action(

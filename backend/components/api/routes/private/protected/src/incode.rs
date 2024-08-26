@@ -31,6 +31,7 @@ use api_core::State;
 use api_wire_types::CreateDocumentResponse;
 use api_wire_types::DocumentResponse;
 use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
 use db::models::document::NewDocumentArgs;
@@ -246,8 +247,9 @@ pub async fn adhoc_create_document_and_workflow(
     let (vw, document_request, wf_id) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
+            let seqno = DataLifetime::get_current_seqno(conn)?;
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
 
             let (obc, _) = ObConfiguration::get_enabled(conn, (&playbook_key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
@@ -261,6 +263,7 @@ pub async fn adhoc_create_document_and_workflow(
                 wfr_id: None,
                 force_create: false,
                 sv: &sv,
+                seqno,
                 obc: &obc,
                 insight_event: None,
                 new_biz_args: None,
@@ -396,7 +399,7 @@ pub async fn adhoc_document_process(
 ) -> ApiResponse<api_wire_types::Empty> {
     let document_id = args.into_inner();
 
-    let (wf, uvw, obc) = state
+    let (wf, uvw, obc, seqno) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
@@ -416,17 +419,19 @@ pub async fn adhoc_document_process(
             let (obc, _) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)
                 .map_err(|_| DbError::PlaybookNotFound)?;
 
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&wf.scoped_vault_id, seqno))?;
 
-            Ok((wf, uvw, obc))
+            Ok((wf, uvw, obc, seqno))
         })
         .await?;
 
     // run the workflow to completion
     let wf2 = wf.clone();
-    let ww = WorkflowWrapper::init(&state, wf2).await?;
+    let ww = WorkflowWrapper::init(&state, wf2, seqno).await?;
     if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
-        ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+        ww.run(&state, WorkflowActions::Authorize(Authorize { seqno }))
+            .await?;
     } else if matches!(ww.state, WorkflowKind::Kyc(KycState::Complete(_))) {
     } else {
         tracing::info!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "adhoc document process workflow in wrong state");

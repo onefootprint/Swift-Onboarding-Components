@@ -37,7 +37,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vw = VaultWrapper::build_for_tenant_version(conn, &sv.id, seqno)?;
+            let vw = VaultWrapper::build_for_tenant_maybe_version(conn, &sv.id, seqno)?;
             Ok(vw)
         })
         .await?;

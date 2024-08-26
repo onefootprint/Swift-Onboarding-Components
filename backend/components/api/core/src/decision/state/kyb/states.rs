@@ -27,7 +27,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
-use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
@@ -41,6 +40,7 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode;
 use newtypes::KybConfig;
@@ -60,7 +60,12 @@ use std::sync::Arc;
 /// authorized
 impl KybDataCollection {
     #[tracing::instrument("KybDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDataCollection {
@@ -106,7 +111,7 @@ impl WorkflowState for KybDataCollection {
         newtypes::WorkflowState::from(newtypes::KybState::DataCollection)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -117,7 +122,12 @@ impl WorkflowState for KybDataCollection {
 /// After all business information is collected, we wait in this state for all BO's to complete KYC
 impl KybAwaitingBoKyc {
     #[tracing::instrument("KybAwaitingBoKyc::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingBoKyc {
@@ -199,7 +209,7 @@ impl WorkflowState for KybAwaitingBoKyc {
         newtypes::WorkflowState::from(newtypes::KybState::AwaitingBoKyc)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -211,7 +221,12 @@ impl WorkflowState for KybAwaitingBoKyc {
 /// syncronous KYB vendors here (eg: Lexis + Experian)
 impl KybVendorCalls {
     #[tracing::instrument("KybVendorCalls::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybVendorCalls {
@@ -285,8 +300,8 @@ impl WorkflowState for KybVendorCalls {
         newtypes::WorkflowState::from(newtypes::KybState::VendorCalls)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
-        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls))
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeVendorCalls(MakeVendorCalls { seqno }))
     }
 }
 
@@ -296,7 +311,12 @@ impl WorkflowState for KybVendorCalls {
 /// We remain in this state until the Middesk asyncronous flow completes.
 impl KybAwaitingAsyncVendors {
     #[tracing::instrument("KybAwaitingAsyncVendors::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingAsyncVendors {
@@ -341,7 +361,7 @@ impl WorkflowState for KybAwaitingAsyncVendors {
         newtypes::WorkflowState::from(newtypes::KybState::AwaitingAsyncVendors)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
@@ -351,7 +371,12 @@ impl WorkflowState for KybAwaitingAsyncVendors {
 /// ////////////////
 impl KybDecisioning {
     #[tracing::instrument("KybDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        state: &State,
+        workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDecisioning::new(workflow.id, sv.tenant_id))
@@ -372,7 +397,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
     )]
     async fn execute_async_idempotent_actions(
         &self,
-        _action: MakeDecision,
+        action: MakeDecision,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
@@ -384,10 +409,10 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
-                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
-                                                                    // a new seqno inside the RSR write itself
+                // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
+                // of pulling a new seqno inside the RSR write itself
                 let vw =
-                    VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, Some(seqno))?;
+                    VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, action.seqno)?;
 
                 let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
 
@@ -474,8 +499,8 @@ impl WorkflowState for KybDecisioning {
         newtypes::WorkflowState::from(newtypes::KybState::Decisioning)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
-        Some(WorkflowActions::MakeDecision(MakeDecision))
+    fn default_action(&self, seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
+        Some(WorkflowActions::MakeDecision(MakeDecision { seqno }))
     }
 }
 
@@ -484,7 +509,12 @@ impl WorkflowState for KybDecisioning {
 /// ////////////////
 impl KybComplete {
     #[tracing::instrument("KybComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
+    pub async fn init(
+        _state: &State,
+        _workflow: DbWorkflow,
+        _config: KybConfig,
+        _seqno: DataLifetimeSeqno,
+    ) -> FpResult<Self> {
         Ok(KybComplete {})
     }
 }
@@ -494,7 +524,7 @@ impl WorkflowState for KybComplete {
         newtypes::WorkflowState::from(newtypes::KybState::Complete)
     }
 
-    fn default_action(&self) -> Option<WorkflowActions> {
+    fn default_action(&self, _seqno: DataLifetimeSeqno) -> Option<WorkflowActions> {
         None
     }
 }
