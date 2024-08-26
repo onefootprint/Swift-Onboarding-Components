@@ -8,10 +8,12 @@ use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::fingerprint;
+use db_schema::schema::fingerprint::BoxedQuery;
 use db_schema::schema::fingerprint_junction;
 use db_schema::schema::scoped_vault;
 use diesel::dsl::count_distinct;
 use diesel::dsl::not;
+use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::Queryable;
 use itertools::Itertools;
@@ -225,40 +227,17 @@ impl Fingerprint {
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
     pub fn get_dupes(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<FingerprintDupesResult> {
-        let sh_datas = fingerprint::table
-            .filter(fingerprint::scoped_vault_id.eq(&sv.id))
-            .filter(fingerprint::deactivated_at.is_null())
-            .filter(fingerprint::is_hidden.eq(false))
-            .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
-            .filter(fingerprint::sh_data.is_not_null())
-            .select(fingerprint::sh_data.assume_not_null())
-            .get_results::<FingerprintData>(conn)?;
-
-        let q_dupes = fingerprint::table
-            .filter(fingerprint::sh_data.is_not_null())
-            .filter(fingerprint::sh_data.eq_any(&sh_datas))
-            .filter(fingerprint::deactivated_at.is_null())
-            .filter(fingerprint::is_hidden.eq(false))
-            .filter(fingerprint::is_live.eq(sv.is_live))
-            .filter(fingerprint::vault_id.ne(&sv.vault_id))
-            // TODO when we stop making unverified vaults after each signup challenge, remove this
-            // logic. It will be horribly slow
-            .inner_join(scoped_vault::table)
-            .filter(scoped_vault::is_active.eq(true))
-            .select(fingerprint::all_columns);
-
         // TODO hide dupes at other tenants in sandbox in next PR
-        let internal_matches = q_dupes
-            .clone()
-            .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
-            // TODO weird things will happen when there are more than 100 dupes
-            .limit(100)
-            .order_by(fingerprint::vault_id)
-            .get_results::<Self>(conn)?;
-
+        let (internal_matches, _) = Self::get_internal_dupes(conn, sv, OffsetPagination::new(Some(0), 100))?;
         let external = if sv.is_live {
             let v_ids_with_dupes_at_tenant = internal_matches.iter().map(|f| &f.vault_id).collect_vec();
-            let (num_users, num_tenants) = q_dupes
+            let sh_datas = Self::get_sh_datas(conn, sv)?;
+            let (num_users, num_tenants) = Self::q_dupes_query(sv, &sh_datas)
+                // TODO when we stop making unverified vaults after each signup challenge, remove this
+                // logic. It will be horribly slow
+                .inner_join(scoped_vault::table)
+                .filter(scoped_vault::is_active.eq(true))
+                .select(fingerprint::all_columns)
                 .filter(fingerprint::tenant_id.ne(&sv.tenant_id))
                 .filter(not(fingerprint::vault_id.eq_any(v_ids_with_dupes_at_tenant)))
                 .select((
@@ -290,6 +269,24 @@ impl Fingerprint {
         sv: &ScopedVault,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<Fingerprint>, NextPage)> {
+        let sh_datas = Self::get_sh_datas(conn, sv)?;
+        let q_dupes = Self::q_dupes_query(sv, &sh_datas);
+        let internal_matches = q_dupes
+            // TODO when we stop making unverified vaults after each signup challenge, remove this
+            // logic. It will be horribly slow
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault::is_active.eq(true))
+            .select(fingerprint::all_columns)
+            .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
+            .offset(pagination.offset().unwrap_or_default())
+            .limit(pagination.limit())
+            .order_by(fingerprint::vault_id)
+            .get_results::<Self>(conn)?;
+
+        Ok(pagination.results(internal_matches))
+    }
+
+    fn get_sh_datas(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<Vec<FingerprintData>> {
         let sh_datas = fingerprint::table
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
@@ -298,28 +295,19 @@ impl Fingerprint {
             .filter(fingerprint::sh_data.is_not_null())
             .select(fingerprint::sh_data.assume_not_null())
             .get_results::<FingerprintData>(conn)?;
+        Ok(sh_datas)
+    }
 
+    fn q_dupes_query<'a>(sv: &'a ScopedVault, sh_datas: &'a Vec<FingerprintData>) -> BoxedQuery<'a, Pg> {
         let q_dupes = fingerprint::table
             .filter(fingerprint::sh_data.is_not_null())
-            .filter(fingerprint::sh_data.eq_any(&sh_datas))
+            .filter(fingerprint::sh_data.eq_any(sh_datas))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::is_hidden.eq(false))
             .filter(fingerprint::is_live.eq(sv.is_live))
             .filter(fingerprint::vault_id.ne(&sv.vault_id))
-            // TODO when we stop making unverified vaults after each signup challenge, remove this
-            // logic. It will be horribly slow
-            .inner_join(scoped_vault::table)
-            .filter(scoped_vault::is_active.eq(true))
-            .select(fingerprint::all_columns);
+            .into_boxed();
 
-        let internal_matches = q_dupes
-            .clone()
-            .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
-            .offset(pagination.offset().unwrap_or_default())
-            .limit(pagination.limit())
-            .order_by(fingerprint::vault_id)
-            .get_results::<Self>(conn)?;
-
-        Ok(pagination.results(internal_matches))
+        q_dupes
     }
 }
