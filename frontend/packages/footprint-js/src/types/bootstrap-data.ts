@@ -26,6 +26,14 @@ type IDProps = {
   'id.zip': string;
 };
 
+type Business_BeneficialOwners = {
+  email: string;
+  first_name: string;
+  last_name: string;
+  ownership_stake: number;
+  phone_number: string;
+};
+
 type BusinessProps = {
   'business.address_line1': string;
   'business.address_line2': string;
@@ -39,8 +47,11 @@ type BusinessProps = {
   'business.tin': string;
   'business.website': string;
   'business.zip': string;
+  'business.primary_owner_stake': number;
+  'business.secondary_owners': Partial<Business_BeneficialOwners>[];
 };
 
 /** @deprecated: use BootstrapData instead */
 export type FootprintUserData = Partial<IDProps & CustomProps>;
-export type BootstrapData = Partial<IDProps> & Partial<BusinessProps> & Partial<CustomProps>;
+
+export type BootstrapData = Partial<IDProps & BusinessProps & CustomProps>;
