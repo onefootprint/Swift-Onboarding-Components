@@ -1,5 +1,9 @@
 import type { BusinessDI, IdDocOutcome, IdvBootstrapData, ObConfigAuth, OverallOutcome } from '@onefootprint/types';
-import { BootstrapOnlyBusinessOwnersKey, IdDI } from '@onefootprint/types';
+import {
+  BootstrapOnlyBusinessPrimaryOwnerStake,
+  BootstrapOnlyBusinessSecondaryOwnersKey,
+  IdDI,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks';
@@ -32,7 +36,13 @@ const getIdvMachineContext = (args: IdvMachineArgs): Readonly<MachineContext> =>
 
   if (bootstrapData) {
     for (const [key, value] of Object.entries(bootstrapData)) {
-      const checkedKey = key === 'businessOwners' ? BootstrapOnlyBusinessOwnersKey : (key as IdDI | BusinessDI);
+      // Bootstrap keys that are not DIs are being automatically converted to camelCase, need to convert them back
+      const checkedKey =
+        key === 'businessSecondaryOwners'
+          ? BootstrapOnlyBusinessSecondaryOwnersKey
+          : key === 'businessPrimaryOwnerStake'
+            ? BootstrapOnlyBusinessPrimaryOwnerStake
+            : (key as IdDI | BusinessDI);
 
       if (value) {
         // @ts-expect-error: Type 'any' is not assignable to type 'never'

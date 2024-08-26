@@ -15,7 +15,7 @@ import type { FormData } from './types';
 export type FormProps = {
   config?: PublicOnboardingConfig;
   ctaLabel?: string;
-  defaultValues?: BeneficialOwner[];
+  defaultValues: BeneficialOwner[];
   hideHeader?: boolean;
   isLoading: boolean;
   onCancel?: () => void;
@@ -38,19 +38,9 @@ const Form = ({
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.beneficial-owners.form' });
   const toast = useToast();
   const l10n = useL10nContext();
-  const defaultBeneficialOwnersData = defaultValues ?? [
-    {
-      [BeneficialOwnerDataAttribute.firstName]: '',
-      [BeneficialOwnerDataAttribute.middleName]: '',
-      [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]: '',
-      [BeneficialOwnerDataAttribute.phoneNumber]: '',
-      [BeneficialOwnerDataAttribute.ownershipStake]: 0,
-    },
-  ];
   const methods = useForm<FormData>({
     defaultValues: {
-      beneficialOwners: [...defaultBeneficialOwnersData],
+      beneficialOwners: [...defaultValues],
     },
   });
 

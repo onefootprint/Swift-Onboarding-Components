@@ -6,7 +6,7 @@ import type {
   ValueTypeForBusinessDI,
   ValueTypeForIdDI,
 } from '@onefootprint/types';
-import { BootstrapOnlyBusinessOwnersKey } from '@onefootprint/types';
+import { BootstrapOnlyBusinessPrimaryOwnerStake, BootstrapOnlyBusinessSecondaryOwnersKey } from '@onefootprint/types';
 
 import type { CompletePayload } from './utils/state-machine';
 import type { IdvMachineArgs } from './utils/state-machine/machine';
@@ -20,6 +20,7 @@ export type UserData = Partial<{ [K in IdDI]: DIMetadata<ValueTypeForIdDI<K>> }>
 export type BusinessData = Partial<{ [K in BusinessDI]: DIMetadata<ValueTypeForBusinessDI<K>> }>;
 
 type BusinessBootstrapOnlyProps = {
-  [BootstrapOnlyBusinessOwnersKey]?: DIMetadata<BeneficialOwner[]>;
+  [BootstrapOnlyBusinessSecondaryOwnersKey]?: DIMetadata<BeneficialOwner[]>;
+  [BootstrapOnlyBusinessPrimaryOwnerStake]?: DIMetadata<number>;
 };
 export type BootstrapBusinessData = Omit<BusinessData, BootstrapIgnoredBusinessDI> & BusinessBootstrapOnlyProps;

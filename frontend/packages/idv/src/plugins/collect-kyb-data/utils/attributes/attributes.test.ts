@@ -48,7 +48,7 @@ describe('extractNonBoBootstrapValues', () => {
     expect(result).toEqual({});
   });
 
-  it("should filter out 'business.beneficial_owners', 'business.kyced_beneficial_owners', 'business.owners'", () => {
+  it("should filter out 'business.beneficial_owners', 'business.kyced_beneficial_owners', 'business.secondary_owners'", () => {
     const input = {
       'business.name': { value: 'Acme Bank Inc.', isBootstrap: true },
       'business.dba': { value: 'Acme Bank', isBootstrap: true },
@@ -62,7 +62,7 @@ describe('extractNonBoBootstrapValues', () => {
       'business.state': { value: 'MA', isBootstrap: true },
       'business.zip': { value: '02117', isBootstrap: true },
       'business.country': { value: 'US' as const, isBootstrap: true },
-      'business.owners': {
+      'business.secondary_owners': {
         value: [
           {
             first_name: 'Owner',
@@ -661,15 +661,14 @@ describe('extractBoBootstrapValues', () => {
       kybRequirement: getKybRequirement([CollectedKybDataOption.beneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {
-        'business.owners': {
+        'business.secondary_owners': {
           value: [
             {
-              // @ts-expect-error: the bootstrap values are camelCased
-              firstName: 'Owner',
-              lastName: 'Last',
+              first_name: 'Owner',
+              last_name: 'Last',
               email: 'owners@acme.com',
-              phoneNumber: '+12025550179',
-              ownershipStake: 50,
+              phone_number: '+12025550179',
+              ownership_stake: 50,
             },
           ],
           isBootstrap: true,
@@ -680,10 +679,14 @@ describe('extractBoBootstrapValues', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    // @ts-expect-error: the bootstrap values are camelCased
     const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({
-      'business.beneficial_owners': [{ first_name: 'Owner', last_name: 'Last', ownership_stake: 50 }],
+      'business.beneficial_owners': [
+        // Primary BO is inferred from id data or empty
+        {},
+        // Secondary BO data passed in
+        { first_name: 'Owner', last_name: 'Last', ownership_stake: 50 },
+      ],
     });
   });
 
@@ -692,15 +695,14 @@ describe('extractBoBootstrapValues', () => {
       kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
       idvContext: idvContext,
       bootstrapBusinessData: {
-        'business.owners': {
+        'business.secondary_owners': {
           value: [
             {
-              // @ts-expect-error: the bootstrap values are camelCased
-              firstName: 'Owner',
-              lastName: 'Last',
+              first_name: 'Owner',
+              last_name: 'Last',
               email: 'owners@acme.com',
-              phoneNumber: '+12025550179',
-              ownershipStake: 50,
+              phone_number: '+12025550179',
+              ownership_stake: 50,
             },
           ],
           isBootstrap: true,
@@ -711,10 +713,119 @@ describe('extractBoBootstrapValues', () => {
       dataCollectionScreensToShow: [],
     } satisfies MachineContext;
 
-    // @ts-expect-error: the bootstrap values are camelCased
     const result = extractBoBootstrapValues(ctx);
     expect(result).toEqual({
       'business.kyced_beneficial_owners': [
+        // Primary BO is inferred from id data or empty
+        {},
+        // Secondary BO data passed in
+        {
+          email: 'owners@acme.com',
+          first_name: 'Owner',
+          last_name: 'Last',
+          ownership_stake: 50,
+          phone_number: '+12025550179',
+        },
+      ],
+    });
+  });
+
+  it('constructs primary BO using id.xxx data and business.primary_owner_stake', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      idvContext: idvContext,
+      bootstrapUserData: {
+        'id.phone_number': { value: '+15555550100', isBootstrap: true },
+        'id.email': { value: 'sandbox@onefootprint.com', isBootstrap: true },
+        'id.first_name': { value: 'Primary', isBootstrap: true },
+        'id.last_name': { value: 'Owner', isBootstrap: true },
+      },
+      bootstrapBusinessData: {
+        'business.primary_owner_stake': { value: 10, isBootstrap: true },
+      },
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    const result = extractBoBootstrapValues(ctx);
+    expect(result).toEqual({
+      'business.kyced_beneficial_owners': [
+        {
+          email: 'sandbox@onefootprint.com',
+          first_name: 'Primary',
+          last_name: 'Owner',
+          ownership_stake: 10,
+          phone_number: '+15555550100',
+        },
+      ],
+    });
+  });
+
+  it('constructs primary BO id.xxx data', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      idvContext: idvContext,
+      bootstrapUserData: {
+        'id.phone_number': { value: '+15555550100', isBootstrap: true },
+        'id.email': { value: 'sandbox@onefootprint.com', isBootstrap: true },
+        'id.first_name': { value: 'Primary', isBootstrap: true },
+        'id.last_name': { value: 'Owner', isBootstrap: true },
+      },
+      bootstrapBusinessData: {},
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    const result = extractBoBootstrapValues(ctx);
+    expect(result).toEqual({
+      'business.kyced_beneficial_owners': [
+        {
+          email: 'sandbox@onefootprint.com',
+          first_name: 'Primary',
+          last_name: 'Owner',
+          phone_number: '+15555550100',
+        },
+      ],
+    });
+  });
+
+  it('constructs primary BO and secondary BOs', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      idvContext: idvContext,
+      bootstrapUserData: {
+        'id.phone_number': { value: '+15555550100', isBootstrap: true },
+        'id.email': { value: 'sandbox@onefootprint.com', isBootstrap: true },
+        'id.first_name': { value: 'Primary', isBootstrap: true },
+        'id.last_name': { value: 'Owner', isBootstrap: true },
+      },
+      bootstrapBusinessData: {
+        'business.secondary_owners': {
+          value: [
+            {
+              first_name: 'Owner',
+              last_name: 'Last',
+              email: 'owners@acme.com',
+              phone_number: '+12025550179',
+              ownership_stake: 50,
+            },
+          ],
+          isBootstrap: true,
+        },
+      },
+      data: {},
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    const result = extractBoBootstrapValues(ctx);
+    expect(result).toEqual({
+      'business.kyced_beneficial_owners': [
+        {
+          email: 'sandbox@onefootprint.com',
+          first_name: 'Primary',
+          last_name: 'Owner',
+          phone_number: '+15555550100',
+        },
         {
           email: 'owners@acme.com',
           first_name: 'Owner',

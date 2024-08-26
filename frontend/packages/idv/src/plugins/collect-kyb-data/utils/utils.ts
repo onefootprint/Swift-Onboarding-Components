@@ -1,4 +1,6 @@
 import {
+  type BeneficialOwner,
+  BeneficialOwnerDataAttribute,
   BusinessDI,
   type BusinessDIData,
   CollectedKybDataOption,
@@ -8,7 +10,7 @@ import {
 import isEqual from 'lodash/isEqual';
 import { isObject, isStringValid } from '../../../utils';
 import { fromUSDateToISO8601Format, isISO8601Format, strInputToUSDate } from '../../../utils/string';
-import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields, type IdField } from './constants';
+import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields } from './constants';
 
 export const omitNullAndUndefined = <T extends object>(data: T): T =>
   Object.entries(data).reduce((response, [key, value]) => {
@@ -22,29 +24,40 @@ export const getBoDi = (allAttributes: CollectedKybDataOption[] | undefined) => 
   if (allAttributes?.includes(CollectedKybDataOption.kycedBeneficialOwners)) return BusinessDI.kycedBeneficialOwners;
 };
 
-const hasBeneficialOwnerDi = (
-  userDi: IdField,
+/** Builds a beneficial owner from the provided userData, respecting whether the phone and email are required for the DI. */
+export const buildBeneficialOwner = (
+  userData: DecryptUserResponse,
   boDi: BusinessDI.beneficialOwners | BusinessDI.kycedBeneficialOwners,
 ) => {
-  const isContactInfo = ['id.email', 'id.phone_number'].includes(userDi);
+  const bo = Object.fromEntries(
+    BeneficialOwnerIdFields.map(userDi => {
+      const businessOwnerKey = BENEFICIAL_OWNER_ATTRIBUTE[userDi];
+      const userDataValue = isStringValid(userData[userDi]) ? userData[userDi] : undefined;
+      return [businessOwnerKey, userDataValue];
+    }).filter(([_key, value]) => Boolean(value)),
+  );
+  return omitIrrelevantData(bo, boDi);
+};
+
+const diIncludesField = (
+  boDataAttribute: BeneficialOwnerDataAttribute,
+  boDi: BusinessDI.beneficialOwners | BusinessDI.kycedBeneficialOwners,
+) => {
+  const isContactInfo = [BeneficialOwnerDataAttribute.email, BeneficialOwnerDataAttribute.phoneNumber].includes(
+    boDataAttribute,
+  );
   const isKycedBo = boDi === BusinessDI.kycedBeneficialOwners;
   // Only kyced BOs need to include contact info
   return !isContactInfo || isKycedBo;
 };
 
-/** Builds a beneficial owner from the provided userData, respecting whether the phone and email are required for the DI. */
-export const buildBeneficialOwner = (
-  userData: DecryptUserResponse,
+/** Filters out contact info from BeneficialOwners if the playbook does not require kycing beneficial owners */
+export const omitIrrelevantData = (
+  bo: Partial<BeneficialOwner>,
   boDi: BusinessDI.beneficialOwners | BusinessDI.kycedBeneficialOwners,
 ) =>
   Object.fromEntries(
-    BeneficialOwnerIdFields.filter(userDi => hasBeneficialOwnerDi(userDi, boDi))
-      .map(userDi => {
-        const businessOwnerKey = BENEFICIAL_OWNER_ATTRIBUTE[userDi];
-        const userDataValue = isStringValid(userData[userDi]) ? userData[userDi] : undefined;
-        return [businessOwnerKey, userDataValue];
-      })
-      .filter(([_key, value]) => Boolean(value)),
+    Object.entries(bo).filter(([key, _value]) => diIncludesField(key as BeneficialOwnerDataAttribute, boDi)),
   );
 
 export const omitEqualData = <T extends BusinessDIData>(vaultData: T | undefined | null, payload: T): T => {

@@ -28,7 +28,7 @@ export type {
   KycBootstrapData,
   BootstrapIgnoredBusinessDI,
 } from './bootstrap-data';
-export { BootstrapOnlyBusinessOwnersKey } from './bootstrap-data';
+export { BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake } from './bootstrap-data';
 export type { BusinessBoKycData } from './business-bo-kyc-data';
 export type {
   BusinessDIData,

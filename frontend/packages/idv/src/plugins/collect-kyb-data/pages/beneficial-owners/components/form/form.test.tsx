@@ -17,7 +17,18 @@ describe('<Form />', () => {
   }: Partial<FormProps>) => {
     customRender(
       <Form
-        defaultValues={defaultValues}
+        defaultValues={
+          defaultValues ?? [
+            {
+              [BeneficialOwnerDataAttribute.firstName]: '',
+              [BeneficialOwnerDataAttribute.middleName]: '',
+              [BeneficialOwnerDataAttribute.lastName]: '',
+              [BeneficialOwnerDataAttribute.email]: '',
+              [BeneficialOwnerDataAttribute.phoneNumber]: '',
+              [BeneficialOwnerDataAttribute.ownershipStake]: 0,
+            },
+          ]
+        }
         isLoading={isLoading}
         onSubmit={onSubmit}
         ctaLabel={ctaLabel}

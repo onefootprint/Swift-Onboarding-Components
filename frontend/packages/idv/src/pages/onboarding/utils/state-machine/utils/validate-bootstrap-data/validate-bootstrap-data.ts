@@ -1,7 +1,11 @@
 import { isAddressLine, isEmail, isName, isPhoneNumber, isSSN9Flexible, isSsn4, isURL } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { STATES } from '@onefootprint/global-constants';
-import { BootstrapOnlyBusinessOwnersKey, CorporationType } from '@onefootprint/types';
+import {
+  BootstrapOnlyBusinessPrimaryOwnerStake,
+  BootstrapOnlyBusinessSecondaryOwnersKey,
+  CorporationType,
+} from '@onefootprint/types';
 import type { CountryCode, PublicOnboardingConfig } from '@onefootprint/types';
 import {
   type BootstrapIgnoredBusinessDI,
@@ -16,15 +20,18 @@ import { isFuture } from 'date-fns';
 import snakeCase from 'lodash/snakeCase';
 
 import type { DIMetadata, UserData } from '../../../../../../types';
-import { isObject, isStringValid } from '../../../../../../utils';
+import { isNumber, isObject, isStringValid } from '../../../../../../utils';
 import { getLogger } from '../../../../../../utils/logger';
 // TODO: Move fromUSDateToISO8601Format, strInputToUSDate to @onefootprint/core, it's being used in footprint-react too
 import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../../../utils/string';
 
 // biome-ignore lint/suspicious/noExplicitAny: This is intentional
 type Predicate = (...args: any[]) => boolean;
-type BusinessDICustom = Exclude<BusinessDI, BootstrapIgnoredBusinessDI> | typeof BootstrapOnlyBusinessOwnersKey;
-type NotValidatedUserData = Partial<{ [K in IdDI]: DIMetadata<unknown> }>;
+type BusinessDICustom =
+  | Exclude<BusinessDI, BootstrapIgnoredBusinessDI>
+  | typeof BootstrapOnlyBusinessSecondaryOwnersKey
+  | typeof BootstrapOnlyBusinessPrimaryOwnerStake;
+type NotValidatedUserData = Partial<{ [K in IdDI | BusinessDICustom]: DIMetadata<unknown> }>;
 
 const { logWarn } = getLogger({ location: 'validate-bootstrap-data' });
 
@@ -88,7 +95,7 @@ const isCountryValid = (config: PublicOnboardingConfig, country: string): boolea
 const isCorporationTypeValid = (str: string): boolean =>
   isStringValid(str) && Object.values(CorporationType).includes(str as CorporationType);
 
-export const isBusinessOwnersValid = (owners: IdvBootstrapData[typeof BootstrapOnlyBusinessOwnersKey]) => {
+export const isBusinessOwnersValid = (owners: IdvBootstrapData[typeof BootstrapOnlyBusinessSecondaryOwnersKey]) => {
   if (!owners || !Array.isArray(owners) || owners.length < 1) return false;
   if (owners.some(owner => !isObject(owner) || !Object.keys(owner).length)) return false;
 
@@ -153,7 +160,8 @@ const validateBootstrapData = ({
     [BusinessDI.tin]: () => true, // TODO: Add real validators for this field
     [BusinessDI.website]: value => isURL(value),
     [BusinessDI.zip]: isStringValid,
-    [BootstrapOnlyBusinessOwnersKey]: owners => isBusinessOwnersValid(owners),
+    [BootstrapOnlyBusinessPrimaryOwnerStake]: isNumber,
+    [BootstrapOnlyBusinessSecondaryOwnersKey]: owners => isBusinessOwnersValid(owners),
   };
 
   // Ignore null or undefined values or invalid keys
@@ -173,7 +181,26 @@ const validateBootstrapData = ({
     return !!FieldsValidator[k as IdDI](v.value as string);
   });
 
-  const validatedData = Object.fromEntries(validatedEntries);
+  const finalBootstrapEntries = validatedEntries.map(([k, v]) => {
+    if (k === BootstrapOnlyBusinessSecondaryOwnersKey) {
+      // Since bootstrap data _can_ be fetched from the SDK args API, our case converter is automatically
+      // transforming keys (except DIs) from snake_case to camelCase.
+      // Here, we map them back for benficial owners
+      // TODO maybe we should disable the case converter in SDK args?
+      const { value, ...restOfValue } = v;
+      const snakeCaseBos = (v.value as object[]).map(bo =>
+        Object.fromEntries(Object.entries(bo).map(([k, v]) => [snakeCase(k), v])),
+      );
+      const newValue = {
+        value: snakeCaseBos,
+        ...restOfValue,
+      };
+      return [k, newValue];
+    }
+    return [k, v];
+  });
+
+  const validatedData = Object.fromEntries(finalBootstrapEntries);
   const validatedKeys = new Set(Object.keys(validatedData));
   const allKeys = Object.keys(bootstrapData) as IdDI[];
   const invalidKeys = allKeys.filter(key => !validatedKeys.has(key));
@@ -182,7 +209,7 @@ const validateBootstrapData = ({
     logWarn(`Filtering out invalid bootstrapped user data for keys: ${invalidKeys.join(', ')}`);
   }
 
-  return Object.fromEntries(validatedEntries);
+  return Object.fromEntries(finalBootstrapEntries);
 };
 
 export default validateBootstrapData;

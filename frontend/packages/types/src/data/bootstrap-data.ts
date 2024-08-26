@@ -3,10 +3,12 @@ import type { BusinessDIData } from './business-di-data';
 import type { BusinessDI } from './di';
 import type { IdDIData } from './id-di-data';
 
-export const BootstrapOnlyBusinessOwnersKey = 'business.owners';
+export const BootstrapOnlyBusinessSecondaryOwnersKey = 'business.secondary_owners';
+export const BootstrapOnlyBusinessPrimaryOwnerStake = 'business.primary_owner_stake';
 
 type BusinessBootstrapOnlyProps = {
-  [BootstrapOnlyBusinessOwnersKey]?: Partial<Omit<BeneficialOwner, BeneficialOwnerDataAttribute.middleName>>[];
+  [BootstrapOnlyBusinessSecondaryOwnersKey]?: Partial<Omit<BeneficialOwner, BeneficialOwnerDataAttribute.middleName>>[];
+  [BootstrapOnlyBusinessPrimaryOwnerStake]?: number;
 };
 
 export type BootstrapIgnoredBusinessDI =
@@ -15,7 +17,7 @@ export type BootstrapIgnoredBusinessDI =
   | BusinessDI.formationState
   | BusinessDI.formationDate;
 
-// TODO: expand in the future with KybBootstrapData and InvestorProfileBootstrapData
+// TODO: expand in the future with InvestorProfileBootstrapData
 export type IdvBootstrapData = IdDIData & Omit<BusinessDIData, BootstrapIgnoredBusinessDI> & BusinessBootstrapOnlyProps;
 
 export type IdvOptions = {

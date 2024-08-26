@@ -10,5 +10,6 @@ export {
   isSms,
   isString,
   isStringValid,
+  isNumber,
   isUndefined,
 } from './type-guards';

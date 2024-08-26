@@ -38,10 +38,6 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches('loadFromVault')) {
     return (
       <BusinessFieldsLoader
-        authToken={state.context.idvContext.authToken}
-        bootstrapUserData={state.context.bootstrapUserData}
-        missingAttributes={state.context.kybRequirement.missingAttributes}
-        populatedAttributes={state.context.kybRequirement.populatedAttributes}
         onSuccess={payload => send({ type: 'businessDataLoadSuccess', payload })}
         onError={err => {
           logError('error fetching business.* and id.*', err);

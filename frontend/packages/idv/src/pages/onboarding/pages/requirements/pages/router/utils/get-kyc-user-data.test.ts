@@ -1,4 +1,9 @@
-import { BootstrapOnlyBusinessOwnersKey, BusinessDI, IdDI } from '@onefootprint/types';
+import {
+  BootstrapOnlyBusinessPrimaryOwnerStake,
+  BootstrapOnlyBusinessSecondaryOwnersKey,
+  BusinessDI,
+  IdDI,
+} from '@onefootprint/types';
 import { filterBusinessData, filterUserData } from './get-kyc-user-data';
 
 jest.mock('../../../../../../../utils/logger', () => ({
@@ -110,11 +115,12 @@ describe('filterBusinessData', () => {
     expect(filteredData).toEqual({ [BusinessDI.corporationType]: { value: 'unknown', isBootstrap: true } });
   });
 
-  it('should allow business.owners', () => {
+  it('should allow business.secondary_owners', () => {
     const data = {
       [BusinessDI.formationDate]: { value: '1999-12-25', isBootstrap: true },
       [BusinessDI.formationState]: { value: 'MA', isBootstrap: true },
-      [BootstrapOnlyBusinessOwnersKey]: {
+      [BootstrapOnlyBusinessPrimaryOwnerStake]: { value: 20, isBootstrap: true },
+      [BootstrapOnlyBusinessSecondaryOwnersKey]: {
         value: [
           {
             first_name: 'Jane',
@@ -131,7 +137,8 @@ describe('filterBusinessData', () => {
     // @ts-expect-error: Property 'formation_date' and other were removed from the static types
     const filteredData = filterBusinessData(data);
     expect(filteredData).toEqual({
-      [BootstrapOnlyBusinessOwnersKey]: {
+      [BootstrapOnlyBusinessPrimaryOwnerStake]: { value: 20, isBootstrap: true },
+      [BootstrapOnlyBusinessSecondaryOwnersKey]: {
         value: [
           {
             first_name: 'Jane',

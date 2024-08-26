@@ -21,6 +21,7 @@ export const isUndefined = (x: unknown): x is undefined => typeof x === 'undefin
 
 export const isObject = (x: unknown): x is Obj => !!x && typeof x === 'object' && !Array.isArray(x);
 export const isString = (x: unknown): x is string => typeof x === 'string';
+export const isNumber = (x: unknown): x is number => typeof x === 'number';
 export const isStringValid = (x: unknown): x is string => isString(x) && !!x;
 
 export const isError = (x: unknown): x is Error => x instanceof Error;

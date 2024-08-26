@@ -73,9 +73,9 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
   const defaultData = requireMultiKyc ? data?.[BusinessDI.kycedBeneficialOwners] : data?.[BusinessDI.beneficialOwners];
   const defaultValues = cloneDeep(defaultData) ?? [
     {
-      [BeneficialOwnerDataAttribute.firstName]: '',
-      [BeneficialOwnerDataAttribute.middleName]: '',
-      [BeneficialOwnerDataAttribute.lastName]: '',
+      [BeneficialOwnerDataAttribute.firstName]: bootstrapUserData?.[IdDI.firstName]?.value ?? '',
+      [BeneficialOwnerDataAttribute.middleName]: bootstrapUserData?.[IdDI.middleName]?.value ?? '',
+      [BeneficialOwnerDataAttribute.lastName]: bootstrapUserData?.[IdDI.lastName]?.value ?? '',
       [BeneficialOwnerDataAttribute.email]: bootstrapUserData?.[IdDI.email]?.value ?? '',
       [BeneficialOwnerDataAttribute.phoneNumber]: bootstrapUserData?.[IdDI.phoneNumber]?.value ?? '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,

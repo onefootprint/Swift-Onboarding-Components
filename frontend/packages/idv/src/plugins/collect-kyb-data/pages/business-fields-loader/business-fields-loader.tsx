@@ -4,17 +4,15 @@ import useEffectOnceStrict from '../../../../components/identify/hooks/use-effec
 import { useDecryptBusiness, useDecryptUser } from '../../../../queries';
 import type { UserData } from '../../../../types';
 import { isObject, isStringValid } from '../../../../utils';
+import { useCollectKybDataMachine } from '../../components/machine-provider';
+import { computeBosValue } from '../../utils/attributes/attributes';
 import { BeneficialOwnerIdFields, BusinessFields } from '../../utils/constants';
-import { buildBeneficialOwner, getBoDi, omitNullAndUndefined } from '../../utils/utils';
+import { omitNullAndUndefined } from '../../utils/utils';
 
 type BusinessFieldsLoaderProps = {
-  authToken?: string;
-  bootstrapUserData?: UserData;
   children: React.ReactNode;
-  missingAttributes?: CollectedKybDataOption[];
   onError: (error?: unknown) => void;
   onSuccess: (payload: { data: BusinessDIData; vaultBusinessData: BusinessDIData }) => void;
-  populatedAttributes?: CollectedKybDataOption[];
 };
 
 const hasUserDataBootstrapped = (userData?: UserData | undefined): boolean =>
@@ -24,25 +22,26 @@ const hasUserDataBootstrapped = (userData?: UserData | undefined): boolean =>
     idKey => Boolean(userData?.[idKey]?.isBootstrap) && isStringValid(userData?.[idKey]?.value),
   );
 
-const BusinessFieldsLoader = ({
-  authToken,
-  bootstrapUserData,
-  children,
-  missingAttributes,
-  onError,
-  onSuccess,
-  populatedAttributes,
-}: BusinessFieldsLoaderProps) => {
+const BusinessFieldsLoader = ({ children, onError, onSuccess }: BusinessFieldsLoaderProps) => {
   const mutDecryptBusiness = useDecryptBusiness();
   const mutDecryptUser = useDecryptUser();
+  const [state, _] = useCollectKybDataMachine();
+  const {
+    idvContext: { authToken },
+    bootstrapUserData,
+    bootstrapBusinessData,
+    kybRequirement,
+  } = state.context;
 
-  const fetchDecryptedData = (authToken: string): Promise<[BusinessDIData, DecryptUserResponse]> => {
+  const fetchDecryptedData = (authToken: string): Promise<[BusinessDIData, DecryptUserResponse | undefined]> => {
     const decryptBusiness: Promise<BusinessDIData> = new Promise<BusinessDIData>((resolve, reject) => {
       mutDecryptBusiness.mutate({ authToken, fields: BusinessFields }, { onError: reject, onSuccess: resolve });
     });
 
-    const decryptUser: Promise<DecryptUserResponse> = hasUserDataBootstrapped(bootstrapUserData)
-      ? Promise.resolve({})
+    // TODO this is incorrect - we could have bootstrapped user data AND existing user data.
+    // We should overlay the bootstrap data on top of the existing data
+    const decryptUser: Promise<DecryptUserResponse | undefined> = hasUserDataBootstrapped(bootstrapUserData)
+      ? Promise.resolve(undefined)
       : new Promise<DecryptUserResponse>((resolve, reject) => {
           mutDecryptUser.mutate(
             { authToken, fields: BeneficialOwnerIdFields },
@@ -57,20 +56,25 @@ const BusinessFieldsLoader = ({
     if (authToken) {
       fetchDecryptedData(authToken)
         .then(([businessData, userData]) => {
-          const userCleanObj = omitNullAndUndefined(userData);
           const vaultBusinessData: Readonly<BusinessDIData> = omitNullAndUndefined(businessData);
-          const payload = { ...vaultBusinessData };
+          let payload = {
+            ...vaultBusinessData,
+          };
 
-          if (populatedAttributes?.includes(CollectedKybDataOption.tin)) {
-            payload['business.tin'] = 'scrubbed';
+          if (!!userData && !payload['business.beneficial_owners'] && !payload['business.kyced_beneficial_owners']) {
+            // If we decrypted user data from the backend (because there's no bootstrap data) and if the business
+            // doesn't already have beneficial owners, prepopulate this.
+            // TODO the user data decryption might be easier to do in `beneficial-owners.tsx`, this is a little complex
+            const userCleanObj = omitNullAndUndefined(userData);
+            const bosPopulatedFromUserData = computeBosValue(kybRequirement, userCleanObj, bootstrapBusinessData);
+            payload = {
+              ...payload,
+              ...bosPopulatedFromUserData,
+            };
           }
 
-          const allAttributes = (missingAttributes || []).concat(populatedAttributes || []);
-          const boDi = getBoDi(allAttributes);
-          const businessOwnerObj = boDi && !payload[boDi] ? buildBeneficialOwner(userCleanObj, boDi) : {};
-
-          if (boDi && Object.keys(businessOwnerObj).length > 0) {
-            payload[boDi] = [businessOwnerObj];
+          if (kybRequirement.populatedAttributes?.includes(CollectedKybDataOption.tin)) {
+            payload['business.tin'] = 'scrubbed';
           }
 
           return onSuccess({

@@ -1,64 +1,73 @@
 import {
-  BootstrapOnlyBusinessOwnersKey,
+  type BeneficialOwner,
+  BeneficialOwnerDataAttribute,
+  BootstrapOnlyBusinessPrimaryOwnerStake,
+  BootstrapOnlyBusinessSecondaryOwnersKey,
   BusinessDI,
   type BusinessDIData,
   CdoToAllDisMap,
+  type CollectKybDataRequirement,
   type DecryptUserResponse,
 } from '@onefootprint/types';
 import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
-import type { BootstrapBusinessData } from '../../../../types';
 import { isStringValid } from '../../../../utils';
 import { BeneficialOwnerIdFields } from '../constants';
 import type { MachineContext } from '../state-machine/types';
-import { buildBeneficialOwner, getBoDi } from '../utils';
+import { buildBeneficialOwner, getBoDi, omitIrrelevantData } from '../utils';
 
-type CustomBusinessDI = BusinessDI | typeof BootstrapOnlyBusinessOwnersKey;
-type BusinessOwners = BootstrapBusinessData[typeof BootstrapOnlyBusinessOwnersKey];
+type CustomBusinessDI =
+  | BusinessDI
+  | typeof BootstrapOnlyBusinessSecondaryOwnersKey
+  | typeof BootstrapOnlyBusinessSecondaryOwnersKey;
 
 export const BO_FIELDS: BusinessDI[] = [BusinessDI.beneficialOwners, BusinessDI.kycedBeneficialOwners];
 
 export const extractNonBoBootstrapValues = (filteredObj: MachineContext['bootstrapBusinessData']): BusinessDIData => {
-  const extendedBoFields = [...BO_FIELDS, BootstrapOnlyBusinessOwnersKey];
+  const ignoreFields = [...BO_FIELDS, BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake];
 
   return Object.fromEntries(
     Object.entries(filteredObj)
-      .filter(([k, v]) => v.value != null && !extendedBoFields.includes(k))
+      .filter(([k, v]) => v.value != null && !ignoreFields.includes(k))
       .map(([k, v]) => [k, v.value] as const),
   );
 };
 
-export const extractBoBootstrapValues = (ctx: MachineContext): BusinessDIData => {
-  const cdos = [...(ctx.kybRequirement.populatedAttributes || []), ...ctx.kybRequirement.missingAttributes];
+/** Given the `userData` (either from bootstrap or decrypted) and the `bootstrapBusinessData`, computes the set of beneficial owners. The primary BO is composed from `id.xxx` attributes and `business.primary_owner_stake`. All other BOs are composed from `business.secondary_owners` */
+export const computeBosValue = (
+  kybRequirement: CollectKybDataRequirement,
+  userData: DecryptUserResponse,
+  bootstrapBusinessData: MachineContext['bootstrapBusinessData'],
+) => {
+  const cdos = [...(kybRequirement.populatedAttributes || []), ...kybRequirement.missingAttributes];
   const boDi = getBoDi(cdos);
-  const businessOwnersObj: BusinessOwners = ctx.bootstrapBusinessData[BootstrapOnlyBusinessOwnersKey];
 
   if (!boDi) return {};
 
-  const fromKybBootstrap = {
-    [boDi]: businessOwnersObj?.value.map(owner => {
-      return Object.fromEntries(
-        Object.entries(owner)
-          .map(([key, value]) => {
-            if (key === 'firstName') return ['first_name', value] as const;
-            if (key === 'lastName') return ['last_name', value] as const;
-            if (key === 'ownershipStake') return ['ownership_stake', value] as const;
-
-            if (boDi === BusinessDI.kycedBeneficialOwners) {
-              if (key === 'email') return ['email', value] as const;
-              if (key === 'phoneNumber') return ['phone_number', value] as const;
-            }
-
-            return [undefined, undefined];
-          })
-          .filter(([_k, v]) => v != null),
-      );
-    }),
+  const primaryOwner: Partial<BeneficialOwner> = {
+    ...buildBeneficialOwner(userData, boDi),
+    [BeneficialOwnerDataAttribute.ownershipStake]:
+      bootstrapBusinessData?.[BootstrapOnlyBusinessPrimaryOwnerStake]?.value,
   };
 
-  if (fromKybBootstrap?.[boDi] != null) return fromKybBootstrap;
+  const secondaryOwners = bootstrapBusinessData[BootstrapOnlyBusinessSecondaryOwnersKey]?.value || [];
+  const allBeneficialOwners = [primaryOwner, ...secondaryOwners];
 
+  const filteredBeneficialOwners = allBeneficialOwners.map(bo => omitIrrelevantData(bo, boDi));
+
+  const onlyEmptyBos = allBeneficialOwners.every(bo => Object.values(bo).every(v => !v));
+  if (onlyEmptyBos) {
+    return {};
+  }
+
+  return { [boDi]: filteredBeneficialOwners };
+};
+
+export const extractBoBootstrapValues = (ctx: MachineContext): BusinessDIData => {
+  // Compute the primary BO from the combination if `id.xxx` data and `business.primary_owner_stake`.
+  // Even if no identity data is provided, we should always start with an empty primary BO in case secondary
+  // BOs are added on.
   const userData: DecryptUserResponse = Object.fromEntries(
     Object.entries(ctx?.bootstrapUserData || {})
       .filter(([k, _v]) => BeneficialOwnerIdFields.includes(k as (typeof BeneficialOwnerIdFields)[0]))
@@ -66,10 +75,7 @@ export const extractBoBootstrapValues = (ctx: MachineContext): BusinessDIData =>
       .filter(([_k, v]) => isStringValid(v)),
   );
 
-  /* Ignore when there is no relevant business data in the user data */
-  if (Object.keys(userData).length === 0) return {};
-
-  return { [boDi]: [buildBeneficialOwner(userData, boDi)] };
+  return computeBosValue(ctx.kybRequirement, userData, ctx.bootstrapBusinessData);
 };
 
 export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData => {
@@ -77,7 +83,7 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
   const kybDiAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as CustomBusinessDI[];
 
   const filteredBootstrapBusinessData = pickBy(ctx.bootstrapBusinessData, (_, key) => {
-    const kybDiAttributesWithCustomBootstrap = kybDiAttributes.concat(BootstrapOnlyBusinessOwnersKey);
+    const kybDiAttributesWithCustomBootstrap = kybDiAttributes.concat(BootstrapOnlyBusinessSecondaryOwnersKey);
     return kybDiAttributesWithCustomBootstrap.includes(key as CustomBusinessDI);
   });
 
@@ -100,7 +106,7 @@ export const getBusinessDataFromContext = (ctx: MachineContext): BusinessDIData 
     });
   }
 
-  return omit(initialData, [BootstrapOnlyBusinessOwnersKey]);
+  return omit(initialData, [BootstrapOnlyBusinessSecondaryOwnersKey, BootstrapOnlyBusinessPrimaryOwnerStake]);
 };
 
 const isMissingDataFromCollection = (ctx: MachineContext, cdos?: CollectedKybDataOption[]): boolean => {
