@@ -22,7 +22,9 @@ Note also that only data fields that are collected by the provided playbook may 
 
 ## Boostraping KYC data
 
-<inline-alert variant='info'>Check out [user-specific onboarding](/articles/integrate/user-specific-sessions) which allows bootstrapping data using a new or existing Footprint user. If you already have user data stored on your backend, you may want to create a Footprint user with this data and start a user-specific onboarding session.</inline-alert>
+<inline-alert variant='info'>If you already have an `fp_id` for the user on your backend, you can initiate a [user-specific onboarding session](/articles/integrate/user-specific-sessions) which preloads all of the user's existing data into the onboarding session. Bootstrap data should be used for users who don't already have an `fp_id`.</inline-alert>
+
+You can pass user data directly into the SDK. The user will be asked to fill out any missing or invalid information.
 
 ```typescript
 import "@onefootprint/footprint-js/dist/footprint-js.css";
@@ -55,6 +57,10 @@ const launchFootprint = () => {
 
 ### Available user data
 
+The follow identity fields are available to bootstrap.
+
+<inline-alert variant='info'>Note, any bootstrap attributes that fail validation or are not collected by the provided playbook will be ignored.</inline-alert>
+
 | Variable                  | Description                                              | Format                                                                                 |
 | ------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | `id.phone_number`         | Primary phone number                                     | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number         |
@@ -77,9 +83,9 @@ const launchFootprint = () => {
 | `id.visa_kind`            | The type of US visa held by the user                     | One of `e1`, `e2`, `e3`, `f1`, `g4`, `h1b`, `l1`, `o1`, `tn1`, or `other`              |
 | `id.visa_expiration_date` | The expiration date of the user's visa                   | Formatted as `MM/DD/YYYY`                                                              |
 
-<inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
-
 ## Boostraping KYB data
+
+When initiating a KYB flow, you can bootstrap _both_ any precollected user information _and_ precollected business information.
 
 ```typescript
 import "@onefootprint/footprint-js/dist/footprint-js.css";
@@ -90,6 +96,12 @@ const launchFootprint = () => {
     kind: "verify",
     publicKey: "pb_test_VMooXd04EUlnu3AvMYKjMW",
     bootstrapData: {
+      // Precollected information about the user
+      "id.first_name": "Jane",
+      "id.last_name": "Doe",
+      "id.dob": "01/01/1990",
+      "id.ssn9": "123456789",
+      // Precollected information about the business
       "business.name": "Acme Bank",
       "business.dba": "Acme",
       "business.tin": "12-3456789",
@@ -110,19 +122,48 @@ const launchFootprint = () => {
 
 ### Available business data
 
-| Variable                    | Description                                   | Format                                                                                                                                                  |
-| --------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `business.name`             | Name of the business                          | Any valid UTF-8 string <1KB                                                                                                                             |
-| `business.dba`              | Doing-business-as alias                       | Any valid UTF-8 string <1KB                                                                                                                             |
-| `business.website`          | Website of the business                       | A valid absolute URL.                                                                                                                                   |
-| `business.phone_number`     | Phone number                                  | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                          |
-| `business.tin`              | Taxpayer identification number                | 9-digit string (hyphens will be ignored and stripped out)                                                                                               |
-| `business.address_line1`    | First line of the business's street address   | Any valid UTF-8 string <1KB                                                                                                                             |
-| `business.address_line2`    | Second line of the business's street address  | Any valid UTF-8 string <1KB                                                                                                                             |
-| `business.city`             | City of the business's street address         | Any valid UTF-8 string <1KB                                                                                                                             |
-| `business.state`            | State of the business's street address        | 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format for US addresses                                                                    |
-| `business.zip`              | Postal code for the business's street address | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                       |
-| `business.country`          | Country for the business's street address     | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                         |
-| `business.corporation_type` | The type of corporation                       | One of `c_corporation`, `s_corporation`, `b_corporation`, `llc`, `llp`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent` |
+In addition to all of the identity fields, you may also provide the following bootstrap fields when onboarding onto a KYB playbook.
 
-<inline-alert variant='info'>Note, any bootstrap attributes that are not collected by the provided playbook will be ignored.</inline-alert>
+<inline-alert variant='info'>Note, any bootstrap attributes that fail validation or are not collected by the provided playbook will be ignored.</inline-alert>
+
+| Variable                       | Description                                                                                                                         | Format                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `business.name`                | Name of the business                                                                                                                | Any valid UTF-8 string <1KB                                                                                                                                                                                                                                                                  |
+| `business.dba`                 | Doing-business-as alias                                                                                                             | Any valid UTF-8 string <1KB                                                                                                                                                                                                                                                                  |
+| `business.website`             | Website of the business                                                                                                             | A valid absolute URL.                                                                                                                                                                                                                                                                        |
+| `business.phone_number`        | Phone number                                                                                                                        | [E.164](https://www.twilio.com/docs/glossary/what-e164) formatted phone number                                                                                                                                                                                                               |
+| `business.tin`                 | Taxpayer identification number                                                                                                      | 9-digit string (hyphens will be ignored and stripped out)                                                                                                                                                                                                                                    |
+| `business.address_line1`       | First line of the business's street address                                                                                         | Any valid UTF-8 string <1KB                                                                                                                                                                                                                                                                  |
+| `business.address_line2`       | Second line of the business's street address                                                                                        | Any valid UTF-8 string <1KB                                                                                                                                                                                                                                                                  |
+| `business.city`                | City of the business's street address                                                                                               | Any valid UTF-8 string <1KB                                                                                                                                                                                                                                                                  |
+| `business.state`               | State of the business's street address                                                                                              | 2-character [USPS](https://pe.usps.com/text/pub28/28apb.htm) format for US addresses                                                                                                                                                                                                         |
+| `business.zip`                 | Postal code for the business's street address                                                                                       | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                                                                                                                            |
+| `business.country`             | Country for the business's street address                                                                                           | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                                                                                                                              |
+| `business.corporation_type`    | The type of corporation                                                                                                             | One of `c_corporation`, `s_corporation`, `b_corporation`, `llc`, `llp`, `partnership`, `sole_proprietorship`, `non_profit`, `unknown`, `trust`, `agent`                                                                                                                                      |
+| `business.primary_owner_stake` | The ownership stake of the primary beneficial owner. The remaining info for the primary owner is specified in the `id.*` attributes | Integer between 0-100                                                                                                                                                                                                                                                                        |
+| `business.secondary_owners`    | A list of the other beneficial owners of the business.                                                                              | An array of objects with `first_name` (string), `last_name` (string), `email` ([email address](https://datatracker.ietf.org/doc/html/rfc3696) string), `phone_number` ([E.164](https://www.twilio.com/docs/glossary/what-e164) string), and `ownership_stake` (integer between 0-100) fields |
+
+### Beneficial owners
+
+When filling out a KYB playbook, the initial user who fills out the business information is always considered the first beneficial owner of the business. If you'd like to prefill any of the first beneficial owner's attributes, use the `id.*` attributes. To bootstrap the primary owner's ownership stake, pass in `business.primary_owner_stake`.
+
+Remaining beneficial owners' information may be provided as a list of `business.secondary_owners`.
+
+For example, to bootstrap information on a business that has two beneficial owners:
+
+```json
+{
+  // Primary beneficial owner information
+  "id.first_name": "Primary",
+  "id.last_name": "Owner",
+  "business.primary_owner_stake": 50,
+  // Information on remaining beneficial owners
+  "business.secondary_owners": [
+    {
+      "first_name": "Secondary",
+      "last_name": "Owner",
+      "ownership_stake": 40
+    }
+  ]
+}
+```
