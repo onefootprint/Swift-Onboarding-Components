@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.14.0
+
+### Minor Changes
+
+- b53be4d15d: Add beneficial owner primary stake and secondary owners
+
 ## 3.13.0
 
 ### Minor Changes
