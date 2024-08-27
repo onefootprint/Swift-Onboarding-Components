@@ -2720,6 +2720,8 @@
       "create": {
         "title": "Create secret key",
         "form": {
+          "dialog-aria": "Secret key dialog",
+          "aria": "Secret key form",
           "name": {
             "label": "Secret key name",
             "placeholder": "Secret key",
@@ -2727,6 +2729,7 @@
               "required": "Please enter a name for your secret key."
             }
           },
+          "loading-aria": "API key creation dialog loading",
           "access-control": {
             "name": "Access control",
             "label": "Access control",

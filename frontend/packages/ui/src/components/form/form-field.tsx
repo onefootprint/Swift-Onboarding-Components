@@ -13,7 +13,11 @@ const FormField = ({ children, variant = 'vertical' }: FormFieldProps) => {
   const contextValues = useMemo(() => ({ id }), [id]);
   return (
     <FormFieldContext.Provider value={contextValues}>
-      {variant === 'vertical' && <Box>{children}</Box>}
+      {variant === 'vertical' && (
+        <Box width="100%" textOverflow="ellipsis" whiteSpace="nowrap">
+          {children}
+        </Box>
+      )}
       {variant === 'horizontal' && (
         <Stack justifyContent="space-between" alignItems="center">
           {children}

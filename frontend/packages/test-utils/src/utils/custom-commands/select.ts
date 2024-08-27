@@ -1,10 +1,4 @@
-import {
-  screen,
-  act,
-  fireEvent,
-  within,
-  waitFor,
-} from '@testing-library/react';
+import { screen, act, fireEvent, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const openMenu = async (trigger: HTMLElement) => {

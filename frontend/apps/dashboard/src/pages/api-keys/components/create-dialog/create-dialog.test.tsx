@@ -1,4 +1,4 @@
-import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 
 import CreateDialog from './create-dialog';
 import { withApiKeys, withCreateApiKeys, withRoles } from './create-dialog.test.config';
@@ -38,9 +38,9 @@ describe('<CreateDialog />', () => {
         await userEvent.click(secretKeyName);
         await userEvent.type(secretKeyName, 'test name');
 
-        // make sure roles are loaded
         await waitFor(() => {
-          expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
+          const loading = screen.queryByLabelText('API creation dialog loading');
+          expect(loading).not.toBeInTheDocument();
         });
 
         const submitButton = screen.getByRole('button', { name: 'Create' });
@@ -61,11 +61,14 @@ describe('<CreateDialog />', () => {
       await userEvent.type(secretKeyName, 'test name');
 
       await waitFor(() => {
-        expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
+        const loading = screen.queryByLabelText('API creation dialog loading');
+        expect(loading).not.toBeInTheDocument();
       });
 
-      const roleSelect = screen.getByRole('button', { name: 'Select role' });
-      await selectEvents.select(roleSelect, 'Admin');
+      const roleSelect = screen.getByRole('option', { name: 'Member' });
+      await userEvent.click(roleSelect);
+      const adminOption = screen.getByRole('option', { name: 'Admin' });
+      await userEvent.click(adminOption);
 
       const submitButton = screen.getByRole('button', { name: 'Create' });
       await userEvent.click(submitButton);

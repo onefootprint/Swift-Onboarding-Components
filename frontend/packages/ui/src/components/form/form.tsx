@@ -5,6 +5,7 @@ import FormFieldContext from './form-field-context';
 import FormGroup from './form-group';
 import FormInput from './form-input';
 import FormLabel from './form-label';
+import FormSelect from './form-select';
 
 const Form = {
   Field: FormField,
@@ -14,6 +15,7 @@ const Form = {
   Errors: FormErrors,
   Context: FormFieldContext,
   Input: FormInput,
+  Select: FormSelect,
 };
 
 export default Form;

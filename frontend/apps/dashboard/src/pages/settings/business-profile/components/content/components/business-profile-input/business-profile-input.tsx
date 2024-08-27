@@ -6,7 +6,7 @@ const BusinessProfileInput = React.forwardRef<HTMLInputElement, React.ComponentP
   (props, ref) => {
     return (
       <OuterContainer>
-        <InnerContainer {...props} ref={ref} />
+        <InnerContainer size="compact" {...props} ref={ref} />
       </OuterContainer>
     );
   },
