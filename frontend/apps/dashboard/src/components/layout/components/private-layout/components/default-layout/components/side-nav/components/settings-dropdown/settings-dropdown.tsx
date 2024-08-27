@@ -40,15 +40,17 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
     subLinks.push({ href: `${href}/billing`, text: t('pages.billing.title') });
   }
 
+  const menuActive = subLinks.some(subLink => router.pathname.startsWith(subLink.href));
+
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
     <Container>
       <DropdownHeader onClick={toggleDropdown} selected={selected}>
         <Element key={text} asChild>
-          <NavLink badgeCount={badgeCount} icon={icon} selected={selected} text={text} href={href} />
+          <NavLink badgeCount={badgeCount} icon={icon} selected={menuActive} text={text} href={href} />
         </Element>
-        <ChevronIcon isOpen={isOpen} color={isOpen ? 'primary' : 'tertiary'} />
+        <ChevronIcon isOpen={isOpen} color={menuActive ? 'primary' : 'tertiary'} />
       </DropdownHeader>
       <AnimatePresence>
         {isOpen && (
