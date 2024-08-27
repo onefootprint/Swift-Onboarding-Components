@@ -73,7 +73,7 @@ const FormBase = ({
   const methods = useForm<FormData>({ defaultValues, mode: 'onBlur' });
   const {
     handleSubmit,
-    formState: { isDirty },
+    formState: { isDirty, touchedFields },
     trigger,
     getValues,
     setError,
@@ -111,7 +111,7 @@ const FormBase = ({
       logTrack('no callback passed to confirmClose');
       return;
     }
-    if (!isDirty) {
+    if (!isDirty || Object.keys(touchedFields).length === 0) {
       callback();
       return;
     }

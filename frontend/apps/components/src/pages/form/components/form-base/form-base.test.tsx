@@ -160,7 +160,7 @@ describe('<FormBase />', () => {
   });
 
   describe('when closing or canceling the form', () => {
-    it('canceling should trigger onCancel', async () => {
+    it('canceling should trigger onCancel if no fields are modified', async () => {
       const onCancel = jest.fn();
       renderFormBase({ onCancel });
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
@@ -171,7 +171,7 @@ describe('<FormBase />', () => {
       });
     });
 
-    it('closing should trigger onClose', async () => {
+    it('closing should trigger onClose if no fields are modified', async () => {
       const onClose = jest.fn();
       renderFormBase({ onClose });
       await userEvent.click(screen.getByTestId('close-button'));
