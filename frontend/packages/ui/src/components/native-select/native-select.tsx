@@ -67,9 +67,6 @@ const Select = styled.select`
 
       &:enabled:focus {
         background-color: ${input.state.default.focus.bg};
-      }
-
-      &:enabled:active {
         border-color: ${input.state.default.focus.border};
         box-shadow: ${input.state.default.focus.elevation};
       }
