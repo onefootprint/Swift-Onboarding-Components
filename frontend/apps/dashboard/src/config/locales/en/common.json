@@ -2191,6 +2191,7 @@
       },
       "vault": {
         "basic": {
+          "select-corporation-type": "Select corporation type",
           "title": "Basic data",
           "corporation-type": {
             "agent": "Agent",

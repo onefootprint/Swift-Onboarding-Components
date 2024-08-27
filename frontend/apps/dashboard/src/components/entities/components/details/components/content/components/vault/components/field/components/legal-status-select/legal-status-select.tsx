@@ -1,6 +1,5 @@
 import { IdDI, UsLegalStatus, type VaultValue } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -19,6 +18,13 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
   const { register, clearErrors } = useFormContext();
   const formField = editFormFieldName(IdDI.usLegalStatus);
 
+  const options = [
+    { value: EMPTY_SELECT_VALUE, label: t('legal-status-mapping.none') },
+    { value: UsLegalStatus.citizen, label: t('legal-status-mapping.citizen') },
+    { value: UsLegalStatus.permanentResident, label: t('legal-status-mapping.permanent_resident') },
+    { value: UsLegalStatus.visa, label: t('legal-status-mapping.visa') },
+  ];
+
   return (
     <ValueContainer>
       <Form.Select
@@ -35,10 +41,9 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
             ]),
         })}
       >
-        <option value={EMPTY_SELECT_VALUE}>{t('legal-status-mapping.none')}</option>
-        {Object.values(UsLegalStatus).map(status => (
-          <option key={status} value={status}>
-            {t(`legal-status-mapping.${status}` as ParseKeys<'common'>)}
+        {options.map(status => (
+          <option key={status.value} value={status.value}>
+            {status.label}
           </option>
         ))}
       </Form.Select>
