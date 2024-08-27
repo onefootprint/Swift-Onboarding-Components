@@ -13,7 +13,7 @@ type CreateDialogProps = {
   onClose: () => void;
 };
 
-type FormData = { name: string; role: { label: string; value: string } };
+type FormData = { name: string; role: string };
 const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createApiKeyMutation = useCreateApiKey();
   const { t } = useTranslation('common', {
@@ -35,7 +35,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
-    const data = { name: formData.name, roleId: formData.role.value };
+    const data = { name: formData.name, roleId: formData.role };
     createApiKeyMutation.mutate(data, {
       onSuccess: () => {
         toast.show({
