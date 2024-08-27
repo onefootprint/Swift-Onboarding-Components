@@ -1,5 +1,5 @@
 /* eslint-disable no-alert */
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { FootprintButtonProps } from './footprint-button';
 import FootprintButton from './footprint-button';
@@ -22,7 +22,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<FootprintButtonProps> = ({
+const Template: StoryFn<FootprintButtonProps> = ({
   disabled,
   fullWidth,
   loading,

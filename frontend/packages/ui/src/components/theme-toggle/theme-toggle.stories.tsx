@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { ThemeToggleProps } from './theme-toggle';
@@ -29,24 +29,24 @@ export default {
       required: false,
     },
     onBlur: {
-      control: 'function',
+      type: 'function',
       description: 'The callback invoked when the checkbox is blurred (loses focus)',
       required: false,
     },
     onChange: {
-      control: 'function',
+      type: 'function',
       description: 'The callback invoked when the checked state of the Checkbox changes.',
       required: false,
     },
     onFocus: {
-      control: 'function',
+      type: 'function',
       description: 'The callback invoked when the checkbox is focused',
       required: false,
     },
   },
-} as Meta;
+} satisfies Meta<typeof ThemeToggle>;
 
-const Template: Story<ThemeToggleProps> = ({
+const Template: StoryFn<ThemeToggleProps> = ({
   checked: initialChecked,
   defaultChecked,
   label,

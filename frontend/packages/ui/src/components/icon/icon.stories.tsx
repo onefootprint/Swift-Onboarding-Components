@@ -1,6 +1,6 @@
 import themes from '@onefootprint/design-tokens';
 import { IcoChevronDown16, icos } from '@onefootprint/icons';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import Box from '../box';
 import Stack from '../stack';
@@ -16,9 +16,9 @@ export default {
     },
     testID: { control: 'text' },
   },
-} as ComponentMeta<typeof IcoChevronDown16>;
+} satisfies Meta<typeof IcoChevronDown16>;
 
-export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({ color, testID }) => (
+export const AllIcons: StoryFn<typeof IcoChevronDown16> = ({ color, testID }) => (
   <Box>
     <Box marginBottom={10}>
       <Text color="primary" variant="heading-2" marginBottom={3}>

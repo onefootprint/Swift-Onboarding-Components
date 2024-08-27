@@ -1,4 +1,4 @@
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -14,9 +14,9 @@ export default {
       defaultValue: 40,
     },
   },
-} as ComponentMeta<typeof AnimatedSuccessCheck>;
+} satisfies Meta<typeof AnimatedSuccessCheck>;
 
-const Template: ComponentStory<typeof AnimatedSuccessCheck> = ({ size }) => {
+const Template: StoryFn<typeof AnimatedSuccessCheck> = ({ size }) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (

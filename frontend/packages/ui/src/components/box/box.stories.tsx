@@ -1,5 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import Box from './box';
 import type { BoxProps } from './box.types';
@@ -33,11 +33,11 @@ export default {
     },
     borderRadius: {
       control: 'select',
-      options: primitives.borderRadius,
+      options: Object.keys(primitives.borderRadius),
     },
     borderWidth: {
       control: 'select',
-      options: primitives.borderWidth,
+      options: Object.keys(primitives.borderWidth),
     },
     borderColor: {
       control: 'select',
@@ -69,53 +69,53 @@ export default {
     },
     padding: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     margin: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     paddingTop: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     paddingBottom: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     paddingLeft: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     paddingRight: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     marginTop: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     marginBottom: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     marginLeft: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     marginRight: {
       control: 'select',
-      options: primitives.spacing,
+      options: Object.keys(primitives.spacing),
     },
     overflow: {
       control: 'select',
       options: ['visible', 'hidden', 'scroll', 'auto'],
     },
   },
-} as ComponentMeta<typeof Box>;
+} satisfies Meta<typeof Box>;
 
 // eslint-disable-next-line react/jsx-props-no-spreading
-const Template: Story<BoxProps> = args => <Box {...args} />;
+const Template: StoryFn<BoxProps> = args => <Box {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   children: 'Box',

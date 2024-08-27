@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { CountrySelectProps } from './country-select';
@@ -67,9 +67,9 @@ export default {
       required: true,
     },
   },
-} as ComponentMeta<typeof CountrySelect>;
+} satisfies Meta<typeof CountrySelect>;
 
-const Template: Story<CountrySelectProps> = ({
+const Template: StoryFn<CountrySelectProps> = ({
   disabled,
   emptyStateText,
   hasError,

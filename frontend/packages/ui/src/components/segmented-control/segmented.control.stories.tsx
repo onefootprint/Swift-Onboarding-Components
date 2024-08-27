@@ -1,5 +1,5 @@
 import { IcoFaceid16, IcoFingerprint16 } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import React, { useEffect } from 'react';
 
 import type { SegmentedControlProps } from './segmented-control';
@@ -19,7 +19,8 @@ export default {
       required: true,
     },
     options: {
-      control: 'array',
+      control: 'select',
+      options: ['option-1', 'option-2'],
       description: 'Array of options in tabs',
       required: true,
     },
@@ -29,9 +30,9 @@ export default {
       required: true,
     },
   },
-} as Meta;
+} satisfies Meta<typeof SegmentedControl>;
 
-const Template: Story<SegmentedControlProps> = ({
+const Template: StoryFn<SegmentedControlProps> = ({
   'aria-label': ariaLabel,
   onChange,
   options,

@@ -1,4 +1,4 @@
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -18,9 +18,9 @@ export default {
       options: ['primary', 'secondary', 'tertiary', 'quaternary'],
     },
   },
-} as ComponentMeta<typeof AnimatedLoadingSpinner>;
+} satisfies Meta<typeof AnimatedLoadingSpinner>;
 
-const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({ size, color }) => {
+const Template: StoryFn<typeof AnimatedLoadingSpinner> = ({ size, color }) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (

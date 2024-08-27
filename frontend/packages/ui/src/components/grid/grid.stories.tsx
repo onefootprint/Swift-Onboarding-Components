@@ -1,5 +1,4 @@
-import type { Story } from '@storybook/react';
-
+import type { StoryFn } from '@storybook/react';
 import Grid from './grid';
 import type { GridContainerProps, GridItemProps } from './grid.types';
 
@@ -40,7 +39,7 @@ export default {
   },
 };
 
-const Template: Story<GridContainerProps & GridItemProps> = ({
+const Template: StoryFn<GridContainerProps & GridItemProps> = ({
   columns,
   rowGap,
   columnGap,

@@ -1,5 +1,5 @@
 import { IcoBook16, IcoBook24, IcoHelp16, IcoHelp24 } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { RadioSelectProps } from './radio-select';
@@ -10,7 +10,7 @@ export default {
   title: 'Components/RadioSelect',
   argTypes: {
     value: {
-      control: 'string',
+      type: 'string',
       description: 'The value that is selected',
       required: true,
     },
@@ -35,7 +35,7 @@ export default {
       required: true,
     },
   },
-} as Meta;
+} satisfies Meta<typeof RadioSelect>;
 
 const defaultOptions = [
   {
@@ -133,7 +133,7 @@ const groupedOptions = [
   },
 ];
 
-const Template: Story<RadioSelectProps> = ({
+const Template: StoryFn<RadioSelectProps> = ({
   value = 'Item 1',
   options = defaultOptions,
   onChange,

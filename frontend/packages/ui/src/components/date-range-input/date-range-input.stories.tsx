@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { DateRangeInputProps } from './date-range-input';
 import DateRangeInput from './date-range-input';
@@ -11,12 +11,9 @@ export default {
       control: 'select',
       options: ['default', 'compact'],
     },
-    $width: {
-      control: 'text',
-    },
   },
-} as Meta<DateRangeInputProps>;
-const Template: Story<DateRangeInputProps> = ({ initialStartDate, initialEndDate, onChange }) => (
+} satisfies Meta<typeof DateRangeInput>;
+const Template: StoryFn<DateRangeInputProps> = ({ initialStartDate, initialEndDate, onChange }) => (
   <DateRangeInput initialStartDate={initialStartDate} initialEndDate={initialEndDate} onChange={onChange} />
 );
 

@@ -1,5 +1,5 @@
 import { IcoFaceid24 } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { ButtonProps } from './button';
 import Button from './button';
@@ -68,7 +68,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<ButtonProps> = ({
+const Template: StoryFn<ButtonProps> = ({
   children,
   disabled,
   fullWidth,

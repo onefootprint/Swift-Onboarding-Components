@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { BadgeProps } from './badge';
 import Badge from './badge';
@@ -21,7 +21,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BadgeProps> = ({ children, variant, testID }: BadgeProps) => (
+const Template: StoryFn<BadgeProps> = ({ children, variant, testID }: BadgeProps) => (
   <Badge variant={variant} testID={testID}>
     {children}
   </Badge>

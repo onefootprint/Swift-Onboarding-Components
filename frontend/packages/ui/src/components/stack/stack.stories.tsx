@@ -1,5 +1,4 @@
-import type { Story } from '@storybook/react';
-
+import type { StoryFn } from '@storybook/react';
 import type { StackProps } from './stack';
 import Stack from './stack';
 
@@ -44,7 +43,7 @@ export default {
   },
 };
 
-const Template: Story<StackProps> = ({ gap, direction, align, justify, flexWrap }) => (
+const Template: StoryFn<StackProps> = ({ gap, direction, align, justify, flexWrap }) => (
   <Stack gap={gap} direction={direction} align={align} justify={justify} flexWrap={flexWrap}>
     <div>😊</div>
     <div>🤠</div>

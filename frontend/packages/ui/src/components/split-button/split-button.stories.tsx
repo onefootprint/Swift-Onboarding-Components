@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import Stack from '../stack';
 import type { SplitButtonProps } from './split-button';
@@ -46,7 +46,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<SplitButtonProps> = ({ disabled, loading, type, variant, options, size }: SplitButtonProps) => (
+const Template: StoryFn<SplitButtonProps> = ({ disabled, loading, type, variant, options, size }: SplitButtonProps) => (
   <Stack align="center" justify="center" height="100vh" width="100vw">
     <SplitButton disabled={disabled} loading={loading} type={type} variant={variant} options={options} size={size} />
   </Stack>

@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -22,7 +22,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = ({ from, to, onClick }) => {
+const Template: StoryFn = ({ from, to, onClick }) => {
   const [isVisible, setisVisible] = useState(false);
 
   return (

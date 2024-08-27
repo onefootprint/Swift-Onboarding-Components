@@ -1,5 +1,4 @@
-import type { Story } from '@storybook/react';
-
+import type { StoryFn } from '@storybook/react';
 import SelectNew from './select-new';
 import type { SelectNewProps } from './select-new.types';
 
@@ -71,7 +70,7 @@ const options = [
   { label: 'Very long Option 4', value: '4' },
 ];
 
-const Template: Story<SelectNewProps> = ({ size, disabled, label, hint, triggerWidth, contentWidth }) => (
+const Template: StoryFn<SelectNewProps> = ({ size, disabled, label, hint, triggerWidth, contentWidth }) => (
   <SelectNew
     size={size}
     disabled={disabled}

@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { FormBaseProps } from './form-base';
 import FormBase from './form-base';
@@ -19,22 +19,17 @@ export default {
       required: false,
     },
     onSave: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the form is saved',
       required: false,
     },
     onCancel: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the cancel button is clicked',
       required: false,
     },
-    canClose: {
-      control: 'boolean',
-      description: 'If true, the close button is displayed',
-      required: false,
-    },
     onClose: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the close button is clicked',
       required: false,
     },
@@ -54,9 +49,9 @@ export default {
       required: false,
     },
   },
-} as Meta;
+} satisfies Meta<typeof FormBase>;
 
-const Template: Story<FormBaseProps> = ({
+const Template: StoryFn<FormBaseProps> = ({
   title,
   variant,
   onSave,

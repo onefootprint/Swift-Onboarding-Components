@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type React from 'react';
 import { useState } from 'react';
 
@@ -10,7 +10,7 @@ export default {
   title: 'Components/PhoneInput',
 } as Meta;
 
-const Template: Story<PhoneInputProps> = ({
+const Template: StoryFn<PhoneInputProps> = ({
   disabled,
   hasError,
   hint,

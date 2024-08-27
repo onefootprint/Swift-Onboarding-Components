@@ -1,5 +1,5 @@
 import { IcoClose24, icos } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -14,7 +14,7 @@ export default {
     title: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string' },
       },
       description: 'The header text of the drawer',
     },
@@ -26,7 +26,7 @@ export default {
     closeAriaLabel: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string' },
         defaultValue: { summary: 'Close' },
       },
       description: 'The aria label for the close button',
@@ -34,65 +34,58 @@ export default {
     children: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string' },
       },
       description: 'The drawer content',
-    },
-    testID: {
-      control: 'text',
-      table: {
-        type: { summary: 'string', required: false },
-      },
-      description: 'Append an attribute data-testid for testing purposes',
     },
     open: {
       control: 'boolean',
       description: 'Show/Hide the drawer',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string' },
         defaultValue: { summary: 'false' },
       },
     },
     onClose: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the user requests to close the drawer',
       table: {
-        type: { summary: 'function', required: false },
+        type: { summary: 'function' },
       },
     },
     onClickOutside: {
-      control: 'function',
+      type: 'function',
       description:
         'Function called when the user clicks anywhere outside the drawer (in case this functionality is different than onClose)',
       table: {
-        type: { summary: 'function', required: false },
+        type: { summary: 'function' },
       },
     },
     primaryButton: {
       control: 'object',
       description: 'Primary',
       table: {
-        type: { summary: 'object', required: false },
+        type: { summary: 'object' },
       },
     },
     secondaryButton: {
       control: 'object',
       description: 'Secondary ',
       table: {
-        type: { summary: 'object', required: false },
+        type: { summary: 'object' },
       },
     },
     linkButton: {
       control: 'object',
       description: 'Link',
       table: {
-        type: { summary: 'object', required: false },
+        type: { summary: 'object' },
       },
     },
   },
-} as Meta;
+} satisfies Meta<typeof Drawer>;
 
-const Template: Story<DrawerProps> = ({
+const Template: StoryFn<DrawerProps> = ({
   children,
   closeIconComponent: CloseIconComponent,
   onClose,

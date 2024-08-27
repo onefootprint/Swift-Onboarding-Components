@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import React from 'react';
 
 import type { MultiSelectProps } from './multi-select';
@@ -43,7 +43,8 @@ export default {
       description: 'Auto focus the multi-select',
     },
     defaultValue: {
-      control: 'array',
+      control: 'select',
+      options: ['1', '2'],
       description: 'Default value of the multi-select',
     },
     disabled: {
@@ -67,23 +68,24 @@ export default {
       description: 'Name of the multi-select',
     },
     onBlur: {
-      control: 'function',
+      type: 'function',
       description: 'Callback when the multi-select is blurred',
     },
     onChange: {
-      control: 'function',
+      type: 'function',
       description: 'Callback when the multi-select value changes',
     },
     onFocus: {
-      control: 'function',
+      type: 'function',
       description: 'Callback when the multi-select is focused',
     },
     onInputChange: {
-      control: 'function',
+      type: 'function',
       description: 'Callback when the multi-select input changes',
     },
     options: {
-      control: 'array',
+      control: 'select',
+      options: ['1', '2'],
       description: 'Options of the multi-select',
     },
     placeholder: {
@@ -104,7 +106,7 @@ export default {
       required: false,
     },
     value: {
-      control: 'option',
+      control: 'text',
       description: 'Value of the multi-select',
     },
     size: {
@@ -113,7 +115,7 @@ export default {
       description: 'Size of the multi-select',
     },
   },
-} as ComponentMeta<typeof MultiSelect>;
+} satisfies Meta<typeof MultiSelect>;
 
 type Option = {
   label: string;
@@ -125,7 +127,7 @@ type Group = {
   label?: string;
 };
 
-const Template: Story<MultiSelectProps<Option, Group>> = ({
+const Template: StoryFn<MultiSelectProps<Option, Group>> = ({
   autoFocus,
   disabled,
   emptyStateText,

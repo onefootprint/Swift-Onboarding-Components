@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { InlineAlertProps } from './inline-alert';
 import InlineAlert from './inline-alert';
 
@@ -20,7 +20,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<InlineAlertProps> = ({ children, variant, cta }: InlineAlertProps) => (
+const Template: StoryFn<InlineAlertProps> = ({ children, variant, cta }: InlineAlertProps) => (
   <InlineAlert cta={cta} variant={variant}>
     {children}
   </InlineAlert>

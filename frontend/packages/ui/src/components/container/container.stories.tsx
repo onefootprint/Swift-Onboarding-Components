@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import Box from '../box';
 import Text from '../text';
@@ -25,9 +25,9 @@ export default {
       description: 'Append an attribute data-testid for testing purposes',
     },
   },
-} as ComponentMeta<typeof Container>;
+} satisfies Meta<typeof Container>;
 
-const Template: Story<ContainerProps> = ({ as, children, testID }: Partial<ContainerProps>) => (
+const Template: StoryFn<ContainerProps> = ({ as, children, testID }: Partial<ContainerProps>) => (
   <Container as={as} testID={testID}>
     <Box width="100%" height="100vh" backgroundColor="tertiary" borderRadius="sm" padding={6}>
       <Text variant="label-1" color="quaternary">

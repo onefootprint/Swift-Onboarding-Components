@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Box from '../box';
@@ -25,13 +25,13 @@ export default {
       description: 'The selected option',
     },
     onChange: {
-      control: 'function',
+      type: 'function',
       description: 'Callback when the option is changed',
     },
   },
-} as Meta;
+} satisfies Meta<typeof Stepper>;
 
-const Template: Story<StepperProps> = ({
+const Template: StoryFn<StepperProps> = ({
   'aria-label': ariaLabel,
   options: defaultOptions,
   onChange,

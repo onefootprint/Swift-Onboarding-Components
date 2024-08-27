@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { SearchInputProps } from './search-input';
@@ -42,7 +42,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<SearchInputProps> = ({
+const Template: StoryFn<SearchInputProps> = ({
   onChange,
   onChangeText,
   onReset,

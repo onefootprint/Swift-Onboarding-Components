@@ -1,5 +1,5 @@
 import { STATES } from '@onefootprint/global-constants';
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Box from '../box';
@@ -20,9 +20,9 @@ export default {
       table: { defaultValue: { summary: 'default' } },
     },
   },
-} as ComponentMeta<typeof Select>;
+} satisfies Meta<typeof Select>;
 
-const Template: Story<SelectProps> = ({
+const Template: StoryFn<SelectProps> = ({
   disabled,
   hasError,
   hint,

@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { TextProps } from './text';
 import Text from './text';
@@ -25,7 +25,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<TextProps> = ({
+const Template: StoryFn<TextProps> = ({
   tag,
   children = 'lorem',
   color = 'primary',

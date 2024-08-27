@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { GoogleButtonProps } from './google-button';
 import GoogleButton from './google-button';
@@ -53,7 +53,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<GoogleButtonProps> = ({
+const Template: StoryFn<GoogleButtonProps> = ({
   children,
   disabled,
   fullWidth,

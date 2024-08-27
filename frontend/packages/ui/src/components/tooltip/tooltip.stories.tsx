@@ -1,5 +1,5 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import styled from 'styled-components';
 
 import Tooltip from './tooltip';
@@ -47,7 +47,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = ({ position, alignment, content, children, disabled, open, onOpenChange }) => (
+const Template: StoryFn = ({ position, alignment, content, children, disabled, open, onOpenChange }) => (
   <Aligner>
     <Tooltip
       position={position}

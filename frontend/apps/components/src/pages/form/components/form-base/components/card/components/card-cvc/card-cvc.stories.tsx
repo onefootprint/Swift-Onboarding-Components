@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { CardCvcProps } from './card-cvc';
@@ -30,7 +30,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<CardCvcProps> = ({
+const Template: StoryFn<CardCvcProps> = ({
   hasError,
   hint,
   testID,

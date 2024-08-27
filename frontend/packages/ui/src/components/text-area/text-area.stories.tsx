@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { TextAreaProps } from './text-area';
@@ -51,7 +51,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<TextAreaProps> = ({
+const Template: StoryFn<TextAreaProps> = ({
   disabled,
   hasError,
   hint,

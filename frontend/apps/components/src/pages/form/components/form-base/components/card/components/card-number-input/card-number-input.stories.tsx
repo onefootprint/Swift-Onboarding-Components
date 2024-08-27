@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type React from 'react';
 import { useState } from 'react';
 
@@ -25,12 +25,12 @@ export default {
       required: false,
     },
     onChange: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the input changes',
       required: false,
     },
     onChangeText: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the value changes',
       required: false,
     },
@@ -40,9 +40,9 @@ export default {
       required: false,
     },
   },
-} as Meta;
+} satisfies Meta<typeof CardNumberInput>;
 
-const Template: Story<CardNumberInputProps> = ({
+const Template: StoryFn<CardNumberInputProps> = ({
   disabled,
   hasError,
   hint,

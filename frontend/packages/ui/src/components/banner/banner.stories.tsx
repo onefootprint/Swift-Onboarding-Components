@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { BannerProps } from './banner';
 import Banner from './banner';
@@ -21,7 +21,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BannerProps> = ({ children, variant: $variant }: BannerProps) => (
+const Template: StoryFn<BannerProps> = ({ children, variant: $variant }: BannerProps) => (
   <Banner variant={$variant}>{children}</Banner>
 );
 

@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { TabsProps } from '.';
 import { Tabs } from '.';
@@ -7,13 +7,8 @@ import type { TabOption } from './tabs';
 export default {
   title: 'Components/Tabs',
   component: Tabs,
-  argTypes: {
-    children: {
-      description: 'Tab items',
-      name: 'children *',
-    },
-  },
-} as ComponentMeta<typeof Tabs>;
+  argTypes: {},
+} satisfies Meta<typeof Tabs>;
 
 const options: TabOption[] = [
   { label: 'Security logs', value: '/security-logs' },
@@ -21,7 +16,7 @@ const options: TabOption[] = [
   { label: 'Settings', value: '/settings' },
 ];
 
-const Template: Story<TabsProps> = () => <Tabs options={options} onChange={value => console.log(value)} />;
+const Template: StoryFn<TabsProps> = () => <Tabs options={options} onChange={value => console.log(value)} />;
 
 export const Base = Template.bind({});
 Base.args = {};

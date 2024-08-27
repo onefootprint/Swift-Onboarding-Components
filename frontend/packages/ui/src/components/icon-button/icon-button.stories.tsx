@@ -1,5 +1,5 @@
 import { IcoClose24 } from '@onefootprint/icons';
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { IconButtonProps } from './icon-button';
 import IconButton from './icon-button';
@@ -32,9 +32,14 @@ export default {
       description: 'Append an attribute data-testid for testing purposes',
     },
   },
-} as ComponentMeta<typeof IconButton>;
+} satisfies Meta<typeof IconButton>;
 
-const Template: Story<IconButtonProps> = ({ 'aria-label': ariaLabel, disabled, onClick, testID }: IconButtonProps) => (
+const Template: StoryFn<IconButtonProps> = ({
+  'aria-label': ariaLabel,
+  disabled,
+  onClick,
+  testID,
+}: IconButtonProps) => (
   <IconButton aria-label={ariaLabel} disabled={disabled} onClick={onClick} testID={testID}>
     <IcoClose24 color="tertiary" />
   </IconButton>

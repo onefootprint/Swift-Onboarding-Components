@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { CodeInlineProps } from './code-inline';
 import CodeInline from './code-inline';
@@ -52,7 +52,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<CodeInlineProps> = ({
+const Template: StoryFn<CodeInlineProps> = ({
   ariaLabel,
   children,
   disabled,

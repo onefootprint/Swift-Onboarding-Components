@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import { IcoArrowRightSmall24, icos } from '@onefootprint/icons';
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { LinkButtonProps } from './link-button';
 import LinkButton from './link-button';
@@ -74,9 +74,9 @@ export default {
       description: 'Whether the button is disabled',
     },
   },
-} as ComponentMeta<typeof LinkButton>;
+} satisfies Meta<typeof LinkButton>;
 
-const Template: Story<LinkButtonProps> = ({
+const Template: StoryFn<LinkButtonProps> = ({
   ariaLabel,
   children,
   href,

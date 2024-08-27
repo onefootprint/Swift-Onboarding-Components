@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { BreadcrumbProps } from './breadcrumb';
 import Breadcrumb from './breadcrumb';
@@ -19,7 +19,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BreadcrumbProps> = ({ separator, 'aria-label': ariaLabel }: BreadcrumbProps) => (
+const Template: StoryFn<BreadcrumbProps> = ({ separator, 'aria-label': ariaLabel }: BreadcrumbProps) => (
   <Breadcrumb separator={separator} aria-label={ariaLabel}>
     <BreadcrumbItem href="#">Footprint</BreadcrumbItem>
     <BreadcrumbItem href="#">UI</BreadcrumbItem>

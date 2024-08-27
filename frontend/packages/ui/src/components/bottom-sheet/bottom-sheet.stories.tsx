@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -11,53 +11,46 @@ export default {
   title: 'Components/BottomSheet',
   argTypes: {
     title: {
-      control: 'text',
+      type: 'string',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string', detail: 'string' },
       },
       description: 'The header text of the bottom sheet',
     },
     closeAriaLabel: {
-      control: 'text',
+      type: 'string',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string', detail: 'string' },
         defaultValue: { summary: 'Close' },
       },
       description: 'The aria label for the close button',
     },
     children: {
-      control: 'text',
+      type: 'string',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string', detail: 'string' },
       },
       description: 'The bottom sheet content',
     },
-    testID: {
-      control: 'text',
-      table: {
-        type: { summary: 'string', required: false },
-      },
-      description: 'Append an attribute data-testid for testing purposes',
-    },
     open: {
-      control: 'boolean',
+      type: 'boolean',
       description: 'Show/Hide the bottom sheet',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string', detail: 'string' },
         defaultValue: { summary: 'false' },
       },
     },
     onClose: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the user requests to close the bottom sheet',
       table: {
-        type: { summary: 'function', required: false },
+        type: { summary: 'function', detail: 'string' },
       },
     },
   },
-} as Meta;
+} satisfies Meta<typeof BottomSheet>;
 
-const Template: Story<BottomSheetProps> = ({ children, onClose, open: initialOpen, title }: BottomSheetProps) => {
+const Template: StoryFn<BottomSheetProps> = ({ children, onClose, open: initialOpen, title }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialOpen);
 
   return (
@@ -97,7 +90,7 @@ OnlyPrimary.args = {
   },
 };
 
-const LinkTemplate: Story<BottomSheetProps> = ({ title, onClose, open: initialVisibility }: BottomSheetProps) => {
+const LinkTemplate: StoryFn<BottomSheetProps> = ({ title, onClose, open: initialVisibility }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialVisibility);
 
   return (

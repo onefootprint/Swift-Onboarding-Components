@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { CodeBlockProps } from './code-block';
 import CodeBlock from './code-block';
@@ -47,7 +47,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<CodeBlockProps> = ({
+const Template: StoryFn<CodeBlockProps> = ({
   ariaLabel = 'Copy to clipboard',
   children,
   language,

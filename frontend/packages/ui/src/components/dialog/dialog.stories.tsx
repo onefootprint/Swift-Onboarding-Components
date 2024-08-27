@@ -1,5 +1,5 @@
 import { IcoClose24, icos } from '@onefootprint/icons';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Button from '../button';
@@ -14,49 +14,33 @@ export default {
     title: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string' },
       },
       description: 'The header text of the dialog',
     },
-    headerIconComponent: {
+    headerIcon: {
       control: 'select',
       description: 'Close icon',
       options: Object.keys(icos),
     },
-    headerIconAriaLabel: {
-      control: 'text',
-      table: {
-        type: { summary: 'string', required: false },
-        defaultValue: { summary: 'Close' },
-      },
-      description: 'The aria label for the close button',
-    },
-    headerIconOnClick: {
-      control: 'function',
-      description:
-        'Function called when the user clicks on the header icon (usually dialog close action, but not always)',
-      table: {
-        type: { summary: 'function', required: false },
-      },
-    },
     onClose: {
-      control: 'function',
+      type: 'function',
       description: 'Function called when the user closes the dialog',
       table: {
-        type: { summary: 'function', required: false },
+        type: { summary: 'function' },
       },
     },
     children: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: true },
+        type: { summary: 'string' },
       },
       description: 'The dialog content',
     },
     testID: {
       control: 'text',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string' },
       },
       description: 'Append an attribute data-testid for testing purposes',
     },
@@ -64,7 +48,7 @@ export default {
       control: 'boolean',
       description: 'Show/Hide the dialog',
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string' },
         defaultValue: { summary: 'false' },
       },
     },
@@ -73,7 +57,7 @@ export default {
       description: 'The size of the dialog',
       options: ['default', 'compact', 'large', 'full-screen'],
       table: {
-        type: { summary: 'string', required: false },
+        type: { summary: 'string' },
         defaultValue: { summary: 'default' },
       },
     },
@@ -81,41 +65,41 @@ export default {
       control: 'object',
       description: 'The primary button',
       table: {
-        type: { summary: 'object', required: true },
+        type: { summary: 'object' },
       },
     },
     secondaryButton: {
       control: 'object',
       description: 'The secondary button',
       table: {
-        type: { summary: 'object', required: true },
+        type: { summary: 'object' },
       },
     },
     linkButton: {
       control: 'object',
       description: 'The link button, which is rendered on the left',
       table: {
-        type: { summary: 'object', required: true },
+        type: { summary: 'object' },
       },
     },
     headerButton: {
       control: 'object',
       description: 'The header button, which is rendered on the right of the title',
       table: {
-        type: { summary: 'object', required: true },
+        type: { summary: 'object' },
       },
     },
     isConfirmation: {
       control: 'boolean',
       description: 'Whether the dialog is a confirmation dialog',
       table: {
-        type: { summary: 'boolean', required: false },
+        type: { summary: 'boolean' },
       },
     },
   },
-} as Meta;
+} satisfies Meta<typeof Dialog>;
 
-const Template: Story<DialogProps> = ({
+const Template: StoryFn<DialogProps> = ({
   children,
   onClose,
   headerIcon: {
@@ -196,7 +180,7 @@ Base.args = {
   isConfirmation: false,
 };
 
-const OnlyPrimaryTemplate: Story<DialogProps> = ({
+const OnlyPrimaryTemplate: StoryFn<DialogProps> = ({
   children,
   onClose,
   headerIcon: {
@@ -262,7 +246,7 @@ OnlyPrimary.args = {
   isConfirmation: false,
 };
 
-const LinkTemplate: Story<DialogProps> = ({
+const LinkTemplate: StoryFn<DialogProps> = ({
   title,
   onClose,
   primaryButton = { label: 'Primary' },

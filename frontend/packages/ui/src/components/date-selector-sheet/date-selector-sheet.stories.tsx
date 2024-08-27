@@ -1,5 +1,5 @@
 import { Stack, Text } from '@onefootprint/ui';
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { add, format, startOfWeek } from 'date-fns';
 import { useState } from 'react';
 
@@ -21,7 +21,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<DateSelectorSheetProps> = ({ startDate, endDate }) => {
+const Template: StoryFn<DateSelectorSheetProps> = ({ startDate, endDate }) => {
   const [displayedStartDate, setDisplayedStartDate] = useState(startDate);
   const [displayedEndDate, setDisplayedEndDate] = useState(endDate);
 

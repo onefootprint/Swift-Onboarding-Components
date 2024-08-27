@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import styled from 'styled-components';
 
 import type { CopyButtonProps } from './copy-button';
@@ -46,7 +46,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<CopyButtonProps> = ({
+const Template: StoryFn<CopyButtonProps> = ({
   ariaLabel,
   children,
   contentToCopy,

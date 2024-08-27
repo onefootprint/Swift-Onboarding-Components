@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -37,7 +37,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<RadioProps> = ({
+const Template: StoryFn<RadioProps> = ({
   checked: checkedProp,
   disabled,
   hasError,

@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Filter from './filters';
@@ -7,7 +7,7 @@ export default {
   title: 'Patterns/Filters',
   component: Filter,
   argTypes: {},
-} as ComponentMeta<typeof Filter>;
+} satisfies Meta<typeof Filter>;
 
 const defaultFilters: {
   statuses: [];
@@ -21,7 +21,7 @@ const defaultFilters: {
   watchlist_hit: undefined,
 };
 
-const Template: Story = ({ onClear, onChange }) => {
+const Template: StoryFn = ({ onClear, onChange }) => {
   const [filters, setFilters] = useState(defaultFilters);
 
   return (

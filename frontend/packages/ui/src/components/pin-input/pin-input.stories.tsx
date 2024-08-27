@@ -1,4 +1,4 @@
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import AnimatedLoadingSpinner from '../animated-loading-spinner';
@@ -33,9 +33,9 @@ export default {
       description: 'Append an attribute data-testid for testing purposes',
     },
   },
-} as ComponentMeta<typeof PinInput>;
+} satisfies Meta<typeof PinInput>;
 
-const Template: Story<PinInputProps> = ({
+const Template: StoryFn<PinInputProps> = ({
   hasError: baseHasError = false,
   hint: basehint,
   onComplete,

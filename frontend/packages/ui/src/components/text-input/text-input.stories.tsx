@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import type { TextInputProps } from './text-input';
@@ -81,7 +81,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<TextInputProps> = ({
+const Template: StoryFn<TextInputProps> = ({
   disabled,
   hasError,
   hint,

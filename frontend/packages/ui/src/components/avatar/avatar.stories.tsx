@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { AvatarProps } from './avatar';
 import Avatar from './avatar';
@@ -30,7 +30,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<AvatarProps> = ({ loading, name, size, src }: AvatarProps) => (
+const Template: StoryFn<AvatarProps> = ({ loading, name, size, src }: AvatarProps) => (
   <Avatar loading={loading} name={name} size={size} src={src} />
 );
 

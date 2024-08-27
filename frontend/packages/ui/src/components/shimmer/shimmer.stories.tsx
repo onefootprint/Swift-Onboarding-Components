@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { ShimmerProps } from './shimmer';
 import Shimmer from './shimmer';
@@ -25,7 +25,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<ShimmerProps> = ({ 'aria-valuetext': ariaValueText, testID }: ShimmerProps) => (
+const Template: StoryFn<ShimmerProps> = ({ 'aria-valuetext': ariaValueText, testID }: ShimmerProps) => (
   <Shimmer testID={testID} aria-valuetext={ariaValueText} />
 );
 

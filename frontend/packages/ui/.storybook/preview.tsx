@@ -1,7 +1,8 @@
-import React, { useEffect, Suspense } from 'react';
-import i18n from './i18n';
-import { DesignSystemProvider } from '../src/utils/design-system-provider';
 import themes from '@onefootprint/design-tokens';
+import type { Decorator } from '@storybook/react';
+import { useEffect } from 'react';
+import { DesignSystemProvider } from '../src/utils/design-system-provider';
+import i18n from './i18n';
 
 // Create a global variable called locale in storybook
 // and add a dropdown in the toolbar to change your locale
@@ -20,7 +21,7 @@ export const globalTypes = {
   },
 };
 
-const StoryDecorator = (Story, context) => {
+const StoryDecorator: Decorator = (Story, context) => {
   const { locale } = context.globals;
 
   // When the locale global changes

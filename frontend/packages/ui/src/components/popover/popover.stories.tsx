@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import Stack from '../stack';
 import Text from '../text';
 import Popover from './popover';
@@ -12,18 +12,11 @@ export default {
       control: 'text',
       description: 'The content of the popover',
       table: {
-        type: { summary: 'ReactNode', required: true },
-      },
-    },
-    trigger: {
-      control: 'text',
-      description: 'The trigger element for the popover',
-      table: {
-        type: { summary: 'ReactNode', required: true },
+        type: { summary: 'ReactNode' },
       },
     },
   },
-} as Meta<typeof Popover>;
+} satisfies Meta<typeof Popover>;
 
 const PopoverContent = () => {
   return (
@@ -34,7 +27,7 @@ const PopoverContent = () => {
   );
 };
 
-const Template: Story<PopoverProps> = () => {
+const Template: StoryFn<PopoverProps> = () => {
   return (
     <Stack justify="center" align="center" width="100vw" height="100vh">
       <Popover content={<PopoverContent />}>

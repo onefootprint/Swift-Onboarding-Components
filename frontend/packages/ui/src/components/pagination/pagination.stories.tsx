@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
 import Pagination from './pagination';
@@ -40,7 +40,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = ({ pageIndex, pageSize, totalNumResults }) => {
+const Template: StoryFn = ({ pageIndex, pageSize, totalNumResults }) => {
   const [currentPage, setCurrentPage] = useState(pageIndex);
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < Math.ceil(totalNumResults / pageSize) - 1;

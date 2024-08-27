@@ -1,5 +1,5 @@
 import { IcoQuote40, icos } from '@onefootprint/icons';
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 import type { EmptyStateProps } from './empty-state';
 import EmptyState from './empty-state';
@@ -28,9 +28,9 @@ export default {
       description: 'Append an attribute data-testid for testing purposes',
     },
   },
-} as ComponentMeta<typeof EmptyState>;
+} satisfies Meta<typeof EmptyState>;
 
-const Template: Story<EmptyStateProps> = ({
+const Template: StoryFn<EmptyStateProps> = ({
   description,
   iconComponent: Icon = IcoQuote40,
   testID,
@@ -40,7 +40,7 @@ const Template: Story<EmptyStateProps> = ({
   return <EmptyState description={description} iconComponent={SelectedIcon} testID={testID} title={title} />;
 };
 
-const HeaderTemplate: Story<EmptyStateProps> = ({
+const HeaderTemplate: StoryFn<EmptyStateProps> = ({
   description,
   renderHeader = () => <h1>Custom Header</h1>,
   testID,
