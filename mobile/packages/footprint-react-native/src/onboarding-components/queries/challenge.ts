@@ -6,6 +6,7 @@ type EmailAndPassword = { email?: string; phoneNumber?: string };
 type RequestOptions = {
   onboardingConfig: string;
   sandboxId?: string;
+  requiredAuthMethods?: string[];
 };
 
 type ChallengeResponse = {
@@ -48,6 +49,12 @@ const identify = async (payload: EmailAndPassword, options: RequestOptions) => {
 };
 
 const signupChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
+  let preferredAuthMethod;
+  if (options.requiredAuthMethods?.includes('phone')) {
+    preferredAuthMethod = 'sms';
+  } else if (options.requiredAuthMethods?.includes('email')) {
+    preferredAuthMethod = 'email';
+  }
   const response = await request<ChallengeResponse>({
     url: '/hosted/identify/signup_challenge',
     method: 'POST',
@@ -55,6 +62,7 @@ const signupChallenge = async (payload: EmailAndPassword, options: RequestOption
       email: { value: payload.email, isBootstrap: false },
       phoneNumber: { value: payload.phoneNumber, isBootstrap: false },
       scope: 'onboarding',
+      challengeKind: preferredAuthMethod,
     },
     headers: {
       'X-Onboarding-Config-Key': options.onboardingConfig,
@@ -64,7 +72,7 @@ const signupChallenge = async (payload: EmailAndPassword, options: RequestOption
   return response;
 };
 
-const loginChallenge = async (payload: { kind: 'sms' }, options: { token: string }) => {
+const loginChallenge = async (payload: { kind: 'sms' | 'email' }, options: { token: string }) => {
   const response = await request<ChallengeResponse>({
     url: '/hosted/identify/login_challenge',
     method: 'POST',
@@ -139,10 +147,18 @@ export const createChallenge = async (payload: EmailAndPassword, options: Reques
       const hasPhone = identifyResponse.user.authMethods.some(
         authMethod => authMethod.kind === 'phone' && authMethod.isVerified,
       );
+      const hasEmail = identifyResponse.user.authMethods.some(
+        authMethod => authMethod.kind === 'email' && authMethod.isVerified,
+      );
       if (hasPhone) {
         const loginResponse = await loginChallenge({ kind: 'sms' }, { token: identifyResponse.user.token });
         return loginResponse;
       }
+      if (hasEmail) {
+        const signupResponse = await loginChallenge({ kind: 'email' }, { token: identifyResponse.user.token });
+        return signupResponse;
+      }
+      throw new InlineOtpNotSupported('Cannot verify inline');
     }
   }
   const signupResponse = await signupChallenge(payload, options);

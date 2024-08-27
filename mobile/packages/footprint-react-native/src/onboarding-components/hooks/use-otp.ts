@@ -71,15 +71,22 @@ const useOtp = () => {
   };
 
   const create = async (payload: { email?: string; phoneNumber?: string }) => {
+    if (!payload.email || !payload.phoneNumber) {
+      // TODO: In the future, we should allow email-only
+      throw new Error('Email and phone number are required');
+    }
     const { onboardingConfig } = context;
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
     }
+    const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
     const response = await createChallenge(payload, {
       onboardingConfig: onboardingConfig.key,
       sandboxId: context.sandboxId,
+      requiredAuthMethods,
     });
     setChallengeData(response.challengeData);
+    return response.challengeData.challengeKind;
   };
 
   const verify = async (payload: { challenge: string }) => {
