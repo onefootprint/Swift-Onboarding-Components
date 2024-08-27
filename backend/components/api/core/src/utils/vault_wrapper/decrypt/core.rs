@@ -142,7 +142,8 @@ pub(in crate::utils::vault_wrapper) struct VwDecryptRequest<'a>(
     pub VaultedData<'a>,
 );
 
-const BATCH_DECRYPT_CHUNK_SIZE: usize = 500;
+const BATCH_DECRYPT_PIISTRING_CHUNK_SIZE: usize = 100;
+const BATCH_DECRYPT_DOCUMENT_CHUNK_SIZE: usize = 20;
 
 /// Executes a batch of decrypt requests for potentially multiple users, returning a hashmap of
 /// identifiers to their decrypted values
@@ -188,11 +189,12 @@ where
     } else {
         let result_futs = e_data
             .into_iter()
-            .chunks(BATCH_DECRYPT_CHUNK_SIZE)
+            .chunks(BATCH_DECRYPT_PIISTRING_CHUNK_SIZE)
             .into_iter()
             .map(|c| enclave_client.batch_decrypt_to_piistring(c.into_iter().collect()))
             .collect_vec();
         futures::stream::iter(result_futs)
+            // Decrypt up to 4 chunks simultaneously.
             .buffer_unordered(4)
             .collect::<Vec<_>>()
             .await
@@ -210,11 +212,12 @@ where
     } else {
         let result_futs = e_large_data
             .into_iter()
-            .chunks(BATCH_DECRYPT_CHUNK_SIZE)
+            .chunks(BATCH_DECRYPT_DOCUMENT_CHUNK_SIZE)
             .into_iter()
             .map(|c| enclave_client.batch_decrypt_documents(c.into_iter().collect()))
             .collect_vec();
         futures::stream::iter(result_futs)
+            // Decrypt up to 4 chunks simultaneously.
             .buffer_unordered(4)
             .collect::<Vec<_>>()
             .await
