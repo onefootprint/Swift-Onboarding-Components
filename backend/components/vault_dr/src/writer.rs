@@ -142,6 +142,7 @@ impl VaultDrWriter {
                     &config_id,
                     batch_size,
                     fp_id_filter,
+                    true,
                 )?;
 
                 let sv_ids = dls.iter().map(|dl| &dl.scoped_vault_id).collect_vec();
