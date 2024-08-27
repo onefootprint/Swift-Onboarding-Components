@@ -144,6 +144,9 @@ export const isMissingAddressData = (ctx: MachineContext): boolean => {
   return isMissingDataFromCollection(ctx, missingCdos);
 };
 
+const isMissingBoProp = (bo: BeneficialOwner) => !bo.first_name || !bo.last_name || !bo.ownership_stake;
+const isMissingBoPropWithContact = (bo: BeneficialOwner) => isMissingBoProp(bo) || !bo.phone_number || !bo.email;
+
 export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
   if (!ctx.kybRequirement) return false;
   if (ctx.kybRequirement.hasLinkedBos) return false;
@@ -152,13 +155,18 @@ export const isMissingBeneficialOwnersData = (ctx: MachineContext): boolean => {
   const missingCdos = missingAttributes(ctx, boCdos);
 
   const requiredDis = missingCdos.flatMap(cdo => CollectedKybDataOptionToRequiredAttributes[cdo]);
+
+  const isAnyPropMissing = requiredDis.includes(BusinessDI.kycedBeneficialOwners)
+    ? isMissingBoPropWithContact
+    : isMissingBoProp;
+
   return requiredDis.some(di => {
     const collectedData = data[di];
     return (
       !collectedData ||
       !Array.isArray(collectedData) ||
       collectedData.length === 0 ||
-      collectedData.some(bOwner => !bOwner.first_name || !bOwner.last_name || !bOwner.ownership_stake)
+      collectedData.some(isAnyPropMissing)
     );
   });
 };

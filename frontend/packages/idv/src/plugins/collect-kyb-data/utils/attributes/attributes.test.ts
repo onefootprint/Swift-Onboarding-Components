@@ -495,6 +495,15 @@ describe('isMissingBeneficialOwnersData', () => {
             first_name: 'John',
             last_name: 'Doe',
             ownership_stake: 50,
+            email: 'j@j.com',
+            phone_number: '+12025550179',
+          },
+          {
+            first_name: 'John',
+            last_name: 'Doe',
+            ownership_stake: 50,
+            email: 'j@j.com',
+            phone_number: '+12025550179',
           },
         ],
       },
@@ -502,6 +511,36 @@ describe('isMissingBeneficialOwnersData', () => {
     } satisfies MachineContext;
 
     expect(isMissingBeneficialOwnersData(ctx)).toBe(false);
+  });
+
+  it('should return true if one of kyced beneficial owners is missing contact info', () => {
+    const ctx = {
+      kybRequirement: getKybRequirement([CollectedKybDataOption.kycedBeneficialOwners]),
+      idvContext: idvContext,
+      bootstrapBusinessData: {},
+      bootstrapUserData: {},
+      data: {
+        [BusinessDI.kycedBeneficialOwners]: [
+          {
+            first_name: 'John',
+            last_name: 'Doe',
+            ownership_stake: 50,
+            email: 'j@j.com',
+            phone_number: '+12025550179',
+          },
+          {
+            first_name: 'John',
+            last_name: 'Doe',
+            ownership_stake: 50,
+            email: 'j@j.com',
+            // phone_number: '+12025550179', <- intentionally comment out
+          },
+        ],
+      },
+      dataCollectionScreensToShow: [],
+    } satisfies MachineContext;
+
+    expect(isMissingBeneficialOwnersData(ctx)).toBe(true);
   });
 
   it('should return true when part of kyced beneficial owners is missing', () => {
