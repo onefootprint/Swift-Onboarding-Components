@@ -126,6 +126,20 @@ const initOnboarding = async (options: { token: string; sandboxOutcome: SandboxO
   return response;
 };
 
+const createVaultingToken = async ({ authToken }: { authToken: string }) => {
+  const response = await request<{ token: string; expiresAt: string }>({
+    url: '/hosted/user/tokens',
+    method: 'POST',
+    headers: {
+      'X-Fp-Authorization': authToken,
+    },
+    data: {
+      requestedScope: 'onboarding_components',
+    },
+  });
+  return response;
+};
+
 export const verifyChallenge = async (
   payload: { challenge: string; challengeToken: string },
   options: { token: string; sandboxOutcome: SandboxOutcome },
@@ -133,7 +147,11 @@ export const verifyChallenge = async (
   const response = await verify(payload, options);
   await getValidationToken({ token: response.authToken });
   await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
-  return response;
+  const vaultingToken = await createVaultingToken({ authToken: response.authToken });
+  return {
+    authToken: response.authToken,
+    vaultingToken: vaultingToken.token,
+  };
 };
 
 export const createChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {

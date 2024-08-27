@@ -106,7 +106,7 @@ const useOtp = () => {
     setContext(prev => ({
       ...prev,
       authToken: response.authToken,
-      vaultingToken: response.authToken,
+      vaultingToken: response.vaultingToken,
       step: OnboardingStep.Onboard,
     }));
   };
