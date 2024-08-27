@@ -10,7 +10,7 @@ import Roles from './components/roles';
 import Table from './components/table';
 
 const ApiKeys = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys' });
+  const { t } = useTranslation('api-keys');
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] = useToggle(false);
 
   return (

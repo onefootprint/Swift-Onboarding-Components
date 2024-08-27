@@ -9,7 +9,7 @@ import SectionHeader from 'src/components/section-header';
 import Table from './components/table';
 
 const Roles = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys.roles' });
+  const { t } = useTranslation('api-keys', { keyPrefix: 'roles' });
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] = useToggle(false);
 
   return (

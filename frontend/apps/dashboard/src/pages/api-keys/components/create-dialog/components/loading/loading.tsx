@@ -2,7 +2,7 @@ import { Box, Shimmer, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 const Loading = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys.create' });
+  const { t } = useTranslation('api-keys', { keyPrefix: 'create' });
 
   return (
     <Box aria-label={t('form.loading-aria')} width="100%">

@@ -1,6 +1,7 @@
 import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 
+import type apiKeys from '../config/locales/en/api-keys.json';
 import type authentication from '../config/locales/en/authentication.json';
 import type businessesResource from '../config/locales/en/businesses.json';
 import type commonResource from '../config/locales/en/common.json';
@@ -24,6 +25,7 @@ declare module 'i18next' {
       'entity-details': typeof entityDetails;
       'entity-documents': typeof entityDocuments;
       'switch-org': typeof switchOrgresource;
+      'api-keys': typeof apiKeys;
       authentication: typeof authentication;
       businesses: typeof businessesResource;
       common: typeof commonResource;

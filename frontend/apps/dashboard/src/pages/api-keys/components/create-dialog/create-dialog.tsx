@@ -16,8 +16,8 @@ type CreateDialogProps = {
 type FormData = { name: string; role: string };
 const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createApiKeyMutation = useCreateApiKey();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.api-keys.create',
+  const { t } = useTranslation('api-keys', {
+    keyPrefix: 'create',
   });
   const toast = useToast();
   const {

@@ -12,8 +12,8 @@ export type EditRoleProps = {
 };
 
 const EditRole = ({ apiKey }: EditRoleProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.api-keys.table.edit-role',
+  const { t } = useTranslation('api-keys', {
+    keyPrefix: 'table.edit-role',
   });
   const rolesQuery = useRoles(RoleKind.apiKey);
   const updateApiKeyMutation = useUpdateRoleId();

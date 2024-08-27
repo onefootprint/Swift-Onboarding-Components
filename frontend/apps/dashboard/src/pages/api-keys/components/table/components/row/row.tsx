@@ -16,7 +16,7 @@ export type RowProps = {
 };
 
 const Row = ({ apiKey }: RowProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys.table' });
+  const { t } = useTranslation('api-keys', { keyPrefix: 'table' });
   const reveal = useReveal(apiKey);
   const status = useUpdateStatus(apiKey);
   const isEnabled = apiKey.status === 'enabled';

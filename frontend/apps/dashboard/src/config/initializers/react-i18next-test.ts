@@ -2,6 +2,7 @@ import { enUiJson as ui } from '@onefootprint/ui';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import apiKeys from '../locales/en/api-keys.json';
 import authentication from '../locales/en/authentication.json';
 import businesses from '../locales/en/businesses.json';
 import common from '../locales/en/common.json';
@@ -23,6 +24,7 @@ i18next.use(initReactI18next).init({
       'entity-details': entityDetails,
       'entity-documents': entityDocuments,
       'switch-org': switchOrg,
+      'api-keys': apiKeys,
       authentication,
       businesses,
       common,
@@ -52,6 +54,7 @@ i18next.use(initReactI18next).init({
     'users',
     'home',
     'settings',
+    'api-keys',
   ],
   returnNull: false,
   interpolation: {

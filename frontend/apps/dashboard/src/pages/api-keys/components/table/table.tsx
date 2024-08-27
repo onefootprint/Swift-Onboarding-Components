@@ -11,7 +11,7 @@ const renderTr = ({ item }: TableRow<ApiKey>) => <Row apiKey={item} />;
 
 const ApiKeysTable = () => {
   const { isLoading, error, data } = useApiKeys();
-  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys' });
+  const { t } = useTranslation('api-keys', {});
   const columns = [
     { text: t('table.header.name'), width: '15%' },
     { text: t('table.header.secret-key'), width: '25%' },
