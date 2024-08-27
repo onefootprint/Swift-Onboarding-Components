@@ -1,6 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IdDI, type VaultValue } from '@onefootprint/types';
-import { NativeSelect } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import { Hint } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
 
   return (
     <ValueContainer>
-      <NativeSelect
+      <Form.Select
         data-dd-privacy="mask"
         aria-label="Country of birth"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
@@ -59,7 +59,7 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
             {country.label}
           </option>
         ))}
-      </NativeSelect>
+      </Form.Select>
       {hasError && <Hint hasError={hasError}>{getHint()}</Hint>}
     </ValueContainer>
   );

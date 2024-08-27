@@ -68,10 +68,10 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     if (name === IdDI.city || name === BusinessDI.city) {
       return <CityInput fieldName={name} value={value} />;
     }
-    if (name === IdDI.state || name === BusinessDI.state) {
+    if (name === IdDI.state || name === BusinessDI.state || name === BusinessDI.formationState) {
       return <StateSelect value={value} fieldName={name} />;
     }
-    if (name === IdDI.country || name === BusinessDI.country || name === BusinessDI.formationState) {
+    if (name === IdDI.country || name === BusinessDI.country) {
       return <AddressCountrySelect value={value} fieldName={name} />;
     }
     if (name === IdDI.zip || name === BusinessDI.zip) {

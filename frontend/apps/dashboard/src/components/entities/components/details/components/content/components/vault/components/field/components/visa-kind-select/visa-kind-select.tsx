@@ -1,5 +1,5 @@
 import { IdDI, type VaultValue, VisaKind } from '@onefootprint/types';
-import { Hint, NativeSelect } from '@onefootprint/ui';
+import { Form, Hint } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +46,7 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
 
   return (
     <ValueContainer>
-      <NativeSelect
+      <Form.Select
         data-dd-privacy="mask"
         aria-label="Visa type"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
@@ -60,7 +60,7 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
             {t(`legal-status.visa-kind-mapping.${kind}` as ParseKeys<'common'>)}
           </option>
         ))}
-      </NativeSelect>
+      </Form.Select>
       <Hint hasError={hasError}>{getHint()}</Hint>
     </ValueContainer>
   );

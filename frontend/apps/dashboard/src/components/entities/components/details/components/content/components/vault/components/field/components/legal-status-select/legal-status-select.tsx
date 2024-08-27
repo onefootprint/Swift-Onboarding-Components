@@ -1,5 +1,5 @@
 import { IdDI, UsLegalStatus, type VaultValue } from '@onefootprint/types';
-import { NativeSelect } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
 
   return (
     <ValueContainer>
-      <NativeSelect
+      <Form.Select
         data-dd-privacy="mask"
         aria-label="Legal status"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
@@ -41,7 +41,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
             {t(`legal-status-mapping.${status}` as ParseKeys<'common'>)}
           </option>
         ))}
-      </NativeSelect>
+      </Form.Select>
     </ValueContainer>
   );
 };

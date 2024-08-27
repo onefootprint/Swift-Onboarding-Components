@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { BusinessDI, type DataIdentifier, IdDI, type VaultValue } from '@onefootprint/types';
-import { Form, Hint, NativeSelect } from '@onefootprint/ui';
+import { Form, Hint } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -41,7 +41,7 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
 
   return isDomestic ? (
     <ValueContainer>
-      <NativeSelect
+      <Form.Select
         data-dd-privacy="mask"
         aria-label="state"
         size="compact"
@@ -54,7 +54,7 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
             {state.label}
           </option>
         ))}
-      </NativeSelect>
+      </Form.Select>
       <Hint hasError={hasError}>{getHint()}</Hint>
     </ValueContainer>
   ) : (
