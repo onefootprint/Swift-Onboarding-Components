@@ -22,7 +22,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
         events: {} as AuthMethodsMachineEvents,
       },
       tsTypes: {} as import('./machine.typegen').Typegen0, // eslint-disable-line @typescript-eslint/consistent-type-imports
-      initial: args.initialMachineState || 'init',
+      initial: args.initialMachineState || 'identify',
       context: {
         authToken: args.authToken,
         updateMethod: UpdateAuthMethodActionKind.addPrimary,
@@ -43,9 +43,6 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
         },
       },
       states: {
-        init: {
-          always: [{ target: 'identify' }],
-        },
         identify: {
           on: {
             setVerifyToken: {

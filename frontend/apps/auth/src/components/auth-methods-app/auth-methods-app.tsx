@@ -115,7 +115,7 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
   return (
     <Layout config={EmptyConfig} onClose={handleOnCloseClick} variant={variant || undefined}>
       {notification ? <Notification title={notification.title} subtitle={notification.subtitle} /> : null}
-      {authToken ? <AuthMethods authToken={authToken} Loading={Loading} onDone={handleOnDoneClick} /> : Loading}
+      {authToken ? <AuthMethods authToken={authToken} onDone={handleOnDoneClick} /> : Loading}
     </Layout>
   );
 };

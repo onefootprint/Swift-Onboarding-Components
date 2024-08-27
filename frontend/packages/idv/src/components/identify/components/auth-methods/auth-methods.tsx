@@ -7,13 +7,12 @@ import { AuthMethodsMachineProvider } from './state';
 type AuthMethodsProps = {
   authToken: string;
   initialMachineState?: AuthMethodsMachineState;
-  Loading: JSX.Element;
   onDone: ComponentProps<typeof AuthMethodsRouter>['onDone'];
 };
 
-const AuthMethods = ({ authToken, initialMachineState, Loading, onDone }: AuthMethodsProps): JSX.Element => (
+const AuthMethods = ({ authToken, initialMachineState, onDone }: AuthMethodsProps): JSX.Element => (
   <AuthMethodsMachineProvider args={{ authToken, initialMachineState }}>
-    <AuthMethodsRouter onDone={onDone} Loading={Loading} />
+    <AuthMethodsRouter onDone={onDone} />
   </AuthMethodsMachineProvider>
 );
 

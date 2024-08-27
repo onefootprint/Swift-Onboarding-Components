@@ -24,7 +24,6 @@ export interface Typegen0 {
   matchesStates:
     | 'dashboard'
     | 'identify'
-    | 'init'
     | 'notFoundChallenge'
     | 'success'
     | 'updateEmail'

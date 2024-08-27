@@ -32,7 +32,6 @@ const renderAuthMethods = ({
       <AuthMethods
         authToken={authToken}
         initialMachineState={initialMachineState}
-        Loading={<span />}
         onDone={onDone ?? (() => undefined)}
       />
     </Layout>,

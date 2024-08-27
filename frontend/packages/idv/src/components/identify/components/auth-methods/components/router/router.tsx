@@ -17,7 +17,6 @@ import { getHeaderLeftNavButton } from '../../utils';
 import UserDashboard from '../dashboard';
 
 type AuthMethodsRouterProps = {
-  Loading: JSX.Element;
   onDone: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -31,7 +30,7 @@ const getHeader = (
     return <StepHeader leftButton={overrideLeftButton || leftButton} subtitle={subtitle} title={title} />;
   };
 
-const AuthMethodsRouter = ({ Loading, onDone }: AuthMethodsRouterProps): JSX.Element | null => {
+const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | null => {
   const [state, send] = useAuthMethodsMachine();
   const { context, matches } = state;
   const { t } = useTranslation('identify');
@@ -41,7 +40,6 @@ const AuthMethodsRouter = ({ Loading, onDone }: AuthMethodsRouterProps): JSX.Ele
   useDeviceInfo(setDevice, () => logWarn('Unable to collect device info'));
 
   if (isDone) return null;
-  if (matches('init')) return Loading;
   if (matches('identify') && device) {
     return (
       <Identify
