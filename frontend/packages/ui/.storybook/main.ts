@@ -23,7 +23,6 @@ const config = {
     name: getAbsolutePath('@storybook/nextjs'),
     options: {},
   },
-  staticDirs: ['../public'],
 };
 
 module.exports = IS_ANALYZE_ACTIVE ? require('@next/bundle-analyzer')({ enabled: true })(config) : config;
