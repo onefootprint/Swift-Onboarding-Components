@@ -1,11 +1,11 @@
-import type { DataIdentifier, VaultValue } from '@onefootprint/types';
+import { type DataIdentifier, IdDI, type VaultValue } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate, isDob as isValidDob } from '@onefootprint/core';
 import editFormFieldName from '../utils/edit-form-field-name';
-import validateDob, { DobValidationError } from '../utils/validate-dob';
 
 export type DateInputProps = {
   value: VaultValue;
@@ -23,15 +23,9 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
   } = useFormContext();
   const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
+  const isDob = fieldName === IdDI.dob;
 
   const getHint = () => {
-    const errorByValidationError: Record<DobValidationError, string> = {
-      [DobValidationError.INVALID]: t('invalid'),
-      [DobValidationError.FUTURE_DATE]: t('future-date'),
-      [DobValidationError.TOO_YOUNG]: t('too-young'),
-      [DobValidationError.TOO_OLD]: t('too-old'),
-    };
-
     if (!hasError) {
       return t('hint');
     }
@@ -45,8 +39,19 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
     if (errors[formField]?.type === 'pattern') {
       return t('pattern');
     }
-    const validationError = validateDob(getValues(formField));
-    return errorByValidationError[validationError ?? DobValidationError.INVALID];
+    const date = getValues(formField);
+    if (!isValidDate(date)) {
+      return t('invalid');
+    }
+    if (isDobInTheFuture(date)) {
+      return t('future-date');
+    }
+    if (isDobTooOld(date)) {
+      return t('too-old');
+    }
+    if (isDobTooYoung(date)) {
+      return t('too-young');
+    }
   };
 
   return (
@@ -63,7 +68,13 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
         {...register(formField, {
           required: !!value,
           pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/, // YYYY-MM-DD or YYYY/MM/DD
-          validate: (dobVal: string) => !validateDob(dobVal),
+          validate: (dateVal: string) => {
+            if (!isValidDate(dateVal)) return false;
+            if (isDob) {
+              return isValidDob(dateVal, new Date());
+            }
+            return !isDobInTheFuture(dateVal);
+          },
         })}
       />
     </ValueContainer>

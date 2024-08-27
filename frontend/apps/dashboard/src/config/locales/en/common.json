@@ -1194,7 +1194,7 @@
             "invalid": "Cannot be invalid",
             "future-date": "Cannot be in the future",
             "too-young": "Must be at least 18 years old",
-            "too-old": "Cannot be before than 1900"
+            "too-old": "Cannot be before 1900"
           },
           "ssn": {
             "required": "Cannot be empty",
