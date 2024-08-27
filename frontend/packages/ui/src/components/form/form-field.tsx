@@ -19,7 +19,7 @@ const FormField = ({ children, variant = 'vertical' }: FormFieldProps) => {
         </Box>
       )}
       {variant === 'horizontal' && (
-        <Stack justifyContent="space-between" alignItems="center">
+        <Stack justifyContent="space-between" alignItems="center" width="100%">
           {children}
         </Stack>
       )}

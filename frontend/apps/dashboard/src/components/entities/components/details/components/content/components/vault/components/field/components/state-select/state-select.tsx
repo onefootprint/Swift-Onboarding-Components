@@ -1,6 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
-import { IdDI, type VaultValue } from '@onefootprint/types';
-import { Hint, NativeSelect, TextInput } from '@onefootprint/ui';
+import { BusinessDI, type DataIdentifier, IdDI, type VaultValue } from '@onefootprint/types';
+import { Form, Hint, NativeSelect } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -9,19 +9,23 @@ import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
 
 export type StateSelectProps = {
+  fieldName: DataIdentifier;
   value: VaultValue;
 };
 
-const StateSelect = ({ value }: StateSelectProps) => {
+const StateSelect = ({ value, fieldName }: StateSelectProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   const {
     register,
     watch,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.state);
+  const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
-  const formCountryVal = watch(editFormFieldName(IdDI.country));
+
+  const isBusinessDI = fieldName in BusinessDI;
+
+  const formCountryVal = watch(editFormFieldName(isBusinessDI ? BusinessDI.country : IdDI.country));
   const isDomestic = formCountryVal === 'US';
 
   const getHint = () => {
@@ -40,6 +44,7 @@ const StateSelect = ({ value }: StateSelectProps) => {
       <NativeSelect
         data-dd-privacy="mask"
         aria-label="state"
+        size="compact"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField)}
       >
@@ -54,7 +59,7 @@ const StateSelect = ({ value }: StateSelectProps) => {
     </ValueContainer>
   ) : (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"

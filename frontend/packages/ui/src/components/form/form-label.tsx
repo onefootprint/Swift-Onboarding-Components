@@ -13,7 +13,7 @@ type LabelTooltipProps = {
 };
 
 type FormLabelLabelProps = {
-  children: string;
+  children: string | React.ReactNode;
   hasError?: boolean;
   htmlFor?: string;
   id?: string;
@@ -68,7 +68,6 @@ const InfoButton = styled.button`
 
 const LabelContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[3]};
     display: flex;
     justify-content: flex-start;
     flex-direction: row;

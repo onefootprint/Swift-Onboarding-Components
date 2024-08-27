@@ -1,5 +1,5 @@
-import { IdDI, type VaultValue } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import type { DataIdentifier, VaultValue } from '@onefootprint/types';
+import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -8,9 +8,10 @@ import editFormFieldName from '../utils/edit-form-field-name';
 
 export type CityInputProps = {
   value: VaultValue;
+  fieldName: DataIdentifier;
 };
 
-const CityInput = ({ value }: CityInputProps) => {
+const CityInput = ({ value, fieldName }: CityInputProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.edit.errors',
   });
@@ -18,7 +19,8 @@ const CityInput = ({ value }: CityInputProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.city);
+
+  const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
 
   const getHint = () => {
@@ -34,7 +36,7 @@ const CityInput = ({ value }: CityInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"

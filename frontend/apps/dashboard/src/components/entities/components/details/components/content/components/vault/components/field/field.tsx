@@ -1,5 +1,5 @@
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
-import { Box, Checkbox, Text, Tooltip } from '@onefootprint/ui';
+import { Box, Checkbox, Form, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -29,48 +29,54 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
   const registerField = skipRegisterFieldToDecryptForm ? undefined : register(field.name);
 
+  const labelDisplay = (
+    <Text variant="body-3" color="tertiary">
+      {label}
+    </Text>
+  );
+
   return (
     <Container role="row" aria-label={ariaLabel}>
-      {field.showCheckbox ? (
-        <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
-          <Box>
-            <Checkbox
-              checked={isChecked || undefined}
-              {...registerField}
-              disabled={field.disabled}
-              label={label}
-              hint={hint}
-            />
-          </Box>
-        </Tooltip>
-      ) : (
-        <LabelContainer>
-          {customLabel && React.isValidElement(customLabel) ? (
-            customLabel
-          ) : (
-            <Text variant="body-3" color="tertiary" tag="label">
-              {label}
-            </Text>
-          )}
-          {hint && (
-            <Text variant="caption-2" color="secondary">
-              {hint}
-            </Text>
-          )}
-        </LabelContainer>
-      )}
-      <FieldValue field={field} renderValue={renderValue} />
+      <Form.Field variant="horizontal">
+        {field.showCheckbox ? (
+          <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
+            <Box>
+              <Checkbox
+                checked={isChecked || undefined}
+                {...registerField}
+                disabled={field.disabled}
+                label={labelDisplay}
+                hint={hint}
+              />
+            </Box>
+          </Tooltip>
+        ) : (
+          <>
+            {customLabel && React.isValidElement(customLabel) ? (
+              customLabel
+            ) : (
+              <LabelContainer>{labelDisplay}</LabelContainer>
+            )}
+            {hint && (
+              <Text variant="caption-2" color="secondary">
+                {hint}
+              </Text>
+            )}
+          </>
+        )}
+        <FieldValue field={field} renderValue={renderValue} />
+      </Form.Field>
     </Container>
   );
 };
 
 const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `;
 
-const LabelContainer = styled.div`
+const LabelContainer = styled(Form.Label)`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[2]};

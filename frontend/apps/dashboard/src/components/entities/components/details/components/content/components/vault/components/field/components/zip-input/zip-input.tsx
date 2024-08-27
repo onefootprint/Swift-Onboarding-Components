@@ -1,5 +1,5 @@
-import { IdDI, type VaultValue } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import { BusinessDI, type DataIdentifier, IdDI, type VaultValue } from '@onefootprint/types';
+import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -8,9 +8,10 @@ import editFormFieldName from '../utils/edit-form-field-name';
 
 export type ZipInputProps = {
   value: VaultValue;
+  fieldName: DataIdentifier;
 };
 
-const ZipInput = ({ value }: ZipInputProps) => {
+const ZipInput = ({ value, fieldName }: ZipInputProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.edit.errors.zip',
   });
@@ -20,9 +21,10 @@ const ZipInput = ({ value }: ZipInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.zip);
+  const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
-  const formCountryVal = watch(editFormFieldName(IdDI.country));
+  const isBusinessDI = fieldName in BusinessDI;
+  const formCountryVal = watch(editFormFieldName(isBusinessDI ? BusinessDI.country : IdDI.country));
 
   const getHint = () => {
     if (!hasError) {
@@ -49,7 +51,7 @@ const ZipInput = ({ value }: ZipInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"

@@ -1,5 +1,5 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { IdDI, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
+import { BusinessDI, IdDI, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,10 @@ const useField = (entity: Entity) => {
 
   const canEditField = (di: DataIdentifier) => {
     if (di === IdDI.email || di === IdDI.phoneNumber) {
+      return false;
+    }
+    // temporary!
+    if (di in BusinessDI) {
       return false;
     }
     // BE updates both ssn4 and ssn9 when ssn9 is changed and errors if only ssn4 is updated

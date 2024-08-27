@@ -1,5 +1,5 @@
-import { IdDI, type VaultValue } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import type { DataIdentifier, VaultValue } from '@onefootprint/types';
+import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -7,11 +7,12 @@ import styled from 'styled-components';
 import editFormFieldName from '../utils/edit-form-field-name';
 import validateDob, { DobValidationError } from '../utils/validate-dob';
 
-export type DobInputProps = {
+export type DateInputProps = {
   value: VaultValue;
+  fieldName: DataIdentifier;
 };
 
-const DobInput = ({ value }: DobInputProps) => {
+const DateInput = ({ value, fieldName }: DateInputProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.edit.errors.dob',
   });
@@ -20,7 +21,7 @@ const DobInput = ({ value }: DobInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.dob);
+  const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
 
   const getHint = () => {
@@ -50,7 +51,7 @@ const DobInput = ({ value }: DobInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"
@@ -77,4 +78,4 @@ const ValueContainer = styled.div`
   }
 `;
 
-export default DobInput;
+export default DateInput;

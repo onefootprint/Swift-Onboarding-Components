@@ -1,6 +1,6 @@
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,7 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"

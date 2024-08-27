@@ -1,5 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { IdDI, type VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { NativeSelect } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -8,14 +8,16 @@ import editFormFieldName from '../utils/edit-form-field-name';
 
 export type AddressCountrySelectProps = {
   value: VaultValue;
+  fieldName: DataIdentifier;
 };
 
-const AddressCountrySelect = ({ value }: AddressCountrySelectProps) => {
+const AddressCountrySelect = ({ value, fieldName }: AddressCountrySelectProps) => {
   const { register } = useFormContext();
-  const formField = editFormFieldName(IdDI.country);
+  const formField = editFormFieldName(fieldName);
   return (
     <ValueContainer>
       <NativeSelect
+        size="compact"
         data-dd-privacy="mask"
         aria-label="address country"
         defaultValue={value as string}

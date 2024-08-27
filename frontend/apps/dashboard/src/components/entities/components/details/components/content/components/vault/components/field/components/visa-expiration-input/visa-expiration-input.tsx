@@ -1,5 +1,5 @@
 import { IdDI, type VaultValue } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -51,7 +51,7 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         placeholder="YYYY-MM-DD"

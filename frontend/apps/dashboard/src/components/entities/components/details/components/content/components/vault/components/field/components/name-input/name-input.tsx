@@ -1,6 +1,6 @@
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
-import { TextInput } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -54,7 +54,7 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
 
   return (
     <ValueContainer>
-      <TextInput
+      <Form.Input
         data-dd-privacy="mask"
         size="compact"
         width="fit-content"
