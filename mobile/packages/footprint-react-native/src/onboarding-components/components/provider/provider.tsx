@@ -45,6 +45,7 @@ const Provider = ({
   publicKey,
   sandboxId,
   sandboxOutcome = 'pass',
+  redirectUrl,
 }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
@@ -53,6 +54,7 @@ const Provider = ({
     publicKey,
     sandboxId,
     sandboxOutcome,
+    redirectUrl,
     step: authToken ? OnboardingStep.Onboard : OnboardingStep.Auth,
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
