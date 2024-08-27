@@ -16,7 +16,7 @@ export type FieldProps = {
   name: keyof FormValues;
   children?: ChidrenOrFunction<FieldOptions>;
   style?: ViewStyle;
-} & ViewProps;
+} & Omit<ViewProps, 'style' | 'children'>;
 
 const Field = ({ name, children, style, ...props }: FieldProps) => {
   const id = useId();
