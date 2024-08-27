@@ -47,7 +47,6 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
   return (
     <ValueContainer>
       <Form.Select
-        data-dd-privacy="mask"
         aria-label="Visa type"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {

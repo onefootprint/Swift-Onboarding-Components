@@ -52,7 +52,6 @@ const ZipInput = ({ value, fieldName }: ZipInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

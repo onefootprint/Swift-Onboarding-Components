@@ -4,7 +4,7 @@ import formFieldContext from './form-field-context';
 
 export const FormSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(({ ...props }, ref) => {
   const { id: contextId } = useContext(formFieldContext);
-  return <NativeSelect id={contextId} {...props} ref={ref} />;
+  return <NativeSelect data-dd-privacy="mask" id={contextId} {...props} ref={ref} />;
 });
 
 export default FormSelect;

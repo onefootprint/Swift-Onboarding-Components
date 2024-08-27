@@ -37,7 +37,6 @@ const CityInput = ({ value, fieldName }: CityInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

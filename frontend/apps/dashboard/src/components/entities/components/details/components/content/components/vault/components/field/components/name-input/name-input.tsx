@@ -55,7 +55,6 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

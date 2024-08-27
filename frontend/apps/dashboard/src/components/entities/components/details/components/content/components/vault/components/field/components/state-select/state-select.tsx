@@ -42,7 +42,6 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
   return isDomestic ? (
     <ValueContainer>
       <Form.Select
-        data-dd-privacy="mask"
         aria-label="state"
         size="compact"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
@@ -60,7 +59,6 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
   ) : (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

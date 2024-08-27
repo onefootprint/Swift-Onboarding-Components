@@ -44,7 +44,6 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

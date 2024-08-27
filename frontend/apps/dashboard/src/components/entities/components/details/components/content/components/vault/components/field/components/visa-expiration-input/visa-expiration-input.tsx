@@ -52,7 +52,6 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         placeholder="YYYY-MM-DD"
         defaultValue={value as string}

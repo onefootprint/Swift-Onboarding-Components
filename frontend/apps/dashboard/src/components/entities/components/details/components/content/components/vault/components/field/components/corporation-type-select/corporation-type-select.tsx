@@ -35,11 +35,7 @@ const CorporationTypeSelect = ({ value }: CorporationTypeSelectProps) => {
 
   return (
     <ValueContainer>
-      <Form.Select
-        data-dd-privacy="mask"
-        defaultValue={(value as string) || EMPTY_SELECT_VALUE}
-        {...register(formField)}
-      >
+      <Form.Select defaultValue={(value as string) || EMPTY_SELECT_VALUE} {...register(formField)}>
         {options.map(corpType => (
           <option key={corpType.value} value={corpType.value}>
             {corpType.label}

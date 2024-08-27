@@ -52,7 +52,6 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder="CA, MX"

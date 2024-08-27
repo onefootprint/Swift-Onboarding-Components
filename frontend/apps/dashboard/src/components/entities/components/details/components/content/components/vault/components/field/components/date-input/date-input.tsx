@@ -57,7 +57,6 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
   return (
     <ValueContainer>
       <Form.Input
-        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder="YYYY-MM-DD"

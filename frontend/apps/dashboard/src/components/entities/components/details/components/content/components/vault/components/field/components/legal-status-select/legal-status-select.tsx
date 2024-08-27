@@ -28,7 +28,6 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
   return (
     <ValueContainer>
       <Form.Select
-        data-dd-privacy="mask"
         aria-label="Legal status"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
