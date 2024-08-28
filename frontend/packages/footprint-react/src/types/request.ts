@@ -12,3 +12,10 @@ export class ApiError<E> extends Error {
     this.details = errorDetails;
   }
 }
+
+export class InlineOtpNotSupported extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InlineOtpNotSupported';
+  }
+}

@@ -1,10 +1,14 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { useContext } from 'react';
+import type { ChallengeData } from '@onefootprint/types';
+import { useContext, useState } from 'react';
 import { Context } from '../provider';
+import { createChallenge } from '../queries/challenge';
 import { unlockBody } from '../utils/dom-utils';
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
+  const [_challengeData, setChallengeData] = useState<ChallengeData | null>(null);
+
   const launchIdentify = (
     { email, phoneNumber }: { email?: string; phoneNumber?: string },
     {
@@ -64,7 +68,26 @@ const useOtp = () => {
     setContext(prev => ({ ...prev, fpInstance: fp }));
   };
 
-  return { launchIdentify };
+  const create = async (payload: { email?: string; phoneNumber?: string }) => {
+    if (!payload.email || !payload.phoneNumber) {
+      // TODO: In the future, we should allow email-only
+      throw new Error('Email and phone number are required');
+    }
+    const { onboardingConfig } = context;
+    if (!onboardingConfig) {
+      throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
+    }
+    const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+    const response = await createChallenge(payload, {
+      onboardingConfig: onboardingConfig.key,
+      sandboxId: context.sandboxId,
+      requiredAuthMethods,
+    });
+    setChallengeData(response.challengeData);
+    return response.challengeData.challengeKind;
+  };
+
+  return { launchIdentify, create };
 };
 
 export default useOtp;

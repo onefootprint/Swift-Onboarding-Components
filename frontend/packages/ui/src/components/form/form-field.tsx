@@ -11,7 +11,7 @@ export type FormFieldProps = {
 const FormField = ({ children, variant = 'vertical' }: FormFieldProps) => {
   const id = useId();
   const contextValues = useMemo(() => ({ id }), [id]);
-  
+
   return (
     <FormFieldContext.Provider value={contextValues}>
       {variant === 'vertical' && (
