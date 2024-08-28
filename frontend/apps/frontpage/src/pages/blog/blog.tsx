@@ -23,10 +23,20 @@ export type BlogProps = {
   posts: Post[];
 };
 
+enum Tags {
+  all = 'all',
+  design = 'design',
+  engineering = 'engineering',
+  product = 'product',
+  companyNews = 'news',
+  knowledgeBase = 'knowledge-base',
+}
+
 const Blog = ({ posts }: BlogProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.blog' });
   const { formatDateWithLongMonth } = useIntl();
-  const [featuredPost, ...allPosts] = posts;
+  // Get the first post that is not a knowledge base post
+  const [featuredPost] = posts.filter(post => post.primary_tag?.slug !== Tags.knowledgeBase);
   const [selectedTag, setSelectedTag] = useState('all');
   const filtersRef = useRef<HTMLDivElement>(null);
   const [showLeftShadow, setShowLeftShadow] = useState(false);
@@ -36,10 +46,21 @@ const Blog = ({ posts }: BlogProps) => {
     setSelectedTag(value || 'all');
   };
 
-  const tags = Array.from(new Set(posts.map(post => post.primary_tag?.slug).filter(Boolean))).sort();
+  const tags = Object.values(Tags)
+    .filter(tag => tag !== 'knowledge-base')
+    .map(tag => tag)
+    .sort();
 
   const filteredPosts =
-    selectedTag === 'all' ? allPosts : allPosts.filter(post => selectedTag === post.primary_tag?.slug);
+    selectedTag === 'all'
+      ? posts.filter(
+          post =>
+            post.primary_tag?.slug === Tags.design ||
+            post.primary_tag?.slug === Tags.engineering ||
+            post.primary_tag?.slug === Tags.product ||
+            post.primary_tag?.slug === Tags.companyNews,
+        )
+      : posts.filter(post => post.primary_tag?.slug === selectedTag);
 
   const handleScroll = () => {
     if (filtersRef.current) {
@@ -61,6 +82,7 @@ const Blog = ({ posts }: BlogProps) => {
     };
   }, []);
 
+  console.log(featuredPost);
   return (
     <>
       <SEO title={t('html-title')} description={t('html-description')} slug="/blog" />
@@ -90,12 +112,13 @@ const Blog = ({ posts }: BlogProps) => {
         </FeaturedPost>
         <FiltersContainer $showLeftShadow={showLeftShadow} $showRightShadow={showRightShadow}>
           <Filters ref={filtersRef} type="single" value={selectedTag} onValueChange={handleTagChange}>
-            <FilterChip value="all">All</FilterChip>
             {tags.map(tag => (
               <FilterChip key={tag} value={tag}>
                 {t(`tags.${tag}` as ParseKeys<'common'>)}
               </FilterChip>
             ))}
+            <VerticalDivider />
+            <FilterChip value={Tags.knowledgeBase}>Knowledge Base</FilterChip>
           </Filters>
         </FiltersContainer>
         <Posts
@@ -129,6 +152,15 @@ const Blog = ({ posts }: BlogProps) => {
     </>
   );
 };
+
+const VerticalDivider = styled(Divider)`
+  ${({ theme }) => css`
+    width: ${theme.borderWidth[1]};
+    height: ${theme.spacing[7]};
+    background-color: ${theme.borderColor.tertiary};
+    margin: 0 ${theme.spacing[3]};
+  `}
+`;
 
 const StyledContainer = styled(Container)`
   && {
@@ -190,6 +222,7 @@ const Filters = styled(ToggleGroup.Root)`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[2]};
+    align-items: center;
     max-width: 100%;
     overflow-x: auto;
   `}
