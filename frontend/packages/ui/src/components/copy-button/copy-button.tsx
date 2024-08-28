@@ -104,6 +104,8 @@ const CopyButton = ({
           aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
           disabled={disable}
           onClick={handleClick}
+          height={size === 'compact' ? '16px' : '32px'}
+          width={size === 'compact' ? '16px' : '32px'}
         >
           <CopyIcon color={disable ? 'tertiary' : undefined} />
         </IconButton>

@@ -44,13 +44,13 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
   return (
     <Container>
       <Main>
-        <Text variant="snippet-3">{mainId?.value}</Text>
+        <Text variant="caption-1">{mainId?.value}</Text>
         <CopyButton size="compact" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
       </Main>
       {hasSingleId ? null : (
         <Dropdown.Root>
           <ChevronContainer>
-            <IcoChevronDown16 />
+            <IcoChevronDown16 className="chevronIcon" />
           </ChevronContainer>
           <Dropdown.Content sideOffset={4}>
             {ids.map(item => {
@@ -62,7 +62,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
                     </Text>
                     <Text variant="snippet-2">{item.value}</Text>
                   </Stack>
-                  <CopyButton contentToCopy={item.value || ''} size="compact" />
+                  <CopyButton size="compact" contentToCopy={item.value || ''} />
                 </Item>
               );
             })}
@@ -79,13 +79,13 @@ const Container = styled(Stack)`
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
     display: flex;
-    height: 24px;
   `}
 `;
 
 const Main = styled(Stack)`
   ${({ theme }) => css`
-    padding-left: calc(${theme.spacing[4]} - ${theme.spacing[1]});
+    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} calc(${theme.spacing[4]} - ${theme.spacing[1]});
+    gap: ${theme.spacing[3]};
     align-items: center;
   `}
 `;
@@ -110,9 +110,20 @@ const ChevronContainer = styled(Dropdown.Trigger)`
     width: fit-content;
     height: 100%;
     border-radius: 0 ${theme.borderRadius.full} ${theme.borderRadius.full} 0;
-    height: ${theme.spacing[8]};
     width: ${theme.spacing[7]};
     position: relative;
+
+    .chevronIcon {
+      transition: transform 0.1s ease-in-out;
+      transform: rotate(0deg);
+    }
+
+    &[data-state='open'] {
+      background-color: ${theme.backgroundColor.secondary};
+      .chevronIcon {
+        transform: rotate(180deg);
+      }
+    }
 
     &:before {
       content: '';

@@ -11,10 +11,12 @@ export type IconButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
   testID?: string;
+  width?: string;
+  height?: string;
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ 'aria-label': ariaLabel, children, onClick, disabled, testID }: IconButtonProps, ref) => (
+  ({ 'aria-label': ariaLabel, children, onClick, disabled, testID, width, height }: IconButtonProps, ref) => (
     <Container
       aria-label={ariaLabel}
       data-testid={testID}
@@ -23,23 +25,27 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       tabIndex={0}
       type="button"
       disabled={disabled}
+      $width={width}
+      $height={height}
     >
       {children}
     </Container>
   ),
 );
 
-const Container = styled.button`
+const Container = styled.button<{ $width?: string; $height?: string }>`
+  ${({ $width, $height }) => css`
   align-items: center;
   background: none;
   border: none;
   cursor: pointer;
   display: flex;
-  height: 32px;
   justify-content: center;
-  margin: 0;
-  padding: 0;
-  width: 32px;
+    margin: 0;
+    padding: 0;
+    height: ${$height || '32px'};
+    width: ${$width || '32px'};
+  `}
 
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.full};
