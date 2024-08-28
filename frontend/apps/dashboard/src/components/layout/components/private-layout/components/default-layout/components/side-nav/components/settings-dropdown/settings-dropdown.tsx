@@ -48,7 +48,8 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
     <Container>
       <DropdownHeader onClick={toggleDropdown} selected={selected}>
         <Element key={text} asChild>
-          <NavLink badgeCount={badgeCount} icon={icon} selected={menuActive} text={text} href={href} />
+          {/* this will be a no-op re clicking - by navigating to router.pathname, we don't change pages */}
+          <NavLink badgeCount={badgeCount} icon={icon} selected={menuActive} text={text} href={router.pathname} />
         </Element>
         <ChevronIcon isOpen={isOpen} color={menuActive ? 'primary' : 'tertiary'} />
       </DropdownHeader>
