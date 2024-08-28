@@ -1,6 +1,6 @@
 import type { FormValues } from '@onefootprint/footprint-react';
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
-import { Box, Button, Container, Divider, InlineAlert, Stack, Stepper, Text } from '@onefootprint/ui';
+import { Box, Button, Container, Divider, InlineAlert, Shimmer, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -44,6 +44,8 @@ const Demo = () => {
   const isBoData = option.value === 'bo-data';
   const isPersonalData = option.value === 'personal-data';
   const isSuccess = option.value === 'confirmation';
+
+  if (!router.isReady) return <Loading />;
 
   return (
     <>
@@ -345,5 +347,36 @@ const Success = () => (
     </Box>
   </Layout>
 );
+
+const Loading = () => {
+  return (
+    <Stack direction="row" width="100%">
+      <Stack direction="column" width="100%">
+        <Stack direction="column" width="100%" alignItems="center">
+          <Shimmer height="32px" width="160px" marginBottom={4} marginTop={4} />
+          <Divider />
+        </Stack>
+        <Container>
+          <Stack marginTop={7} gap={8}>
+            <Stack direction="column" width="30%" gridArea="left">
+              <Shimmer height="24px" width="160px" marginBottom={4} />
+              <Shimmer height="24px" width="160px" marginBottom={4} />
+              <Shimmer height="24px" width="160px" />
+            </Stack>
+            <Stack direction="column" width="100%" maxWidth="480px" gridArea="center" alignItems="left">
+              <Shimmer height="32px" width="300px" marginBottom={5} />
+              <Shimmer height="16px" width="100px" marginBottom={2} />
+              <Shimmer height="32px" width="100%" marginBottom={5} />
+              <Shimmer height="16px" width="100px" marginBottom={2} />
+              <Shimmer height="32px" width="100%" marginBottom={5} />
+              <Divider />
+              <Shimmer height="32px" width="100%" marginTop={5} />
+            </Stack>
+          </Stack>
+        </Container>
+      </Stack>
+    </Stack>
+  );
+};
 
 export default Demo;

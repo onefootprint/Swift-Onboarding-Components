@@ -1,5 +1,5 @@
 import { Fp } from '@onefootprint/footprint-react';
-import { Stack, Stepper } from '@onefootprint/ui';
+import { Divider, Shimmer, Stack, Stepper } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
@@ -90,6 +90,8 @@ const Demo = () => {
       });
   }, [recordGeolocationEvent]);
 
+  if (!router.isReady) return <Loading />;
+
   return (
     <>
       <GlobalStyles />
@@ -117,6 +119,35 @@ const Demo = () => {
         </Stack>
       </Fp.Provider>
     </>
+  );
+};
+
+const Loading = () => {
+  return (
+    <Stack direction="row" width="100%">
+      <Stack direction="column" width="100%">
+        <Stack direction="column" width="100%" alignItems="center">
+          <Shimmer height="32px" width="160px" marginBottom={4} marginTop={4} />
+          <Divider />
+        </Stack>
+        <ContentLayout>
+          <Stack direction="column" width="100%" gridArea="left">
+            <Shimmer height="24px" width="160px" marginBottom={4} />
+            <Shimmer height="24px" width="160px" marginBottom={4} />
+            <Shimmer height="24px" width="160px" />
+          </Stack>
+          <Stack direction="column" width="100%" maxWidth="480px" gridArea="center" alignItems="left">
+            <Shimmer height="32px" width="300px" marginBottom={5} />
+            <Shimmer height="16px" width="100px" marginBottom={2} />
+            <Shimmer height="32px" width="100%" marginBottom={5} />
+            <Shimmer height="16px" width="100px" marginBottom={2} />
+            <Shimmer height="32px" width="100%" marginBottom={5} />
+            <Divider />
+            <Shimmer height="32px" width="100%" marginTop={5} />
+          </Stack>
+        </ContentLayout>
+      </Stack>
+    </Stack>
   );
 };
 
