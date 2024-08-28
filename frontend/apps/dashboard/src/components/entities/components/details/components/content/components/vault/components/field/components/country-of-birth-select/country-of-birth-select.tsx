@@ -6,8 +6,8 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import get from 'lodash/get';
 import EMPTY_SELECT_VALUE from '../../../../constants';
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type CountryOfBirthSelectProps = {
   value: VaultValue;
@@ -20,19 +20,19 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
     watch,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.nationality);
-  const hasError = !!errors[formField];
-  const formLegalStatus = watch(editFormFieldName(IdDI.usLegalStatus));
+  const formField = IdDI.nationality;
+  const error = get(errors, formField);
+  const formLegalStatus = watch(IdDI.usLegalStatus);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return '';
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type === 'validate') {
+    if (error?.type === 'validate') {
       return t('errors.nationality');
     }
     return '';
@@ -59,7 +59,7 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
           </option>
         ))}
       </Form.Select>
-      {hasError && <Hint hasError={hasError}>{getHint()}</Hint>}
+      {!!error && <Hint hasError={!!error}>{getHint()}</Hint>}
     </ValueContainer>
   );
 };

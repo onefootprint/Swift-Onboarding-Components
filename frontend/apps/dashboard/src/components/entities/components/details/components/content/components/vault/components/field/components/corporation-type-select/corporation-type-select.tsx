@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type CorporationTypeSelectProps = {
   value: VaultValue;
@@ -16,7 +15,7 @@ const CorporationTypeSelect = ({ value }: CorporationTypeSelectProps) => {
     keyPrefix: 'pages.business.vault',
   });
   const { register } = useFormContext();
-  const formField = editFormFieldName(BusinessDI.corporationType);
+  const formField = BusinessDI.corporationType;
 
   const options = [
     { value: EMPTY_SELECT_VALUE, label: t('basic.select-corporation-type') },

@@ -33,7 +33,6 @@ const Actions = ({ entity }: WithEntityProps) => {
   const { t: newT } = useTranslation('entity-details', { keyPrefix: 'header.actions' });
   const editControls = useEditControls();
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
-  const shouldShow = entity.kind === EntityKind.person;
   const {
     data: { user },
   } = useSession();
@@ -67,7 +66,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(ActionDialog.historicalData);
   };
 
-  return shouldShow ? (
+  return entity.kind === EntityKind.person ? (
     <>
       <Dropdown.Root>
         <StyledTrigger $asButton aria-label={t('cta')}>

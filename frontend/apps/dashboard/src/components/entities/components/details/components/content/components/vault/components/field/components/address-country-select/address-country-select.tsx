@@ -4,8 +4,6 @@ import { NativeSelect } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import editFormFieldName from '../utils/edit-form-field-name';
-
 export type AddressCountrySelectProps = {
   value: VaultValue;
   fieldName: DataIdentifier;
@@ -13,7 +11,7 @@ export type AddressCountrySelectProps = {
 
 const AddressCountrySelect = ({ value, fieldName }: AddressCountrySelectProps) => {
   const { register } = useFormContext();
-  const formField = editFormFieldName(fieldName);
+
   return (
     <ValueContainer>
       <NativeSelect
@@ -21,7 +19,7 @@ const AddressCountrySelect = ({ value, fieldName }: AddressCountrySelectProps) =
         data-dd-privacy="mask"
         aria-label="address country"
         defaultValue={value as string}
-        {...register(formField, {
+        {...register(fieldName, {
           required: true,
         })}
       >

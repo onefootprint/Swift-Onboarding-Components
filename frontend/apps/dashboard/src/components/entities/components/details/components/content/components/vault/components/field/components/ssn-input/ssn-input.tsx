@@ -2,11 +2,10 @@ import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
+import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type SsnInputProps = {
   fieldName: DataIdentifier;
@@ -22,21 +21,20 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
   const pattern =
     fieldName === IdDI.ssn9 ? /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/ : /^((?!(0000))\d{4})$/;
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return undefined;
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type) {
-      return t(`${errors[formField]?.type}` as ParseKeys<'common'>);
+    if (error?.type) {
+      return t(`${error?.type}` as ParseKeys<'common'>);
     }
     return undefined;
   };
@@ -47,11 +45,11 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
         size="compact"
         width="fit-content"
         placeholder=""
-        hasError={hasError}
+        hasError={!!error}
         defaultValue={fieldValue as string}
         type="tel"
         value={getValues(fieldName)}
-        {...register(formField, {
+        {...register(fieldName, {
           required: !!fieldValue,
           pattern,
         })}

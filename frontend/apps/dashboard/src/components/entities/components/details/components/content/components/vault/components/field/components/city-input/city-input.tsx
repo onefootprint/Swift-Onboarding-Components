@@ -1,10 +1,9 @@
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
+import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type CityInputProps = {
   value: VaultValue;
@@ -19,15 +18,13 @@ const CityInput = ({ value, fieldName }: CityInputProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return undefined;
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
@@ -40,9 +37,9 @@ const CityInput = ({ value, fieldName }: CityInputProps) => {
         size="compact"
         width="fit-content"
         placeholder=""
-        hasError={hasError}
+        hasError={!!error}
         defaultValue={value as string}
-        {...register(formField, {
+        {...register(fieldName, {
           required: true,
         })}
       />

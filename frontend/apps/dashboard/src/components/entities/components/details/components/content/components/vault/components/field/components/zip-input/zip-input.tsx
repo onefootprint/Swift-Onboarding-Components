@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import editFormFieldName from '../utils/edit-form-field-name';
+import get from 'lodash/get';
 
 export type ZipInputProps = {
   value: VaultValue;
@@ -21,20 +21,19 @@ const ZipInput = ({ value, fieldName }: ZipInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
   const isBusinessDI = fieldName in BusinessDI;
-  const formCountryVal = watch(editFormFieldName(isBusinessDI ? BusinessDI.country : IdDI.country));
+  const formCountryVal = watch(isBusinessDI ? BusinessDI.country : IdDI.country);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return '';
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    return validateZip(getValues(formField));
+    return validateZip(getValues(fieldName));
   };
 
   const validateZip = (zip: string) => {
@@ -56,8 +55,8 @@ const ZipInput = ({ value, fieldName }: ZipInputProps) => {
         width="fit-content"
         placeholder=""
         defaultValue={value as string}
-        hasError={hasError}
-        {...register(formField, {
+        hasError={!!error}
+        {...register(fieldName, {
           validate: (zip: string) => validateZip(zip) === undefined,
         })}
       />

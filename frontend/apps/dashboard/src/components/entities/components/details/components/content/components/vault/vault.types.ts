@@ -16,7 +16,7 @@ type DecryptDocumentFormData = {
 
 export type DecryptFormData = DecryptDiFormData & DecryptDocumentFormData;
 
-export type EditFormData = Record<string, VaultValue>;
+export type EditFormData = Record<string, Record<string, VaultValue>>; // Eg {id: {first_name: ..., last_name: ...}}
 
 export type EditSubmitData = Partial<Record<DataIdentifier, VaultValue>>;
 

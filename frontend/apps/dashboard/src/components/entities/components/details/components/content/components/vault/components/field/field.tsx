@@ -27,7 +27,7 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
   const label = customLabel ?? field.label;
   const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
-  const registerField = skipRegisterFieldToDecryptForm ? undefined : register(field.name);
+  const registerField = skipRegisterFieldToDecryptForm || !decrypt.inProgress ? undefined : register(field.name);
 
   const labelDisplay = (
     <Text variant="body-3" color="tertiary">
@@ -81,6 +81,7 @@ const LabelContainer = styled(Form.Label)`
     display: flex;
     gap: ${theme.spacing[2]};
     flex-direction: column;
+    max-width: 75%;
   `};
 `;
 

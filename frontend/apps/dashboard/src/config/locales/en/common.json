@@ -1493,6 +1493,9 @@
           "add-tag": "Add custom tag",
           "save": "Save",
           "cancel": "Cancel"
+        },
+        "edit-business": {
+          "not-allowed": "You're not allowed to edit business information"
         }
       },
       "manual-note-entry-form": {

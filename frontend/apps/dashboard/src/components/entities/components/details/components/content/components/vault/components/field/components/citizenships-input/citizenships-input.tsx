@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import editFormFieldName from '../utils/edit-form-field-name';
+import get from 'lodash/get';
 import validateCitizenships, { CitizenshipsValidationError } from '../utils/validate-citizenships';
 
 export type CitizenshipsInputProps = {
@@ -21,15 +21,15 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
     watch,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.citizenships);
-  const hasError = !!errors[formField];
-  const formLegalStatus = watch(editFormFieldName(IdDI.usLegalStatus));
+  const formField = IdDI.citizenships;
+  const error = get(errors, formField);
+  const formLegalStatus = watch(IdDI.usLegalStatus);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return t('hint');
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
@@ -55,7 +55,7 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
         size="compact"
         width="fit-content"
         placeholder="CA, MX"
-        hasError={hasError}
+        hasError={!!error}
         defaultValue={citizenships?.join(', ')}
         {...register(formField, {
           validate: (countriesStr: string) => validateCitizenships(countriesStr, formLegalStatus) === undefined,

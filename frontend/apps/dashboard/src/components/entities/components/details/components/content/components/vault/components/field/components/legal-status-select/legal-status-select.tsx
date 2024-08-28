@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type LegalStatusSelectProps = {
   value: VaultValue;
@@ -16,7 +15,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
     keyPrefix: 'pages.entity.edit.legal-status',
   });
   const { register, clearErrors } = useFormContext();
-  const formField = editFormFieldName(IdDI.usLegalStatus);
+  const formField = IdDI.usLegalStatus;
 
   const options = [
     { value: EMPTY_SELECT_VALUE, label: t('legal-status-mapping.none') },
@@ -31,13 +30,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
         aria-label="Legal status"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
-          onChange: () =>
-            clearErrors([
-              editFormFieldName(IdDI.nationality),
-              editFormFieldName(IdDI.citizenships),
-              editFormFieldName(IdDI.visaKind),
-              editFormFieldName(IdDI.visaExpirationDate),
-            ]),
+          onChange: () => clearErrors([IdDI.nationality, IdDI.citizenships, IdDI.visaKind, IdDI.visaExpirationDate]),
         })}
       >
         {options.map(status => (

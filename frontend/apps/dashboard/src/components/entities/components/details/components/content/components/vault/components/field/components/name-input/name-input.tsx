@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import editFormFieldName from '../utils/edit-form-field-name';
+import get from 'lodash/get';
 import validateName, { NameValidationError } from '../utils/validate-name';
 
 export type NameInputProps = {
@@ -22,8 +22,7 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
   const options =
     fieldName === IdDI.middleName || !fieldValue
       ? {
@@ -35,17 +34,17 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
         };
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return undefined;
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type === 'required') {
+    if (error?.type === 'required') {
       return t('required');
     }
-    const validationError = validateName(getValues(formField));
+    const validationError = validateName(getValues(fieldName));
     if (validationError === NameValidationError.SPECIAL_CHARS) {
       return t('special-chars');
     }
@@ -58,9 +57,9 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
         size="compact"
         width="fit-content"
         placeholder=""
-        hasError={hasError}
+        hasError={!!error}
         defaultValue={fieldValue as string}
-        {...register(formField, options)}
+        {...register(fieldName, options)}
       />
       <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>

@@ -2,11 +2,10 @@ import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
+import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type AddressLineInputProps = {
   fieldName: DataIdentifier;
@@ -21,8 +20,7 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
   const options =
     fieldName === IdDI.addressLine1
       ? {
@@ -32,15 +30,15 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
       : {};
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return undefined;
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type) {
-      return t(`${errors[formField]?.type}` as ParseKeys<'common'>);
+    if (error?.type) {
+      return t(`${error?.type}` as ParseKeys<'common'>);
     }
     return undefined;
   };
@@ -52,8 +50,8 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
         width="fit-content"
         placeholder=""
         defaultValue={fieldValue as string}
-        hasError={hasError}
-        {...register(formField, options)}
+        hasError={!!error}
+        {...register(fieldName, options)}
       />
       <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>

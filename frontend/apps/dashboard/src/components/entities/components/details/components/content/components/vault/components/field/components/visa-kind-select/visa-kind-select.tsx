@@ -5,8 +5,8 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import get from 'lodash/get';
 import EMPTY_SELECT_VALUE from '../../../../constants';
-import editFormFieldName from '../utils/edit-form-field-name';
 import validateVisaKind, { VisaKindValidationError } from '../utils/validate-visa-kind';
 
 export type VisaKindSelectProps = {
@@ -21,15 +21,15 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
     watch,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.visaKind);
-  const hasError = !!errors[formField];
-  const formLegalStatus = watch(editFormFieldName(IdDI.usLegalStatus));
+  const formField = IdDI.visaKind;
+  const error = get(errors, formField);
+  const formLegalStatus = watch(IdDI.usLegalStatus);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return '';
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
@@ -60,7 +60,7 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
           </option>
         ))}
       </Form.Select>
-      <Hint hasError={hasError}>{getHint()}</Hint>
+      <Hint hasError={!!error}>{getHint()}</Hint>
     </ValueContainer>
   );
 };

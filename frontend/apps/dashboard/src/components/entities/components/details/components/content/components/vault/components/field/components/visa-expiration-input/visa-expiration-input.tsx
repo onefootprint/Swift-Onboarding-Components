@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import editFormFieldName from '../utils/edit-form-field-name';
+import get from 'lodash/get';
 import validateVisaExpiration, { VisaExpirationValidationError } from '../utils/validate-visa-expiration';
 
 export type VisaExpirationInputProps = {
@@ -21,19 +21,19 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(IdDI.visaExpirationDate);
-  const hasError = !!errors[formField];
-  const formLegalStatus = watch(editFormFieldName(IdDI.usLegalStatus));
+  const formField = IdDI.visaExpirationDate;
+  const error = get(errors, formField);
+  const formLegalStatus = watch(IdDI.usLegalStatus);
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return t('hint');
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type === 'pattern') {
+    if (error?.type === 'pattern') {
       return t('pattern');
     }
     const validationError = validateVisaExpiration(getValues(formField), formLegalStatus);
@@ -55,7 +55,7 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
         size="compact"
         placeholder="YYYY-MM-DD"
         defaultValue={value as string}
-        hasError={hasError}
+        hasError={!!error}
         {...register(formField, {
           // YYYY-MM-DD or YYYY/MM/DD
           pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,

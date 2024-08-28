@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate, isDob as isValidDob } from '@onefootprint/core';
-import editFormFieldName from '../utils/edit-form-field-name';
+import get from 'lodash/get';
 
 export type DateInputProps = {
   value: VaultValue;
@@ -21,25 +21,24 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
     getValues,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
+  const error = get(errors, fieldName);
   const isDob = fieldName === IdDI.dob;
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return t('hint');
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type === 'required') {
+    if (error?.type === 'required') {
       return t('required');
     }
-    if (errors[formField]?.type === 'pattern') {
+    if (error?.type === 'pattern') {
       return t('pattern');
     }
-    const date = getValues(formField);
+    const date = getValues(fieldName);
     if (!isValidDate(date)) {
       return t('invalid');
     }
@@ -60,10 +59,10 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
         size="compact"
         width="fit-content"
         placeholder="YYYY-MM-DD"
-        hasError={hasError}
+        hasError={!!error}
         defaultValue={value as string}
         inputMode="numeric"
-        {...register(formField, {
+        {...register(fieldName, {
           required: !!value,
           pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/, // YYYY-MM-DD or YYYY/MM/DD
           validate: (dateVal: string) => {

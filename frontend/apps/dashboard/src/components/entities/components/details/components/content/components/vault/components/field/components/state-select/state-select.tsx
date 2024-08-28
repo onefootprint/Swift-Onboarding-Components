@@ -5,8 +5,8 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import get from 'lodash/get';
 import EMPTY_SELECT_VALUE from '../../../../constants';
-import editFormFieldName from '../utils/edit-form-field-name';
 
 export type StateSelectProps = {
   fieldName: DataIdentifier;
@@ -20,19 +20,16 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
     watch,
     formState: { errors },
   } = useFormContext();
-  const formField = editFormFieldName(fieldName);
-  const hasError = !!errors[formField];
-
+  const error = get(errors, fieldName);
   const isBusinessDI = fieldName in BusinessDI;
-
-  const formCountryVal = watch(editFormFieldName(isBusinessDI ? BusinessDI.country : IdDI.country));
+  const formCountryVal = watch(isBusinessDI ? BusinessDI.country : IdDI.country);
   const isDomestic = formCountryVal === 'US';
 
   const getHint = () => {
-    if (!hasError) {
+    if (!error) {
       return '';
     }
-    const message = errors[formField]?.message;
+    const message = error?.message;
     if (message && typeof message === 'string') {
       return message;
     }
@@ -45,7 +42,7 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
         aria-label="state"
         size="compact"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
-        {...register(formField)}
+        {...register(fieldName)}
       >
         <option value={EMPTY_SELECT_VALUE}>{t('state-mapping.none')}</option>
         {STATES.map(state => (
@@ -54,7 +51,7 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
           </option>
         ))}
       </Form.Select>
-      <Hint hasError={hasError}>{getHint()}</Hint>
+      <Hint hasError={!!error}>{getHint()}</Hint>
     </ValueContainer>
   ) : (
     <ValueContainer>
@@ -63,8 +60,8 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
         width="fit-content"
         placeholder=""
         defaultValue={value as string}
-        hasError={hasError}
-        {...register(formField)}
+        hasError={!!error}
+        {...register(fieldName)}
       />
       <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>

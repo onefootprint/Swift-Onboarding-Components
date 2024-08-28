@@ -28,11 +28,11 @@ export type FieldValueProps = {
 
 const FieldValue = ({ field, renderValue }: FieldValueProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
-  const { value, showEditView, canEditField, isDecrypted, name: di, transforms } = field;
+  const { value, showEditView, canEdit, isDecrypted, name: di, transforms } = field;
   const name = di as string;
 
   if (showEditView) {
-    if (!canEditField) {
+    if (!canEdit) {
       return (
         <Text variant="body-3" color="tertiary">
           {t('not-allowed')}
@@ -66,7 +66,7 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
       return <AddressLineInput fieldName={name} fieldValue={value} />;
     }
     if (name === IdDI.city || name === BusinessDI.city) {
-      return <CityInput fieldName={name} value={value} />;
+      return <CityInput value={value} fieldName={name} />;
     }
     if (name === IdDI.state || name === BusinessDI.state || name === BusinessDI.formationState) {
       return <StateSelect value={value} fieldName={name} />;
@@ -77,7 +77,6 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     if (name === IdDI.zip || name === BusinessDI.zip) {
       return <ZipInput value={value} fieldName={name} />;
     }
-
     if (name === IdDI.usLegalStatus) {
       return <LegalStatusSelect value={value} />;
     }

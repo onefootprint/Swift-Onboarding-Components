@@ -24,7 +24,14 @@ const useField = (entity: Entity) => {
   };
 
   const canEditField = (di: DataIdentifier) => {
-    if (di === IdDI.email || di === IdDI.phoneNumber) {
+    const uneditableFields: DataIdentifier[] = [
+      IdDI.email,
+      IdDI.phoneNumber,
+      BusinessDI.phoneNumber,
+      BusinessDI.beneficialOwners,
+      BusinessDI.kycedBeneficialOwners,
+    ];
+    if (uneditableFields.includes(di)) {
       return false;
     }
     // temporary!
@@ -35,7 +42,7 @@ const useField = (entity: Entity) => {
     if (di === IdDI.ssn4) {
       return !entityVaultWithTransforms.data?.vault[IdDI.ssn9];
     }
-    return di.startsWith('id');
+    return di.startsWith('id') || di.startsWith('business');
   };
 
   const showEditView = editControls.inProgress;
@@ -53,7 +60,7 @@ const useField = (entity: Entity) => {
       value,
       transforms,
       isDecrypted: isVaultDataDecrypted(value),
-      canEditField: canEditField(di),
+      canEdit: canEditField(di),
       showEditView,
     };
   };
