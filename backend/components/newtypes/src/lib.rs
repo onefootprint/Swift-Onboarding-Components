@@ -1,100 +1,75 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod id;
+pub use self::auth_token::*;
+pub use self::filter_function::*;
 pub use self::id::*;
 pub use self::phone_number::*;
-
-pub mod idv;
+pub use self::proxy_token::*;
 use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
-pub use idv::*;
-
-pub mod docv;
-pub use docv::*;
-
-mod user_auth_scope;
-pub use user_auth_scope::*;
-
-pub mod decision;
-pub use decision::*;
-
-pub mod scoped_vault_cursor;
-pub use scoped_vault_cursor::*;
-
-mod challenge_kind;
-pub use challenge_kind::*;
-
-pub mod country_codes;
-pub use country_codes::*;
-
-pub mod fields;
-pub use fields::*;
-
-pub mod db_types;
-pub use db_types::*;
-
-pub mod data_identifier;
-pub use data_identifier::*;
-
-pub mod handoff_metadata;
-pub use handoff_metadata::*;
-
-mod us_states;
-pub use us_states::*;
-
-mod b64;
 pub use b64::Base64Data;
 pub use b64::Base64EncodedString;
-pub use serde;
-
-mod auth_token;
-pub use self::auth_token::*;
-
-pub mod map_container;
-pub mod secret_api_key;
-
-pub mod reason_code;
-pub use reason_code::*;
-
-pub mod list;
+pub use challenge_kind::*;
+pub use country_codes::*;
+pub use data_identifier::*;
+pub use db_types::*;
+pub use decision::*;
+pub use document_upload_settings::*;
+pub use docv::*;
+pub use fields::*;
+pub use handoff_metadata::*;
+pub use idv::*;
+pub use integrity_signing_key::*;
 pub use list::*;
-
-pub mod locked;
 pub use locked::*;
-
-pub mod vendor;
+pub use onboarding_requirement::*;
+pub use phone::*;
+pub use reason_code::*;
+pub use samba_webhook::*;
+pub use scoped_vault_cursor::*;
+pub use serde;
+use std::collections::HashMap;
+pub use tenant_business_info::*;
+pub use us_states::*;
+pub use user_auth_scope::*;
+pub use user_insight::*;
 pub use uuid::Uuid;
 pub use vendor::*;
 
-pub mod proxy_token;
-pub use self::proxy_token::*;
+mod auth_token;
+mod b64;
+mod challenge_kind;
+pub mod country_codes;
+pub mod data_identifier;
+pub mod db_types;
+pub mod decision;
+pub mod docv;
+pub mod fields;
+pub mod handoff_metadata;
+mod id;
+pub mod idv;
+pub mod map_container;
+pub mod scoped_vault_cursor;
+pub mod secret_api_key;
+mod us_states;
+mod user_auth_scope;
 
-pub mod filter_function;
-pub use self::filter_function::*;
-
-pub mod onboarding_requirement;
-pub use onboarding_requirement::*;
-
-pub mod integrity_signing_key;
-pub use integrity_signing_key::*;
 pub mod document_upload_settings;
-pub use document_upload_settings::*;
-
+pub mod filter_function;
 pub mod fingerprint_salt;
-
-pub mod tenant_business_info;
-pub use tenant_business_info::*;
-
-pub mod user_insight;
-pub use user_insight::*;
-
-pub mod samba_webhook;
-pub use samba_webhook::*;
+pub mod integrity_signing_key;
+pub mod list;
+pub mod locked;
+pub mod onboarding_requirement;
+pub mod proxy_token;
+pub mod reason_code;
+pub mod vendor;
 
 pub mod phone;
-pub use phone::*;
-
+pub mod samba_webhook;
+pub mod tenant_business_info;
+pub mod user_insight;
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Invalid email address: {0}")]
@@ -153,6 +128,8 @@ pub enum Error {
     AssertionError(String),
     #[error("Vault version must be a non-negative integer")]
     VaultVersionParseError,
+    #[error("{0}")]
+    MissingFingerprint(#[from] MissingFingerprint),
 }
 
 impl From<DataValidationError> for Error {
@@ -185,8 +162,6 @@ impl FpErrorTrait for Error {
         self.to_string()
     }
 }
-
-use std::collections::HashMap;
 
 #[derive(Debug)]
 pub enum DataValidationError {

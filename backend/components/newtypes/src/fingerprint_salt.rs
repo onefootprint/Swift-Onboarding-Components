@@ -7,6 +7,7 @@ use itertools::chain;
 use itertools::Itertools;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
+use strum_macros::Display;
 
 impl DataIdentifier {
     /// Given a DataIdentifier and its corresponding data, returns the fingerprintable payloads
@@ -47,7 +48,7 @@ impl DataIdentifier {
 
 /// Each unique salt essentially builds a unique space of fingerprints.
 /// This allows us to make tenant-scoped fingerprints and globally-scoped fingerprints
-#[derive(Debug, Clone, derive_more::From, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, derive_more::From, Eq, PartialEq, Hash, Display)]
 pub enum FingerprintSalt {
     /// Searchable across all tenants
     Global(GlobalFingerprintKind),
@@ -224,14 +225,30 @@ mod tests {
         TenantId::test_data("org_hello_world".into())
     }
 
-    #[test_case(GlobalFingerprintKind::PhoneNumber.into() => "d3d059cf8cb307035ab86a728dc4a1774a9dad641925d1b54bfd767c75352797".to_string())]
-    #[test_case(GlobalFingerprintKind::Email.into() => "9f9b892d2e59405899706bbd46b7477a47684385efed538475e785108c298615".to_string())]
-    #[test_case(GlobalFingerprintKind::Ssn9.into() => "525339bc5289b4848ed65342337aef5f6ae8254967d13f368ab073bdcb1a2088".to_string())]
-    #[test_case(FingerprintSalt::Tenant(IDK::PhoneNumber.into(), test_org_id()) => "6f930e083b99ac46ef5ce0acfe28ea15454fd8c0f035b41fe866ddc521ab3d0b".to_string())]
-    #[test_case(FingerprintSalt::Tenant(IDK::Email.into(), test_org_id()) => "ff41f7640520c8fe77574f839706cdde2eafbd1d852c507cf76662ef3380cf52".to_string())]
-    #[test_case(FingerprintSalt::Tenant(IDK::FirstName.into(), test_org_id()) => "618954b917c536cd90cdb556f0f8153a63d89048dba2894f00895169414a30db".to_string())]
-    #[test_case(TransientGlobalFingerprintKind::Dob.into() => "c4729af039e10bf709bb34f347c9d02e4eecb8883c5a11110f73e1556cdda130")]
-    #[test_case(TransientGlobalFingerprintKind::FirstName.into() => "fc1cb06526ec348cd2c3061c46c5169ece69568e15bd91ae5b3829515370f1fe")]
+    #[test_case(
+        GlobalFingerprintKind::PhoneNumber.into() => "d3d059cf8cb307035ab86a728dc4a1774a9dad641925d1b54bfd767c75352797".to_string()
+    )]
+    #[test_case(
+        GlobalFingerprintKind::Email.into() => "9f9b892d2e59405899706bbd46b7477a47684385efed538475e785108c298615".to_string()
+    )]
+    #[test_case(
+        GlobalFingerprintKind::Ssn9.into() => "525339bc5289b4848ed65342337aef5f6ae8254967d13f368ab073bdcb1a2088".to_string()
+    )]
+    #[test_case(
+        FingerprintSalt::Tenant(IDK::PhoneNumber.into(), test_org_id()) => "6f930e083b99ac46ef5ce0acfe28ea15454fd8c0f035b41fe866ddc521ab3d0b".to_string()
+    )]
+    #[test_case(
+        FingerprintSalt::Tenant(IDK::Email.into(), test_org_id()) => "ff41f7640520c8fe77574f839706cdde2eafbd1d852c507cf76662ef3380cf52".to_string()
+    )]
+    #[test_case(
+        FingerprintSalt::Tenant(IDK::FirstName.into(), test_org_id()) => "618954b917c536cd90cdb556f0f8153a63d89048dba2894f00895169414a30db".to_string()
+    )]
+    #[test_case(
+        TransientGlobalFingerprintKind::Dob.into() => "c4729af039e10bf709bb34f347c9d02e4eecb8883c5a11110f73e1556cdda130"
+    )]
+    #[test_case(
+        TransientGlobalFingerprintKind::FirstName.into() => "fc1cb06526ec348cd2c3061c46c5169ece69568e15bd91ae5b3829515370f1fe"
+    )]
     fn test_unchanged_fingerprint_salt_bytes(scope: FingerprintSalt) -> String {
         // If this test fails, it means you've changed the way we compute the salt for the tested
         // fingerprint scopes, which will in turn modify ever fingerprint generated with this salt.

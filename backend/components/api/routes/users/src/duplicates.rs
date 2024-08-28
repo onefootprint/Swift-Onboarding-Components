@@ -50,7 +50,7 @@ pub async fn get(
             let sv_ids = fingerprints.iter().map(|fp| &fp.scoped_vault_id).collect_vec();
             let labels = ScopedVaultLabel::bulk_get_active(conn, sv_ids.clone())?;
             let tags = ScopedVaultTag::bulk_get_active(conn, sv_ids.clone())?;
-            let scoped_vaults = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, true)?
+            let scoped_vaults = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?
                 .iter()
                 .map(|(scoped_vault, _)| scoped_vault.clone())
                 .collect_vec();

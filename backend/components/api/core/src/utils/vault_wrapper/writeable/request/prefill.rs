@@ -175,7 +175,7 @@ impl<Type> VaultWrapper<Type> {
     /// Generates fingerprints for the provided DIs from the encrypted data currently in the vault.
     /// Also returns a HashMap that specifies the DataLifetimeId from which each Fingerprint was
     /// generated
-    pub(super) async fn fingerprint_ciphertext(
+    pub async fn fingerprint_ciphertext(
         &self,
         state: &State,
         dis: Vec<&DataIdentifier>,

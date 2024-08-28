@@ -192,7 +192,8 @@ impl CompositeFingerprintKind {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, thiserror::Error)]
+#[error("Missing fingerprint: {0}")]
 pub struct MissingFingerprint(pub FingerprintSalt);
 
 #[cfg(test)]
@@ -293,18 +294,38 @@ mod test {
         );
     }
 
-    #[test_case(CompositeFingerprint::NameDob, vec![], vec![] => false)]
-    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName, IDK::LastName, IDK::Dob], vec![] => false)]
-    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName, IDK::LastName], vec![IDK::Dob] => true)]
-    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName], vec![IDK::LastName, IDK::Dob] => true)]
-    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::FirstName, IDK::LastName, IDK::Dob] => true)]
-    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::LastName, IDK::Dob] => false)]
-    #[test_case(CompositeFingerprint::NameDob, vec![IDK::LastName], vec![IDK::LastName, IDK::Dob] => false)]
-    #[test_case(CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::LastName, IDK::FirstName], vec![IDK::Ssn4] => true)]
-    #[test_case(CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec![], vec![IDK::Ssn4] => false)]
-    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::Dob], vec![IDK::Ssn4] => true)]
-    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![], vec![IDK::Ssn4] => false)]
-    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::Dob], vec![] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec ! [], vec ! [] => false)]
+    #[test_case(
+        CompositeFingerprint::NameDob, vec ! [IDK::FirstName, IDK::LastName, IDK::Dob], vec ! [] => false
+    )]
+    #[test_case(
+        CompositeFingerprint::NameDob, vec ! [IDK::FirstName, IDK::LastName], vec ! [IDK::Dob] => true
+    )]
+    #[test_case(
+        CompositeFingerprint::NameDob, vec ! [IDK::FirstName], vec ! [IDK::LastName, IDK::Dob] => true
+    )]
+    #[test_case(
+        CompositeFingerprint::NameDob, vec ! [], vec ! [IDK::FirstName, IDK::LastName, IDK::Dob] => true
+    )]
+    #[test_case(CompositeFingerprint::NameDob, vec ! [], vec ! [IDK::LastName, IDK::Dob] => false)]
+    #[test_case(
+        CompositeFingerprint::NameDob, vec ! [IDK::LastName], vec ! [IDK::LastName, IDK::Dob] => false
+    )]
+    #[test_case(
+        CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::LastName, IDK::FirstName], vec ! [IDK::Ssn4] => true
+    )]
+    #[test_case(
+        CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec ! [], vec ! [IDK::Ssn4] => false
+    )]
+    #[test_case(
+        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::Dob], vec ! [IDK::Ssn4] => true
+    )]
+    #[test_case(
+        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [], vec ! [IDK::Ssn4] => false
+    )]
+    #[test_case(
+        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::Dob], vec ! [] => false
+    )]
     fn test_should_generate(cfp: CompositeFingerprint, existing: Vec<IDK>, new: Vec<IDK>) -> bool {
         let existing = existing.into_iter().map(DataIdentifier::from).collect_vec();
         let new = new.into_iter().map(DataIdentifier::from).collect_vec();

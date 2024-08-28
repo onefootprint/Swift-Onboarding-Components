@@ -2,13 +2,25 @@ use actix_web::web;
 use std::hash::DefaultHasher;
 use std::hash::Hasher;
 
+mod composite_fingerprint_batch;
+
+/*
 #[derive(serde::Deserialize)]
 #[allow(unused)]
-struct BackfillRequest<TCursor> {
+struct CursorBackfillRequest<TCursor> {
     dry_run: bool,
     concurrency: usize,
     limit: i64,
     cursor: TCursor,
+    shard_config: Option<ShardConfig>,
+}
+*/
+
+#[derive(serde::Deserialize)]
+#[allow(unused)]
+struct BatchBackfillRequest<TEntity> {
+    concurrency: usize,
+    entity_ids: Vec<TEntity>,
     shard_config: Option<ShardConfig>,
 }
 
@@ -30,12 +42,20 @@ impl ShardConfig {
     }
 }
 
-#[derive(serde::Serialize)]
+/*
+#[derive(serde::Serialize, macros::JsonResponder)]
 #[allow(unused)]
-struct BackfillResponse<T, TCursor> {
+struct CursorBackfillResponse<T, TCursor> {
     data: T,
     cursor: Option<TCursor>,
 }
+*/
+
+#[derive(serde::Serialize, macros::JsonResponder)]
+#[allow(unused)]
+struct BatchBackfillResponse {}
 
 #[allow(unused)]
-pub fn configure(config: &mut web::ServiceConfig) {}
+pub fn configure(config: &mut web::ServiceConfig) {
+    config.service(composite_fingerprint_batch::post);
+}
