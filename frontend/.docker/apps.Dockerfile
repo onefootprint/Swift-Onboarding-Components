@@ -57,7 +57,7 @@ RUN sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend
 # RUN sed -i 's/"\([^"]*\)": "\*"/"\1": "workspace:\*"/g' /frontend/packages/ui/package.json
 
 # RUN pnpm install
-RUN yarn install --pure-lockfile --link-duplicates
+RUN yarn install --pure-lockfile
 RUN yarn turbo run build --filter=bifrost... --filter=handoff... --filter=auth... --filter=components... --filter=demos...
 
 EXPOSE 3000 

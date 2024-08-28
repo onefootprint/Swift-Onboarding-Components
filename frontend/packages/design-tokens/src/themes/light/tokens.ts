@@ -26,7 +26,7 @@ export const backgroundColor = {
 
 export const primaryBtnBackgroundColor = {
   default: `${p.Purple500}`,
-  hover: `${p.Purple700}`,
+  hover: `${p.Purple600}`,
   active: `${p.Purple600}`,
   disabled: `${p.Purple300}`,
 };
