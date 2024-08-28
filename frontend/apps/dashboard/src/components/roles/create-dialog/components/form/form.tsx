@@ -1,6 +1,6 @@
 import type { CreateRoleRequest, RoleKind, RoleScope, UpdateRoleRequest } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, TextInput } from '@onefootprint/ui';
+import { Box, Form as FormComponent } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -57,19 +57,21 @@ const Form = ({
     <FormProvider {...formMethods}>
       <form id="roles-form" onSubmit={handleSubmit(handleAfterSubmit)}>
         <Box marginBottom={8}>
-          <TextInput
-            autoFocus
-            hasError={!!errors.name}
-            hint={errors.name?.message}
-            label={t('name.label')}
-            placeholder={t('name.placeholder')}
-            {...register('name', {
-              required: {
-                value: true,
-                message: t('name.errors.required'),
-              },
-            })}
-          />
+          <FormComponent.Field>
+            <FormComponent.Label>{t('name.label')}</FormComponent.Label>
+            <FormComponent.Input
+              autoFocus
+              hasError={!!errors.name}
+              placeholder={t('name.placeholder')}
+              {...register('name', {
+                required: {
+                  value: true,
+                  message: t('name.errors.required'),
+                },
+              })}
+            />
+            <FormComponent.Errors>{errors.name?.message}</FormComponent.Errors>
+          </FormComponent.Field>
         </Box>
         <Permissions kind={kind} />
       </form>
