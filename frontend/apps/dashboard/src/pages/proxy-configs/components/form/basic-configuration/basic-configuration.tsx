@@ -1,4 +1,4 @@
-import { Box, Form, NativeSelect, Text, TextInput } from '@onefootprint/ui';
+import { Box, Form, Text } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
@@ -22,35 +22,39 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
         {t('title')}
       </Text>
       <Box gap={7} display="grid">
-        <TextInput
-          autoFocus
-          hasError={!!formState.errors.name}
-          hint={formState.errors.name?.message}
-          label={t('name.label')}
-          placeholder={t('name.placeholder')}
-          {...register('name', {
-            required: {
-              value: true,
-              message: t('name.errors.required'),
-            },
-          })}
-        />
-        <TextInput
-          hasError={!!formState.errors.url}
-          hint={formState.errors.url?.message}
-          label={t('url.label')}
-          placeholder={t('url.placeholder')}
-          type="url"
-          {...register('url', {
-            required: {
-              value: true,
-              message: t('url.errors.required'),
-            },
-          })}
-        />
+        <Form.Field>
+          <Form.Label htmlFor="name">{t('name.label')}</Form.Label>
+          <Form.Input
+            id="name"
+            autoFocus
+            placeholder={t('name.placeholder')}
+            {...register('name', {
+              required: {
+                value: true,
+                message: t('name.errors.required'),
+              },
+            })}
+          />
+          <Form.Errors>{formState.errors.name?.message}</Form.Errors>
+        </Form.Field>
+        <Form.Field>
+          <Form.Label htmlFor="url">{t('url.label')}</Form.Label>
+          <Form.Input
+            id="url"
+            placeholder={t('url.placeholder')}
+            type="url"
+            {...register('url', {
+              required: {
+                value: true,
+                message: t('url.errors.required'),
+              },
+            })}
+          />
+          <Form.Errors>{formState.errors.url?.message}</Form.Errors>
+        </Form.Field>
         <Form.Field>
           <Form.Label htmlFor="method">{t('method.label')}</Form.Label>
-          <NativeSelect
+          <Form.Select
             id="method"
             {...register('method', {
               required: {
@@ -64,20 +68,22 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
             <option value="PUT">PUT</option>
             <option value="DELETE">DELETE</option>
             <option value="PATCH">PATCH</option>
-          </NativeSelect>
+          </Form.Select>
         </Form.Field>
-        <TextInput
-          hasError={!!formState.errors.accessReason}
-          hint={formState.errors.accessReason?.message}
-          label={t('access-reason.label')}
-          placeholder={t('access-reason.placeholder')}
-          {...register('accessReason', {
-            required: {
-              value: true,
-              message: t('access-reason.errors.required'),
-            },
-          })}
-        />
+        <Form.Field>
+          <Form.Label htmlFor="accessReason">{t('access-reason.label')}</Form.Label>
+          <Form.Input
+            id="accessReason"
+            placeholder={t('access-reason.placeholder')}
+            {...register('accessReason', {
+              required: {
+                value: true,
+                message: t('access-reason.errors.required'),
+              },
+            })}
+          />
+          <Form.Errors>{formState.errors.accessReason?.message}</Form.Errors>
+        </Form.Field>
       </Box>
     </form>
   );
