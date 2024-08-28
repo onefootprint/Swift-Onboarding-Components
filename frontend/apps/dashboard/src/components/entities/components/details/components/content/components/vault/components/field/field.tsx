@@ -51,18 +51,14 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
             </Box>
           </Tooltip>
         ) : (
-          <>
-            {customLabel && React.isValidElement(customLabel) ? (
-              customLabel
-            ) : (
-              <LabelContainer>{labelDisplay}</LabelContainer>
-            )}
+          <LabelContainer>
+            {customLabel && React.isValidElement(customLabel) ? customLabel : labelDisplay}
             {hint && (
               <Text variant="caption-2" color="secondary">
                 {hint}
               </Text>
             )}
-          </>
+          </LabelContainer>
         )}
         <FieldValue field={field} renderValue={renderValue} />
       </Form.Field>
