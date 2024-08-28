@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import type { Decorator } from '@storybook/react';
+import type { Decorator, Preview } from '@storybook/react';
 import { useEffect } from 'react';
 import { DesignSystemProvider } from '../src/utils/design-system-provider';
 import i18n from './i18n';
@@ -38,6 +38,11 @@ const StoryDecorator: Decorator = (Story, context) => {
     </DesignSystemProvider>
   );
 };
-
-// export decorators for storybook to wrap your stories in
 export const decorators = [StoryDecorator];
+
+const preview: Preview = {
+  //👇 Enables auto-generated documentation for all stories
+  tags: ['autodocs'],
+};
+
+export default preview;
