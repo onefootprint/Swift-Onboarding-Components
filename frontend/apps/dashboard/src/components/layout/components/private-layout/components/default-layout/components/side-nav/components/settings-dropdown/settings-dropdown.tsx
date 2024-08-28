@@ -59,26 +59,19 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.1 }}
+            layout
           >
             {subLinks.map(subLink => (
               <SubLinkWrapper key={subLink.href}>
-                <AnimatedLineContainer>
-                  <AnimatedLine
-                    initial={{ backgroundColor: theme.backgroundColor.senary }}
-                    animate={{
-                      backgroundColor: router.pathname.startsWith(subLink.href)
-                        ? theme.color.primary
-                        : theme.backgroundColor.senary,
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </AnimatedLineContainer>
+                {router.pathname.startsWith(subLink.href) && (
+                  <ActiveMarker layoutId="activeMarker" transition={{ duration: 0.1 }} />
+                )}
                 <SubLink href={subLink.href}>
                   <AnimatedSubLinkBackground
                     initial={{ backgroundColor: 'transparent' }}
                     whileHover={{ backgroundColor: theme.backgroundColor.secondary }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.1 }}
                   >
                     <Text
                       color={router.pathname.startsWith(subLink.href) ? 'primary' : 'tertiary'}
@@ -98,96 +91,110 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
 };
 
 const Container = styled.div`
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 `;
 
 const DropdownHeader = styled.div<{ selected: boolean }>`
-    ${({ selected, theme }) => css`
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: ${theme.spacing[3]};
-        padding-right: ${theme.spacing[3]};
-        text-decoration: none;
-        border-radius: ${theme.borderRadius.default};
-        background-color: ${selected ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
-        cursor: pointer;
+  ${({ selected, theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: ${theme.spacing[3]};
+    padding-right: ${theme.spacing[3]};
+    text-decoration: none;
+    border-radius: ${theme.borderRadius.default};
+    background-color: ${selected ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
+    cursor: pointer;
 
-        &:hover {
-            background-color: ${theme.backgroundColor.secondary};
-        }
+    &:hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
 
-        &:hover > * {
-            background-color: ${theme.backgroundColor.secondary};
-        }
+    &:hover > * {
+      background-color: ${theme.backgroundColor.secondary};
+    }
 
-        ${
-          !selected &&
-          css`
-                &:hover .badge {
-                    color: ${theme.color.secondary};
-                    background-color: ${theme.backgroundColor.senary};
-                }
-            `
+    ${
+      !selected &&
+      css`
+        &:hover .badge {
+          color: ${theme.color.secondary};
+          background-color: ${theme.backgroundColor.senary};
         }
+      `
+    }
 
-        .badge {
-            color: ${theme.color.tertiary};
-            background-color: ${theme.backgroundColor.secondary};
-        }
-    `};
+    .badge {
+      color: ${theme.color.tertiary};
+      background-color: ${theme.backgroundColor.secondary};
+    }
+  `};
 `;
 
 const ChevronIcon = styled(IcoChevronRight24)<{ isOpen: boolean }>`
+  ${({ isOpen }) => css`
     transition: transform 0.3s ease;
-    transform: ${({ isOpen }) => (isOpen ? 'rotate(90deg)' : 'rotate(0)')};
+    transform: ${isOpen ? 'rotate(90deg)' : 'rotate(0)'};
+  `}
 `;
 
 const Element = styled(NavigationMenu.Link)`
-    flex-grow: 1;
+  flex-grow: 1;
 `;
 
 const SubLinksContainer = styled(motion.div)`
+  ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    margin: ${({ theme }) => theme.spacing[3]};
-    margin-left: ${({ theme }) => theme.spacing[6]};
+    margin: ${theme.spacing[3]};
+    margin-left: ${theme.spacing[6]};
     position: relative;
-    overflow: hidden;
+
+    &:before {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      bottom: 0;
+      left: calc(${theme.spacing[1]} * -1);
+      width: ${theme.spacing[1]};
+      background-color: ${theme.backgroundColor.senary};
+    }
+  `}
 `;
 
 const SubLinkWrapper = styled.div`
-    display: flex;
-    align-items: center;
-    position: relative;
+  display: flex;
+  align-items: center;
+  position: relative;
 `;
 
 const SubLink = styled(Link)`
-    text-decoration: none;
-    flex-grow: 1;
+  text-decoration: none;
+  flex-grow: 1;
 `;
 
 const AnimatedSubLinkBackground = styled(motion.div)`
-    ${({ theme }) => css`
-        padding: ${theme.spacing[2]} ${theme.spacing[4]};
-        display: flex;
-        align-items: center;
-        position: relative;
-        height: 32px;
-        border-radius: ${theme.borderRadius.default};
-    `}
-`;
-
-const AnimatedLineContainer = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[2]} ${theme.spacing[4]};
+    display: flex;
+    align-items: center;
+    position: relative;
     height: 32px;
-    width: 1px;
-    margin-right: ${({ theme }) => theme.spacing[2]};
+    border-radius: ${theme.borderRadius.default};
+  `}
 `;
 
-const AnimatedLine = styled(motion.div)`
-    width: 100%;
+const ActiveMarker = styled(motion.div)`
+  ${({ theme }) => css`
+    position: absolute;
+    left: calc(${theme.spacing[1]} * -1);
+    z-index: 1;
+    width: ${theme.spacing[1]};
     height: 100%;
+    background-color: ${theme.color.primary};
+  `}
 `;
 
 export default SettingsDropdown;
