@@ -82,6 +82,38 @@ const Provider = ({
 
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
+  const getSandboxProps = (response: PublicOnboardingConfig) => {
+    if (response.isLive && sandboxId) {
+      throw new Error('sandboxId is not allowed for live environments');
+    }
+    if (response.isLive && sandboxOutcome) {
+      throw new Error('sandboxOutcome is not allowed for live environments');
+    }
+    if (!response.requiresIdDoc && sandboxOutcome?.documentOutcome) {
+      throw new Error('documentOutcome is not allowed for no-document verification flow');
+    }
+
+    let newSandboxId = sandboxId;
+    let newSandboxOutcome = sandboxOutcome;
+    if (!response.isLive) {
+      if (sandboxId) {
+        const regex = /^[A-Za-z0-9]+$/;
+        if (!regex.test(sandboxId)) {
+          throw new Error('sandboxId should only contain letters and numbers');
+        }
+      }
+      if (!sandboxId) {
+        // create a random sandboxId with both letters and numbers of lenth 12
+        newSandboxId = Math.random().toString(36).substring(2, 14);
+      }
+
+      const overallOutcome = sandboxOutcome?.overallOutcome ?? 'pass';
+      const documentOutcome = response.requiresIdDoc ? sandboxOutcome?.documentOutcome ?? 'pass' : undefined;
+      newSandboxOutcome = { overallOutcome, documentOutcome };
+    }
+    return { sandboxId: newSandboxId, sandboxOutcome: newSandboxOutcome };
+  };
+
   const getOnboardingConfig = async (pKey?: string) => {
     if (!pKey) {
       throw new Error('No publicKey found');
@@ -94,23 +126,14 @@ const Provider = ({
       throw new Error('Public key is invalid');
     }
 
-    let newSandboxId = sandboxId;
-    if (response.isLive && sandboxId) {
-      throw new Error('sandboxId is not allowed for live environments');
-    }
-    if (!response.isLive) {
-      if (sandboxId) {
-        const regex = /^[A-Za-z0-9]+$/;
-        if (!regex.test(sandboxId)) {
-          throw new Error('sandboxId should only contain letters and numbers');
-        }
-      }
-      if (!sandboxId) {
-        // create a random sandboxId with both letters and numbers of lenth 12
-        newSandboxId = Math.random().toString(36).substring(2, 14);
-      }
-    }
-    setContext(prev => ({ ...prev, onboardingConfig: response, sandboxId: newSandboxId }));
+    const { sandboxId, sandboxOutcome } = getSandboxProps(response);
+
+    setContext(prev => ({
+      ...prev,
+      onboardingConfig: response,
+      sandboxId,
+      sandboxOutcome,
+    }));
   };
 
   useEffect(() => {

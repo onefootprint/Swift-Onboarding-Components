@@ -1,3 +1,4 @@
+import type { SandboxOutcome } from '@onefootprint/footprint-js';
 import type { IdentifyResponse, LoginChallengeResponse, SignupChallengeResponse } from '@onefootprint/types';
 import { InlineOtpNotSupported } from '../../../types/request';
 import request from '../utils/request';
@@ -89,4 +90,73 @@ export const createChallenge = async (payload: EmailAndPassword, options: Reques
   }
   const signupResponse = await signupChallenge(payload, options);
   return signupResponse;
+};
+
+const verify = async (payload: { challenge: string; challengeToken: string }, options: { token: string }) => {
+  const response = await request<{ authToken: string }>({
+    url: '/hosted/identify/verify',
+    method: 'POST',
+    data: {
+      challengeResponse: payload.challenge,
+      challengeToken: payload.challengeToken,
+      scope: 'onboarding',
+    },
+    headers: {
+      'X-Fp-Authorization': options.token,
+    },
+  });
+  return response;
+};
+
+const getValidationToken = async (options: { token: string }) => {
+  const response = await request<{ validationToken: string }>({
+    url: '/hosted/identify/validation_token',
+    method: 'POST',
+    headers: {
+      'X-Fp-Authorization': options.token,
+    },
+  });
+  return response;
+};
+
+const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
+  const response = await request<{ authToken: string }>({
+    url: '/hosted/onboarding',
+    method: 'POST',
+    data: {
+      fixture_result: options.sandboxOutcome?.overallOutcome,
+    },
+    headers: {
+      'X-Fp-Authorization': options.token,
+    },
+  });
+  return response;
+};
+
+const createVaultingToken = async ({ authToken }: { authToken: string }) => {
+  const response = await request<{ token: string; expiresAt: string }>({
+    url: '/hosted/user/tokens',
+    method: 'POST',
+    headers: {
+      'X-Fp-Authorization': authToken,
+    },
+    data: {
+      requestedScope: 'onboarding_components',
+    },
+  });
+  return response;
+};
+
+export const verifyChallenge = async (
+  payload: { challenge: string; challengeToken: string },
+  options: { token: string; sandboxOutcome?: SandboxOutcome },
+) => {
+  const response = await verify(payload, options);
+  await getValidationToken({ token: response.authToken });
+  await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
+  const vaultingToken = await createVaultingToken({ authToken: response.authToken });
+  return {
+    authToken: response.authToken,
+    vaultingToken: vaultingToken.token,
+  };
 };

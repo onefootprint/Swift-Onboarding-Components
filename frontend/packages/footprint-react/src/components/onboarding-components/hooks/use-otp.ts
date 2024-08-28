@@ -2,12 +2,12 @@ import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { ChallengeData } from '@onefootprint/types';
 import { useContext, useState } from 'react';
 import { Context } from '../provider';
-import { createChallenge } from '../queries/challenge';
+import { createChallenge, verifyChallenge } from '../queries/challenge';
 import { unlockBody } from '../utils/dom-utils';
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
-  const [_challengeData, setChallengeData] = useState<ChallengeData | null>(null);
+  const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
 
   const launchIdentify = (
     { email, phoneNumber }: { email?: string; phoneNumber?: string },
@@ -87,7 +87,28 @@ const useOtp = () => {
     return response.challengeData.challengeKind;
   };
 
-  return { launchIdentify, create };
+  const verify = async (payload: { verificationCode: string }) => {
+    if (!challengeData) {
+      throw new Error('No challengeData found. Please make sure that the publicKey is correct');
+    }
+    const response = await verifyChallenge(
+      {
+        challenge: payload.verificationCode,
+        challengeToken: challengeData?.challengeToken,
+      },
+      {
+        token: challengeData.token,
+        sandboxOutcome: context.sandboxOutcome,
+      },
+    );
+    setContext(prev => ({
+      ...prev,
+      authToken: response.authToken,
+      vaultingToken: response.vaultingToken,
+    }));
+  };
+
+  return { launchIdentify, create, verify };
 };
 
 export default useOtp;
