@@ -11,6 +11,7 @@ use newtypes::EncryptedVaultPrivateKey;
 use newtypes::ObConfigurationKey;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
+use newtypes::SandboxId;
 use newtypes::SealedVaultBytes;
 use newtypes::SessionAuthToken;
 use newtypes::WorkflowFixtureResult;
@@ -56,6 +57,8 @@ pub struct VerifyV1SdkArgs {
     pub fixture_result: Option<WorkflowFixtureResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub document_fixture_result: Option<DocumentFixtureResult>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sandbox_id: Option<SandboxId>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
