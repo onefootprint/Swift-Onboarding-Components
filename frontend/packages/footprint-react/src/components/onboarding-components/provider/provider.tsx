@@ -6,6 +6,7 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
+import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 
 export type ContextData = {
   appearance?: FootprintAppearance;
@@ -61,10 +62,12 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
     },
   });
 
-  useEffect(() => {
-    // Update the context when the props change
-    setContext(prev => ({ ...prev, appearance, authToken, locale, sandboxOutcome }));
-  }, [appearance, authToken, locale, sandboxOutcome, publicKey]);
+  usePropsUpdated({
+    props: { appearance, authToken, locale, sandboxOutcome, publicKey },
+    onUpdate: updatedProps => {
+      setContext(prev => ({ ...prev, ...updatedProps }));
+    },
+  });
 
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
