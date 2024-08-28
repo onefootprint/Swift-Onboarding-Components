@@ -21,6 +21,7 @@ export type ContextData = {
   };
   onboardingConfig: PublicOnboardingConfig | null;
   sandboxOutcome?: SandboxOutcome;
+  sandboxId?: string;
   publicKey: string;
   locale?: SupportedLocale;
 };
@@ -40,12 +41,20 @@ const Context = createContext<[ContextData, UpdateContext]>([
 // These are the props users can set on the provider
 export type ProviderProps = Pick<
   ContextData,
-  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxOutcome'
+  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxOutcome' | 'sandboxId'
 > & {
   children: React.ReactNode;
 };
 
-const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US', sandboxOutcome }: ProviderProps) => {
+const Provider = ({
+  appearance,
+  authToken,
+  children,
+  publicKey,
+  locale = 'en-US',
+  sandboxOutcome,
+  sandboxId,
+}: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
@@ -53,6 +62,7 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
     fpInstance: null,
     onboardingConfig: null,
     sandboxOutcome,
+    sandboxId,
     publicKey,
     // when calling handoff, we can listen to fp instance events
     handoffCallbacks: {
@@ -64,7 +74,7 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
   });
 
   usePropsUpdated({
-    props: { appearance, authToken, locale, sandboxOutcome, publicKey },
+    props: { appearance, authToken, locale, sandboxOutcome, publicKey, sandboxId },
     onUpdate: updatedProps => {
       setContext(prev => ({ ...prev, ...updatedProps }));
     },
@@ -76,13 +86,31 @@ const Provider = ({ appearance, authToken, children, publicKey, locale = 'en-US'
     if (!pKey) {
       throw new Error('No publicKey found');
     }
+    let response;
 
     try {
-      const response = await getOnboardingConfigReq(pKey);
-      setContext(prev => ({ ...prev, onboardingConfig: response }));
+      response = await getOnboardingConfigReq(pKey);
     } catch (_e: unknown) {
       throw new Error('Public key is invalid');
     }
+
+    let newSandboxId = sandboxId;
+    if (response.isLive && sandboxId) {
+      throw new Error('sandboxId is not allowed for live environments');
+    }
+    if (!response.isLive) {
+      if (sandboxId) {
+        const regex = /^[A-Za-z0-9]+$/;
+        if (!regex.test(sandboxId)) {
+          throw new Error('sandboxId should only contain letters and numbers');
+        }
+      }
+      if (!sandboxId) {
+        // create a random sandboxId with both letters and numbers of lenth 12
+        newSandboxId = Math.random().toString(36).substring(2, 14);
+      }
+    }
+    setContext(prev => ({ ...prev, onboardingConfig: response, sandboxId: newSandboxId }));
   };
 
   useEffect(() => {

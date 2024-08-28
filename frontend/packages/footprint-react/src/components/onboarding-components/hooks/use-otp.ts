@@ -15,6 +15,7 @@ const useOtp = () => {
       onError?: (error: unknown) => void;
     } = {},
   ) => {
+    // TODO: we need to pass sandbox id from context here too. We will need to wait until the BE is ready
     const fp = footprint.init({
       appearance: context.appearance,
       publicKey: context.publicKey,
