@@ -61,7 +61,6 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
         width="fit-content"
         placeholder="YYYY-MM-DD"
         hasError={hasError}
-        hint={getHint()}
         defaultValue={value as string}
         inputMode="numeric"
         {...register(formField, {
@@ -76,6 +75,7 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
           },
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

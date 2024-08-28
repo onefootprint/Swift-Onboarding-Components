@@ -48,7 +48,6 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
         width="fit-content"
         placeholder=""
         hasError={hasError}
-        hint={getHint()}
         defaultValue={fieldValue as string}
         type="tel"
         value={getValues(fieldName)}
@@ -57,6 +56,7 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
           pattern,
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

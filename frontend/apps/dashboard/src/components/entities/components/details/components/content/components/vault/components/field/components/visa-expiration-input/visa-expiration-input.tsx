@@ -56,13 +56,13 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
         placeholder="YYYY-MM-DD"
         defaultValue={value as string}
         hasError={hasError}
-        hint={getHint()}
         {...register(formField, {
           // YYYY-MM-DD or YYYY/MM/DD
           pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
           validate: (expiration: string) => validateVisaExpiration(expiration, formLegalStatus) === undefined,
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

@@ -59,10 +59,10 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
         width="fit-content"
         placeholder=""
         hasError={hasError}
-        hint={getHint()}
         defaultValue={fieldValue as string}
         {...register(formField, options)}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

@@ -64,9 +64,9 @@ const StateSelect = ({ value, fieldName }: StateSelectProps) => {
         placeholder=""
         defaultValue={value as string}
         hasError={hasError}
-        hint={getHint()}
         {...register(formField)}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

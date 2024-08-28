@@ -57,11 +57,11 @@ const ZipInput = ({ value, fieldName }: ZipInputProps) => {
         placeholder=""
         defaultValue={value as string}
         hasError={hasError}
-        hint={getHint()}
         {...register(formField, {
           validate: (zip: string) => validateZip(zip) === undefined,
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

@@ -56,12 +56,12 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
         width="fit-content"
         placeholder="CA, MX"
         hasError={hasError}
-        hint={getHint()}
         defaultValue={citizenships?.join(', ')}
         {...register(formField, {
           validate: (countriesStr: string) => validateCitizenships(countriesStr, formLegalStatus) === undefined,
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

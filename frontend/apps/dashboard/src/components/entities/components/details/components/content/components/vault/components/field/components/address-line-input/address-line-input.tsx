@@ -53,9 +53,9 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
         placeholder=""
         defaultValue={fieldValue as string}
         hasError={hasError}
-        hint={getHint()}
         {...register(formField, options)}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };

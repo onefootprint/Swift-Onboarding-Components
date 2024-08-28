@@ -41,12 +41,12 @@ const CityInput = ({ value, fieldName }: CityInputProps) => {
         width="fit-content"
         placeholder=""
         hasError={hasError}
-        hint={getHint()}
         defaultValue={value as string}
         {...register(formField, {
           required: true,
         })}
       />
+      <Form.Errors>{getHint() || ''}</Form.Errors>
     </ValueContainer>
   );
 };
