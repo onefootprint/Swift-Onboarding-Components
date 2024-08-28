@@ -1,7 +1,7 @@
 import type { CustomDoc, DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash16 } from '@onefootprint/icons';
 import type { CustomDocumentUploadSettings } from '@onefootprint/types';
-import { Button, Divider, Form, LinkButton, Radio, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
+import { Button, Divider, Form, LinkButton, Radio, Stack, Text, TextArea } from '@onefootprint/ui';
 import get from 'lodash/get';
 import { useId, useState } from 'react';
 import { type UseFieldArrayProps, useFormContext, useWatch } from 'react-hook-form';
@@ -81,7 +81,7 @@ const CustomDocsForm = ({ index = 0, formName, onDelete, onCancel, onSubmit }: C
           >
             {t('name.label')}
           </Form.Label>
-          <TextInput
+          <Form.Input
             id={`name-${id}`}
             placeholder={t('name.placeholder')}
             size="compact"
@@ -103,7 +103,7 @@ const CustomDocsForm = ({ index = 0, formName, onDelete, onCancel, onSubmit }: C
           </Form.Label>
           <Form.Group>
             <Form.Addon size="compact">{t('identifier.placeholder')}</Form.Addon>
-            <TextInput
+            <Form.Input
               id={`identifier-${id}`}
               placeholder=""
               size="compact"
