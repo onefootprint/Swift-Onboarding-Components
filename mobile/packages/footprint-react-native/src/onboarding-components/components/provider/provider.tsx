@@ -63,19 +63,31 @@ const Provider = ({
     if (!pKey) {
       throw new Error('No publicKey found');
     }
+    let response;
 
     try {
-      const response = await getOnboardingConfigReq(pKey);
-      let newSandboxId = sandboxId;
-      if (!response.isLive && !sandboxId) {
-        // create a random sandboxId with both letters and numbers of lenth 12
-        newSandboxId = Math.random().toString(36).substring(2, 14);
-      }
-      setContext(prev => ({ ...prev, onboardingConfig: response, sandboxId: newSandboxId }));
-      setContext(prev => ({ ...prev, onboardingConfig: response }));
+      response = await getOnboardingConfigReq(pKey);
     } catch (_e: unknown) {
       throw new Error(`Failed to fetch onboarding config: ${_e}`);
     }
+
+    let newSandboxId = sandboxId;
+    if (response.isLive && sandboxId) {
+      throw new Error('sandboxId is not allowed for live environments');
+    }
+    if (!response.isLive) {
+      if (sandboxId) {
+        const regex = /^[A-Za-z0-9]+$/;
+        if (!regex.test(sandboxId)) {
+          throw new Error('sandboxId should only contain letters and numbers');
+        }
+      }
+      if (!sandboxId) {
+        // create a random sandboxId with both letters and numbers of lenth 12
+        newSandboxId = Math.random().toString(36).substring(2, 14);
+      }
+    }
+    setContext(prev => ({ ...prev, onboardingConfig: response, sandboxId: newSandboxId }));
   };
 
   useEffect(() => {
