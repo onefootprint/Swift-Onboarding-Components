@@ -1,5 +1,5 @@
 import type { FormValues } from '@onefootprint/footprint-react';
-import { Fp, useFootprint } from '@onefootprint/footprint-react';
+import { Fp, useFootprint, useOtp } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, InlineAlert, Shimmer, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -94,10 +94,10 @@ const Demo = () => {
 };
 
 const Identify = ({ onDone }: { onDone: () => void }) => {
-  const fp = useFootprint();
+  const otp = useOtp();
 
   const handleSubmit = (formValues: FormValues) => {
-    fp.launchIdentify(
+    otp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],

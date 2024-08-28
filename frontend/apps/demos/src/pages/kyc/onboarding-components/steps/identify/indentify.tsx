@@ -1,4 +1,4 @@
-import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { type FormValues, Fp, useOtp } from '@onefootprint/footprint-react';
 import { Box, Button, Divider, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import EncryptedInput from '../../components/encrypted-input';
@@ -6,11 +6,11 @@ import type { FormStates, StepProps } from '../../kyc.types';
 
 const Identify = ({ onFormSubmit, onInputEvent }: StepProps) => {
   const [formState, setFormState] = useState<FormStates>('default');
-  const fp = useFootprint();
+  const otp = useOtp();
 
   const handleSubmit = (formValues: FormValues) => {
     setFormState('loading');
-    fp.launchIdentify(
+    otp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],

@@ -1,6 +1,6 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
+import { type FormValues, Fp, useFootprint, useOtp } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
@@ -65,10 +65,10 @@ const Step3 = () => (
 );
 
 const Step4 = () => {
-  const fp = useFootprint();
+  const otp = useOtp();
 
   const handleSubmit = (formValues: FormValues) => {
-    fp.launchIdentify(
+    otp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -104,11 +104,12 @@ const Step4 = () => {
 };
 
 const Step5 = () => {
+  const otp = useOtp();
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
   const handleSubmitIdentify = (formValues: FormValues) => {
-    fp.launchIdentify(
+    otp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -215,10 +216,11 @@ const Step5 = () => {
 
 const Step6 = () => {
   const fp = useFootprint();
+  const otp = useOtp();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
   const handleSubmitIdentify = (formValues: FormValues) => {
-    fp.launchIdentify(
+    otp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
