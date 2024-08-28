@@ -1,4 +1,4 @@
-import { Select, type SelectOption, Text, TextInput, useToast } from '@onefootprint/ui';
+import { Form, Select, type SelectOption, Text, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import useSession from 'src/hooks/use-session';
@@ -59,19 +59,15 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
         <Text variant="label-3">
           {`Create a new tenant with the following parameters. You will be redirected to the new tenant's dashboard after creating`}
         </Text>
-        <TextInput
-          label="Tenant name"
-          placeholder="Acme Inc."
-          hasError={!!errors.name}
-          {...register('name', { required: true })}
-        />
-        <TextInput
-          label="Tenant domain"
-          hint="The domain of the emails of employees of this tenant"
-          placeholder="acme.org"
-          hasError={!!errors.domain}
-          {...register('domain', { required: false })}
-        />
+        <Form.Field>
+          <Form.Label>Tenant name</Form.Label>
+          <Form.Input placeholder="Acme Inc." hasError={!!errors.name} {...register('name', { required: true })} />
+        </Form.Field>
+        <Form.Field>
+          <Form.Label>Tenant domain</Form.Label>
+          <Form.Input placeholder="acme.org" hasError={!!errors.domain} {...register('domain', { required: false })} />
+          <Form.Hint>The domain of the emails of employees of this tenant</Form.Hint>
+        </Form.Field>
         <Controller
           control={control}
           name="companySize"
@@ -87,13 +83,15 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
             />
           )}
         />
-        <TextInput
-          label="Parent tenant ID"
-          hint="If this is a child tenant, specify the parent tenant ID"
-          placeholder="org_xyz..."
-          hasError={!!errors.superTenantId}
-          {...register('superTenantId', { required: false })}
-        />
+        <Form.Field>
+          <Form.Label>Parent tenant ID</Form.Label>
+          <Form.Input
+            placeholder="org_xyz..."
+            hasError={!!errors.superTenantId}
+            {...register('superTenantId', { required: false })}
+          />
+          <Form.Hint>If this is a child tenant, specify the parent tenant ID</Form.Hint>
+        </Form.Field>
       </StyledForm>
     </FormProvider>
   );
