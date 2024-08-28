@@ -33,6 +33,8 @@ pub enum DupeKind {
     DeviceId,
     CookieId,
     Selfie,
+    NameSsn4,
+    DobSsn4,
 }
 
 impl TryFrom<FingerprintKind> for DupeKind {
@@ -48,7 +50,14 @@ impl TryFrom<FingerprintKind> for DupeKind {
                     format!("Can't convert {} into DupeKind", value).to_owned(),
                 )),
             },
-            FingerprintKind::Composite(CompositeFingerprintKind::NameDob) => Ok(Self::NameDob),
+            FingerprintKind::Composite(cfk) => match cfk {
+                CompositeFingerprintKind::NameDob => Ok(Self::NameDob),
+                CompositeFingerprintKind::DobSsn4 => Ok(Self::DobSsn4),
+                CompositeFingerprintKind::NameSsn4 => Ok(Self::NameSsn4),
+                _ => Err(crate::Error::Custom(
+                    format!("Can't convert {} into DupeKind", value).to_owned(),
+                )),
+            },
             _ => Err(crate::Error::Custom(
                 format!("Can't convert {} into DupeKind", value).to_owned(),
             )),

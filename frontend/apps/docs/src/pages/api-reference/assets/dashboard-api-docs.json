@@ -13585,7 +13585,9 @@
                                             "name_dob",
                                             "device_id",
                                             "cookie_id",
-                                            "selfie"
+                                            "selfie",
+                                            "name_ssn4",
+                                            "dob_ssn4"
                                         ]
                                     }
                                 },

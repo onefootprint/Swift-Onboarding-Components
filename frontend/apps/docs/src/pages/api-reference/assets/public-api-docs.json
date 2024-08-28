@@ -2025,7 +2025,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "Look up users with duplicate attributes to the provided user.",
+                "description": "List users with duplicate attributes to the provided user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -11953,7 +11953,9 @@
                                         "name_dob",
                                         "device_id",
                                         "cookie_id",
-                                        "selfie"
+                                        "selfie",
+                                        "name_ssn4",
+                                        "dob_ssn4"
                                     ]
                                 },
                                 "labels": {
