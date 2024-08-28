@@ -1,4 +1,4 @@
-import { Button, Stack, TextInput } from '@onefootprint/ui';
+import { Button, Form, Stack } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -39,15 +39,17 @@ const EmailForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack direction="column" gap={4}>
-        <TextInput
-          autoComplete="email"
-          hasError={!!errors.email}
-          hint={errors?.email?.message}
-          label={t('form.email.label')}
-          placeholder={t('form.email.placeholder')}
-          type="email"
-          {...register('email', { required: t('form.email.errors.required') })}
-        />
+        <Form.Field>
+          <Form.Label>{t('form.email.label')}</Form.Label>
+          <Form.Input
+            autoComplete="email"
+            hasError={!!errors.email}
+            placeholder={t('form.email.placeholder')}
+            type="email"
+            {...register('email', { required: t('form.email.errors.required') })}
+          />
+          <Form.Errors>{errors?.email?.message}</Form.Errors>
+        </Form.Field>
         <Button fullWidth loading={mutateLoginEmail.isLoading} size="large" type="submit">
           {t('cta')}
         </Button>
