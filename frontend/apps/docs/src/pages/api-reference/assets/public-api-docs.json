@@ -105,6 +105,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -565,6 +573,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -611,6 +627,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -644,6 +668,16 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-vault-version",
+                        "description": "When provided, specifies the vault version to use for the given request.",
+                        "schema": {
+                            "x_fp_preview_gate": "vault_versioning",
+                            "type": "string"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -659,6 +693,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -922,6 +964,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -994,7 +1044,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1011,6 +1060,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1043,7 +1100,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1118,7 +1174,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     }
                 ],
@@ -1405,7 +1460,6 @@
                             "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                             "type": "string"
                         },
-                        "example": "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
                         "style": "simple"
                     },
                     {
@@ -1965,6 +2019,63 @@
                 ]
             }
         },
+        "/users/{fp_id}/duplicates": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "Look up users with duplicate attributes to the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicDuplicateFingerprint"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": [
+                            "preview:list_duplicate_users"
+                        ]
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/integrations/alpaca/account": {
             "post": {
                 "tags": [
@@ -2140,6 +2251,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2679,6 +2798,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2725,6 +2852,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2758,6 +2893,16 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-vault-version",
+                        "description": "When provided, specifies the vault version to use for the given request.",
+                        "schema": {
+                            "x_fp_preview_gate": "vault_versioning",
+                            "type": "string"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -2773,6 +2918,14 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "headers": {
+                            "x-fp-vault-version": {
+                                "description": "The resulting version of the vault after applying any updates in this request.",
+                                "style": "simple",
+                                "content": {},
+                                "x_fp_preview_gate": "vault_versioning"
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3203,7 +3356,6 @@
                             "example": "https://acmebankprocessor.com/api/process_transaction",
                             "type": "string"
                         },
-                        "example": "https://acmebankprocessor.com/api/process_transaction",
                         "style": "simple"
                     },
                     {
@@ -11773,6 +11925,72 @@
                         "required": [
                             "count"
                         ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
+            "OffsetPaginatedPublicDuplicateFingerprint": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "fp_id": {
+                                    "type": "string"
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "ssn9",
+                                        "email",
+                                        "phone_number",
+                                        "name_dob",
+                                        "device_id",
+                                        "cookie_id",
+                                        "selfie"
+                                    ]
+                                },
+                                "labels": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "offboard_fraud",
+                                            "offboard_other"
+                                        ]
+                                    }
+                                },
+                                "tags": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": [
+                                "fp_id",
+                                "labels",
+                                "tags"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
                     }
                 },
                 "required": [

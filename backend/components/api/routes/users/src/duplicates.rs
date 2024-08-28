@@ -26,7 +26,7 @@ use paperclip::actix::web;
 use std::collections::HashMap;
 
 #[api_v2_operation(
-    description = "Look up users with duplicate attributes to the provided user.",
+    description = "List users with duplicate attributes to the provided user.",
     tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/duplicates")]

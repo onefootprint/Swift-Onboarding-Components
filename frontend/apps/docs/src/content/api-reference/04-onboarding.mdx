@@ -37,6 +37,10 @@ apis:
     path: /users/{fp_id}/risk_signals
     title: List all risk signals for a user
     description: Lists the risk signals for a Footprint user.
+  - method: get
+    path: /users/{fp_id}/duplicates
+    title: List all users with duplicate attributes
+    description:  Returns list of users with duplicate attributes to the provided user. Includes tags and label values for each user that shares duplicate attributes.
 
   # These will all be hidden for non-legacy tenants
   - method: get
