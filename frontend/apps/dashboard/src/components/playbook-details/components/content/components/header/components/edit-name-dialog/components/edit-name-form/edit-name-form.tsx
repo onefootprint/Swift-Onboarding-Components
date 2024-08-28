@@ -1,4 +1,4 @@
-import { TextInput } from '@onefootprint/ui';
+import { Form } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -34,15 +34,18 @@ const EditNameForm = ({ formId, playbookName, onSubmit }: EditNameFormProps) => 
   return (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <TextInput
-          autoFocus
-          label={t('label')}
-          hasError={!!errors.name}
-          hint={errors?.name?.message}
-          defaultValue={playbookName}
-          placeholder=""
-          {...register('name')}
-        />
+        <Form.Field>
+          <Form.Label>{t('label')}</Form.Label>
+          <Form.Input
+            autoFocus
+            hasError={!!errors.name}
+            hint={errors?.name?.message}
+            defaultValue={playbookName}
+            placeholder=""
+            {...register('name')}
+          />
+          <Form.Errors> {!!errors.name}</Form.Errors>
+        </Form.Field>
       </StyledForm>
     </FormProvider>
   );
