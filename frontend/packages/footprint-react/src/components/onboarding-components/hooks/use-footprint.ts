@@ -1,5 +1,7 @@
+import type { ComponentsSdkProps } from '@onefootprint/footprint-js/src/types/components';
 import { useContext, useState } from 'react';
 
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { FormValues } from '../../../types';
 import { Context } from '../provider';
 import saveReq from '../queries/save';
@@ -51,6 +53,34 @@ export const useFootprint = () => {
     }
   };
 
+  const createNewHandoff = ({
+    onComplete,
+    onError,
+    onCancel,
+    onClose,
+    authToken,
+  }: {
+    onComplete?: (validationToken: string) => void;
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+    onClose?: () => void;
+    authToken: string;
+  }) => {
+    const props: ComponentsSdkProps = {
+      authToken,
+      appearance: context.appearance,
+      sandboxOutcome: context.sandboxOutcome,
+      kind: FootprintComponentKind.Components,
+      onComplete,
+      onError,
+      onCancel,
+      onClose,
+    };
+
+    const fp = footprint.init(props);
+    fp.render();
+  };
+
   const handoff = ({
     onComplete,
     onError,
@@ -62,13 +92,21 @@ export const useFootprint = () => {
     onCancel?: () => void;
     onClose?: () => void;
   } = {}) => {
+    // We may not have the fpInstance if the user is authenticated through inline OTP
+    // In that case, we will have the vaultingToken and authToken
+    // We can use the authToken to create a new fpInstance
+    // If we don't have any of these, we can't proceed
     if (!context.fpInstance) {
-      onError?.(new Error('No fpInstance found'));
-      return;
+      if (!context.vaultingToken || !context.authToken) {
+        onError?.(new Error('No fpInstance found'));
+        return;
+      }
+      createNewHandoff({ onComplete, onError, onCancel, onClose, authToken: context.authToken });
+    } else {
+      lockBody();
+      context.fpInstance.relayFromComponents?.();
+      setContext(prev => ({ ...prev, handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
     }
-    lockBody();
-    context.fpInstance.relayFromComponents?.();
-    setContext(prev => ({ ...prev, handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
   };
 
   return { context, busy, handoff, save };

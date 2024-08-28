@@ -96,7 +96,7 @@ export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
 };
 
 /** Components SDK. Just a subset of Verify */
-export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey> & {
+export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey | VerifyAuthToken> & {
   readonly onRelayToComponents?: (authToken: string) => void;
   readonly kind: `${ComponentKind.Components}`;
   readonly variant?: VerifyVariant;

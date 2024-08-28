@@ -106,7 +106,7 @@ const Root = ({ variant }: RootProps) => {
       onRelayFromComponents: (cb: () => void) => fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
       relayToComponents: fpProvider.relayToComponents,
       componentsSdkType: isWebview ? ComponentsSdkTypes.MOBILE : ComponentsSdkTypes.WEB,
-      skipRelayToComponents: isWebview && !!authToken,
+      skipRelayToComponents: !!authToken,
     };
   }
 
