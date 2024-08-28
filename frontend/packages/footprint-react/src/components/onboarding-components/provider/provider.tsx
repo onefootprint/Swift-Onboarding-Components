@@ -11,6 +11,7 @@ import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 export type ContextData = {
   appearance?: FootprintAppearance;
   authToken?: string;
+  vaultingToken?: string;
   fpInstance: FootprintComponent | null;
   handoffCallbacks?: {
     onCancel?: () => void;

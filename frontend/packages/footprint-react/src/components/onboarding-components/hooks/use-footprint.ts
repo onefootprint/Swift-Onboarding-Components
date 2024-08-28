@@ -57,7 +57,10 @@ export const useFootprint = () => {
       },
       onRelayToComponents: (authToken: string) => {
         unlockBody();
-        setContext(prev => ({ ...prev, authToken }));
+        // This part might be a little confusing, but we need to set the vaultingToken here
+        // Technically, the the authToken we recieve here has a lower scope and can only be used for vaulting
+        // The token is created by a API request to "/hosted/user/tokens" using the original authToken
+        setContext(prev => ({ ...prev, vaultingToken: authToken }));
         onAuthenticated?.();
       },
     });
@@ -76,8 +79,8 @@ export const useFootprint = () => {
       onError?: (error: unknown) => void;
     } = {},
   ) => {
-    const { authToken, onboardingConfig } = context;
-    if (!authToken) {
+    const { vaultingToken, onboardingConfig } = context;
+    if (!vaultingToken) {
       onError?.(new Error('No authToken found. Please authenticate first'));
       return;
     }
@@ -94,7 +97,11 @@ export const useFootprint = () => {
 
     try {
       setBusy('save');
-      await saveReq({ data: formatBeforeSave(data, context.locale ?? 'en-US'), bootstrapDis: [], authToken });
+      await saveReq({
+        data: formatBeforeSave(data, context.locale ?? 'en-US'),
+        bootstrapDis: [],
+        authToken: vaultingToken,
+      });
       onSuccess?.();
     } catch (error: unknown) {
       onError?.(error);
