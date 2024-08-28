@@ -57,21 +57,12 @@ const FormLabel = ({
   );
 };
 
-const InfoButton = styled.button`
-  ${({ theme }) => css`
-    background: none;
-    border: none;
-    padding: ${theme.spacing[1]} 0 0 0;
-    margin: 0;
-  `}
-`;
-
 const LabelContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     justify-content: flex-start;
-    flex-direction: row;
     gap: ${theme.spacing[2]};
+    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 
@@ -92,6 +83,15 @@ const StyledLabel = styled.label`
       }
     `;
   }}
+`;
+
+const InfoButton = styled.button`
+  ${({ theme }) => css`
+    background: none;
+    border: none;
+    padding: ${theme.spacing[1]} 0 0 0;
+    margin: 0;
+  `}
 `;
 
 export default FormLabel;
