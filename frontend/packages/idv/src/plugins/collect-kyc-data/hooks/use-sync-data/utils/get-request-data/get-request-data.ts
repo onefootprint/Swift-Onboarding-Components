@@ -1,10 +1,10 @@
+import { getIsoDate } from '@onefootprint/core';
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
 import { CdoToAllDisMap, CollectedKycDataOptionToRequiredAttributes, IdDI } from '@onefootprint/types';
 
 import { getLogger } from '../../../../../../utils/logger';
-import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../../../utils/string';
-import { isString, isUndefined } from '../../../../../../utils/type-guards';
+import { isUndefined } from '../../../../../../utils/type-guards';
 import getAllKycAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
@@ -101,8 +101,7 @@ const getRequestData = (
   Object.entries(filteredData).forEach(([key, value]) => {
     const di = key as IdDI;
     if (isDate(di)) {
-      const dateInputValue = isString(value.value) ? strInputToUSDate(locale, value.value) : undefined;
-      requestData[di] = fromUSDateToISO8601Format(dateInputValue);
+      requestData[di] = getIsoDate(value.value as string, locale);
     } else {
       requestData[di] = value.value;
     }

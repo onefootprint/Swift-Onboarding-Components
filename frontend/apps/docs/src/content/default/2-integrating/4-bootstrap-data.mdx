@@ -40,7 +40,7 @@ const launchFootprint = () => {
       "id.first_name": "Jane",
       "id.middle_name": "Samantha",
       "id.last_name": "Doe",
-      "id.dob": "01/01/2001",
+      "id.dob": "2001-12-30",
       "id.ssn9": "123456789",
       "id.nationality": "US",
       "id.address_line1": "123 Apple St.",
@@ -70,7 +70,7 @@ The follow identity fields are available to bootstrap.
 | `id.last_name`            | Last name                                                | Any valid UTF-8 string <1KB                                                            |
 | `id.ssn9`                 | Full SSN                                                 | 9-digit string (hyphens will be ignored and stripped out)                              |
 | `id.ssn4`                 | Last four of the SSN                                     | 4-digit string                                                                         |
-| `id.dob`                  | Date of birth                                            | Formatted as `MM/DD/YYYY`                                                              |
+| `id.dob`                  | Date of birth                                            | Formatted as `YYYY-MM-DD`                                                              |
 | `id.address_line1`        | First line of the user's street address                  | Any valid UTF-8 string <1KB                                                            |
 | `id.address_line2`        | Second line of the user's street address                 | Any valid UTF-8 string <1KB                                                            |
 | `id.city`                 | City of the user's street address                        | Any valid UTF-8 string <1KB                                                            |
@@ -81,7 +81,7 @@ The follow identity fields are available to bootstrap.
 | `id.nationality`          | The user's nationality                                   | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)        |
 | `id.citizenships`         | A list of countries for which the user holds citizenship | A list of valid [ISO3166-alpha-2 Country Codes](https://datahub.io/core/country-codes) |
 | `id.visa_kind`            | The type of US visa held by the user                     | One of `e1`, `e2`, `e3`, `f1`, `g4`, `h1b`, `l1`, `o1`, `tn1`, or `other`              |
-| `id.visa_expiration_date` | The expiration date of the user's visa                   | Formatted as `MM/DD/YYYY`                                                              |
+| `id.visa_expiration_date` | The expiration date of the user's visa                   | Formatted as `YYYY-MM-DD`                                                              |
 
 ## Boostraping KYB data
 
@@ -99,7 +99,7 @@ const launchFootprint = () => {
       // Precollected information about the user
       "id.first_name": "Jane",
       "id.last_name": "Doe",
-      "id.dob": "01/01/1990",
+      "id.dob": "2001-12-30",
       "id.ssn9": "123456789",
       // Precollected information about the business
       "business.name": "Acme Bank",

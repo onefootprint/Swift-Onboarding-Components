@@ -23,6 +23,9 @@
     "test": "bun test --bail",
     "typecheck": "yarn tsc --noEmit"
   },
+  "dependencies": {
+    "date-fns": "^2.30.0"
+  },
   "devDependencies": {
     "@happy-dom/global-registrator": "^14.7.1",
     "@types/node": "^20",

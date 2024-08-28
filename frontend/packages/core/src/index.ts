@@ -14,6 +14,7 @@ export {
   isDobTooYoung,
   isValidDate,
 } from './validations/is-dob';
+export { getIsoDate, isValidIsoDate } from './validations/date';
 export { default as isAddressLine } from './validations/is-address-line';
 export { default as isEmail } from './validations/is-email';
 export { default as isName } from './validations/is-name';

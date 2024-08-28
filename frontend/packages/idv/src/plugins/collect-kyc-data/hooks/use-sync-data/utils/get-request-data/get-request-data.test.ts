@@ -153,6 +153,52 @@ describe('getRequestData', () => {
     });
   });
 
+  it('formats dob and visa expiration data correctly when yyyy-mm-dd is provided', () => {
+    const { data } = getRequestData(
+      'en-US',
+      {
+        [IdDI.dob]: { value: '2003-01-02', dirty: true },
+        [IdDI.visaExpirationDate]: { value: '2003-01-02', dirty: true },
+        [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen, dirty: true },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
+      'id.dob': '2003-01-02',
+      'id.us_legal_status': 'citizen',
+      'id.visa_expiration_date': '2003-01-02',
+    });
+  });
+
+  it('formats dob and visa expiration data correctly when dd/mm/yyyy + es-MX is provided', () => {
+    const { data } = getRequestData(
+      'es-MX',
+      {
+        [IdDI.dob]: { value: '25/12/2001', dirty: true },
+        [IdDI.visaExpirationDate]: { value: '25/12/2001', dirty: true },
+        [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen, dirty: true },
+      },
+      {
+        kind: OnboardingRequirementKind.collectKycData,
+        missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
+        populatedAttributes: [],
+        optionalAttributes: [],
+        isMet: false,
+      },
+    );
+    expect(data).toEqual({
+      'id.dob': '2001-12-25',
+      'id.us_legal_status': 'citizen',
+      'id.visa_expiration_date': '2001-12-25',
+    });
+  });
+
   it('matches cdos if there are any dangling dis, address', () => {
     const { data, bootstrapDis } = getRequestData(
       'en-US',

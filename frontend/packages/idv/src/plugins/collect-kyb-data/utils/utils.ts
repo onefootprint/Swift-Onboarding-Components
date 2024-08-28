@@ -1,3 +1,4 @@
+import { getIsoDate, isValidIsoDate } from '@onefootprint/core';
 import {
   type BeneficialOwner,
   BeneficialOwnerDataAttribute,
@@ -9,7 +10,6 @@ import {
 } from '@onefootprint/types';
 import isEqual from 'lodash/isEqual';
 import { isObject, isStringValid } from '../../../utils';
-import { fromUSDateToISO8601Format, isISO8601Format, strInputToUSDate } from '../../../utils/string';
 import { BENEFICIAL_OWNER_ATTRIBUTE, BeneficialOwnerIdFields, BusinessAddressFields } from './constants';
 
 export const omitNullAndUndefined = <T extends object>(data: T): T =>
@@ -98,10 +98,7 @@ export const formatPayload = (locale: SupportedLocale, data: BusinessDIData): Bu
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => {
       if (key === BusinessDI.formationDate) {
-        return [
-          key,
-          isISO8601Format(value) ? value : fromUSDateToISO8601Format(strInputToUSDate(locale, value)) || undefined,
-        ];
+        return [key, isValidIsoDate(value) ? value : getIsoDate(value, locale) || undefined];
       }
       return [key, value];
     }),

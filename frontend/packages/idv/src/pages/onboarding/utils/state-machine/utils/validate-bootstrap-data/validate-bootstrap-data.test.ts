@@ -1,7 +1,7 @@
 import { IdDI, OnboardingConfigStatus, type PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DIMetadata } from '../../../../../../types';
-import validateBootstrapData, { isBusinessOwnersValid } from './validate-bootstrap-data';
+import validateBootstrapData, { isBusinessOwnersValid, isDobValid } from './validate-bootstrap-data';
 
 const config: PublicOnboardingConfig = {
   isLive: true,
@@ -65,7 +65,9 @@ describe('validateBootstrapData', () => {
     ).toEqual({
       [IdDI.addressLine2]: createDIMetadata('Apt 2'),
       [IdDI.city]: createDIMetadata('San Francisco'),
+      [IdDI.dob]: createDIMetadata('02/03/1993'),
       [IdDI.state]: createDIMetadata('CA'),
+      [IdDI.visaExpirationDate]: createDIMetadata('01/01/2020'),
       [IdDI.zip]: createDIMetadata('12321'),
     });
 
@@ -130,6 +132,7 @@ describe('validateBootstrapData', () => {
     ).toEqual({
       [IdDI.state]: createDIMetadata('internationalState'),
       [IdDI.dob]: createDIMetadata('25/12/1997'),
+      [IdDI.visaExpirationDate]: createDIMetadata('01/01/2020'),
     });
 
     expect(
@@ -242,5 +245,56 @@ describe('isBusinessOwnersValid', () => {
         },
       ]),
     ).toBe(true);
+  });
+});
+
+describe('isDobValid', () => {
+  const today = new Date();
+  const twentyFourHoursFromNow = new Date(Date.now() + 1000 * 60 * 60 * 24);
+  const twentyFourHoursFromNowIso = twentyFourHoursFromNow.toISOString().split('T')[0];
+
+  const seventeenYearsAgo = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
+  const seventeenYearsAgoIso = seventeenYearsAgo.toISOString().split('T')[0];
+
+  describe('en-US', () => {
+    it('should return true for a valid date when YYYY-MM-DD format is provided', () => {
+      expect(isDobValid('en-US', '2000-04-12')).toBe(true);
+    });
+    it('should return true for a valid date when en-US + MM/DD/YYYY format is provided', () => {
+      expect(isDobValid('en-US', '12/25/2000')).toBe(true);
+    });
+
+    it('should return false for a date in the future', () => {
+      expect(isDobValid('en-US', twentyFourHoursFromNowIso)).toBe(false);
+    });
+
+    it('should return false for a date before 1900', () => {
+      expect(isDobValid('en-US', '1899-12-31')).toBe(false);
+    });
+
+    it('should return false for a date that is too young < 18 years', () => {
+      expect(isDobValid('en-US', seventeenYearsAgoIso)).toBe(false);
+    });
+  });
+
+  describe('es-MX', () => {
+    it('should return true for a valid date when YYYY-MM-DD format is provided', () => {
+      expect(isDobValid('es-MX', '2000-04-12')).toBe(true);
+    });
+    it('should return true for a valid date when en-US + MM/DD/YYYY format is provided', () => {
+      expect(isDobValid('es-MX', '25/12/2000')).toBe(true);
+    });
+
+    it('should return false for a date in the future', () => {
+      expect(isDobValid('es-MX', twentyFourHoursFromNowIso)).toBe(false);
+    });
+
+    it('should return false for a date before 1900', () => {
+      expect(isDobValid('es-MX', '1899-12-31')).toBe(false);
+    });
+
+    it('should return false for a date that is too young < 18 years', () => {
+      expect(isDobValid('es-MX', seventeenYearsAgoIso)).toBe(false);
+    });
   });
 });
