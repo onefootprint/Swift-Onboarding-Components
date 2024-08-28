@@ -35,7 +35,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
                 first_name: 'Bob',
                 last_name: 'Boberto',
                 ownership_stake: 27,
-                phone_number: '+16173839084',
+                phone_number: '+15555550100',
                 email: 'bob@onefootprint.com',
               },
             ],
@@ -105,7 +105,7 @@ test('KYB obtok_ happy path #ci #debug', async ({ page, isMobile }) => {
   await expect(frame.getByText('Bob').first()).toBeAttached();
   await expect(frame.getByText('Boberto').first()).toBeAttached();
   await expect(frame.getByText('bob@onefootprint.com').first()).toBeAttached();
-  await expect(frame.getByText('+16173839084').first()).toBeAttached();
+  await expect(frame.getByText('+15555550100').first()).toBeAttached();
   await expect(frame.getByText('27%').first()).toBeAttached();
 
   await clickOnContinue(frame);
