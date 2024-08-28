@@ -48,7 +48,6 @@ pub async fn get(
                 &config.id,
                 1,
                 None,
-                false,
             )?;
 
             let backup_lag_seconds = if let Some(next_dl) = next_batch.first() {

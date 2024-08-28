@@ -24,7 +24,6 @@ pub fn load_vault_dr_data_lifetime_batch(
     config_id: &VaultDrConfigId,
     batch_size: u32,
     fp_id_filter: Option<Vec<FpId>>,
-    enable_backfill_2024_08_27: bool,
 ) -> DbResult<Vec<DataLifetime>> {
     // Query performance optimization:
     //
@@ -35,22 +34,11 @@ pub fn load_vault_dr_data_lifetime_batch(
     // With the Read Committed isolation level, this seqno may be a bit stale (e.g. if more records
     // are processed after finding this seqno and before the following batch query). However, the
     // DL batch query will still return the correct records. The seqno search bound will just be low.
-
-    // Temporary fix for https://github.com/onefootprint/monorepo/pull/11481
-    // Backfill mode disabled for /org/vault_dr/status to keep that query responsive.
-    // That endpoint is why we have this max seqno optimization:
-    // https://github.com/onefootprint/monorepo/commit/a7e866a068c6107a65ceda82dbfd140bfe88f3f0)
-    //
-    // The batch query for the worker will be temporarily slower during the backfill.
-    let max_processed_seqno = if enable_backfill_2024_08_27 {
-        DataLifetimeSeqno::from(0)
-    } else {
-        vault_dr_blob::table
-            .filter(vault_dr_blob::config_id.eq(config_id))
-            .select(diesel::dsl::max(vault_dr_blob::dl_created_seqno))
-            .first::<Option<DataLifetimeSeqno>>(conn)?
-            .unwrap_or(DataLifetimeSeqno::from(0))
-    };
+    let max_processed_seqno = vault_dr_blob::table
+        .filter(vault_dr_blob::config_id.eq(config_id))
+        .select(diesel::dsl::max(vault_dr_blob::dl_created_seqno))
+        .first::<Option<DataLifetimeSeqno>>(conn)?
+        .unwrap_or(DataLifetimeSeqno::from(0));
 
     let mut query = data_lifetime::table
         .inner_join(scoped_vault::table)
@@ -215,7 +203,6 @@ mod tests {
                 &vdr_config.id,
                 batch_size as u32,
                 Some(vec![sv1.fp_id.clone()]),
-                false,
             )
             .unwrap();
             assert_eq!(batch.len(), expected_batch_size, "Batch {} size", i);
