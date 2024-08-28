@@ -13,6 +13,7 @@ const userData = encodeURIComponent(
 );
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
+  test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());

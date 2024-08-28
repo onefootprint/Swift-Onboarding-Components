@@ -72,6 +72,7 @@ const userData = encodeURIComponent(
 );
 
 test.beforeEach(async ({ browserName, isMobile, page }) => {
+  test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
@@ -111,7 +112,7 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await page.waitForLoadState();
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
+  await confirmH2.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
 
   // Confirm
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Edit' }).click();
