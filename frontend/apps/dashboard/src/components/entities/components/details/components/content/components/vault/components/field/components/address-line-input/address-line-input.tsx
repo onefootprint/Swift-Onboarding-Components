@@ -1,7 +1,7 @@
+import { isAddressLine } from '@onefootprint/core';
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,28 +20,8 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const error = get(errors, fieldName);
-  const options =
-    fieldName === IdDI.addressLine1
-      ? {
-          required: true,
-          pattern: /^(?!p\.?o\.?\s*?(?:box)?\s*?[0-9]+?).*$/i,
-        }
-      : {};
 
-  const getHint = () => {
-    if (!error) {
-      return undefined;
-    }
-    const message = error?.message;
-    if (message && typeof message === 'string') {
-      return message;
-    }
-    if (error?.type) {
-      return t(`${error?.type}` as ParseKeys<'common'>);
-    }
-    return undefined;
-  };
+  const error = get(errors, fieldName);
 
   return (
     <ValueContainer>
@@ -51,9 +31,21 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
         placeholder=""
         defaultValue={fieldValue as string}
         hasError={!!error}
-        {...register(fieldName, options)}
+        {...register(fieldName, {
+          validate: (value: string) => {
+            if (fieldName === IdDI.addressLine1) {
+              if (!value) {
+                return t('required');
+              }
+              if (!isAddressLine(value)) {
+                return t('pattern');
+              }
+            }
+            return true;
+          },
+        })}
       />
-      <Form.Errors>{getHint() || ''}</Form.Errors>
+      <Form.Errors>{error?.message}</Form.Errors>
     </ValueContainer>
   );
 };
