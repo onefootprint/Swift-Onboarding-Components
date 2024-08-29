@@ -43,8 +43,10 @@ pub async fn post(
     let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, Some(doc_id.clone())).await?;
 
 
-    let deadline =
-        ResponseDeadline::from_req_or_timeout(&http_request, Duration::from_secs(50)).into_instant();
+    let deadline = ResponseDeadline::from_req_or_timeout(&http_request, Duration::from_secs(50))
+        .into_instant()
+        - Duration::from_secs(2); // Small buffer to gracefully handle the incode timeout before
+                                  // the timeout middleware cancels the whole request.
     let response = handle_document_process(
         &state,
         sv_id,
