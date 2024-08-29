@@ -26,7 +26,6 @@ use newtypes::CompositeFingerprint;
 use newtypes::CompositeFingerprintKind;
 use newtypes::Error;
 use newtypes::Fingerprint;
-use newtypes::FingerprintKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultId;
 use std::collections::HashMap;
@@ -159,22 +158,6 @@ async fn backfill_composite_fingerprints(state: &State, sv_id: ScopedVaultId) ->
             // Don't make duplicate composite fingerprints
             let fps = composite_fingerprints.into_iter().filter(|(sh_data, _)| !existing_fps.contains(sh_data)).map(|(_, fp)| fp).collect_vec();
             DbFingerprint::bulk_create(conn, fps)?;
-
-            // Make sure the user has composite fingerprints
-            let existing_fps = fingerprint::table
-                .filter(fingerprint::vault_id.eq(&sv.vault_id))
-                .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
-                .filter(fingerprint::is_live.eq(sv.is_live))
-                .filter(fingerprint::deactivated_at.is_null())
-                .filter(fingerprint::sh_data.is_not_null())
-                .select(fingerprint::kind)
-                .get_results::<FingerprintKind>(conn.conn())
-                .map_err(DbError::from)?;
-
-            if !existing_fps.iter().any(|fp| matches!(fp, FingerprintKind::Composite(_))) {
-                return Err(AssertionError(&format!("User has no composite fingerprints {}", sv.id)).into());
-            }
-
             Ok(())
         })
         .await?;
