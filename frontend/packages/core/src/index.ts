@@ -21,6 +21,7 @@ export { default as isName } from './validations/is-name';
 export { default as isPhoneNumber } from './validations/is-phone-number';
 export { default as isSsn4 } from './validations/is-ssn4';
 export { default as isSsn9, isSSN9Flexible } from './validations/is-ssn9';
+export { default as isTin } from './validations/is-tin';
 export { default as isEmailDomain } from './validations/is-email-domain';
 export { default as isIpAddress } from './validations/is-ip-address';
 export { default as isPhoneCountryCode } from './validations/is-phone-country-code';

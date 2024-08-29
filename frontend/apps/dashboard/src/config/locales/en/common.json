@@ -1233,6 +1233,11 @@
             "should-be-empty": "Please leave blank unless the legal status is Green Card or Visa",
             "us-citizenship": "If user is a US citizen, select the Citizen legal status option",
             "invalid": "Invalid country code: {{ countries }}"
+          },
+          "tin": {
+            "hint": "Cannot contain special characters",
+            "required": "Cannot be empty",
+            "invalid": "Cannot be invalid or contain special characters"
           }
         }
       },

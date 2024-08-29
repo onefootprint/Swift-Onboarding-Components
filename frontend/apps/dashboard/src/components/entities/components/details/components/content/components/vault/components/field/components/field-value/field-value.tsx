@@ -17,6 +17,7 @@ import LegalStatusSelect from '../legal-status-select';
 import NameInput from '../name-input';
 import SsnInput from '../ssn-input';
 import StateSelect from '../state-select';
+import TinInput from '../tin-input';
 import VisaExpirationInput from '../visa-expiration-input';
 import VisaKindSelect from '../visa-kind-select';
 import ZipInput from '../zip-input';
@@ -91,6 +92,9 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     }
     if (name === IdDI.citizenships) {
       return <CitizenshipsInput citizenships={value as string[] | undefined} />;
+    }
+    if (name === BusinessDI.tin) {
+      return <TinInput value={value} />;
     }
   }
 
