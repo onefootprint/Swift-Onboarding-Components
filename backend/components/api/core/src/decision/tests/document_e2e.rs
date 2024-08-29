@@ -51,7 +51,9 @@ use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::TenantId;
 use newtypes::WorkflowFixtureResult;
+use std::time::Duration;
 use strum::IntoEnumIterator;
+use tokio::time::Instant;
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
 #[test_state_case(UserKind::Live, Selfie::None)]
@@ -305,6 +307,7 @@ async fn upload_and_process_inner(
         document_id,
         IsRerun(false),
         IncodeConfigurationIdOverride(None),
+        Instant::now() + Duration::from_secs(60),
     )
     .await
     .unwrap()

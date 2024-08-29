@@ -2,6 +2,7 @@ use crate::auth::user::UserAuthScope;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::State;
+use actix_web::HttpRequest;
 use api_core::auth::user::CheckUserWfAuthContext;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
@@ -16,6 +17,7 @@ use api_core::errors::workflow::WorkflowError;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::timeouts::ResponseDeadline;
 use api_core::FpResult;
 use api_wire_types::ProcessRequest;
 use chrono::Duration;
@@ -36,6 +38,7 @@ use paperclip::actix::web;
 use paperclip::actix::{
     self,
 };
+use std::time::Duration as StdDuration;
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),
@@ -46,6 +49,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
+    http_request: HttpRequest,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
@@ -103,9 +107,12 @@ pub async fn post(
 
     // Run Incode state machine if it's in a non terminal state due to polling timing out during /upload
     // if we timeout polling incode here still, then we enqueue a task which tries again async
-    match decision::state::run_incode_machine_and_workflow(&state, ww).await {
+    let deadline =
+        ResponseDeadline::from_req_or_timeout(&http_request, StdDuration::from_secs(50)).into_instant();
+    match decision::state::run_incode_machine_and_workflow(&state, ww, deadline).await {
         Ok(run) => match run {
-            RunIncodeMachineAndWorkflowResult::IncodeStuck => {
+            RunIncodeMachineAndWorkflowResult::IncodeStuck
+            | RunIncodeMachineAndWorkflowResult::WorkflowTimedOut => {
                 enqueue_run_incode_stuck_workflow_task(&state.db_pool, &wf.id).await?;
             }
             RunIncodeMachineAndWorkflowResult::WorkflowRan => {}

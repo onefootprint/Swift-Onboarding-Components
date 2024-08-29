@@ -12,6 +12,8 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::workflow::Workflow;
 use db::DbResult;
 use newtypes::RunIncodeStuckWorkflowArgs;
+use std::time::Duration;
+use tokio::time::Instant;
 
 #[derive(derive_more::Constructor)]
 pub(crate) struct RunIncodeStuckWorkflowTask {
@@ -32,10 +34,14 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
             })
             .await?;
         let ww = WorkflowWrapper::init(&state, wf, seqno).await?;
-        let run = decision::state::run_incode_machine_and_workflow(&state, ww).await?;
+        let deadline = Instant::now() + Duration::from_secs(60);
+        let run = decision::state::run_incode_machine_and_workflow(&state, ww, deadline).await?;
         match run {
             RunIncodeMachineAndWorkflowResult::IncodeStuck => {
                 return AssertionError("IncodeStuck").into();
+            }
+            RunIncodeMachineAndWorkflowResult::WorkflowTimedOut => {
+                return AssertionError("WorkflowTimedOut").into();
             }
             RunIncodeMachineAndWorkflowResult::WorkflowRan => Ok(()),
         }

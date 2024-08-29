@@ -30,7 +30,7 @@ use newtypes::IncodeVerificationSessionState;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
 use std::sync::Arc;
-use std::time::Duration;
+use tokio::time::Instant;
 
 #[tracing::instrument(skip_all)]
 #[allow(clippy::too_many_arguments)]
@@ -50,6 +50,7 @@ pub async fn handle_incode_request(
     is_re_run: bool,
     missing_sides: Vec<DocumentSide>, //kinda dumb
     configuration_id_override: IncodeConfigurationIdOverride,
+    deadline: Instant,
 ) -> FpResult<DocumentResponse> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let vault_country = uvw.get_decrypted_country(state).await?;
@@ -91,8 +92,8 @@ pub async fn handle_incode_request(
         is_re_run,
     );
 
-    let timeout = Duration::from_secs(50);
-    let machine_response_fut_with_timeout = actix_web::rt::time::timeout(timeout, machine_response_fut);
+    let machine_response_fut_with_timeout = tokio::time::timeout_at(deadline, machine_response_fut);
+
 
     let machine_response = match machine_response_fut_with_timeout.await {
         Ok(result_without_timeout) => result_without_timeout?,

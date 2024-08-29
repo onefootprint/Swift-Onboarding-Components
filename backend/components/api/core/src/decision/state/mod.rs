@@ -9,8 +9,8 @@ use db::DbResult;
 use enum_dispatch::enum_dispatch;
 use newtypes::DataLifetimeSeqno;
 use newtypes::WorkflowId;
-use std::time::Duration;
 use thiserror::Error;
+use tokio::time::Instant;
 
 pub mod actions;
 pub use actions::*;
@@ -157,6 +157,7 @@ impl WorkflowWrapper {
 
 pub enum RunIncodeMachineAndWorkflowResult {
     IncodeStuck,
+    WorkflowTimedOut,
     WorkflowRan,
 }
 
@@ -164,6 +165,7 @@ pub enum RunIncodeMachineAndWorkflowResult {
 pub async fn run_incode_machine_and_workflow(
     state: &State,
     ww: WorkflowWrapper,
+    deadline: Instant,
 ) -> FpResult<RunIncodeMachineAndWorkflowResult> {
     let wfid = ww.workflow_id.clone();
     let (ivs, seqno) = state
@@ -180,12 +182,20 @@ pub async fn run_incode_machine_and_workflow(
 
     if let Some(ivs) = ivs {
         if !ivs.state.is_terminal() {
-            let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
+            let machine_fut = IncodeStateMachine::init_from_existing(state, ivs);
+            let machine = match tokio::time::timeout_at(deadline, machine_fut).await {
+                Ok(result) => result?,
+                Err(_) => {
+                    tracing::error!("Timeout initializing Incode machine via future cancellation");
+                    return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
+                }
+            };
+
+
             // TODO: should or could this call handle_incode_request instead..?  yeah def cause then it can do
             // the new logic of setting latest_hard_error
-            let timeout = Duration::from_secs(50);
             let run_fut = machine.run(&state.db_pool, &state.vendor_clients.incode);
-            let fut_with_timeout = actix_web::rt::time::timeout(timeout, run_fut);
+            let fut_with_timeout = tokio::time::timeout_at(deadline, run_fut);
 
             match fut_with_timeout.await {
                 Ok(Ok((machine, _))) => {
@@ -208,7 +218,17 @@ pub async fn run_incode_machine_and_workflow(
 
     let next_action = ww.state.default_action(seqno);
     if let Some(next_action) = next_action {
-        ww.run(state, next_action).await?;
+        let ww_run_fut = ww.run(state, next_action);
+        let fut_with_timeout = tokio::time::timeout_at(deadline, ww_run_fut);
+        match fut_with_timeout.await {
+            Ok(result) => {
+                result?;
+            }
+            Err(_) => {
+                tracing::error!("Timeout running workflow via future cancellation");
+                return Ok(RunIncodeMachineAndWorkflowResult::WorkflowTimedOut);
+            }
+        }
     }
 
     Ok(RunIncodeMachineAndWorkflowResult::WorkflowRan)

@@ -23,6 +23,7 @@ use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::EntityInfo;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::timeouts::ResponseDeadline;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -62,6 +63,7 @@ use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::TenantId;
 use newtypes::WorkflowSource;
+use std::time::Duration;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Request {
@@ -83,6 +85,7 @@ pub async fn rerun_machine(
     state: web::Data<State>,
     request: Json<Request>,
     _: ProtectedAuth,
+    http_request: HttpRequest,
 ) -> ApiResponse<DocumentResponse> {
     let Request {
         id,
@@ -148,6 +151,8 @@ pub async fn rerun_machine(
         })
         .await?;
 
+    let deadline =
+        ResponseDeadline::from_req_or_timeout(&http_request, Duration::from_secs(50)).into_instant();
     let response: DocumentResponse = api_core::utils::incode_helper::handle_incode_request(
         &state,
         id_doc.id,
@@ -164,6 +169,7 @@ pub async fn rerun_machine(
         true,
         vec![],
         IncodeConfigurationIdOverride(None),
+        deadline,
     )
     .await?;
     Ok(response)
@@ -369,6 +375,7 @@ pub async fn adhoc_upload_and_process(
     .await?;
 
     // TODO: thread through a incode config ID override
+    let deadline = ResponseDeadline::from_req_or_timeout(&request, Duration::from_secs(50)).into_instant();
     let response = decision::document::route_handler::handle_document_process(
         &state,
         sv_id.clone(),
@@ -380,6 +387,7 @@ pub async fn adhoc_upload_and_process(
         IncodeConfigurationIdOverride(Some(IncodeConfigurationId::from(
             "665f263f43396f459aea7cc5".to_string(),
         ))),
+        deadline,
     )
     .await?;
 

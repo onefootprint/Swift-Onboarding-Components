@@ -45,6 +45,7 @@ use newtypes::IncodeConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
+use tokio::time::Instant;
 
 /// Route handler for "/hosted/documents"
 pub async fn handle_document_create(
@@ -282,6 +283,7 @@ pub struct IncodeConfigurationIdOverride(pub Option<IncodeConfigurationId>);
 
 /// Route handler for /hosted/documents/{id}/process
 /// TODO: appclip special logic
+#[allow(clippy::too_many_arguments)]
 pub async fn handle_document_process(
     state: &State,
     sv_id: ScopedVaultId,
@@ -290,6 +292,7 @@ pub async fn handle_document_process(
     doc_id: DocumentId,
     is_re_run: IsRerun,
     configuration_id_override: IncodeConfigurationIdOverride,
+    deadline: Instant,
 ) -> FpResult<DocumentResponse> {
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
@@ -351,6 +354,7 @@ pub async fn handle_document_process(
             is_re_run.0,
             missing_sides.0,
             configuration_id_override,
+            deadline,
         )
         .await?
     } else {
