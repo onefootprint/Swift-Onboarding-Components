@@ -1,7 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IdDI, type VaultValue } from '@onefootprint/types';
 import { Form } from '@onefootprint/ui';
-import { Hint } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -23,21 +22,6 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
   const formField = IdDI.nationality;
   const error = get(errors, formField);
   const formLegalStatus = watch(IdDI.usLegalStatus);
-
-  const getHint = () => {
-    if (!error) {
-      return '';
-    }
-    const message = error?.message;
-    if (message && typeof message === 'string') {
-      return message;
-    }
-    if (error?.type === 'validate') {
-      return t('errors.nationality');
-    }
-    return '';
-  };
-
   return (
     <ValueContainer>
       <Form.Select
@@ -45,21 +29,23 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
           validate: (input: string) => {
-            if (formLegalStatus !== EMPTY_SELECT_VALUE) {
-              return input !== EMPTY_SELECT_VALUE;
+            if (formLegalStatus !== EMPTY_SELECT_VALUE && input === EMPTY_SELECT_VALUE) {
+              return t('errors.nationality');
             }
             return true;
           },
         })}
       >
-        <option value={EMPTY_SELECT_VALUE}>{t('legal-status.nationality-mapping.none')}</option>
+        <option disabled value={EMPTY_SELECT_VALUE}>
+          {t('legal-status.nationality-mapping.none')}
+        </option>
         {COUNTRIES.map(country => (
           <option key={country.value} value={country.value}>
             {country.label}
           </option>
         ))}
       </Form.Select>
-      {!!error && <Hint hasError={!!error}>{getHint()}</Hint>}
+      <Form.Errors>{error?.message}</Form.Errors>
     </ValueContainer>
   );
 };
