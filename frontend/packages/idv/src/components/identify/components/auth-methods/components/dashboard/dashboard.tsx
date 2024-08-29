@@ -1,4 +1,5 @@
 import type { AuthMethodKind, UserAuthMethodsResponse } from '@onefootprint/types';
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import type { NextToast } from '@onefootprint/ui';
 import { useToast } from '@onefootprint/ui';
@@ -11,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { getLogger } from '../../../../../../utils/logger';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
 import { useDecryptUser, useUserAuthMethods } from '../../../../queries';
-import { UpdateAuthMethodActionKind } from '../../../../types';
 import { useAuthMethodsMachine } from '../../state';
 import Component from './component';
 
@@ -28,10 +28,8 @@ const isPassKeyFeatureReady = false;
 const EmailAndPhone: IdDI[] = [IdDI.email, IdDI.phoneNumber];
 const EmptyMethodsMap: MethodsMap = Object.create(null);
 
-const actionKind = (isVerified: boolean): UpdateAuthMethodActionKind => {
-  if (isVerified) return UpdateAuthMethodActionKind.replace;
-  return UpdateAuthMethodActionKind.addPrimary;
-};
+const actionKind = (isVerified: boolean): UserChallengeActionKind =>
+  isVerified ? UserChallengeActionKind.replace : UserChallengeActionKind.addPrimary;
 
 const getAuthAddFlowTexts = (t: T): Texts => ({
   add: t('add'),
@@ -124,7 +122,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               onClick: () =>
                 send({
                   type: 'updateEmail',
-                  payload: UpdateAuthMethodActionKind.addPrimary,
+                  payload: UserChallengeActionKind.addPrimary,
                 }),
             }
       }
@@ -149,7 +147,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               onClick: () =>
                 send({
                   type: 'updatePhone',
-                  payload: UpdateAuthMethodActionKind.addPrimary,
+                  payload: UserChallengeActionKind.addPrimary,
                 }),
             }
       }

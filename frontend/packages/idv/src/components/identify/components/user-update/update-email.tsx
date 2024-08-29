@@ -1,15 +1,15 @@
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
-import { UpdateAuthMethodActionKind } from '../../types';
 import EmailPageStructure from '../email-page-structure';
 import { ScreenState, isCollectScreen } from './helpers';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {
-  actionKind: UpdateAuthMethodActionKind;
+  actionKind: UserChallengeActionKind;
   authToken: string;
   Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: IdentifyVariant;
@@ -22,10 +22,8 @@ const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, initialEm
   const [screen, setScreen] = useState<ScreenState>(initialEmail ? ScreenState.verify : ScreenState.collect);
   const [email, setEmail] = useState<string>(initialEmail || '');
 
-  const getHeaderTitle = (kind: UpdateAuthMethodActionKind): string => {
-    return kind === UpdateAuthMethodActionKind.replace
-      ? t('email-step.replace-title')
-      : t('email-step.add-primary-title');
+  const getHeaderTitle = (kind: UserChallengeActionKind): string => {
+    return kind === UserChallengeActionKind.replace ? t('email-step.replace-title') : t('email-step.add-primary-title');
   };
 
   return isCollectScreen(screen) || !email ? (

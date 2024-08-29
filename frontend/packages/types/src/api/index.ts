@@ -8,6 +8,7 @@ export type {
   BiometricRegisterRequest,
   BiometricRegisterResponse,
 } from './biometric-register';
+export { UserChallengeActionKind } from './biometric-register';
 export type { BusinessRequest, BusinessResponse } from './business';
 export type {
   BusinessDataRequest,

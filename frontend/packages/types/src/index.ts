@@ -239,6 +239,7 @@ export {
   TokenKind,
   TriggerKind,
   UserTokenScope,
+  UserChallengeActionKind,
 } from './api';
 export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 export type {

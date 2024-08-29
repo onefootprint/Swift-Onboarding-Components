@@ -1037,7 +1037,8 @@
     },
     "pages": {
       "register": {
-        "title": "Agrega tu passkey",
+        "title-add": "Agregar passkey",
+        "title-replace": "Reemplazar passkey",
         "subtitle": "Passkey es un reemplazo de las contraseñas convencionales. Valida tu identidad utilizando tu dispositivo, mediante datos biométricos, contraseña o código PIN. Se almacena de forma segura en el gestor de contraseñas de tu dispositivo por lo que es completamente privado. El proceso de configuración puede variar según tu navegador.",
         "cta": "Iniciar verificación",
         "learn-more": {

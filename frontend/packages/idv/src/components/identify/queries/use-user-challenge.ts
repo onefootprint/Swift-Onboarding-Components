@@ -1,13 +1,13 @@
 import request from '@onefootprint/request';
 import type { AuthMethodKind } from '@onefootprint/types';
+import type { UserChallengeActionKind } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { UpdateAuthMethodActionKind } from '../types';
 import calculateRetryTime from './get-retry-time';
 
 export type UserChallengeBody = {
-  actionKind: `${UpdateAuthMethodActionKind}`; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
+  actionKind: `${UserChallengeActionKind}`; // Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.
   authToken: string;
   email?: string; // If the challenge kind is email, the email address to send the challenge to
   kind: AuthMethodKind; // The kind of challenge to initiate

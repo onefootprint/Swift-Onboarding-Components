@@ -1,4 +1,10 @@
+export enum UserChallengeActionKind {
+  replace = 'replace',
+  addPrimary = 'add_primary',
+}
+
 export type BiometricRegisterRequest = {
+  actionKind: UserChallengeActionKind;
   authToken: string;
 };
 

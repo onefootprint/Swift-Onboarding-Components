@@ -1,3 +1,4 @@
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +7,6 @@ import StepHeader from '../../../step-header';
 import type { IdentifyMachineContext } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { DoneArgs, HeaderProps } from '../../types';
-import { UpdateAuthMethodActionKind } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import DifferentAccountOption from '../different-account-option';
@@ -107,7 +107,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
       <UpdatePhone
         Header={Header}
         authToken={challenge.authToken}
-        actionKind={UpdateAuthMethodActionKind.addPrimary}
+        actionKind={UserChallengeActionKind.addPrimary}
         identifyVariant={variant}
         onSuccess={payload => send({ type: 'phoneAdded', payload })}
       />
@@ -116,7 +116,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
   if (matches('addEmail') && challenge.authToken) {
     return (
       <UpdateEmail
-        actionKind={UpdateAuthMethodActionKind.addPrimary}
+        actionKind={UserChallengeActionKind.addPrimary}
         authToken={challenge.authToken}
         Header={Header}
         identifyVariant={variant}

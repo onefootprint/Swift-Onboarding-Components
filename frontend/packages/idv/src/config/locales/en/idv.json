@@ -1036,7 +1036,8 @@
     },
     "pages": {
       "register": {
-        "title": "Add a passkey",
+        "title-add": "Add a passkey",
+        "title-replace": "Replace your passkey",
         "subtitle": "We use passkeys to validate your identity without the need for a password",
         "cta": "Launch registration",
         "learn-more": {

@@ -1,3 +1,4 @@
+import type { UserChallengeActionKind } from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import { useLogStateMachine } from '../../../../hooks';
@@ -7,10 +8,11 @@ import Register from '../register';
 import Unavailable from '../unavailable';
 
 type RouterProps = {
+  actionKind: UserChallengeActionKind;
   onDone: () => void;
 };
 
-const Router = ({ onDone }: RouterProps) => {
+const Router = ({ actionKind, onDone }: RouterProps) => {
   const [state] = useLivenessMachine();
   const isDone = state.matches('completed');
   useLogStateMachine('liveness', state);
@@ -27,7 +29,7 @@ const Router = ({ onDone }: RouterProps) => {
   }, [isDone, onDone]);
 
   if (state.matches('register')) {
-    return <Register />;
+    return <Register actionKind={actionKind} />;
   }
   if (state.matches('unavailable')) {
     return <Unavailable />;

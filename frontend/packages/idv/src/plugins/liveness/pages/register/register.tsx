@@ -1,5 +1,6 @@
 import { IcoPasskey40, IcoWarning40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
+import { UserChallengeActionKind } from '@onefootprint/types';
 import type { PasskeyAttemptContext } from '@onefootprint/types/src/api/skip-liveness';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { BottomSheet, Box, Button, LinkButton, Stack, Text } from '@onefootprint/ui';
@@ -21,7 +22,7 @@ const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'liveness-register',
 });
 
-const Register = () => {
+const Register = ({ actionKind }: { actionKind: UserChallengeActionKind }) => {
   const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.register' });
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [state, send] = useLivenessMachine();
@@ -47,7 +48,7 @@ const Register = () => {
     }
 
     biometricInitMutation.mutate(
-      { authToken },
+      { authToken, actionKind },
       {
         onSuccess({ deviceResponseJson }) {
           logTrack('Passkeys registration succeeded');
@@ -119,7 +120,7 @@ const Register = () => {
   } else if (!passkeyRegisterAttempts.length) {
     // First attempt - show normal copy
     icon = <IcoPasskey40 />;
-    headerTitle = t('title');
+    headerTitle = actionKind === UserChallengeActionKind.replace ? t('title-replace') : t('title-add');
     headerSubtitle = t('subtitle');
     primaryButtonText = t('cta');
   } else {

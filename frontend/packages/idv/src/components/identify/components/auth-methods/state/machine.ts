@@ -1,6 +1,6 @@
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { UpdateAuthMethodActionKind } from '../../../types';
 import { assignDecryptedData, assignUpdateMethod, assignUserDashboard, assignVerifyToken } from './assigners';
 import type { Typegen0 } from './machine.typegen';
 import type { AuthMethodsMachineContext, AuthMethodsMachineEvents } from './types';
@@ -25,7 +25,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
       initial: args.initialMachineState || 'identify',
       context: {
         authToken: args.authToken,
-        updateMethod: UpdateAuthMethodActionKind.addPrimary,
+        updateMethod: UserChallengeActionKind.addPrimary,
         userDashboard: {
           email: { status: 'empty' },
           phone: { status: 'empty' },

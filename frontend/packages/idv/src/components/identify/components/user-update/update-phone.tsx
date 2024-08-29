@@ -1,4 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,13 +7,12 @@ import { checkIsPhoneValid } from '../../../../utils';
 import { useL10nContext } from '../../../l10n-provider';
 import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
-import { UpdateAuthMethodActionKind } from '../../types';
 import PhonePageStructure from '../phone-page-structure';
 import { ScreenState, isCollectScreen } from './helpers';
 import UpdateVerifyPhone from './update-verify-phone';
 
 type UpdatePhoneProps = {
-  actionKind: UpdateAuthMethodActionKind;
+  actionKind: UserChallengeActionKind;
   authToken: string;
   Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: IdentifyVariant;
@@ -47,7 +47,7 @@ const UpdatePhone = ({ Header, authToken, actionKind, onSuccess, identifyVariant
         phoneValidator={handlePhoneValidation}
         texts={{
           headerTitle:
-            actionKind === UpdateAuthMethodActionKind.replace // Maybe add some information that the company requires primary phone?
+            actionKind === UserChallengeActionKind.replace // Maybe add some information that the company requires primary phone?
               ? t('phone-step.replace-title')
               : t('phone-step.add-primary-title'),
           headerSubtitle: t('phone-step.subtitle'),

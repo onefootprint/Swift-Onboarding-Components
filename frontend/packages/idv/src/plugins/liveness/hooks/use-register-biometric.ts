@@ -3,7 +3,6 @@ import { AuthMethodKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-import { UpdateAuthMethodActionKind } from '../../../components/identify';
 import { useUserChallenge, useUserChallengeVerify } from '../../../components/identify/queries';
 
 const registerPasskeyOnDevice = async (challenge: string) => {
@@ -45,13 +44,11 @@ const useBiometricInit = () => {
   const userChallengeMut = useUserChallenge();
   const userChallengeVerifyMut = useUserChallengeVerify();
 
-  const biometricInit = async (payload: BiometricRegisterRequest) => {
-    const { authToken } = payload;
-
+  const biometricInit = async ({ authToken, actionKind }: BiometricRegisterRequest) => {
     const { challengeToken, biometricChallengeJson } = await userChallengeMut.mutateAsync({
       authToken,
       kind: AuthMethodKind.passkey,
-      actionKind: UpdateAuthMethodActionKind.addPrimary,
+      actionKind,
     });
 
     if (!biometricChallengeJson) {

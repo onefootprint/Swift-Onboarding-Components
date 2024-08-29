@@ -1,4 +1,5 @@
 import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
+import { UserChallengeActionKind } from '@onefootprint/types';
 import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import { useEffect } from 'react';
 
@@ -118,7 +119,13 @@ const Router = ({ onDone }: RouterProps) => {
     );
   }
   if (state.matches('liveness')) {
-    return <Liveness idvContext={idvContext} onDone={handleRequirementCompleted} />;
+    return (
+      <Liveness
+        actionKind={UserChallengeActionKind.addPrimary}
+        idvContext={idvContext}
+        onDone={handleRequirementCompleted}
+      />
+    );
   }
   if (state.matches('idDoc') && idDocReqs.length) {
     return (

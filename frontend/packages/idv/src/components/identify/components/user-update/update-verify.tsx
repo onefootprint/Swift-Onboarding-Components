@@ -1,3 +1,4 @@
+import type { UserChallengeActionKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import noop from 'lodash/noop';
@@ -9,14 +10,14 @@ import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
 import type { UserChallengeBody, UserChallengeResponse } from '../../queries';
 import { useUserChallenge, useUserChallengeVerify } from '../../queries';
 import { IdentifyVariant } from '../../state/types';
-import type { HeaderProps, UpdateAuthMethodActionKind } from '../../types';
+import type { HeaderProps } from '../../types';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getErrorToastVariant from '../../utils/toast-error-variant';
 import PinForm from '../pin-form';
 
 type PartialPayload = 'kind' | 'email' | 'phoneNumber' | 'authToken';
 export type UpdateVerifyBaseProps = {
-  actionKind: `${UpdateAuthMethodActionKind}`;
+  actionKind: `${UserChallengeActionKind}`;
   Header: (props: HeaderProps) => JSX.Element;
   identifyVariant: `${IdentifyVariant}`;
   onBack: () => void;
