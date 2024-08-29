@@ -1,4 +1,4 @@
-import { Button, TextInput } from '@onefootprint/ui';
+import { Button, Form as FormComponent } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -38,16 +38,18 @@ const StepName = ({ defaultValues, meta, onBack, onSubmit }: StepNameProps) => {
         <Form id="playbook-name-form" onSubmit={handleSubmit(onSubmit)}>
           <Header title={t('title')} subtitle={t('subtitle')} />
           <NameContainer>
-            <TextInput
-              autoFocus
-              hasError={!!errors.name}
-              hint={errors.name?.message}
-              label={t('form.name.label')}
-              placeholder={defaultName}
-              {...register('name', {
-                required: t('form.errors.required'),
-              })}
-            />
+            <FormComponent.Field>
+              <FormComponent.Label>{t('form.name.label')}</FormComponent.Label>
+              <FormComponent.Input
+                autoFocus
+                hasError={!!errors.name}
+                placeholder={defaultName}
+                {...register('name', {
+                  required: t('form.errors.required'),
+                })}
+              />
+              <FormComponent.Errors>{errors.name?.message}</FormComponent.Errors>
+            </FormComponent.Field>
           </NameContainer>
           <ButtonContainer>
             <Button variant="secondary" onClick={onBack}>
