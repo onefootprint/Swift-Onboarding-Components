@@ -1,5 +1,4 @@
 import { useId, useMemo } from 'react';
-import Box from '../box';
 import Stack from '../stack';
 import FormFieldContext from './form-field-context';
 
@@ -15,12 +14,12 @@ const FormField = ({ children, variant = 'vertical' }: FormFieldProps) => {
   return (
     <FormFieldContext.Provider value={contextValues}>
       {variant === 'vertical' && (
-        <Box width="100%" textOverflow="ellipsis" whiteSpace="nowrap">
+        <Stack direction="column" gap={3} width="100%" textOverflow="ellipsis" whiteSpace="nowrap" id="stack">
           {children}
-        </Box>
+        </Stack>
       )}
       {variant === 'horizontal' && (
-        <Stack justifyContent="space-between" alignItems="center" width="100%">
+        <Stack justifyContent="space-between" align="center" width="100%">
           {children}
         </Stack>
       )}

@@ -62,7 +62,6 @@ const LabelContainer = styled.div`
     display: flex;
     justify-content: flex-start;
     gap: ${theme.spacing[2]};
-    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 
