@@ -1,12 +1,12 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useIntl } from '@onefootprint/hooks';
-import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
-import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
+import { Badge, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Actions from './components/actions';
 
@@ -28,20 +28,21 @@ const Row = ({ playbook }: RowProps) => {
     <>
       <td>
         {sandbox.isSandbox ? (
-          <IndicatorContainer>
+          <>
             {status === 'enabled' && canShowLink ? (
-              <LinkButton
+              <StyledLink
                 href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
-                iconComponent={IcoArrowTopRight24}
                 target="_blank"
                 onClick={event => event.stopPropagation()}
               >
                 {name}
-              </LinkButton>
+              </StyledLink>
             ) : (
-              name
+              <Text variant="body-3" truncate>
+                {name}
+              </Text>
             )}
-          </IndicatorContainer>
+          </>
         ) : (
           name
         )}
@@ -67,9 +68,16 @@ const Row = ({ playbook }: RowProps) => {
   );
 };
 
-const IndicatorContainer = styled.div`
-  position: relative;
-  width: fit-content;
+const StyledLink = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')};
+    color: ${theme.color.accent};
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `};
 `;
 
 export default Row;
