@@ -17,37 +17,12 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
   });
   const {
     register,
-    getValues,
     watch,
     formState: { errors },
   } = useFormContext();
   const formField = IdDI.citizenships;
   const error = get(errors, formField);
   const formLegalStatus = watch(IdDI.usLegalStatus);
-
-  const getHint = () => {
-    if (!error) {
-      return t('hint');
-    }
-    const message = error?.message;
-    if (message && typeof message === 'string') {
-      return message;
-    }
-    const validationError = validateCitizenships(getValues(formField), formLegalStatus);
-    if (validationError?.errorType === CitizenshipsValidationError.REQUIRED) {
-      return t('required');
-    }
-    if (validationError?.errorType === CitizenshipsValidationError.SHOULD_BE_EMPTY) {
-      return t('should-be-empty');
-    }
-    if (validationError?.errorType === CitizenshipsValidationError.US_CITIZENSHIP) {
-      return t('us-citizenship');
-    }
-    if (validationError?.errorType === CitizenshipsValidationError.INVALID) {
-      return t('invalid', { countries: validationError.data });
-    }
-    return undefined;
-  };
 
   return (
     <ValueContainer>
@@ -58,24 +33,37 @@ const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
         hasError={!!error}
         defaultValue={citizenships?.join(', ')}
         {...register(formField, {
-          validate: (countriesStr: string) => validateCitizenships(countriesStr, formLegalStatus) === undefined,
+          validate: (countriesStr: string) => {
+            const validationError = validateCitizenships(countriesStr, formLegalStatus);
+            if (validationError?.errorType === CitizenshipsValidationError.REQUIRED) {
+              return t('required');
+            }
+            if (validationError?.errorType === CitizenshipsValidationError.SHOULD_BE_EMPTY) {
+              return t('should-be-empty');
+            }
+            if (validationError?.errorType === CitizenshipsValidationError.US_CITIZENSHIP) {
+              return t('us-citizenship');
+            }
+            if (validationError?.errorType === CitizenshipsValidationError.INVALID) {
+              return t('invalid', { countries: validationError.data });
+            }
+            return true;
+          },
         })}
       />
-      <Form.Errors>{getHint() || ''}</Form.Errors>
+      {error ? <Form.Errors>{error?.message}</Form.Errors> : <Form.Hint>{t('hint')}</Form.Hint>}
     </ValueContainer>
   );
 };
 
 const ValueContainer = styled.div`
-  > .fp-input-container {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    max-width: 278px;
+
     > .fp-hint {
       text-align: right;
     }
-  }
 `;
 
 export default CitizenshipsInput;
