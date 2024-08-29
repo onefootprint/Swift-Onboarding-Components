@@ -1,12 +1,12 @@
 import { AuthMethodKind } from '@onefootprint/types';
 import type React from 'react';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
-import type { DeviceInfo } from '../../../../../../hooks';
 import { useDeviceInfo } from '../../../../../../hooks';
+import Liveness from '../../../../../../plugins/liveness';
 import { getLogger } from '../../../../../../utils';
+import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';
 import type { HeaderProps } from '../../../../types';
@@ -34,10 +34,13 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
   const [state, send] = useAuthMethodsMachine();
   const { context, matches } = state;
   const { t } = useTranslation('identify');
+  const device = context.device;
   const isDone = matches('success');
   const Header = getHeader(context, getHeaderLeftNavButton(state, send));
-  const [device, setDevice] = useState<DeviceInfo>();
-  useDeviceInfo(setDevice, () => logWarn('Unable to collect device info'));
+  useDeviceInfo(
+    payload => send({ type: 'setDevice', payload }),
+    () => logWarn('Unable to collect device info'),
+  );
 
   if (isDone) return null;
   if (matches('identify') && device) {
@@ -95,12 +98,28 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
       />
     );
   }
-  if (matches('updatePasskey')) {
+  if (matches('updatePasskey') && device && context.verifyToken) {
     return (
-      <Header
-        title="Feature in Progress"
-        subtitle="This functionality is currently undergoing the design phase and development is in progress."
-      />
+      <>
+        <Header />
+        <Liveness
+          actionKind={context.updateMethod}
+          idvContext={{
+            authToken: context.verifyToken,
+            device: device,
+            isInIframe: checkIsIframe(),
+          }}
+          onDone={() => {
+            send({
+              type: 'updateUserDashboard',
+              payload: {
+                kind: AuthMethodKind.passkey,
+                entry: { label: t('passkey'), status: 'set' },
+              },
+            });
+          }}
+        />
+      </>
     );
   }
   if (matches('notFoundChallenge')) {

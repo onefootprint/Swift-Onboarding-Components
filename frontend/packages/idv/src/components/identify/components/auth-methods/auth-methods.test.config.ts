@@ -8,6 +8,7 @@ export const withUserAuthMethods = (data?: unknown) =>
     response: data || [
       { kind: 'phone', is_verified: true, can_update: true },
       { kind: 'email', is_verified: true, can_update: true },
+      { kind: 'passkey', is_verified: true, can_update: true },
     ],
   });
 

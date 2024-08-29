@@ -1,3 +1,4 @@
+import type { AuthMethodKind } from '@onefootprint/types';
 import type { Assigner } from 'xstate';
 
 import { isObject, isString } from '../../../../../utils';
@@ -9,6 +10,7 @@ type MEvent<T, U> = T extends { type: U; payload: infer P } ? { type: U; payload
 
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
+type SetDevice = MCtx<MEvent<Events, 'setDevice'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
 type UpdateMethodActionKind = MCtx<MEvent<Events, 'updateEmail' | 'updatePhone' | 'updatePasskey'>>;
 
@@ -23,6 +25,9 @@ const assignVerifyToken: SetVerifyToken = (ctx, { payload }) => {
 };
 
 const assignUserDashboard: UpdateUserDashboard = (ctx, { payload }) => {
+  const validAuthMethodsKinds: `${AuthMethodKind}`[] = ['email', 'phone', 'passkey'];
+  if (!validAuthMethodsKinds.includes(payload.kind)) return ctx;
+
   const dashboard = { ...ctx.userDashboard };
   const { entry, kind } = payload;
 
@@ -53,4 +58,9 @@ const assignUpdateMethod: UpdateMethodActionKind = (ctx, { payload }) => {
   return ctx;
 };
 
-export { assignDecryptedData, assignUpdateMethod, assignUserDashboard, assignVerifyToken };
+const assignDevice: SetDevice = (ctx, { payload }) => {
+  ctx.device = payload;
+  return ctx;
+};
+
+export { assignDecryptedData, assignDevice, assignUpdateMethod, assignUserDashboard, assignVerifyToken };

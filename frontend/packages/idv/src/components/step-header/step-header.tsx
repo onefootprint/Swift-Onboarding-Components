@@ -1,5 +1,4 @@
-import styled, { css } from 'styled-components';
-
+import { Box } from '@onefootprint/ui';
 import HeaderTitle from '../layout/components/header-title';
 import NavigationHeader from '../layout/components/navigation-header';
 import type { NavigationHeaderLeftButtonProps } from '../layout/components/navigation-header/types';
@@ -11,25 +10,23 @@ type HeaderProps = {
   orgName?: string;
   showLogo?: boolean;
   subtitle?: string | JSX.Element;
-  title: string | JSX.Element;
+  title?: string | JSX.Element;
 };
 
-const StepHeader = ({ leftButton, logoUrl, orgName, showLogo, subtitle, title }: HeaderProps) => (
-  <>
-    <NavigationHeader leftButton={leftButton} />
-    <ContentHeader>
-      {showLogo && orgName ? <Logo orgName={orgName} logoUrl={logoUrl} /> : null}
-      <HeaderTitle title={title} subtitle={subtitle} />
-    </ContentHeader>
-  </>
-);
+const StepHeader = ({ leftButton, logoUrl, orgName, showLogo, subtitle, title }: HeaderProps) => {
+  const shouldShowLogo = showLogo && orgName;
 
-const ContentHeader = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-  `}
-`;
+  return (
+    <>
+      <NavigationHeader leftButton={leftButton} />
+      {shouldShowLogo || title ? (
+        <Box display="flex" flexDirection="column" gap={7}>
+          {shouldShowLogo ? <Logo orgName={orgName} logoUrl={logoUrl} /> : null}
+          {title ? <HeaderTitle title={title} subtitle={subtitle} /> : null}
+        </Box>
+      ) : null}
+    </>
+  );
+};
 
 export default StepHeader;

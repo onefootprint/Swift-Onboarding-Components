@@ -1,5 +1,5 @@
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
-import type { AuthMethodsMachineHook } from '../../state';
+import type { AuthMethodsMachineHook, AuthMethodsMachineState } from '../../state';
 
 const getHeaderLeftNavButton = (
   state: AuthMethodsMachineHook[0],
@@ -8,18 +8,9 @@ const getHeaderLeftNavButton = (
   const onBack = () => send({ type: 'goToBack' });
   const CLOSE: NavigationHeaderLeftButtonProps = { variant: 'close' };
   const BACK: NavigationHeaderLeftButtonProps = { variant: 'back', onBack };
+  const states: AuthMethodsMachineState[] = ['updateEmail', 'updatePasskey', 'updatePhone'];
 
-  return [
-    'emailChallenge',
-    'passkeyChallenge',
-    'phoneChallenge',
-    'updateEmail',
-    'updatePasskey',
-    'updatePhone',
-    'updatePhoneVerify',
-  ].some(state.matches)
-    ? BACK
-    : CLOSE;
+  return states.some(state.matches) ? BACK : CLOSE;
 };
 
 export default getHeaderLeftNavButton;

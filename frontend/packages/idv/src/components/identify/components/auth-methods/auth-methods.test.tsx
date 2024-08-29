@@ -1,6 +1,6 @@
 import '../../../../config/initializers/i18next-test';
 
-import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, userEvent } from '@onefootprint/test-utils';
 import type * as React from 'react';
 
 import { Layout } from '../../../layout';
@@ -15,6 +15,14 @@ import {
 } from './auth-methods.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
+jest.mock('../../../../hooks', () => {
+  const originalModule = jest.requireActual('../../../../hooks');
+  return {
+    ...originalModule,
+    useDeviceInfo: () => undefined,
+  };
+});
 
 type AuthMethodsProps = React.ComponentProps<typeof AuthMethods>;
 type LayoutProps = React.ComponentProps<typeof Layout>;
@@ -67,7 +75,7 @@ describe('<AuthMethods />', () => {
       expect(screen.getByText(/Finish/i)).toBeInTheDocument();
     });
 
-    it('should show decrypted + verified email and phone', async () => {
+    it('should show decrypted email and phone, and passkey', async () => {
       const onClose = jest.fn();
       const onDone = jest.fn();
       renderAuthMethods({
@@ -77,17 +85,10 @@ describe('<AuthMethods />', () => {
         onDone,
       });
 
-      await waitFor(() => {
-        expect(screen.getByText(emailRegEx)).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(phoneRegEx)).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(screen.getAllByText(/Verified/i)).toHaveLength(2);
-      });
+      expect(await screen.findByText(emailRegEx)).toBeInTheDocument();
+      expect(await screen.findByText(phoneRegEx)).toBeInTheDocument();
+      expect(await screen.findByText('Passkey')).toBeInTheDocument();
+      expect(await screen.findAllByText(/Verified/i)).toHaveLength(2);
     });
 
     it('should be possible to edit email', async () => {
@@ -100,36 +101,19 @@ describe('<AuthMethods />', () => {
         onDone,
       });
 
-      await waitFor(() => {
-        const btnWithEmail = screen.getByText(emailRegEx);
-        expect(btnWithEmail).toBeInTheDocument();
-      });
+      expect(await screen.findByText(emailRegEx)).toBeInTheDocument();
       await userEvent.click(screen.getByText(emailRegEx));
 
-      await waitFor(() => {
-        const el = screen.getByText(/Update your email/i);
-        expect(el).toBeInTheDocument();
-      });
-
+      expect(await screen.findByText(/Update your email/i)).toBeInTheDocument();
       const emailField = screen.getByLabelText('Email');
       await userEvent.type(emailField, 'piip@onefootprint.com');
       await userEvent.click(screen.getByText('Continue'));
 
-      await waitFor(() => {
-        const el = screen.getByText(/Verify your email address/i);
-        expect(el).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        const el = screen.getByText(/piip@onefootprint.com/i);
-        expect(el).toBeInTheDocument();
-      });
-
+      expect(await screen.findByText(/Verify your email address/i)).toBeInTheDocument();
+      expect(await screen.findByText(/piip@onefootprint.com/i)).toBeInTheDocument();
       await fillChallengePin();
 
-      await waitFor(() => {
-        const el = screen.getByText(/Finish/i);
-        expect(el).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Finish/i)).toBeInTheDocument();
     });
 
     it('should be possible to edit phone', async () => {
@@ -142,32 +126,36 @@ describe('<AuthMethods />', () => {
         onDone,
       });
 
-      await waitFor(() => {
-        const btnWithPhone = screen.getByText(phoneRegEx);
-        expect(btnWithPhone).toBeInTheDocument();
-      });
+      expect(await screen.findByText(phoneRegEx)).toBeInTheDocument();
       await userEvent.click(screen.getByText(phoneRegEx));
 
-      await waitFor(() => {
-        const el = screen.getByText(/Update your phone number/i);
-        expect(el).toBeInTheDocument();
-      });
-
+      expect(await screen.findByText(/Update your phone number/i)).toBeInTheDocument();
       const emailField = screen.getByLabelText('Phone number');
       await userEvent.type(emailField, '5555550100');
       await userEvent.click(screen.getByText('Verify with SMS'));
 
-      await waitFor(() => {
-        const el = screen.getByText(/Verify your phone number/i);
-        expect(el).toBeInTheDocument();
-      });
-
+      expect(await screen.findByText(/Verify your phone number/i)).toBeInTheDocument();
       await fillChallengePin();
 
-      await waitFor(() => {
-        const el = screen.getByText(/Finish/i);
-        expect(el).toBeInTheDocument();
+      expect(await screen.findByText(/Finish/i)).toBeInTheDocument();
+    });
+
+    it('should be possible to start the passkey update flow', async () => {
+      const onClose = jest.fn();
+      const onDone = jest.fn();
+      renderAuthMethods({
+        authToken: 'authToken',
+        initialMachineState: 'dashboard',
+        onClose,
+        onDone,
       });
+
+      expect(await screen.findByText('Passkey')).toBeInTheDocument();
+      await userEvent.click(screen.getByText('Passkey'));
+
+      expect(await screen.findByText(/Replace your passkey/i)).toBeInTheDocument();
+
+      expect(await screen.findByText('Launch registration')).toBeInTheDocument();
     });
   });
 });

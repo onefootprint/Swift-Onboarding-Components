@@ -1,7 +1,14 @@
 import { UserChallengeActionKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { assignDecryptedData, assignUpdateMethod, assignUserDashboard, assignVerifyToken } from './assigners';
+import type { DeviceInfo } from '../../../../../hooks/use-device-info';
+import {
+  assignDecryptedData,
+  assignDevice,
+  assignUpdateMethod,
+  assignUserDashboard,
+  assignVerifyToken,
+} from './assigners';
 import type { Typegen0 } from './machine.typegen';
 import type { AuthMethodsMachineContext, AuthMethodsMachineEvents } from './types';
 
@@ -10,6 +17,7 @@ export type AuthMethodsMachineArgs = {
   initialMachineState?: Typegen0['matchesStates'];
 };
 const isTest = process.env.NODE_ENV === 'test';
+const fixtureTestDevice = { hasSupportForWebauthn: true } as DeviceInfo;
 
 const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
   createMachine(
@@ -32,6 +40,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
           passkey: { status: 'empty' },
         },
         verifyToken: isTest ? 'utok_INITIAL-TEST-MODE' : undefined,
+        device: isTest ? fixtureTestDevice : undefined,
       },
       on: {
         decryptUserDone: {
@@ -40,6 +49,9 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
         updateUserDashboard: {
           target: 'dashboard',
           actions: ['assignUserDashboard'],
+        },
+        setDevice: {
+          actions: ['assignDevice'],
         },
       },
       states: {
@@ -92,6 +104,7 @@ const createAuthMethodsMachine = (args: AuthMethodsMachineArgs) =>
         assignDecryptedData: assign(assignDecryptedData),
         assignUserDashboard: assign(assignUserDashboard),
         assignVerifyToken: assign(assignVerifyToken),
+        assignDevice: assign(assignDevice),
       },
     },
   );

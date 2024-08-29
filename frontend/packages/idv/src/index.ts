@@ -31,6 +31,7 @@ export { default as enIdvJson } from './config/locales/en/idv.json';
 export { default as esIdentifyJson } from './config/locales/es/identify.json';
 export { default as esIdvJson } from './config/locales/es/idv.json';
 export type { DeviceInfo } from './hooks';
+export { Liveness } from './plugins';
 export {
   getBasicDevice,
   useDeviceInfo,

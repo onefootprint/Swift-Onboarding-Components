@@ -6,8 +6,9 @@ import { useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
 import type React from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
 
 import { getLogger } from '../../../../../../utils/logger';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
@@ -24,9 +25,9 @@ type DashboardProps = Pick<TComponentProps, 'children' | 'Header'> & {
   onDone: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-const isPassKeyFeatureReady = false;
 const EmailAndPhone: IdDI[] = [IdDI.email, IdDI.phoneNumber];
 const EmptyMethodsMap: MethodsMap = Object.create(null);
+const isAppInIframe = checkIsIframe();
 
 const actionKind = (isVerified: boolean): UserChallengeActionKind =>
   isVerified ? UserChallengeActionKind.replace : UserChallengeActionKind.addPrimary;
@@ -72,7 +73,7 @@ const { logWarn } = getLogger({ location: 'user-dashboard' });
 
 const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const [state, send] = useAuthMethodsMachine();
-  const { userDashboard, verifyToken } = state.context;
+  const { device, userDashboard, verifyToken } = state.context;
   const { t } = useTranslation('identify');
   const qryUserAuthMethods = useUserAuthMethods(verifyToken);
   const mutDecryptUser = useDecryptUser();
@@ -100,6 +101,20 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
       );
     }
   });
+
+  /** Update user dashboard status for passkey, based on methodsMap, because it cannot be decrypted */
+  useEffect(() => {
+    if (!methodsMap.passkey) return;
+    if (userDashboard.passkey?.status === 'set') return;
+
+    send({
+      type: 'updateUserDashboard',
+      payload: {
+        kind: 'passkey',
+        entry: { status: 'set' },
+      },
+    });
+  }, [methodsMap]);
 
   return (
     <Component
@@ -155,10 +170,10 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
             }
       }
       entryPasskey={
-        methodsMap.passkey && isPassKeyFeatureReady
+        device?.hasSupportForWebauthn
           ? {
               isLoading,
-              isDisabled: false,
+              isDisabled: isAppInIframe,
               isVerified: !!methodsMap.passkey?.isVerified,
               label: userDashboard.passkey?.label || t('passkey'),
               status: userDashboard.passkey?.status || 'empty',
