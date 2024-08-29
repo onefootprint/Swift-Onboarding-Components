@@ -11,16 +11,19 @@ use db_schema::schema::data_lifetime;
 use db_schema::schema::vault_dr_aws_pre_enrollment;
 use db_schema::schema::vault_dr_blob;
 use db_schema::schema::vault_dr_config;
+use db_schema::schema::vault_dr_manifest;
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
 use newtypes::PiiString;
+use newtypes::ScopedVaultVersionId;
 use newtypes::TenantId;
 use newtypes::VaultDrAwsPreEnrollmentId;
 use newtypes::VaultDrBlobId;
 use newtypes::VaultDrConfigId;
+use newtypes::VaultDrManifestId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = vault_dr_aws_pre_enrollment)]
@@ -255,6 +258,43 @@ impl VaultDrBlob {
             .filter(vault_dr_blob::bucket_path.eq_any(bucket_paths))
             .select((VaultDrBlob::as_select(), DataLifetime::as_select()))
             .load(conn)?;
+
+        Ok(results)
+    }
+}
+
+#[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
+#[diesel(table_name = vault_dr_manifest)]
+pub struct VaultDrManifest {
+    pub id: VaultDrManifestId,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+
+    pub config_id: VaultDrConfigId,
+    pub scoped_vault_version_id: ScopedVaultVersionId,
+
+    pub bucket_path: String,
+    pub content_etag: String,
+    pub content_length_bytes: i64,
+}
+
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = vault_dr_manifest)]
+pub struct NewVaultDrManifest {
+    pub config_id: VaultDrConfigId,
+    pub scoped_vault_version_id: ScopedVaultVersionId,
+
+    pub bucket_path: String,
+    pub content_etag: String,
+    pub content_length_bytes: i64,
+}
+
+impl VaultDrManifest {
+    #[tracing::instrument("VaultDrManifest::bulk_create", skip_all)]
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrManifest>) -> DbResult<Vec<Self>> {
+        let results = diesel::insert_into(vault_dr_manifest::table)
+            .values(new)
+            .get_results(conn.conn())?;
 
         Ok(results)
     }

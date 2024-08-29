@@ -392,3 +392,4 @@ define_newtype_id!(
     String,
     "Identifier for a scoped_vault_version"
 );
+define_newtype_id!(VaultDrManifestId, String, "Identifier for a vault_dr_manifest");
