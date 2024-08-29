@@ -2,7 +2,7 @@ import { IdDocOutcome, IdVerificationOutcome, OverallOutcome, type PublicOnboard
 import { Box, Button, Stack } from '@onefootprint/ui';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { HeaderTitle, NavigationHeader } from '../../../../components';
+import { HeaderTitle } from '../../../../components';
 import { getRandomID } from '../../../../utils';
 import type { SandboxOutcomeFormData } from '../../types';
 import IdDocOutcomeSelect from '../id-doc-outcome-select';
@@ -27,7 +27,7 @@ export const SandboxOutcomeContainer = ({ config, collectTestId }: SandboxOutcom
 
   return (
     <Stack flexDirection="column">
-      <NavigationHeader leftButton={{ variant: 'close' }} />
+      {/*<NavigationHeader leftButton={{ variant: 'close' }} />*/}
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Box
         marginBlock={7}

@@ -8,7 +8,7 @@ import { Layout } from '../../components';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 
-const getOnboardingConfig = (
+export const getOnboardingConfig = (
   requiresIdDoc = true,
   canMakeRealDocScanCallsInSandbox = true,
 ): PublicOnboardingConfig => ({

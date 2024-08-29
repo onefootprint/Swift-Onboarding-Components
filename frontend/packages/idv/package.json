@@ -7,6 +7,8 @@
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
+    "build:storybook": "storybook build",
+    "dev:storybook": "storybook dev -p 3100",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "i18n:clean": "rm -rf ./public/locales/",
     "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
@@ -16,6 +18,7 @@
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe",
     "test:ci": "jest --ci --bail --runInBand",
+    "test:storybook": "test-storybook --ci --url http://127.0.0.1:3100",
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
     "typecheck": "yarn tsc --noEmit"
@@ -79,7 +82,20 @@
     "ts-node": "^10.9.2",
     "tsconfig": "*",
     "typescript": "^5.5.2",
-    "webpack": "*"
+    "webpack": "*",
+    "@chromatic-com/storybook": "^1.7.0",
+    "@storybook/addon-actions": "^8.2.9",
+    "@storybook/addon-essentials": "^8.2.9",
+    "@storybook/addon-interactions": "^8.2.9",
+    "@storybook/addon-links": "^8.2.9",
+    "@storybook/blocks": "^8.2.9",
+    "@storybook/nextjs": "^8.2.9",
+    "@storybook/react": "^8.2.9",
+    "@storybook/test": "^8.2.9",
+    "@storybook/testing-library": "^0.2.2",
+    "@storybook/test-runner": "^0.19.1",
+    "@types/react": "^18",
+    "storybook": "^8.2.9"
   },
   "peerDependencies": {
     "next": "14.x",

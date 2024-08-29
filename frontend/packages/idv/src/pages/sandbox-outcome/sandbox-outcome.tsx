@@ -7,6 +7,8 @@ const SandboxOutcome = () => {
   const [state, send] = useIdvMachine();
   const { config, authToken } = state.context;
 
+  console.log('> authToken', authToken);
+
   const handleAfterSubmit = ({
     testID,
     overallOutcome,
