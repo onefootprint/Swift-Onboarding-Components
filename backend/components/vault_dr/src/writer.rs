@@ -13,7 +13,6 @@ use api_core::State;
 use api_errors::AssertionError;
 use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
-use chrono::Utc;
 use db::errors::FpOptionalExtension;
 use db::helpers::load_vault_dr_data_lifetime_batch;
 use db::models::data_lifetime::DataLifetime;
@@ -355,7 +354,6 @@ impl VaultDrWriter {
 
 
         let new_blob = NewVaultDrBlob {
-            created_at: Utc::now(),
             config_id: self.config_id.clone(),
             data_lifetime_id: dl.id,
             dl_created_seqno: dl.created_seqno,
@@ -419,6 +417,7 @@ fn blob_key(
 mod tests {
     use super::*;
     use chrono::DateTime;
+    use chrono::Utc;
     use newtypes::DataLifetimeId;
     use newtypes::DataLifetimeSource;
     use newtypes::KvDataKey;

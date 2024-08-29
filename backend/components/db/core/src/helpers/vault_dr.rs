@@ -221,7 +221,6 @@ mod tests {
         let new_blobs = dls
             .into_iter()
             .map(|dl| NewVaultDrBlob {
-                created_at: Utc::now(),
                 config_id: config_id.clone(),
                 data_lifetime_id: dl.id,
                 dl_created_seqno: dl.created_seqno,

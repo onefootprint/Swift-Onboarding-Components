@@ -1565,7 +1565,6 @@ diesel::table! {
         id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        created_at -> Timestamptz,
         config_id -> Text,
         data_lifetime_id -> Text,
         dl_created_seqno -> Int8,
