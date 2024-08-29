@@ -86,7 +86,7 @@ describe('<DateInput />', () => {
     });
 
     it('rejects an invalid date for business formation date', async () => {
-      renderDateInput(BusinessDI.formationDate, '2023-02-30');
+      renderDateInput(BusinessDI.formationDate, '2023/13/32');
       fireEvent.submit(screen.getByRole('form', { name: 'date-input-form' }));
       await waitFor(() => {
         const invalidBusinessDateHint = screen.getByText('Must be formatted YYYY-MM-DD');

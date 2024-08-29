@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate, isDob as isValidDob } from '@onefootprint/core';
+import { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate } from '@onefootprint/core';
 import get from 'lodash/get';
 
 export type DateInputProps = {
@@ -18,63 +18,43 @@ const DateInput = ({ value, fieldName }: DateInputProps) => {
   });
   const {
     register,
-    getValues,
     formState: { errors },
   } = useFormContext();
   const error = get(errors, fieldName);
   const isDob = fieldName === IdDI.dob;
 
-  const getHint = () => {
-    if (!error) {
-      return t('hint');
-    }
-    const message = error?.message;
-    if (message && typeof message === 'string') {
-      return message;
-    }
-    if (error?.type === 'required') {
-      return t('required');
-    }
-    if (error?.type === 'pattern') {
-      return t('pattern');
-    }
-    const date = getValues(fieldName);
-    if (!isValidDate(date)) {
-      return t('invalid');
-    }
-    if (isDobInTheFuture(date)) {
-      return t('future-date');
-    }
-    if (isDobTooOld(date)) {
-      return t('too-old');
-    }
-    if (isDobTooYoung(date)) {
-      return t('too-young');
-    }
-  };
-
   return (
     <ValueContainer>
-      <Form.Input
-        size="compact"
-        width="fit-content"
-        placeholder="YYYY-MM-DD"
-        hasError={!!error}
-        defaultValue={value as string}
-        inputMode="numeric"
-        {...register(fieldName, {
-          required: !!value,
-          pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/, // YYYY-MM-DD or YYYY/MM/DD
-          validate: (dateVal: string) => {
-            if (!isValidDate(dateVal)) return false;
-            if (isDob) {
-              return isValidDob(dateVal, new Date());
-            }
-            return !isDobInTheFuture(dateVal);
-          },
-        })}
-      />
-      <Form.Errors>{getHint() || ''}</Form.Errors>
+      <Form.Field>
+        <Form.Input
+          size="compact"
+          width="fit-content"
+          placeholder="YYYY-MM-DD"
+          hasError={!!error}
+          defaultValue={value as string}
+          inputMode="numeric"
+          {...register(fieldName, {
+            required: {
+              value: !!value,
+              message: t('required'),
+            },
+            pattern: {
+              value: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/, // YYYY-MM-DD or YYYY/MM/DD
+              message: t('invalid'),
+            },
+            validate: (dateVal: string) => {
+              if (!isValidDate(dateVal)) return t('pattern');
+              if (isDobInTheFuture(dateVal)) return t('future-date');
+              if (isDob) {
+                if (isDobTooOld(dateVal)) return t('too-old');
+                if (isDobTooYoung(dateVal)) return t('too-young');
+              }
+              return true;
+            },
+          })}
+        />
+        <Form.Errors>{error?.message}</Form.Errors>
+      </Form.Field>
     </ValueContainer>
   );
 };
