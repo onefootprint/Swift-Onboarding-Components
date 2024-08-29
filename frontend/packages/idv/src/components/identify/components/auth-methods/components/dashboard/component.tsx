@@ -1,4 +1,4 @@
-import { IcoEmail24, IcoFaceid16, IcoSmartphone24 } from '@onefootprint/icons';
+import { IcoEmail24, IcoFaceid24, IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Shimmer, Stack } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import type React from 'react';
@@ -8,15 +8,17 @@ import EditButton from './edit-button';
 
 type ComponentTexts = {
   add: string;
+  added: string;
   cta: string;
-  deviceAdded: string;
   edit: string;
   headerSubtitle: string;
   headerTitle: string;
+  replace: string;
   verified: string;
 };
 
 type Entry = {
+  isDisabled?: boolean;
   isLoading: boolean;
   isVerified: boolean;
   label: string;
@@ -47,7 +49,7 @@ const Component = ({ children, cta, entryEmail, entryPasskey, entryPhone, Header
     <Stack direction="column" marginBottom={7}>
       <Header subtitle={texts.headerSubtitle} title={texts.headerTitle} />
     </Stack>
-    <Stack direction="column" gap={5} marginBottom={7}>
+    <Stack direction="column" gap={3} marginBottom={7}>
       {entryEmail?.isLoading ? <ButtonLoading /> : null}
       {entryEmail && !entryEmail.isLoading ? (
         <EditButton
@@ -72,14 +74,20 @@ const Component = ({ children, cta, entryEmail, entryPasskey, entryPhone, Header
         />
       ) : null}
 
-      {entryPasskey ? (
+      {entryPasskey?.isLoading ? <ButtonLoading /> : null}
+      {entryPasskey && !entryPasskey.isLoading ? (
         <EditButton
+          isDisabled={entryPasskey?.isDisabled}
           label={entryPasskey.label}
-          icon={IcoFaceid16}
+          icon={IcoFaceid24}
           onClick={entryPasskey.onClick}
           isVerified={entryPasskey.isVerified}
           isEmpty={isEmpty(entryPasskey.status)}
-          texts={texts}
+          texts={{
+            ...texts,
+            verified: texts.added,
+            edit: texts.replace,
+          }}
         />
       ) : null}
     </Stack>

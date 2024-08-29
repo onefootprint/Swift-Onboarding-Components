@@ -33,21 +33,23 @@ const actionKind = (isVerified: boolean): UserChallengeActionKind =>
 
 const getAuthAddFlowTexts = (t: T): Texts => ({
   add: t('add'),
+  added: t('added'),
   cta: t('skip-and-finish'),
-  deviceAdded: t('device-added'),
   edit: t('edit'),
   headerSubtitle: t('enhance-security-advice'),
   headerTitle: t('additional-verifications'),
+  replace: t('replace'),
   verified: t('verified'),
 });
 
 const getEditFlowTexts = (t: T): Texts => ({
   add: t('add'),
+  added: t('added'),
   cta: t('finish'),
-  deviceAdded: t('device-added'),
   edit: t('edit'),
   headerSubtitle: t('edit-details-in-account'),
   headerTitle: t('revise-auth-details'),
+  replace: t('replace'),
   verified: t('verified'),
 });
 
@@ -75,6 +77,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const qryUserAuthMethods = useUserAuthMethods(verifyToken);
   const mutDecryptUser = useDecryptUser();
   const toast = useToast();
+  const isLoading = qryUserAuthMethods.isLoading || mutDecryptUser.isLoading;
 
   const methodsMap = useMemo(() => {
     const methods = qryUserAuthMethods.data;
@@ -104,7 +107,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
       entryEmail={
         methodsMap.email
           ? {
-              isLoading: mutDecryptUser.isLoading,
+              isLoading,
               isVerified: methodsMap.email.isVerified,
               label: userDashboard.email?.label || t('email.label'),
               status: userDashboard.email?.status || 'empty',
@@ -115,7 +118,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
                 }),
             }
           : {
-              isLoading: false,
+              isLoading,
               isVerified: false,
               label: t('email.label'),
               status: 'empty',
@@ -129,7 +132,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
       entryPhone={
         methodsMap.phone
           ? {
-              isLoading: mutDecryptUser.isLoading,
+              isLoading,
               isVerified: methodsMap.phone.isVerified,
               label: userDashboard.phone?.label || t('phone-number'),
               status: userDashboard.phone?.status || 'empty',
@@ -140,7 +143,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
                 }),
             }
           : {
-              isLoading: false,
+              isLoading,
               isVerified: false,
               label: t('phone-number'),
               status: 'empty',
@@ -154,21 +157,22 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
       entryPasskey={
         methodsMap.passkey && isPassKeyFeatureReady
           ? {
-              isLoading: mutDecryptUser.isLoading,
-              isVerified: methodsMap.passkey.isVerified,
+              isLoading,
+              isDisabled: false,
+              isVerified: !!methodsMap.passkey?.isVerified,
               label: userDashboard.passkey?.label || t('passkey'),
               status: userDashboard.passkey?.status || 'empty',
               onClick: () =>
                 send({
                   type: 'updatePasskey',
-                  payload: actionKind(methodsMap.passkey.isVerified),
+                  payload: actionKind(methodsMap.passkey?.isVerified),
                 }),
             }
           : undefined
       }
       texts={isEditing ? getEditFlowTexts(t) : getAuthAddFlowTexts(t)}
       cta={{
-        isLoading: mutDecryptUser.isLoading,
+        isLoading,
         onClick: onDone,
         variant: isEditing ? 'primary' : 'secondary',
       }}

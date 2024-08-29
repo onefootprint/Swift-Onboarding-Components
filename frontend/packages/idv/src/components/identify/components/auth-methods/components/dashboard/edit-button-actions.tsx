@@ -2,6 +2,7 @@ import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 
 type EditButtonActionsProps = {
+  isDisabled?: boolean;
   isEmpty: boolean;
   shouldShowVerify: boolean;
   texts: {
@@ -11,7 +12,7 @@ type EditButtonActionsProps = {
   };
 };
 
-const EditButtonActions = ({ shouldShowVerify, isEmpty, texts }: EditButtonActionsProps) => (
+const EditButtonActions = ({ shouldShowVerify, isDisabled, isEmpty, texts }: EditButtonActionsProps) => (
   <Stack direction="row" align="center" gap={3} justify="flex-end">
     {shouldShowVerify ? (
       <>
@@ -26,7 +27,7 @@ const EditButtonActions = ({ shouldShowVerify, isEmpty, texts }: EditButtonActio
         </Text>
       </>
     ) : null}
-    <Text tag="span" variant="label-4" color="accent">
+    <Text tag="span" variant="label-4" color={isDisabled ? 'quaternary' : 'accent'}>
       {isEmpty ? texts.add : texts.edit}
     </Text>
   </Stack>

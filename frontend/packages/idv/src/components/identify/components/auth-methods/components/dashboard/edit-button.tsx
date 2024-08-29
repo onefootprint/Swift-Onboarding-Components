@@ -7,6 +7,7 @@ import EditButtonActions from './edit-button-actions';
 
 type EditButtonProps = {
   icon: Icon;
+  isDisabled?: boolean;
   isEmpty: boolean;
   isVerified: boolean;
   label: string;
@@ -17,19 +18,22 @@ type EditButtonProps = {
     verified: string;
   };
 };
-const EditButton = ({ label, icon: Icon, onClick, isVerified, isEmpty, texts }: EditButtonProps) => (
-  <Button type="button" onClick={onClick}>
+const EditButton = ({ label, icon: Icon, onClick, isDisabled, isVerified, isEmpty, texts }: EditButtonProps) => (
+  <Button type="button" onClick={onClick} disabled={isDisabled}>
     <Stack align="center" justify="center" height="24px" width="24px">
-      <Icon />
+      <Icon color={isDisabled ? 'quaternary' : 'primary'} />
     </Stack>
-    <TextContainer data-dd-privacy="mask">{label}</TextContainer>
-    <EditButtonActions shouldShowVerify={isVerified} isEmpty={isEmpty} texts={texts} />
+    <TextContainer data-dd-privacy="mask">
+      <Inner>{label}</Inner>
+    </TextContainer>
+    <EditButtonActions shouldShowVerify={isVerified} isEmpty={isEmpty} texts={texts} isDisabled={isDisabled} />
   </Button>
 );
 
 const Button = styled.button`
   ${({ theme }) => css`
     display: flex;
+    align-items: center;
     border: none;
     cursor: pointer;
     user-select: none;
@@ -41,13 +45,17 @@ const Button = styled.button`
   `}
 `;
 
-const TextContainer = styled.span`
-  ${createFontStyles('label-3')};
+const TextContainer = styled.div`
   display: flex;
-  width: 100%;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  overflow: hidden;
+`;
+
+const Inner = styled.span`
+  ${createFontStyles('label-3')};
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
 `;
 
 export default EditButton;

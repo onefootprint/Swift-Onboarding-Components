@@ -61,10 +61,9 @@ describe('<AuthMethods />', () => {
         onDone,
       });
 
-      expect(screen.getByText(/Revise your authentication details/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review your authentication details/i)).toBeInTheDocument();
       expect(screen.getByText(/You can edit the details in your account/i)).toBeInTheDocument();
-      expect(screen.getByText(/Email/i)).toBeInTheDocument();
-      expect(screen.getByText(/Phone number/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Loading/i)).toBeInTheDocument();
       expect(screen.getByText(/Finish/i)).toBeInTheDocument();
     });
 

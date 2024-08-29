@@ -17,7 +17,7 @@ import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-register-biometric';
 
-const SUCCESS_TRANSITION_DELAY_MS = 1500;
+const SUCCESS_TRANSITION_DELAY_MS = 2500;
 const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'liveness-register',
 });
