@@ -34,7 +34,7 @@ const Header = styled.header`
 
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]};
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 
