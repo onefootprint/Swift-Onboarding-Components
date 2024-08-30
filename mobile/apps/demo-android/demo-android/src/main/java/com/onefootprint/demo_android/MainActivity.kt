@@ -12,6 +12,7 @@ import com.footprint.android.FootprintBootstrapData
 import com.footprint.android.FootprintConfiguration
 import com.footprint.android.FootprintL10n
 import com.footprint.android.FootprintOptions
+import com.footprint.android.FootprintSupportedLanguage
 import com.footprint.android.FootprintSupportedLocale
 
 class MainActivity : AppCompatActivity() {
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 publicKey = "pb_test_pZoERpZeZkGW7RRVeBawSm", // KYB pb_key to test all bootstrap data
                 bootstrapData = bootstrapData,
                 options = FootprintOptions(showLogo = true),
-                l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
+                l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX, language = FootprintSupportedLanguage.SPANISH),
                 appearance = FootprintAppearance(
                     rules = FootprintAppearanceRules(button = mapOf("transition" to "all .2s linear")),
                     variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
