@@ -97,11 +97,11 @@ export const useFootprint = () => {
     // We can use the authToken to create a new fpInstance
     // If we don't have any of these, we can't proceed
     if (!context.fpInstance) {
-      if (!context.vaultingToken || !context.authToken) {
+      if (!context.vaultingToken || !context.verifiedAuthToken) {
         onError?.(new Error('No fpInstance found'));
         return;
       }
-      createNewHandoff({ onComplete, onError, onCancel, onClose, authToken: context.authToken });
+      createNewHandoff({ onComplete, onError, onCancel, onClose, authToken: context.verifiedAuthToken });
     } else {
       lockBody();
       context.fpInstance.relayFromComponents?.();

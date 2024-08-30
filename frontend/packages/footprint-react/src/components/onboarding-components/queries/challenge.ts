@@ -5,6 +5,7 @@ import request from '../utils/request';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
 type IdentifyRequestPayload = EmailAndPassword & { authToken?: string };
+type CreateChallengeRequestPayload = IdentifyRequestPayload;
 
 type RequestOptions = {
   onboardingConfig: string;
@@ -66,7 +67,7 @@ const loginChallenge = async (payload: { kind: 'sms' | 'email' }, options: { tok
   return response;
 };
 
-export const createChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
+export const createChallenge = async (payload: CreateChallengeRequestPayload, options: RequestOptions) => {
   const identifyResponse = await identify(payload, options);
   if (identifyResponse.user) {
     if (identifyResponse.user.authMethods) {

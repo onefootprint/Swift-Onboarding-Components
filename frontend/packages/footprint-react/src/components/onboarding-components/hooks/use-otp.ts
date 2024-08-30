@@ -16,6 +16,8 @@ type AuthRequirement = {
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
+  const [didCallRequiresAuth, setDidCallRequiresAuth] = useState(false);
+  const isReadyForAuth = !!context.onboardingConfig && didCallRequiresAuth;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): AuthRequirement => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
@@ -32,6 +34,7 @@ const useOtp = () => {
 
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken) {
+      setDidCallRequiresAuth(true);
       return { requiresAuth: false, authMethod: null };
     }
 
@@ -39,6 +42,7 @@ const useOtp = () => {
     // But we need to create a vaulting token
     if (verifiedAuthToken) {
       const vaultingTokenResponse = await createVaultingToken({ authToken: verifiedAuthToken });
+      setDidCallRequiresAuth(true);
       setContext(prev => ({ ...prev, vaultingToken: vaultingTokenResponse.token }));
       return { requiresAuth: false, authMethod: null };
     }
@@ -55,11 +59,14 @@ const useOtp = () => {
           sandboxId: context.sandboxId,
           setContext,
         });
+        setDidCallRequiresAuth(true);
         return authTokenStatusToRequirement(status);
       }
+      setDidCallRequiresAuth(true);
       return authTokenStatusToRequirement(authTokenStatus);
     }
 
+    setDidCallRequiresAuth(true);
     return { requiresAuth: true, authMethod: TenantAuthMethods.emailAndPhone };
   };
 
@@ -122,21 +129,69 @@ const useOtp = () => {
     setContext(prev => ({ ...prev, fpInstance: fp }));
   };
 
-  const create = async (payload: { email?: string; phoneNumber?: string }) => {
-    if (!payload.email || !payload.phoneNumber) {
+  const createEmailPhoneBasedChallenge = async ({ email, phoneNumber }: { email?: string; phoneNumber?: string }) => {
+    const { sandboxId, onboardingConfig, authToken, authTokenStatus } = context;
+
+    // Enforce calling "requiresAuth" before creating a challenge
+    if (!didCallRequiresAuth) {
+      throw new Error('Please call "requiresAuth" to check the available auth methods before creating a challenge');
+    }
+
+    if (authToken) {
+      // Enforce authenticating using auth token
+      if (authTokenStatus !== AuthTokenStatus.invalid) {
+        throw new Error('Provided auth token is valid. Please authenticate using auth token');
+      }
+      throw new Error(
+        'You provided an invalid auth token. Please provide a valid auth token and authenticate using it or remove the auth token and authenticate using email/phone number',
+      );
+    }
+
+    if (!email || !phoneNumber) {
       // TODO: In the future, we should allow email-only
       throw new Error('Email and phone number are required');
     }
-    const { onboardingConfig } = context;
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
     }
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
-    const response = await createChallenge(payload, {
-      onboardingConfig: onboardingConfig.key,
-      sandboxId: context.sandboxId,
-      requiredAuthMethods,
-    });
+    const response = await createChallenge(
+      { email, phoneNumber },
+      {
+        onboardingConfig: onboardingConfig.key,
+        sandboxId: sandboxId,
+        requiredAuthMethods,
+      },
+    );
+    setChallengeData(response.challengeData);
+    return response.challengeData.challengeKind;
+  };
+
+  const createAuthTokenBasedChallenge = async () => {
+    const { sandboxId, onboardingConfig, authToken, authTokenStatus } = context;
+
+    if (!didCallRequiresAuth) {
+      throw new Error('Please call "requiresAuth" to check the available auth methods before creating a challenge');
+    }
+    if (!onboardingConfig) {
+      throw new Error('Onboarding config not found. Please check your public key');
+    }
+    if (!authToken) {
+      throw new Error('Auth token not found. Please authenticate using email/phone number');
+    }
+    if (authTokenStatus === AuthTokenStatus.invalid) {
+      throw new Error('Auth token is invalid. Please use a valid auth token');
+    }
+
+    const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+    const response = await createChallenge(
+      { authToken },
+      {
+        onboardingConfig: onboardingConfig.key,
+        sandboxId: sandboxId,
+        requiredAuthMethods,
+      },
+    );
     setChallengeData(response.challengeData);
     return response.challengeData.challengeKind;
   };
@@ -157,12 +212,20 @@ const useOtp = () => {
     );
     setContext(prev => ({
       ...prev,
-      authToken: response.authToken,
       vaultingToken: response.vaultingToken,
+      verifiedAuthToken: response.authToken,
+      authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
   };
 
-  return { launchIdentify, create, verify, requiresAuth };
+  return {
+    launchIdentify,
+    createEmailPhoneBasedChallenge,
+    createAuthTokenBasedChallenge,
+    verify,
+    requiresAuth,
+    isReadyForAuth,
+  };
 };
 
 export default useOtp;
