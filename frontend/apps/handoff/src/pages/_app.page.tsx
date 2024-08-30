@@ -39,7 +39,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           />
         </Head>
       ) : null}
-      <Providers>
+      <Providers pageProps={pageProps}>
         <GlobalStyle />
         <Component {...pageProps} />
       </Providers>

@@ -9,7 +9,6 @@ import queryClient from '../../config/initializers/react-query';
 import { BifrostMachineProvider } from '../bifrost-machine-provider';
 
 const footprint = configureFootprint();
-configureI18n();
 
 const App = ({
   children,
@@ -18,7 +17,8 @@ const App = ({
   children: React.ReactNode;
   pageProps: AppProps['pageProps'];
 }) => {
-  const { appearance, theme, rules } = pageProps;
+  const { appearance, theme, rules, language } = pageProps;
+  configureI18n({ language: language ?? 'en' });
 
   return (
     <QueryClientProvider client={queryClient}>

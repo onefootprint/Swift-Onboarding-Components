@@ -25,7 +25,7 @@ const codeFont = Source_Code_Pro({
 });
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <Providers>
+  <Providers pageProps={pageProps}>
     <GlobalStyle />
     <Component {...pageProps} />
   </Providers>
