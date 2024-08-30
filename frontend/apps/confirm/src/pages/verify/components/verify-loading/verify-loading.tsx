@@ -1,5 +1,5 @@
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 
-const VerifyLoading = () => <AnimatedLoadingSpinner animationStart />;
+const VerifyLoading = () => <LoadingSpinner />;
 
 export default VerifyLoading;

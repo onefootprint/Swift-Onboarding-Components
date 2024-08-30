@@ -1,9 +1,9 @@
 import type { Meta, StoryFn } from '@storybook/react';
 import { useState } from 'react';
 
-import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import Box from '../box';
 import LinkButton from '../link-button';
+import LoadingSpinner from '../loading-spinner';
 import Stack from '../stack';
 import Text from '../text';
 import type { PinInputProps } from './pin-input';
@@ -77,7 +77,7 @@ const Template: StoryFn<PinInputProps> = ({
       </Box>
       <Box marginBottom={8}>
         {loading ? (
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         ) : (
           <PinInput
             hasError={baseHasError || hasError}

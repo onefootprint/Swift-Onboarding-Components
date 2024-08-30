@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Box, Text } from '@onefootprint/ui';
+import { Box, LoadingSpinner, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -23,7 +23,7 @@ const DesktopCameraPermission = ({ permissionState }: DesktopCameraPermissionPro
       </Box>
       <CameraStateContainer $height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         {permissionState === 'undetected' ? (
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         ) : (
           <Box paddingLeft={9} paddingRight={9}>
             <Text variant="label-2" textAlign="center">

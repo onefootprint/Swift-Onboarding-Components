@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Box, Shimmer, Stack } from '@onefootprint/ui';
+import { Box, LoadingSpinner, Shimmer, Stack } from '@onefootprint/ui';
 
 const Loading = () => (
   <Box aria-label="Loading documents" role="progressbar">
@@ -17,7 +17,7 @@ const Loading = () => (
       <Tabs />
     </Stack>
     <Stack center marginTop={12}>
-      <AnimatedLoadingSpinner animationStart size={24} />
+      <LoadingSpinner size={24} />
     </Stack>
   </Box>
 );

@@ -1,6 +1,6 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/footprint-react';
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
@@ -69,7 +69,7 @@ const Demo = () => {
             publicKey={publicKey}
           />
         ) : (
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         )}
         <div data-testid="result" />
       </Container>

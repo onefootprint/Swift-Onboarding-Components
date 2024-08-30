@@ -1,7 +1,7 @@
 export type { AddressInputProps } from './address-input';
 export { default as AddressInput } from './address-input';
-export { default as AnimatedLoadingSpinner } from './animated-loading-spinner';
-export { default as SuccessCheck } from './animated-success-check';
+export { default as LoadingSpinner } from './loading-spinner';
+export { default as SuccessCheck } from './success-check';
 export type { AvatarProps } from './avatar';
 export { default as Avatar } from './avatar';
 export type { BadgeProps } from './badge';

@@ -1,5 +1,5 @@
 import { useCountdown } from '@onefootprint/hooks';
-import { AnimatedLoadingSpinner, Box, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { Box, LinkButton, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -56,7 +56,7 @@ const ResendButton = ({ isResendLoading, onResend, resendDisabledUntil, texts }:
     <Stack align="center" direction="column" justify="center" gap={2} marginTop={5}>
       <Box minHeight="32px" textAlign="center">
         {isResendLoading ? (
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         ) : (
           <LinkButton disabled={resendClicked && countdown > 0} onClick={handleClick} data-dd-action-name="pin:resend">
             {texts.resendCta}

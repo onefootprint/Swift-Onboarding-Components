@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoWand24 } from '@onefootprint/icons';
-import { AnimatedLoadingSpinner, Dialog, Stack, Text } from '@onefootprint/ui';
+import { Dialog, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import { useCallback, useEffect } from 'react';
@@ -78,7 +78,7 @@ const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
         <AnimatePresence>
           {generateSummaryMutation.isLoading ? (
             <EmptyState gap={5} direction="column" width="100%" height="420px" align="center" justify="center">
-              <AnimatedLoadingSpinner animationStart />
+              <LoadingSpinner />
               <Text variant="label-3">{t('generating-summary')}</Text>
             </EmptyState>
           ) : (

@@ -4,9 +4,9 @@
 import { useId, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import AnimatedLoadingSpinner from '../../../animated-loading-spinner';
 import Box from '../../../box';
 import Fade from '../../../fade';
+import LoadingSpinner from '../../../loading-spinner';
 import type { FilterControl, FilterSelectedOption } from '../../filters.types';
 import AddPill from './components/add-pill';
 import ClearPill from './components/clear-pill';
@@ -90,7 +90,7 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
         <StyledFade isVisible={open} from="center" to="center" ref={setPopperElement} {...attributes.popper}>
           <Popover id={popoverId} onClose={close} title={label}>
             {loading ? (
-              <AnimatedLoadingSpinner color="secondary" ariaLabel={`Loading ${label}`} size={24} animationStart />
+              <LoadingSpinner color="secondary" ariaLabel={`Loading ${label}`} size={24} />
             ) : (
               <>
                 {kind === 'single-select' && (

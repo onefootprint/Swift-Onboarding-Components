@@ -1,5 +1,5 @@
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 
-const Loading = () => <AnimatedLoadingSpinner animationStart />;
+const Loading = () => <LoadingSpinner />;
 
 export default Loading;

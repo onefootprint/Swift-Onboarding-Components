@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Drawer, Stack, Text } from '@onefootprint/ui';
+import { Drawer, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 
 import useTenant from '../../hooks/use-tenant';
 import Content from './components/content';
@@ -15,7 +15,7 @@ const DetailDrawer = ({ tenantId, onClose }: DetailDrawerProps) => {
     <Drawer open={!!tenantId} title={tenant?.name || 'Tenant details'} onClose={onClose}>
       {isLoading && (
         <Stack justifyContent="center">
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         </Stack>
       )}
       {isError && (

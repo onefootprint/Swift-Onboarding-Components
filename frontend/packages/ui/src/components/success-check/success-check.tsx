@@ -4,7 +4,7 @@ import { useTimeout } from 'usehooks-ts';
 
 import Stack from '../stack';
 
-type AnimatedSuccessCheckProps = {
+export type SuccessCheckProps = {
   animationStart: boolean;
   onComplete?: () => void;
   size?: number;
@@ -69,7 +69,7 @@ const explodeCircleVariants = (index: number) => ({
   },
 });
 
-const AnimatedSuccessCheck = ({ onComplete, animationStart, size = 32 }: AnimatedSuccessCheckProps) => {
+const SuccessCheck = ({ onComplete, animationStart, size = 32 }: SuccessCheckProps) => {
   const theme = useTheme();
   useTimeout(
     () => {
@@ -162,4 +162,4 @@ const Container = styled(Stack)<{ $height: number; $width: number }>`
     `}
 `;
 
-export default AnimatedSuccessCheck;
+export default SuccessCheck;

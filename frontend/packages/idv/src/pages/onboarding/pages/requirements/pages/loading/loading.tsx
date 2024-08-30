@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 import styled from 'styled-components';
 import type { StateValue } from 'xstate';
 
@@ -17,7 +17,7 @@ const Loading = () => {
 
   return (
     <Container>
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </Container>
   );
 };

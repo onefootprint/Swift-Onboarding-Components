@@ -3,8 +3,8 @@ import type * as CSS from 'csstype';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
-import type { AnimatedLoadingSpinnerProps } from '../animated-loading-spinner';
-import AnimatedLoadingSpinner from '../animated-loading-spinner';
+import type { LoadingSpinnerProps } from '../loading-spinner';
+import LoadingSpinner from '../loading-spinner';
 import type { AvatarSize } from './avatar.types';
 
 export type AvatarProps = {
@@ -18,7 +18,7 @@ const Avatar = ({ loading = false, name, size = 'default', src }: AvatarProps) =
   if (loading) {
     return (
       <Fallback data-size={size} data-variant={src ? 'secondary' : 'primary'}>
-        <AnimatedLoadingSpinner animationStart size={loadingIndicatorSize[size]} />
+        <LoadingSpinner size={loadingIndicatorSize[size]} />
       </Fallback>
     );
   }
@@ -41,7 +41,7 @@ const sizes: Record<AvatarSize, CSS.Property.Width | CSS.Property.Height> = {
   xlarge: '72px',
 };
 
-export const loadingIndicatorSize: Record<AvatarSize, AnimatedLoadingSpinnerProps['size']> = {
+export const loadingIndicatorSize: Record<AvatarSize, LoadingSpinnerProps['size']> = {
   compact: 20,
   default: 24,
   large: 32,

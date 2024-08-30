@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { ListEntry } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, Text, useToast } from '@onefootprint/ui';
+import { LoadingSpinner, Text, useToast } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -58,7 +58,7 @@ const EntryChip = ({ entry, disabled }: EntryChipProps) => {
       </Label>
       {isDeleting ? (
         <Close aria-label={`Deleting ${data}`} data-disabled={disabled}>
-          <AnimatedLoadingSpinner animationStart size={16} />
+          <LoadingSpinner size={16} />
         </Close>
       ) : (
         <Close aria-label={`Delete ${data}`} onClick={disabled ? undefined : handleDelete} data-disabled={disabled}>

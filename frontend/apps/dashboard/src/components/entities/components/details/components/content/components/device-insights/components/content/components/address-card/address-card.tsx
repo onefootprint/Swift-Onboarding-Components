@@ -1,5 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { LinkButton, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
@@ -54,7 +54,7 @@ const AddressCard = ({ id, type, entity, isSelected, onSelect, isLoading }: Addr
   let ctaElem;
   if (isCtaVisible) {
     if (isCtaLoading) {
-      ctaElem = <AnimatedLoadingSpinner animationStart size={22} color="accent" />;
+      ctaElem = <LoadingSpinner size={22} color="accent" />;
     } else {
       ctaElem = (
         <Stack width="100%" direction="column" align="flex-start" zIndex={2}>

@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 import styled from 'styled-components';
 
 import { getLogger, trackAction } from '../../../../utils/logger';
@@ -36,7 +36,7 @@ const Init = () => {
 
   return (
     <Container>
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 
@@ -63,7 +63,7 @@ const Unavailable = () => {
   return (
     <Container>
       <NavigationHeader />
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </Container>
   );
 };

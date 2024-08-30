@@ -2,7 +2,7 @@ import type React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../../../utils';
-import AnimatedLoadingSpinner from '../../../animated-loading-spinner';
+import LoadingSpinner from '../../../loading-spinner';
 import Stack from '../../../stack';
 import type { ButtonSize, ButtonVariant } from '../../split-button.types';
 
@@ -44,11 +44,7 @@ const MainButton = ({
   >
     <Stack align="center" justify="center">
       {loading ? (
-        <AnimatedLoadingSpinner
-          ariaLabel={loadingAriaLabel}
-          color={variant === 'primary' ? 'quinary' : 'primary'}
-          animationStart
-        />
+        <LoadingSpinner ariaLabel={loadingAriaLabel} color={variant === 'primary' ? 'quinary' : 'primary'} />
       ) : (
         <TextContent as="span">{children}</TextContent>
       )}

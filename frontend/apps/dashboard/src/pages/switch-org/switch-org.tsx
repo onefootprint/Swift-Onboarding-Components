@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Box } from '@onefootprint/ui';
+import { Box, LoadingSpinner } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ const SwitchOrg = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Box center flexDirection="column" height="100%" marginTop={12} width="100%">
-        <AnimatedLoadingSpinner animationStart />
+        <LoadingSpinner />
       </Box>
     </>
   );

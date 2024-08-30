@@ -1,5 +1,5 @@
 import { useCountdownCustom, useInterval } from '@onefootprint/hooks';
-import { AnimatedLoadingSpinner, Stack, Text, media } from '@onefootprint/ui';
+import { LoadingSpinner, Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
@@ -436,7 +436,7 @@ const Camera = ({
       {!isCameraVisible ? (
         <LoadingContainer data-device-kind={deviceKind} $desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}>
           <AnimatePresence>
-            <AnimatedLoadingSpinner animationStart />
+            <LoadingSpinner />
             {showCameraLoadingFeedback && (
               <TextContainer
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
@@ -527,7 +527,7 @@ const Camera = ({
             </>
           ) : (
             <ProcessingContainer>
-              <AnimatedLoadingSpinner animationStart />
+              <LoadingSpinner />
             </ProcessingContainer>
           )}
         </VideoContainer>

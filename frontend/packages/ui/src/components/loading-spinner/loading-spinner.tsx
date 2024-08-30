@@ -3,19 +3,13 @@ import styled, { keyframes, useTheme } from 'styled-components';
 
 import Stack from '../stack';
 
-export type AnimatedLoadingSpinnerProps = {
-  animationStart: boolean;
+export type LoadingSpinnerProps = {
   size?: number;
   color?: Color;
   ariaLabel?: string;
 };
 
-const AnimatedLoadingSpinner = ({
-  animationStart = true,
-  size = 32,
-  color,
-  ariaLabel = 'Loading...',
-}: AnimatedLoadingSpinnerProps) => {
+const LoadingSpinner = ({ size = 32, color, ariaLabel = 'Loading...' }: LoadingSpinnerProps) => {
   const theme = useTheme();
   const spinnerColor = color ? theme.color[color] : theme.color.quaternary;
 
@@ -27,26 +21,24 @@ const AnimatedLoadingSpinner = ({
 
   return (
     <Container $height={size} $width={size} align="center" justify="center" aria-label={ariaLabel} role="progressbar">
-      {animationStart && (
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={color ? theme.backgroundColor.transparent : theme.backgroundColor.secondary}
-            strokeWidth={strokeWidth}
-          />
-          <AnimatedCircle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={spinnerColor}
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            $circumference={adjustedCircumference}
-          />
-        </svg>
-      )}
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color ? theme.backgroundColor.transparent : theme.backgroundColor.secondary}
+          strokeWidth={strokeWidth}
+        />
+        <AnimatedCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={spinnerColor}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          $circumference={adjustedCircumference}
+        />
+      </svg>
     </Container>
   );
 };
@@ -74,11 +66,11 @@ const dash = (size: number) => keyframes`
 
 const Container = styled(Stack)<{ $height: number; $width: number }>`
   ${({ $height, $width }) => `
-      height: ${$height}px;
-      width: ${$width}px;
-      display: flex; 
-      justify-content: center;
-      align-items: center; 
+    height: ${$height}px;
+    width: ${$width}px;
+    display: flex; 
+    justify-content: center;
+    align-items: center; 
   `}
 `;
 
@@ -89,4 +81,4 @@ const AnimatedCircle = styled.circle<{ $circumference: number }>`
   transform-origin: center;
 `;
 
-export default AnimatedLoadingSpinner;
+export default LoadingSpinner;

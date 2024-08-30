@@ -1,6 +1,6 @@
 import { IcoWarning24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
-import { AnimatedLoadingSpinner, Box, Button, Text } from '@onefootprint/ui';
+import { Box, Button, LoadingSpinner, Text } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -77,7 +77,7 @@ const Init = () => {
 
   return (
     <LoadingContainer>
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </LoadingContainer>
   );
 };

@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -42,7 +42,7 @@ const Validate = () => {
     <ErrorComponent />
   ) : (
     <Container>
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </Container>
   );
 };

@@ -1,5 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import { AnimatedLoadingSpinner, Box, Grid, Stack, Text } from '@onefootprint/ui';
+import { Box, Grid, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -103,7 +103,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
       </Stack>
       {isLoading && (
         <Stack padding={7} width="100%" align="center" justify="center">
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         </Stack>
       )}
     </>

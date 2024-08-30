@@ -3,25 +3,26 @@ import { useState } from 'react';
 
 import Button from '../button';
 import Stack from '../stack';
-import AnimatedSuccessCheck from './animated-success-check';
+import SuccessCheck from './success-check';
+import type { SuccessCheckProps } from './success-check';
 
 export default {
-  title: 'Components/AnimatedSuccessCheck',
-  component: AnimatedSuccessCheck,
+  title: 'Components/SuccessCheck',
+  component: SuccessCheck,
   argTypes: {
     size: {
       control: 'number',
       defaultValue: 40,
     },
   },
-} satisfies Meta<typeof AnimatedSuccessCheck>;
+} satisfies Meta<typeof SuccessCheck>;
 
-const Template: StoryFn<typeof AnimatedSuccessCheck> = ({ size }) => {
+const Template: StoryFn<SuccessCheckProps> = ({ size }) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (
     <Stack dir="column" gap={5}>
-      <AnimatedSuccessCheck animationStart={animationStart} size={size} />
+      <SuccessCheck animationStart={animationStart} size={size} />
       <Stack gap={3}>
         <Button type="button" size="compact" onClick={() => setAnimationStart(true)}>
           Play Animation

@@ -1,5 +1,5 @@
 import { Text } from '@onefootprint/ui';
-import AnimatedSuccessCheck from '@onefootprint/ui/src/components/animated-success-check';
+import { SuccessCheck } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -10,7 +10,7 @@ const LivenessSuccess = () => {
 
   return (
     <IconContainer>
-      <AnimatedSuccessCheck animationStart />
+      <SuccessCheck animationStart />
       <Text variant="label-3" color="success" marginTop={5}>
         {t('label')}
       </Text>

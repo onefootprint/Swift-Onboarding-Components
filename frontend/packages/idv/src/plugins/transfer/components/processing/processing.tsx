@@ -1,5 +1,5 @@
 import { D2PStatus } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, LinkButton } from '@onefootprint/ui';
+import { LinkButton, LoadingSpinner } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -56,7 +56,7 @@ const Processing = ({ title, subtitle, cta }: ProcessingProps) => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Container>
         <HeaderTitle title={title} subtitle={subtitle} />
-        <AnimatedLoadingSpinner animationStart />
+        <LoadingSpinner />
         <LinkButton onClick={handleCancelD2p} data-dd-action-name="transfer-processing:cancel">
           {cta}
         </LinkButton>

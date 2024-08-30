@@ -1,10 +1,10 @@
-import { AnimatedLoadingSpinner, Stack, Text } from '@onefootprint/ui';
+import { LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 const Verifying = ({ text }: { text: string }) => (
   <Container>
     <Stack justify="center" width="40px" height="40px">
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
     </Stack>
     <Text variant="label-3">{text}</Text>
   </Container>

@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Stack } from '@onefootprint/ui';
+import { LoadingSpinner, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -17,7 +17,7 @@ const ScanCode = ({ children, Header }: ScanCodeProps) => {
       <Stack direction="column" gap={7}>
         <Header title={t('scan-code-to-log-in')} subtitle={t('use-camera-or-qr-reader')} />
         <CodePlaceholder>
-          <AnimatedLoadingSpinner animationStart />
+          <LoadingSpinner />
         </CodePlaceholder>
       </Stack>
       {children}

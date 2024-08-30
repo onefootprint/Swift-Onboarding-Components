@@ -87,7 +87,7 @@ export type {
 export {
   Hint,
   AddressInput,
-  AnimatedLoadingSpinner,
+  LoadingSpinner,
   Avatar,
   Badge,
   Banner,

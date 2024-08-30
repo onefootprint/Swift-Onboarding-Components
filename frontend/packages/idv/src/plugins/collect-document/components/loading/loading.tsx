@@ -1,4 +1,4 @@
-import { AnimatedLoadingSpinner, Box, Stack, Text } from '@onefootprint/ui';
+import { Box, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type Step = 'process' | 'upload' | 'analyze';
@@ -15,7 +15,7 @@ const Loading = ({ step, showSlowConnectionMessage }: LoadingProps) => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" padding={6}>
-      <AnimatedLoadingSpinner animationStart />
+      <LoadingSpinner />
       <Stack direction="column" justify="center" align="center" gap={3}>
         <Text variant="label-1" marginTop={5} textAlign="center">
           {t(`title.${step}`)}

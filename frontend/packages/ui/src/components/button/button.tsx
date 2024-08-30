@@ -7,8 +7,8 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils/mixins';
-import AnimatedLoadingSpinner from '../animated-loading-spinner';
 import Box from '../box';
+import LoadingSpinner from '../loading-spinner';
 import Stack from '../stack';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
@@ -75,8 +75,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {getContent()}
         <Box visibility={loading ? 'visible' : 'hidden'} position="absolute">
-          <AnimatedLoadingSpinner
-            animationStart={loading ?? false}
+          <LoadingSpinner
             ariaLabel={loadingAriaLabel}
             color={variant === 'primary' ? 'quinary' : 'tertiary'}
             size={size === 'large' ? 20 : 16}

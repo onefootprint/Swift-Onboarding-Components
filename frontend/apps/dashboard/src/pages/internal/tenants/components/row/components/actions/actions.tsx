@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { Tenant } from '@onefootprint/types';
-import { AnimatedLoadingSpinner, Dropdown, useToast } from '@onefootprint/ui';
+import { Dropdown, LoadingSpinner, useToast } from '@onefootprint/ui';
 import useGenerateInvoice from './hooks/use-generate-invoice';
 
 type ActionsProps = {
@@ -30,7 +30,7 @@ const Actions = ({ tenant }: ActionsProps) => {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger aria-label={'Actions'}>
-        {isLoading ? <AnimatedLoadingSpinner animationStart /> : <IcoDotsHorizontal24 />}
+        {isLoading ? <LoadingSpinner /> : <IcoDotsHorizontal24 />}
       </Dropdown.Trigger>
       <Dropdown.Content align="end">
         <Dropdown.Item onSelect={handleGenerateInvoice} onClick={event => event.stopPropagation()}>
