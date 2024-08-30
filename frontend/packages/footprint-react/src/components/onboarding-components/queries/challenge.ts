@@ -4,6 +4,7 @@ import { InlineOtpNotSupported } from '../../../types/request';
 import request from '../utils/request';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
+type IdentifyRequestPayload = EmailAndPassword & { authToken?: string };
 
 type RequestOptions = {
   onboardingConfig: string;
@@ -11,14 +12,16 @@ type RequestOptions = {
   requiredAuthMethods?: string[];
 };
 
-const identify = async (payload: EmailAndPassword, options: RequestOptions) => {
+export const identify = async (payload: IdentifyRequestPayload, options: RequestOptions) => {
+  const { authToken, ...restPayload } = payload;
   const response = await request<IdentifyResponse>({
     url: '/hosted/identify',
     method: 'POST',
-    data: { ...payload, scope: 'onboarding' },
+    data: { ...restPayload, scope: 'onboarding' },
     headers: {
       'X-Onboarding-Config-Key': options.onboardingConfig,
       'X-Sandbox-Id': options.sandboxId,
+      'X-Fp-Authorization': authToken,
     },
   });
   return response;
@@ -133,7 +136,7 @@ const initOnboarding = async (options: { token: string; sandboxOutcome?: Sandbox
   return response;
 };
 
-const createVaultingToken = async ({ authToken }: { authToken: string }) => {
+export const createVaultingToken = async ({ authToken }: { authToken: string }) => {
   const response = await request<{ token: string; expiresAt: string }>({
     url: '/hosted/user/tokens',
     method: 'POST',

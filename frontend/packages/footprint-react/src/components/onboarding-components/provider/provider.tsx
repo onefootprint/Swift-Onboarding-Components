@@ -6,12 +6,15 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
+import type AuthTokenStatus from '../types/auth-token-status';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 
 export type ContextData = {
   appearance?: FootprintAppearance;
   authToken?: string;
   vaultingToken?: string;
+  verifiedAuthToken?: string;
+  authTokenStatus?: AuthTokenStatus;
   fpInstance: FootprintComponent | null;
   handoffCallbacks?: {
     onCancel?: () => void;
@@ -26,7 +29,7 @@ export type ContextData = {
   locale?: SupportedLocale;
 };
 
-type UpdateContext = Dispatch<SetStateAction<ContextData>>;
+export type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 
 const Context = createContext<[ContextData, UpdateContext]>([
   {

@@ -2,12 +2,66 @@ import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { ChallengeData } from '@onefootprint/types';
 import { useContext, useState } from 'react';
 import { Context } from '../provider';
-import { createChallenge, verifyChallenge } from '../queries/challenge';
+import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
+import AuthTokenStatus from '../types/auth-token-status';
+import TenantAuthMethods from '../types/tenant-auth-methods';
 import { unlockBody } from '../utils/dom-utils';
+import validateAuthToken from '../utils/validate-auth-token';
+
+type AuthRequirement = {
+  requiresAuth: boolean;
+  authMethod: null | TenantAuthMethods;
+};
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
+
+  const authTokenStatusToRequirement = (status: AuthTokenStatus): AuthRequirement => {
+    if (status === AuthTokenStatus.validWithSufficientScope) {
+      return { requiresAuth: false, authMethod: null };
+    }
+    if (status === AuthTokenStatus.validWithInsufficientScope) {
+      return { requiresAuth: true, authMethod: TenantAuthMethods.authToken };
+    }
+    throw new Error('Invalid auth token. Please use a valid auth token.');
+  };
+
+  const requiresAuth = async (): Promise<AuthRequirement> => {
+    const { authToken, authTokenStatus, vaultingToken, verifiedAuthToken } = context;
+
+    // If we already have a vaulting token, we don't need to authenticate
+    if (vaultingToken) {
+      return { requiresAuth: false, authMethod: null };
+    }
+
+    // If we have a verified auth token, we don't need to authenticate
+    // But we need to create a vaulting token
+    if (verifiedAuthToken) {
+      const vaultingTokenResponse = await createVaultingToken({ authToken: verifiedAuthToken });
+      setContext(prev => ({ ...prev, vaultingToken: vaultingTokenResponse.token }));
+      return { requiresAuth: false, authMethod: null };
+    }
+
+    if (authToken) {
+      // If we have an auth token, but we don't know if it's valid
+      // We need to validate it
+      // This part will only be reached if the authTokenStatus is undefined
+      // which will only happen once the first time we call the function
+      if (!authTokenStatus) {
+        const status = await validateAuthToken({
+          publicKey: context.publicKey,
+          authToken,
+          sandboxId: context.sandboxId,
+          setContext,
+        });
+        return authTokenStatusToRequirement(status);
+      }
+      return authTokenStatusToRequirement(authTokenStatus);
+    }
+
+    return { requiresAuth: true, authMethod: TenantAuthMethods.emailAndPhone };
+  };
 
   const launchIdentify = (
     { email, phoneNumber }: { email?: string; phoneNumber?: string },
@@ -108,7 +162,7 @@ const useOtp = () => {
     }));
   };
 
-  return { launchIdentify, create, verify };
+  return { launchIdentify, create, verify, requiresAuth };
 };
 
 export default useOtp;
