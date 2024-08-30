@@ -129,9 +129,9 @@ config:
     openaiApiKey:
       secure: v1:du0pxYZ+lwWtlim8:hSjpDmZFOnSWbcBmaMWPTNsNEKs4hDoZ1Zg+wSwBiVJyVFfREo3n3+qwg1HulbTMCuDS0eCa0/vnHi/dpVUCvezaAg==
     resources:
-      cpuUnits: 256
+      cpuUnits: 1024
       maxInstances: 6
-      memoryMB: 1024
+      memoryMB: 2048
       minInstances: 2
       targetCpuUtilization: 60
       targetMemoryUtilization: 60
