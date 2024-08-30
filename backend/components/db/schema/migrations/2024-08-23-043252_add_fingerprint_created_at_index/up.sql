@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS fingerprint_query_sh_data_created_at ON fingerprint USING btree (is_live, sh_data, tenant_id, _created_at) WHERE deactivated_at IS NULL AND is_hidden = 'f';

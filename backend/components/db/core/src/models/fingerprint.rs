@@ -280,7 +280,7 @@ impl Fingerprint {
             .filter(fingerprint::tenant_id.eq(&sv.tenant_id))
             .offset(pagination.offset().unwrap_or_default())
             .limit(pagination.limit())
-            .order_by(fingerprint::vault_id)
+            .order_by(fingerprint::_created_at)
             .get_results::<Self>(conn)?;
 
         Ok(pagination.results(internal_matches))
