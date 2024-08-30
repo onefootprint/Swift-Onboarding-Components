@@ -1,11 +1,13 @@
 import {
+  type AmlCheck,
   AuthMethodKind,
+  type KybCheck,
   type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 
-const onboardingConfig: OnboardingConfig = {
+export const onboardingConfigFixture: OnboardingConfig = {
   id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
   name: 'KYB',
   key: 'pb_test_u29z2AvnfqhGKpIb4f0raa',
@@ -65,4 +67,20 @@ const onboardingConfig: OnboardingConfig = {
   verificationChecks: [],
 };
 
-export default onboardingConfig;
+export const amlCheck = ({
+  adverseMedia = false,
+  continuousMonitoring = false,
+  ofac = false,
+  pep = false,
+}: {
+  adverseMedia?: boolean;
+  continuousMonitoring?: boolean;
+  ofac?: boolean;
+  pep?: boolean;
+}) => {
+  return { kind: 'aml', data: { adverseMedia, ofac, pep, continuousMonitoring } } as AmlCheck;
+};
+
+export const kybCheck = (einOnly: boolean = false) => {
+  return { kind: 'kyb', data: { einOnly } } as KybCheck;
+};

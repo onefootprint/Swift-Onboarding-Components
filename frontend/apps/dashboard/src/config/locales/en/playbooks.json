@@ -695,9 +695,25 @@
       }
     },
     "verification-checks": {
+      "kyb": {
+        "title": "Know Your Business (KYB)",
+        "full": "Full KYB (data collection + verification checks).",
+        "ein-only": "TIN (EIN) and business name verification only.",
+        "none": "Only collecting the data (<b>no</b> verification checks).",
+        "kyc": {
+          "full": "On all business owners.",
+          "primary-only": "Only on business’ primary owner (the person who filled out the KYB form).",
+          "none": "KYC is <b>not</b> being conducted on beneficial owners."
+        }
+      },
+      "kyc": {
+        "title": "Know Your Customer (KYC)",
+        "full": "Database checks with collected identity data are being performed.",
+        "none": "Database checks with collected identity data are <b>not</b> being performed."
+      },
       "aml": {
         "title": "Anti-Money Laundering (AML)",
-        "empty": "AML checks are not enabled.",
+        "none": "AML checks are <b>not</b> enabled.",
         "ofac": "Office of Foreign Assets Control (OFAC)",
         "pep": "Politically Exposed Person (PEP)",
         "adverse-media": "Adverse media"

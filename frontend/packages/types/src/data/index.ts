@@ -166,6 +166,10 @@ export type {
   DocumentTypesAndCountries,
   OnboardingConfig,
   PublicOnboardingConfig,
+  KybCheck,
+  KycCheck,
+  AmlCheck,
+  VerificationCheck,
 } from './onboarding-config';
 export {
   OnboardingConfigKind,

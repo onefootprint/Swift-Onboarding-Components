@@ -22,17 +22,30 @@ export type DocumentTypesAndCountries = {
   global?: SupportedIdDocTypes[];
 };
 
-export type Aml = {
-  kind: 'aml';
+export type KycCheck = {
+  kind: 'kyc';
+  data: {};
+};
+
+export type KybCheck = {
+  kind: 'kyb';
   data: {
-    continuousMonitoring: boolean;
-    adverseMedia: boolean;
-    ofac: boolean;
-    pep: boolean;
+    einOnly: boolean;
   };
 };
 
-export type VerificationCheck = Aml;
+export type AmlCheck = {
+  kind: 'aml';
+  data: {
+    ofac: boolean;
+    pep: boolean;
+    adverseMedia: boolean;
+    continuousMonitoring: boolean;
+    adverseMediaLists: string[];
+  };
+};
+
+export type VerificationCheck = KycCheck | KybCheck | AmlCheck;
 
 // Used in the IDV context
 export type PublicOnboardingConfig = {
