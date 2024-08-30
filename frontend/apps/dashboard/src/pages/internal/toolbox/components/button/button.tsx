@@ -42,7 +42,7 @@ const Container = styled.button`
 
     &:hover {
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-      box-shadow: ${theme.elevation[2]};
+      background-color: ${theme.backgroundColor.secondary};
 
       ${IconContainer} {
         background-color: ${theme.backgroundColor.senary};
