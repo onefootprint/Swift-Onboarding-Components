@@ -178,7 +178,7 @@ const GlobalStyle = createGlobalStyle`
    }
 
    button, a, input {
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent !important;
     } 
  `}
 `;
