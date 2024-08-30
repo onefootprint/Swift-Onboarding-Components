@@ -86,7 +86,7 @@ class FootprintAndroid private constructor() {
             builder.appendQueryParameter("redirect_url", "com.footprint.android://")
             val appearanceJson = config.appearance?.toJSON()
             appearanceJson?.let {
-                it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("fontSrc", fontSrc) }
+                it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("font_src", fontSrc) }
                 it["variant"]?.let { variant -> builder.appendQueryParameter("variant", variant) }
                 it["variables"]?.let { variables -> builder.appendQueryParameter("variables", variables) }
                 it["rules"]?.let { rules -> builder.appendQueryParameter("rules", rules) }
