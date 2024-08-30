@@ -176,6 +176,10 @@ const GlobalStyle = createGlobalStyle`
    body {
      background-color: ${theme.backgroundColor.primary};
    }
+
+   button, a, input {
+    -webkit-tap-highlight-color: transparent;
+    } 
  `}
 `;
 
