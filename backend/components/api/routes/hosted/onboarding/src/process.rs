@@ -109,8 +109,8 @@ pub async fn post(
     // if we timeout polling incode here still, then we enqueue a task which tries again async
     let deadline = ResponseDeadline::from_req_or_timeout(&http_request, StdDuration::from_secs(50))
         .into_instant()
-        - StdDuration::from_secs(2); // Small buffer to gracefully handle the incode timeout before
-                                     // the timeout middleware cancels the whole request.
+        - StdDuration::from_secs(10); // Small buffer to gracefully handle the incode timeout before
+                                      // the timeout middleware cancels the whole request.
     match decision::state::run_incode_machine_and_workflow(&state, ww, deadline).await {
         Ok(run) => match run {
             RunIncodeMachineAndWorkflowResult::IncodeStuck
