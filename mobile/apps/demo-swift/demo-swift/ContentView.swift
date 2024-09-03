@@ -54,7 +54,7 @@ struct ContentView: View {
                     scheme: "footprintapp-callback",
                     bootstrapData: bootstrapData,
                     options: options,
-                    l10n: FootprintL10n(locale: .esMX),
+                    l10n: FootprintL10n(locale: .esMX, language: .spanish),
                     appearance: appearance,
                     onCancel: {
                         print("User canceled")

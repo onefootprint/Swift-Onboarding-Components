@@ -35,6 +35,10 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
             }
         }
         
+        if let lng = self.configuration.l10n?.language{
+            queryItems.append(URLQueryItem(name: "lng", value: lng.rawValue))
+        }
+        
         urlComponents.queryItems = queryItems
         urlComponents.fragment = token
         return urlComponents.url!
