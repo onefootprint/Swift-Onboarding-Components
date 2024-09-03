@@ -85,6 +85,7 @@ const useOtp = () => {
       appearance: context.appearance,
       publicKey: context.publicKey,
       sandboxOutcome: context.sandboxOutcome,
+      sandboxId: context.sandboxId,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,
