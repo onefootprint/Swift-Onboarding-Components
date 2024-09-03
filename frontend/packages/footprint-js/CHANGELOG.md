@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.14.1
+
+### Patch Changes
+
+- f312ff1204: Add more robust logging by including the fp session id
+
 ## 3.14.0
 
 ### Minor Changes
