@@ -70,6 +70,7 @@ export const createBifrostMachine = () =>
             isComponentsSdk,
             fixtureResult,
             documentFixtureResult,
+            sandboxId,
           } = event.payload;
 
           let sandboxOutcome = undefined;
@@ -98,6 +99,8 @@ export const createBifrostMachine = () =>
           context.isComponentsSdk = isUndefined(isComponentsSdk) ? context.isComponentsSdk : isComponentsSdk;
 
           context.sandboxOutcome = isUndefined(sandboxOutcome) ? context.sandboxOutcome : sandboxOutcome;
+
+          context.sandboxId = isUndefined(sandboxId) ? context.sandboxId : sandboxId;
 
           return context;
         }),

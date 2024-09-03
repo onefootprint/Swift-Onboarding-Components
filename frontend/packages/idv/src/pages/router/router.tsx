@@ -54,6 +54,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
   } = state.context;
   const isDone = state.matches('complete');
   const retryLimitExceeded = retries > IDV_SESSION_RETRY_LIMIT;
+  console.log('SandBoxId: ', sandboxId);
 
   useValidateSession(
     { authToken },

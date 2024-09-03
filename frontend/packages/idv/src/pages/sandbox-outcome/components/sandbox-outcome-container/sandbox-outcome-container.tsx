@@ -12,6 +12,7 @@ import TestIdInput from '../test-id-input';
 type SandboxOutcomeContainerProps = {
   config?: PublicOnboardingConfig;
   collectTestId?: boolean;
+  sandboxId?: string;
 };
 
 export const SandboxOutcomeContainer = ({ config, collectTestId }: SandboxOutcomeContainerProps) => {
@@ -54,13 +55,14 @@ const SandboxOutcomeFormWrapper = ({
   config,
   collectTestId,
   onSubmit,
+  sandboxId,
 }: SandboxOutcomeContainerProps & { onSubmit: (formData: SandboxOutcomeFormData) => void }) => {
   const formMethods = useForm<SandboxOutcomeFormData>({
     defaultValues: {
       overallOutcome: OverallOutcome.success,
       docVerificationOutcome: IdVerificationOutcome.simulated,
       idDocOutcome: config?.requiresIdDoc ? IdDocOutcome.success : undefined,
-      testID: collectTestId ? getRandomID() : undefined,
+      testID: collectTestId ? sandboxId ?? getRandomID() : undefined,
     },
     mode: 'onChange',
   });

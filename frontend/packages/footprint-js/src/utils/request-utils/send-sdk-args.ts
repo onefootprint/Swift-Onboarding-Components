@@ -50,6 +50,7 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       l10n: props.l10n,
       fixtureResult: props.sandboxOutcome?.overallOutcome,
       documentFixtureResult: props.sandboxOutcome?.documentOutcome,
+      sandboxId: props.sandboxId,
       isComponentsSdk: kind === ComponentKind.Components,
     };
   }

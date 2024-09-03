@@ -13,7 +13,9 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useTimeout } from 'usehooks-ts';
 
+import { isAlphanumeric } from '@onefootprint/core';
 import { useRequestError } from '@onefootprint/request';
+import { useToast } from '@onefootprint/ui';
 import useProps from './hooks/use-props';
 
 const STUCK_ON_SHIMMER_TIMEOUT = 5000;
@@ -63,6 +65,7 @@ const Init = () => {
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const startMs = Date.now();
   const obConfigAuth = publicKeyContext ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext } : undefined;
+  const toast = useToast();
 
   useTimeout(() => {
     logError(`User is stuck on init shimmer screen for ${(Date.now() - startMs) / 1000} seconds`, undefined, {
@@ -105,9 +108,19 @@ const Init = () => {
         options = {},
         publicKey = '',
         fixtureResult,
+        sandboxId,
         documentFixtureResult,
       } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
+      const isValidPredefinedSandboxId = sandboxId && isAlphanumeric(sandboxId);
+      if (!isValidPredefinedSandboxId) {
+        toast.show({
+          title: 'Invalid sandbox id provided',
+          description: 'The sandbox id can only contain alphanumeric characters. Resetting the sandbox id.',
+          variant: 'error',
+        });
+      }
+
       send({
         type: 'initContextUpdated',
         payload: {
@@ -121,6 +134,7 @@ const Init = () => {
           showLogo,
           fixtureResult: fixtureResult as OverallOutcome,
           documentFixtureResult: documentFixtureResult as IdDocOutcome,
+          sandboxId: isValidPredefinedSandboxId ? sandboxId : undefined,
         },
       });
     },

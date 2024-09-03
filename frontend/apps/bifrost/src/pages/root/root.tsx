@@ -41,6 +41,7 @@ const Root = ({ variant }: RootProps) => {
     publicKey,
     isComponentsSdk,
     sandboxOutcome: { overallOutcome, idDocOutcome } = {},
+    sandboxId,
   } = state.context;
   const obConfigAuth = publicKey ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey } : undefined;
 
@@ -129,6 +130,7 @@ const Root = ({ variant }: RootProps) => {
             overallOutcome={overallOutcome}
             idDocOutcome={idDocOutcome}
             l10n={l10n}
+            sandboxId={sandboxId}
           />
         )}
         {state.matches('complete') && <Complete />}

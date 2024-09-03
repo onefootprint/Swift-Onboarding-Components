@@ -17,6 +17,7 @@ export type MachineContext = {
     overallOutcome?: OverallOutcome;
     idDocOutcome?: IdDocOutcome;
   };
+  sandboxId?: string;
 };
 
 export type MachineEvents =
@@ -33,6 +34,7 @@ export type MachineEvents =
         isComponentsSdk?: boolean;
         fixtureResult?: OverallOutcome;
         documentFixtureResult?: IdDocOutcome;
+        sandboxId?: string;
       };
     }
   | { type: 'configRequestFailed' }

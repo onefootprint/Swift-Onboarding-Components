@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type React from 'react';
 import { createContext, useEffect, useMemo, useState } from 'react';
 
+import { isAlphanumeric } from '@onefootprint/core';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
 import type AuthTokenStatus from '../types/auth-token-status';
@@ -100,8 +101,7 @@ const Provider = ({
     let newSandboxOutcome = sandboxOutcome;
     if (!response.isLive) {
       if (sandboxId) {
-        const regex = /^[A-Za-z0-9]+$/;
-        if (!regex.test(sandboxId)) {
+        if (!isAlphanumeric(sandboxId)) {
           throw new Error('sandboxId should only contain letters and numbers');
         }
       }

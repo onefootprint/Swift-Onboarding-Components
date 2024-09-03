@@ -79,6 +79,7 @@ type VerifyPropsBase<TAuth> = PropsBase & {
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Options;
   readonly sandboxOutcome?: SandboxOutcome;
+  readonly sandboxId?: string;
   /** @deprecated use bootstrapData instead */
   readonly userData?: FootprintUserData;
 } & TAuth;
@@ -93,6 +94,7 @@ export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
   isComponentsSdk?: boolean;
   fixtureResult?: OverallOutcome;
   documentFixtureResult?: IdDocOutcome;
+  readonly sandboxId?: string;
 };
 
 /** Components SDK. Just a subset of Verify */

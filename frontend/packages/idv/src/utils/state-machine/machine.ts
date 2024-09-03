@@ -28,6 +28,7 @@ export type IdvMachineArgs = {
   showLogo?: boolean;
   onClose?: () => void;
   onComplete?: (payload: CompletePayload) => void;
+  sandboxId?: string;
 };
 
 const getIdvMachineContext = (args: IdvMachineArgs): Readonly<MachineContext> => {
