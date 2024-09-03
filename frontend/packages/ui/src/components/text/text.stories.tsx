@@ -1,6 +1,7 @@
 import themes from '@onefootprint/design-tokens';
 import type { Meta, StoryFn } from '@storybook/react';
 
+import Box from '../box';
 import type { TextProps } from './text';
 import Text from './text';
 import variantMapping from './text.constants';
@@ -23,7 +24,7 @@ export default {
     },
     variant: { control: 'select', options: Object.keys(variantMapping) },
   },
-} as Meta;
+} as Meta<typeof Text>;
 
 const Template: StoryFn<TextProps> = ({
   tag,
@@ -31,10 +32,13 @@ const Template: StoryFn<TextProps> = ({
   color = 'primary',
   testID,
   variant = 'heading-1',
+  truncate,
 }: Partial<TextProps>) => (
-  <Text tag={tag} color={color} testID={testID} variant={variant}>
-    {children}
-  </Text>
+  <Box width={truncate ? '100px' : 'inherit'}>
+    <Text tag={tag} color={color} testID={testID} variant={variant} truncate={truncate}>
+      {children}
+    </Text>
+  </Box>
 );
 
 export const Display1 = Template.bind({});
@@ -142,4 +146,10 @@ export const Caption2 = Template.bind({});
 Caption2.args = {
   variant: 'caption-2',
   children: 'Footprint (caption-2)',
+};
+
+export const Truncated = Template.bind({});
+Truncated.args = {
+  truncate: true,
+  children: 'Truncated when text is too long',
 };

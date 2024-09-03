@@ -12,13 +12,15 @@ const CustomDocsPreview = ({ name, uploadSettings, identifier, ...rest }: Custom
 
   return (
     <Stack flexDirection="column" gap={4} {...rest}>
-      <Stack justifyContent="space-between">
-        <Text variant="body-3" color="tertiary">
+      <Stack justifyContent="space-between" alignItems="center" gap={5}>
+        <Text variant="body-3" color="tertiary" flex="none">
           {t('form.name.label')}
         </Text>
-        <Text variant="body-3">{name}</Text>
+        <Text truncate variant="body-3">
+          {name}
+        </Text>
       </Stack>
-      <Stack justifyContent="space-between">
+      <Stack justifyContent="space-between" alignItems="center" gap={5}>
         <Text variant="body-3" color="tertiary">
           {t('form.identifier.label')}
         </Text>
@@ -31,16 +33,14 @@ const CustomDocsPreview = ({ name, uploadSettings, identifier, ...rest }: Custom
           overflow="hidden"
           paddingBlock={1}
           paddingInline={2}
-          textOverflow="ellipsis"
           userSelect="none"
-          whiteSpace="nowrap"
         >
-          <Text variant="snippet-2" color="tertiary" truncate>
+          <Text truncate variant="snippet-2" color="tertiary">
             document.custom.{identifier}
           </Text>
         </Box>
       </Stack>
-      <Stack justifyContent="space-between">
+      <Stack justifyContent="space-between" alignItems="center" gap={5}>
         <Text variant="body-3" color="tertiary">
           {t('form.collection-method.title')}
         </Text>
