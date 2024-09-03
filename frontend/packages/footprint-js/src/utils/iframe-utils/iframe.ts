@@ -1,3 +1,4 @@
+import { addSessionIdToQueryParam } from '@onefootprint/dev-tools';
 import Postmate from '@onefootprint/postmate';
 import { version } from '../../../package.json';
 import type { FormRef, Props } from '../../types/components';
@@ -15,7 +16,7 @@ import {
   showContainer,
 } from '../dom-utils';
 import getUniqueId from '../get-unique-id';
-import { logError, logWarn } from '../logger';
+import { logError, logInfo, logWarn } from '../logger';
 import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
 import { SdkKindByComponentKind } from '../request-utils/constants';
 import sendSdkArgs from '../request-utils/send-sdk-args';
@@ -144,17 +145,20 @@ const initIframe = (rawProps: Props): Iframe => {
       });
       return { success: true, parentApi };
     } catch (e) {
-      handleError(`Initializing ${url} iframe failed with error ${e}`);
+      handleError(`Initializing iframe with ${new URL(url).host} failed with error ${e}`);
       return { success: false };
     }
   };
 
   const initIframe = async (container: HTMLElement, { url, fallbackUrl }: ReturnType<typeof getURL>) => {
+    logInfo(SdkKindByComponentKind[props.kind], `Initializing iframe with ${new URL(url).host}`);
     const response = await initializePostmate(container, url);
 
     if (response.success) {
       return response.parentApi;
     }
+
+    logInfo(SdkKindByComponentKind[props.kind], `Initializing iframe with ${new URL(fallbackUrl).host} as fallback`);
 
     const responseFallback = await initializePostmate(container, fallbackUrl);
 
@@ -192,10 +196,13 @@ const initIframe = (rawProps: Props): Iframe => {
       return;
     }
 
-    const urls = getURL(props, sdkArgsToken || '');
+    const { url, fallbackUrl } = getURL(props, sdkArgsToken || '');
 
     try {
-      await initIframe(container, urls);
+      await initIframe(container, {
+        url: addSessionIdToQueryParam(url),
+        fallbackUrl: addSessionIdToQueryParam(fallbackUrl),
+      });
       registerCallbackProps();
     } catch (_) {
       createErrorModal(container);

@@ -1,3 +1,4 @@
+import { getSessionId } from '@onefootprint/dev-tools';
 import type { SdkKind } from './constants';
 import { API_BASE_URL, SDK_NAME, SDK_VERSION } from './constants';
 import transformKeys from './transform-keys';
@@ -12,7 +13,7 @@ type SdkTelemetryRequest = {
   sessionId?: string;
 };
 
-const sendSdkTelemetry = (kind: SdkKind, message: string, level: 'error' | 'warn', domain?: string) => {
+const sendSdkTelemetry = (kind: SdkKind, message: string, level: 'error' | 'warn' | 'info', domain?: string) => {
   const body: SdkTelemetryRequest = {
     tenantDomain: domain,
     sdkKind: kind,
@@ -20,6 +21,7 @@ const sendSdkTelemetry = (kind: SdkKind, message: string, level: 'error' | 'warn
     sdkVersion: SDK_VERSION,
     logLevel: level,
     logMessage: message,
+    sessionId: getSessionId(),
   };
   try {
     // Fire and forget. No need to await or handle the response.

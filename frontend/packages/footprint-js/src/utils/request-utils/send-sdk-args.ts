@@ -8,6 +8,7 @@ import type {
   VerifyDataProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
+import { logError, logInfo } from '../logger';
 import { getBootstrapData } from '../prop-utils';
 import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
 import { API_BASE_URL, SDK_NAME, SDK_VERSION, SdkKind, SdkKindByComponentKind } from './constants';
@@ -112,6 +113,9 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       l10n: props.l10n,
     } as VerifyButtonDataProps;
   }
+
+  logError(kind, 'Invalid kind provided');
+
   return undefined;
 };
 
@@ -134,6 +138,7 @@ const sendSdkArgsRecursive = async (payload: SendSdkArgsRequest, numRetries: num
   });
 
 const sendSdkArgs = async (props: Props): Promise<string | undefined> => {
+  logInfo(SdkKindByComponentKind[props.kind], 'Sending SDK args');
   const data = getSdkArgsDataPayload(props);
   if (!data) {
     return undefined;
