@@ -1,9 +1,14 @@
-import { v4 as uuidv4 } from 'uuid';
-
 const key = 'fp-session-id';
 const isBrowser = typeof window !== 'undefined';
 const isTest = process.env.NODE_ENV === 'test';
 const queryParamKey = 'xfpsessionid';
+
+// replaced the uuid lib with custom implementation as the package is not compatible with our UMD build of footprint-js
+const uuidv4 = () => {
+  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
+    (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16),
+  );
+};
 
 const getParamValue = (param: string, url: string): string | null => {
   const urlObject = new URL(url);
