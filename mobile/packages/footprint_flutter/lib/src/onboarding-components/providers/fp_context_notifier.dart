@@ -1,28 +1,19 @@
 import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-part 'fp_context_notifier.g.dart';
 
-@riverpod
-class FpContextNotifier extends _$FpContextNotifier {
+class FpContextNotifier extends Notifier<ProviderContext> {
+  final ProviderContext initialContext;
+
+  FpContextNotifier(this.initialContext);
+
   @override
   ProviderContext build() {
-    return ProviderContext(
-      publicKey: '',
-      step: OnboardingStep.auth,
-      appearance: null,
-      locale: FootprintSupportedLocale.enUS,
-      onboardingConfig: null,
-      authToken: null,
-      vaultingToken: null,
-      redirectUrl: '',
-      sandboxId: null,
-      sandboxOutcome: null,
-    );
+    return initialContext;
   }
 
   void init(ProviderContext context) {
@@ -42,14 +33,6 @@ class FpContextNotifier extends _$FpContextNotifier {
 
   void updateOnboardingConfig(OnboardingConfig onboardingConfig) {
     state = state.copyWith(onboardingConfig: onboardingConfig);
-  }
-
-  void updateStep(OnboardingStep step) {
-    state = state.copyWith(step: step);
-  }
-
-  void updateAuthToken(String authToken) {
-    state = state.copyWith(authToken: authToken);
   }
 
   void updateVaultingToken(String vaultingToken) {
@@ -72,12 +55,20 @@ class FpContextNotifier extends _$FpContextNotifier {
     state = state.copyWith(sandboxOutcome: sandboxOutcome);
   }
 
+  void updateVerifiedAuthToken(String verifiedAuthToken) {
+    state = state.copyWith(verifiedAuthToken: verifiedAuthToken);
+  }
+
+  void updateAuthTokenStatus(AuthTokenStatus authTokenStatus) {
+    state = state.copyWith(authTokenStatus: authTokenStatus);
+  }
+
   void update({
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
     OnboardingConfig? onboardingConfig,
-    OnboardingStep? step,
-    String? authToken,
+    String? verifiedAuthToken,
+    AuthTokenStatus? authTokenStatus,
     String? vaultingToken,
     String? publicKey,
     String? redirectUrl,
@@ -88,8 +79,8 @@ class FpContextNotifier extends _$FpContextNotifier {
       appearance: appearance,
       locale: locale,
       onboardingConfig: onboardingConfig,
-      step: step,
-      authToken: authToken,
+      verifiedAuthToken: verifiedAuthToken,
+      authTokenStatus: authTokenStatus,
       vaultingToken: vaultingToken,
       publicKey: publicKey,
       redirectUrl: redirectUrl,
@@ -102,3 +93,20 @@ class FpContextNotifier extends _$FpContextNotifier {
     state = build();
   }
 }
+
+final fpContextNotifierProvider =
+    NotifierProvider<FpContextNotifier, ProviderContext>(
+  () => FpContextNotifier(ProviderContext(
+    publicKey: '',
+    appearance: null,
+    locale: FootprintSupportedLocale.enUS,
+    onboardingConfig: null,
+    authToken: null,
+    verifiedAuthToken: null,
+    authTokenStatus: null,
+    vaultingToken: null,
+    redirectUrl: '',
+    sandboxId: null,
+    sandboxOutcome: null,
+  )),
+);

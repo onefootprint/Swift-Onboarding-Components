@@ -13,15 +13,27 @@ typedef OtpChallengeRequest = ({
   String obConfig,
   String? sandboxId,
   List<AuthMethodKind>? requiredAuthMethods,
+  String? authToken,
 });
 
-Future<IdentifyResponse> identify(OtpChallengeRequest requestData) async {
+typedef OtpIdentifyRequest = ({
+  String? email,
+  String? phoneNumber,
+  String obConfig,
+  String? sandboxId,
+  String? authToken,
+});
+
+Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
   final headers = {
     'Content-Type': 'application/json',
     'X-Onboarding-Config-Key': requestData.obConfig,
   };
   if (requestData.sandboxId != null) {
     headers['X-Sandbox-Id'] = requestData.sandboxId!;
+  }
+  if (requestData.authToken != null) {
+    headers['X-Fp-Authorization'] = requestData.authToken!;
   }
 
   final response = await http.post(
@@ -105,27 +117,44 @@ Future<ChallengeResponse> signupChallenge(
 
 Future<ChallengeResponse> createOtpChallenge(
     OtpChallengeRequest requestData) async {
-  final identifyResponse = await identify(requestData);
+  final identifyResponse = await identify((
+    email: requestData.email,
+    phoneNumber: requestData.phoneNumber,
+    obConfig: requestData.obConfig,
+    sandboxId: requestData.sandboxId,
+    authToken: requestData.authToken,
+  ));
   if (identifyResponse.user?.authMethods != null) {
     final hasVerifiedSource =
-        identifyResponse.user!.authMethods!.any((e) => e.isVerified);
+        identifyResponse.user!.authMethods.any((e) => e.isVerified);
     if (!hasVerifiedSource) {
       throw InlineOtpNotSupportedException("No verified source found");
     }
-    final hasPhone = identifyResponse.user!.authMethods!.any(
+    final hasPhone = identifyResponse.user!.authMethods.any(
       (e) => e.kind == AuthMethodKind.phone && e.isVerified,
     );
-    final hasEmail = identifyResponse.user!.authMethods!.any(
+    final hasEmail = identifyResponse.user!.authMethods.any(
       (e) => e.kind == AuthMethodKind.email && e.isVerified,
     );
-    // TODO: Allow user to pick preferred method in the future
+    if (requestData.requiredAuthMethods != null) {
+      if (requestData.requiredAuthMethods!.contains(AuthMethodKind.phone) &&
+          !hasPhone) {
+        throw InlineOtpNotSupportedException(
+            "Inline OTP not supported - phone number is required but has not been verified");
+      }
+      if (requestData.requiredAuthMethods!.contains(AuthMethodKind.email) &&
+          !hasEmail) {
+        throw InlineOtpNotSupportedException(
+            "Inline OTP not supported - email is required but has not been verified");
+      }
+    }
     if (hasPhone) {
       final loginChallengeResponse =
-          await loginChallenge(token: identifyResponse.user!.token!);
+          await loginChallenge(token: identifyResponse.user!.token);
       return loginChallengeResponse;
     } else if (hasEmail) {
       final loginChallengeResponse = await loginChallenge(
-          kind: "email", token: identifyResponse.user!.token!);
+          kind: "email", token: identifyResponse.user!.token);
       return loginChallengeResponse;
     } else {
       throw InlineOtpNotSupportedException("No supported auth method found");

@@ -14,7 +14,7 @@ typedef VerifyOtpChallengeRequest = ({
 
 typedef VerifyOtpChallengeResponse = ({String authToken, String vaultingToken});
 
-Future<VarificationResponse> verify(
+Future<VerificationResponse> verify(
     VerifyOtpChallengeRequest requestData) async {
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify/verify'),
@@ -31,7 +31,7 @@ Future<VarificationResponse> verify(
 
   if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
-    return VarificationResponse.fromJson(responseBody);
+    return VerificationResponse.fromJson(responseBody);
   } else {
     throw Exception('Failed to verify OTP challenge');
   }

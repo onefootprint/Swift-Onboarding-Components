@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
@@ -42,23 +40,6 @@ class _WrapperState extends ConsumerState<Wrapper> {
     super.initState();
     // we initialize the provider with the context after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentProvider = ref.read(fpContextNotifierProvider);
-      ref.read(fpContextNotifierProvider.notifier).init(
-            ProviderContext(
-              publicKey: widget.publicKey,
-              step: widget.authToken != null
-                  ? OnboardingStep.onboard
-                  : OnboardingStep.auth,
-              appearance: widget.appearance ?? currentProvider.appearance,
-              locale: widget.locale ?? currentProvider.locale,
-              onboardingConfig: null,
-              authToken: widget.authToken ?? currentProvider.authToken,
-              vaultingToken: null,
-              redirectUrl: widget.redirectUrl,
-              sandboxId: widget.sandboxId,
-              sandboxOutcome: widget.sandboxOutcome,
-            ),
-          );
       getOnboardingConfig(widget.publicKey).then((config) {
         ref
             .read(fpContextNotifierProvider.notifier)
@@ -69,13 +50,15 @@ class _WrapperState extends ConsumerState<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(fpContextNotifierProvider);
-    final (:launchIdentify, :save, :handoff) =
+    final fpContext = ref.watch(fpContextNotifierProvider);
+    final (:launchIdentify, :save, :handoff, :requiresAuth) =
         getFootprintService(context, ref);
     return FootprintService(
       launchIdentify: launchIdentify,
       save: save,
       handoff: handoff,
+      requiresAuth: requiresAuth,
+      isReadyForAuth: fpContext.onboardingConfig != null,
       child: widget.child,
     );
   }

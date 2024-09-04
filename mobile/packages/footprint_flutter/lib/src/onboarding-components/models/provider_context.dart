@@ -1,13 +1,14 @@
 import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 
 class ProviderContext {
   final String publicKey;
-  final OnboardingStep step;
   final String? authToken;
+  final String? verifiedAuthToken;
+  final AuthTokenStatus? authTokenStatus;
   final String? vaultingToken;
   final FootprintAppearance? appearance;
   final FootprintSupportedLocale? locale;
@@ -18,9 +19,10 @@ class ProviderContext {
 
   ProviderContext({
     required this.publicKey,
-    required this.step,
     required this.redirectUrl,
     this.authToken,
+    this.verifiedAuthToken,
+    this.authTokenStatus,
     this.vaultingToken,
     this.appearance,
     this.locale,
@@ -31,8 +33,9 @@ class ProviderContext {
 
   ProviderContext copyWith({
     String? publicKey,
-    OnboardingStep? step,
     String? authToken,
+    String? verifiedAuthToken,
+    AuthTokenStatus? authTokenStatus,
     String? vaultingToken,
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
@@ -43,8 +46,9 @@ class ProviderContext {
   }) {
     return ProviderContext(
       publicKey: publicKey ?? this.publicKey,
-      step: step ?? this.step,
       authToken: authToken ?? this.authToken,
+      verifiedAuthToken: verifiedAuthToken ?? this.verifiedAuthToken,
+      authTokenStatus: authTokenStatus ?? this.authTokenStatus,
       vaultingToken: vaultingToken ?? this.vaultingToken,
       appearance: appearance ?? this.appearance,
       locale: locale ?? this.locale,

@@ -15,15 +15,15 @@ class VaultingTokenResponse {
   }
 }
 
-class VarificationResponse {
+class VerificationResponse {
   final String authToken;
 
-  VarificationResponse({
+  VerificationResponse({
     required this.authToken,
   });
 
-  factory VarificationResponse.fromJson(Map<String, dynamic> json) {
-    return VarificationResponse(
+  factory VerificationResponse.fromJson(Map<String, dynamic> json) {
+    return VerificationResponse(
       authToken: json['auth_token'],
     );
   }

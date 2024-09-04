@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
+import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_provider/wrapper.dart';
 
 class FootprintProvider extends StatelessWidget {
@@ -30,15 +32,30 @@ class FootprintProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
+        overrides: [
+          fpContextNotifierProvider.overrideWith(
+            () => FpContextNotifier(
+              ProviderContext(
+                publicKey: publicKey,
+                appearance: appearance,
+                locale: locale ?? FootprintSupportedLocale.enUS,
+                authToken: authToken,
+                redirectUrl: redirectUrl,
+                sandboxId: sandboxId,
+                sandboxOutcome: sandboxOutcome,
+              ),
+            ),
+          ),
+        ],
         child: Wrapper(
-      publicKey: publicKey,
-      appearance: appearance,
-      authToken: authToken,
-      locale: locale,
-      redirectUrl: redirectUrl,
-      sandboxId: sandboxId,
-      sandboxOutcome: sandboxOutcome,
-      child: child,
-    ));
+          publicKey: publicKey,
+          appearance: appearance,
+          authToken: authToken,
+          locale: locale,
+          redirectUrl: redirectUrl,
+          sandboxId: sandboxId,
+          sandboxOutcome: sandboxOutcome,
+          child: child,
+        ));
   }
 }
