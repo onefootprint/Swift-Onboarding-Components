@@ -113,7 +113,7 @@ const Init = () => {
       } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       const isValidPredefinedSandboxId = sandboxId && isAlphanumeric(sandboxId);
-      if (!isValidPredefinedSandboxId) {
+      if (sandboxId && !isValidPredefinedSandboxId) {
         toast.show({
           title: 'Invalid sandbox id provided',
           description: 'The sandbox id can only contain alphanumeric characters. Resetting the sandbox id.',
