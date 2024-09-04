@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.14.2
+
+### Patch Changes
+
+- b35785a093: Removed uuid dependency
+
 ## 3.14.1
 
 ### Patch Changes
