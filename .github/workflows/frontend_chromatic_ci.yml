@@ -1,9 +1,6 @@
 name: UI Chromatic
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
 
 concurrency:
