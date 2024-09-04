@@ -40,7 +40,8 @@
         "log-out": "Log out",
         "api-reference": "API Reference",
         "docs": "Documentation",
-        "help": "Help"
+        "help": "Help",
+        "whats-new": "What's new"
       }
     },
     "cmd": {

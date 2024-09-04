@@ -1,11 +1,12 @@
 import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { asAdminUserFirmEmployee, asAdminUserInLive, resetUser } from 'src/config/tests';
+import { asAdminUserFirmEmployee, asAdminUserInLive } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import SideNav from './side-nav';
 import {
   getOrgAuthRoleFixture,
   withEntities,
+  withGhostPosts,
   withOrgAssumeRole,
   withOrgAssumeRoleError,
   withOrgAuthRolesError,
@@ -22,14 +23,14 @@ const AUTH_METHOD_NOT_SUPPORTED_TEXT = (tenantName: string) =>
 describe('<SideNav />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/');
+  });
+
+  beforeEach(() => {
     withEntities();
     withTwoOrgAuthRoles();
     asAdminUserInLive();
     withRiskSignals();
-  });
-
-  afterAll(() => {
-    resetUser();
+    withGhostPosts();
   });
 
   const renderSideNav = () => customRender(<SideNav />);

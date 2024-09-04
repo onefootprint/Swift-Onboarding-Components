@@ -1,0 +1,87 @@
+export type Author = {
+  bio: string | null;
+  coverImage: string | null;
+  facebook: string | null;
+  id: string;
+  location: string | null;
+  metaDescription: string | null;
+  metaTitle: string | null;
+  name: string;
+  profileImage: string;
+  slug: string;
+  twitter: string | null;
+  url: string;
+  website: string | null;
+};
+
+export type Tag = {
+  accentColor: string | null;
+  canonicalUrl: string | null;
+  codeinjectionFoot: string | null;
+  codeinjectionHead: string | null;
+  description: string | null;
+  featureImage: string | null;
+  id: string;
+  metaDescription: string | null;
+  metaTitle: string | null;
+  name: string;
+  ogDescription: string | null;
+  ogImage: string | null;
+  ogTitle: string | null;
+  slug: string;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+  twitterTitle: string | null;
+  url: string;
+  visibility: string;
+};
+
+export type Post = {
+  authors: Author[];
+  createdAt: string;
+  excerpt: string;
+  featureImageAlt?: string;
+  featureImage: string;
+  featured: boolean | undefined;
+  html: string | undefined;
+  id: string;
+  primaryAuthor: Author;
+  primaryTag: Tag;
+  publishedAt: string;
+  readingTime: number;
+  slug: string;
+  tags: Tag[];
+  title: string;
+  url: string;
+  uuid: string;
+};
+
+export type PostDetails = {
+  authors: Author[];
+  canonicalUrl: string;
+  createdAt: string;
+  customExcerpt: string;
+  excerpt: string;
+  featureImageAlt?: string;
+  featureImage: string;
+  featured: boolean;
+  html: string;
+  metaDescription: string;
+  metaTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  ogTitle: string;
+  primaryAuthor: Author;
+  primaryTag: Tag;
+  publishedAt: string;
+  readingTime: number;
+  slug: string;
+  tags: Tag[];
+  title: string;
+  twitterDescription: string;
+  twitterImage: string;
+  twitterTitle: string;
+  updatedAt: string;
+  url: string;
+  uuid: string;
+};

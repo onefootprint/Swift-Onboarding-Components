@@ -116,6 +116,13 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
   },
 ];
 
+export const withGhostPosts = () =>
+  mockRequest({
+    method: 'get',
+    path: '/ghost/api/v3/content/posts/',
+    response: { posts: [] },
+  });
+
 export const withRiskSignals = () =>
   mockRequest({
     method: 'get',

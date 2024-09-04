@@ -7293,6 +7293,13 @@
   dependencies:
     axios "^1.0.0"
 
+"@tryghost/content-api@^1.11.21":
+  version "1.11.21"
+  resolved "https://registry.yarnpkg.com/@tryghost/content-api/-/content-api-1.11.21.tgz#3904416b39297dadb8e5430d3f19a512e5ce1214"
+  integrity sha512-ozJqEMHDUO7D0SGxPbUnG+RvwBbzC3zmdGOW8cFvkcKzrhe7uOAmVKyq7/J3kRAM2QthTlmiDpqp7NEo9ZLlKg==
+  dependencies:
+    axios "^1.0.0"
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz"
@@ -10234,7 +10241,7 @@ date-fns@^2.30.0:
   dependencies:
     "@babel/runtime" "^7.21.0"
 
-date-fns@^3.3.1:
+date-fns@^3.3.1, date-fns@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.6.0.tgz#f20ca4fe94f8b754951b24240676e8618c0206bf"
   integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==

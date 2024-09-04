@@ -1,5 +1,4 @@
-import { customRender, mockRequest, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { RoleScopeKind } from '@onefootprint/types';
+import { customRender, mockRouter, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import {
   asAdminUserFirmEmployee,
   asAdminUserInLive,
@@ -9,7 +8,14 @@ import {
 } from 'src/config/tests';
 
 import DefaultLayout from './default-layout';
-import { withEntities, withOrgAuthRoles, withRiskSignals } from './default-layout.test.config';
+import {
+  withEntities,
+  withGhostPosts,
+  withMembersAdmin,
+  withMembersRead,
+  withOrgAuthRoles,
+  withRiskSignals,
+} from './default-layout.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -25,20 +31,14 @@ const SANDBOX_MODE_TEXT = "You're in sandbox mode.";
 describe('<DefaultLayout />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/users');
-    mockRequest({
-      method: 'get',
-      path: '/org/member',
-      statusCode: 200,
-      response: {
-        scopes: [RoleScopeKind.read],
-        tenant: {
-          isSandboxRestricted: false,
-        },
-      },
-    });
+  });
+
+  beforeEach(() => {
     withEntities();
     withOrgAuthRoles();
     withRiskSignals();
+    withMembersRead();
+    withGhostPosts();
   });
 
   describe('when its restricted to use only the sandbox mode', () => {
@@ -186,14 +186,7 @@ describe('<DefaultLayout />', () => {
 
     describe('when user has write permissions while impersonating', () => {
       it('allow enabling edit mode', async () => {
-        mockRequest({
-          method: 'get',
-          path: '/org/member',
-          statusCode: 200,
-          response: {
-            scopes: [RoleScopeKind.admin],
-          },
-        });
+        withMembersAdmin();
         asAssumedUser();
         renderDefaultLayout();
 

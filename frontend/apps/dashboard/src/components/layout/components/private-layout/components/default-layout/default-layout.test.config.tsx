@@ -1,5 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { GetAuthRoleResponse } from '@onefootprint/types';
+import { RoleScopeKind } from '@onefootprint/types';
 
 export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
   {
@@ -55,4 +56,37 @@ export const withRiskSignals = () =>
     method: 'get',
     path: '/org/risk_signals',
     response: { data: [], meta: { count: 0 } },
+  });
+
+export const withMembersRead = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/member',
+    statusCode: 200,
+    response: {
+      scopes: [RoleScopeKind.read],
+      tenant: {
+        isSandboxRestricted: false,
+      },
+    },
+  });
+
+export const withMembersAdmin = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/member',
+    statusCode: 200,
+    response: {
+      scopes: [RoleScopeKind.admin],
+      tenant: {
+        isSandboxRestricted: false,
+      },
+    },
+  });
+
+export const withGhostPosts = () =>
+  mockRequest({
+    method: 'get',
+    path: '/ghost/api/v3/content/posts/',
+    response: { posts: [] },
   });

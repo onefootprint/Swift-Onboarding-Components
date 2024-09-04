@@ -11,13 +11,13 @@ const getNextConfig = () => {
 
   const ContentSecurityPolicy = `
     child-src onefootprint.com;
-    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${DATADOG_SRC} *.mapbox.com;
+    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${DATADOG_SRC} *.mapbox.com *.ghost.io;
     default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';
     frame-ancestors 'self';
     frame-src 'self' vercel.live https://app.svix.com calendly.com data: blob:;
-    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net;
+    img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net *.ghost.io;
     media-src 'self' https data:;
     script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${DATADOG_SRC};
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
@@ -114,6 +114,10 @@ const getNextConfig = () => {
         {
           protocol: 'https',
           hostname: 'local.i-dev.onefp.net',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.ghost.io',
         },
       ],
     },

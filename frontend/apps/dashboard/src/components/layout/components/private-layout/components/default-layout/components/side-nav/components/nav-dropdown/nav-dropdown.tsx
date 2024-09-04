@@ -1,9 +1,9 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowTopRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
-import { Dropdown } from '@onefootprint/ui';
+import { Box, Dropdown } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RiskSignalsGlossary from 'src/components/risk-signals-glossary';
 import styled, { css } from 'styled-components';
@@ -13,6 +13,8 @@ import PgpUploadTool from 'src/components/pgp-upload-tool';
 import type { UserSession } from 'src/hooks/use-session';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
+
+const WhatsNew = lazy(() => import('./components/whats-new'));
 
 export type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];
@@ -26,6 +28,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
+  const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
   const router = useRouter();
 
   const handleLogout = () => {
@@ -56,6 +59,14 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
     setIsPgpHelperOpen(false);
   };
 
+  const handleWhatsNewOpen = () => {
+    setIsWhatsNewOpen(true);
+  };
+
+  const handleWhatsNewClose = () => {
+    setIsWhatsNewOpen(false);
+  };
+
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
@@ -83,6 +94,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
               </StyledLink>
               <StyledLink onSelect={handleGlossaryOpen}>{t('help-links.risk-signals-glossary')}</StyledLink>
               <StyledLink onSelect={handlePgpHelperOpen}>{t('help-links.pgp-helper-tool')}</StyledLink>
+              <StyledLink onSelect={handleWhatsNewOpen}>{t('whats-new.title')}</StyledLink>
             </Dropdown.Group>
             <Dropdown.Separator />
             <Dropdown.Group>
@@ -96,6 +108,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
       </Dropdown.Root>
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
       <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
+      <Suspense fallback={<Box />}>
+        <WhatsNew open={isWhatsNewOpen} onClose={handleWhatsNewClose} />
+      </Suspense>
     </>
   );
 };

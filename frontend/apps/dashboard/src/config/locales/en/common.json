@@ -595,6 +595,13 @@
           "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
         },
         "admin-mode": "Log in as Super Admin",
+        "whats-new": {
+          "title": "What's new",
+          "description": "Check out the latest updates to Footprint",
+          "more-details": "More details",
+          "want-to-know-more": "Want to know more about what we've been working on?",
+          "view-full-changelog": "View full changelog"
+        },
         "log-out": "Log out"
       },
       "mode-switcher": {
