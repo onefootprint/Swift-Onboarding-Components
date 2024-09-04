@@ -22,7 +22,8 @@
     "test:ci:hidden": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
     "test": "jest --coverage --passWithNoTests",
-    "typecheck": "yarn tsc --noEmit"
+    "typecheck": "yarn tsc --noEmit",
+    "chromatic": "chromatic --exit-zero-on-changes --monorepo-root=../.."
   },
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.5",

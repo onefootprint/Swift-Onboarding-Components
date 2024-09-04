@@ -44,7 +44,7 @@ jobs:
 
       - name: Cache turbo build setup
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        with: 
+        with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
@@ -57,7 +57,7 @@ jobs:
       - name: Lint
         working-directory: ./frontend
         run: yarn lint:ci
-  
+
   test:
     runs-on: frontend_runner
     steps:
@@ -71,7 +71,7 @@ jobs:
 
       - name: Cache turbo build setup
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        with: 
+        with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
@@ -98,7 +98,7 @@ jobs:
 
       - name: Cache turbo build setup
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # ratchet:actions/cache@v4
-        with: 
+        with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
@@ -120,7 +120,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
-        
+
       - uses: oven-sh/setup-bun@f4d14e03ff726c06358e5557344e1da148b56cf7 # ratchet:oven-sh/setup-bun@v1
         with:
           bun-version: latest # or "latest", "canary", 1.0.23 ,<sha>

@@ -4,7 +4,7 @@
     "build": {
       "cache": false,
       "dependsOn": ["^build", "i18n:build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**", "storybook-static/**"],
       "env": [
         "API_BASE_URL",
         "AUTH_URL",
@@ -137,6 +137,9 @@
     "dev:storybook": {
       "cache": false,
       "persistent": true,
+      "dependsOn": ["^build:storybook"]
+    },
+    "chromatic": {
       "dependsOn": ["^build:storybook"]
     }
   }

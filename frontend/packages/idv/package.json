@@ -21,7 +21,8 @@
     "test:storybook": "test-storybook --ci --url http://127.0.0.1:3100",
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
-    "typecheck": "yarn tsc --noEmit"
+    "typecheck": "yarn tsc --noEmit",
+    "chromatic": "chromatic --exit-zero-on-changes --monorepo-root=../.."
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.18.0",
