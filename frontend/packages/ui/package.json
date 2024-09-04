@@ -86,6 +86,7 @@
     "@types/react-syntax-highlighter": "^15.5.4",
     "@types/react-window": "^1.8.5",
     "@types/styled-components": "^5.1.26",
+    "chromatic": "^11.7.1",
     "copy-and-watch": "^0.1.6",
     "csstype": "^3.1.2",
     "i18next": "^23.7.16",
