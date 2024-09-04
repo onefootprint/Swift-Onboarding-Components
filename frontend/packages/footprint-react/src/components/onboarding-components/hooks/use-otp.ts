@@ -1,7 +1,7 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { ChallengeData } from '@onefootprint/types';
 import { useContext, useState } from 'react';
-import { Context } from '../provider';
+import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
 import AuthTokenStatus from '../types/auth-token-status';
 import TenantAuthMethods from '../types/tenant-auth-methods';
@@ -17,7 +17,7 @@ const useOtp = () => {
   const [context, setContext] = useContext(Context);
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
   const [didCallRequiresAuth, setDidCallRequiresAuth] = useState(false);
-  const isReadyForAuth = !!context.onboardingConfig && didCallRequiresAuth;
+  const isReadyForAuth = !!context.onboardingConfig;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): AuthRequirement => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
@@ -131,29 +131,19 @@ const useOtp = () => {
   };
 
   const createEmailPhoneBasedChallenge = async ({ email, phoneNumber }: { email?: string; phoneNumber?: string }) => {
-    const { sandboxId, onboardingConfig, authToken, authTokenStatus } = context;
+    const { sandboxId, onboardingConfig, authToken } = context;
 
-    // Enforce calling "requiresAuth" before creating a challenge
-    if (!didCallRequiresAuth) {
-      throw new Error('Please call "requiresAuth" to check the available auth methods before creating a challenge');
-    }
-
-    if (authToken) {
-      // Enforce authenticating using auth token
-      if (authTokenStatus !== AuthTokenStatus.invalid) {
-        throw new Error('Provided auth token is valid. Please authenticate using auth token');
-      }
-      throw new Error(
-        'You provided an invalid auth token. Please provide a valid auth token and authenticate using it or remove the auth token and authenticate using email/phone number',
-      );
-    }
-
-    if (!email || !phoneNumber) {
-      // TODO: In the future, we should allow email-only
-      throw new Error('Email and phone number are required');
-    }
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Please make sure that the publicKey is correct');
+    }
+    if (authToken) {
+      throw new Error(
+        'You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number',
+      );
+    }
+    // TODO: In the future, we should allow email-only
+    if (!email || !phoneNumber) {
+      throw new Error('Email and phone number are required');
     }
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
     const response = await createChallenge(

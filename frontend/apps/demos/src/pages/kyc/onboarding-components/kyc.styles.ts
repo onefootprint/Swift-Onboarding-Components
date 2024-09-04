@@ -115,6 +115,18 @@ const GlobalStyles = createGlobalStyle`
     flex-direction: column;
     gap: 12px;
   }
+
+  .fp-pin-input-container {
+    display: flex;
+    gap: 8px;
+  }
+
+  .fp-pin-input {
+    width: 40px;
+    height: 44px;
+    padding: 0;
+    text-align: center;
+  }
 `;
 
 export default GlobalStyles;

@@ -5,7 +5,7 @@ import type React from 'react';
 import { useEffect } from 'react';
 
 import { useFormContext } from 'react-hook-form';
-import useFieldProps, { type FormInputProps } from '../hooks/use-field-props';
+import useFieldProps, { type FormInputProps } from '../../hooks/use-field-props';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 

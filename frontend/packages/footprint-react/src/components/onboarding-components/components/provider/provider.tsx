@@ -6,8 +6,8 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import { isAlphanumeric } from '@onefootprint/core';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
-import getOnboardingConfigReq from '../queries/get-onboarding-config';
-import type AuthTokenStatus from '../types/auth-token-status';
+import getOnboardingConfigReq from '../../queries/get-onboarding-config';
+import type AuthTokenStatus from '../../types/auth-token-status';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 
 export type ContextData = {

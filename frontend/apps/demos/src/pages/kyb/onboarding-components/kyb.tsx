@@ -1,5 +1,5 @@
 import type { FormValues } from '@onefootprint/footprint-react';
-import { Fp, useFootprint, useOtp } from '@onefootprint/footprint-react';
+import { Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, InlineAlert, Shimmer, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -94,10 +94,10 @@ const Demo = () => {
 };
 
 const Identify = ({ onDone }: { onDone: () => void }) => {
-  const otp = useOtp();
+  const fp = useFootprint();
 
   const handleSubmit = (formValues: FormValues) => {
-    otp.launchIdentify(
+    fp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -137,8 +137,13 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
 const BusinessData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: FormValues) => {
-    fp.save(data, { onSuccess: onDone });
+  const handleSubmit = async (formValues: FormValues) => {
+    try {
+      await fp.save(formValues);
+      onDone();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -196,9 +201,7 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
-          <Button type="submit" loading={fp.busy === 'save'}>
-            Continue
-          </Button>
+          <Button type="submit">Continue</Button>
         </Stack>
       </Fp.Form>
     </Layout>
@@ -208,8 +211,13 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
 const BoData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: FormValues) => {
-    fp.save(data, { onSuccess: onDone });
+  const handleSubmit = async (formValues: FormValues) => {
+    try {
+      await fp.save(formValues);
+      onDone();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -246,9 +254,7 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
-          <Button type="submit" loading={fp.busy === 'save'}>
-            Continue
-          </Button>
+          <Button type="submit">Continue</Button>
         </Stack>
       </Fp.Form>
     </Layout>
@@ -258,8 +264,13 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
 const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = (data: FormValues) => {
-    fp.save(data, { onSuccess: () => fp.handoff({ onComplete: onDone }) });
+  const handleSubmit = async (formValues: FormValues) => {
+    try {
+      await fp.save(formValues);
+      fp.handoff({ onComplete: onDone });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -328,9 +339,7 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
-          <Button type="submit" loading={fp.busy === 'save'}>
-            Continue
-          </Button>
+          <Button type="submit">Continue</Button>
         </Stack>
       </Fp.Form>
     </Layout>

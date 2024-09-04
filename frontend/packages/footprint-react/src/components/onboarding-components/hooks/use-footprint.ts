@@ -1,56 +1,34 @@
 import type { ComponentsSdkProps } from '@onefootprint/footprint-js/src/types/components';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { FormValues } from '../../../types';
-import { Context } from '../provider';
-import saveReq from '../queries/save';
+import { Context } from '../components/provider';
+import save from '../queries/save';
 import { lockBody } from '../utils/dom-utils';
 import { formatBeforeSave } from '../utils/save-utils';
+import useOtp from './use-otp';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
-  const [busy, setBusy] = useState<string | null>(null);
+  const otp = useOtp();
 
-  const save = async (
-    data: FormValues,
-    {
-      onSuccess,
-      onError,
-    }: {
-      onSuccess?: () => void;
-      onError?: (error: unknown) => void;
-    } = {},
-  ) => {
+  const vault = async (formValues: FormValues) => {
     const { vaultingToken, onboardingConfig } = context;
     if (!vaultingToken) {
-      onError?.(new Error('No authToken found. Please authenticate first'));
-      return;
+      throw new Error('No authToken found. Please authenticate first');
     }
-
     if (!onboardingConfig) {
-      onError?.(new Error('No onboardingConfig found. Make sure that the publicKey is correct'));
-      return;
+      throw new Error('No onboardingConfig found. Make sure that the publicKey is correct');
     }
-
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
-      onError?.(new Error('Onboarding components only support kyc and kyb kind'));
-      return;
+      throw new Error('Onboarding components only support kyc and kyb kind');
     }
-
-    try {
-      setBusy('save');
-      await saveReq({
-        data: formatBeforeSave(data, context.locale ?? 'en-US'),
-        bootstrapDis: [],
-        authToken: vaultingToken,
-      });
-      onSuccess?.();
-    } catch (error: unknown) {
-      onError?.(error);
-    } finally {
-      setBusy(null);
-    }
+    await save({
+      data: formatBeforeSave(formValues, context.locale ?? 'en-US'),
+      bootstrapDis: [],
+      authToken: vaultingToken,
+    });
   };
 
   const createNewHandoff = ({
@@ -109,7 +87,11 @@ export const useFootprint = () => {
     }
   };
 
-  return { context, busy, handoff, save };
+  return {
+    handoff,
+    save: vault,
+    ...otp,
+  };
 };
 
 export default useFootprint;

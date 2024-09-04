@@ -8,13 +8,14 @@ const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
   const [formState, setFormState] = useState<FormStates>('default');
   const fp = useFootprint();
 
-  const handleSubmit = (data: FormValues) => {
+  const handleSubmit = async (formValues: FormValues) => {
     setFormState('loading');
-    fp.save(data, {
-      onSuccess: () => {
-        fp.handoff({ onComplete: onFormSubmit });
-      },
-    });
+    try {
+      await fp.save(formValues);
+      fp.handoff({ onComplete: onFormSubmit });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const renderField = (

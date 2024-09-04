@@ -1,16 +1,16 @@
 /* eslint-FormValuessable react/jsx-props-no-spreading */
 import cx from 'classnames';
-import isPlainObject from 'lodash/isPlainObject';
 import type { FormHTMLAttributes } from 'react';
 import type React from 'react';
-import { type FieldErrors, FormProvider, useForm } from 'react-hook-form';
+import { type FieldErrors, FormProvider, type UseFormSetFocus, type UseFormSetValue, useForm } from 'react-hook-form';
 
-import type { FormValues } from '../../../types';
-
-type DiKey = keyof FormValues;
+import type { FormValues } from '../../../../types';
+import flattenObject from '../../utils/flatten-object';
 
 type FormOptions = {
-  setValue: (name: DiKey, value: FormValues[DiKey]) => void;
+  handleSubmit: () => void;
+  setValue: UseFormSetValue<FormValues>;
+  setFocus: UseFormSetFocus<FormValues>;
   errors: FieldErrors<FormValues>;
 };
 
@@ -25,6 +25,7 @@ const Form = ({ className, children, defaultValues, onSubmit, ...props }: FormPr
   const {
     handleSubmit,
     setValue,
+    setFocus,
     formState: { errors },
   } = methods;
 
@@ -37,35 +38,15 @@ const Form = ({ className, children, defaultValues, onSubmit, ...props }: FormPr
       <form className={cx('fp-form', className)} {...props} onSubmit={handleSubmit(handleBeforeSubmit)}>
         {typeof children === 'function'
           ? children({
-              setValue: (name, value) => setValue(name, value as never), // TODO: Fix this type casting - issue with react-form-hook
-              errors,
+              handleSubmit: handleSubmit(handleBeforeSubmit),
+              setValue,
+              setFocus,
+              errors: flattenObject(errors, { level: 1 }) as FieldErrors<FormValues>,
             })
           : children}
       </form>
     </FormProvider>
   );
-};
-
-const flattenObject = (
-  obj: Record<string, unknown>,
-  parentKey: string = '',
-  sep: string = '.',
-): Record<string, unknown> => {
-  const toReturn: Record<string, unknown> = {};
-
-  Object.keys(obj).forEach(key => {
-    const newKey = parentKey ? `${parentKey}${sep}${key}` : key;
-    if (isPlainObject(obj[key])) {
-      const flatObject = flattenObject(obj[key] as Record<string, unknown>, newKey, sep);
-      Object.keys(flatObject).forEach(x => {
-        toReturn[x] = flatObject[x] as FormValues;
-      });
-    } else {
-      toReturn[newKey] = obj[key] as FormValues;
-    }
-  });
-
-  return toReturn;
 };
 
 export default Form;

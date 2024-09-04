@@ -6,8 +6,8 @@ import { useContext } from 'react';
 
 import type { SupportedLocale } from '@onefootprint/types';
 import { useFormContext } from 'react-hook-form';
-import fieldContext from '../field-context';
-import { Context } from '../provider';
+import fieldContext from '../components/field-context';
+import { Context } from '../components/provider';
 import validateDob from '../utils/validate-dob';
 
 type FormAttributes = {

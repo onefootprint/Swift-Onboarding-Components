@@ -1,4 +1,4 @@
-import type { UpdateContext } from '../provider/provider';
+import type { UpdateContext } from '../components/provider';
 import { createVaultingToken, identify } from '../queries/challenge';
 import AuthTokenStatus from '../types/auth-token-status';
 

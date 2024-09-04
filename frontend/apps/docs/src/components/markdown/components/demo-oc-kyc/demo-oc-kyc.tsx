@@ -1,6 +1,6 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { type FormValues, Fp, useFootprint, useOtp } from '@onefootprint/footprint-react';
+import { type FormValues, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
@@ -65,10 +65,10 @@ const Step3 = () => (
 );
 
 const Step4 = () => {
-  const otp = useOtp();
+  const fp = useFootprint();
 
   const handleSubmit = (formValues: FormValues) => {
-    otp.launchIdentify(
+    fp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -104,12 +104,11 @@ const Step4 = () => {
 };
 
 const Step5 = () => {
-  const otp = useOtp();
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
   const handleSubmitIdentify = (formValues: FormValues) => {
-    otp.launchIdentify(
+    fp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -122,12 +121,13 @@ const Step5 = () => {
     );
   };
 
-  const handleSubmitData = (formValues: FormValues) => {
-    fp.save(formValues, {
-      onSuccess: () => {
-        console.log('done');
-      },
-    });
+  const handleSubmitData = async (formValues: FormValues) => {
+    try {
+      await fp.save(formValues);
+      console.log('done');
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -206,7 +206,7 @@ const Step5 = () => {
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
-            {fp.busy === 'save' ? 'Saving...' : 'Continue'}
+            Continue
           </button>
         </Fp.Form>
       )}
@@ -216,11 +216,10 @@ const Step5 = () => {
 
 const Step6 = () => {
   const fp = useFootprint();
-  const otp = useOtp();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
   const handleSubmitIdentify = (formValues: FormValues) => {
-    otp.launchIdentify(
+    fp.launchIdentify(
       {
         email: formValues['id.email'],
         phoneNumber: formValues['id.phone_number'],
@@ -233,10 +232,13 @@ const Step6 = () => {
     );
   };
 
-  const handleSubmitData = (formValues: FormValues) => {
-    fp.save(formValues, {
-      onSuccess: fp.handoff,
-    });
+  const handleSubmitData = async (formValues: FormValues) => {
+    try {
+      await fp.save(formValues);
+      fp.handoff();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -317,7 +319,7 @@ const Step6 = () => {
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
-            {fp.busy === 'save' ? 'Saving...' : 'Continue'}
+            Continue
           </button>
         </Fp.Form>
       )}

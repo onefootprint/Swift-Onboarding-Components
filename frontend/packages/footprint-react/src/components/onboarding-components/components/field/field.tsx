@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'react';
 import type React from 'react';
 import { useId, useMemo } from 'react';
 
-import type { FormValues } from '../../../types';
+import type { FormValues } from '../../../../types';
 import FieldContext from '../field-context';
 
 export type FieldProps = {
