@@ -387,7 +387,7 @@ const StepperContainer = styled.div`
   ${({ theme }) => css`
     display: none;
     
-    ${media.greaterThan('md')`
+    ${media.greaterThan('lg')`
       display: block;
       position: absolute;
       top: ${theme.spacing[3]};
