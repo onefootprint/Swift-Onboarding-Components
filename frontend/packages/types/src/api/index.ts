@@ -20,6 +20,9 @@ export type {
   CopyPlaybookResponse,
 } from './copy-playbook';
 export type { CreateListRequest, CreateListResponse } from './create-list';
+export type { CreateOrgTagRequest, CreateOrgTagResponse } from './create-org-tag';
+export type { AddTagRequest, AddTagResponse } from './add-tag';
+export type { RemoveTagRequest, RemoveTagResponse } from './remove-tag';
 export type {
   CreateMembersRequest,
   CreateMembersResponse,
@@ -157,6 +160,8 @@ export type {
 } from './get-risk-signal-details';
 export type { GetRolesRequest, GetRolesResponse } from './get-roles';
 export type { GetRulesResponse } from './get-rules';
+export type { GetTagsResponse } from './get-tags';
+export type { GetOrgTagsResponse } from './get-org-tags';
 export type { GetBusinessInsightsResponse } from './get-business-insights';
 export type {
   GetTenantsRequest,

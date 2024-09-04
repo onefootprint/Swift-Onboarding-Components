@@ -25,6 +25,7 @@ import {
   withData,
   withEntity,
   withLists,
+  withTags,
   withTimeline,
   withTokenSendLink,
   withTrigger,
@@ -49,6 +50,7 @@ describe('<Actions />', () => {
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     withPlaybooks();
     withLists();
+    withTags();
     withData();
     mockRequest({
       method: 'get',

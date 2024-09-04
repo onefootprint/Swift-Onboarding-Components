@@ -9,6 +9,8 @@ import Labels from '@/entities/components/labels';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
+import { RoleScopeKind } from '@onefootprint/types';
+import usePermissions from 'src/hooks/use-permissions';
 import IdDropdown from './components/id-dropdown';
 
 type HeaderProps = WithEntityProps & {
@@ -18,6 +20,8 @@ type HeaderProps = WithEntityProps & {
 const Header = ({ entity, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header' });
   const { kind } = useEntityContext();
+  const { hasPermission } = usePermissions();
+  const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)} data-is-disabled={isDisabled}>
@@ -42,7 +46,7 @@ const Header = ({ entity, isDisabled }: HeaderProps) => {
             <div id={HEADER_ACTIONS_ID} />
           </Stack>
         </FirstRow>
-        <Tags entity={entity} />
+        {hasLabelAndTagPermissions && <Tags />}
       </Stack>
     </HeaderContainer>
   );

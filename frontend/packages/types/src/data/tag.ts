@@ -1,4 +1,8 @@
 export type Tag = {
-  tag: string;
+  text: string;
   createdAt: string;
+};
+
+export type TagWithId = Tag & {
+  id: string;
 };

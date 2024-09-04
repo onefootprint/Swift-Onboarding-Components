@@ -1337,6 +1337,11 @@
           "label": "Edit user information",
           "not-allowed": "You're not allowed to edit user information"
         },
+        "edit-tags": {
+          "edit-label": "Edit tags",
+          "add-label": "Add tags",
+          "not-allowed": "You are not allowed to edit tags"
+        },
         "open-datadog": "Open in Datadog",
         "summarize": {
           "label": "Summarize with AI",
@@ -1487,16 +1492,6 @@
             "phone": "User will receive an SMS detailing the next steps shortly",
             "email": "User will receive an email detailing the next steps shortly"
           }
-        },
-        "edit-tags": {
-          "label": "Edit tags",
-          "title": "Edit tags",
-          "description": "Tags are an unstructured way to organize, categorize, and add metadata about your users.",
-          "empty-active-tags": "There are no tags associated with this user yet",
-          "inactive-tags": "Tags already used by {{org}}",
-          "add-tag": "Add custom tag",
-          "save": "Save",
-          "cancel": "Cancel"
         },
         "edit-business": {
           "not-allowed": "You're not allowed to edit business information"

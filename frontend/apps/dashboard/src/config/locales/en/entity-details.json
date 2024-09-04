@@ -1,6 +1,24 @@
 {
   "header": {
     "actions": {
+      "edit-tags": {
+        "edit-title": "Edit tags",
+        "add-title": "Add tags",
+        "description": "Tags are an unstructured way to organize, categorize, and add metadata about your users.",
+        "empty-active-tags": "There are no tags associated with this user yet",
+        "inactive-tags": "Tags already used by {{org}}",
+        "add-tag": "Add custom tag",
+        "save": "Save",
+        "cancel": "Cancel",
+        "success-toast": {
+          "title": "Success!",
+          "description": "Your changes to tags have been saved."
+        },
+        "error-toast": {
+          "title": "Uh oh!",
+          "description": "One or more changes could not be saved: \n{{details}}"
+        }
+      },
       "upload-doc": {
         "label": "Upload document",
         "not-allowed": "You're not allowed to upload documents",

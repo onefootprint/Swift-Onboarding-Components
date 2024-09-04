@@ -1,29 +1,24 @@
-import { Dialog } from '@onefootprint/ui';
+import { Dialog, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 import { LinkButton, Stack, Text } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
 
-import type { Tag } from '@onefootprint/types';
+import type { WithEntityProps } from '@/entity/components/with-entity';
+import useTags from '@/entity/hooks/use-tags';
+import { useRequestError } from '@onefootprint/request';
+import type { OrgTag } from '@onefootprint/types';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { useState } from 'react';
-import type { WithEntityProps } from 'src/components/entities/components/details/components/with-entity';
-import useSession from 'src/hooks/use-session';
-import EditableTag from './components/editable-tag';
-import { EditableTagKind } from './types';
-
-// const mockActiveTags = [ {tag: 'LTV', createdAt: '1'}, {tag: 'bad', createdAt: '1'}, {tag: 'lost_id', createdAt: '1'}, {tag: 'big_suv', createdAt: '1'}, {tag: 'crashed_car', createdAt: '1'}]
-const mockOrgTags = [
-  { tag: 'lorem', createdAt: '123' },
-  { tag: 'ipsum', createdAt: '123' },
-  { tag: 'fraud', createdAt: '123' },
-  { tag: 'another', createdAt: '123' },
-  { tag: 'scam_user', createdAt: '123' },
-  { tag: 'fradulent_user', createdAt: '123' },
-  { tag: 'fake_ids', createdAt: '123' },
-  { tag: 'fake_SSN', createdAt: '123' },
-];
+import unionBy from 'lodash/unionBy';
+import { useEffect, useState } from 'react';
+import ErrorComponent from 'src/components/error';
+import ActiveTags from './components/active-tags';
+import InactiveTags from './components/inactive-tags';
+import Loading from './components/loading';
+import useAddTag from './hooks/use-add-tag';
+import useCreateOrgTag from './hooks/use-create-org-tag';
+import useRemoveTag from './hooks/use-remove-tag';
+import type { EditedTag } from './types';
 
 export type EditTagsDialogProps = WithEntityProps & {
   open: boolean;
@@ -31,42 +26,125 @@ export type EditTagsDialogProps = WithEntityProps & {
 };
 
 const EditTagsDialog = ({ entity, open, onClose }: EditTagsDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.edit-tags',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'header.actions.edit-tags',
   });
-  const { data } = useSession();
-  const [activeTags, setActiveTags] = useState<Tag[]>(entity.tags ?? []);
-  const [isAddingTag, setIsAddingTag] = useState<boolean>(false);
-  const inactiveTags = mockOrgTags.filter(tag => !activeTags.find(activeTag => isEqual(tag, activeTag)));
+  const { data: currentEntityTags, isLoading, error } = useTags(entity.id);
+  const [activeTags, setActiveTags] = useState<EditedTag[]>(currentEntityTags ?? []);
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const createTagMutation = useCreateOrgTag();
+  const addTagMutation = useAddTag();
+  const removeTagMutation = useRemoveTag();
+  const toast = useToast();
+  const { getErrorMessage } = useRequestError();
 
-  const handleTagVault = (tagToAdd: Tag) => {
-    const newTags = cloneDeep(activeTags);
-    newTags.push(tagToAdd);
-    setActiveTags(newTags);
+  useEffect(() => {
+    setActiveTags(currentActive => unionBy(currentEntityTags, currentActive, 'text'));
+  }, [currentEntityTags]);
+
+  const handleTagVault = ({ text, id }: OrgTag) => {
+    setActiveTags(currentActive => {
+      const tagsToAdd = cloneDeep(currentActive);
+      tagsToAdd.push({ text, id });
+      return tagsToAdd;
+    });
   };
 
-  const handleUntagVault = (tagToRemove: Tag) => {
-    setActiveTags(activeTags.filter(tag => tag !== tagToRemove));
+  const handleUntagVault = (tag: EditedTag) => {
+    setActiveTags(currentActive => currentActive.filter(activeTag => !isEqual(activeTag, tag)));
   };
 
   const handleClickAdd = () => {
     setIsAddingTag(true);
   };
 
+  const handleAddNewTag = (text: string) => {
+    setActiveTags(currentActive => {
+      const tagsToAdd = cloneDeep(currentActive);
+      tagsToAdd.push({ text });
+      return tagsToAdd;
+    });
+    setIsAddingTag(false);
+  };
+
+  const handleRemoveNewTag = () => {
+    setIsAddingTag(false);
+  };
+
   const handleSave = () => {
-    console.log(activeTags);
+    const tagsToAdd = activeTags.filter(tag => !currentEntityTags?.find(currTag => isEqual(currTag, tag)));
+    const tagsToCreate = tagsToAdd.filter(tag => !tag.id);
+    const tagsToRemove = (currentEntityTags ?? []).filter(
+      ({ text: currText }) => !activeTags.find(({ text }) => text === currText),
+    );
+    const errors: Record<string, string> = {};
+    const totalNumChanges = tagsToCreate.length + tagsToAdd.length + tagsToRemove.length - 1;
+
+    const onSuccess = (index: number) => {
+      if (index === totalNumChanges) {
+        toast.show({
+          title: t('success-toast.title'),
+          description: t('success-toast.description'),
+        });
+      }
+    };
+    const onError = (tagText: string, e: unknown) => {
+      errors[tagText] = getErrorMessage(e);
+    };
+
+    tagsToCreate.forEach(({ text }, index) => {
+      createTagMutation.mutate(
+        { kind: entity.kind, text },
+        {
+          onSuccess: () => onSuccess(index),
+          onError: (e: unknown) => onError(text, e),
+        },
+      );
+    });
+    tagsToAdd.forEach(({ text }, index) => {
+      addTagMutation.mutate(
+        { id: entity.id, text },
+        {
+          onSuccess: () => onSuccess(index + tagsToCreate.length),
+          onError: (e: unknown) => onError(text, e),
+        },
+      );
+    });
+    tagsToRemove.forEach(({ id, text }, index) => {
+      removeTagMutation.mutate(
+        { id: entity.id, tagId: id },
+        {
+          onSuccess: () => onSuccess(index + tagsToCreate.length + tagsToAdd.length),
+          onError: (e: unknown) => onError(text, e),
+        },
+      );
+    });
+
+    if (Object.keys(errors).length) {
+      toast.show({
+        description: t('error-toast.description', {
+          details: Object.entries(errors)
+            .map(([tagText, error]) => `${tagText}: ${error}`)
+            .join('\n'),
+        }),
+        title: t('error-toast.title'),
+        variant: 'error',
+      });
+    } else {
+      onClose();
+    }
   };
 
   return (
     <Dialog
       size="compact"
-      title={t('title')}
+      title={currentEntityTags?.length ? t('edit-title') : t('add-title')}
       onClose={onClose}
       open={open}
       primaryButton={{
         label: t('save'),
-        loading: false,
-        disabled: false,
+        loading: isLoading,
+        disabled: isLoading || !!error,
         onClick: handleSave,
       }}
       secondaryButton={{
@@ -77,57 +155,26 @@ const EditTagsDialog = ({ entity, open, onClose }: EditTagsDialogProps) => {
     >
       <Stack direction="column" justify="flex-start" gap={5}>
         <Text variant="body-3">{t('description')}</Text>
-        <ActiveTagsContainer>
-          {activeTags.length ? (
-            activeTags.map(tag => (
-              <EditableTag text={tag.tag} tagKind={EditableTagKind.active} onClick={() => handleUntagVault(tag)} />
-            ))
-          ) : (
-            <Text variant="body-3" color="tertiary" center width="100%">
-              {t('empty-active-tags')}
-            </Text>
-          )}
-        </ActiveTagsContainer>
-        <Text variant="label-3" color="tertiary">
-          {t('inactive-tags', { org: data.org?.name })}
-        </Text>
-        <InactiveTagsContainer>
-          {inactiveTags.map(tag => (
-            <EditableTag text={tag.tag} tagKind={EditableTagKind.inactive} onClick={() => handleTagVault(tag)} />
-          ))}
-        </InactiveTagsContainer>
-        <LinkButton onClick={handleClickAdd} disabled={isAddingTag}>
-          {t('add-tag')}
-        </LinkButton>
+        {isLoading && <Loading />}
+        {error && <ErrorComponent error={error} />}
+        {currentEntityTags && (
+          <>
+            <ActiveTags
+              activeTags={activeTags}
+              isAddingTag={isAddingTag}
+              onRemove={handleUntagVault}
+              onRemoveNew={handleRemoveNewTag}
+              onAddNew={handleAddNewTag}
+            />
+            <InactiveTags entityKind={entity.kind} activeTags={activeTags} onClick={handleTagVault} />
+            <LinkButton onClick={handleClickAdd} disabled={isAddingTag}>
+              {t('add-tag')}
+            </LinkButton>
+          </>
+        )}
       </Stack>
     </Dialog>
   );
 };
-
-const ActiveTagsContainer = styled(Stack)`
-  ${({ theme }) => css`
-    min-height: 52px;
-    max-height: 154px;
-    max-width: 100%;
-    flex-wrap: wrap;
-    overflow: scroll;
-    padding: ${theme.spacing[5]} ${theme.spacing[4]};
-    align-items: center;
-    gap: ${theme.spacing[2]};
-    border: ${theme.borderWidth[1]} dashed ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-  `}
-`;
-
-const InactiveTagsContainer = styled(Stack)`
-  ${({ theme }) => css`
-    max-height: 154px;
-    max-width: 452px;
-    flex-wrap: wrap;
-    overflow: scroll;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 export default EditTagsDialog;

@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
+import useTags from '@/entity/hooks/use-tags';
+import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
@@ -32,10 +34,13 @@ const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actions' });
   const { t: newT } = useTranslation('entity-details', { keyPrefix: 'header.actions' });
   const editControls = useEditControls();
+  const { data: tags } = useTags(entity.id);
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
   const {
     data: { user },
   } = useSession();
+  const { hasPermission } = usePermissions();
+  const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
   const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
 
   const handleCloseDialog = () => {
@@ -66,6 +71,10 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(ActionDialog.historicalData);
   };
 
+  const handleOpenEditTagsDialog = () => {
+    setOpenDialog(ActionDialog.editTags);
+  };
+
   return entity.kind === EntityKind.person ? (
     <>
       <Dropdown.Root>
@@ -77,6 +86,11 @@ const Actions = ({ entity }: WithEntityProps) => {
             <Dropdown.GroupTitle>{t('groups.user-management')}</Dropdown.GroupTitle>
             <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
               <Dropdown.Item onSelect={editControls.start}>{t('edit-user.label')}</Dropdown.Item>
+            </PermissionGate>
+            <PermissionGate scopeKind={RoleScopeKind.labelAndTag} fallbackText={t('edit-tags.not-allowed')}>
+              <Dropdown.Item onSelect={handleOpenEditTagsDialog}>
+                {tags?.length ? t('edit-tags.edit-label') : t('edit-tags.add-label')}
+              </Dropdown.Item>
             </PermissionGate>
             <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={newT('upload-doc.not-allowed')}>
               <Dropdown.Item onSelect={handleOpenUploadDocDialog}>{newT('upload-doc.label')}</Dropdown.Item>
@@ -116,7 +130,9 @@ const Actions = ({ entity }: WithEntityProps) => {
       <ViewHistoricalDataDialog open={openDialog === ActionDialog.historicalData} onClose={handleCloseDialog} />
       <SummarizeAiDialog open={openDialog === ActionDialog.summarize} onClose={handleCloseDialog} />
       <UploadDocDialog open={openDialog === ActionDialog.uploadDoc} onClose={handleCloseDialog} />
-      <EditTagsDialog open={openDialog === ActionDialog.editTags} onClose={handleCloseDialog} />
+      {hasLabelAndTagPermissions && (
+        <EditTagsDialog open={openDialog === ActionDialog.editTags} onClose={handleCloseDialog} />
+      )}
     </>
   ) : null;
 };

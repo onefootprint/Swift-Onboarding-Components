@@ -210,3 +210,10 @@ export const withData = (entity = entityWithPhoneFixture, response = {}) =>
     path: `/entities/${entity.id}/data`,
     response,
   });
+
+export const withTags = (entity = entityWithPhoneFixture, response = []) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/tags`,
+    response,
+  });
