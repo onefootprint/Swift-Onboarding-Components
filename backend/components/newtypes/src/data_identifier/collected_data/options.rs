@@ -71,6 +71,8 @@ pub enum CollectedDataOption {
     Card,
 
     UsTaxId,
+
+    Bank,
 }
 
 crate::util::impl_enum_string_diesel!(CollectedDataOption);
@@ -123,6 +125,7 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::Nationality => Self::Nationality,
             CollectedDataOptionKind::UsLegalStatus => Self::UsLegalStatus,
             CollectedDataOptionKind::UsTaxId => Self::UsTaxId,
+            CollectedDataOptionKind::Bank => Self::Bank,
             CollectedDataOptionKind::Document => {
                 return Err(crate::Error::Custom("Cannot convert".to_owned()))
             }
@@ -151,6 +154,7 @@ impl CollectedDataOption {
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
             Self::Card => CollectedData::Card,
+            Self::Bank => CollectedData::Bank,
             Self::Nationality => CollectedData::Nationality,
             Self::UsLegalStatus => CollectedData::UsLegalStatus,
             Self::UsTaxId => CollectedData::UsTaxId,
@@ -204,8 +208,9 @@ impl CollectedDataOption {
 
             Self::Document(_) => None,
 
-            // TODO we should associate this with types of data
+            // TODO we should associate these with types of data
             Self::Card => None,
+            Self::Bank => None,
 
             Self::Nationality => Some(vec![IDK::Nationality.into()]),
             Self::UsLegalStatus => Some(vec![
@@ -254,6 +259,7 @@ impl CollectedDataOption {
 
             // TODO we should associate this with types of data
             Self::Card => vec![],
+            Self::Bank => vec![],
 
             Self::Nationality => vec![IDK::Nationality.into()],
             Self::UsLegalStatus => vec![IDK::UsLegalStatus.into()],

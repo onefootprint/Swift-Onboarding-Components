@@ -33,6 +33,7 @@ pub enum CollectedData {
     Nationality,
 
     UsTaxId,
+    Bank,
 }
 
 impl CollectedData {
@@ -58,6 +59,7 @@ impl CollectedData {
             Self::BusinessCorporationType => vec![BusinessCorporationType],
             Self::InvestorProfile => vec![InvestorProfile],
             Self::Card => vec![Card],
+            Self::Bank => vec![Bank],
             // TODO it would be great if we didn't have to specify this here. could likely wipe this list
             Self::Document => vec![],
             Self::UsLegalStatus => vec![UsLegalStatus],
@@ -87,6 +89,7 @@ impl CollectedData {
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
             Self::Card => DataIdentifierDiscriminant::Card,
+            Self::Bank => DataIdentifierDiscriminant::Bank,
         }
     }
 }

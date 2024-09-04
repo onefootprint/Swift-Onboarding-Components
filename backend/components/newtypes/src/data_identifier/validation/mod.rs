@@ -7,13 +7,13 @@ use crate::PiiValueKind;
 use crate::ValidateArgs;
 use std::collections::HashMap;
 
+mod bank;
 mod business;
 mod card;
 mod document;
 mod identity;
 mod investor_profile;
 mod utils;
-
 pub use business::BusinessOwnerData;
 pub use business::KycedBusinessOwnerData;
 pub use card::CardData;

@@ -4,6 +4,7 @@ use crate::FpResult;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::AllData;
+use newtypes::BankDataKind;
 use newtypes::BusinessDataKind;
 use newtypes::CardDataKind;
 use newtypes::CleanAndValidate;
@@ -61,6 +62,13 @@ fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
             | CardDataKind::ExpMonth
             | CardDataKind::ExpYear
             | CardDataKind::Last4 => false,
+        },
+        DataIdentifier::Bank(bank_info) => match bank_info.kind {
+            BankDataKind::AchRoutingNumber
+            | BankDataKind::AchAccountId
+            | BankDataKind::AccountType
+            | BankDataKind::Name => true,
+            BankDataKind::AchAccountNumber => false,
         },
         DataIdentifier::Custom(_) => false,
         DataIdentifier::Business(_) => false,

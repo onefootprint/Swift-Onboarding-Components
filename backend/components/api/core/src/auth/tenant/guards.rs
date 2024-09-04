@@ -158,6 +158,7 @@ fn can_decrypt(di: &DataIdentifier, token_scopes: &[TenantScope]) -> bool {
             })
         }
         DataIdentifier::Card(_) => token_scopes.contains(&TenantScope::Decrypt { data: CDO::Card }),
+        DataIdentifier::Bank(_) => token_scopes.contains(&TenantScope::Decrypt { data: CDO::Bank }),
     }
 }
 

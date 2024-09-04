@@ -1,3 +1,4 @@
+use super::bank_data_kind::BankInfo;
 use crate::BusinessDataKind;
 use crate::CardInfo;
 use crate::DataIdentifier;
@@ -34,6 +35,10 @@ impl DataIdentifier {
                     .map(DataIdentifier::from)
                     .collect_vec(),
                 DataIdentifierDiscriminant::Card => CardInfo::api_examples()
+                    .into_iter()
+                    .map(DataIdentifier::from)
+                    .collect_vec(),
+                DataIdentifierDiscriminant::Bank => BankInfo::api_examples()
                     .into_iter()
                     .map(DataIdentifier::from)
                     .collect_vec(),

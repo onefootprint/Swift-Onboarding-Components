@@ -102,7 +102,8 @@ pub async fn vault_pii(
                 | DataIdentifier::Business(_)
                 | DataIdentifier::Id(_)
                 | DataIdentifier::Custom(_)
-                | DataIdentifier::Card(_) => Some(Either::Left((di, filters, value))),
+                | DataIdentifier::Card(_)
+                | DataIdentifier::Bank(_) => Some(Either::Left((di, filters, value))),
             })
             .partition_map(|r| r);
 

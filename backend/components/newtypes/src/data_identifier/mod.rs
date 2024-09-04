@@ -18,6 +18,7 @@
 //!   for example, `CDO::Name` cannot be collected without collecting _both_ `IDK::FirstName` and
 //!   `IDK::LastName`.
 
+mod bank_data_kind;
 mod business_data_kind;
 mod card_data_kind;
 mod collected_data;
@@ -31,7 +32,7 @@ mod identity_data_kind;
 mod investor_profile_kind;
 mod kv_data_key;
 mod validation;
-
+pub use self::bank_data_kind::*;
 pub use self::business_data_kind::*;
 pub use self::card_data_kind::*;
 pub use self::collected_data::*;
@@ -98,6 +99,7 @@ pub enum DataIdentifier {
     InvestorProfile(InvestorProfileKind),
     Document(DocumentDiKind),
     Card(CardInfo),
+    Bank(BankInfo),
 }
 
 // non_exhaustive ensures values are only constructed via CleanAndValidate.
@@ -151,6 +153,7 @@ impl DataIdentifier {
             Self::InvestorProfile(s) => s.parent(),
             Self::Document(s) => s.parent(),
             Self::Card(s) => s.parent(),
+            Self::Bank(s) => s.parent(),
         }
     }
 
@@ -198,7 +201,8 @@ impl DataIdentifier {
             | DataIdentifier::Business(_)
             | DataIdentifier::InvestorProfile(_)
             | DataIdentifier::Document(_)
-            | DataIdentifier::Card(_) => vec![],
+            | DataIdentifier::Card(_)
+            | DataIdentifier::Bank(_) => vec![],
         }
     }
 }
@@ -232,6 +236,7 @@ impl CleanAndValidate for DataIdentifier {
             Self::InvestorProfile(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
             Self::Document(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
             Self::Card(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
+            Self::Bank(s) => s.clean_and_validate(value, args, all_data).map(Into::into),
         }
     }
 }
@@ -248,6 +253,7 @@ impl std::fmt::Display for DataIdentifier {
             Self::InvestorProfile(s) => s.to_string(),
             Self::Document(s) => s.to_string(),
             Self::Card(s) => s.to_string(),
+            Self::Bank(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
     }
@@ -259,12 +265,17 @@ impl DataIdentifierDiscriminant {
     pub fn is_allowed_for(&self, vault_kind: VaultKind) -> bool {
         match vault_kind {
             VaultKind::Person => match self {
-                Self::Id | Self::Custom | Self::InvestorProfile | Self::Document | Self::Card => true,
+                Self::Id
+                | Self::Custom
+                | Self::InvestorProfile
+                | Self::Document
+                | Self::Card
+                | Self::Bank => true,
                 Self::Business => false,
             },
             VaultKind::Business => match self {
                 Self::Business | Self::Custom => true,
-                Self::Id | Self::InvestorProfile | Self::Document | Self::Card => false,
+                Self::Id | Self::InvestorProfile | Self::Document | Self::Card | Self::Bank => false,
             },
         }
     }
@@ -306,6 +317,9 @@ impl FromStr for DataIdentifier {
             }
             DataIdentifierDiscriminant::Card => {
                 Self::Card(CardInfo::from_str(suffix).map_err(|_| cannot_parse_err)?)
+            }
+            DataIdentifierDiscriminant::Bank => {
+                Self::Bank(BankInfo::from_str(suffix).map_err(|_| cannot_parse_err)?)
             }
         };
         Ok(result)
@@ -370,7 +384,8 @@ impl DataIdentifier {
             | DataIdentifier::Id(_)
             // Custom data won't always be VaultData anymore - will sometimes be document
             | DataIdentifier::Custom(_)
-            | DataIdentifier::Card(_) => StorageType::VaultData,
+            | DataIdentifier::Card(_)
+            | DataIdentifier::Bank(_) => StorageType::VaultData,
         }
     }
 
