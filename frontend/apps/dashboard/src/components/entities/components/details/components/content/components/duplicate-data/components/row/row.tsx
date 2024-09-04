@@ -22,6 +22,8 @@ const Row = ({ duplicateDataItem }: RowProps) => {
     [DupeKind.nameDob]: t('dupe-kinds.name-dob'),
     [DupeKind.deviceId]: t('dupe-kinds.device-id'),
     [DupeKind.cookieId]: t('dupe-kinds.cookie-id'),
+    [DupeKind.nameSsn4]: t('dupe-kinds.name-ssn4'),
+    [DupeKind.dobSsn4]: t('dupe-kinds.dob-ssn4'),
   };
 
   return (

@@ -483,7 +483,6 @@
       "manual-pgp-instructions-link-title": "Manual PGP instructions",
       "public-key-link-title": "Footprint's PGP public key"
     },
-
     "frequent-notes": {
       "title": "Frequent Notes",
       "edit": "Edit",
@@ -1971,7 +1970,9 @@
           "phone-number": "Phone number",
           "name-dob": "Name + DOB",
           "device-id": "Device ID",
-          "cookie-id": "Cookie ID"
+          "cookie-id": "Cookie ID",
+          "name-ssn4": "Name + SSN4",
+          "dob-ssn4": "DOB + SSN4"
         },
         "other-tenants-summary": {
           "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",

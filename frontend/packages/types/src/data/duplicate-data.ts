@@ -7,6 +7,8 @@ export enum DupeKind {
   nameDob = 'name_dob',
   deviceId = 'device_id',
   cookieId = 'cookie_id',
+  nameSsn4 = 'name_ssn4',
+  dobSsn4 = 'dob_ssn4',
 }
 
 export type DuplicateDataItem = {
