@@ -54,6 +54,8 @@ pub struct VerifyV1SdkArgs {
     /// The components SDK wraps the verify SDK with the same args
     pub is_components_sdk: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub should_relay_to_components: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub fixture_result: Option<WorkflowFixtureResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub document_fixture_result: Option<DocumentFixtureResult>,
