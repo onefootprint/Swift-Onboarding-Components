@@ -48,14 +48,14 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
 
   const confirmBeforeClosing = () => {
     confirmationDialog.open({
-      title: t('confirm.title'),
-      description: t('confirm.description'),
+      title: allT('confirm.title'),
+      description: allT('confirm.description'),
       primaryButton: {
-        label: t('confirm.cta'),
+        label: allT('confirm.cta'),
         onClick: onClose,
       },
       secondaryButton: {
-        label: t('confirm.cancel'),
+        label: allT('confirm.cancel'),
       },
     });
   };

@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 type OverlayProps = {
   isVisible?: boolean;
+  isConfirmation?: boolean;
 };
 
 const overlayVariants = {
@@ -11,16 +12,25 @@ const overlayVariants = {
   visible: { opacity: 1 },
 };
 
-const Overlay = forwardRef<HTMLDivElement, OverlayProps>(({ isVisible = false }: OverlayProps, ref) => (
-  <AnimatePresence>
-    {isVisible && (
-      <OverlayLayer ref={ref} variants={overlayVariants} initial="hidden" animate="visible" exit="hidden" />
-    )}
-  </AnimatePresence>
-));
+const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
+  ({ isVisible = false, isConfirmation = false }: OverlayProps, ref) => (
+    <AnimatePresence>
+      {isVisible && (
+        <OverlayLayer
+          ref={ref}
+          variants={overlayVariants}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          $isConfirmation={isConfirmation}
+        />
+      )}
+    </AnimatePresence>
+  ),
+);
 
-const OverlayLayer = styled(motion.div)`
-  ${({ theme }) => css`
+const OverlayLayer = styled(motion.div)<{ $isConfirmation: boolean }>`
+  ${({ theme, $isConfirmation }) => css`
     position: fixed;
     background-color: ${theme.backgroundColor.senary}40;
     height: 100vh;
@@ -28,7 +38,7 @@ const OverlayLayer = styled(motion.div)`
     left: 0;
     top: 0;
     user-select: none;
-    z-index: ${theme.zIndex.overlay};
+    z-index: ${$isConfirmation ? theme.zIndex.confirmationOverlay : theme.zIndex.overlay};
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
   `}

@@ -39,7 +39,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
         {fields.map((field, index) => (
           <Box key={field.id}>
             <Box marginBottom={5}>
-              <Grid.Container columns={['1fr', '1fr']}>
+              <Grid.Container columns={['1fr', '1fr']} gap={5}>
                 <TextInput
                   autoFocus
                   label={t('name.label')}

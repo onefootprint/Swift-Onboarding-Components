@@ -185,7 +185,7 @@ const Dialog = ({
           ) : null}
         </DialogContainer>
       </FocusTrap>
-      <StyledOverlay isVisible={open} isConfirmation={isConfirmation} />
+      <Overlay isVisible={open} isConfirmation={isConfirmation} />
     </Portal>
   ) : null;
 };
@@ -314,17 +314,6 @@ const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[4]};
-  `}
-`;
-
-const StyledOverlay = styled(Overlay)<{ isConfirmation: boolean }>`
-  ${({ theme, isConfirmation }) => css`
-    ${
-      isConfirmation &&
-      `
-      z-index: ${theme.zIndex.confirmationOverlay};
-    `
-    };
   `}
 `;
 
