@@ -1,12 +1,5 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
-import {
-  IcoCheckSmall16,
-  IcoChevronDown16,
-  IcoFlag16,
-  IcoInfo16,
-  IcoPlusSmall16,
-  IcoTrash16,
-} from '@onefootprint/icons';
+import { IcoChevronDown16, IcoFlag16, IcoInfo16, IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import { EntityLabel } from '@onefootprint/types';
 import { Dropdown, Stack, Tooltip, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
@@ -53,7 +46,7 @@ const FraudLabel = () => {
             </Tooltip>
           </Main>
           <ChevronContainer aria-label={t('aria-label')}>
-            <IcoChevronDown16 />
+            <IcoChevronDown16 className="chevronIcon" />
           </ChevronContainer>
         </LabelContainer>
       ) : (
@@ -71,20 +64,22 @@ const FraudLabel = () => {
         <Content>
           <Dropdown.Group>
             {Object.values(EntityLabel).map(labelOption => (
-              <StyledItem key={labelOption} onClick={() => handleEditLabel(labelOption)}>
+              <Dropdown.Item
+                key={labelOption}
+                onClick={() => handleEditLabel(labelOption)}
+                checked={labelOption === label}
+              >
                 {labelT(labelOption)}
-                {labelOption === label && <IcoCheckSmall16 />}
-              </StyledItem>
+              </Dropdown.Item>
             ))}
           </Dropdown.Group>
           {label && (
             <>
               <Dropdown.Separator />
               <Dropdown.Group>
-                <StyledItem onClick={() => handleEditLabel(null)} data-is-remove={true}>
-                  <IcoTrash16 color="error" />
+                <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
                   {t('labels.remove')}
-                </StyledItem>
+                </Dropdown.Item>
               </Dropdown.Group>
             </>
           )}
@@ -146,6 +141,19 @@ const ChevronContainer = styled(Dropdown.Trigger)`
       left: 0;
       transform: translate(-50%, -50%);
     }
+
+      .chevronIcon {
+      transition: transform 0.1s ease-in-out;
+      transform: rotate(0deg);
+    }
+
+    &[data-state='open'] {
+      background-color: ${theme.backgroundColor.secondary};
+      .chevronIcon {
+        transform: rotate(180deg);
+      }
+    }
+
   `}
 `;
 
@@ -157,21 +165,6 @@ const Content = styled(Stack)`
     background-color: ${theme.backgroundColor.primary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
-  `};
-`;
-
-const StyledItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    
-    &[data-is-remove='true'] {
-      color: ${theme.color.error};
-      justify-content: start;
-      gap: ${theme.spacing[2]};
-    }
   `};
 `;
 

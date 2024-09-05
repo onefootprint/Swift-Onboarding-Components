@@ -22,7 +22,7 @@ const Item = ({
   const IconRight = asLink ? StyledIcoArrowTopRight16 : iconRight;
   return (
     <StyledDropdownItem size={size} variant={variant} $height={height} {...props}>
-      {IconLeft && <IconLeft />}
+      {IconLeft && <IconLeft color={variant === 'destructive' ? 'error' : undefined} />}
       <Content>{children}</Content>
       {IconRight && <IconRight />}
       {checked && <CheckIcon />}
@@ -61,7 +61,7 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
       position: relative;
       flex-wrap: nowrap;
       overflow: hidden;
-      gap: ${theme.spacing[2]};
+      gap: ${theme.spacing[3]};
       color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
       padding: ${theme.spacing[2]} ${theme.spacing[4]};
       border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
