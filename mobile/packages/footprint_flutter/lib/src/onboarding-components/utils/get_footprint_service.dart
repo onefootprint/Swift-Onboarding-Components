@@ -9,7 +9,7 @@ import 'package:footprint_flutter/src/onboarding-components/models/footprint_con
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/tenant_auth_methods.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_auth_methods.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/save.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
@@ -26,7 +26,7 @@ typedef IdentifyLauncher = void Function({
 });
 typedef AuthMethodCheckerResult = ({
   bool requiresAuth,
-  TenantAuthMethods? authMethod
+  FootprintAuthMethods? authMethod
 });
 typedef AuthMethodChecker = Future<AuthMethodCheckerResult> Function();
 typedef SaveHandler = Future<void> Function(FormData data);
@@ -49,7 +49,7 @@ typedef HandoffHandler = void Function({
       return (requiresAuth: false, authMethod: null);
     }
     if (status == AuthTokenStatus.validWithInsufficientScope) {
-      return (requiresAuth: true, authMethod: TenantAuthMethods.authToken);
+      return (requiresAuth: true, authMethod: FootprintAuthMethods.authToken);
     }
     throw Exception('Invalid auth token. Please use a valid auth token.');
   }
@@ -90,7 +90,7 @@ typedef HandoffHandler = void Function({
       return authTokenStatusToResult(authTokenStatus);
     }
 
-    return (requiresAuth: true, authMethod: TenantAuthMethods.emailAndPhone);
+    return (requiresAuth: true, authMethod: FootprintAuthMethods.emailAndPhone);
   }
 
   void launchIdentify({
@@ -107,6 +107,9 @@ typedef HandoffHandler = void Function({
     }
     final publicKey = ref.read(fpContextNotifierProvider).publicKey;
     final redirectUrl = ref.read(fpContextNotifierProvider).redirectUrl;
+    final sandboxOutcome = ref.read(fpContextNotifierProvider).sandboxOutcome;
+    final sandboxId = ref.read(fpContextNotifierProvider).sandboxId;
+    final appearance = ref.read(fpContextNotifierProvider).appearance;
 
     final data = FormData(email: email, phoneNumber: phoneNumber);
 
@@ -114,6 +117,9 @@ typedef HandoffHandler = void Function({
         publicKey: publicKey,
         formData: data,
         redirectUrl: redirectUrl,
+        appearance: appearance,
+        sandboxOutcome: sandboxOutcome,
+        sandboxId: sandboxId,
         onAuthComplete: (
             {required String authToken, required String vaultingToken}) {
           onAuthenticated?.call();
@@ -171,6 +177,8 @@ typedef HandoffHandler = void Function({
     final authToken = fpContext.verifiedAuthToken;
     final appearance = fpContext.appearance;
     final redirectUrl = fpContext.redirectUrl;
+    final sandboxId = fpContext.sandboxId;
+    final sandboxOutcome = fpContext.sandboxOutcome;
 
     if (authToken == null) {
       onError
@@ -182,6 +190,8 @@ typedef HandoffHandler = void Function({
         authToken: authToken,
         appearance: appearance,
         redirectUrl: redirectUrl,
+        sandboxId: sandboxId,
+        sandboxOutcome: sandboxOutcome,
         onComplete: (validationToken) {
           onComplete?.call(validationToken);
         },

@@ -1,4 +1,4 @@
-enum TenantAuthMethods {
+enum FootprintAuthMethods {
   authToken,
   emailAndPhone,
 }

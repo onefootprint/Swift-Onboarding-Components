@@ -49,10 +49,6 @@ class FootprintProvider extends StatelessWidget {
         ],
         child: Wrapper(
           publicKey: publicKey,
-          appearance: appearance,
-          authToken: authToken,
-          locale: locale,
-          redirectUrl: redirectUrl,
           sandboxId: sandboxId,
           sandboxOutcome: sandboxOutcome,
           child: child,

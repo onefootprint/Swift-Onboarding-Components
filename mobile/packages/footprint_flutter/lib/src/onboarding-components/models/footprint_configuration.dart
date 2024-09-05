@@ -15,6 +15,8 @@ class FootprintConfiguration extends Configuration {
     super.onError,
     super.options,
     super.publicKey,
+    super.sandboxId,
+    super.sandboxOutcome,
     required super.redirectUrl,
     this.formData,
   });
@@ -29,6 +31,9 @@ class FootprintConfiguration extends Configuration {
       'public_key': publicKey,
       'user_data': formData?.toJson(),
       'appearance': appearance?.toJson(),
+      "fixture_result": sandboxOutcome?.overallOutcome?.toString(),
+      "document_fixture_result": sandboxOutcome?.idDocOutcome?.toString(),
+      "sandbox_id": sandboxId,
     };
     map.removeWhere((key, value) => value == null);
     return map;

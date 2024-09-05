@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:footprint_flutter/src/models/appearance.dart';
-import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/generate_random_string.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/is_alphanumeric.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_service.dart';
 
 class Wrapper extends ConsumerStatefulWidget {
   final Widget child;
-  final FootprintAppearance? appearance;
-  final String? authToken;
   final String publicKey;
-  final FootprintSupportedLocale? locale;
-  final String redirectUrl;
   final String? sandboxId;
   final SandboxOutcome? sandboxOutcome;
 
@@ -22,10 +18,6 @@ class Wrapper extends ConsumerStatefulWidget {
     super.key,
     required this.child,
     required this.publicKey,
-    required this.redirectUrl,
-    this.appearance,
-    this.authToken,
-    this.locale,
     this.sandboxId,
     this.sandboxOutcome,
   });
@@ -41,6 +33,46 @@ class _WrapperState extends ConsumerState<Wrapper> {
     // we initialize the provider with the context after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getOnboardingConfig(widget.publicKey).then((config) {
+        if (config.isLive && widget.sandboxId != null) {
+          throw Exception('sandboxId is not allowed in live mode');
+        }
+
+        if (config.isLive && widget.sandboxOutcome != null) {
+          throw Exception('sandboxOutcome is not allowed in live mode');
+        }
+
+        if (config.requiresIdDoc == false &&
+            widget.sandboxOutcome?.idDocOutcome != null) {
+          throw Exception(
+              'idDocOutcome is not allowed for no-document verification flow');
+        }
+
+        if (!config.isLive) {
+          SandboxOutcome? newSandBoxOutcome = widget.sandboxOutcome;
+          String? newSandboxId = widget.sandboxId;
+          if (newSandboxId != null) {
+            if (!isAlphanumeric(newSandboxId)) {
+              throw Exception('sandboxId must be alphanumeric');
+            }
+          } else {
+            newSandboxId = generateRandomString(length: 12);
+          }
+
+          OverallOutcome? overallOutcome =
+              newSandBoxOutcome?.overallOutcome ?? OverallOutcome.pass;
+          IdDocOutcome? idDocOutcome =
+              newSandBoxOutcome?.idDocOutcome ?? IdDocOutcome.pass;
+          newSandBoxOutcome = SandboxOutcome(
+            overallOutcome: overallOutcome,
+            idDocOutcome: config.requiresIdDoc ? idDocOutcome : null,
+          );
+          ref
+              .read(fpContextNotifierProvider.notifier)
+              .updateSandboxOutcome(newSandBoxOutcome);
+          ref
+              .read(fpContextNotifierProvider.notifier)
+              .updateSandboxId(newSandboxId);
+        }
         ref
             .read(fpContextNotifierProvider.notifier)
             .updateOnboardingConfig(config);
