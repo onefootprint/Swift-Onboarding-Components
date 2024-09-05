@@ -1,3 +1,4 @@
+import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity } from '@onefootprint/types';
 import { EntityKind, EntityStatus, WatchlistCheckReasonCode, WatchlistCheckStatus } from '@onefootprint/types';
 
@@ -71,3 +72,13 @@ export const entityManualReviewFixture: Entity = {
   ...entityPassedFixture,
   requiresManualReview: true,
 };
+
+export const withLabel = () =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entityPassedFixture.id}/label`,
+    response: {
+      createdAt: '2023-06-27T14:43:47.444716Z',
+      kind: null,
+    },
+  });

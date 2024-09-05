@@ -2,7 +2,7 @@ import { customRender, mockRouter, screen, waitFor, within } from '@onefootprint
 import { asAdminUser } from 'src/config/tests';
 
 import List from './list';
-import { withEntities, withEntitiesError, withOnboardingConfigs } from './list.test.config';
+import { entitiesFixture, withEntities, withEntitiesError, withLabel, withOnboardingConfigs } from './list.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -31,6 +31,7 @@ describe('<List />', () => {
   describe('when the request to fetch the users succeeds', () => {
     beforeEach(() => {
       withEntities();
+      entitiesFixture.forEach(({ id }) => withLabel(id));
     });
 
     it.each`

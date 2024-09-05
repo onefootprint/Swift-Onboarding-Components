@@ -28,6 +28,8 @@ export type {
   CreateMembersResponse,
 } from './create-org-member';
 export type { CreateRoleRequest, CreateRoleResponse } from './create-org-role';
+export type { EditLabelRequest, EditLabelResponse } from './edit-label';
+export type { GetLabelResponse } from './get-label';
 export type {
   CreateProxyConfigRequest,
   CreateProxyConfigResponse,

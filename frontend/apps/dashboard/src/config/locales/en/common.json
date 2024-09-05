@@ -992,16 +992,6 @@
           "copied": "Copied!",
           "copy-to-clipboard": "Copy to clipboard",
           "copied-to-clipboard": "copied to clipboard"
-        },
-        "fraud-label": {
-          "add-label": "Add fraud label",
-          "tooltip": "Labels offer a high-level assessment of a user and feedback to Footprint for enhancing risk systems. Each user can have one active label.",
-          "labels": {
-            "active": "Active",
-            "offboard-fraud": "Offboard (Fraud)",
-            "offboard-other": "Offboard (Other)",
-            "remove": "Remove label"
-          }
         }
       },
       "manual-review-not-allowed": "You're not allowed to manually review users",

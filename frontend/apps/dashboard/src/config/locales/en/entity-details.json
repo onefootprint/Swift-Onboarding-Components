@@ -1,5 +1,15 @@
 {
   "header": {
+    "fraud-label": {
+      "add-label": "Add fraud label",
+      "tooltip": "Labels offer a high-level assessment of a user and feedback to Footprint for enhancing risk systems. Each user can have one active label.",
+      "labels": {
+        "active": "Active",
+        "offboard-fraud": "Offboard (Fraud)",
+        "offboard-other": "Offboard (Other)",
+        "remove": "Remove label"
+      }
+    },
     "actions": {
       "edit-tags": {
         "edit-title": "Edit tags",

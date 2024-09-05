@@ -5,13 +5,14 @@ import StatusBadge from 'src/components/status-badge';
 import styled, { css } from 'styled-components';
 import Tags from './components/tags';
 
-import Labels from '@/entities/components/labels';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import { RoleScopeKind } from '@onefootprint/types';
 import usePermissions from 'src/hooks/use-permissions';
+import FraudLabel from './components/fraud-label';
 import IdDropdown from './components/id-dropdown';
+import Labels from './components/labels';
 
 type HeaderProps = WithEntityProps & {
   isDisabled?: boolean;
@@ -31,7 +32,7 @@ const Header = ({ entity, isDisabled }: HeaderProps) => {
             <Text variant="label-1">{t(`${kind}.title` as ParseKeys<'common'>)}</Text>
             <IdDropdown entity={entity} />
             <Text variant="label-1">⋅</Text>
-            <Stack gap={2}>
+            <Stack gap={2} align="center">
               <StatusBadge
                 status={entity.status}
                 requiresManualReview={entity.requiresManualReview}
@@ -40,6 +41,7 @@ const Header = ({ entity, isDisabled }: HeaderProps) => {
                 watchlistLabel={t(`watchlist.on-watchlist-${kind}` as ParseKeys<'common'>)}
               />
               <Labels entity={entity} />
+              <FraudLabel />
             </Stack>
           </Main>
           <Stack align="center" gap={3} flex={0}>
