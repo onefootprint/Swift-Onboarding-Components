@@ -186,30 +186,30 @@ impl Client {
             .await?;
 
         let message: Message = decode_response(response).await?;
-        tracing::info!(sid=%message.sid, "Sent twilio message");
+        let price = message.price.as_ref().map(|s| s.as_ref()).unwrap_or("null");
+        tracing::info!(sid=%message.sid, status=%message.status, %price, "Sent twilio message");
 
         let result = if matches!(message.status, Status::Undelivered | Status::Failed) {
             // fatal delivery here, instantly abort
-            tracing::info!(status=%message.status, "Twilio SMS status");
-            Err(Error::DeliveryFailed(message.status, message.error_code))
+            Err(Error::DeliveryFailed(Box::new(message)))
         } else {
             // Wait for ~5s for the message to be delivered. If it doesn't deliver, error
             self.check_status(message.uri.clone()).await
         };
-        let status = match &result {
-            Ok(message) => Some(message.status),
-            Err(Error::DeliveryFailed(status, _)) => Some(*status),
-            Err(Error::NotDeliveredAfterTimeout(status, _)) => Some(*status),
-            _ => None,
-        };
-        if let Some(status) = status {
-            // Log for aggregate metrics on twilio performance
-            tracing::info!(%status, "Twilio SMS with status");
+        match &result {
+            Ok(message)
+            | Err(Error::DeliveryFailed(message))
+            | Err(Error::NotDeliveredAfterTimeout(message)) => {
+                let price = message.price.as_ref().map(|s| s.as_ref()).unwrap_or("null");
+                // Log for aggregate metrics on twilio performance
+                tracing::info!(status=%message.status, %price, "Twilio SMS with status");
+            }
+            _ => (),
         }
-        result
+        result.map(|m| *m)
     }
 
-    async fn check_status(&self, message_uri: String) -> crate::response::Result<Message> {
+    async fn check_status(&self, message_uri: String) -> crate::response::Result<Box<Message>> {
         // We want to check every 500ms for 5s if there's been an error/success.
         let retry_strategy = FixedInterval::from_millis(500).map(jitter_10p).take(10);
         let result = Retry::spawn(retry_strategy, move || {
@@ -219,7 +219,7 @@ impl Client {
 
         match result {
             // Determinate success
-            Ok(Ok(message)) => Ok(message),
+            Ok(Ok(message)) => Ok(Box::new(message)),
             // Determinate error encountered
             Ok(Err(e)) => Err(e),
             // We stayed in an indeterminate state for all attempts
@@ -229,12 +229,9 @@ impl Client {
                     // This could still techncally transition to either Delivered or Undelivered,
                     // so it's indeterminate. But I figure it's unlikely retrying will get the
                     // result faster
-                    Ok(message)
+                    Ok(Box::new(message))
                 } else {
-                    Err(Error::NotDeliveredAfterTimeout(
-                        message.status,
-                        message.error_code,
-                    ))
+                    Err(Error::NotDeliveredAfterTimeout(Box::new(message)))
                 }
             }
         }
@@ -251,7 +248,7 @@ impl Client {
         };
         if matches!(message.status, Status::Undelivered | Status::Failed) {
             // Terminal failure status
-            return Ok(Err(Error::DeliveryFailed(message.status, message.error_code)));
+            return Ok(Err(Error::DeliveryFailed(Box::new(message))));
         };
         if matches!(message.status, Status::Delivered | Status::Read) {
             // Terminal success status

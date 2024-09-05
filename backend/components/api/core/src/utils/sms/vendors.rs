@@ -99,7 +99,7 @@ impl SmsVendor for TwilioWhatsapp {
             Ok(m) if m.status == twilio::response::message::Status::Sent => {
                 // Special logic for WhatsApp - we want to consider Sent as a failure and fall back
                 // to SMS, in case someone has a WhatsApp account but doesn't have the app installed
-                return Err(twilio::error::Error::NotDeliveredAfterTimeout(m.status, None).into());
+                return Err(twilio::error::Error::NotDeliveredAfterTimeout(Box::new(m)).into());
             }
             Err(e) if e.is_invalid_recipient_error() => {
                 // Special logic for WhatsApp - if the recipient was invalid, we want to gracefully

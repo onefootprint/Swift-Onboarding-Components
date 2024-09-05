@@ -1,3 +1,4 @@
+use crate::response::message::Message;
 use crate::response::message::Status;
 use std::fmt::Display;
 use thiserror::Error;
@@ -9,9 +10,9 @@ pub enum Error {
     #[error("{0}")]
     Request(#[from] reqwest::Error),
     #[error("Message delivery failed. Please try resending the message or use a different phone number.")]
-    DeliveryFailed(Status, Option<i64>),
+    DeliveryFailed(Box<Message>),
     #[error("Message unable to be delivered.")]
-    NotDeliveredAfterTimeout(Status, Option<i64>),
+    NotDeliveredAfterTimeout(Box<Message>),
     #[error("{0}")]
     Api(ApiErrorResponse),
     #[error("{0}")]
@@ -24,7 +25,7 @@ impl api_errors::FpErrorTrait for Error {
             Error::Request(_) | Error::ReqwestMiddleware(_) | Error::SerdeJson(_) => {
                 api_errors::StatusCode::INTERNAL_SERVER_ERROR
             }
-            Error::DeliveryFailed(_, _) | Error::NotDeliveredAfterTimeout(_, _) => {
+            Error::DeliveryFailed(_) | Error::NotDeliveredAfterTimeout(_) => {
                 api_errors::StatusCode::BAD_REQUEST
             }
             Error::Api(e) => match e.status {
@@ -36,10 +37,10 @@ impl api_errors::FpErrorTrait for Error {
 
     fn message(&self) -> String {
         match self {
-            Self::DeliveryFailed(_, error_code) | Self::NotDeliveredAfterTimeout(_, error_code) => {
+            Self::DeliveryFailed(message) | Self::NotDeliveredAfterTimeout(message) => {
                 // Try attaching specific context from the error code received by twilio, if any
                 let generic_err = self.to_string();
-                let specific_err = error_code.and_then(error_description);
+                let specific_err = message.error_code.and_then(error_description);
                 if let Some(specific_err) = specific_err {
                     format!("{} {}", generic_err, specific_err)
                 } else {
@@ -56,10 +57,12 @@ impl Error {
     /// Returns true if the error is from failed delivery due to the recipient being invalid
     pub fn is_invalid_recipient_error(&self) -> bool {
         const TWILIO_INVALID_RECIPIENT_ERROR_CODE: i64 = 63024;
-        matches!(
-            self,
-            Error::DeliveryFailed(Status::Failed, Some(TWILIO_INVALID_RECIPIENT_ERROR_CODE))
-        )
+        if let Error::DeliveryFailed(message) = self {
+            message.status == Status::Failed
+                && message.error_code == Some(TWILIO_INVALID_RECIPIENT_ERROR_CODE)
+        } else {
+            false
+        }
     }
 }
 
