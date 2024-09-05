@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
-import { useTheme } from 'styled-components';
 import NavLink from '../nav-link';
 
 export type SettingsDropdownProps = {
@@ -24,7 +23,6 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation('settings');
   const router = useRouter();
-  const theme = useTheme();
   const {
     data: { user, org },
   } = useSession();
@@ -68,18 +66,12 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
                   <ActiveMarker layoutId="activeMarker" transition={{ duration: 0.1 }} />
                 )}
                 <SubLink href={subLink.href}>
-                  <AnimatedSubLinkBackground
-                    initial={{ backgroundColor: 'transparent' }}
-                    whileHover={{ backgroundColor: theme.backgroundColor.secondary }}
-                    transition={{ duration: 0.1 }}
+                  <Text
+                    color={router.pathname.startsWith(subLink.href) ? 'primary' : 'tertiary'}
+                    variant={router.pathname.startsWith(subLink.href) ? 'label-4' : 'body-4'}
                   >
-                    <Text
-                      color={router.pathname.startsWith(subLink.href) ? 'primary' : 'tertiary'}
-                      variant={router.pathname.startsWith(subLink.href) ? 'label-4' : 'body-4'}
-                    >
-                      {subLink.text}
-                    </Text>
-                  </AnimatedSubLinkBackground>
+                    {subLink.text}
+                  </Text>
                 </SubLink>
               </SubLinkWrapper>
             ))}
@@ -132,15 +124,15 @@ const DropdownHeader = styled.div<{ selected: boolean }>`
   `};
 `;
 
+const Element = styled(NavigationMenu.Link)`
+  flex-grow: 1;
+`;
+
 const ChevronIcon = styled(IcoChevronRight24)<{ isOpen: boolean }>`
   ${({ isOpen }) => css`
     transition: transform 0.3s ease;
     transform: ${isOpen ? 'rotate(90deg)' : 'rotate(0)'};
   `}
-`;
-
-const Element = styled(NavigationMenu.Link)`
-  flex-grow: 1;
 `;
 
 const SubLinksContainer = styled(motion.div)`
@@ -150,17 +142,7 @@ const SubLinksContainer = styled(motion.div)`
     margin: ${theme.spacing[3]};
     margin-left: ${theme.spacing[6]};
     position: relative;
-
-    &:before {
-      content: '';
-      position: absolute;
-      z-index: 0;
-      top: 0;
-      bottom: 0;
-      left: calc(${theme.spacing[1]} * -1);
-      width: ${theme.spacing[1]};
-      background-color: ${theme.backgroundColor.senary};
-    }
+    border-left: ${theme.borderWidth[1]} solid ${theme.backgroundColor.senary};
   `}
 `;
 
@@ -170,30 +152,34 @@ const SubLinkWrapper = styled.div`
   position: relative;
 `;
 
-const SubLink = styled(Link)`
-  text-decoration: none;
-  flex-grow: 1;
-`;
-
-const AnimatedSubLinkBackground = styled(motion.div)`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[2]} ${theme.spacing[4]};
-    display: flex;
-    align-items: center;
-    position: relative;
-    height: 32px;
-    border-radius: ${theme.borderRadius.default};
-  `}
-`;
-
 const ActiveMarker = styled(motion.div)`
   ${({ theme }) => css`
     position: absolute;
-    left: calc(${theme.spacing[1]} * -1);
+    left: calc(${theme.borderWidth[1]} * -1);
     z-index: 1;
-    width: ${theme.spacing[1]};
+    width: ${theme.borderWidth[1]};
     height: 100%;
     background-color: ${theme.color.primary};
+  `}
+`;
+
+const SubLink = styled(Link)`
+  ${({ theme }) => css`
+    text-decoration: none;
+    padding: ${theme.spacing[2]} ${theme.spacing[4]};
+    flex-grow: 1;
+    border-radius: ${theme.borderRadius.default};
+    height: 32px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.1s ease;
+    margin-left: ${theme.spacing[2]};
+
+    &:hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
   `}
 `;
 
