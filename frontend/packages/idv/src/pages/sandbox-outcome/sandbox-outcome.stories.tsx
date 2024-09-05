@@ -2,6 +2,7 @@ import { OnboardingConfigStatus, type PublicOnboardingConfig } from '@onefootpri
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent } from '@storybook/test';
 import noop from 'lodash/noop';
+import getRandomID from '../../utils/get-random-id/get-random-id.mock';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 
@@ -11,6 +12,8 @@ const Template: StoryFn<{
   collectTestId?: boolean;
   onSubmit: (formData: SandboxOutcomeFormData) => void;
 }> = ({ requiresIdDoc, allowRealDocOutcome, collectTestId, onSubmit }) => {
+  getRandomID.mockReturnValue('testId');
+
   return (
     <SandboxOutcomeContainer
       onSubmit={onSubmit}

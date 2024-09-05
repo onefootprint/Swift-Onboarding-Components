@@ -3,7 +3,7 @@ import { Box, Button, Stack } from '@onefootprint/ui';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { HeaderTitle, NavigationHeader } from '../../../../components';
-import { getRandomID } from '../../../../utils';
+import getRandomID from '../../../../utils/get-random-id';
 import type { SandboxOutcomeFormData } from '../../types';
 import IdDocOutcomeSelect from '../id-doc-outcome-select';
 import OverallOutcomeSelect from '../overall-outcome-select';

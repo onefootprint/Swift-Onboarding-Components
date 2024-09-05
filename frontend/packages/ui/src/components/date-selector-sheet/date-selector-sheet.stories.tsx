@@ -48,7 +48,7 @@ const Template: StoryFn<DateSelectorSheetProps> = ({ startDate, endDate }) => {
 
 export const Default = Template.bind({});
 Default.args = {
-  startDate: startOfWeek(add(new Date(), { weeks: -1 })),
-  endDate: new Date(),
+  startDate: startOfWeek(add(new Date('2025-02-15'), { weeks: -1 })),
+  endDate: new Date('2025-02-15'),
   onChange: ({ startDate, endDate }) => console.log(startDate, endDate),
 };

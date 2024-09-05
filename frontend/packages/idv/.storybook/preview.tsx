@@ -9,6 +9,7 @@ import { L10nContextProvider } from '../src/components/l10n-provider';
 import { MachineProvider } from '../src/components/machine-provider';
 import { GOOGLE_MAPS_SRC } from '../src/config/constants';
 import i18n from '../src/config/initializers/i18next-test';
+import { viewports } from './viewports';
 
 // Create a global variable called locale in storybook
 // and add a dropdown in the toolbar to change your locale
@@ -64,27 +65,16 @@ const StoryDecorator: Decorator = (Story, context) => {
 export const decorators = [StoryDecorator];
 
 const preview: Preview = {
-  //👇 Enables auto-generated documentation for all stories
   parameters: {
+    chromatic: {
+      modes: {
+        mobile: { viewport: 'smallMobile' },
+        default: { viewport: 'default' },
+      },
+    },
     viewport: {
       defaultViewport: 'default',
-      viewports: {
-        mobile1: {
-          name: 'Small mobile',
-          styles: {
-            height: '568px',
-            width: '380px',
-          },
-          type: 'mobile',
-        },
-        default: {
-          name: 'Default',
-          styles: {
-            width: '480px',
-            height: '800px',
-          },
-        },
-      },
+      viewports,
     },
   },
 };

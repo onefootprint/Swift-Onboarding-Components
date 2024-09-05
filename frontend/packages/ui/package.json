@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "build:analyze": "ANALYZE=true yarn build:storybook",
-    "build:storybook": "storybook build",
+    "build:storybook": "storybook build --stats-json",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "dev:storybook": "storybook dev -p 3100",
     "i18n:clean": "rm -rf ./public/locales/",
