@@ -117,6 +117,18 @@ Each individual card is assigned an alias by your application. Each card alias m
 | `card.*.number_last4`            | The last four digits of the card number. Automatically populated | 4-digit string. Cannot be specified, can only be read.                                                                                                                                      |
 | `card.*.issuer`                  | The issuer of the card. Automatically populated                  | One of `visa`, `master_card`, `amex`, `discover`, `mir`, `diners_club`, `union_pay`, `jcb`, `visa_electron`, `maestro`, `forbrugsforeningen`, `dankort`, or `unknown`                       |
 
+### Bank account fields
+
+Each individual bank account is assigned an alias by your application. Each bank alias must match `^([A-Za-z0-9\-_]+)$`.
+
+| Data Identifier             | Description                                                  | Format                 |
+| --------------------------- | ------------------------------------------------------------ | ---------------------- |
+| `bank.*.name`               | The name of the bank account                                 | Any UTF-8 string <200B |
+| `bank.*.account_type`       | The type of the bank account; usually 'checking or 'savings' | Any UTF-8 string <200B |
+| `bank.*.ach_routing_number` | The ACH routing number as a string                           | Any UTF-8 string <200B |
+| `bank.*.ach_account_number` | The ACH account number as a string                           | Any UTF-8 string <200B |
+| `bank.*.ach_account_ud`     | The identifier of the ach account                            | Any UTF-8 string <200B |
+
 ### Custom fields
 
 Each piece of custom data is assigned an alias by your application. Each custom data alias must match `^([A-Za-z0-9\-_\.]+)$`.
