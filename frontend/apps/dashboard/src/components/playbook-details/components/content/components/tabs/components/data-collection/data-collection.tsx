@@ -2,7 +2,7 @@ import CollectedInformation from '@/playbooks/components/collected-information';
 import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import AdditionalDocs from './components/additional-docs';
+import AdditionalDocs from '../../../additional-docs';
 import Auth from './components/auth';
 import GovDocs from './components/gov-docs';
 import Section from './components/section';
@@ -32,6 +32,8 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const isKYB = kind === 'kyb';
   const isAuth = kind === 'auth';
   const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods.length > 0;
+  const hasBusinessDocumentsToCollect = !!businessDocumentsToCollect && businessDocumentsToCollect.length > 0;
+  const hasKYCDocsToCollect = !!documentsToCollect && documentsToCollect.length > 0;
 
   const kycOnlyPrimaryBusinessOwner = mustCollectData.includes('business_beneficial_owners');
   const kycAllBusinessOwners = mustCollectData.includes('business_kyced_beneficial_owners');
@@ -68,7 +70,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
               businessType: mustCollectData.includes('business_corporation_type'),
             }}
           />
-          <AdditionalDocs docs={businessDocumentsToCollect || []} />
+          {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
         </Section>
       )}
       <Section title={isKYB ? t('kyb.business_beneficial_owners') : undefined} type={isKYB ? 'withBorders' : 'default'}>
@@ -128,7 +130,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
             global={documentTypesAndCountries?.global || []}
             hasSelfie={mustCollectData.includes('document_selfie')}
           />
-          <AdditionalDocs docs={documentsToCollect || []} />
+          {hasKYCDocsToCollect && <AdditionalDocs docs={documentsToCollect} />}
         </Stack>
       </Section>
       {allowUsTerritoryResidents && (

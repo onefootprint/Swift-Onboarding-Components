@@ -472,6 +472,7 @@
       "rules": "Rules"
     },
     "data-collection": {
+      "section-title": "Data collection",
       "basic-information": "Basic information",
       "otp": "OTP (One Time Password) verifications",
       "sign-up": "Sign up information",
@@ -510,16 +511,24 @@
         "title": "ID document scan"
       },
       "gov-docs": {
+        "title": "Government-issued ID",
+        "selfie": "Selfie",
         "global": {
           "title": "Globally accepted government-issued ID",
+          "scans": "Globally accepted doc scans",
           "empty": "No globally accepted document types are available for scanning."
         },
         "country-specific": {
           "title": "Country-based accepted government-issued ID",
-          "empty": "No country-specific document types are available for scanning."
-        }
+          "scans": "Country-based accepted doc scans",
+          "empty": "No country-specific document types are available for scanning.",
+          "none": "No country-specific rules; all globally accepted documents are accepted."
+        },
+        "none": "None"
       },
       "additional-docs": {
+        "docs-to-collect": "Documents to collect",
+        "title-full": "Additional documents",
         "title": "Additional docs",
         "empty": "No additional docs docs are available for scanning.",
         "poa": {

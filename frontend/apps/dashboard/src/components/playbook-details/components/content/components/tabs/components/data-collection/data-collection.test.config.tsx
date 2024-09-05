@@ -1,11 +1,12 @@
 import {
   AuthMethodKind,
+  DocumentRequestKind,
   type OnboardingConfig,
   OnboardingConfigKind,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
 
-const onboardingConfig: OnboardingConfig = {
+export const onboardingConfigFixture: OnboardingConfig = {
   id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',
   name: 'KYB',
   key: 'pb_test_u29z2AvnfqhGKpIb4f0raa',
@@ -65,4 +66,43 @@ const onboardingConfig: OnboardingConfig = {
   verificationChecks: [],
 };
 
-export default onboardingConfig;
+export const playbookFixtureWithBusinessAndKYCDocsFixture: OnboardingConfig = {
+  ...onboardingConfigFixture,
+  kind: OnboardingConfigKind.kyb,
+  businessDocumentsToCollect: [
+    {
+      kind: DocumentRequestKind.Custom,
+      data: {
+        name: 'Business license',
+        identifier: 'custom.document.business_license',
+        requiresHumanReview: false,
+        uploadSettings: 'prefer_upload',
+      },
+    },
+  ],
+  documentsToCollect: [
+    {
+      kind: DocumentRequestKind.ProofOfSsn,
+      data: {
+        requiresHumanReview: false,
+      },
+    },
+  ],
+};
+
+export const playbookFixtureWithKYCForAllBusinessOwnersFixture: OnboardingConfig = {
+  ...onboardingConfigFixture,
+  kind: OnboardingConfigKind.kyb,
+  mustCollectData: [
+    'email',
+    'name',
+    'dob',
+    'full_address',
+    'phone_number',
+    'ssn9',
+    'business_name',
+    'business_tin',
+    'business_beneficial_owners',
+    'business_address',
+  ],
+};

@@ -5,16 +5,16 @@ import {
   type DocumentRequestConfig,
   DocumentRequestKind,
 } from '@onefootprint/types';
-import { Box, Popover, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, Popover, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type AdditionalDocsProps = {
   docs: DocumentRequestConfig[];
+  variant?: 'sectioned' | 'default';
 };
 
-const AdditionalDocs = ({ docs }: AdditionalDocsProps) => {
+const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
-  const hasDocs = docs.length > 0;
   const list = docs.map(doc => {
     if (doc.kind === DocumentRequestKind.ProofOfSsn) {
       return {
@@ -47,26 +47,26 @@ const AdditionalDocs = ({ docs }: AdditionalDocsProps) => {
   });
 
   return (
-    <Stack gap={5} flexDirection="column">
-      <Text variant="label-3">{t('title')}</Text>
-      {hasDocs ? (
-        <Stack gap={3} flexDirection="column">
-          {list.map(doc => (
-            <DocItem
-              uploadSettings={doc.uploadSettings}
-              description={doc.description}
-              identifier={doc.identifier}
-              key={doc.label}
-              label={doc.label}
-              requiresHumanReview={doc.requiresHumanReview}
-            />
-          ))}
-        </Stack>
-      ) : (
-        <Text variant="body-3" color="tertiary">
-          {t('empty')}
-        </Text>
+    <Stack gap={4} flexDirection="column">
+      <Text variant="label-4">{t('title')}</Text>
+      {variant === 'sectioned' && (
+        <>
+          <Divider variant="secondary" />
+          <Text variant="label-4">{t('docs-to-collect')}</Text>
+        </>
       )}
+      <Stack paddingLeft={3} gap={3} flexDirection="column">
+        {list.map(doc => (
+          <DocItem
+            uploadSettings={doc.uploadSettings}
+            description={doc.description}
+            identifier={doc.identifier}
+            key={doc.label}
+            label={doc.label}
+            requiresHumanReview={doc.requiresHumanReview}
+          />
+        ))}
+      </Stack>
     </Stack>
   );
 };
