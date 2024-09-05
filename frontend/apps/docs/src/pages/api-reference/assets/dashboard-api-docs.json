@@ -281,7 +281,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         },
                         "style": "simple"
@@ -826,7 +831,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         },
                         "style": "simple"
@@ -2571,7 +2581,12 @@
                                     "card.*.expiration_month",
                                     "card.*.expiration_year",
                                     "card.*.number_last4",
-                                    "card.*.issuer"
+                                    "card.*.issuer",
+                                    "bank.*.name",
+                                    "bank.*.ach_routing_number",
+                                    "bank.*.ach_account_number",
+                                    "bank.*.ach_account_id",
+                                    "bank.*.account_type"
                                 ]
                             }
                         },
@@ -3139,7 +3154,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         },
                         "style": "simple"
@@ -9447,7 +9467,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     },
@@ -9937,7 +9962,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -9973,7 +9999,8 @@
                             "BusinessCorporationType",
                             "InvestorProfile",
                             "Card",
-                            "UsTaxId"
+                            "UsTaxId",
+                            "Bank"
                         ]
                     },
                     "document_types_and_countries": {
@@ -10332,7 +10359,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -10364,7 +10392,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -10745,7 +10774,12 @@
                                                 "card.*.expiration_month",
                                                 "card.*.expiration_year",
                                                 "card.*.number_last4",
-                                                "card.*.issuer"
+                                                "card.*.issuer",
+                                                "bank.*.name",
+                                                "bank.*.ach_routing_number",
+                                                "bank.*.ach_account_number",
+                                                "bank.*.ach_account_id",
+                                                "bank.*.account_type"
                                             ]
                                         }
                                     },
@@ -11395,7 +11429,12 @@
                                             "card.*.expiration_month",
                                             "card.*.expiration_year",
                                             "card.*.number_last4",
-                                            "card.*.issuer"
+                                            "card.*.issuer",
+                                            "bank.*.name",
+                                            "bank.*.ach_routing_number",
+                                            "bank.*.ach_account_number",
+                                            "bank.*.ach_account_id",
+                                            "bank.*.account_type"
                                         ]
                                     }
                                 },
@@ -11641,7 +11680,12 @@
                                                     "card.*.expiration_month",
                                                     "card.*.expiration_year",
                                                     "card.*.number_last4",
-                                                    "card.*.issuer"
+                                                    "card.*.issuer",
+                                                    "bank.*.name",
+                                                    "bank.*.ach_routing_number",
+                                                    "bank.*.ach_account_number",
+                                                    "bank.*.ach_account_id",
+                                                    "bank.*.account_type"
                                                 ]
                                             },
                                             "is_decryptable": {
@@ -11911,7 +11955,12 @@
                                             "card.*.expiration_month",
                                             "card.*.expiration_year",
                                             "card.*.number_last4",
-                                            "card.*.issuer"
+                                            "card.*.issuer",
+                                            "bank.*.name",
+                                            "bank.*.ach_routing_number",
+                                            "bank.*.ach_account_number",
+                                            "bank.*.ach_account_id",
+                                            "bank.*.account_type"
                                         ]
                                     }
                                 },
@@ -12888,7 +12937,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     }
@@ -13259,7 +13313,12 @@
                                         "card.*.expiration_month",
                                         "card.*.expiration_year",
                                         "card.*.number_last4",
-                                        "card.*.issuer"
+                                        "card.*.issuer",
+                                        "bank.*.name",
+                                        "bank.*.ach_routing_number",
+                                        "bank.*.ach_account_number",
+                                        "bank.*.ach_account_id",
+                                        "bank.*.account_type"
                                     ]
                                 },
                                 "is_extra_compressed": {
@@ -13569,7 +13628,12 @@
                                                     "card.*.expiration_month",
                                                     "card.*.expiration_year",
                                                     "card.*.number_last4",
-                                                    "card.*.issuer"
+                                                    "card.*.issuer",
+                                                    "bank.*.name",
+                                                    "bank.*.ach_routing_number",
+                                                    "bank.*.ach_account_number",
+                                                    "bank.*.ach_account_id",
+                                                    "bank.*.account_type"
                                                 ]
                                             },
                                             "is_decryptable": {
@@ -13917,7 +13981,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     },
@@ -14163,7 +14232,12 @@
                                         "card.*.expiration_month",
                                         "card.*.expiration_year",
                                         "card.*.number_last4",
-                                        "card.*.issuer"
+                                        "card.*.issuer",
+                                        "bank.*.name",
+                                        "bank.*.ach_routing_number",
+                                        "bank.*.ach_account_number",
+                                        "bank.*.ach_account_id",
+                                        "bank.*.account_type"
                                     ]
                                 },
                                 "is_decryptable": {
@@ -14433,7 +14507,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     },
@@ -15274,7 +15353,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "is_decryptable": {
@@ -15643,7 +15727,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     }
@@ -21147,7 +21236,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "<value>": {
@@ -21192,17 +21286,13 @@
                     "timestamp": {
                         "type": "string",
                         "format": "date-time"
-                    },
-                    "wf_id": {
-                        "type": "string"
                     }
                 },
                 "required": [
                     "fp_id",
                     "status",
                     "tenant",
-                    "timestamp",
-                    "wf_id"
+                    "timestamp"
                 ]
             },
             "IntegrityRequest": {
@@ -21425,7 +21515,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     },
@@ -21660,7 +21755,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "<value>": {
@@ -22335,7 +22435,8 @@
                                             "BusinessCorporationType",
                                             "InvestorProfile",
                                             "Card",
-                                            "UsTaxId"
+                                            "UsTaxId",
+                                            "Bank"
                                         ]
                                     }
                                 },
@@ -22375,7 +22476,8 @@
                                         "BusinessCorporationType",
                                         "InvestorProfile",
                                         "Card",
-                                        "UsTaxId"
+                                        "UsTaxId",
+                                        "Bank"
                                     ]
                                 },
                                 "document_types_and_countries": {
@@ -22746,7 +22848,8 @@
                                             "BusinessCorporationType",
                                             "InvestorProfile",
                                             "Card",
-                                            "UsTaxId"
+                                            "UsTaxId",
+                                            "Bank"
                                         ]
                                     }
                                 },
@@ -22778,7 +22881,8 @@
                                             "BusinessCorporationType",
                                             "InvestorProfile",
                                             "Card",
-                                            "UsTaxId"
+                                            "UsTaxId",
+                                            "Bank"
                                         ]
                                     }
                                 },
@@ -23355,7 +23459,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -23395,7 +23500,8 @@
                             "BusinessCorporationType",
                             "InvestorProfile",
                             "Card",
-                            "UsTaxId"
+                            "UsTaxId",
+                            "Bank"
                         ]
                     },
                     "document_types_and_countries": {
@@ -23766,7 +23872,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -23798,7 +23905,8 @@
                                 "BusinessCorporationType",
                                 "InvestorProfile",
                                 "Card",
-                                "UsTaxId"
+                                "UsTaxId",
+                                "Bank"
                             ]
                         }
                     },
@@ -25038,7 +25146,12 @@
                                                 "card.*.expiration_month",
                                                 "card.*.expiration_year",
                                                 "card.*.number_last4",
-                                                "card.*.issuer"
+                                                "card.*.issuer",
+                                                "bank.*.name",
+                                                "bank.*.ach_routing_number",
+                                                "bank.*.ach_account_number",
+                                                "bank.*.ach_account_id",
+                                                "bank.*.account_type"
                                             ]
                                         }
                                     },
@@ -25481,7 +25594,12 @@
                                         "card.*.expiration_month",
                                         "card.*.expiration_year",
                                         "card.*.number_last4",
-                                        "card.*.issuer"
+                                        "card.*.issuer",
+                                        "bank.*.name",
+                                        "bank.*.ach_routing_number",
+                                        "bank.*.ach_account_number",
+                                        "bank.*.ach_account_id",
+                                        "bank.*.account_type"
                                     ]
                                 }
                             },
@@ -25777,7 +25895,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "<value>": {
@@ -27623,7 +27746,12 @@
                                 "card.*.expiration_month",
                                 "card.*.expiration_year",
                                 "card.*.number_last4",
-                                "card.*.issuer"
+                                "card.*.issuer",
+                                "bank.*.name",
+                                "bank.*.ach_routing_number",
+                                "bank.*.ach_account_number",
+                                "bank.*.ach_account_id",
+                                "bank.*.account_type"
                             ]
                         }
                     },
@@ -27884,7 +28012,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "<value>": {
@@ -28117,7 +28250,12 @@
                             "card.*.expiration_month",
                             "card.*.expiration_year",
                             "card.*.number_last4",
-                            "card.*.issuer"
+                            "card.*.issuer",
+                            "bank.*.name",
+                            "bank.*.ach_routing_number",
+                            "bank.*.ach_account_number",
+                            "bank.*.ach_account_id",
+                            "bank.*.account_type"
                         ]
                     },
                     "<value>": {

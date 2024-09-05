@@ -52,7 +52,6 @@ async fn get(
     let response = workflows
         .into_iter()
         .map(|(wf, sv, tenant)| api_wire_types::InProgressOnboarding {
-            wf_id: wf.id,
             fp_id: sv.fp_id,
             tenant: InProgressOnboardingTenant {
                 name: tenant.name,
