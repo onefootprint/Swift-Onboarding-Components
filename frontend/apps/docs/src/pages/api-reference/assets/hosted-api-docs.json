@@ -1591,6 +1591,21 @@
                 "security": []
             }
         },
+        "/hosted/user/private_info": {
+            "get": {
+                "tags": [
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Returns information about the auth token. Can only be used in sandbox mode for demo tenants.",
+                "responses": {},
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/user/token": {
             "get": {
                 "tags": [

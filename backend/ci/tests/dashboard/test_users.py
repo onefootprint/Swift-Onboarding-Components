@@ -15,13 +15,8 @@ def sandbox_user2(sandbox_tenant):
 @pytest.fixture(scope="module")
 def incomplete_user(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
-
-    phone_number = bifrost.decrypted_data["id.phone_number"]
-    # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
-    data = dict(search=phone_number, pagination=dict(page_size=100))
-    body = post("entities/search", data, *sandbox_tenant.db_auths)
-    user = next(i for i in body["data"] if i["sandbox_id"] == bifrost.sandbox_id)
-    return user["id"]
+    body = get("hosted/user/private_info", None, bifrost.auth_token)
+    return body["fp_id"]
 
 
 @pytest.fixture(scope="module")
