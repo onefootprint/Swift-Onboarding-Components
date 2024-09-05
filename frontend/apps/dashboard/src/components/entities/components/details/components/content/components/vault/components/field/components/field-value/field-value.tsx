@@ -4,23 +4,9 @@ import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FieldOrPlaceholder } from 'src/components';
-
-import AddressCountrySelect from '../address-country-select';
-import AddressLineInput from '../address-line-input';
-import CitizenshipsInput from '../citizenships-input';
-import CityInput from '../city-input';
-import CountryOfBirthSelect from '../country-of-birth-select/country-of-birth-select';
-import DateInput from '../date-input';
-import EncryptedInput from '../encrypted-input/encrypted-input';
-import LegalStatusSelect from '../legal-status-select';
-import NameInput from '../name-input';
-import SsnInput from '../ssn-input';
-import StateSelect from '../state-select';
-import TinInput from '../tin-input';
-import VisaExpirationInput from '../visa-expiration-input';
-import VisaKindSelect from '../visa-kind-select';
-import ZipInput from '../zip-input';
+import FieldOrPlaceholder from 'src/components/field-or-placeholder';
+import Editable from '../editable';
+import EncryptedInput from '../encrypted-input';
 
 export type FieldValueProps = {
   field: Record<string, boolean | string | DataIdentifier | VaultValue | Transforms | null | undefined>;
@@ -43,58 +29,42 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     if (!isDecrypted && !isVaultDataEmpty(value)) {
       return <EncryptedInput />;
     }
-    if (
-      name === IdDI.firstName ||
-      name === IdDI.lastName ||
-      name === IdDI.middleName ||
-      name === BusinessDI.name ||
-      name === BusinessDI.doingBusinessAs
-    ) {
-      return <NameInput fieldName={name} fieldValue={value} />;
-    }
-    if (name === IdDI.dob || name === BusinessDI.formationDate) {
-      return <DateInput value={value} fieldName={name} />;
-    }
-    if (name === IdDI.ssn9 || name === IdDI.ssn4) {
-      return <SsnInput fieldName={name} fieldValue={value} />;
-    }
-    if (
-      name === IdDI.addressLine1 ||
-      name === IdDI.addressLine2 ||
-      name === BusinessDI.addressLine1 ||
-      name === BusinessDI.addressLine2
-    ) {
-      return <AddressLineInput fieldName={name} fieldValue={value} />;
-    }
-    if (name === IdDI.city || name === BusinessDI.city) {
-      return <CityInput value={value} fieldName={name} />;
-    }
-    if (name === IdDI.state || name === BusinessDI.state || name === BusinessDI.formationState) {
-      return <StateSelect value={value} fieldName={name} />;
-    }
-    if (name === IdDI.country || name === BusinessDI.country) {
-      return <AddressCountrySelect value={value} fieldName={name} />;
-    }
-    if (name === IdDI.zip || name === BusinessDI.zip) {
-      return <ZipInput value={value} fieldName={name} />;
-    }
-    if (name === IdDI.usLegalStatus) {
-      return <LegalStatusSelect value={value} />;
-    }
-    if (name === IdDI.nationality) {
-      return <CountryOfBirthSelect value={value} />;
-    }
-    if (name === IdDI.visaKind) {
-      return <VisaKindSelect value={value} />;
-    }
-    if (name === IdDI.visaExpirationDate) {
-      return <VisaExpirationInput value={value} />;
-    }
-    if (name === IdDI.citizenships) {
-      return <CitizenshipsInput citizenships={value as string[] | undefined} />;
-    }
-    if (name === BusinessDI.tin) {
-      return <TinInput value={value} />;
+
+    const editableFields: (IdDI | BusinessDI)[] = [
+      IdDI.firstName,
+      IdDI.middleName,
+      IdDI.lastName,
+      IdDI.dob,
+      IdDI.ssn9,
+      IdDI.ssn4,
+      IdDI.addressLine1,
+      IdDI.addressLine2,
+      IdDI.city,
+      IdDI.state,
+      IdDI.country,
+      IdDI.zip,
+      IdDI.nationality,
+      IdDI.usLegalStatus,
+      IdDI.visaKind,
+      IdDI.visaExpirationDate,
+      IdDI.citizenships,
+      BusinessDI.name,
+      BusinessDI.doingBusinessAs,
+      BusinessDI.website,
+      BusinessDI.tin,
+      BusinessDI.corporationType,
+      BusinessDI.addressLine1,
+      BusinessDI.addressLine2,
+      BusinessDI.city,
+      BusinessDI.state,
+      BusinessDI.country,
+      BusinessDI.zip,
+      BusinessDI.formationState,
+      BusinessDI.formationDate,
+    ];
+
+    if (editableFields.includes(name as IdDI | BusinessDI)) {
+      return <Editable value={value} fieldName={name as DataIdentifier} />;
     }
   }
 

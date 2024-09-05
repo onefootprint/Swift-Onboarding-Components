@@ -1,4 +1,4 @@
-import { Dialog, Grid, TextInput, useToast } from '@onefootprint/ui';
+import { Dialog, Form, Grid, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -31,7 +31,6 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
   const {
     reset,
     register,
-    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
@@ -61,16 +60,6 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
     );
   };
 
-  const listName = watch('name');
-
-  const getNameHint = () => {
-    if (!listName?.length) {
-      return errors?.name?.message;
-    }
-    const alias = getAliasforListName(listName);
-    return t('form.name.hint', { alias });
-  };
-
   return (
     <Dialog
       size="compact"
@@ -93,19 +82,17 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
     >
       <form onSubmit={handleSubmit(handleBeforeSubmit)} id="update-list-form">
         <Grid.Container gap={7}>
-          <TextInput
-            autoFocus
-            hasError={!!errors.name}
-            hint={getNameHint()}
-            label={t('form.name.label')}
-            placeholder={t('form.name.placeholder')}
-            {...register('name', {
-              required: {
-                value: true,
-                message: t('form.name.errors.required'),
-              },
-            })}
-          />
+          <Form.Field>
+            <Form.Label>{t('form.name.label')}</Form.Label>
+            <Form.Input
+              autoFocus
+              placeholder={t('form.name.placeholder')}
+              {...register('name', {
+                required: t('form.name.errors.required'),
+              })}
+            />
+            <Form.Errors>{errors.name?.message}</Form.Errors>
+          </Form.Field>
         </Grid.Container>
       </form>
     </Dialog>

@@ -1,25 +1,25 @@
 import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils/mixins';
+import Box, { type BoxProps } from '../box';
 
 export type FormErrorsProps = {
   children?: unknown;
   className?: string;
-};
+} & Omit<BoxProps, 'children'>;
 
 const FormErrors = ({ children, className }: FormErrorsProps) =>
   children && typeof children === 'string' ? (
-    <Text className={`${className} fp-hint fp-custom-appearance`}>{children}</Text>
+    <Text className={`${className} fp-form-errors fp-custom-appearance`}>{children}</Text>
   ) : null;
 
-const Text = styled.div`
+const Text = styled(Box)`
   ${({ theme }) => {
     const { hint } = theme.components;
 
     return css`
       color: ${hint.states.error.color};
       margin-top: ${theme.spacing[3]};
-      text-align: left;
       ${createText(hint.size.default.typography)}
     `;
   }}

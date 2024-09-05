@@ -1194,11 +1194,14 @@
           },
           "ssn": {
             "required": "Cannot be empty",
-            "pattern": "Cannot be invalid"
+            "pattern": "Must be of format 123-45-6789"
           },
           "address-line": {
             "required": "Cannot be empty",
             "pattern": "Must be a residential address (e.g. cannot be a P.O. Box)"
+          },
+          "country": {
+            "required": "Cannot be empty"
           },
           "city": "Cannot be empty",
           "state": {
@@ -1229,6 +1232,10 @@
             "should-be-empty": "Please leave blank unless the legal status is Green Card or Visa",
             "us-citizenship": "If user is a US citizen, select the Citizen legal status option",
             "invalid": "Invalid country code: {{ countries }}"
+          },
+          "website": {
+            "placeholder": "https://www.acmebank.com",
+            "invalid": "Invalid website URL"
           },
           "tin": {
             "hint": "Cannot contain special characters",

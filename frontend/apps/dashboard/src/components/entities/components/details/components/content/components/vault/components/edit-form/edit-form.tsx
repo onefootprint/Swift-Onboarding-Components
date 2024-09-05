@@ -5,7 +5,9 @@ import { EDIT_VAULT_FORM_ID } from '@/entity/constants';
 
 import type { VaultValue } from '@onefootprint/types';
 import isPlainObject from 'lodash/isPlainObject';
+import { useEffect } from 'react';
 import type { EditFormData } from '../../vault.types';
+import { useEditControls } from '../vault-actions';
 
 export type EditFormProps = {
   children: React.ReactNode;
@@ -14,7 +16,14 @@ export type EditFormProps = {
 
 const EditForm = ({ children, onSubmit }: EditFormProps) => {
   const formMethods = useForm<EditFormData>();
-  const { handleSubmit } = formMethods;
+  const { reset, handleSubmit } = formMethods;
+  const editControls = useEditControls();
+
+  useEffect(() => {
+    if (editControls.isIdle) {
+      reset();
+    }
+  }, [editControls.isIdle]);
 
   const handleBeforeSubmit = (formValues: EditFormData) => {
     onSubmit(flattenObject(formValues) as Record<string, VaultValue>);
