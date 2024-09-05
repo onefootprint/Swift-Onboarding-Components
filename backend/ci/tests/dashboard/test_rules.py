@@ -208,7 +208,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
 
 
 def new_list(kind, entries, sandbox_tenant):
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(10)
     return post(
         f"/org/lists",
         dict(
@@ -699,7 +699,7 @@ def test_blocklist_rules(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "Test OB Config", must_collect_data, must_collect_data
     )
-    nonce = _gen_random_str(5)
+    nonce = _gen_random_str(10)
     list = post(
         f"/org/lists",
         dict(
