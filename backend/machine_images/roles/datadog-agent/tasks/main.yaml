@@ -12,11 +12,26 @@
     state: present
     update_cache: yes
 
+- name: Create directory for datadog-agent.service override
+  file:
+    path: /etc/systemd/system/datadog-agent.service.d
+    state: directory
+    mode: "0755"
+
+- name: Add cloud-final dependency to datadog-agent.service for API key population
+  copy:
+    src: etc/systemd/system/datadog-agent.service.d/override.conf
+    dest: /etc/systemd/system/datadog-agent.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Enable Datadog agent
   systemd:
     name: datadog-agent
     enabled: yes
     state: stopped
+    daemon_reload: true
 
 - name: Add dd-agent to systemd-journal group
   user:
