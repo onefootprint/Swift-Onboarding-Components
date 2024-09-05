@@ -34,7 +34,10 @@ const sendSdkArgsRecursive = async (payload: SendSdkArgsRequest, numRetries: num
   });
 };
 
-const sendSdkArgs = async (data: SendSdkArgsRequest['data'], options?: { isComponentSdk?: boolean }) => {
+const sendSdkArgs = async (
+  data: SendSdkArgsRequest['data'],
+  options?: { isComponentSdk?: boolean; shouldRelayToComponents?: boolean },
+) => {
   const result = await sendSdkArgsRecursive(
     {
       kind: SDK_KIND,
@@ -47,6 +50,7 @@ const sendSdkArgs = async (data: SendSdkArgsRequest['data'], options?: { isCompo
           l10n: data.l10n,
         }),
         is_components_sdk: options?.isComponentSdk,
+        should_relay_to_components: options?.shouldRelayToComponents,
       },
     },
     NUM_RETRIES,

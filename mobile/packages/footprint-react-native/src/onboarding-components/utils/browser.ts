@@ -59,7 +59,7 @@ const footprint = () => {
         options: props.options,
         l10n: props.l10n,
       },
-      { isComponentSdk: true },
+      { isComponentSdk: true, shouldRelayToComponents: !!props.shouldRelayToComponents },
     );
     if (!token) {
       handleError(props, 'Unable to get SDK args token.');

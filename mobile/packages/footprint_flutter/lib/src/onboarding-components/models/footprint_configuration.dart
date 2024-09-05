@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 
 class FootprintConfiguration extends Configuration {
   final FormData? formData;
+  final bool? shouldRelayToComponents;
 
   FootprintConfiguration({
     super.appearance,
@@ -19,6 +20,7 @@ class FootprintConfiguration extends Configuration {
     super.sandboxOutcome,
     required super.redirectUrl,
     this.formData,
+    this.shouldRelayToComponents,
   });
 
   @override
@@ -34,6 +36,7 @@ class FootprintConfiguration extends Configuration {
       "fixture_result": sandboxOutcome?.overallOutcome?.toString(),
       "document_fixture_result": sandboxOutcome?.idDocOutcome?.toString(),
       "sandbox_id": sandboxId,
+      "should_relay_to_components": shouldRelayToComponents,
     };
     map.removeWhere((key, value) => value == null);
     return map;

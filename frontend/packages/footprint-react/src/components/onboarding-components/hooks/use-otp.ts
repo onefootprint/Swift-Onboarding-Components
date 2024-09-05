@@ -116,6 +116,7 @@ const useOtp = () => {
           return prev;
         });
       },
+      shouldRelayToComponents: true,
       onRelayToComponents: (authToken: string) => {
         unlockBody();
         // This part might be a little confusing, but we need to set the vaultingToken here

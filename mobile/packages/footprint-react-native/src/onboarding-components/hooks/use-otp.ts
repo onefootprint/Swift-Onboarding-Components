@@ -66,6 +66,7 @@ const useOtp = () => {
         onCancel?.();
       },
       step: OnboardingStep.Auth,
+      shouldRelayToComponents: true,
     });
     component.render();
   };

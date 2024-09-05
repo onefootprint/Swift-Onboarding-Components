@@ -36,6 +36,7 @@ export enum OnboardingStep {
 
 export type OnboardingProps = VerifyProps & {
   step: OnboardingStep;
+  shouldRelayToComponents?: boolean;
   onAuthComplete?: (tokens: {
     authToken: string;
     vaultingToken: string;

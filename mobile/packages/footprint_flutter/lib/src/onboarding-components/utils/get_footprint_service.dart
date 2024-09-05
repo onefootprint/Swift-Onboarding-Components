@@ -120,6 +120,7 @@ typedef HandoffHandler = void Function({
         appearance: appearance,
         sandboxOutcome: sandboxOutcome,
         sandboxId: sandboxId,
+        shouldRelayToComponents: true,
         onAuthComplete: (
             {required String authToken, required String vaultingToken}) {
           onAuthenticated?.call();
