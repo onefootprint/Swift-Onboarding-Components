@@ -6,8 +6,10 @@ from tests.utils import (
     post,
     delete,
     get,
+    patch,
     create_ob_config,
     _gen_random_ssn,
+    _gen_random_str,
     post_raw,
 )
 
@@ -78,6 +80,33 @@ def test_external_id(tenant, sandbox_tenant):
 
     invalid_id_too_short = ExternalId("1234")
     post("users/", None, sandbox_tenant.sk.key, invalid_id_too_short, status_code=400)
+
+
+@pytest.mark.parametrize("url", ["users", "businesses"])
+def test_update_external_id(sandbox_tenant, url):
+    external_id1 = f"ext_id_{_gen_random_str(15)}"
+    external_id2 = f"ext_id_{_gen_random_str(15)}"
+    body = post(url, None, sandbox_tenant.s_sk, ExternalId(external_id1))
+    fp_id1 = body["id"]
+    assert body["external_id"] == external_id1
+
+    body = post(url, None, sandbox_tenant.s_sk)
+    assert not body["external_id"]
+    fp_id2 = body["id"]
+    assert fp_id2 != fp_id1
+
+    # Can update the external ID after user is created
+    body = patch(f"{url}/{fp_id2}", dict(external_id=external_id2), sandbox_tenant.s_sk)
+    assert body["external_id"] == external_id2
+
+    # Cannot update the external ID to conflict
+    body = patch(
+        f"{url}/{fp_id2}",
+        dict(external_id=external_id1),
+        sandbox_tenant.s_sk,
+        status_code=400,
+    )
+    assert body["message"] == "User or business with this external ID already exists"
 
 
 def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):

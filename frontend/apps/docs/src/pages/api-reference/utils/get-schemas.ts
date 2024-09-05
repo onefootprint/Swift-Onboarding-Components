@@ -34,6 +34,8 @@ const DefaultFieldValues: Record<string, string> = {
   fp_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
   fp_bid: 'fp_bid_xIMR8HSsaGvKtiwosEsvV0',
   fp_user_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
+  external_id: '0cece047-151f-4ac4-9782-dc27691fd766',
+  sandbox_id: 'WH8RkRCDSxCfH',
   ip_address: '192.168.1.1',
 };
 

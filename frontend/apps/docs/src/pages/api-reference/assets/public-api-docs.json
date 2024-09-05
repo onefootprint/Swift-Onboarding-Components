@@ -165,6 +165,53 @@
                         "Secret API Key": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Businesses",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEntityRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ],
+                "description": ""
             }
         },
         "/businesses/{fp_bid}/decisions": {
@@ -1541,6 +1588,53 @@
                         "Secret API Key": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Users",
+                    "Vault",
+                    "PublicApi"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEntityRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LiteUser"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ],
+                "description": ""
             }
         },
         "/users/{fp_id:fp_[_A-Za-z0-9]*}/label": {
@@ -13377,6 +13471,15 @@
                 "required": [
                     "key"
                 ]
+            },
+            "UpdateEntityRequest": {
+                "type": "object",
+                "properties": {
+                    "external_id": {
+                        "description": "Optionally, the new external ID for the entity. If an entity with this external ID already\n exists, returns a 400.",
+                        "type": "string"
+                    }
+                }
             },
             "UpdateLabelRequest": {
                 "type": "object",

@@ -11,6 +11,7 @@ mod kyc;
 mod liveness;
 mod match_signals;
 mod onboardings;
+mod patch;
 mod post;
 mod risk_signals;
 mod search;
@@ -21,6 +22,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     decisions::routes(config);
     config
         .service(post::post)
+        .service(patch::patch)
         .service(search::get)
         .service(search::post_search)
         .service(delete::delete)

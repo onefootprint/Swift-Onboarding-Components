@@ -106,5 +106,8 @@ pub use action::*;
 pub mod seqno;
 pub use self::seqno::*;
 
+pub mod entity;
+pub use self::entity::*;
+
 pub mod vault_dr;
 pub use self::vault_dr::*;

@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import _gen_random_sandbox_id, post, patch, get
+from tests.utils import _gen_random_sandbox_id, _gen_random_str, post, patch, get
 from tests.headers import ExternalId
 
 

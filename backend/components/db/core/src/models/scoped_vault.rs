@@ -122,6 +122,7 @@ pub struct ScopedVaultUpdate {
     pub is_active: Option<bool>,
     pub is_billable_for_vault_storage: Option<bool>,
     pub last_activity_at: Option<DateTime<Utc>>,
+    pub external_id: Option<ExternalId>,
 }
 
 #[derive(derive_more::From)]

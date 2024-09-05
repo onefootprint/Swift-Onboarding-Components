@@ -7,6 +7,7 @@ use crate::telemetry::RootSpan;
 use crate::types::ApiResponse;
 use crate::types::WithVaultVersionHeader;
 use crate::utils::db2api::DbToApi;
+use crate::utils::fp_id_path::FpIdPath;
 use crate::utils::headers::ExternalId;
 use crate::utils::headers::IdempotencyId;
 use crate::utils::headers::InsightHeaders;
@@ -18,12 +19,17 @@ use crate::utils::vault_wrapper::PatchDataResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpError;
+use api_wire_types::UpdateEntityRequest;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::models::vault::NewVaultArgs;
+use db::models::vault::Vault;
+use db::DbError;
 use itertools::Itertools;
 use newtypes::put_data_request::PatchDataRequest;
 use newtypes::AuditEventDetail;
@@ -158,4 +164,39 @@ pub async fn create_non_portable_vault(
     };
 
     Ok(WithVaultVersionHeader::new(response, vault_version))
+}
+
+pub async fn patch_vault(
+    state: web::Data<State>,
+    fp_id: FpIdPath,
+    request: UpdateEntityRequest,
+    auth: TenantApiKey,
+) -> FpResult<api_wire_types::LiteUser> {
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let fp_id = fp_id.into_inner();
+
+    let UpdateEntityRequest { external_id } = request;
+    let (sv, v) = state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let v = Vault::get(conn, &sv.vault_id)?;
+            let update = ScopedVaultUpdate {
+                external_id,
+                ..Default::default()
+            };
+            let sv = ScopedVault::update(conn, &sv.id, update).map_err(|e| -> FpError {
+                if matches!(e, DbError::UniqueConstraintViolation(_)) {
+                    ValidationError("User or business with this external ID already exists").into()
+                } else {
+                    e.into()
+                }
+            })?;
+            Ok((sv, v))
+        })
+        .await?;
+    let response = api_wire_types::LiteUser::from_db((sv, v));
+    Ok(response)
 }
