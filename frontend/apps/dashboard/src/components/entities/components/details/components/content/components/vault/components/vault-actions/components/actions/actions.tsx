@@ -1,6 +1,6 @@
-import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import { IcoDotsHorizontal24, IcoPencil16 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
-import { Dropdown } from '@onefootprint/ui';
+import { Button, Dropdown, Stack } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -136,7 +136,17 @@ const Actions = ({ entity }: WithEntityProps) => {
         <EditTagsDialog open={openDialog === ActionDialog.editTags} onClose={handleCloseDialog} />
       )}
     </>
-  ) : null;
+  ) : (
+    <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
+      <EditContainer>
+        <Button variant="secondary" onClick={editControls.start}>
+          <Stack align="center" justify="center">
+            <IcoPencil16 />
+          </Stack>
+        </Button>
+      </EditContainer>
+    </PermissionGate>
+  );
 };
 
 const DotsButton = styled.button`
@@ -174,6 +184,14 @@ const DotsButton = styled.button`
       }
     `;
   }}
+`;
+
+const EditContainer = styled.div`
+  ${({ theme }) => css`
+    > button {
+      padding: 0 ${theme.spacing[3]} !important;
+    }
+  `}
 `;
 
 export default Actions;

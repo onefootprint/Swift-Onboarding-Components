@@ -22,7 +22,7 @@ const Vault = ({ entity }: VaultProps) => {
   const decrypt = useDecryptControls();
   const edit = useEditControls();
   const vaultWithTransforms = useEntityVault(entity.id, entity);
-  const showEditForm = context.kind === EntityKind.person && edit.inProgress;
+  const showEditForm = edit.inProgress;
 
   const handleBeforeEditSubmit = (flattenedFormData: Record<string, VaultValue>) => {
     const previousData = vaultWithTransforms.data?.vault;
@@ -50,11 +50,11 @@ const Vault = ({ entity }: VaultProps) => {
       <VaultActions entity={entity} />
       {showEditForm ? (
         <EditForm onSubmit={handleBeforeEditSubmit}>
-          <PersonVault />
+          {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
         </EditForm>
       ) : (
         <DecryptForm onSubmit={handleBeforeDecryptSubmit}>
-          {context.kind === EntityKind.business ? <BusinessVault /> : <PersonVault />}
+          {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
         </DecryptForm>
       )}
     </>
