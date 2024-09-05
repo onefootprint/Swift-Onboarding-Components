@@ -150,7 +150,7 @@ export async function CreateNitroService(
       enclaveOptions: {
         enabled: true,
       },
-      imageId: 'ami-0c9be5c48757e9518',
+      imageId: 'ami-03e41bef0ac56c6cf',
       iamInstanceProfile: {
         arn: instanceProfile.arn,
       },
