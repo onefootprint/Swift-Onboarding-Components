@@ -2,7 +2,7 @@ import type { InlineAlertVariant } from '@onefootprint/ui';
 import { InlineAlert } from '@onefootprint/ui';
 
 type DocsInlineAlertProps = {
-  children: string;
+  children: React.ReactNode;
   variant: InlineAlertVariant;
 };
 

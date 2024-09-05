@@ -19,18 +19,10 @@ Alternatively, Footprint's API also supports [HTTP Basic Authentication](https:/
 
 <ApiReferenceColumnBreak />
 
-[TODO also use the tenant's sandbox API key here]: <>
+<AuthenticationCurlSample variant="basic"></AuthenticationCurlSample>
 
-```bash
-curl https://api.onefootprint.com/users \
-  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
-# The colon prevents curl from asking for a password.
-```
+<br>
 
-```bash
-curl https://api.onefootprint.com/users \
-  -H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"
-# Alternatively, you may provide the X-Footprint-Secret-Key header
-```
+<AuthenticationCurlSample variant="header"></AuthenticationCurlSample>
 
-[TODO uncomment this when we start to show sandbox API keys in the dashboard <inline-alert variant='info'>Your sandbox API keys are included in the example cURL requests here, so you can test examples right away. Only you can see this value.</inline-alert>]: <>
+<AuthenticationLoggedInAlert></AuthenticationLoggedInAlert>

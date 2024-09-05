@@ -16,7 +16,7 @@ import Responses from './components/responses';
 import Security from './components/security';
 import Tags from './components/tags';
 
-const API_BASE_URL = 'api.onefootprint.com';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 type ArticleProps = {
   article: ApiArticleContent;

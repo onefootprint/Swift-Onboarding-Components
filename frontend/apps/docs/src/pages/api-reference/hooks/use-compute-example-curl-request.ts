@@ -3,22 +3,22 @@ import { useMemo } from 'react';
 import { getExample } from '@/api-reference/utils/get-schemas';
 import type { SecurityTypes } from 'src/pages/api-reference/api-reference.types';
 import type { HydratedArticle } from 'src/pages/api-reference/hooks';
+import useGetSandboxApiKey from './use-get-sandbox-api-key';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const useComputeExampleCurlRequest = (article: HydratedArticle) => {
   const requestSchema = article.requestBody?.content;
+  const apiKey = useGetSandboxApiKey();
 
   // TODO look how stripe chooses which of your API keys to use. Should we just use the active admin key?
   return useMemo(() => {
     const exampleRequest = getExample(requestSchema);
-
     const lines = [];
-
     const security = article.security?.flatMap(s => Object.keys(s));
     security?.forEach(s => {
       const ExampleHeaderForSecurity: Record<SecurityTypes, string> = {
-        'Secret API Key': '-u sk_test_xxxxx:',
+        'Secret API Key': `-u ${apiKey.data?.key || 'sk_test_xxxxx'}:`,
         'Dashboard Token': "-H 'X-Fp-Authorization: dbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
         'User Token': "-H 'X-Fp-Authorization: utok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
         'User Onboarding Token': "-H 'X-Fp-Authorization: utok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH'",
@@ -28,10 +28,6 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
         lines.push(ExampleHeaderForSecurity[s as SecurityTypes]);
       }
     });
-
-    if (article.security?.flatMap(s => Object.keys(s)).includes('')) {
-      lines.push('-u sk_test_xxxxx:');
-    }
 
     // Add required headers to curl request
     const headerParams = article.parameters?.filter(p => p.in === 'header').filter(p => p.required);
@@ -60,12 +56,12 @@ const useComputeExampleCurlRequest = (article: HydratedArticle) => {
     }
 
     // Construct the first curl line
-    const completePath = `https://api.onefootprint.com${article.path}`;
+    const completePath = `${API_BASE_URL}${article.path}`;
     const curlLine = ['curl', httpMethodArgs, completePath].filter(l => l).join(' ');
 
     // Join all with escape character and newline. Indent every line except the first
     return [curlLine, ...lines].join(' \\\n').replaceAll('\n', '\n  ');
-  }, [requestSchema]);
+  }, [article, apiKey.data]);
 };
 
 export default useComputeExampleCurlRequest;
