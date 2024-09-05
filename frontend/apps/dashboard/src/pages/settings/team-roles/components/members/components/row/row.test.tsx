@@ -96,19 +96,19 @@ describe('<Row />', () => {
       const currentRole = screen.getByText('Admin');
       expect(currentRole).toBeInTheDocument();
 
-      const triggerButton = screen.getByRole('combobox', {
+      const triggerButton = screen.getByRole('button', {
         name: `Change ${memberFixture.email} role`,
       });
       await userEvent.click(triggerButton);
 
       await waitFor(() => {
-        const memberOption = screen.getByRole('option', {
+        const memberOption = screen.getByRole('menuitem', {
           name: 'Member',
         });
         expect(memberOption).toBeInTheDocument();
       });
 
-      const memberOption = screen.getByRole('option', {
+      const memberOption = screen.getByRole('menuitem', {
         name: 'Member',
       });
       const description = within(memberOption).getByText('Read-only');

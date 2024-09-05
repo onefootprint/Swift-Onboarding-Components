@@ -1,6 +1,5 @@
-import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
 import type { EntityCard } from '@onefootprint/types';
-import { Dropdown, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Dropdown, Stack, Text, media } from '@onefootprint/ui';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,11 +14,11 @@ export type CardHeaderProps = {
 export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const toggleDropdown = () => {
+  const handleToggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const changeCard = (card: EntityCard) => {
+  const handleCardChange = (card: EntityCard) => {
     onChange(card);
     setShowDropdown(false);
   };
@@ -30,97 +29,40 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
 
   return (
     <CardHeaderContainer>
-      <Dropdown.Root open={showDropdown} onOpenChange={toggleDropdown}>
-        <CustomDropdownTrigger aria-label="Open card options">
+      <Dropdown.Root open={showDropdown} onOpenChange={handleToggleDropdown}>
+        <Dropdown.Trigger aria-label="Open card options" variant="chevron">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
             <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
             <Text variant="body-4">({selectedCard.alias})</Text>
           </CardLine>
-          <IcoChevronDown24 className="dropdown-trigger-icon" />
-        </CustomDropdownTrigger>
-        <Dropdown.Content align="end" sideOffset={4} asChild>
-          <Content>
+        </Dropdown.Trigger>
+        <Dropdown.Content align="end" $width="240px">
+          <Dropdown.Group>
             {sortedCards.map(card => (
-              <CardDropdownElement key={`${card?.number_last4}-${card.alias}`} onClick={() => changeCard(card)}>
-                <CardAndNumber>
+              <CardAndNumber
+                key={`${card?.number_last4}-${card.alias}`}
+                onClick={() => handleCardChange(card)}
+                checked={card.alias === selectedCard.alias}
+              >
+                <Stack direction="row" align="center" justify="between" gap={4}>
                   <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
                   <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
-                </CardAndNumber>
-                <AliasAndCheckmark>
-                  {card.alias}
-                  {card.alias === selectedCard.alias ? <IcoCheck24 /> : <BlankIcon />}
-                </AliasAndCheckmark>
-              </CardDropdownElement>
+                  <Text variant="body-4">({card.alias})</Text>
+                </Stack>
+              </CardAndNumber>
             ))}
-          </Content>
+          </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Root>
     </CardHeaderContainer>
   );
 };
 
-const Content = styled(Stack)`
-  ${({ theme }) => css`
-    max-height: 30vh;
-    overflow-y: auto;
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[2]};
-    display: flex;
-    flex-direction: column;
-  `};
-`;
-
 const CardHeaderContainer = styled.div`
   ${media.lessThan('md')`
     display: none;
   `}
-`;
-
-const CustomDropdownTrigger = styled(Dropdown.Trigger)`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[3]} 0 ${theme.spacing[3]} ${theme.spacing[3]};
-    width: unset;
-    border-radius: ${theme.borderRadius.default};
-
-    .dropdown-trigger-icon {
-      transition: transform 0.2s ease-in-out;
-    }
-
-    &[data-state='open'] {
-      background: unset;
-
-      .dropdown-trigger-icon {
-        transform: rotate(180deg);
-      }
-    }
-  `};
-`;
-
-const BlankIcon = styled.div`
-  ${({ theme }) => css`
-    width: ${theme.spacing[7]};
-    height: ${theme.spacing[7]};
-  `};
-`;
-
-const CardDropdownElement = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[5]};
-    cursor: pointer;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    border-radius: ${theme.borderRadius.default};
-    min-height: 40px;
-
-    &:hover {
-      background-color: ${theme.backgroundColor.secondary};
-    }
-  `};
 `;
 
 const CardLine = styled.div`
@@ -133,7 +75,7 @@ const CardLine = styled.div`
   `};
 `;
 
-const CardAndNumber = styled.div`
+const CardAndNumber = styled(Dropdown.Item)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;
@@ -142,15 +84,6 @@ const CardAndNumber = styled.div`
     flex-wrap: nowrap;
     overflow: hidden;
     width: 100%;
-  `};
-`;
-
-const AliasAndCheckmark = styled(Stack)`
-  ${({ theme }) => css`
-    ${createFontStyles('body-3')}
-    color: ${theme.color.tertiary};
-    align-items: center;
-    gap: ${theme.spacing[2]};
   `};
 `;
 

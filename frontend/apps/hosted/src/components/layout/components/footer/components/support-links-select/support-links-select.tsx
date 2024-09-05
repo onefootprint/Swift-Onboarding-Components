@@ -76,7 +76,7 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
   return shouldShowSupportLinks ? (
     <Dropdown.Root>
       <Dropdown.Trigger asChild>
-        <StyledTrigger>{t('links.support.label')}</StyledTrigger>
+        <Container>{t('links.support.label')}</Container>
       </Dropdown.Trigger>
       <StyledContent sideOffset={8}>
         {supportLinks.map(({ label, contactLink, type, onSelect }) =>
@@ -91,7 +91,7 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
   ) : null;
 };
 
-const StyledTrigger = styled.button`
+const Container = styled.button`
   ${({ theme }) => css`
     all: unset;
     ${createFontStyles('caption-1')}

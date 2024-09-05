@@ -40,15 +40,17 @@ const Actions = ({ role }: ActionsProps) => {
     <Stack justify="flex-end">
       <Dropdown.Root open={openDropdown} onOpenChange={setOpenDropdown}>
         <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
-          <Dropdown.Trigger aria-label={t('aria-label', { name })}>
+          <Dropdown.Trigger variant="icon" aria-label={t('aria-label', { name })}>
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Content align="end">
-          <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
-          <Dropdown.Item onSelect={handleRemove} variant="destructive">
-            {t('remove')}
-          </Dropdown.Item>
+          <Dropdown.Group>
+            <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
+            <Dropdown.Item onSelect={handleRemove} variant="destructive">
+              {t('remove')}
+            </Dropdown.Item>
+          </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Root>
       <Remove role={role} ref={removeRef} />

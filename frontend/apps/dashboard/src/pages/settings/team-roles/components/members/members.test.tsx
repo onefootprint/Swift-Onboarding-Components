@@ -301,20 +301,22 @@ describe('<Members />', () => {
         it('should show an error message', async () => {
           await renderMembersAndWaitData();
 
-          const roleButton = screen.getByRole('combobox', {
+          const roleButton = screen.getByRole('button', {
             name: `Change ${memberToEdit.email} role`,
           });
           await userEvent.click(roleButton);
 
           await waitFor(() => {
-            const newRoleOption = screen.getByRole('option', {
-              name: memberToEditRole.name,
+            const newRoleOption = screen.getByRole('menuitem', {
+              name: (_accessibleName: string, element: Element) =>
+                element.textContent?.includes(memberToEditRole.name) ?? false,
             });
             expect(newRoleOption).toBeInTheDocument();
           });
 
-          const newRoleOption = screen.getByRole('option', {
-            name: memberToEditRole.name,
+          const newRoleOption = screen.getByRole('menuitem', {
+            name: (_accessibleName: string, element: Element) =>
+              element.textContent?.includes(memberToEditRole.name) ?? false,
           });
           await userEvent.click(newRoleOption);
 
@@ -333,20 +335,22 @@ describe('<Members />', () => {
         it('should update the member role', async () => {
           await renderMembersAndWaitData();
 
-          const roleButton = screen.getByRole('combobox', {
+          const roleButton = screen.getByRole('button', {
             name: `Change ${memberToEdit.email} role`,
           });
           await userEvent.click(roleButton);
 
           await waitFor(() => {
-            const newRoleOption = screen.getByRole('option', {
-              name: memberToEditRole.name,
+            const newRoleOption = screen.getByRole('menuitem', {
+              name: (_accessibleName: string, element: Element) =>
+                element.textContent?.includes(memberToEditRole.name) ?? false,
             });
             expect(newRoleOption).toBeInTheDocument();
           });
 
-          const newRoleOption = screen.getByRole('option', {
-            name: memberToEditRole.name,
+          const newRoleOption = screen.getByRole('menuitem', {
+            name: (_accessibleName: string, element: Element) =>
+              element.textContent?.includes(memberToEditRole.name) ?? false,
           });
           await userEvent.click(newRoleOption);
 

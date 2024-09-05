@@ -3,10 +3,10 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dialog, Dropdown, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import OverflowButton from 'src/components/overflow-button';
 import PermissionGate from 'src/components/permission-gate';
 import styled from 'styled-components';
 
+import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import useRemoveMember from './hooks/use-remove-org-member';
 
 export type ActionsProps = {
@@ -46,12 +46,16 @@ const Actions = ({ member }: ActionsProps) => {
     <Stack justify="flex-end">
       <Dropdown.Root>
         <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
-          <OverflowButton ariaLabel={t('aria-label', { email })} />
+          <Dropdown.Trigger aria-label={t('aria-label', { email })} variant="icon">
+            <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
+          </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Content align="end">
-          <Dropdown.Item onSelect={handleRemove} variant="destructive">
-            {t('remove.cta')}
-          </Dropdown.Item>
+          <Dropdown.Group>
+            <Dropdown.Item onSelect={handleRemove} variant="destructive">
+              {t('remove.cta')}
+            </Dropdown.Item>
+          </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Root>
       <Box>

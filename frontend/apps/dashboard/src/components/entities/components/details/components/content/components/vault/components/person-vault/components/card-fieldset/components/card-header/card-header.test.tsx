@@ -1,4 +1,4 @@
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 
 import type { CardHeaderProps } from './card-header';
 import { CardHeader } from './card-header';
@@ -12,7 +12,7 @@ describe('<CardHeader />', () => {
     it('should display topcard alias it exists', () => {
       const currentCard = {
         ...defaultCard,
-        alias: 'Hayes',
+        alias: 'Personal',
         issuer: 'visa',
         number_last4: '1234',
       };
@@ -23,13 +23,13 @@ describe('<CardHeader />', () => {
         onChange: () => undefined,
       });
 
-      expect(screen.getByText('(Hayes)')).toBeInTheDocument();
+      expect(screen.getByText('(Personal)')).toBeInTheDocument();
     });
 
     it('should display topcard last 4 if it exists', () => {
       const currentCard = {
         ...defaultCard,
-        alias: 'Hayes',
+        alias: 'Personal',
         issuer: 'visa',
         number_last4: '1234',
       };
@@ -46,7 +46,7 @@ describe('<CardHeader />', () => {
     it('should display just for dots if no 4 provided for selected card', () => {
       const currentCard = {
         ...defaultCard,
-        alias: 'Hayes',
+        alias: 'Personal',
         issuer: 'visa',
         number_last4: null,
       };
@@ -63,34 +63,32 @@ describe('<CardHeader />', () => {
 
   describe('should display dropdown as expected', () => {
     it('should display other cards provided', async () => {
-      const firstCard = { ...defaultCard, alias: 'Hayes', issuer: 'visa' };
+      const firstCard = { ...defaultCard, alias: 'Personal', issuer: 'visa' };
 
       renderCardHeader({
         cards: [
           firstCard,
-          { ...defaultCard, alias: 'Nopa', issuer: 'mastercard' },
-          { ...defaultCard, alias: 'Haight-Ashbury', issuer: 'discover' },
+          { ...defaultCard, alias: 'Business', issuer: 'mastercard' },
+          { ...defaultCard, alias: 'Travel', issuer: 'discover' },
         ],
         selectedCard: firstCard,
         onChange: () => undefined,
       });
 
-      const dropdownTrigger = screen.getByLabelText('Open card options');
+      const dropdownTrigger = screen.getByRole('button', { name: 'Open card options' });
       await userEvent.click(dropdownTrigger);
 
-      await waitFor(() => {
-        expect(screen.getByText('Nopa')).toBeInTheDocument();
-      });
+      const businessCard = await screen.findByText('Business', { exact: false });
+      expect(businessCard).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.getByText('Haight-Ashbury')).toBeInTheDocument();
-      });
+      const travelCard = await screen.findByText('Travel', { exact: false });
+      expect(travelCard).toBeInTheDocument();
     });
 
     it('should display last4 on dropdown element', async () => {
       const firstCard = {
         ...defaultCard,
-        alias: 'Hayes',
+        alias: 'Personal',
         issuer: 'visa',
         number_last4: null,
       };
@@ -100,13 +98,13 @@ describe('<CardHeader />', () => {
           firstCard,
           {
             ...defaultCard,
-            alias: 'Nopa',
+            alias: 'Business',
             issuer: 'mastercard',
             number_last4: '1234',
           },
           {
             ...defaultCard,
-            alias: 'Haight',
+            alias: 'Travel',
             issuer: 'discover',
             number_last4: null,
           },
@@ -115,12 +113,11 @@ describe('<CardHeader />', () => {
         onChange: () => undefined,
       });
 
-      const dropdownTrigger = screen.getByLabelText('Open card options');
+      const dropdownTrigger = screen.getByRole('button', { name: 'Open card options' });
       await userEvent.click(dropdownTrigger);
 
-      await waitFor(() => {
-        expect(screen.getByText('••••1234')).toBeInTheDocument();
-      });
+      const lastFourDigits = await screen.findByText('••••1234');
+      expect(lastFourDigits).toBeInTheDocument();
     });
   });
 });

@@ -2,7 +2,6 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { Dropdown, useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import useDeleteList from './hooks/use-delete-list';
 
@@ -45,32 +44,14 @@ const Actions = ({ disabled }: ActionsProps) => {
 
   return (
     <Dropdown.Root>
-      <StyledTrigger $asButton aria-label={t('delete')} disabled={disabled}>
+      <Dropdown.Trigger variant="button" aria-label={t('delete')} disabled={disabled}>
         <IcoDotsHorizontal24 />
-      </StyledTrigger>
+      </Dropdown.Trigger>
       <Dropdown.Content align="end" sideOffset={8}>
         <Dropdown.Item onSelect={launchDeleteConfirmation}>{t('delete')}</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );
 };
-
-const StyledTrigger = styled(Dropdown.Trigger)`
-  ${({ theme }) => {
-    const { button } = theme.components;
-    return css`
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:not([disabled]) {
-        box-shadow: ${button.variant.secondary.boxShadow};
-      }
-
-      &:not([disabled]):hover {
-        background-color: ${button.variant.secondary.hover.bg};
-      }
-    `;
-  }}
-`;
 
 export default Actions;

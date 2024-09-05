@@ -1,16 +1,16 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
-import { IcoArrowTopRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
+import { IcoArrowTopRight16, IcoDotsHorizontal24, IcoLogOut16 } from '@onefootprint/icons';
 import { Box, Dropdown } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RiskSignalsGlossary from 'src/components/risk-signals-glossary';
-import styled, { css } from 'styled-components';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import PgpUploadTool from 'src/components/pgp-upload-tool';
 import type { UserSession } from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
 
@@ -70,11 +70,11 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
-        <StyledTrigger aria-label="Account">
-          <IcoDotsHorizontal16 testID="nav-dropdown-button" />
-        </StyledTrigger>
-        <Dropdown.Portal>
-          <NavDropdownContent sideOffset={8}>
+        <Dropdown.Trigger aria-label="Account" variant="icon">
+          <IcoDotsHorizontal24 testID="nav-dropdown-button" />
+        </Dropdown.Trigger>
+        {isOpen && (
+          <Dropdown.Content sideOffset={8} $maxWidth="260px">
             <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
             <Dropdown.Separator />
             {tenants?.length > 1 ? (
@@ -84,27 +84,40 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
             ) : null}
             <Dropdown.Separator />
             <Dropdown.Group>
-              <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
-                {t('help-links.documentation')}
-                <IcoArrowTopRight16 color="secondary" />
-              </StyledLink>
-              <StyledLink as={Link} href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
-                {t('help-links.api-reference')}
-                <IcoArrowTopRight16 color="secondary" />
-              </StyledLink>
-              <StyledLink onSelect={handleGlossaryOpen}>{t('help-links.risk-signals-glossary')}</StyledLink>
-              <StyledLink onSelect={handlePgpHelperOpen}>{t('help-links.pgp-helper-tool')}</StyledLink>
-              <StyledLink onSelect={handleWhatsNewOpen}>{t('whats-new.title')}</StyledLink>
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
+                  {t('help-links.documentation')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
+                  {t('help-links.api-reference')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handleGlossaryOpen}>
+                  {t('help-links.risk-signals-glossary')}
+                </button>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handlePgpHelperOpen}>
+                  {t('help-links.pgp-helper-tool')}
+                </button>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handleWhatsNewOpen}>
+                  {t('whats-new.title')}
+                </button>
+              </Dropdown.Item>
             </Dropdown.Group>
             <Dropdown.Separator />
             <Dropdown.Group>
-              <Dropdown.Item onSelect={handleLogout}>
-                <LogoutIcon />
+              <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
                 {t('log-out')}
               </Dropdown.Item>
             </Dropdown.Group>
-          </NavDropdownContent>
-        </Dropdown.Portal>
+          </Dropdown.Content>
+        )}
       </Dropdown.Root>
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
       <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
@@ -115,33 +128,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   );
 };
 
-const NavDropdownContent = styled(Dropdown.Content)`
-  width: 260px;
-  overflow: hidden;
-`;
-
-const StyledLink = styled(Dropdown.Item)`
+const StyledIcoArrowTopRight16 = styled(IcoArrowTopRight16)`
   ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[1]};
-    text-decoration: none;
-    cursor: pointer;
-
-    svg {
-      margin-top: ${theme.spacing[1]};
-    }
-  `}
-`;
-
-const LogoutIcon = styled(IcoLogOut24)`
-  margin-left: -3px;
-`;
-
-const StyledTrigger = styled(Dropdown.Trigger)`
-  ${({ theme }) => css`
-    width: ${theme.spacing[7]};
-    height: ${theme.spacing[7]};
+    color: ${theme.color.secondary};
   `}
 `;
 

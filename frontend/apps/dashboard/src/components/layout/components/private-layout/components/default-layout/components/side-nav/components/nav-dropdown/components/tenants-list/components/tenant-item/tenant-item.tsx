@@ -16,7 +16,7 @@ const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
   });
 
   return (
-    <ItemContainer data-testid="tenant-item">
+    <DropdownItem data-testid="tenant-item" iconRight={isSelected ? IcoCheckSmall16 : undefined} onSelect={onClick}>
       <Tooltip
         text={t('errors.auth-method-not-supported', {
           tenantName: tenant.name,
@@ -33,14 +33,13 @@ const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
           >
             {tenant.name}
           </EllipsisButton>
-          {isSelected && <IcoCheckSmall16 />}
         </TenantCheckmarkContainer>
       </Tooltip>
-    </ItemContainer>
+    </DropdownItem>
   );
 };
 
-const ItemContainer = styled(Dropdown.Item)`
+const DropdownItem = styled(Dropdown.Item)`
   div[data-tooltip-trigger='true'] {
     width: 100%;
   }

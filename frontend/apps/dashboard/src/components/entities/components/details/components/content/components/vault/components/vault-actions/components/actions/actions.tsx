@@ -4,11 +4,11 @@ import { Dropdown } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import styled, { css } from 'styled-components';
 
 import useTags from '@/entity/hooks/use-tags';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
+import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
@@ -78,10 +78,12 @@ const Actions = ({ entity }: WithEntityProps) => {
   return entity.kind === EntityKind.person ? (
     <>
       <Dropdown.Root>
-        <StyledTrigger $asButton aria-label={t('cta')}>
-          <IcoDotsHorizontal24 />
-        </StyledTrigger>
-        <Dropdown.Content align="end" sideOffset={8} $noPadding>
+        <Dropdown.Trigger aria-label={t('cta')} asChild>
+          <DotsButton>
+            <IcoDotsHorizontal24 />
+          </DotsButton>
+        </Dropdown.Trigger>
+        <Dropdown.Content align="end" sideOffset={8}>
           <Dropdown.Group>
             <Dropdown.GroupTitle>{t('groups.user-management')}</Dropdown.GroupTitle>
             <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
@@ -137,16 +139,38 @@ const Actions = ({ entity }: WithEntityProps) => {
   ) : null;
 };
 
-const StyledTrigger = styled(Dropdown.Trigger)`
+const DotsButton = styled.button`
   ${({ theme }) => {
     const { button } = theme.components;
     return css`
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: ${button.variant.secondary.boxShadow};
+      all: unset;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: ${button.borderRadius};
+      background-color: ${button.variant.secondary.bg};
+      color: ${button.variant.secondary.color};
+      border: ${button.borderWidth} solid ${button.variant.secondary.borderColor};
 
-      &:hover {
-        box-shadow: ${button.variant.secondary.hover.boxShadow};
+      &:not([data-disabled]) {
+        &:hover {
+          background-color: ${button.variant.secondary.hover.bg};
+          color: ${button.variant.secondary.hover.color};
+          border-color: ${button.variant.secondary.hover.borderColor};
+        }
+
+        &:active {
+          background-color: ${button.variant.secondary.active.bg};
+          color: ${button.variant.secondary.active.color};
+          border-color: ${button.variant.secondary.active.borderColor};
+        }
+      }
+
+      &[data-disabled] {
+        cursor: initial;
+        opacity: 0.5;
       }
     `;
   }}

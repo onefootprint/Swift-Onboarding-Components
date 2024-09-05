@@ -1,6 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import * as DropdownPrimitive from '@radix-ui/react-dropdown-menu';
 import styled, { css } from 'styled-components';
+import Dropdown from '../../../dropdown';
 
 import { createFontStyles } from '../../../../utils';
 import type { ButtonVariant } from '../../split-button.types';
@@ -30,39 +30,23 @@ const DropdownOptions = ({
   flat = false,
   onOptionChange,
 }: DropdownOptionsProps) => (
-  <DropdownPrimitive.Root>
+  <Dropdown.Root>
     <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={$width}>
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
-    <DropdownContainer sideOffset={8} align="end">
-      <DropdownPrimitive.Group>
+    <Dropdown.Content sideOffset={8} align="end" $minWidth="186px">
+      <Dropdown.Group>
         {options.map(option => (
           <Item key={option.value} onSelect={() => onOptionChange(option)}>
             {option.label}
           </Item>
         ))}
-      </DropdownPrimitive.Group>
-    </DropdownContainer>
-  </DropdownPrimitive.Root>
+      </Dropdown.Group>
+    </Dropdown.Content>
+  </Dropdown.Root>
 );
 
-const DropdownContainer = styled(DropdownPrimitive.Content)`
-  ${({ theme }) => {
-    const { dropdown } = theme.components;
-
-    return css`
-      background-color: ${dropdown.bg};
-      box-shadow: ${dropdown.elevation};
-      padding: ${theme.spacing[2]} ${theme.spacing[2]};
-      border-radius: ${dropdown.borderRadius};
-      border-color: ${dropdown.borderColor};
-      border-style: solid;
-      min-width: 186px;
-    `;
-  }}
-`;
-
-const Item = styled(DropdownPrimitive.Item)`
+const Item = styled(Dropdown.Item)`
   ${({ theme }) => {
     const { dropdown } = theme.components;
 
@@ -85,7 +69,7 @@ const Item = styled(DropdownPrimitive.Item)`
   }}
 `;
 
-const Trigger = styled(DropdownPrimitive.Trigger)<{
+const Trigger = styled(Dropdown.Trigger)<{
   variant: ButtonVariant;
   $width: string;
 }>`

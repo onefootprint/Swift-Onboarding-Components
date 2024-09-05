@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { IcoArrowTopRight16, IcoDotsHorizontal16, IcoLogOut24 } from '@onefootprint/icons';
-import { Dropdown, Text } from '@onefootprint/ui';
+import { IcoArrowTopRight16, IcoDotsHorizontal24, IcoLogOut16 } from '@onefootprint/icons';
+import { Box, Dropdown, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,100 +34,57 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
   return (
     <>
       <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
-        <StyledTrigger aria-label="Account">
-          <IcoDotsHorizontal16 testID="nav-dropdown-button" />
-        </StyledTrigger>
+        <Dropdown.Trigger aria-label="Account" variant="icon">
+          <IcoDotsHorizontal24 testID="nav-dropdown-button" />
+        </Dropdown.Trigger>
         {isOpen && (
-          <NavDropdownContent sideOffset={8} $noPadding>
-            <UserDropdownItem>
-              {name && (
-                <Text variant="label-3" truncate>
-                  {name}
+          <Dropdown.Content sideOffset={8} $maxWidth="260px">
+            <Dropdown.Group>
+              <Box paddingTop={3} paddingBottom={3} paddingLeft={4} paddingRight={4}>
+                {name && (
+                  <Text variant="label-3" truncate>
+                    {name}
+                  </Text>
+                )}
+                <Text variant={!name ? 'label-3' : 'body-3'} color={!name ? 'primary' : 'secondary'} truncate>
+                  {email}
                 </Text>
-              )}
-              <Text variant={!name ? 'label-3' : 'body-3'} color={!name ? 'primary' : 'secondary'} truncate>
-                {email}
-              </Text>
-            </UserDropdownItem>
-            <Dropdown.Separator />
-            <Dropdown.Group>
-              <StyledLink as={Link} href={`${DASHBOARD_BASE_URL}`} target="_blank">
-                {t('dashboard')}
-                <IcoArrowTopRight16 color="secondary" />
-              </StyledLink>
-              <StyledLink as={Link} href={isApiReference ? '/' : API_REFERENCE_PATH}>
-                {isApiReference ? t('docs') : t('api-reference')}
-                <IcoArrowTopRight16 color="secondary" />
-              </StyledLink>
-              <StyledLink as={'a'} onClick={handleClickHelp}>
-                {t('help')}
-              </StyledLink>
+              </Box>
             </Dropdown.Group>
             <Dropdown.Separator />
             <Dropdown.Group>
-              <LogoutContainer onSelect={handleLogout}>
-                <LogoutIcon />
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={`${DASHBOARD_BASE_URL}`} target="_blank">
+                  {t('dashboard')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={isApiReference ? '/' : API_REFERENCE_PATH} target="_blank">
+                  {isApiReference ? t('docs') : t('api-reference')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handleClickHelp}>
+                  {t('help')}
+                </button>
+              </Dropdown.Item>
+            </Dropdown.Group>
+            <Dropdown.Separator />
+            <Dropdown.Group>
+              <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
                 {t('log-out')}
-              </LogoutContainer>
+              </Dropdown.Item>
             </Dropdown.Group>
-          </NavDropdownContent>
+          </Dropdown.Content>
         )}
       </Dropdown.Root>
     </>
   );
 };
 
-const NavDropdownContent = styled(Dropdown.Content)`
-  width: 260px;
-  overflow: hidden;
-  z-index: 1000;
-`;
-
-const UserDropdownItem = styled(Dropdown.Item)`
+const StyledIcoArrowTopRight16 = styled(IcoArrowTopRight16)`
   ${({ theme }) => css`
-    align-items: flex-start;
-    flex-direction: column;
-    height: 64px;
-    overflow: hidden;
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    pointer-events: none;
-    width: 100%;
-    user-select: none;
-
-    & > * {
-      max-width: 100%;
-    }
-  `};
-`;
-
-const StyledLink = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[1]};
-    text-decoration: none;
-    cursor: pointer;
-
-    svg {
-      margin-top: ${theme.spacing[1]};
-    }
-  `}
-`;
-
-const LogoutIcon = styled(IcoLogOut24)`
-  margin-left: -3px;
-`;
-
-const LogoutContainer = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[2]};
-  `}
-`;
-
-const StyledTrigger = styled(Dropdown.Trigger)`
-  ${({ theme }) => css`
-    width: ${theme.spacing[7]};
-    height: ${theme.spacing[7]};
+    color: ${theme.color.secondary};
   `}
 `;
 

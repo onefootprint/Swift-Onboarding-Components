@@ -1,6 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import type { Entity } from '@onefootprint/types';
-import { CopyButton, Dropdown, Stack, Text, useToast } from '@onefootprint/ui';
+import { CopyButton, Dropdown, Stack, Text, Tooltip, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -53,19 +53,22 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
             <IcoChevronDown16 className="chevronIcon" />
           </ChevronContainer>
           <Dropdown.Content sideOffset={4}>
-            {ids.map(item => {
-              return (
-                <Item key={item.label} onClick={() => handleCopy(item)}>
-                  <Stack direction="column" gap={2}>
-                    <Text variant="caption-2" color="tertiary">
-                      {item.label}
-                    </Text>
-                    <Text variant="snippet-2">{item.value}</Text>
-                  </Stack>
-                  <CopyButton size="compact" contentToCopy={item.value || ''} />
-                </Item>
-              );
-            })}
+            <Dropdown.Group>
+              {ids.map(item => {
+                return (
+                  <Dropdown.Item height="56px" key={item.label} onClick={() => handleCopy(item)}>
+                    <Tooltip text={t('copy-to-clipboard')}>
+                      <Stack direction="column" gap={2}>
+                        <Text variant="caption-2" color="tertiary">
+                          {item.label}
+                        </Text>
+                        <Text variant="snippet-2">{item.value}</Text>
+                      </Stack>
+                    </Tooltip>
+                  </Dropdown.Item>
+                );
+              })}
+            </Dropdown.Group>
           </Dropdown.Content>
         </Dropdown.Root>
       )}
@@ -87,17 +90,6 @@ const Main = styled(Stack)`
     padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} calc(${theme.spacing[4]} - ${theme.spacing[1]});
     gap: ${theme.spacing[3]};
     align-items: center;
-  `}
-`;
-
-const Item = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: ${theme.spacing[5]};
-    padding: ${theme.spacing[4]} ${theme.spacing[4]};
-    height: 62px;
   `}
 `;
 

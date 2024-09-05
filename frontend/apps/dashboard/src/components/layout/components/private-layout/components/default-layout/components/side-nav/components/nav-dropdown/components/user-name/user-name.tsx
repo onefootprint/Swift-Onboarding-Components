@@ -12,7 +12,7 @@ const UserName = ({ name, lastName, email }: UserNameProps) => {
   const hasName = name || lastName;
 
   return (
-    <UserDropdownItem>
+    <UserDropdownItem disabled>
       {hasName && (
         <Text variant="label-3" truncate>
           {name} {lastName}
@@ -27,18 +27,13 @@ const UserName = ({ name, lastName, email }: UserNameProps) => {
 
 const UserDropdownItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
+    display: flex;
     align-items: flex-start;
     flex-direction: column;
-    height: 64px;
     overflow: hidden;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    pointer-events: none;
     width: 100%;
-    user-select: none;
-
-    & > * {
-      max-width: 100%;
-    }
+    height: fit-content;
   `};
 `;
 
