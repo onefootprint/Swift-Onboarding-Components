@@ -1,0 +1,15 @@
+{
+  "exclude": ["node_modules"],
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "types": ["google.maps", "jest", "../../styled.d.ts", "bun-types"],
+    "paths": {
+      "src/*": ["./src/*"],
+      "@/*": ["./src/*"],
+    }
+  },
+  "include": ["src", "next-env.d.ts"]
+}

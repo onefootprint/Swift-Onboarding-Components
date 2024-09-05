@@ -14,7 +14,7 @@ const FormField = ({ children, variant = 'vertical' }: FormFieldProps) => {
   return (
     <FormFieldContext.Provider value={contextValues}>
       {variant === 'vertical' && (
-        <Stack direction="column" gap={3} width="100%" textOverflow="ellipsis" whiteSpace="nowrap" id="stack">
+        <Stack direction="column" gap={3} width="100%" textOverflow="ellipsis" whiteSpace="nowrap">
           {children}
         </Stack>
       )}
