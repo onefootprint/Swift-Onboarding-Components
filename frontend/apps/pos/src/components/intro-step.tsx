@@ -1,21 +1,63 @@
+import Header from '@/components/header';
 import { Button, PhoneInput, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
+import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-const IntroStep = () => {
+type IntroStepProps = {
+  onHandoff: (phoneNumber: string) => void;
+  onFillout: (phoneNumber: string) => void;
+};
+
+type FormValues = {
+  phoneNumber: string;
+};
+
+const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
+  const { control, handleSubmit, setFocus } = useForm<FormValues>();
+
+  const handleFormSubmit = handleSubmit(data => {
+    onHandoff(data.phoneNumber);
+  });
+
+  const handleFillout = handleSubmit(
+    data => {
+      onFillout(data.phoneNumber);
+    },
+    errors => {
+      if (errors.phoneNumber) {
+        setFocus('phoneNumber');
+      }
+    },
+  );
+
   return (
     <Stack direction="column" gap={7} textAlign="center" width="100%" alignItems="center">
       <Image src="/logo.png" width={92} height={30} alt="Avi's logo" />
-      <Stack direction="column" gap={3}>
-        <Text variant="heading-3">Let's verify your customer's identity! 😊</Text>
-        <Text variant="body-2" color="secondary">
-          Enter their phone number to proceed.
-        </Text>
-      </Stack>
-      <Stack flexDirection="column">
+      <Header title="Let's verify your customer's identity! 😊" subtitle="Enter their phone number to proceed." />
+      <Stack flexDirection="column" tag="form" onSubmit={handleFormSubmit}>
         <Stack flexDirection="column" gap={7}>
-          <PhoneInput label="Phone number" />
-          <Button size="large">Continue</Button>
+          <Controller
+            control={control}
+            name="phoneNumber"
+            rules={{
+              required: 'Phone number is required',
+            }}
+            render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
+              <PhoneInput
+                label="Phone number"
+                hasError={!!error}
+                hint={error?.message}
+                name={name}
+                onBlur={onBlur}
+                onChange={onChange}
+                value={value}
+              />
+            )}
+          />
+          <Button size="large" type="submit">
+            Continue
+          </Button>
         </Stack>
         <Stack alignItems="center" marginBlock={5}>
           <Divider />
@@ -25,7 +67,7 @@ const IntroStep = () => {
           <Divider />
         </Stack>
         <Stack flexDirection="column">
-          <Button size="large" variant="secondary">
+          <Button size="large" variant="secondary" onClick={handleFillout}>
             Fill out for customer
           </Button>
         </Stack>

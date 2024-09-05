@@ -9,11 +9,21 @@ import { initialState, reducer } from '@/utils/reducer';
 import { useReducer } from 'react';
 
 const Pos = () => {
-  const [state, _dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const handleHandoff = (phoneNumber: string) => {
+    dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
+    dispatch({ type: 'NEXT_STEP' });
+  };
+
+  const handleFillout = (phoneNumber: string) => {
+    dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
+    dispatch({ type: 'NEXT_STEP' });
+  };
 
   return (
     <Layout>
-      {state.currentStep === 'intro' && <IntroStep />}
+      {state.currentStep === 'intro' && <IntroStep onHandoff={handleHandoff} onFillout={handleFillout} />}
       {state.currentStep === 'otp' && <OtpStep />}
       {state.currentStep === 'email' && <EmailStep />}
       {state.currentStep === 'basic-data' && <BasicDataStep />}
