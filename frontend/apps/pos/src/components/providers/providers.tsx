@@ -12,7 +12,7 @@ const queryClient = configureReactQuery();
 
 const App = ({ children }: React.PropsWithChildren) => (
   <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>{children}</DesignSystemProvider>
+    <DesignSystemProvider theme={themes.avis}>{children}</DesignSystemProvider>
   </QueryClientProvider>
 );
 
