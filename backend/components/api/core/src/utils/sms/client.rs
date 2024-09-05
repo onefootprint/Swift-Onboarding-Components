@@ -6,6 +6,7 @@ use crate::utils::sms::vendors::SmsSendStatus;
 use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
+use api_errors::ValidationError;
 use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
@@ -107,6 +108,7 @@ impl SmsClient {
         state: &State,
         message: &SmsMessage,
         destination: &PhoneNumber,
+        t_id: Option<&TenantId>,
     ) -> FpResult<bool> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -120,12 +122,21 @@ impl SmsClient {
         }
         .enforce_and_update(state)
         .await?;
+        if destination.is_high_fraud_risk_country() {
+            let Some(t_id) = t_id else {
+                return ValidationError("Cannot send SMS to high-risk country").into();
+            };
+            if !state
+                .ff_client
+                .flag(BoolFlag::CanSendSmsToHighFraudCountries(t_id))
+            {
+                return ValidationError("Organization cannot send SMS to high-risk country").into();
+            }
+        }
         Ok(true)
     }
 
     #[tracing::instrument("SmsClient::send_message", skip_all)]
-    /// Rate limits sending messages to the destination phone number and then spawns an async task
-    /// to send the message
     pub async fn send_message(
         &self,
         state: &State,
@@ -133,7 +144,10 @@ impl SmsClient {
         destination: PhoneNumber,
         t_id: Option<&TenantId>,
     ) -> FpResult<()> {
-        if !self.should_send_message(state, &message, &destination).await? {
+        if !self
+            .should_send_message(state, &message, &destination, t_id)
+            .await?
+        {
             return Ok(());
         }
         self._send_message(message, destination, t_id, None).await?;
@@ -149,7 +163,10 @@ impl SmsClient {
         t_id: Option<TenantId>,
         tx: Sender<FpError>,
     ) -> FpResult<()> {
-        if !self.should_send_message(state, &message, &destination).await? {
+        if !self
+            .should_send_message(state, &message, &destination, t_id.as_ref())
+            .await?
+        {
             return Ok(());
         }
         let client = self.clone();

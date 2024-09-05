@@ -116,6 +116,21 @@ impl FromStr for PhoneNumber {
 }
 
 impl PhoneNumber {
+    const HIGH_SMS_PUMPING_FRAUD_COUNTRIES: &'static [CountryId] = &[
+        // Asia
+        CountryId::BD, // Bangladesh
+        CountryId::IL, // Israel
+        CountryId::PK, // Pakistan
+        CountryId::PS, // State of Palestine
+        CountryId::AZ, // Azerbaijan
+        CountryId::TJ, // Tajikistan
+        CountryId::OM, // Oman
+        CountryId::LK, // Sri Lanka
+        // Africa
+        CountryId::DZ, // Algeria
+        CountryId::NG, // Nigeria
+        CountryId::TN, // Tunisia
+    ];
     const PREFER_WHATSAPP_COUNTRIES: &'static [CountryId] = &[CountryId::MX, CountryId::BR];
 
     /// Returns true if we decide the country of this phone number prefers to receive messages
@@ -125,6 +140,16 @@ impl PhoneNumber {
             .country()
             .id()
             .is_some_and(|c| Self::PREFER_WHATSAPP_COUNTRIES.contains(&c))
+    }
+
+    /// Twilio has designated certain countries as having high risk for SMS pumping fraud.
+    /// This returns true if the phone number's country code is for a country with high SMS pumping
+    /// fraud risk
+    pub fn is_high_fraud_risk_country(&self) -> bool {
+        self.number
+            .country()
+            .id()
+            .is_some_and(|c| Self::HIGH_SMS_PUMPING_FRAUD_COUNTRIES.contains(&c))
     }
 }
 
@@ -171,6 +196,13 @@ mod tests {
     fn test_prefers_whatsapp(number: &str) -> bool {
         let phone_number = PhoneNumber::parse(number.into()).unwrap();
         phone_number.prefers_whatsapp()
+    }
+
+    #[test_case("+1-415-123-1234" => false)]
+    #[test_case("+234 09 461 4000" => true)]
+    fn test_is_high_fraud_risk_number(number: &str) -> bool {
+        let phone_number = PhoneNumber::parse(number.into()).unwrap();
+        phone_number.is_high_fraud_risk_country()
     }
 
     #[test]

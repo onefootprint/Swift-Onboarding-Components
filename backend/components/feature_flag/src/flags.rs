@@ -87,6 +87,8 @@ pub enum BoolFlag<'a> {
 
     #[strum(to_string = "ApiKycSkipEmailAndPhoneRequirements")]
     ApiKycSkipEmailAndPhoneRequirements(&'a TenantId),
+    #[strum(to_string = "CanSendSmsToHighFraudCountries")]
+    CanSendSmsToHighFraudCountries(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -135,6 +137,7 @@ impl<'a> BoolFlag<'a> {
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
             Self::UseKycWaterfallV2Rollout(k) => Some(k.to_string()),
             Self::ApiKycSkipEmailAndPhoneRequirements(k) => Some(k.to_string()),
+            Self::CanSendSmsToHighFraudCountries(k) => Some(k.to_string()),
         }
     }
 
@@ -179,6 +182,7 @@ impl<'a> BoolFlag<'a> {
             Self::RequireCaptureOnStepUp(_) => false,
             Self::UseKycWaterfallV2Rollout(_) => false,
             Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
+            Self::CanSendSmsToHighFraudCountries(_) => false,
         }
     }
 
@@ -226,6 +230,7 @@ impl<'a> BoolFlag<'a> {
             | Self::MakeLexisCall(_)
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
+            | Self::CanSendSmsToHighFraudCountries(_)
             | Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
             // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,

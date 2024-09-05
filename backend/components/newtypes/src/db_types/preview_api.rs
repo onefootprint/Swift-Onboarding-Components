@@ -71,8 +71,9 @@ pub enum PreviewApi {
     /// APIs
     ClientVaultingDocs,
 
-    // We don't want tenants being able to query duplicates without knowing their used case. While the
-    // duplicates API is in p0, we might want to keep this to tenants that absolutely need it.
+    /// We don't want tenants being able to query duplicates without knowing their used case. While
+    /// the duplicates API is in p0, we might want to keep this to tenants that absolutely need
+    /// it.
     ListDuplicateUsers,
 }
 
