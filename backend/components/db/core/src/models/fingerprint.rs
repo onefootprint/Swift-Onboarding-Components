@@ -1,5 +1,6 @@
 use super::scoped_vault::ScopedVault;
 use crate::DbError;
+use crate::DbError::AssertionError;
 use crate::DbResult;
 use crate::NextPage;
 use crate::OffsetPagination;
@@ -248,8 +249,7 @@ impl Fingerprint {
         let (internal_matches, _) = Self::get_internal_dupes(conn, sv, OffsetPagination::new(Some(0), 100))?;
         let external = if sv.is_live {
             let v_ids_with_dupes_at_tenant = internal_matches.iter().map(|f| &f.vault_id).collect_vec();
-            let sh_datas = Self::get_sh_datas(conn, sv)?;
-            let (num_users, num_tenants) = Self::q_dupes_query(sv, &sh_datas)
+            let (num_users, num_tenants) = Self::q_dupes_query(conn, sv, false)?
                 // TODO when we stop making unverified vaults after each signup challenge, remove this
                 // logic. It will be horribly slow
                 .inner_join(scoped_vault::table)
@@ -286,8 +286,7 @@ impl Fingerprint {
         sv: &ScopedVault,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<Fingerprint>, NextPage)> {
-        let sh_datas = Self::get_sh_datas(conn, sv)?;
-        let q_dupes = Self::q_dupes_query(sv, &sh_datas);
+        let q_dupes = Self::q_dupes_query(conn, sv, true)?;
         let internal_matches = q_dupes
             // TODO when we stop making unverified vaults after each signup challenge, remove this
             // logic. It will be horribly slow
@@ -303,19 +302,40 @@ impl Fingerprint {
         Ok(pagination.results(internal_matches))
     }
 
-    fn get_sh_datas(conn: &mut PgConn, sv: &ScopedVault) -> DbResult<Vec<FingerprintData>> {
-        let sh_datas = fingerprint::table
+    fn q_dupes_query<'a>(
+        conn: &mut PgConn,
+        sv: &'a ScopedVault,
+        distinct_on_kind: bool,
+    ) -> DbResult<BoxedQuery<'a, Pg>> {
+        let mut fingerprints = fingerprint::table
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::is_hidden.eq(false))
             .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
             .filter(fingerprint::sh_data.is_not_null())
-            .select(fingerprint::sh_data.assume_not_null())
-            .get_results::<FingerprintData>(conn)?;
-        Ok(sh_datas)
-    }
+            .select(fingerprint::all_columns)
+            .get_results::<Fingerprint>(conn)?;
 
-    fn q_dupes_query<'a>(sv: &'a ScopedVault, sh_datas: &'a Vec<FingerprintData>) -> BoxedQuery<'a, Pg> {
+        // Because some fingerprints can be globally and tenant scoped, this query will often return two
+        // fingerprints of the same kind. Some consumers of get_internal_dupes are only interested in
+        // the fingerprints within the scope of a single tenant, in which case, it makes sense to filter
+        // out fingerprints that are tenant-scoped, but globally fingerprint-able.
+        if distinct_on_kind {
+            fingerprints.retain(|fingerprint| {
+                !fingerprint.kind.is_globally_fingerprintable()
+                    || fingerprint.scope != FingerprintScope::Tenant
+            });
+        }
+
+        let sh_datas = fingerprints
+            .into_iter()
+            .map(|fingerprint| {
+                fingerprint
+                    .sh_data
+                    .ok_or(AssertionError("Missing sh_data on fingerprint".into()))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
         let q_dupes = fingerprint::table
             .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(sh_datas))
@@ -325,6 +345,6 @@ impl Fingerprint {
             .filter(fingerprint::vault_id.ne(&sv.vault_id))
             .into_boxed();
 
-        q_dupes
+        Ok(q_dupes)
     }
 }
