@@ -242,7 +242,9 @@ jobs:
       # pulumi setup
       - uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8 # ratchet:actions/setup-node@v2
         with:
-          node-version: 18.x
+          node-version: '18.x'
+          cache: 'yarn'
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
         with:
