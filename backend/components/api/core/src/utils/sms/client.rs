@@ -101,6 +101,28 @@ impl SmsClient {
         }
     }
 
+    /// Runs pre-validation for the message and returns whether the message should be sent.
+    async fn should_send_message(
+        &self,
+        state: &State,
+        message: &SmsMessage,
+        destination: &PhoneNumber,
+    ) -> FpResult<bool> {
+        if destination.is_fixture_phone_number() {
+            // Don't rate limit or send SMS messages to the fixture phone number
+            tracing::info!("Fixture phone number. Not sending SMS");
+            return Ok(false);
+        }
+        RateLimit {
+            key: &destination.e164(),
+            period: self.duration_between_challenges,
+            scope: message.rate_limit_scope(),
+        }
+        .enforce_and_update(state)
+        .await?;
+        Ok(true)
+    }
+
     #[tracing::instrument("SmsClient::send_message", skip_all)]
     /// Rate limits sending messages to the destination phone number and then spawns an async task
     /// to send the message
@@ -111,18 +133,9 @@ impl SmsClient {
         destination: PhoneNumber,
         t_id: Option<&TenantId>,
     ) -> FpResult<()> {
-        if destination.is_fixture_phone_number() {
-            // Don't rate limit or send SMS messages to the fixture phone number
-            tracing::info!("Fixture phone number. Not sending SMS");
+        if !self.should_send_message(state, &message, &destination).await? {
             return Ok(());
         }
-        RateLimit {
-            key: &destination.e164(),
-            period: self.duration_between_challenges,
-            scope: message.rate_limit_scope(),
-        }
-        .enforce_and_update(state)
-        .await?;
         self._send_message(message, destination, t_id, None).await?;
         Ok(())
     }
@@ -136,17 +149,9 @@ impl SmsClient {
         t_id: Option<TenantId>,
         tx: Sender<FpError>,
     ) -> FpResult<()> {
-        if destination.is_fixture_phone_number() {
-            // Don't rate limit or send SMS messages to the fixture phone number
+        if !self.should_send_message(state, &message, &destination).await? {
             return Ok(());
         }
-        RateLimit {
-            key: &destination.e164(),
-            period: self.duration_between_challenges,
-            scope: message.rate_limit_scope(),
-        }
-        .enforce_and_update(state)
-        .await?;
         let client = self.clone();
         let fut = async move {
             let t_id = t_id.as_ref();
