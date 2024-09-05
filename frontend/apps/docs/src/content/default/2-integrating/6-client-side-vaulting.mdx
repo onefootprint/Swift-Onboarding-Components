@@ -60,9 +60,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
             "card.primary.expiration",
             "card.primary.name"
           ],
-          "scopes": [
-            "vault"
-          ],
+          "scope": "vault",
           "ttl": 180
       }'
 ```
@@ -123,9 +121,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
             "id.ssn9",
             "card.primary.number"
           ],
-          "scopes": [
-            "decrypt"
-          ],
+          "scope": "decrypt",
           "ttl": 180,
           "decrypt_reason": "test structured"
       }'
@@ -170,9 +166,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
         "fields": [
           "custom.paystub_w2"
         ],
-        "scopes": [
-          "decrypt_download"
-        ],
+        "scope": "decrypt_download",
         "ttl": 180,
         "decrypt_reason": "download w2 test"
       }'
