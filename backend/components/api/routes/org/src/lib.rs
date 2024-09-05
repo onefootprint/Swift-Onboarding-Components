@@ -10,6 +10,7 @@ mod logo;
 mod member;
 mod members;
 // Weird module name, but there's a metrics module inside api_core too...
+mod in_progress_onboardings;
 mod invoice_preview;
 mod metrics_api;
 mod onboarding_configs;
@@ -49,6 +50,7 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(sdk_args::post)
         .service(sdk_args::get)
         .service(sdk_telemetry::post)
+        .service(in_progress_onboardings::get)
         .service(client_security_config::get)
         .service(client_security_config::patch)
         .service(frequent_notes::get)

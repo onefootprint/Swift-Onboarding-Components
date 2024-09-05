@@ -57,11 +57,11 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     assert!(
         Vault::find_portable(conn, &[fingerprint.clone()], inverse_sandbox_id, None)
             .unwrap()
-            .is_none()
+            .is_empty()
     );
 
     let u = Vault::find_portable(conn, &[fingerprint], uv.sandbox_id, None).unwrap();
-    u.is_some()
+    !u.is_empty()
 }
 
 #[test]

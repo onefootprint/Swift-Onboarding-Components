@@ -1,3 +1,4 @@
+use super::fingerprint::Fingerprint;
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
@@ -6,6 +7,7 @@ use super::scoped_vault::ScopedVault;
 use super::scoped_vault::ScopedVaultUpdate;
 use super::scoped_vault::SvStatusDelta;
 use super::task::Task;
+use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use super::workflow_request::WorkflowRequest;
@@ -27,6 +29,7 @@ use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
 use newtypes::DocumentConfig;
 use newtypes::DocumentState;
+use newtypes::Fingerprint as FingerprintData;
 use newtypes::InsightEventId;
 use newtypes::KybConfig;
 use newtypes::KybState;
@@ -648,6 +651,39 @@ impl Workflow {
             .first(conn)
             .optional()?;
         Ok(res)
+    }
+
+    /// Given the fingerprint of a user's phone or email, returns a list of their in-progress
+    /// onboardings. Note that their onboardings may be for different scoped vaults or even
+    /// different vaults.
+    pub fn get_in_progress(
+        conn: &mut PgConn,
+        sh_data: &[FingerprintData],
+        is_live: bool,
+    ) -> DbResult<Vec<(Self, ScopedVault, Tenant)>> {
+        use db_schema::schema::fingerprint;
+        use db_schema::schema::scoped_vault;
+        use db_schema::schema::tenant;
+        let sv_ids = Fingerprint::q_fingerprints(sh_data, is_live)
+            .select(fingerprint::scoped_vault_id)
+            .get_results::<ScopedVaultId>(conn)?;
+
+        let results = workflow::table
+            .inner_join(scoped_vault::table.inner_join(tenant::table))
+            .filter(workflow::completed_at.is_null())
+            .filter(workflow::deactivated_at.is_null())
+            .filter(workflow::scoped_vault_id.eq_any(sv_ids))
+            .select((
+                workflow::all_columns,
+                scoped_vault::all_columns,
+                tenant::all_columns,
+            ))
+            .order_by(workflow::created_at.desc())
+            // TODO: implicit limit
+            .limit(20)
+            .get_results(conn)?;
+
+        Ok(results)
     }
 }
 

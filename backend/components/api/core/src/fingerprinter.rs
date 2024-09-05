@@ -111,7 +111,7 @@ impl State {
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
                 let existing = Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref())?;
-                let Some(existing) = existing else {
+                let Some(existing) = existing.into_iter().next() else {
                     return Ok(None);
                 };
                 let sv_id = t_id

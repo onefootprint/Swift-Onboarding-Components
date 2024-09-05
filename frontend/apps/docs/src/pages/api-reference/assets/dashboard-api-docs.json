@@ -5051,6 +5051,38 @@
                 ]
             }
         },
+        "/org/member/in_progress_onboardings": {
+            "get": {
+                "tags": [
+                    "Members",
+                    "Private"
+                ],
+                "description": "Returns the list of in-progress KYC/KYB onboardings for the email associated with the logged-in dashboard user.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InProgressOnboarding"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/members": {
             "get": {
                 "tags": [
@@ -21125,6 +21157,52 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "InProgressOnboarding": {
+                "type": "object",
+                "properties": {
+                    "fp_id": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pass",
+                            "fail",
+                            "incomplete",
+                            "pending",
+                            "none"
+                        ]
+                    },
+                    "tenant": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "website_url": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "wf_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "fp_id",
+                    "status",
+                    "tenant",
+                    "timestamp",
+                    "wf_id"
                 ]
             },
             "IntegrityRequest": {

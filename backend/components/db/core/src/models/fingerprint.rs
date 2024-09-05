@@ -199,6 +199,23 @@ impl Fingerprint {
             .execute(conn.conn())?;
         Ok(())
     }
+
+    pub fn q_fingerprints(
+        sh_data: &[FingerprintData],
+        is_live: bool,
+    ) -> db_schema::schema::fingerprint::BoxedQuery<Pg> {
+        use db_schema::schema::fingerprint;
+        // Be careful changing these fingerprint queries - they're optimized to use a specific index
+        fingerprint::table
+        .filter(fingerprint::sh_data.is_not_null())
+        .filter(fingerprint::sh_data.eq_any(sh_data))
+        .filter(fingerprint::is_hidden.eq(false))
+        .filter(fingerprint::is_live.eq(is_live))
+        // When we allow replacing contact info, we might want to support finding the vault on
+        // deactivated fingerprints in case the portable data is replaced by tenant-specific data
+        .filter(fingerprint::deactivated_at.is_null())
+        .into_boxed()
+    }
 }
 
 pub struct FingerprintDupesResult {

@@ -1,4 +1,5 @@
 use super::ob_configuration::IsLive;
+use crate::models::fingerprint::Fingerprint as DbFingerprint;
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
@@ -312,16 +313,17 @@ pub struct LocatedVault {
 }
 
 impl Vault {
-    /// Given a fingerprint search parameter, find the Vault that we should log into.
-    /// When there are multiple vaults matching the search, we choose somewhat arbitrarily
-    /// (but consistenly) which vault to log into.
+    /// Given a fingerprint search parameter, find the list of Vaults that we can log into,
+    /// sorted in descending order of priority.
+    /// When there are multiple vaults matching the search, we order somewhat arbitrarily
+    /// (but consistenly) which vault is the highest priority to log into.
     #[tracing::instrument("Vault::find_portable", skip_all)]
     pub fn find_portable(
         conn: &mut PgConn,
         sh_data: &[Fingerprint],
         sandbox_id: Option<SandboxId>,
         tenant_id: Option<&TenantId>,
-    ) -> DbResult<Option<LocatedVault>> {
+    ) -> DbResult<Vec<LocatedVault>> {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::data_lifetime;
         use db_schema::schema::fingerprint;
@@ -331,16 +333,9 @@ impl Vault {
         // Look for verified vaults marked `is_portable` and `is_verified`
         // that also have portable, active data matching the fingerprint
         // and a matching sandbox_id, if provided
-        let mut query = fingerprint::table
+        let mut query = DbFingerprint::q_fingerprints(sh_data, sandbox_id.is_none())
             .inner_join(fingerprint_junction::table.inner_join(data_lifetime::table))
             .inner_join(vault::table)
-            .filter(fingerprint::sh_data.is_not_null())
-            .filter(fingerprint::sh_data.eq_any(sh_data))
-            .filter(fingerprint::is_hidden.eq(false))
-            .filter(fingerprint::is_live.eq(sandbox_id.is_none()))
-            // When we allow replacing contact info, we might want to support finding the vault on
-            // deactivated fingerprints in case the portable data is replaced by tenant-specific data
-            .filter(fingerprint::deactivated_at.is_null())
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             // Don't identify users that haven't completed an OTP challenge
             .filter(vault::is_verified.eq(true))
@@ -348,8 +343,7 @@ impl Vault {
             // API-only vaults start as non-identifiable until they become PIDs
             .filter(vault::is_identifiable.eq(true))
             .filter(vault::is_hidden.eq(false))
-            .select((vault::all_columns, fingerprint::kind))
-            .into_boxed();
+            .select((vault::all_columns, fingerprint::kind));
 
         query = if let Some(sandbox_id) = sandbox_id.as_ref() {
             query.filter(vault::sandbox_id.eq(sandbox_id))
@@ -361,23 +355,17 @@ impl Vault {
         // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
         // non-portable vaults
         if let Some(tenant_id) = tenant_id {
-            let mut query = fingerprint::table
+            let mut query = DbFingerprint::q_fingerprints(sh_data, sandbox_id.is_none())
                 .inner_join(fingerprint_junction::table.inner_join(data_lifetime::table))
                 .inner_join(vault::table)
                 .inner_join(scoped_vault::table)
-                .filter(fingerprint::sh_data.is_not_null())
-                .filter(fingerprint::sh_data.eq_any(sh_data))
-                .filter(fingerprint::is_hidden.eq(false))
-                .filter(fingerprint::deactivated_at.is_null())
-                .filter(fingerprint::is_live.eq(sandbox_id.is_none()))
                 // Un-verified vaults owned by this tenant
                 .filter(fingerprint::tenant_id.eq(tenant_id))
                 .filter(data_lifetime::portablized_seqno.is_null())
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))
                 .filter(vault::is_hidden.eq(false))
-                .select((vault::all_columns, fingerprint::kind))
-                .into_boxed();
+                .select((vault::all_columns, fingerprint::kind));
             query = if let Some(sandbox_id) = sandbox_id.as_ref() {
                 query.filter(vault::sandbox_id.eq(sandbox_id))
             } else {
@@ -428,7 +416,7 @@ impl Vault {
 
         // Find the vault with the highest priority. Some of these criteria are required for
         // correctness, and others are heuristics to select the best of many duplicate vaults
-        let highest_priority = vaults
+        let ordered_vaults = vaults
             .into_iter()
             // Filter out vaults that only have deactivated scoped vaults
             .filter(|vault| v_id_to_svs.get(&vault.id).is_some_and(|svs| !svs.is_empty()))
@@ -442,10 +430,9 @@ impl Vault {
                     .get(&vault.id)
                     .map(|dis| dis.len())
                     .unwrap_or_default();
-                let matching_fp_priority = vault_id_to_matching_dis
-                    .get(&vault.id)
-                    .and_then(|dis| dis.iter().map(matching_fp_priority).max())
-                    .unwrap_or_default();
+                let matching_fps = vault_id_to_matching_dis.remove(&vault.id).unwrap_or_default();
+                let matching_fps = matching_fps.into_iter().unique().collect_vec();
+                let matching_fp_priority = matching_fps.iter().map(matching_fp_priority).max().unwrap_or_default();
                 let priority = Priority {
                     has_sv_at_tenant,
                     num_svs: svs.len(),
@@ -454,20 +441,18 @@ impl Vault {
                     matching_fp_priority,
                     created_at: vault.created_at,
                 };
-                (priority, vault)
+                let located_vault = LocatedVault { vault, matching_fps };
+                (priority, located_vault)
             })
-            .max_by_key(|(p, _)| *p)
-            .map(|(_, v)| v);
+            .sorted_by_key(|(p, _)| *p)
+            .rev()
+            .map(|(_, v)| v)
+            .collect_vec();
 
-        let Some(vault) = highest_priority else {
-            return Ok(None);
-        };
-        tracing::info!(vault_id=%vault.id, "Found match");
+        let vault_ids = Csv(ordered_vaults.iter().map(|v| &v.vault.id).collect_vec());
+        tracing::info!(%vault_ids, "Found matches");
 
-        let matching_fps = vault_id_to_matching_dis.remove(&vault.id).unwrap_or_default();
-        let matching_fps = matching_fps.into_iter().unique().collect();
-        let located_vault = LocatedVault { vault, matching_fps };
-        Ok(Some(located_vault))
+        Ok(ordered_vaults)
     }
 }
 
