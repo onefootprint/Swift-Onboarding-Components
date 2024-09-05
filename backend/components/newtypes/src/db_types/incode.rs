@@ -158,7 +158,7 @@ impl IncodeFailureReason {
     }
 
     pub fn selfie_processing_failed(&self) -> bool {
-        matches!(self, Self::SelfieFaceNotFound | Self::SelfieTooDark)
+        matches!(self, Self::SelfieFaceNotFound)
     }
 }
 
