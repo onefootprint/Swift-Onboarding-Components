@@ -52,12 +52,12 @@ const FraudLabel = () => {
               <IcoInfo16 />
             </Tooltip>
           </Main>
-          <ChevronContainer>
+          <ChevronContainer aria-label={t('aria-label')}>
             <IcoChevronDown16 />
           </ChevronContainer>
         </LabelContainer>
       ) : (
-        <NoLabelContainer>
+        <NoLabelContainer aria-label={t('aria-label')}>
           <Main>
             <IcoPlusSmall16 />
             {t('add-label')}
