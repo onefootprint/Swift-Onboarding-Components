@@ -153,7 +153,7 @@ const Content = styled(Stack)`
   ${({ theme }) => css`
     width: 186px;
     flex-direction: column;
-    padding: ${theme.spacing[1]};
+    padding: 0;
     background-color: ${theme.backgroundColor.primary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
