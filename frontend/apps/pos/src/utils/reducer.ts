@@ -7,7 +7,7 @@ export type Action = {
 };
 
 export const initialState: State = {
-  currentStep: 'intro',
+  currentStep: 'otp',
 };
 
 export const reducer = (state: State, action: Action): State => {
