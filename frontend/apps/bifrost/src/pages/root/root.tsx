@@ -42,6 +42,7 @@ const Root = ({ variant }: RootProps) => {
     isComponentsSdk,
     sandboxOutcome: { overallOutcome, idDocOutcome } = {},
     sandboxId,
+    shouldRelayToComponents,
   } = state.context;
   const obConfigAuth = publicKey ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey } : undefined;
 
@@ -107,7 +108,7 @@ const Root = ({ variant }: RootProps) => {
       onRelayFromComponents: (cb: () => void) => fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
       relayToComponents: fpProvider.relayToComponents,
       componentsSdkType: isWebview ? ComponentsSdkTypes.MOBILE : ComponentsSdkTypes.WEB,
-      skipRelayToComponents: !!authToken,
+      skipRelayToComponents: !shouldRelayToComponents,
     };
   }
 

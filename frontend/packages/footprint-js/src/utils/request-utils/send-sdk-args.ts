@@ -52,6 +52,7 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       documentFixtureResult: props.sandboxOutcome?.documentOutcome,
       sandboxId: props.sandboxId,
       isComponentsSdk: kind === ComponentKind.Components,
+      shouldRelayToComponents: kind === ComponentKind.Components ? props.shouldRelayToComponents : undefined,
     };
   }
   if (kind === ComponentKind.UpdateLoginMethods) {

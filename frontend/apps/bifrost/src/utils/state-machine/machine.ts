@@ -71,6 +71,7 @@ export const createBifrostMachine = () =>
             fixtureResult,
             documentFixtureResult,
             sandboxId,
+            shouldRelayToComponents,
           } = event.payload;
 
           let sandboxOutcome = undefined;
@@ -101,6 +102,10 @@ export const createBifrostMachine = () =>
           context.sandboxOutcome = isUndefined(sandboxOutcome) ? context.sandboxOutcome : sandboxOutcome;
 
           context.sandboxId = isUndefined(sandboxId) ? context.sandboxId : sandboxId;
+
+          context.shouldRelayToComponents = isUndefined(shouldRelayToComponents)
+            ? context.shouldRelayToComponents
+            : shouldRelayToComponents;
 
           return context;
         }),

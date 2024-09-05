@@ -110,6 +110,7 @@ const Init = () => {
         fixtureResult,
         sandboxId,
         documentFixtureResult,
+        shouldRelayToComponents,
       } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       const isValidPredefinedSandboxId = sandboxId && isAlphanumeric(sandboxId);
@@ -135,6 +136,7 @@ const Init = () => {
           fixtureResult: fixtureResult as OverallOutcome,
           documentFixtureResult: documentFixtureResult as IdDocOutcome,
           sandboxId: isValidPredefinedSandboxId ? sandboxId : undefined,
+          shouldRelayToComponents,
         },
       });
     },

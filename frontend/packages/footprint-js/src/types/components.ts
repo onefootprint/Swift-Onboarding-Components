@@ -92,9 +92,10 @@ export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
 // The subset of VerifyProps that are sent to the iframe via sdk_args
 export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
   isComponentsSdk?: boolean;
+  shouldRelayToComponents?: boolean;
   fixtureResult?: OverallOutcome;
   documentFixtureResult?: IdDocOutcome;
-  readonly sandboxId?: string;
+  sandboxId?: string;
 };
 
 /** Components SDK. Just a subset of Verify */
@@ -102,6 +103,7 @@ export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey | VerifyAuthTok
   readonly onRelayToComponents?: (authToken: string) => void;
   readonly kind: `${ComponentKind.Components}`;
   readonly variant?: VerifyVariant;
+  readonly shouldRelayToComponents?: boolean;
 };
 
 /** verify-button */
