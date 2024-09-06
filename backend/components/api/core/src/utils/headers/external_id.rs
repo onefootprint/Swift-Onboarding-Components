@@ -1,28 +1,17 @@
 use super::get_header;
-use crate::ApiCoreError;
 use crate::ApiResponse;
 use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
-use lazy_static::lazy_static;
 use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::Parameter;
 use paperclip::v2::schema::Apiv2Schema;
 use paperclip::v2::schema::TypedData;
-use regex::Regex;
 use serde::Deserialize;
 use serde::Serialize;
 use std::pin::Pin;
-
-fn external_id_regex() -> Regex {
-    #[allow(clippy::unwrap_used)]
-    Regex::new(r"^([A-Za-z0-9\-_\.]+)$").unwrap()
-}
-
-lazy_static! {
-    pub static ref EXTERNAL_ID_CHARS: Regex = external_id_regex();
-}
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
 /// Attach a unique, client-generated `x-external-id` to the request
@@ -39,7 +28,7 @@ impl Apiv2Schema for ExternalId {
             paperclip::v2::models::Parameter::<DefaultSchemaRaw>{
                 name: "x-external-id".to_owned(),
                 in_: paperclip::v2::models::ParameterIn::Header,
-                description: Some("Optionally, this user's identifier in your own database. This will be associated with the user as their `external_id`, which is may be used in the future to look up a user in Footprint using your own user identifier. `x-external-id` must be globally unique to your organization. Note, if `x-external-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
+                description: Some("Optionally, this user's identifier in your own database. This will be associated with the user as their `external_id`, which is may be used in the future to look up a user in Footprint using your own user identifier. `x-external-id` must be globally unique to your organization. Can only be composed of alphanumeric characters, underscores, hyphens, and periods. Note, if `x-external-id` is provided, initial data may not be specified in the HTTP body.".to_string()),
                 data_type: Some(newtypes::ExternalId::data_type()),
                 format: newtypes::ExternalId::format(),
                 required: Self::required(),
@@ -54,21 +43,9 @@ impl ExternalId {
     const HEADER_NAME: &'static str = "x-external-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResponse<Self> {
-        let external_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
-            if id.len() < 10 || id.len() > 256 {
-                return Err(ApiCoreError::ValidationError(
-                    "External ID length is invalid. Must be between 10 and 256 characters.".into(),
-                ))?;
-            }
-            if !EXTERNAL_ID_CHARS.is_match(&id) {
-                return Err(ApiCoreError::ValidationError(
-                    "External ID is invalid. Must only include alphanumeric characters, -, _, or .".into(),
-                ))?;
-            }
-            Some(newtypes::ExternalId::from(id))
-        } else {
-            None
-        };
+        let external_id = get_header(Self::HEADER_NAME, headers)
+            .map(|id| newtypes::ExternalId::from_str(&id))
+            .transpose()?;
         Ok(Self(external_id))
     }
 }

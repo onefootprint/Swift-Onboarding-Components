@@ -714,6 +714,7 @@ mod tests {
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
     use macros::db_test;
+    use std::str::FromStr;
 
     #[db_test]
     fn test_create_scoped_vault_idempotency(conn: &mut TestPgConn) {
@@ -868,7 +869,9 @@ mod tests {
                 nva.clone(),
                 tenant.id.clone(),
                 test.create_1.idempotency_id.map(|s| s.into()),
-                test.create_1.external_id.map(|s| s.to_owned().into()),
+                test.create_1
+                    .external_id
+                    .map(|s| ExternalId::from_str(s).unwrap()),
                 DbActor::Footprint,
             )
             .unwrap_or_else(|e| panic!("{}: create 1 failed with error: {}", test.name, e,));
@@ -877,7 +880,9 @@ mod tests {
                 nva.clone(),
                 tenant.id.clone(),
                 test.create_2.idempotency_id.map(|s| s.into()),
-                test.create_2.external_id.map(|s| s.to_owned().into()),
+                test.create_2
+                    .external_id
+                    .map(|s| ExternalId::from_str(s).unwrap()),
                 DbActor::Footprint,
             )
             .unwrap_or_else(|e| panic!("{}: create 2 failed with error: {}", test.name, e,));
@@ -888,13 +893,17 @@ mod tests {
             }
             assert_eq!(
                 sv0.external_id,
-                test.expect_external_ids.0.map(|s| s.to_owned().into()),
+                test.expect_external_ids
+                    .0
+                    .map(|s| ExternalId::from_str(s).unwrap()),
                 "{}",
                 test.name
             );
             assert_eq!(
                 sv1.external_id,
-                test.expect_external_ids.1.map(|s| s.to_owned().into()),
+                test.expect_external_ids
+                    .1
+                    .map(|s| ExternalId::from_str(s).unwrap()),
                 "{}",
                 test.name
             );
@@ -922,7 +931,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             Some("idempotency-id-1".into()),
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap();
@@ -938,7 +947,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             Some("idempotency-id-1".into()),
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap_err();
@@ -949,7 +958,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             Some("idempotency-id-2".into()),
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap();
@@ -966,7 +975,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             None,
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap();
@@ -980,7 +989,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             None,
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap();
@@ -997,7 +1006,7 @@ mod tests {
             nva.clone(),
             tenant.id.clone(),
             None,
-            Some("external-id-1".to_owned().into()),
+            Some(ExternalId::from_str("external-id-1").unwrap()),
             DbActor::Footprint,
         )
         .unwrap();

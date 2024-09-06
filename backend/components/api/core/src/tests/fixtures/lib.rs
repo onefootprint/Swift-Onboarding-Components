@@ -44,7 +44,7 @@ pub fn create_user_and_populate_vault(
     ob_config: Option<ObConfiguration>,
     idks: Vec<IDK>,
 ) -> (Vault, Locked<ScopedVault>) {
-    let sandbox_id = (!is_live).then_some("#pass".to_string());
+    let sandbox_id = (!is_live).then_some("pass".to_string());
     let (uv, su) = if let Some(ob_config) = ob_config {
         let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true).into_inner();
         let uvid = uv.id.clone();

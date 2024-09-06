@@ -1,12 +1,16 @@
 mod alias;
 mod basic;
 mod data_lifetime;
+mod external_id;
 mod prefix;
+mod sandbox_id;
 mod scoped_vault_version_number;
 mod tenant_utils;
 pub use self::alias::*;
 pub use self::basic::*;
 pub use self::data_lifetime::*;
+pub use self::external_id::*;
+pub use self::sandbox_id::*;
 pub use self::scoped_vault_version_number::*;
 pub use self::tenant_utils::*;
 

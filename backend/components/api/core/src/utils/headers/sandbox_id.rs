@@ -10,6 +10,7 @@ use paperclip::v2::schema::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 use std::pin::Pin;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
 /// When provided, creates a sandbox user with the provided sandbox ID.
@@ -41,12 +42,9 @@ impl SandboxId {
     const HEADER_NAME: &'static str = "x-sandbox-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResponse<Self> {
-        let sandbox_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
-            let id = newtypes::SandboxId::parse(&id)?;
-            Some(id)
-        } else {
-            None
-        };
+        let sandbox_id = get_header(Self::HEADER_NAME, headers)
+            .map(|id| newtypes::SandboxId::from_str(&id))
+            .transpose()?;
         Ok(Self(sandbox_id))
     }
 }

@@ -6,6 +6,7 @@ use newtypes::Locked;
 use newtypes::SandboxId;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
+use std::str::FromStr;
 
 pub fn create_person(conn: &mut TxnPgConn, is_live: bool) -> Locked<Vault> {
     let sandbox_id = (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10));
@@ -23,7 +24,7 @@ pub fn new_vault_args(kind: VaultKind, sandbox_id: Option<String>, is_portable: 
         e_private_key: EncryptedVaultPrivateKey(e_private_key_bytes),
         public_key: VaultPublicKey::from_raw_uncompressed(&public_key_bytes).unwrap(),
         is_live: sandbox_id.is_none(),
-        sandbox_id: sandbox_id.map(SandboxId::from),
+        sandbox_id: sandbox_id.map(|s| SandboxId::from_str(&s).unwrap()),
         kind,
         is_fixture: false,
         is_created_via_api: !is_portable,

@@ -27,6 +27,7 @@ use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
+use std::str::FromStr;
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
@@ -274,9 +275,7 @@ fn vaults_matching_search(
             .get_results::<ScopedVaultId>(conn)?
     };
 
-    let external_id_results = {
-        let external_id: ExternalId = search.leak().to_owned().into();
-
+    let external_id_results = if let Ok(external_id) = ExternalId::from_str(search.leak()) {
         let id = ScopedVaultIdentifier::ExternalId {
             e_id: &external_id,
             t_id: tenant_id,
@@ -285,6 +284,8 @@ fn vaults_matching_search(
         let sv = ScopedVault::get(conn, id).optional()?;
 
         sv.into_iter().map(|sv| sv.id).collect_vec()
+    } else {
+        vec![]
     };
 
     tracing::info!(

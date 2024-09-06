@@ -21,7 +21,6 @@ define_newtype_id!(
     "Identifier for an org api key access log"
 );
 define_newtype_id!(VaultId, String, "Identifier for a User Vault");
-define_newtype_id!(SandboxId, String, "User-defined sandbox ID for a vault");
 define_newtype_id!(BoId, String, "Identifier for a business owner");
 define_newtype_id!(
     BoLinkId,
@@ -248,11 +247,6 @@ define_newtype_id!(
 );
 define_newtype_id!(RuleSetResultId, String, "Identifier for a RuleSetResult");
 define_newtype_id!(RuleResultId, String, "Identifier for a RuleResult");
-define_newtype_id!(
-    ExternalId,
-    String,
-    "Identifier for a external vault ID referencing footprint ID"
-);
 
 define_newtype_id!(LabelId, String, "Identifier for a footprint id label");
 define_newtype_id!(TagId, String, "Identifier for a footprint id tag");

@@ -99,6 +99,18 @@ def test_update_external_id(sandbox_tenant, url):
     body = patch(f"{url}/{fp_id2}", dict(external_id=external_id2), sandbox_tenant.s_sk)
     assert body["external_id"] == external_id2
 
+    # External ID must use valid characters
+    body = patch(
+        f"{url}/{fp_id2}",
+        dict(external_id="1234567890%!"),
+        sandbox_tenant.s_sk,
+        status_code=400,
+    )
+    assert (
+        "External ID is invalid. Must only include alphanumeric characters, -, _, or ."
+        in body["message"]
+    )
+
     # Cannot update the external ID to conflict
     body = patch(
         f"{url}/{fp_id2}",
