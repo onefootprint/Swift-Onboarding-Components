@@ -1716,7 +1716,7 @@ diesel::table! {
         insight_event_id -> Text,
         backup_state -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
-        scoped_vault_id -> Nullable<Text>,
+        scoped_vault_id -> Text,
     }
 }
 
@@ -1957,6 +1957,7 @@ diesel::joinable!(waterfall_execution -> decision_intent (decision_intent_id));
 diesel::joinable!(waterfall_step -> verification_result (verification_result_id));
 diesel::joinable!(waterfall_step -> waterfall_execution (execution_id));
 diesel::joinable!(webauthn_credential -> insight_event (insight_event_id));
+diesel::joinable!(webauthn_credential -> scoped_vault (scoped_vault_id));
 diesel::joinable!(webauthn_credential -> vault (vault_id));
 diesel::joinable!(workflow -> insight_event (insight_event_id));
 diesel::joinable!(workflow -> ob_configuration (ob_configuration_id));

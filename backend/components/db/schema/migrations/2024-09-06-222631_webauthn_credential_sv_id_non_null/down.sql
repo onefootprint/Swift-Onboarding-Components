@@ -1,0 +1,1 @@
+ALTER TABLE webauthn_credential ALTER COLUMN scoped_vault_id DROP NOT NULL;

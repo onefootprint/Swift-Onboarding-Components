@@ -2,6 +2,7 @@ use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserAuth;
 use crate::config::Config;
 use crate::FpResult;
+use api_errors::AssertionError;
 use api_errors::FpErrorCode;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
@@ -215,30 +216,31 @@ impl VerifyChallengeResult {
             attestation_data,
         } = self;
         let attestation_data = serde_cbor::to_vec(&attestation_data)?;
-        // Create a liveness event and timeline event
-        if let Some(su_id) = user_auth.scoped_user_id() {
-            if let Some(attributes) = liveness_event_attributes {
-                let liveness_event = NewLivenessEvent {
-                    scoped_vault_id: su_id.clone(),
-                    liveness_source: newtypes::LivenessSource::WebauthnAttestation,
-                    attributes: Some(attributes),
-                    insight_event_id: Some(ie_id.clone()),
-                    skip_context: None,
-                }
-                .insert(conn)?;
-                // create the timeline event for a liveness
-                let info = LivenessInfo {
-                    id: liveness_event.id,
-                };
-                UserTimeline::create(conn, info, vault_id.clone(), su_id)?;
+        let su_id = user_auth
+            .scoped_user_id()
+            .ok_or(AssertionError("No scoped vault available"))?;
+
+        if let Some(attributes) = liveness_event_attributes {
+            // Create a liveness event and timeline event
+            let liveness_event = NewLivenessEvent {
+                scoped_vault_id: su_id.clone(),
+                liveness_source: newtypes::LivenessSource::WebauthnAttestation,
+                attributes: Some(attributes),
+                insight_event_id: Some(ie_id.clone()),
+                skip_context: None,
             }
+            .insert(conn)?;
+            // create the timeline event for a liveness
+            let info = LivenessInfo {
+                id: liveness_event.id,
+            };
+            UserTimeline::create(conn, info, vault_id.clone(), su_id.clone())?;
         }
-        tracing::info!(has_su=%user_auth.scoped_user_id().is_some(), "Registering passkey");
 
         // Save the webauthn credential to the DB
         let public_key = crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?;
         let credential = NewWebauthnCredential {
-            scoped_vault_id: user_auth.scoped_user_id(),
+            scoped_vault_id: su_id,
             vault_id: vault_id.clone(),
             credential_id: cred.cred_id.0,
             public_key,

@@ -37,7 +37,7 @@ pub struct WebauthnCredential {
     pub insight_event_id: InsightEventId,
     pub backup_state: bool,
     pub deactivated_at: Option<DateTime<Utc>>,
-    pub scoped_vault_id: Option<ScopedVaultId>,
+    pub scoped_vault_id: ScopedVaultId,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -98,7 +98,7 @@ pub struct NewWebauthnCredential {
     pub attestation_type: AttestationType,
     pub insight_event_id: InsightEventId,
     pub backup_state: bool,
-    pub scoped_vault_id: Option<ScopedVaultId>,
+    pub scoped_vault_id: ScopedVaultId,
 }
 
 impl NewWebauthnCredential {
