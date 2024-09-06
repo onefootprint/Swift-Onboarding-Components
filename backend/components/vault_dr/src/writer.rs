@@ -24,6 +24,7 @@ use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use futures::StreamExt;
+use futures::TryStreamExt;
 use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::PiiString;
@@ -166,7 +167,7 @@ impl VaultDrWriter {
             "Encrypting and writing records to S3 in parallel"
         );
 
-        let mut blob_futs = vec![];
+        let mut blob_tasks = vec![];
         for (dl_id, pii) in pii_by_dl {
             let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
                 "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
@@ -177,14 +178,18 @@ impl VaultDrWriter {
                 .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
                 .clone();
 
-            let fut = self.encrypt_and_write_record_to_s3(fp_id, dl, pii);
-            blob_futs.push(fut);
+            let writer = self.clone();
+            let task =
+                tokio::task::spawn(
+                    async move { writer.encrypt_and_write_record_to_s3(fp_id, dl, pii).await },
+                );
+            blob_tasks.push(task);
         }
 
-        let new_blobs = futures::stream::iter(blob_futs)
+        let new_blobs = futures::stream::iter(blob_tasks)
             .buffer_unordered(concurrency_limit)
-            .collect::<Vec<FpResult<_>>>()
-            .await
+            .try_collect::<Vec<_>>()
+            .await?
             .into_iter()
             .collect::<FpResult<Vec<_>>>()?;
 
