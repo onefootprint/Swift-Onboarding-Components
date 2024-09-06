@@ -233,10 +233,12 @@ impl VerifyChallengeResult {
                 UserTimeline::create(conn, info, vault_id.clone(), su_id)?;
             }
         }
+        tracing::info!(has_su=%user_auth.scoped_user_id().is_some(), "Registering passkey");
 
         // Save the webauthn credential to the DB
         let public_key = crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?;
         let credential = NewWebauthnCredential {
+            scoped_vault_id: user_auth.scoped_user_id(),
             vault_id: vault_id.clone(),
             credential_id: cred.cred_id.0,
             public_key,

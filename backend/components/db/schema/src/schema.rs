@@ -1716,6 +1716,7 @@ diesel::table! {
         insight_event_id -> Text,
         backup_state -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
+        scoped_vault_id -> Nullable<Text>,
     }
 }
 

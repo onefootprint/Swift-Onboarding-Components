@@ -13,6 +13,7 @@ use diesel::Queryable;
 use diesel::RunQueryDsl;
 use newtypes::AttestationType;
 use newtypes::InsightEventId;
+use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
 
@@ -36,6 +37,7 @@ pub struct WebauthnCredential {
     pub insight_event_id: InsightEventId,
     pub backup_state: bool,
     pub deactivated_at: Option<DateTime<Utc>>,
+    pub scoped_vault_id: Option<ScopedVaultId>,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -96,6 +98,7 @@ pub struct NewWebauthnCredential {
     pub attestation_type: AttestationType,
     pub insight_event_id: InsightEventId,
     pub backup_state: bool,
+    pub scoped_vault_id: Option<ScopedVaultId>,
 }
 
 impl NewWebauthnCredential {
