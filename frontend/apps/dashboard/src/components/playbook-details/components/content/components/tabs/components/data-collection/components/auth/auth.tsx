@@ -21,7 +21,7 @@ const Auth = ({ requiredAuthMethods, mustCollectData, allowUsTerritoryResidents 
       />
       {hasAnyRequiredAuthMethods ? (
         <CollectedInformation
-          title={t('sign-in')}
+          title={t('otp')}
           options={{
             phoneOTP: requiredAuthMethods?.includes(AuthMethodKind.phone),
             emailOTP: requiredAuthMethods?.includes(AuthMethodKind.email),
