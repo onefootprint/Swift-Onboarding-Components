@@ -70,9 +70,8 @@ const Row = ({ playbook }: RowProps) => {
 
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
-    ${createFontStyles('body-3')};
+    ${createFontStyles('label-3')};
     color: ${theme.color.accent};
-    display: block;
     overflow: hidden;
     text-decoration: none;
     text-overflow: ellipsis;
