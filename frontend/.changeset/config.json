@@ -20,6 +20,7 @@
     "@onefootprint/test-utils",
     "@onefootprint/types",
     "@onefootprint/ui",
+    "pos",
     "auth",
     "bifrost",
     "components",
