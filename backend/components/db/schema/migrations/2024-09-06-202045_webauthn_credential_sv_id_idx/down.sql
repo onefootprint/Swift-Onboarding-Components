@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY webauthn_credential_scoped_vault_id ON webauthn_credential(scoped_vault_id);

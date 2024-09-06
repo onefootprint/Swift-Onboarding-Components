@@ -1,0 +1,2 @@
+ALTER TABLE webauthn_credential
+  DROP CONSTRAINT fk_webauthn_credential_scoped_vault_id;
