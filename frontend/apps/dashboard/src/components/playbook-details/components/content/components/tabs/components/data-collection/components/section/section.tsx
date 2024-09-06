@@ -1,25 +1,26 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { Divider, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 
-type BorderedSectionProps = { title?: string; children: React.ReactNode; type: 'withBorders' | 'default' };
+type BorderedSectionProps = {
+  title?: string;
+  children: React.ReactNode;
+  variant: 'default' | 'withDivider';
+};
 
-const Section = ({ title, type, children }: BorderedSectionProps) => {
-  if (type === 'withBorders') {
+const Section = ({ title, variant, children }: BorderedSectionProps) => {
+  if (variant === 'withDivider') {
     return (
-      <Box borderWidth={1} borderStyle="solid" borderRadius="default" borderColor="tertiary">
-        <Stack direction="column" gap={5}>
-          {!!title && (
-            <Box paddingInline={7} paddingBlock={5} borderBottomWidth={1} borderStyle="solid" borderColor="tertiary">
-              <Text variant="label-3" color="primary">
-                {title}
-              </Text>
-            </Box>
-          )}
-          <Stack direction="column" gap={7} paddingInline={7} paddingBottom={7}>
-            {children}
-          </Stack>
+      <Stack direction="column" gap={4} paddingBottom={7}>
+        {!!title && (
+          <Text variant="label-3" color="primary">
+            {title}
+          </Text>
+        )}
+        <Divider variant="secondary" />
+        <Stack direction="column" gap={7}>
+          {children}
         </Stack>
-      </Box>
+      </Stack>
     );
   }
 

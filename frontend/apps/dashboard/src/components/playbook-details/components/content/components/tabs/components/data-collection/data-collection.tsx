@@ -52,7 +52,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   return (
     <Stack direction="column" gap={5}>
       {isKYB && (
-        <Section title={t('kyb.business')} type="withBorders">
+        <Section title={t('kyb.business')} variant="withDivider">
           <CollectedInformation
             title={t('kyb.basic_information')}
             options={{
@@ -73,7 +73,10 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
           {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
         </Section>
       )}
-      <Section title={isKYB ? t('kyb.business_beneficial_owners') : undefined} type={isKYB ? 'withBorders' : 'default'}>
+      <Section
+        title={isKYB ? t('kyb.business_beneficial_owners') : undefined}
+        variant={isKYB ? 'withDivider' : 'default'}
+      >
         <Stack direction="column" gap={7}>
           <CollectedInformation
             title={t('sign-up-information')}
