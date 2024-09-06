@@ -502,7 +502,4 @@ pub struct VaultDrConfig {
     pub aws_access_key_id: Option<PiiString>,
     #[envconfig(from = "VAULT_DR_AWS_SECRET_ACCESS_KEY")]
     pub aws_secret_access_key: Option<PiiString>,
-
-    #[envconfig(from = "VAULT_DR_RECORD_TASK_CONCURRENCY", default = "64")]
-    pub record_task_concurrency: usize,
 }

@@ -1,5 +1,6 @@
 use crate::AgeEncryptor;
 use crate::Error;
+use crate::Knobs;
 use crate::PublicKey;
 use crate::PublicKeySet;
 use crate::VaultDrAwsConfig;
@@ -49,6 +50,8 @@ pub struct VaultDrWriter {
 
     org_public_keys: PublicKeySet,
     recovery_public_key: PublicKey,
+
+    knobs: Knobs,
 }
 
 pub struct EncryptedRecord {
@@ -58,7 +61,7 @@ pub struct EncryptedRecord {
 }
 
 impl VaultDrWriter {
-    pub async fn new(state: &State, config_id: &VaultDrConfigId) -> FpResult<Self> {
+    pub async fn new(state: &State, config_id: &VaultDrConfigId, knobs: Knobs) -> FpResult<Self> {
         let state_config = state.config.vault_dr_config.clone();
 
         let config_id_0 = config_id.clone();
@@ -114,6 +117,7 @@ impl VaultDrWriter {
             bucket_path_namespace,
             org_public_keys,
             recovery_public_key,
+            knobs,
         };
 
         writer.aws_config.validate().await?;
@@ -121,15 +125,11 @@ impl VaultDrWriter {
         Ok(writer)
     }
 
-    pub async fn write_blobs_batch(
-        &self,
-        state: &State,
-        batch_size: u32,
-        fp_id_filter: Option<Vec<FpId>>,
-    ) -> FpResult<u32> {
+    pub async fn write_blobs_batch(&self, state: &State, fp_id_filter: Option<Vec<FpId>>) -> FpResult<u32> {
         let tenant_id = self.tenant_id.clone();
         let config_id = self.config_id.clone();
         let is_live = self.is_live;
+        let batch_size = self.knobs.batch_size;
 
         let (dls, sv_id_to_fp_id) = state
             .db_pool
@@ -157,7 +157,7 @@ impl VaultDrWriter {
         let pii_by_dl = bulk_decrypt_dls_unchecked(state, &self.tenant_id, self.is_live, &dls_by_id).await?;
 
         // Encrypt and write records to S3 in parallel tasks.
-        let concurrency_limit = state.config.vault_dr_config.record_task_concurrency;
+        let concurrency_limit = self.knobs.record_task_concurrency;
         tracing::info!(
             config_id=%self.config_id,
             tenant_id=%self.tenant_id,

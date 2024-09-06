@@ -203,6 +203,7 @@ config:
           - vault-dr-worker
           - --batch-size=1000
           - --poll-period-ms=5000
+          - --record-task-concurrency=256
         cpuUnits: 2048
         memoryMB: 4096
         name: vault-dr

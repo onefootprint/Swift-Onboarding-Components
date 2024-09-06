@@ -4,9 +4,24 @@ use api_core::State;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::VaultDrConfigId;
 
+#[derive(Debug, Clone, Copy)]
+pub struct Knobs {
+    pub batch_size: u32,
+    pub record_task_concurrency: usize,
+}
+
+impl Default for Knobs {
+    fn default() -> Self {
+        Self {
+            batch_size: 1000,
+            record_task_concurrency: 64,
+        }
+    }
+}
+
 // For each enrolled tenant, encrypt and write up to `batch_size` records to Vault DR buckets.
 // Errors returned from this function cause the worker to shut down.
-pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
+pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
     let configs = state.db_pool.db_query(VaultDrConfig::list).await?;
 
     for config in configs {
@@ -21,17 +36,17 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
             %config_id,
             %tenant_id,
             is_live,
-            batch_size,
+            ?knobs,
             "Starting batch for config"
         );
-        let result = run_batch_for_config(state, batch_size, &config_id).await;
+        let result = run_batch_for_config(state, knobs, &config_id).await;
         match result {
             Ok(_) => {
                 tracing::info!(
                     %config_id,
                     %tenant_id,
                     is_live,
-                    batch_size,
+                    ?knobs,
                     "Batch completed for config"
                 );
             }
@@ -40,7 +55,7 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
                     %config_id,
                     %tenant_id,
                     is_live,
-                    batch_size,
+                    ?knobs,
                     ?error,
                     "Batch failed for config"
                 );
@@ -52,10 +67,10 @@ pub async fn run_batch(state: &State, batch_size: u32) -> FpResult<()> {
 }
 
 
-async fn run_batch_for_config(state: &State, batch_size: u32, config_id: &VaultDrConfigId) -> FpResult<()> {
-    let vdr_writer = VaultDrWriter::new(state, config_id).await?;
+async fn run_batch_for_config(state: &State, knobs: Knobs, config_id: &VaultDrConfigId) -> FpResult<()> {
+    let vdr_writer = VaultDrWriter::new(state, config_id, knobs).await?;
 
-    vdr_writer.write_blobs_batch(state, batch_size, None).await?;
+    vdr_writer.write_blobs_batch(state, None).await?;
 
     Ok(())
 }

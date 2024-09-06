@@ -11,15 +11,19 @@ use tokio::time::{
 };
 use tracing::error;
 use tracing::info;
+use vault_dr::Knobs;
 
 
 #[derive(Parser, Debug)]
 pub struct VaultDrWorker {
     #[arg(long)]
+    pub poll_period_ms: u64,
+
+    #[arg(long)]
     pub batch_size: u32,
 
     #[arg(long)]
-    pub poll_period_ms: u64,
+    pub record_task_concurrency: usize,
 }
 
 impl VaultDrWorker {
@@ -69,9 +73,16 @@ impl VaultDrWorker {
         Ok(())
     }
 
+    fn knobs(&self) -> Knobs {
+        Knobs {
+            batch_size: self.batch_size,
+            record_task_concurrency: self.record_task_concurrency,
+        }
+    }
+
     #[tracing::instrument("VaultDrWorker::run_batch", skip_all)]
     async fn run_batch(&self, state: &State) -> Result<()> {
-        vault_dr::run_batch(state, self.batch_size)
+        vault_dr::run_batch(state, self.knobs())
             .await
             .map_err(|err| anyhow!("{}", err).context("VaultDrWorker::run_batch"))?;
 
