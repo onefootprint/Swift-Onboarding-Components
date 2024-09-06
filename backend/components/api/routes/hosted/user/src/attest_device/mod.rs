@@ -5,6 +5,7 @@ use crate::State;
 use actix_web::web::Json;
 use api_core::decision::vendor;
 use api_core::decision::vendor::fp_device_attestation::AttestationResult;
+use api_core::telemetry::RootSpan;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
@@ -53,8 +54,12 @@ pub async fn post_challenge(
     request: Json<GetDeviceAttestationChallengeRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    root_span: RootSpan,
 ) -> ApiResponse<DeviceAttestationChallengeResponse> {
-    let _ = user_auth.check_guard(UserAuthScope::SignUp)?;
+    let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    // TODO migrate this to use UserWfAuthContext
+    let has_wf = auth.workflow_id().map(|_| "has_wf").unwrap_or("no_wf");
+    root_span.record("meta", has_wf);
     let GetDeviceAttestationChallengeRequest {
         device_type,
         ios_bundle_id,
@@ -83,7 +88,7 @@ pub async fn post_challenge(
 }
 
 /// receive the attestation
-#[tracing::instrument(skip(state, user_auth))]
+#[tracing::instrument(skip(state, user_auth, root_span))]
 #[api_v2_operation(
     tags(Hosted),
     description = "Parses and accepts a user's onboarding device attestation"
@@ -94,8 +99,12 @@ pub async fn post_attestation(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
+    root_span: RootSpan,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    // TODO migrate this to use UserWfAuthContext
+    let has_wf = auth.workflow_id().map(|_| "has_wf").unwrap_or("no_wf");
+    root_span.record("meta", has_wf);
 
     let CreateDeviceAttestationRequest {
         attestation,
@@ -138,6 +147,7 @@ pub async fn post_attestation(
                     let attestation = new_attestation.create(conn.conn())?;
 
                     // if we have a scoped vault (which we should always have in an onboarding)
+                    // TODO dedupliate this code
                     if let Some(scoped_vault_id) = scoped_vault_id {
                         // generate risk signals
                         vendor::fp_device_attestation::save_vendor_result_and_risk_signals(
