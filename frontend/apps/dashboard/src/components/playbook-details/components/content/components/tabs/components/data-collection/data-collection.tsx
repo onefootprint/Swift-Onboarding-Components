@@ -3,9 +3,10 @@ import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import AdditionalDocs from '../../../additional-docs';
+import Global from '../../../global';
 import Auth from './components/auth';
-import GovDocs from './components/gov-docs';
 import Section from './components/section';
+import SingleItem from './components/single-item';
 
 export type DataCollectionProps = {
   playbook: OnboardingConfig;
@@ -18,7 +19,6 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
     allowInternationalResidents,
     allowUsResidents,
     allowUsTerritoryResidents,
-    internationalCountryRestrictions,
     mustCollectData,
     documentTypesAndCountries,
     optionalData = [],
@@ -76,7 +76,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
       <Section title={isKYB ? t('kyb.business_beneficial_owners') : undefined} type={isKYB ? 'withBorders' : 'default'}>
         <Stack direction="column" gap={7}>
           <CollectedInformation
-            title={t('basic-information')}
+            title={t('sign-up-information')}
             options={{
               name: mustCollectData.includes('name'),
               email: mustCollectData.includes('email'),
@@ -110,23 +110,13 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
               }}
             />
           ) : (
-            <CollectedInformation title={t('us-residents.title')} subtitle={t('us-residents.empty')} />
+            <SingleItem name="usResidents" value={false} />
           )}
-          {allowInternationalResidents ? (
-            <CollectedInformation
-              title={t('non-us-residents.title')}
-              options={{
-                internationalCountryRestrictions,
-              }}
-            />
-          ) : (
-            <CollectedInformation title={t('non-us-residents.title')} subtitle={t('non-us-residents.empty')} />
-          )}
+          <SingleItem name="nonUSResidents" value={allowInternationalResidents} />
           {hasInvestorProfile && (
             <CollectedInformation title={t('investor_profile.title')} subtitle={t('investor_profile.subtitle')} />
           )}
-          <GovDocs
-            countrySpecific={documentTypesAndCountries?.countrySpecific || {}}
+          <Global
             global={documentTypesAndCountries?.global || []}
             hasSelfie={mustCollectData.includes('document_selfie')}
           />

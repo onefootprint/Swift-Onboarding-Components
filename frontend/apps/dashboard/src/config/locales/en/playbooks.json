@@ -473,17 +473,22 @@
     },
     "data-collection": {
       "section-title": "Data collection",
+      "sign-up-information": "Sign up information",
       "basic-information": "Basic information",
       "otp": "OTP (One Time Password) verifications",
       "sign-up": "Sign up information",
       "sign-in": "Sign in methods",
       "us-residents": {
+        "enabled": "U.S. residents are allowed to be onboarded",
+        "disabled": "U.S. residents aren't allowed to be onboarded",
         "title": "U.S. residents",
         "empty": "U.S. residents aren't allowed to be onboarded."
       },
       "non-us-residents": {
         "title": "Non-U.S. residents",
-        "empty": "Non-U.S. residents aren't allowed to be onboarded."
+        "empty": "Non-U.S. residents aren't allowed to be onboarded.",
+        "enabled": "Non-U.S. residents are allowed to be onboarded",
+        "disabled": "Non-U.S. residents are not allowed to be onboarded"
       },
       "us-territories": {
         "label": "Note:",

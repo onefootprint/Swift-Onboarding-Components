@@ -1,13 +1,11 @@
 import { IcoCheckSmall24, IcoCloseSmall24 } from '@onefootprint/icons';
-import { Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import type { Option } from '../../collected-information.types';
 
-type DisplayValueProps<K extends keyof Option = keyof Option> = {
-  name: K;
-  value: Option[K];
+type DisplayValueProps = {
+  name: keyof Option;
+  value: Option[keyof Option];
 };
 
 const DisplayValue = ({ name, value }: DisplayValueProps) => {
@@ -20,11 +18,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   if (name === 'ssn') {
     const ssnValue = value as NonNullable<Option['ssn']>;
     if (ssnValue.active) {
-      return (
-        <Text variant="body-3">
-          {t(`${ssnValue.kind}` as ParseKeys<'common'>)} {ssnValue.optional ? t('optional') : ''}
-        </Text>
-      );
+      return <IcoCheckSmall24 aria-label={t('enabled')} />;
     }
     return <IcoCloseSmall24 />;
   }

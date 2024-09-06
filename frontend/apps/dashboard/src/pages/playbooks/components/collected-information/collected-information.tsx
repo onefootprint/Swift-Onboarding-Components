@@ -1,14 +1,10 @@
 import { Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
-import kebabCase from 'lodash/kebabCase';
-import type { ComponentProps } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { Option } from './collected-information.types';
 import DisplayValue from './components/display-value';
-
-type DisplayValueProps = ComponentProps<typeof DisplayValue>;
+import Label from './components/label';
+import useInfoLabel from './hooks/use-info-label';
 
 type CollectedInformationProps = {
   title?: string;
@@ -17,9 +13,7 @@ type CollectedInformationProps = {
 };
 
 const CollectedInformation = ({ title, subtitle, options }: CollectedInformationProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.collected-data',
-  });
+  const getLabel = useInfoLabel();
 
   return (
     <Container>
@@ -28,22 +22,22 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
+            const typedName = name as keyof Option;
+            const typedValue = value as Option[keyof Option];
             return (
-              <OptionItem key={name} role="row" aria-label={t(kebabCase(name) as ParseKeys<'common'>)}>
-                <Label variant="body-3" color="tertiary">
-                  {t(kebabCase(name) as ParseKeys<'common'>)}
-                </Label>
-                <DisplayValue name={name as DisplayValueProps['name']} value={value} />
+              <OptionItem key={name} role="row" aria-label={getLabel(typedName)}>
+                <DisplayValue name={typedName} value={typedValue} />
+                <Label name={typedName} value={typedValue} />
               </OptionItem>
             );
           })}
         </OptionsContainer>
       )}
-      {subtitle ? (
+      {subtitle && (
         <Text color="tertiary" variant="body-3">
           {subtitle}
         </Text>
-      ) : null}
+      )}
     </Container>
   );
 };
@@ -52,7 +46,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[5]};
+    gap: ${theme.spacing[3]};
   `}
 `;
 
@@ -69,16 +63,11 @@ const OptionItem = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacing[10]};
+    gap: ${theme.spacing[3]};
     height: ${theme.spacing[7]};
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
   `}
-`;
-
-const Label = styled(Text)`
-  white-space: nowrap;
-  text-align: right;
 `;
 
 export default CollectedInformation;
