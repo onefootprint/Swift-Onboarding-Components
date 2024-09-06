@@ -188,12 +188,12 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           title: const Text('Onboarding Components'),
         ),
         body: FootprintProvider(
-          publicKey: "pb_test_PfC6ts7Tnc17nmWO01jLBJ",
+          publicKey: "pb_test_tO6WpT0Tgrw2ZWNZOw0bZB",
           redirectUrl: "com.footprint.fluttersdk://example",
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "sandbox123",
+          sandboxId: "3ruc9MwH2LRm9",
           child: Container(
             alignment: Alignment.center,
             decoration: const BoxDecoration(
@@ -322,7 +322,15 @@ class _IdentifyState extends State<Identify> {
           if (!isChallengeCreated) {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
-            });
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  onAuthenticated: widget
+                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -394,7 +402,16 @@ class _IdentifyState extends State<Identify> {
               )
                   .then((challegeKind) {
                 handleChallengeCreated(challegeKind);
-              });
+              }).catchError(
+                (_) {
+                  footprintUtils(context).launchIdentify(
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    onAuthenticated: widget.handleAuthenticated,
+                  );
+                },
+                test: (err) => err is InlineOtpNotSupportedException,
+              );
             },
           );
         }

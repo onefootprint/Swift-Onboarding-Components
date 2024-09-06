@@ -100,16 +100,29 @@ typedef HandoffHandler = void Function({
     void Function(Object err)? onError,
     void Function()? onCancel,
   }) {
-    if (email == null || phoneNumber == null) {
-      onError?.call(
-          'Email and Phone Number are required. Email: $email, Phone Number: $phoneNumber');
-      return;
-    }
     final publicKey = ref.read(fpContextNotifierProvider).publicKey;
     final redirectUrl = ref.read(fpContextNotifierProvider).redirectUrl;
     final sandboxOutcome = ref.read(fpContextNotifierProvider).sandboxOutcome;
     final sandboxId = ref.read(fpContextNotifierProvider).sandboxId;
     final appearance = ref.read(fpContextNotifierProvider).appearance;
+    final authToken = ref.read(fpContextNotifierProvider).authToken;
+
+    final hasEmailAndPhone = email != null && phoneNumber != null;
+    final hasAuthToken = authToken != null;
+
+    if (!hasEmailAndPhone && !hasAuthToken) {
+      onError?.call(
+        Exception('Please provide either email and phone or an auth token.'),
+      );
+      return;
+    }
+
+    if (hasEmailAndPhone && hasAuthToken) {
+      onError?.call(
+        Exception('Please provide either email and phone or an auth token.'),
+      );
+      return;
+    }
 
     final data = FormData(email: email, phoneNumber: phoneNumber);
 
@@ -121,6 +134,7 @@ typedef HandoffHandler = void Function({
         sandboxOutcome: sandboxOutcome,
         sandboxId: sandboxId,
         shouldRelayToComponents: true,
+        authToken: authToken,
         onAuthComplete: (
             {required String authToken, required String vaultingToken}) {
           onAuthenticated?.call();
