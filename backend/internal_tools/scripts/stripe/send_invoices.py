@@ -11,6 +11,9 @@ load_dotenv()
 stripe.api_key = os.environ["STRIPE_API_KEY"]
 
 
+SMALL_INVOICE_NOTIONAL_CENTS = 500_00
+
+
 def dollar_fmt(amount_cents: int):
     return f"${(amount_cents / 100):,.2f}"
 
@@ -68,9 +71,11 @@ def print_invoice_comparison(invoice: stripe.Invoice):
     )
 
     # Fetch the line items for each invoice
-    get_lis = lambda id: stripe.Invoice.list_lines(id, expand=["data.price.product"])
-    this_month = get_lis(invoice.id).data
-    last_month = get_lis(last_month_invoice.id).data if last_month_invoice else []
+    get_lis = lambda id: reversed(
+        stripe.Invoice.list_lines(id, expand=["data.price.product"]).data
+    )
+    this_month = get_lis(invoice.id)
+    last_month = get_lis(last_month_invoice.id) if last_month_invoice else []
 
     get_li = lambda lines, product_name: next(
         (li for li in lines if li.price.product.name == product_name), None
@@ -176,12 +181,30 @@ def send_invoice(invoice: stripe.Invoice):
         if item.amount == 0:
             print(f"Deleting 0c item {item.id}. Invoice ID: {invoice.id}")
             stripe.InvoiceItem.delete(item.id)
+
+    payment_methods = ["ach_credit_transfer", "us_bank_account"]
+    if invoice.total < SMALL_INVOICE_NOTIONAL_CENTS:
+        # For small invoices, let tenants pay via card
+        payment_methods.append("card")
+        payment_methods.append("cash_app")
+
+    # TODO next month: some of these might fail for customers that don't have a billing email
+    invoice_update = dict(
+        # These settings are also set by the backend when the customer has an email associated with their
+        # profile. But if the user's email is added after the invoice is generated, these settings need
+        # to all be set manually...
+        collection_method="send_invoice",
+        days_until_due=30,
+        payment_settings=dict(payment_method_types=payment_methods),
+    )
     if invoice.customer_email:
-        print("Setting auto advance to true...")
-        stripe.Invoice.modify(invoice.id, auto_advance=True)
+        invoice_update["auto_advance"] = True
+    print("Setting invoice settings...")
+    stripe.Invoice.modify(invoice.id, **invoice_update)
 
     print("Finalizing invoice...")
     stripe.Invoice.finalize_invoice(invoice.id)
+
     print(
         colored(
             f"Invoice finalized! https://dashboard.stripe.com/invoices/{invoice.id}",
