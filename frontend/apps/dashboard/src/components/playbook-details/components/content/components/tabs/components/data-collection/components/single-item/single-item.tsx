@@ -3,7 +3,7 @@ import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-export type SingleItemType = 'usResidents' | 'nonUSResidents';
+export type SingleItemType = 'usResidents' | 'nonUSResidents' | 'investorProfile';
 
 type SingleItemProps = {
   name: SingleItemType;
@@ -23,6 +23,11 @@ const SingleItem = ({ name, value }: SingleItemProps) => {
       title: t('non-us-residents.title'),
       enabled: t('non-us-residents.enabled'),
       disabled: t('non-us-residents.disabled'),
+    },
+    investorProfile: {
+      title: t('investor_profile.title'),
+      enabled: t('investor_profile.enabled'),
+      disabled: t('investor_profile.disabled'),
     },
   };
 

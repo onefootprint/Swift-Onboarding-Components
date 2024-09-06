@@ -17,7 +17,7 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
 
   return (
     <Container>
-      {title && <Text variant="label-3">{title}</Text>}
+      {title && <Text variant="label-4">{title}</Text>}
       {options && (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {

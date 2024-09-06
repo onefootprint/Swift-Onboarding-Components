@@ -501,7 +501,8 @@
       "last4_optional": "Last 4 (Optional)",
       "investor_profile": {
         "title": "Investor profile questions",
-        "subtitle": "Investor profiling questions will be part of the onboarding process."
+        "enabled": "Investor profiling questions will be part of the onboarding process.",
+        "disabled": "Investor profiling questions will not be part of the onboarding process."
       },
       "kyb": {
         "business": "Business information",

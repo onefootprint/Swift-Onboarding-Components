@@ -3,6 +3,7 @@ import { AuthMethodKind, type OnboardingConfig } from '@onefootprint/types';
 import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import AdditionalDocs from '../../../additional-docs';
+import CountrySpecific from '../../../country-specific';
 import Global from '../../../global';
 import Auth from './components/auth';
 import Section from './components/section';
@@ -116,13 +117,13 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
             <SingleItem name="usResidents" value={false} />
           )}
           <SingleItem name="nonUSResidents" value={allowInternationalResidents} />
-          {hasInvestorProfile && (
-            <CollectedInformation title={t('investor_profile.title')} subtitle={t('investor_profile.subtitle')} />
+          {hasInvestorProfile && <SingleItem name="investorProfile" value={hasInvestorProfile} />}
+          {documentTypesAndCountries?.global && (
+            <Global global={documentTypesAndCountries.global} hasSelfie={mustCollectData.includes('document_selfie')} />
           )}
-          <Global
-            global={documentTypesAndCountries?.global || []}
-            hasSelfie={mustCollectData.includes('document_selfie')}
-          />
+          {documentTypesAndCountries?.countrySpecific && (
+            <CountrySpecific countrySpecific={documentTypesAndCountries.countrySpecific} />
+          )}
           {hasKYCDocsToCollect && <AdditionalDocs docs={documentsToCollect} />}
         </Stack>
       </Section>
