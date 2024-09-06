@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 7.2.0
+
+### Minor Changes
+
+- 93273e2f20: Fix relay to components
+
+### Patch Changes
+
+- Updated dependencies [93273e2f20]
+  - @onefootprint/footprint-js@3.15.0
+
 ## 7.1.0
 
 ### Patch Changes

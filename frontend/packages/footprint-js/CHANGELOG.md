@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.15.0
+
+### Minor Changes
+
+- 93273e2f20: Fix relay to components
+
 ## 3.14.2
 
 ### Patch Changes
