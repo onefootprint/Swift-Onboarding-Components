@@ -33,7 +33,6 @@ const EndpointsOverview = ({ apiArticles }: EndpointsOverviewProps) => {
           .filter(article => !article.api.isHidden)
           .map(article => (
             <Link
-              id={article.api.id}
               to={article.api.id}
               containerId={ARTICLES_CONTAINER_ID}
               href={`#${article.api.id}`}
