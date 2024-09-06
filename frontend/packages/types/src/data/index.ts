@@ -124,6 +124,7 @@ export type {
   PhoneIdentifier,
 } from './identifier';
 export type { InsightEvent } from './insight-event';
+export type { InProgressOnboarding } from './in-progress-onboarding';
 export {
   InvestorProfileAnnualIncome,
   InvestorProfileDeclaration,

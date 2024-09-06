@@ -322,6 +322,7 @@ export type {
   Identifier,
   IdvBootstrapData,
   IdvOptions,
+  InProgressOnboarding,
   InsightEvent,
   InvestorProfileData,
   InvokeVaultProxyRoleScope,
