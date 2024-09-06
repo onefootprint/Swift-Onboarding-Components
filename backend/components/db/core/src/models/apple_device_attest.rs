@@ -22,7 +22,7 @@ use serde::Serialize;
 pub struct AppleDeviceAttestation {
     pub id: AppleDeviceAttestationId,
     pub vault_id: VaultId,
-    pub metadata: AppleDeviceMetadata,
+    pub metadata: DeviceMetadata,
     pub receipt: Vec<u8>,
     pub raw_attestation: Vec<u8>,
 
@@ -50,7 +50,7 @@ pub struct AppleDeviceAttestation {
 /// This is a custom metadata object that comes from the device
 #[derive(Debug, Serialize, Deserialize, Clone, AsJsonb, Eq, PartialEq, Hash, Default)]
 #[serde(rename_all = "snake_case")]
-pub struct AppleDeviceMetadata {
+pub struct DeviceMetadata {
     pub model: Option<String>,
     pub os: Option<String>,
 }
@@ -59,7 +59,7 @@ pub struct AppleDeviceMetadata {
 #[diesel(table_name = apple_device_attestation)]
 pub struct NewAppleDeviceAttestation {
     pub vault_id: VaultId,
-    pub metadata: AppleDeviceMetadata,
+    pub metadata: DeviceMetadata,
     pub receipt: Vec<u8>,
     pub raw_attestation: Vec<u8>,
 

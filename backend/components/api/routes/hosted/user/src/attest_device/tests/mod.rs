@@ -29,7 +29,7 @@ qriAvCkH
     )
     .unwrap();
     let vault_id = VaultId::test_data("test".into());
-    attest_ios(vault_id, &verifier, "".into(), test_attestation.into(), vec![])
+    attest_ios(&vault_id, &verifier, "".into(), test_attestation.into(), vec![])
         .await
         .expect("failed attest");
 }
@@ -56,7 +56,7 @@ qriAvCkH
     )
     .unwrap();
     let vault_id = VaultId::test_data("test".into());
-    let res = attest_ios(vault_id, &verifier, "".into(), test_attestation.into(), vec![])
+    let res = attest_ios(&vault_id, &verifier, "".into(), test_attestation.into(), vec![])
         .await
         .expect("failed attest");
 

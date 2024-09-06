@@ -39,8 +39,7 @@ use std::str::FromStr;
 
 #[api_v2_operation(
     tags(Identify, Hosted),
-    description = "Tries to identify an existing user by either phone number or email. If the user \
-    is found, returns available challenge kinds."
+    description = "Tries to identify an existing user by either phone number or email. If the user is found, returns available challenge kinds."
 )]
 #[actix::post("/hosted/identify")]
 pub async fn post(

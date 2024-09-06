@@ -9,7 +9,7 @@ use app_attest::google::IntegrityVerdictWithRawResponse;
 use app_attest::google::PlayIntegrityTokenError;
 use chrono::Utc;
 use crypto::base64;
-use db::models::google_device_attest::GoogleDeviceMetadata;
+use db::models::apple_device_attest::DeviceMetadata;
 use db::models::google_device_attest::NewGoogleDeviceAttestation;
 use db::models::tenant::Tenant;
 use db::models::tenant_android_app_meta::TenantAndroidAppFilters;
@@ -52,7 +52,7 @@ struct AttestedMetadata {
 pub(super) async fn attest(
     state: &State,
     tenant: &Tenant,
-    vault_id: VaultId,
+    vault_id: &VaultId,
     challenge: String,
     attestation: String,
     package_name: Option<String>,
@@ -118,7 +118,7 @@ pub(super) async fn attest(
 
 #[tracing::instrument(skip_all)]
 pub(super) async fn attest_inner(
-    vault_id: VaultId,
+    vault_id: &VaultId,
     verifier: &GoogleAppAttestationVerifier,
     challenge: String,
     attestation: String,
@@ -164,8 +164,8 @@ pub(super) async fn attest_inner(
         });
 
     Ok(NewGoogleDeviceAttestation {
-        vault_id,
-        metadata: GoogleDeviceMetadata {
+        vault_id: vault_id.clone(),
+        metadata: DeviceMetadata {
             model: attested_metadata.model,
             os: attested_metadata.os,
         },

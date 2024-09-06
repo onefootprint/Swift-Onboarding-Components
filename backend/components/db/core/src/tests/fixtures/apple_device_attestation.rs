@@ -1,5 +1,5 @@
 use crate::models::apple_device_attest::AppleDeviceAttestation;
-use crate::models::apple_device_attest::AppleDeviceMetadata;
+use crate::models::apple_device_attest::DeviceMetadata;
 use crate::models::apple_device_attest::NewAppleDeviceAttestation;
 use crate::TxnPgConn;
 use chrono::Utc;
@@ -9,7 +9,7 @@ use newtypes::VaultId;
 pub fn create(conn: &mut TxnPgConn, vault_id: &VaultId) -> AppleDeviceAttestation {
     NewAppleDeviceAttestation {
         vault_id: vault_id.clone(),
-        metadata: AppleDeviceMetadata {
+        metadata: DeviceMetadata {
             model: Some("iPhone 15".to_owned()),
             os: Some("iOS".to_owned()),
         },

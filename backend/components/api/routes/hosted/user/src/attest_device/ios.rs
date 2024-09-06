@@ -2,7 +2,7 @@ use crate::State;
 use api_core::FpResult;
 use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
-use db::models::apple_device_attest::AppleDeviceMetadata;
+use db::models::apple_device_attest::DeviceMetadata;
 use db::models::apple_device_attest::NewAppleDeviceAttestation;
 use db::models::tenant::Tenant;
 use db::models::tenant_ios_app_meta::TenantIosAppFilters;
@@ -38,7 +38,7 @@ struct AttestedMetadata {
 pub(super) async fn attest(
     state: &State,
     tenant: &Tenant,
-    vault_id: VaultId,
+    vault_id: &VaultId,
     challenge: String,
     attestation: String,
     app_bundle_id: Option<String>,
@@ -96,7 +96,7 @@ pub(super) async fn attest(
 
 #[tracing::instrument(skip_all)]
 pub(super) async fn attest_inner(
-    vault_id: VaultId,
+    vault_id: &VaultId,
     verifier: &AppleAppAttestationVerifier,
     challenge: String,
     attestation: String,
@@ -137,12 +137,12 @@ pub(super) async fn attest_inner(
     };
 
     Ok(NewAppleDeviceAttestation {
-        vault_id,
+        vault_id: vault_id.clone(),
         webauthn_credential_id: super::util::link_webauthn_credential(
             webauthn_creds,
             attested_metadata.webauthn_device_response_json,
         )?,
-        metadata: AppleDeviceMetadata {
+        metadata: DeviceMetadata {
             model: attested_metadata.model,
             os: attested_metadata.os,
         },

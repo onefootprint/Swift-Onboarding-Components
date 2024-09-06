@@ -3,6 +3,7 @@ use crate::decision;
 use crate::decision::vendor;
 use crate::FpResult;
 use db::models::apple_device_attest::AppleDeviceAttestation;
+use db::models::apple_device_attest::DeviceMetadata;
 use db::models::decision_intent::DecisionIntent;
 use db::models::google_device_attest::GoogleDeviceAttestation;
 use db::models::risk_signal::RiskSignal;
@@ -13,16 +14,51 @@ use idv::footprint::FootprintDeviceAttestationData;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::DecisionIntentKind;
+use newtypes::LivenessIssuer;
+use newtypes::LivenessSource;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
+use newtypes::WebauthnCredentialId;
 use newtypes::WorkflowId;
 
-pub enum AttestationResult<'a> {
-    Apple(&'a AppleDeviceAttestation),
-    Google(&'a GoogleDeviceAttestation),
+#[derive(derive_more::From)]
+#[allow(clippy::large_enum_variant)]
+pub enum AttestationResult {
+    Apple(AppleDeviceAttestation),
+    Google(GoogleDeviceAttestation),
+}
+
+impl AttestationResult {
+    pub fn liveness_source(&self) -> LivenessSource {
+        match self {
+            Self::Apple(_) => LivenessSource::AppleDeviceAttestation,
+            Self::Google(_) => LivenessSource::GoogleDeviceAttestation,
+        }
+    }
+
+    pub fn liveness_issuer(&self) -> LivenessIssuer {
+        match self {
+            Self::Apple(_) => LivenessIssuer::Apple,
+            Self::Google(_) => LivenessIssuer::Google,
+        }
+    }
+
+    pub fn webauthn_credential_id(&self) -> Option<&WebauthnCredentialId> {
+        match self {
+            Self::Apple(attestation) => attestation.webauthn_credential_id.as_ref(),
+            Self::Google(attestation) => attestation.webauthn_credential_id.as_ref(),
+        }
+    }
+
+    pub fn metadata(&self) -> &DeviceMetadata {
+        match self {
+            Self::Apple(attestation) => &attestation.metadata,
+            Self::Google(attestation) => &attestation.metadata,
+        }
+    }
 }
 
 pub fn save_vendor_result_and_risk_signals(
@@ -30,7 +66,7 @@ pub fn save_vendor_result_and_risk_signals(
     res: &AttestationResult,
     public_key: &VaultPublicKey,
     sv_id: &ScopedVaultId,
-    wf_id: Option<&WorkflowId>,
+    wf_id: &WorkflowId,
     is_live: bool,
 ) -> FpResult<(VerificationRequest, VerificationResult, Vec<RiskSignal>)> {
     // count the associated vaults derived by this attestation
@@ -39,7 +75,7 @@ pub fn save_vendor_result_and_risk_signals(
         AttestationResult::Google(res) => res.count_associated_vaults(conn, is_live)?,
     };
 
-    let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceAttestation, sv_id, wf_id)?;
+    let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceAttestation, sv_id, Some(wf_id))?;
 
     // Our synthetic "vendor" response payload
     let vres_data = FootprintDeviceAttestationData {
@@ -116,15 +152,16 @@ mod tests {
                 let t = fixtures::tenant::create(conn);
                 let obc = fixtures::ob_configuration::create(conn, &t.id, true);
                 let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+                let wf = fixtures::workflow::create(conn, &sv.id, &obc.id, None);
 
                 let attest = fixtures::apple_device_attestation::create(conn, &uv.id);
 
                 let (vreq, _, _rs) = save_vendor_result_and_risk_signals(
                     conn,
-                    &AttestationResult::Apple(&attest),
+                    &AttestationResult::Apple(attest),
                     &uv.public_key,
                     &sv.id,
-                    None,
+                    &wf.id,
                     false,
                 )
                 .unwrap();

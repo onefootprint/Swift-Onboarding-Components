@@ -1,3 +1,4 @@
+use super::apple_device_attest::DeviceMetadata;
 use crate::DbResult;
 use crate::PgConn;
 use chrono::DateTime;
@@ -8,7 +9,6 @@ use db_schema::schema::vault;
 use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
-use diesel_as_jsonb::AsJsonb;
 use newtypes::AndroidAppLicense;
 use newtypes::AndroidAppRecognition;
 use newtypes::AndroidDeviceIntegrityLevel;
@@ -16,7 +16,6 @@ use newtypes::GoogleDeviceAttestationId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
-use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Debug, Serialize, Clone, Queryable)]
@@ -24,7 +23,7 @@ use serde::Serialize;
 pub struct GoogleDeviceAttestation {
     pub id: GoogleDeviceAttestationId,
     pub vault_id: VaultId,
-    pub metadata: GoogleDeviceMetadata,
+    pub metadata: DeviceMetadata,
     pub created_at: DateTime<Utc>,
     pub raw_token: String,
     pub raw_claims: serde_json::Value,
@@ -52,18 +51,11 @@ pub struct GoogleDeviceAttestation {
     pub _updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Hash, Default)]
-#[serde(rename_all = "snake_case")]
-pub struct GoogleDeviceMetadata {
-    pub model: Option<String>,
-    pub os: Option<String>,
-}
-
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = google_device_attestation)]
 pub struct NewGoogleDeviceAttestation {
     pub vault_id: VaultId,
-    pub metadata: GoogleDeviceMetadata,
+    pub metadata: DeviceMetadata,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub raw_token: String,
     pub raw_claims: serde_json::Value,

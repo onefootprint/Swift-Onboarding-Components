@@ -3,8 +3,7 @@ use crate::types::ApiResponse;
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::vendor;
-use api_core::decision::vendor::fp_device_attestation::AttestationResult;
+use api_core::decision::vendor::fp_device_attestation::save_vendor_result_and_risk_signals;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
@@ -14,6 +13,8 @@ use api_wire_types::hosted::device_attestation::DeviceAttestationType;
 use api_wire_types::hosted::device_attestation::GetDeviceAttestationChallengeRequest;
 use chrono::Duration;
 use chrono::Utc;
+use db::models::apple_device_attest::NewAppleDeviceAttestation;
+use db::models::google_device_attest::NewGoogleDeviceAttestation;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
@@ -53,8 +54,7 @@ pub async fn post_challenge(
     state: web::Data<State>,
     auth: UserWfAuthContext,
 ) -> ApiResponse<DeviceAttestationChallengeResponse> {
-    let _ = auth.check_guard(UserAuthScope::SignUp)?;
-
+    auth.check_guard(UserAuthScope::SignUp)?;
     let GetDeviceAttestationChallengeRequest {
         device_type,
         ios_bundle_id,
@@ -83,7 +83,7 @@ pub async fn post_challenge(
 }
 
 /// receive the attestation
-#[tracing::instrument(skip(state))]
+#[tracing::instrument(skip(state, auth))]
 #[api_v2_operation(
     tags(Hosted),
     description = "Parses and accepts a user's onboarding device attestation"
@@ -110,128 +110,69 @@ pub async fn post_attestation(
         android_package_name,
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
-    let tenant = auth.tenant();
-    let vault_id = auth.user().id.clone();
-    let scoped_vault_id = auth.scoped_user.id.clone();
-    let workflow_id = auth.workflow().id.clone();
-    let vault_public_key = auth.user().public_key.clone();
-    let is_live = auth.user().is_live;
+    let t = auth.tenant();
+    let v_id = auth.user().id.clone();
 
-    match device_type {
-        DeviceAttestationType::Ios => {
-            let new_attestation = ios::attest(
-                &state,
-                tenant,
-                vault_id.clone(),
-                challenge,
-                attestation,
-                ios_bundle_id,
-            )
-            .await?;
+    #[derive(derive_more::From)]
+    #[allow(clippy::large_enum_variant)]
+    enum NewDeviceAttestation {
+        Apple(NewAppleDeviceAttestation),
+        Android(NewGoogleDeviceAttestation),
+    }
 
-            state
-                .db_pool
-                .db_transaction(move |conn| -> FpResult<()> {
-                    let attestation = new_attestation.create(conn.conn())?;
-
-                    // TODO dedupliate this code
-                    // generate risk signals
-                    vendor::fp_device_attestation::save_vendor_result_and_risk_signals(
-                        conn,
-                        &AttestationResult::Apple(&attestation),
-                        &vault_public_key,
-                        &scoped_vault_id,
-                        Some(&workflow_id),
-                        is_live,
-                    )?;
-
-                    // the iOS attestation, in conjuction with a passkey registration, also helps us prove
-                    // liveness so if the device attests it registered a passkey,
-                    // we can confirm liveness too!
-                    if attestation.webauthn_credential_id.is_some() {
-                        let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
-                        let liveness_event = NewLivenessEvent {
-                            scoped_vault_id: scoped_vault_id.clone(),
-                            liveness_source: newtypes::LivenessSource::AppleDeviceAttestation,
-                            attributes: Some(LivenessAttributes {
-                                issuers: vec![LivenessIssuer::Footprint, LivenessIssuer::Apple],
-                                os: attestation.metadata.os.clone(),
-                                device: attestation.metadata.model.clone(),
-                                ..Default::default()
-                            }),
-                            insight_event_id: Some(insight_event.id),
-                            skip_context: None,
-                        }
-                        .insert(conn)?;
-
-                        // create the timeline event for a liveness
-                        let info = LivenessInfo {
-                            id: liveness_event.id,
-                        };
-                        UserTimeline::create(conn, info, vault_id, scoped_vault_id.clone())?;
-                    }
-
-                    Ok(())
-                })
-                .await?;
-        }
+    let new_attestation = match device_type {
+        DeviceAttestationType::Ios => ios::attest(&state, t, &v_id, challenge, attestation, ios_bundle_id)
+            .await?
+            .into(),
         DeviceAttestationType::Android => {
-            let new_attestation = android::attest(
-                &state,
-                tenant,
-                vault_id.clone(),
-                challenge,
-                attestation,
-                android_package_name,
-            )
-            .await?;
-
-            state
-                .db_pool
-                .db_transaction(move |conn| -> FpResult<()> {
-                    let attestation = new_attestation.create(conn.conn())?;
-
-                    // generate risk signals
-                    vendor::fp_device_attestation::save_vendor_result_and_risk_signals(
-                        conn,
-                        &AttestationResult::Google(&attestation),
-                        &vault_public_key,
-                        &scoped_vault_id,
-                        Some(&workflow_id),
-                        is_live,
-                    )?;
-
-                    // the iOS attestation, in conjuction with a passkey registration, also helps us prove
-                    // liveness so if the device attests it registered a passkey,
-                    // we can confirm liveness too!
-                    if attestation.webauthn_credential_id.is_some() {
-                        let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
-                        let liveness_event = NewLivenessEvent {
-                            scoped_vault_id: scoped_vault_id.clone(),
-                            liveness_source: newtypes::LivenessSource::GoogleDeviceAttestation,
-                            attributes: Some(LivenessAttributes {
-                                issuers: vec![LivenessIssuer::Footprint, LivenessIssuer::Google],
-                                os: attestation.metadata.os.clone(),
-                                device: attestation.metadata.model.clone(),
-                                ..Default::default()
-                            }),
-                            insight_event_id: Some(insight_event.id),
-                            skip_context: None,
-                        }
-                        .insert(conn)?;
-
-                        // create the timeline event for a liveness
-                        let info = LivenessInfo {
-                            id: liveness_event.id,
-                        };
-                        UserTimeline::create(conn, info, vault_id, scoped_vault_id.clone())?;
-                    }
-
-                    Ok(())
-                })
-                .await?;
+            android::attest(&state, t, &v_id, challenge, attestation, android_package_name)
+                .await?
+                .into()
         }
     };
+
+    let sv_id = auth.scoped_user.id.clone();
+    let wf_id = auth.workflow().id.clone();
+    let vault_key = auth.user().public_key.clone();
+    let is_live = auth.user().is_live;
+    state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<()> {
+            let attestation = match new_attestation {
+                NewDeviceAttestation::Apple(attestation) => attestation.create(conn.conn())?.into(),
+                NewDeviceAttestation::Android(attestation) => attestation.create(conn.conn())?.into(),
+            };
+
+            save_vendor_result_and_risk_signals(conn, &attestation, &vault_key, &sv_id, &wf_id, is_live)?;
+
+            // the attestation, in conjuction with a passkey registration, also helps us prove
+            // liveness so if the device attests it registered a passkey, we can confirm liveness too!
+            if attestation.webauthn_credential_id().is_some() {
+                let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
+                let liveness_event = NewLivenessEvent {
+                    scoped_vault_id: sv_id.clone(),
+                    liveness_source: attestation.liveness_source(),
+                    attributes: Some(LivenessAttributes {
+                        issuers: vec![LivenessIssuer::Footprint, attestation.liveness_issuer()],
+                        os: attestation.metadata().os.clone(),
+                        device: attestation.metadata().model.clone(),
+                        ..Default::default()
+                    }),
+                    insight_event_id: Some(insight_event.id),
+                    skip_context: None,
+                }
+                .insert(conn)?;
+
+                // create the timeline event for a liveness
+                let info = LivenessInfo {
+                    id: liveness_event.id,
+                };
+                UserTimeline::create(conn, info, v_id, sv_id.clone())?;
+            }
+
+            Ok(())
+        })
+        .await?;
 
     Ok(api_wire_types::Empty)
 }
