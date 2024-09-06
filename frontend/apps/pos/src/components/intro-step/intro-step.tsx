@@ -3,6 +3,7 @@ import { Button, PhoneInput, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
+import useCreateChallenge from './hooks/use-create-challenge';
 
 type IntroStepProps = {
   onHandoff: (phoneNumber: string) => void;
@@ -14,22 +15,19 @@ type FormValues = {
 };
 
 const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
-  const { control, handleSubmit, setFocus } = useForm<FormValues>();
+  const { control, handleSubmit } = useForm<FormValues>();
+  const createChallengeMutation = useCreateChallenge();
 
-  const handleFormSubmit = handleSubmit(data => {
-    onHandoff(data.phoneNumber);
+  const handleFormSubmit = handleSubmit(() => {
+    // TODO:
+    console.log(onHandoff);
   });
 
-  const handleFillout = handleSubmit(
-    data => {
-      onFillout(data.phoneNumber);
-    },
-    errors => {
-      if (errors.phoneNumber) {
-        setFocus('phoneNumber');
-      }
-    },
-  );
+  const handleFillout = handleSubmit(data => {
+    createChallengeMutation.mutate(data.phoneNumber, {
+      onSuccess: () => onFillout(data.phoneNumber),
+    });
+  });
 
   return (
     <Stack direction="column" gap={7} textAlign="center" width="100%" alignItems="center">
@@ -67,7 +65,7 @@ const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
           <Divider />
         </Stack>
         <Stack flexDirection="column">
-          <Button size="large" variant="secondary" onClick={handleFillout}>
+          <Button size="large" variant="secondary" onClick={handleFillout} loading={createChallengeMutation.isPending}>
             Fill out for customer
           </Button>
         </Stack>

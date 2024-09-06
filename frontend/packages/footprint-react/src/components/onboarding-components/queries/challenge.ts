@@ -4,7 +4,9 @@ import { InlineOtpNotSupported } from '../../../types/request';
 import request from '../utils/request';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
+
 type IdentifyRequestPayload = EmailAndPassword & { authToken?: string };
+
 type CreateChallengeRequestPayload = IdentifyRequestPayload;
 
 type RequestOptions = {
@@ -29,21 +31,18 @@ export const identify = async (payload: IdentifyRequestPayload, options: Request
 };
 
 const signupChallenge = async (payload: EmailAndPassword, options: RequestOptions) => {
-  let preferredAuthMethod;
-  if (options.requiredAuthMethods?.includes('phone')) {
-    preferredAuthMethod = 'sms';
-  } else if (options.requiredAuthMethods?.includes('email')) {
-    preferredAuthMethod = 'email';
-  }
+  const preferredAuthMethod = options.requiredAuthMethods?.includes('phone') ? 'sms' : 'email';
+  const data = {
+    scope: 'onboarding',
+    challengeKind: preferredAuthMethod,
+    ...(payload.email && { email: { value: payload.email, isBootstrap: false } }),
+    ...(payload.phoneNumber && { phoneNumber: { value: payload.phoneNumber, isBootstrap: false } }),
+  };
+
   const response = await request<SignupChallengeResponse>({
     url: '/hosted/identify/signup_challenge',
     method: 'POST',
-    data: {
-      email: { value: payload.email, isBootstrap: false },
-      phoneNumber: { value: payload.phoneNumber, isBootstrap: false },
-      scope: 'onboarding',
-      challengeKind: preferredAuthMethod,
-    },
+    data,
     headers: {
       'X-Onboarding-Config-Key': options.onboardingConfig,
       'X-Sandbox-Id': options.sandboxId,

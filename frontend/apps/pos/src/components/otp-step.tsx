@@ -12,7 +12,7 @@ const OtepStep = () => {
       <Image src="/logo.png" width={92} height={30} alt="Avi's logo" />
       <Header title="Verify their phone number" subtitle="Enter the 6-digit code sent to (•••) ••• ••02." />
       <Stack flexDirection="column" gap={8} alignItems="center">
-        <PinInput onComplete={handleSubmit} />
+        <PinInput autoFocus onComplete={handleSubmit} />
         <LinkButton>Resend code</LinkButton>
       </Stack>
     </Stack>

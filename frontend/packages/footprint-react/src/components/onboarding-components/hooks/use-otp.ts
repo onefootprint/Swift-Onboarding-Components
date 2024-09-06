@@ -142,9 +142,8 @@ const useOtp = () => {
         'You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number',
       );
     }
-    // TODO: In the future, we should allow email-only
-    if (!email || !phoneNumber) {
-      throw new Error('Email and phone number are required');
+    if (!email && !phoneNumber) {
+      throw new Error('Email and/or phone number are required');
     }
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
     const response = await createChallenge(
