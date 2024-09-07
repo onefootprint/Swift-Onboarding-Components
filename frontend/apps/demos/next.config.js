@@ -4,6 +4,7 @@ const IS_CI = process.env.CI === 'true';
 const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
+const DATADOG_SRC = ['https://browser-intake-datadoghq.com'].join(' ');
 
 const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 
@@ -13,7 +14,7 @@ const DEV_FRAME_SRC = (
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com ${DEV_CONNECT_SRC} vitals.vercel-insights.com *.usefathom.com *.pusher.com wss://*.pusher.com vercel.live unpkg.com *.neuro-id.com *.neuroid.cloud https://ipapi.co *.mapbox.com;
+  connect-src 'self' *.onefootprint.com ${DEV_CONNECT_SRC} vitals.vercel-insights.com *.usefathom.com *.pusher.com wss://*.pusher.com vercel.live unpkg.com *.neuro-id.com *.neuroid.cloud https://ipapi.co *.mapbox.com ${DATADOG_SRC};
   default-src 'self' vitals.vercel-insights.com *.neuro-id.com *.neuroid.cloud;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
@@ -21,7 +22,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' *.onefootprint.com ${DEV_FRAME_SRC} vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com https://cdn.jsdelivr.net *.neuro-id.com *.neuroid.cloud;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com https://cdn.jsdelivr.net *.neuro-id.com *.neuroid.cloud ${DATADOG_SRC};
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;
