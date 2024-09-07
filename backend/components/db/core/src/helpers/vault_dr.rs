@@ -100,13 +100,14 @@ mod tests {
     #[db_test]
     fn test_vault_dr_batch_query(conn: &mut TestPgConn) {
         let tenant_id = fixtures::tenant::create(conn).id;
-        let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, true).id;
-        let v1_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let is_live = true;
+        let ob_config_id = fixtures::ob_configuration::create(conn, &tenant_id, is_live).id;
+        let v1_id = fixtures::vault::create_person(conn, is_live).into_inner().id;
         let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id);
 
         let new_ape = NewVaultDrAwsPreEnrollment {
             tenant_id: &tenant_id,
-            is_live: true,
+            is_live,
             aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
         };
         let ape = VaultDrAwsPreEnrollment::get_or_create(conn, new_ape).unwrap();
@@ -114,7 +115,7 @@ mod tests {
         let new_vdr_config = NewVaultDrConfig {
             created_at: Utc::now(),
             tenant_id: &tenant_id,
-            is_live: true,
+            is_live,
             aws_pre_enrollment_id: &ape.id,
             aws_account_id: "12345678".to_owned(),
             aws_role_name: "my-role".to_owned(),
@@ -127,8 +128,7 @@ mod tests {
         let vdr_config = VaultDrConfig::create(conn, new_vdr_config).unwrap();
 
         let batch_size: usize = 5;
-        let mut seqno_timeline = vec![];
-        let mut dl_ids = vec![];
+        let mut dls = vec![];
         for _ in 0..=5 {
             let seqno1 = DataLifetime::get_next_seqno(conn).unwrap();
             DataLifetime::bulk_deactivate_kinds(
@@ -140,15 +140,14 @@ mod tests {
             .unwrap();
             let dl =
                 fixtures::data_lifetime::build(conn, &v1_id, &sv1, seqno1, None, None, IdentityDataKind::Dob);
-            seqno_timeline.push(seqno1);
-            dl_ids.push(dl.id);
+            dls.push(dl);
 
             let seqno2 = DataLifetime::get_next_seqno(conn).unwrap();
             DataLifetime::bulk_deactivate_kinds(
                 conn,
                 &sv1,
                 vec![DataIdentifier::Id(IdentityDataKind::Email)],
-                seqno1,
+                seqno2,
             )
             .unwrap();
             let dl = fixtures::data_lifetime::build(
@@ -160,15 +159,14 @@ mod tests {
                 None,
                 IdentityDataKind::Email,
             );
-            seqno_timeline.push(seqno1);
-            dl_ids.push(dl.id);
+            dls.push(dl);
 
             // Create another DL at the same seqno.
             DataLifetime::bulk_deactivate_kinds(
                 conn,
                 &sv1,
                 vec![DataIdentifier::Id(IdentityDataKind::FirstName)],
-                seqno1,
+                seqno2,
             )
             .unwrap();
             let dl = fixtures::data_lifetime::build(
@@ -180,40 +178,53 @@ mod tests {
                 None,
                 IdentityDataKind::FirstName,
             );
-            seqno_timeline.push(seqno1);
-            dl_ids.push(dl.id);
+            dls.push(dl);
         }
 
-        assert_eq!(seqno_timeline.len(), dl_ids.len());
-
-        // Make sure we're triggering a condition where a batch doesn't contain all DLs for a
-        // seqno.
-        assert_eq!(seqno_timeline[batch_size - 1], seqno_timeline[batch_size]);
+        // Make sure we're triggering a condition where a batch of blobs doesn't contain all DLs
+        // for a seqno.
+        assert_eq!(dls[batch_size - 1].created_seqno, dls[batch_size].created_seqno);
 
         let expected_batch_sizes = vec![batch_size, batch_size, batch_size, 3, 0, 0];
-        assert_eq!(dl_ids.len(), expected_batch_sizes.iter().sum::<usize>());
+        assert_eq!(
+            // We should be writing one blob per DL.
+            expected_batch_sizes.iter().sum::<usize>(),
+            dls.len()
+        );
 
-
-        let mut dl_ids = dl_ids.into_iter();
+        let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
         for (i, expected_batch_size) in expected_batch_sizes.into_iter().enumerate() {
-            let batch = load_vault_dr_data_lifetime_batch(
+            let got_dl_batch = load_vault_dr_data_lifetime_batch(
                 conn,
                 &tenant_id,
-                true,
+                is_live,
                 &vdr_config.id,
                 batch_size as u32,
                 Some(vec![sv1.fp_id.clone()]),
             )
             .unwrap();
-            assert_eq!(batch.len(), expected_batch_size, "Batch {} size", i);
+            assert_eq!(got_dl_batch.len(), expected_batch_size, "Batch {} size", i);
 
-            let expected_dl_ids = (&mut dl_ids).take(expected_batch_size).collect_vec();
+            // We can't predict the DL IDs in the batch, since DLs created at the same
+            // seqno may not all be contained in the same batch. However, we can check
+            // that the seqnos in the batch match the expected seqnos, and we can check that all
+            // DL IDs in the batch correspond with the expected seqnos.
+            let expected_seqnos = (&mut dl_created_seqnos).take(expected_batch_size).collect_vec();
             assert_have_same_elements(
-                batch.iter().map(|dl| dl.id.clone()).collect_vec(),
-                expected_dl_ids,
+                got_dl_batch.iter().map(|dl| dl.created_seqno).collect_vec(),
+                expected_seqnos.clone(),
             );
 
-            write_fake_blobs(conn, &vdr_config.id, batch);
+            let candidate_dl_ids_for_seqnos = dls
+                .iter()
+                .filter(|dl| expected_seqnos.contains(&dl.created_seqno))
+                .map(|dl| dl.id.clone())
+                .collect_vec();
+            for dl in got_dl_batch.iter() {
+                assert!(candidate_dl_ids_for_seqnos.contains(&dl.id));
+            }
+
+            write_fake_blobs(conn, &vdr_config.id, got_dl_batch);
         }
     }
 
