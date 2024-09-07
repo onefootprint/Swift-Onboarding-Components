@@ -193,7 +193,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "3ruc9MwH2LRm9",
+          sandboxId: "3ruc9MwHfchgh2LRm9",
           child: Container(
             alignment: Alignment.center,
             decoration: const BoxDecoration(
@@ -275,7 +275,7 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? tenantAuthMethod;
+  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -284,7 +284,7 @@ class _IdentifyState extends State<Identify> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
         setState(() {
-          tenantAuthMethod = response.authMethod;
+          authMethod = response.authMethod;
         });
 
         if (response.requiresAuth == false) {
@@ -311,12 +311,11 @@ class _IdentifyState extends State<Identify> {
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null) {
+    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (footprintUtils(context).isReadyForAuth &&
-        tenantAuthMethod == FootprintAuthMethods.authToken) {
+    if (authMethod == FootprintAuthMethods.authToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -353,7 +352,7 @@ class _IdentifyState extends State<Identify> {
 
     return FootprintOtp(
       buildOtp: (otpUtils) {
-        if (isChallengeCreated == false) {
+        if (!isChallengeCreated) {
           return FootprintForm(
             createForm: (handleSubmit, props) {
               return Container(

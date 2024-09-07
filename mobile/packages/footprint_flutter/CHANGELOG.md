@@ -14,3 +14,7 @@
 ## 2.0.0-beta
 
 - Introduction of onboarding components
+
+## 2.0.0-beta.2
+
+- Introduction of inline OTP in onboarding components
