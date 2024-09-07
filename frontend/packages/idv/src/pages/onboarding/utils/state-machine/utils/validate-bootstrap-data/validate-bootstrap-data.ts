@@ -201,15 +201,18 @@ const validateBootstrapData = ({
     if (key === IdDI.dob || key === IdDI.visaExpirationDate || key === BusinessDI.formationDate) {
       const { value, ...rest } = metaData;
       const strIsoDate = getIsoDate(metaData.value as string, locale);
-      const date = strIsoDate ? new Date(strIsoDate) : undefined;
+      if (!strIsoDate) return [key, metaData];
 
-      if (!date) return [key, metaData];
+      const [year, month, day] = strIsoDate.split('-').map(Number);
+      const localDate = new Date(year, month - 1, day);
 
       return [
         key,
         {
           ...rest,
-          value: new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date),
+          value: new Intl.DateTimeFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+            localDate,
+          ),
         },
       ];
     }

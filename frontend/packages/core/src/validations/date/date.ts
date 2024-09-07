@@ -19,7 +19,7 @@ export const getIsoDate = (dateStr: string, locale: 'es-MX' | 'en-US'): string |
   const date = parse(dateStr, strFormat, new Date());
 
   try {
-    return formatISO(date, { representation: 'date' });
+    return formatISO(new Date(date.getFullYear(), date.getMonth(), date.getDate()), { representation: 'date' });
   } catch (_) {
     return undefined;
   }
