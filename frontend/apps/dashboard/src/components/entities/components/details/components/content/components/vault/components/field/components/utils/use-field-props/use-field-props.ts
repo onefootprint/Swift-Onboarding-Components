@@ -3,8 +3,8 @@ import {
   isDobInTheFuture,
   isDobTooOld,
   isDobTooYoung,
+  isSSN9Flexible,
   isSsn4,
-  isSsn9,
   isTin,
   isURL,
   isValidDate,
@@ -133,7 +133,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           if (!value) {
             return t('pages.entity.edit.errors.ssn.required');
           }
-          if (!isSsn9(value)) {
+          if (!isSSN9Flexible(value)) {
             return t('pages.entity.edit.errors.ssn.pattern');
           }
           return true;
