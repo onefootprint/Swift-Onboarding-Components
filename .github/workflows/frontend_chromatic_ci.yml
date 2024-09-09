@@ -17,9 +17,10 @@ jobs:
     runs-on: frontend_runner
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
-      - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # ratchet:dorny/paths-filter@v3
         id: changes
         with:
+          base: master
           filters: |
             src:
               - 'frontend/packages/**'
@@ -62,7 +63,7 @@ jobs:
           onlyChanged: true
           skip: "dependabot/**"
           storybookBuildDir: storybook-static
-          autoAcceptChanges: "master"
+          autoAcceptChanges: master
 
   chromatic-idv:
     name: Check IDV
@@ -99,4 +100,4 @@ jobs:
           onlyChanged: true
           skip: "dependabot/**"
           storybookBuildDir: storybook-static
-          autoAcceptChanges: "master"
+          autoAcceptChanges: master
