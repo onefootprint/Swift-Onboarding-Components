@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
+import useGenerateScopedAuthToken from '../../../../hooks/use-generate-scoped-auth-token/use-generate-scoped-auth-token';
 import { useGetD2PStatus } from '../../../../queries';
 import SmsButtonWithCountdown from '../../components/sms-button-with-countdown';
 import useCreateHandoffUrl from '../../hooks/use-create-handoff-url';
-import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../hooks/use-handle-d2p-status-update';
 import useTransferMachine from '../../hooks/use-machine';
 import useRequirementsTitle from '../../hooks/use-requirements-title-translation-key';
@@ -35,7 +35,6 @@ const QRRegister = () => {
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
     authToken,
     device,
-    config,
     idDocOutcome,
     l10n,
     onSuccess: (data: D2PGenerateResponse) => {

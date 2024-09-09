@@ -34,7 +34,9 @@ export type { DeviceInfo } from './hooks';
 export { Liveness } from './plugins';
 export {
   getBasicDevice,
+  useCancelD2P,
   useDeviceInfo,
+  useGenerateScopedAuthToken,
   useLogStateMachine,
   useParseHandoffUrl,
 } from './hooks';
@@ -76,6 +78,7 @@ export {
   isStringValid,
   isUndefined,
   isValidTokenFormat,
+  createHandoffUrlAuth,
   Logger,
   default as media,
   shouldChallengeEmail,

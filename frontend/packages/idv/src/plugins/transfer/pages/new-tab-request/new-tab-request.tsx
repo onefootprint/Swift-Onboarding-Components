@@ -6,8 +6,8 @@ import styled, { css } from 'styled-components';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
+import useGenerateScopedAuthToken from '../../../../hooks/use-generate-scoped-auth-token';
 import useCreateHandoffUrl from '../../hooks/use-create-handoff-url';
-import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useTransferMachine from '../../hooks/use-machine';
 
 const NewTabRequest = () => {
@@ -31,7 +31,6 @@ const NewTabRequest = () => {
   const { mutation } = useGenerateScopedAuthToken({
     authToken,
     device,
-    config,
     idDocOutcome,
     l10n,
     onSuccess: (data: D2PGenerateResponse) => {

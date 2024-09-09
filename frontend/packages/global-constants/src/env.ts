@@ -60,6 +60,12 @@ export const HOSTED_BASE_URL = createGetProjectUrl({
   prodAlias: 'verify',
 })(env, branchName);
 
+export const AUTH_BASE_URL = createGetProjectUrl({
+  port: '3011',
+  previewAlias: 'auth',
+  prodAlias: 'auth',
+})(env, branchName);
+
 export const HANDOFF_BASE_URL = createGetProjectUrl({
   port: '3005',
   local: process.env.NEXT_PUBLIC_LOCAL_HANDOFF_BASE_URL,

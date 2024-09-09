@@ -1,5 +1,6 @@
 export * from './countries';
 export {
+  AUTH_BASE_URL,
   DASHBOARD_BASE_URL,
   DEMO_BASE_URL,
   DOCS_BASE_URL,

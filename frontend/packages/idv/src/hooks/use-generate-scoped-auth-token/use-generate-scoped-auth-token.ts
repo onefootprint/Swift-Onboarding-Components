@@ -1,28 +1,30 @@
 import { useAppearance } from '@onefootprint/appearance';
 import { getSessionId } from '@onefootprint/dev-tools';
-import { getErrorMessage } from '@onefootprint/request';
-import type { D2PGenerateResponse, IdDocOutcome, L10n, PublicOnboardingConfig } from '@onefootprint/types';
+import type { D2PGenerateResponse, IdDocOutcome, L10n } from '@onefootprint/types';
 import { useEffect } from 'react';
 
-import type { DeviceInfo } from '../../../hooks';
-import { useD2PGenerate } from '../../../queries';
-import { Logger } from '../../../utils/logger';
+import type { DeviceInfo } from '..';
+import { useD2PGenerate } from '../../queries';
+import { getLogger } from '../../utils/logger';
 
 type GenerateScopedAuthTokenArgs = {
   authToken: string;
   device: DeviceInfo;
-  config?: PublicOnboardingConfig;
-  onSuccess?: (data: D2PGenerateResponse) => void;
   idDocOutcome?: IdDocOutcome;
   l10n?: L10n;
+  onError?: (error: unknown) => void;
+  onSuccess?: (data: D2PGenerateResponse) => void;
 };
+
+const { logError } = getLogger({ location: 'd2p token generator' });
 
 const useGenerateScopedAuthToken = ({
   authToken,
   device,
-  onSuccess,
   idDocOutcome,
   l10n,
+  onError,
+  onSuccess,
 }: GenerateScopedAuthTokenArgs) => {
   const d2pGenerateMutation = useD2PGenerate();
   const sessionId = getSessionId();
@@ -51,12 +53,11 @@ const useGenerateScopedAuthToken = ({
       {
         onSuccess,
         onError: (error: unknown) => {
-          Logger.warn(
-            `Error while generating d2p token in transfer plugin on ${
-              device?.type ?? 'NA'
-            } device type. ${getErrorMessage(error)}`,
-            { location: 'transfer' },
+          logError(
+            `Error while generating d2p token in transfer plugin on ${device?.type ?? 'NA'} device type.`,
+            error,
           );
+          onError?.(error);
         },
       },
     );
