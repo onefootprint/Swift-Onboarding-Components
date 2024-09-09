@@ -54,6 +54,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
         authToken: challenge.authToken,
         phoneNumber,
         email,
+        availableChallengeKinds: context.identify.user?.availableChallengeKinds,
       });
     }
   }, [isDone, onDone, challenge.authToken, email, phoneNumber]);

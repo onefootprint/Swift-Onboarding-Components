@@ -1,3 +1,4 @@
+import type { ChallengeKind } from '@onefootprint/types';
 import type { DIMetadata } from '../../types';
 import type { NavigationHeaderLeftButtonProps } from '../layout';
 
@@ -11,4 +12,5 @@ export type DoneArgs = {
   authToken: string;
   phoneNumber?: DIMetadata<string>;
   email?: DIMetadata<string>;
+  availableChallengeKinds?: ChallengeKind[] | undefined;
 };
