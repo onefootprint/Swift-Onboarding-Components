@@ -1,3 +1,9 @@
+/**
+ * This is being ignored from the CICD pipeline because of lack of bun support HTTPParser, used by msw, but not yet implemented in bun test runner
+ * https://github.com/oven-sh/bun/issues/2297
+ * https://github.com/oven-sh/bun/issues/13072
+ */
+
 import { afterAll, afterEach, beforeAll, describe, expect, it, mock } from 'bun:test';
 import { cleanup, render, screen } from '@testing-library/react'; // eslint-disable-line testing-library/no-manual-cleanup
 import userEvent from '@testing-library/user-event';

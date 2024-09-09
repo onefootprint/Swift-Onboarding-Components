@@ -1,3 +1,9 @@
+/**
+ * This is being ignored from the CICD pipeline because of lack of bun support HTTPParser, used by msw, but not yet implemented in bun test runner
+ * https://github.com/oven-sh/bun/issues/2297
+ * https://github.com/oven-sh/bun/issues/13072
+ */
+
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'bun:test';
 // @ts-ignore: Module '"msw"' has no exported member 'http'.
 import { http } from 'msw';
@@ -51,25 +57,25 @@ const handlers = [
   }),
 ];
 const server = setupServer(...handlers);
-beforeAll(() => server.listen());
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe.todo('identifyUser', () => {
+describe('identifyUser', () => {
   it('should throw an exception when nothing is passed', async () => {
-    await expect(identifyUser()).rejects.toEqual(new Error('User data must be passed in order to identify an user'));
+    expect(identifyUser()).rejects.toEqual(new Error('User data must be passed in order to identify an user'));
   });
 
   it('should be true when only email is passed and user is found', async () => {
-    await expect(identifyUser({ 'id.email': 'userfound@email.com' })).resolves.toEqual(true);
+    expect(identifyUser({ 'id.email': 'userfound@email.com' })).resolves.toEqual(true);
   });
 
   it('should be true when only phoneNumber is passed and user is found', async () => {
-    await expect(identifyUser({ 'id.phone_number': '+1-202-555-0130' })).resolves.toEqual(true);
+    expect(identifyUser({ 'id.phone_number': '+1-202-555-0130' })).resolves.toEqual(true);
   });
 
   it('should be true when email and phoneNumber are passed, and user is found with the phoneNumber', async () => {
-    await expect(
+    expect(
       identifyUser({
         'id.email': 'jane.doe@acme.com',
         'id.phone_number': '+1-202-555-0130',
@@ -78,11 +84,11 @@ describe.todo('identifyUser', () => {
   });
 
   it('should be false when only email is passed and user is not found', async () => {
-    await expect(identifyUser({ 'id.email': 'jane.doe@acme.com' })).resolves.toEqual(false);
+    expect(identifyUser({ 'id.email': 'jane.doe@acme.com' })).resolves.toEqual(false);
   });
 
   it('should return false when email and phoneNumber are passed and user is not found', async () => {
-    await expect(
+    expect(
       identifyUser({
         'id.email': 'jane.doe@acme.com',
         'id.phone_number': '+1-202-555-9999',
