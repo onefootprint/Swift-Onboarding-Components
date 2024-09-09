@@ -9,10 +9,11 @@ import Unavailable from '../unavailable';
 
 type RouterProps = {
   actionKind: UserChallengeActionKind;
+  onCustomSkip?: () => void;
   onDone: () => void;
 };
 
-const Router = ({ actionKind, onDone }: RouterProps) => {
+const Router = ({ actionKind, onCustomSkip, onDone }: RouterProps) => {
   const [state] = useLivenessMachine();
   const isDone = state.matches('completed');
   useLogStateMachine('liveness', state);
@@ -29,7 +30,7 @@ const Router = ({ actionKind, onDone }: RouterProps) => {
   }, [isDone, onDone]);
 
   if (state.matches('register')) {
-    return <Register actionKind={actionKind} />;
+    return <Register actionKind={actionKind} onCustomSkip={onCustomSkip} />;
   }
   if (state.matches('unavailable')) {
     return <Unavailable />;

@@ -22,7 +22,13 @@ const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'liveness-register',
 });
 
-const Register = ({ actionKind }: { actionKind: UserChallengeActionKind }) => {
+const Register = ({
+  actionKind,
+  onCustomSkip,
+}: {
+  actionKind: UserChallengeActionKind;
+  onCustomSkip?: () => void;
+}) => {
   const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.register' });
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [state, send] = useLivenessMachine();
@@ -80,6 +86,13 @@ const Register = ({ actionKind }: { actionKind: UserChallengeActionKind }) => {
         },
       },
     );
+  };
+
+  const handleCustomSkip = () => {
+    trackAction('passkeys:skipped');
+    logInfo('Skipping liveness after retrying registering passkeys');
+    send({ type: 'skipped' });
+    onCustomSkip?.();
   };
 
   const handleSkip = () => {
@@ -155,7 +168,7 @@ const Register = ({ actionKind }: { actionKind: UserChallengeActionKind }) => {
             <Button
               loading={skipLivenessMutation.isLoading}
               disabled={biometricInitMutation.isLoading || skipLivenessMutation.isLoading}
-              onClick={handleSkip}
+              onClick={typeof onCustomSkip === 'function' ? handleCustomSkip : handleSkip}
               fullWidth
               size="large"
               variant="secondary"
