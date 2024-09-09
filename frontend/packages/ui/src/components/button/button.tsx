@@ -35,7 +35,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled = false,
       form,
       fullWidth,
-      loading,
+      loading = false,
       loadingAriaLabel,
       size = 'default',
       testID,

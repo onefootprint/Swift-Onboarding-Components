@@ -88,6 +88,10 @@ export const useFootprint = () => {
   };
 
   return {
+    data: {
+      ...context.onboardingConfig,
+      ...context.challengeData,
+    },
     handoff,
     save: vault,
     ...otp,

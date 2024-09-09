@@ -1,9 +1,10 @@
 import Header from '@/components/header';
+import { useFootprint } from '@onefootprint/footprint-react';
 import { Button, PhoneInput, Stack, Text } from '@onefootprint/ui';
+import { useMutation } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import useCreateChallenge from './hooks/use-create-challenge';
 
 type IntroStepProps = {
   onHandoff: (phoneNumber: string) => void;
@@ -16,7 +17,10 @@ type FormValues = {
 
 const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
   const { control, handleSubmit } = useForm<FormValues>();
-  const createChallengeMutation = useCreateChallenge();
+  const fp = useFootprint();
+  const mutation = useMutation({
+    mutationFn: fp.createEmailPhoneBasedChallenge,
+  });
 
   const handleFormSubmit = handleSubmit(() => {
     // TODO:
@@ -24,9 +28,12 @@ const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
   });
 
   const handleFillout = handleSubmit(data => {
-    createChallengeMutation.mutate(data.phoneNumber, {
-      onSuccess: () => onFillout(data.phoneNumber),
-    });
+    mutation.mutate(
+      { phoneNumber: data.phoneNumber },
+      {
+        onSuccess: () => onFillout(data.phoneNumber),
+      },
+    );
   });
 
   return (
@@ -65,7 +72,7 @@ const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
           <Divider />
         </Stack>
         <Stack flexDirection="column">
-          <Button size="large" variant="secondary" onClick={handleFillout} loading={createChallengeMutation.isPending}>
+          <Button size="large" variant="secondary" onClick={handleFillout} loading={mutation.isLoading}>
             Fill out for customer
           </Button>
         </Stack>

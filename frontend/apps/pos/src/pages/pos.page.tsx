@@ -11,20 +11,27 @@ import { useReducer } from 'react';
 const Pos = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleHandoff = (phoneNumber: string) => {
-    dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
-    dispatch({ type: 'NEXT_STEP' });
-  };
-
-  const handleFillout = (phoneNumber: string) => {
-    dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
-    dispatch({ type: 'NEXT_STEP' });
-  };
-
   return (
     <Layout>
-      {state.currentStep === 'intro' && <IntroStep onHandoff={handleHandoff} onFillout={handleFillout} />}
-      {state.currentStep === 'otp' && <OtpStep />}
+      {state.currentStep === 'intro' && (
+        <IntroStep
+          onHandoff={(phoneNumber: string) => {
+            dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
+            dispatch({ type: 'NEXT_STEP' });
+          }}
+          onFillout={(phoneNumber: string) => {
+            dispatch({ type: 'SET_USER_DATA', payload: { phoneNumber } });
+            dispatch({ type: 'NEXT_STEP' });
+          }}
+        />
+      )}
+      {state.currentStep === 'otp' && (
+        <OtpStep
+          onSuccess={() => {
+            dispatch({ type: 'NEXT_STEP' });
+          }}
+        />
+      )}
       {state.currentStep === 'email' && <EmailStep />}
       {state.currentStep === 'basic-data' && <BasicDataStep />}
       {state.currentStep === 'address' && <AddressStep />}

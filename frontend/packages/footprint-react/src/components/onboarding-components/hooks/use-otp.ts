@@ -1,6 +1,5 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import type { ChallengeData } from '@onefootprint/types';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
 import AuthTokenStatus from '../types/auth-token-status';
@@ -15,9 +14,8 @@ type AuthRequirement = {
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
-  const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
-  const [didCallRequiresAuth, setDidCallRequiresAuth] = useState(false);
   const isReadyForAuth = !!context.onboardingConfig;
+  const { challengeData, didCallRequiresAuth } = context;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): AuthRequirement => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
@@ -34,7 +32,7 @@ const useOtp = () => {
 
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken) {
-      setDidCallRequiresAuth(true);
+      setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
       return { requiresAuth: false, authMethod: null };
     }
 
@@ -42,8 +40,11 @@ const useOtp = () => {
     // But we need to create a vaulting token
     if (verifiedAuthToken) {
       const vaultingTokenResponse = await createVaultingToken({ authToken: verifiedAuthToken });
-      setDidCallRequiresAuth(true);
-      setContext(prev => ({ ...prev, vaultingToken: vaultingTokenResponse.token }));
+      setContext(prev => ({
+        ...prev,
+        vaultingToken: vaultingTokenResponse.token,
+        didCallRequiresAuth: true,
+      }));
       return { requiresAuth: false, authMethod: null };
     }
 
@@ -59,14 +60,17 @@ const useOtp = () => {
           sandboxId: context.sandboxId,
           setContext,
         });
-        setDidCallRequiresAuth(true);
+        setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
+
         return authTokenStatusToRequirement(status);
       }
-      setDidCallRequiresAuth(true);
+      setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
+
       return authTokenStatusToRequirement(authTokenStatus);
     }
 
-    setDidCallRequiresAuth(true);
+    setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
+
     return { requiresAuth: true, authMethod: TenantAuthMethods.emailAndPhone };
   };
 
@@ -154,7 +158,7 @@ const useOtp = () => {
         requiredAuthMethods,
       },
     );
-    setChallengeData(response.challengeData);
+    setContext(prev => ({ ...prev, challengeData: response.challengeData }));
     return response.challengeData.challengeKind;
   };
 
@@ -183,7 +187,7 @@ const useOtp = () => {
         requiredAuthMethods,
       },
     );
-    setChallengeData(response.challengeData);
+    setContext(prev => ({ ...prev, challengeData: response.challengeData }));
     return response.challengeData.challengeKind;
   };
 

@@ -6,6 +6,7 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import { isAlphanumeric } from '@onefootprint/core';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { ChallengeData } from '@onefootprint/types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 import type AuthTokenStatus from '../../types/auth-token-status';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
@@ -13,9 +14,6 @@ import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 export type ContextData = {
   appearance?: FootprintAppearance;
   authToken?: string;
-  vaultingToken?: string;
-  verifiedAuthToken?: string;
-  authTokenStatus?: AuthTokenStatus;
   fpInstance: FootprintComponent | null;
   handoffCallbacks?: {
     onCancel?: () => void;
@@ -28,6 +26,12 @@ export type ContextData = {
   sandboxId?: string;
   publicKey: string;
   locale?: SupportedLocale;
+
+  vaultingToken?: string;
+  verifiedAuthToken?: string;
+  authTokenStatus?: AuthTokenStatus;
+  challengeData: ChallengeData | null;
+  didCallRequiresAuth: boolean;
 };
 
 export type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -38,6 +42,8 @@ const Context = createContext<[ContextData, UpdateContext]>([
     onboardingConfig: null,
     publicKey: '',
     locale: 'en-US',
+    challengeData: null,
+    didCallRequiresAuth: false,
   },
   () => undefined,
 ]);
@@ -75,6 +81,8 @@ const Provider = ({
       onError: undefined,
       onClose: undefined,
     },
+    challengeData: null,
+    didCallRequiresAuth: false,
   });
 
   usePropsUpdated({
