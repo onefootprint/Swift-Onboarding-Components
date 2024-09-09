@@ -5,7 +5,11 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 const SHOULD_SHOW_ANALYZE = IS_DEV && process.env.ANALYZE === 'true';
 
 const getNextConfig = () => {
-  const DATADOG_SRC = ['https://browser-intake-datadoghq.com'].join(' ');
+  const DATADOG_SRC = [
+    'https://browser-intake-datadoghq.com',
+    'https://rum.browser-intake-datadoghq.com',
+    'https://session-replay.browser-intake-datadoghq.com',
+  ].join(' ');
 
   const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 

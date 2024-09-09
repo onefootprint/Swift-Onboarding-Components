@@ -4,7 +4,11 @@ const BundleAnalyzer = require('@next/bundle-analyzer');
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-const DATADOG_SRC = ['https://browser-intake-datadoghq.com'].join(' ');
+const DATADOG_SRC = [
+  'https://browser-intake-datadoghq.com',
+  'https://rum.browser-intake-datadoghq.com',
+  'https://session-replay.browser-intake-datadoghq.com',
+].join(' ');
 
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
