@@ -52,7 +52,7 @@ const DateFilter = ({ dateRange, onChange }: DateFilterProps) => {
           color="primary"
           height="22px"
           lineHeight="22px"
-          variant="body-4"
+          variant="body-3"
           whiteSpace="nowrap"
           minWidth="fit-content"
           textAlign="center"

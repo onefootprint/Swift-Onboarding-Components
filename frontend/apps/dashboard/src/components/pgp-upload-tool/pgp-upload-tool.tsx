@@ -34,7 +34,7 @@ const PgpUploadTool = ({ open, onClose }: PgpUploadToolProps) => {
   return (
     <Dialog size="compact" open={open} onClose={onClose} title={t('title')}>
       <Stack direction="column" gap={3}>
-        <Text variant="body-4" justifyContent="justify">
+        <Text variant="body-3" justifyContent="justify">
           {t('description')}
         </Text>
         <HiddenInput type="file" onChange={handleChange} ref={inputFileRef} />

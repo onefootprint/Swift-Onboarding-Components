@@ -13,7 +13,7 @@ const SectionTitle = ({ title, subtitle, align = 'center' }: SectionTitleProps) 
       {title}
     </Title>
     {subtitle && (
-      <Text tag="h4" variant="body-1" maxWidth="600px" textAlign={align === 'left' ? 'left' : 'center'}>
+      <Text tag="h4" variant="display-5" maxWidth="540px" textAlign={align === 'left' ? 'left' : 'center'}>
         {subtitle}
       </Text>
     )}

@@ -72,7 +72,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
             <IconContainer>
               <Rive src="/animations/face-id.riv" />
             </IconContainer>
-            <Text tag="p" variant="label-4" color="secondary" marginTop={4}>
+            <Text tag="p" variant="label-3" color="secondary" marginTop={4}>
               {t('animation.validating-biometrics')}
             </Text>
           </AnimationContainer>
@@ -82,7 +82,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
         {showSuccessMessage && (
           <AnimationContainer variants={messageVariants} initial="initial" animate="animate" exit="exit">
             <IcoCheck24 />
-            <Text tag="p" variant="label-4" color="secondary" marginTop={4}>
+            <Text tag="p" variant="label-3" color="secondary" marginTop={4}>
               {t('animation.success')}
             </Text>
           </AnimationContainer>

@@ -106,12 +106,6 @@ Body3.args = {
   children: 'Footprint (body-3)',
 };
 
-export const Body4 = Template.bind({});
-Body4.args = {
-  variant: 'body-4',
-  children: 'Footprint (body-4)',
-};
-
 export const Label1 = Template.bind({});
 Label1.args = {
   variant: 'label-1',
@@ -128,12 +122,6 @@ export const Label3 = Template.bind({});
 Label3.args = {
   variant: 'label-3',
   children: 'Footprint (label-3)',
-};
-
-export const Label4 = Template.bind({});
-Label4.args = {
-  variant: 'label-4',
-  children: 'Footprint (label-4)',
 };
 
 export const Caption1 = Template.bind({});

@@ -32,7 +32,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
         data-dd-action-name="authorize:cta"
       />
       {privacyPolicyUrl && (
-        <Text variant="label-4" color="secondary" textAlign="center">
+        <Text variant="label-3" color="secondary" textAlign="center">
           <Trans
             ns="idv"
             i18nKey="onboarding.pages.authorize.footer"

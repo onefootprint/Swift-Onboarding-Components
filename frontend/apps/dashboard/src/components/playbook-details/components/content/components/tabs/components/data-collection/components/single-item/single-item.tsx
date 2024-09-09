@@ -35,7 +35,7 @@ const SingleItem = ({ name, value }: SingleItemProps) => {
 
   return (
     <Container>
-      {item && <Text variant="label-4">{item.title}</Text>}
+      {item && <Text variant="label-3">{item.title}</Text>}
       <OptionsContainer>
         <OptionItem>
           {value ? <IcoCheckSmall24 /> : <IcoCloseSmall24 />}

@@ -15,7 +15,6 @@ const variantMapping: VariantMapping = {
   'label-1': 'p',
   'label-2': 'p',
   'label-3': 'p',
-  'label-4': 'p',
   'caption-1': 'p',
   'caption-2': 'p',
 };

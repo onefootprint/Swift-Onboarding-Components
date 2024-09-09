@@ -15,7 +15,7 @@ const FormInputAddon = ({ children, size = 'default' }: FormInputAddonProps) => 
 
 const Container = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
 
     align-items: center;
     background: ${theme.backgroundColor.secondary};

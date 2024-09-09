@@ -29,7 +29,7 @@ const NavigationScrollLink = ({ id, children, onClick }: NavigationScrollLinkPro
 
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -48,7 +48,7 @@ const StyledLink = styled(Link)`
     }
 
     &.active {
-      ${createFontStyles('label-4')};
+      ${createFontStyles('label-3')};
       color: ${theme.color.primary};
       background-color: ${theme.backgroundColor.secondary};
 

@@ -107,7 +107,7 @@ const ToggleGroupContainer = styled(motion.div)`
 
 const Option = styled(motion.button)`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')};
+    ${createFontStyles('label-3')};
     border: unset;
     height: calc(100% - ${theme.spacing[1]} * 2);
     display: flex;
@@ -142,7 +142,7 @@ const Option = styled(motion.button)`
 
 const Badge = styled(motion.div)<{ 'data-selected': boolean }>`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')};
+    ${createFontStyles('label-3')};
     align-items: center;
     display: inline-flex;
     justify-content: center;

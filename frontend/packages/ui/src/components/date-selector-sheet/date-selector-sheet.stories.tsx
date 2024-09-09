@@ -36,7 +36,7 @@ const Template: StoryFn<DateSelectorSheetProps> = ({ startDate, endDate }) => {
         }}
         open
       >
-        <Text variant="body-4">
+        <Text variant="body-3">
           {displayedStartDate && displayedEndDate
             ? `${format(displayedStartDate, 'MMM dd, yyyy')} - ${format(displayedEndDate, 'MMM dd, yyyy')}`
             : 'Select a date range'}

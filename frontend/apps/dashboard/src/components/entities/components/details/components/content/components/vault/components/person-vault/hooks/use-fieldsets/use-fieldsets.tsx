@@ -1,11 +1,10 @@
 import {
-  IcoBuilding24,
-  IcoCreditcard24,
-  IcoDollar24,
-  IcoFileText24,
-  IcoFileText224,
-  IcoGlobe24,
-  IcoUsers24,
+  IcoBuilding16,
+  IcoCreditcard16,
+  IcoDollar16,
+  IcoFileText16,
+  IcoGlobe16,
+  IcoUsers16,
 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
@@ -28,7 +27,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
   const fieldsets = {
     basic: {
       title: t('basic.title'),
-      iconComponent: IcoFileText224,
+      iconComponent: IcoFileText16,
       fields: [
         { di: IdDI.firstName },
         { di: IdDI.middleName },
@@ -39,7 +38,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
     identity: {
       title: t('identity.title'),
-      iconComponent: IcoUsers24,
+      iconComponent: IcoUsers16,
       fields: [
         {
           di: IdDI.itin,
@@ -58,7 +57,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
     address: {
       title: t('address.title'),
-      iconComponent: IcoBuilding24,
+      iconComponent: IcoBuilding16,
       fields: [
         { di: IdDI.country },
         { di: IdDI.addressLine1 },
@@ -73,7 +72,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
     usLegalStatus: {
       title: t('us-legal-status.title'),
-      iconComponent: IcoGlobe24,
+      iconComponent: IcoGlobe16,
       fields: [
         {
           di: IdDI.usLegalStatus,
@@ -98,7 +97,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
     investorProfile: {
       title: t('investor-profile.title'),
-      iconComponent: IcoDollar24,
+      iconComponent: IcoDollar16,
       fields: [
         { di: InvestorProfileDI.employmentStatus },
         { di: InvestorProfileDI.occupation },
@@ -119,17 +118,17 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
     documents: {
       title: t('documents.title'),
-      iconComponent: IcoFileText24,
+      iconComponent: IcoFileText16,
       fields: [],
     },
     cards: {
       title: t('cards.title'),
-      iconComponent: IcoCreditcard24,
+      iconComponent: IcoCreditcard16,
       fields: [],
     },
     custom: {
       title: t('custom.title'),
-      iconComponent: IcoFileText24,
+      iconComponent: IcoFileText16,
       fields: [],
     },
   };

@@ -17,11 +17,11 @@ const InvestorProfile = () => {
 
   const renderCta = () => {
     return value ? (
-      <LinkButton destructive iconComponent={IcoTrash16} iconPosition="left" onClick={handleToggle} variant="label-4">
+      <LinkButton destructive iconComponent={IcoTrash16} iconPosition="left" onClick={handleToggle} variant="label-3">
         {t('remove')}
       </LinkButton>
     ) : (
-      <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleToggle} variant="label-4">
+      <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleToggle} variant="label-3">
         {t('add')}
       </LinkButton>
     );

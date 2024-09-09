@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Script from 'next/script';
 import { createGlobalStyle } from 'styled-components';
 
-import { DM_Sans, Source_Code_Pro } from 'next/font/google';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import Providers from '../components/providers';
 import { GOOGLE_MAPS_SRC } from '../config/constants';
 
@@ -16,9 +16,10 @@ const defaultFont = DM_Sans({
   fallback: ['Inter'],
 });
 
-const codeFont = Source_Code_Pro({
+const codeFont = DM_Mono({
   display: 'swap',
   preload: true,
+  weight: ['300', '400', '500'],
   subsets: ['latin'],
   variable: '--font-family-code',
   fallback: ['Courier New'],

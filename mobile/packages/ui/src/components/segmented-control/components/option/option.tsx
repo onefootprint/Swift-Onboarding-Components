@@ -29,7 +29,7 @@ const Option = ({ value, label, selected = false, IconComponent, onPress }: Opti
             <IconComponent color={selected ? 'quinary' : 'tertiary'} />
           </IconContainer>
         )}
-        <Typography variant="label-4" color={selected ? 'quinary' : 'tertiary'}>
+        <Typography variant="label-3" color={selected ? 'quinary' : 'tertiary'}>
           {label}
         </Typography>
       </OptionContainer>

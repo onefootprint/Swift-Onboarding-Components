@@ -107,7 +107,7 @@ const Header = styled.tr`
 
 const HeaderItem = styled.th`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     height: ${HEADER_HEIGHT}px;
     line-height: ${HEADER_HEIGHT}px;
     width: 80px;
@@ -125,7 +125,7 @@ const Row = styled.tr<{ $isLast?: boolean }>`
 
 const RowItem = styled.td`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     line-height: ${ROW_HEIGHT}px;
     position: relative;
     text-align: left;

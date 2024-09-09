@@ -7,7 +7,7 @@ const Chip = styled.div<{ children: string }>`
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
     width: fit-content;
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
 
     &[data-transparent='true'] {
       background-color: transparent;

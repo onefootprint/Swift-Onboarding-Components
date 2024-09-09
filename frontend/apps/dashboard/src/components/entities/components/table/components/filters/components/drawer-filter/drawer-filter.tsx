@@ -166,8 +166,9 @@ const DrawerFilter = () => {
 };
 
 const DrawerTrigger = styled.button`
-  ${({ theme }) => css`
-    ${createFontStyles('label-4')};
+  ${({ theme }) =>
+    css`
+    ${createFontStyles('label-3')};
     align-items: center;
     background: ${theme.backgroundColor.primary};
     border-color: ${theme.borderColor.tertiary};

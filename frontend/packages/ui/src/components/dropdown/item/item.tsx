@@ -102,7 +102,7 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
         size === 'compact' &&
         css`
           padding: ${theme.spacing[2]} ${theme.spacing[3]};
-          ${createFontStyles('body-4')};
+          ${createFontStyles('body-3')};
         `
       }
 

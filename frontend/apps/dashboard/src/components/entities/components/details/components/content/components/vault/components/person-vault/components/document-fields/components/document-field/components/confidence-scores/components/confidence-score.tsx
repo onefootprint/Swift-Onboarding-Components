@@ -19,7 +19,7 @@ const ConfidenceScore = ({ score, label }: ConfidenceScoreProps) => {
   }
   return (
     <>
-      <Text variant="body-4" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {label}
       </Text>
       <Score>

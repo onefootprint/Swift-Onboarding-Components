@@ -201,7 +201,7 @@ const Content = styled.div`
     }
 
     figcaption {
-      ${createFontStyles('body-4')}
+      ${createFontStyles('body-3')}
       margin: -${theme.spacing[8]} 0 ${theme.spacing[9]} 0;
       color: ${theme.color.quaternary};
       text-align: center;

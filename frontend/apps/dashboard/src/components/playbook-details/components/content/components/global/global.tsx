@@ -17,7 +17,7 @@ const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
 
   return (
     <Stack gap={3} direction="column">
-      <Text variant="label-4">{t('gov-docs.global.scans')}</Text>
+      <Text variant="label-3">{t('gov-docs.global.scans')}</Text>
       <Text paddingLeft={3} variant="body-3" color="secondary">
         {documentTypes.length === 0 ? t('gov-docs.none') : displayText}
       </Text>

@@ -81,7 +81,7 @@ const Group = styled(Command.Group)`
   ${({ theme }) => css`
     padding: ${theme.spacing[1]} 0;
     [cmdk-group-heading] {
-      ${createFontStyles('label-4')}
+      ${createFontStyles('label-3')}
       color: ${theme.color.tertiary};
       padding-bottom: ${theme.spacing[2]};
       margin-top: ${theme.spacing[3]};

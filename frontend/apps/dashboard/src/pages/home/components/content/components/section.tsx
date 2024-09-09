@@ -57,7 +57,7 @@ const Section = ({ metrics }: SectionProps) => {
           >
             <Grid.Item gridArea={key}>
               <Stack direction="column" gap={7}>
-                <Text variant="body-3">{t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}</Text>
+                <Text variant="body-2">{t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}</Text>
                 <Text variant="display-3">{value.toLocaleString('en-US')}</Text>
               </Stack>
             </Grid.Item>

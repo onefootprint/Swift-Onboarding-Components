@@ -12,18 +12,18 @@ const Footer = () => {
   return (
     <Container>
       <LeftColumn>
-        <Text tag="p" variant="label-4" color="tertiary">
+        <Text tag="p" variant="label-3" color="tertiary">
           © {new Date().getFullYear()} One Footprint
         </Text>
       </LeftColumn>
       <RightColumn>
         <Link rel="noopener noreferrer" href={TWITTER_URL}>
-          <Text variant="label-4" color="tertiary">
+          <Text variant="label-3" color="tertiary">
             {t('footer.twitter')}
           </Text>
         </Link>
         <Link rel="noopener noreferrer" href={LINKEDIN_URL}>
-          <Text variant="label-4" color="tertiary">
+          <Text variant="label-3" color="tertiary">
             {t('footer.linkedin')}
           </Text>
         </Link>

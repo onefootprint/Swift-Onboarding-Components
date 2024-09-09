@@ -66,7 +66,7 @@ const ResendButton = ({ isResendLoading, onResend, resendDisabledUntil, texts }:
       <AnimatePresence>
         {resendClicked && countdown > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}>
-            <Text variant="body-4" color="tertiary" marginTop={3}>
+            <Text variant="body-3" color="tertiary" marginTop={3}>
               {texts.resendCountDown.replace('{{seconds}}', String(countdown))}
             </Text>
           </motion.div>

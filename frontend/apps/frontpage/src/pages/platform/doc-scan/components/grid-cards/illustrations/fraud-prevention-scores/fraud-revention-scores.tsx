@@ -33,7 +33,7 @@ const FraudPreventionScores = () => {
           <Scores>
             {scoresContent.map((score, index) => (
               <Score key={score.title} $isLast={index === scoresContent.length - 1}>
-                <Text variant="body-4" whiteSpace="nowrap">
+                <Text variant="body-3" whiteSpace="nowrap">
                   {score.title}
                 </Text>
                 <ScoreNumber>

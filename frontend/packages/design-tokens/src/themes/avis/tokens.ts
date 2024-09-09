@@ -372,12 +372,12 @@ const tokens: Tokens = {
         default: {
           height: p.buttonHeights.default,
           paddingHorizontal: p.spacing[4],
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
         compact: {
           height: p.buttonHeights.compact,
           paddingHorizontal: p.spacing[3],
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
       },
     },
@@ -470,7 +470,7 @@ const tokens: Tokens = {
         },
         compact: {
           height: p.inputHeights.compact,
-          typography: p.typography['body-4'],
+          typography: p.typography['body-3'],
         },
       },
     },
@@ -485,7 +485,7 @@ const tokens: Tokens = {
       },
       size: {
         default: {
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
         compact: {
           typography: p.typography['caption-1'],

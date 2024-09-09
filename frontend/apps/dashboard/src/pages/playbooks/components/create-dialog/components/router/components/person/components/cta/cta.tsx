@@ -10,7 +10,7 @@ const Cta = ({ onClick }: CtaProps) => {
   const { t } = useTranslation('common');
 
   return (
-    <LinkButton iconComponent={IcoPencil16} iconPosition="left" onClick={onClick} variant="label-4">
+    <LinkButton iconComponent={IcoPencil16} iconPosition="left" onClick={onClick} variant="label-3">
       {t('edit')}
     </LinkButton>
   );

@@ -48,11 +48,11 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
 
   return (
     <Stack gap={4} flexDirection="column">
-      <Text variant="label-4">{t('title')}</Text>
+      <Text variant="label-3">{t('title')}</Text>
       {variant === 'sectioned' && (
         <>
           <Divider variant="secondary" />
-          <Text variant="label-4">{t('docs-to-collect')}</Text>
+          <Text variant="label-3">{t('docs-to-collect')}</Text>
         </>
       )}
       <Stack paddingLeft={3} gap={3} flexDirection="column">
@@ -89,8 +89,8 @@ const PopoverContent = ({
 
   const contentItems = [
     { condition: !!identifier, icon: <IcoCode216 />, text: identifier, variant: 'snippet-2' },
-    { condition: !!description, icon: <IcoWriting16 />, text: description, variant: 'body-4' },
-    { condition: requiresHumanReview, icon: <IcoFlag16 />, text: t('requires-manual-review'), variant: 'body-4' },
+    { condition: !!description, icon: <IcoWriting16 />, text: description, variant: 'body-3' },
+    { condition: requiresHumanReview, icon: <IcoFlag16 />, text: t('requires-manual-review'), variant: 'body-3' },
     {
       condition: !!uploadSettings,
       icon: <IcoFileText16 />,
@@ -98,7 +98,7 @@ const PopoverContent = ({
         uploadSettings === 'prefer_upload'
           ? t('collection-method.prefer-upload')
           : t('collection-method.prefer-capture'),
-      variant: 'body-4',
+      variant: 'body-3',
     },
   ];
 

@@ -18,7 +18,7 @@ const MobileOption = ({ option, onSelect, value }: MobileOptionProps) => {
       <OptionContainer>
         <Box display="flex" alignItems="center">
           {value && <StyledFlag code={option.value as CountryCode} />}
-          <Label variant="body-4">{label}</Label>
+          <Label variant="body-3">{label}</Label>
         </Box>
         <Box>{selected ? <IcoCheck24 /> : null}</Box>
       </OptionContainer>

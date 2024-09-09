@@ -112,7 +112,7 @@ const Template: StoryFn<DrawerProps> = ({
         secondaryButton={secondaryButton}
         linkButton={linkButton}
       >
-        <Text variant="body-4">{children}</Text>
+        <Text variant="body-3">{children}</Text>
       </Drawer>
       <Button onClick={() => setOpen(true)}>Open Drawer</Button>
     </>

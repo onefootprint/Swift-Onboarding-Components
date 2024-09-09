@@ -65,12 +65,14 @@ const LeverageCard = ({ variant, videoSrc, $inverted }: LeverageCardProps) => {
             <Chip tag="h3" variant={variant}>
               {variant === 'app-clip' ? 'Modern' : 'Secure'}
             </Chip>
-            <Text variant="heading-2" tag="h3">
-              {t(`${variant}.title` as unknown as ParseKeys<'common'>)}
-            </Text>
-            <Text variant="body-1" color="secondary" tag="h4">
-              {t(`${variant}.subtitle` as unknown as ParseKeys<'common'>)}
-            </Text>
+            <Stack direction="column" gap={2}>
+              <Text variant="heading-2" tag="h3">
+                {t(`${variant}.title` as unknown as ParseKeys<'common'>)}
+              </Text>
+              <Text variant="display-5" color="secondary" tag="h4">
+                {t(`${variant}.subtitle` as unknown as ParseKeys<'common'>)}
+              </Text>
+            </Stack>
           </Stack>
           <Stack direction="column" gap={3} paddingTop={2} width="100%" tag="ul">
             {bullets.map(bullet => (
@@ -120,7 +122,7 @@ const TextContainer = styled(Stack)`
 
 const Chip = styled(Box)<{ variant: 'app-clip' | 'passkeys' }>`
   ${({ theme, variant }) => css`
-    ${createFontStyles('label-2')}
+    ${createFontStyles('label-1')}
     color: ${variant === 'app-clip' ? theme.color.info : theme.color.success};
     border-color: ${variant === 'app-clip' ? theme.color.info : theme.color.success};
     width: fit-content;

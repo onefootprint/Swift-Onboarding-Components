@@ -69,7 +69,7 @@ const CaptureInformation = () => {
                   <IcoCheck24 color="success" />
                 </IconContainer>
               </IconOuterContainer>
-              <Text variant="label-4" color="success">
+              <Text variant="label-3" color="success">
                 ID successfully captured!
               </Text>
             </SuccessContainer>

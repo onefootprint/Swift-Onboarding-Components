@@ -110,20 +110,20 @@ const Entries = () => {
       {shouldShowAllButton && (
         <ButtonContainer align="flex-start">
           {showAllEntries ? (
-            <LinkButton variant="label-4" onClick={toggleExpanded}>
+            <LinkButton variant="label-3" onClick={toggleExpanded}>
               {t('show-less')}
             </LinkButton>
           ) : (
             <>
-              <Text variant="label-4" color="quaternary">
+              <Text variant="label-3" color="quaternary">
                 {t('entries-more', {
                   count: allCount,
                 })}
               </Text>
-              <Text tag="span" variant="label-4" color="quaternary">
+              <Text tag="span" variant="label-3" color="quaternary">
                 •
               </Text>
-              <LinkButton variant="label-4" onClick={toggleExpanded}>
+              <LinkButton variant="label-3" onClick={toggleExpanded}>
                 {t('show-all')}
               </LinkButton>
             </>

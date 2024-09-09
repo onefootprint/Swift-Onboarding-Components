@@ -227,7 +227,7 @@ const MultiSelect = <Option extends OptionType, Group extends GroupBase<Option>>
             padding: `${theme.spacing[2]} ${theme.spacing[3]}`,
           }),
           multiValueLabel: () => ({
-            ...createText(theme.typography['body-4']),
+            ...createText(theme.typography['body-3']),
           }),
           multiValueRemove: () => ({
             cursor: 'pointer',

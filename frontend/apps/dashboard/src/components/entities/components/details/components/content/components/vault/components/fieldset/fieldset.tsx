@@ -58,7 +58,9 @@ const Fieldset = ({ children, entity, fields, footer, iconComponent: IconCompone
         <Header data-primary-background={isViewingHistorical}>
           <Title>
             <IconComponent />
-            <Text variant="label-3">{title}</Text>
+            <Text variant="label-2" tag="h2">
+              {title}
+            </Text>
           </Title>
           {shouldShowSelectAll && (
             <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
@@ -117,15 +119,14 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
+    padding: ${theme.spacing[5]};
   `};
 `;
 
 const Footer = styled.footer`
   ${({ theme }) => css`
     border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[4]} 0;
-    margin: 0 ${theme.spacing[7]};
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
   `};
 `;
 

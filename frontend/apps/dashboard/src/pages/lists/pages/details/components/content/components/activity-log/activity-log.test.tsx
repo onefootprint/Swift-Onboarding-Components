@@ -33,7 +33,7 @@ describe('<ActivityLog />', () => {
         expect(screen.getByText('04/03/24')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(screen.getByText('8:56 PM')).toBeInTheDocument();
+        expect(screen.getByText('08:56 PM')).toBeInTheDocument();
       });
 
       await waitFor(() => {

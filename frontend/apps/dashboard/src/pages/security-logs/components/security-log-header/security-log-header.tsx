@@ -13,8 +13,8 @@ const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => {
   return (
     <Stack align="center" justify="flex-start" flexWrap="wrap" gap={2} marginTop={2}>
       <FieldTagList targets={targets} />
-      <Text variant="body-4">{targets.length > 1 ? 'were' : 'was'} accessed by</Text>
-      <Text variant="label-4">{actor || 'an automated process'} </Text>
+      <Text variant="body-3">{targets.length > 1 ? 'were' : 'was'} accessed by</Text>
+      <Text variant="label-3">{actor || 'an automated process'} </Text>
     </Stack>
   );
 };

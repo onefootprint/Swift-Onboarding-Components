@@ -85,6 +85,7 @@ const DrawerFilter = ({ states }: DrawerFilterProps) => {
 
 const DrawerTrigger = styled.button`
   ${({ theme }) => css`
+    ${createFontStyles('label-3')};
     height: 32px;
     width: fit-content;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
@@ -93,7 +94,6 @@ const DrawerTrigger = styled.button`
     border-radius: ${theme.borderRadius.default};
     border-style: dashed;
     border-width: ${theme.borderWidth[1]};
-    ${createFontStyles('label-4')};
     color: ${theme.color.secondary};
     cursor: pointer;
     display: flex;

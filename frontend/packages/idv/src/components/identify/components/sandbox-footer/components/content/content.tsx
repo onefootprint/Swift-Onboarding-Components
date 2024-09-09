@@ -24,19 +24,19 @@ const Content = ({ label, sandboxId, overallOutcome }: ContentProps) => {
     <Container>
       <Inner>
         <Column>
-          <Text variant="label-4" color="tertiary">
+          <Text variant="label-3" color="tertiary">
             {label}
           </Text>
-          <Text variant="label-4" color="secondary">
+          <Text variant="label-3" color="secondary">
             {sandboxId}
           </Text>
         </Column>
         {overallOutcome ? (
           <Column>
-            <Text variant="label-4" color="tertiary">
+            <Text variant="label-3" color="tertiary">
               {t('label')}
             </Text>
-            <Text variant="label-4" color="secondary">
+            <Text variant="label-3" color="secondary">
               {outcomeLabels[overallOutcome]}
             </Text>
           </Column>

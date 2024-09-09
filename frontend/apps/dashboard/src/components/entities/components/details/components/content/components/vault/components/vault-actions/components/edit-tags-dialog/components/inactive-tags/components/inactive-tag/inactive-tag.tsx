@@ -11,10 +11,10 @@ const InactiveTag = ({ text, onClick }: InactiveTagProps) => {
   return (
     <Container>
       <TagContainer>
-        <Text variant="label-4" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           #
         </Text>
-        <Text variant="label-4">{text}</Text>
+        <Text variant="label-3">{text}</Text>
       </TagContainer>
       <TriggerContainer onClick={onClick}>
         <IcoPlusSmall16 />

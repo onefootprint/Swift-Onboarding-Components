@@ -24,7 +24,9 @@ const Home = () => {
       </Text>
       <Box aria-busy={metrics.isLoading}>
         <SectionTitle>
-          <Text variant="label-1">{t('onboarding-metrics.title')}</Text>
+          <Text variant="heading-5" tag="h1">
+            {t('onboarding-metrics.title')}
+          </Text>
           <Stack gap={4}>
             <DateFilter />
             <PlaybooksFilter />

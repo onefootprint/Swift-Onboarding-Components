@@ -1,5 +1,5 @@
 import { EntityStatus } from '@onefootprint/types';
-import { InlineAlert, LinkButton } from '@onefootprint/ui';
+import { InlineAlert } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -22,13 +22,16 @@ const Banner = ({ entity, isDisabled }: BannerProps) => {
   if (entity.requiresManualReview && entity.status !== EntityStatus.none) {
     return (
       <BannerContainer data-is-disabled={isDisabled}>
-        <InlineAlert variant={entity.status === EntityStatus.failed ? 'error' : 'warning'}>
+        <InlineAlert
+          variant={entity.status === EntityStatus.failed ? 'error' : 'warning'}
+          cta={{
+            label: t('cta'),
+            onClick: handleClick,
+          }}
+        >
           {entity.status === EntityStatus.failed
             ? t('manual-review.failed-needs-review')
             : t('manual-review.verified-needs-review')}
-          <LinkButton onClick={handleClick} $marginLeft={2}>
-            {t('cta')}
-          </LinkButton>
         </InlineAlert>
       </BannerContainer>
     );
@@ -37,11 +40,14 @@ const Banner = ({ entity, isDisabled }: BannerProps) => {
   if (entity.status === EntityStatus.incomplete) {
     return (
       <BannerContainer data-is-disabled={isDisabled}>
-        <InlineAlert variant="warning">
+        <InlineAlert
+          variant="warning"
+          cta={{
+            label: t('cta'),
+            onClick: handleClick,
+          }}
+        >
           {t(`incomplete.header.${entity.kind}` as ParseKeys<'common'>)}
-          <LinkButton onClick={handleClick} $marginLeft={2}>
-            {t('cta')}
-          </LinkButton>
         </InlineAlert>
       </BannerContainer>
     );

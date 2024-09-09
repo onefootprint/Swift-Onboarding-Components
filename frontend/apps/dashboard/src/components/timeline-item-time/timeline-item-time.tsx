@@ -1,4 +1,5 @@
 import { Text } from '@onefootprint/ui';
+import { format } from 'date-fns';
 import styled, { css } from 'styled-components';
 
 export type TimelineItemTimeData =
@@ -19,25 +20,18 @@ const TimelineItemTime = ({ time }: TimelineItemTimeProps) => {
   if (isTimestamp) {
     return (
       <TimeContainer>
-        <Text variant="label-3" color="tertiary">
-          {new Date(time.timestamp).toLocaleString('en-us', {
-            month: '2-digit',
-            day: '2-digit',
-            year: '2-digit',
-          })}
+        <Text variant="snippet-2" color="tertiary">
+          {format(new Date(time.timestamp), 'MM/dd/yy')}
         </Text>
-        <Text variant="label-3" color="tertiary">
-          {new Date(time.timestamp).toLocaleString('en-us', {
-            hour: 'numeric',
-            minute: 'numeric',
-          })}
+        <Text variant="snippet-2" color="tertiary">
+          {format(new Date(time.timestamp), 'hh:mm a')}
         </Text>
       </TimeContainer>
     );
   }
 
   // Only show one date if start and end dates are the same
-  const start = new Date(time.end).toLocaleString('en-us', {
+  const start = new Date(time.start).toLocaleString('en-us', {
     month: '2-digit',
     day: '2-digit',
     year: '2-digit',

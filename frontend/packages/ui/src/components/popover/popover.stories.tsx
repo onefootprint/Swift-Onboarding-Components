@@ -31,7 +31,9 @@ const Template: StoryFn<PopoverProps> = () => {
   return (
     <Stack justify="center" align="center" width="100vw" height="100vh">
       <Popover content={<PopoverContent />}>
-        <Text variant="body-4">Open Popover</Text>
+        <Text variant="body-3" color="primary">
+          Open Popover
+        </Text>
       </Popover>
     </Stack>
   );

@@ -58,7 +58,7 @@ const ResendButton = ({ isResendLoading, resendDisabledUntil, onResend }: Resend
         {t('cta')}
       </LinkButton>
       {resendClicked && countdown > 0 && (
-        <Typography variant="body-4" color="tertiary">
+        <Typography variant="body-3" color="tertiary">
           {t('disabled', {
             seconds: `${countdown} ${countdown > 1 ? 'seconds' : 'second'}`,
           })}

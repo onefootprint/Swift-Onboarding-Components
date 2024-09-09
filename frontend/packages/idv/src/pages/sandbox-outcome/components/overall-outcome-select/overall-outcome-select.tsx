@@ -83,7 +83,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
     <Stack flexDirection="column" gap={5}>
       <Stack alignItems="center" justifyContent="space-between">
         <label htmlFor="overallOutcome">
-          <Text variant="label-4" color="primary">
+          <Text variant="label-3" color="primary">
             {t('title')}
           </Text>
         </label>
@@ -101,7 +101,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
         </NativeSelect>
       </Stack>
       {watchOverallOutcome === OverallOutcome.stepUp && (
-        <Text variant="body-4" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {overallOutcomeStepUp.description}
         </Text>
       )}

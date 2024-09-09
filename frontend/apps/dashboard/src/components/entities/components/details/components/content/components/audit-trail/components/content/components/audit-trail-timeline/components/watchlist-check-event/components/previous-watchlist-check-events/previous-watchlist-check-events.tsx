@@ -26,7 +26,7 @@ const PreviousWatchlistCheckEvents = ({ data }: PreviousWatchlistCheckEventsProp
           onClick={() => {
             setDrawerOpen(true);
           }}
-          variant="label-4"
+          variant="label-3"
         >
           {t('previous-checks-button.label')}
         </LinkButton>

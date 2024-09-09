@@ -12,7 +12,7 @@ type FeedbackProps = {
 const Feedback = ({ children, deviceKind, top }: FeedbackProps) => (
   <Container data-device={deviceKind} $top={top}>
     <FeedbackText>
-      <Text variant="label-4" color="quinary">
+      <Text variant="label-3" color="quinary">
         {children}
       </Text>
     </FeedbackText>

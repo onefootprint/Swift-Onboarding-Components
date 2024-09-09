@@ -99,7 +99,7 @@ const Markdown = ({ children, id, overrides }: MarkdownProps) => {
 
 const StyledMarkdown = styled(BaseMarkdown)`
   ${({ theme }) => css`
-    ${createFontStyles('body-2')};
+    ${createFontStyles('body-1')};
     color: ${theme.color.secondary};
     max-width: 100%;
 

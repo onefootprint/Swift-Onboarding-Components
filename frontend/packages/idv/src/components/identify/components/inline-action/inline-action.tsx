@@ -23,11 +23,11 @@ const InlineAction = ({ className, isDisabled, label, labelCta, onClick }: Inlin
   };
 
   return (
-    <Text tag="span" className={className} color="tertiary" isPrivate variant="label-4">
+    <Text tag="span" className={className} color="tertiary" isPrivate variant="label-3">
       {label}&nbsp;
       <LinkButton
         disabled={isDisabled}
-        variant="label-4"
+        variant="label-3"
         onClick={event => handleClick(event as EventClickType)}
         data-dd-action-name={`inline-action:${labelCta}`}
       >

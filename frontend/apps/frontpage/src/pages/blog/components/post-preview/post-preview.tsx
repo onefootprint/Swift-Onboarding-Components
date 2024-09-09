@@ -38,7 +38,7 @@ const PostPreview = ({
       </FeatureImageMobileContainer>
       <Content>
         <Header>
-          <Text color="accent" variant="label-4" marginBottom={2}>
+          <Text color="accent" variant="label-3" marginBottom={2}>
             {primaryTag}
           </Text>
           <Text color="primary" variant="heading-2">

@@ -99,7 +99,7 @@ const TabGroup = styled(NavigationMenu.List)`
 
 const Title = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     color: ${theme.color.tertiary};
     margin-bottom: ${theme.spacing[3]};
     padding: 0 ${theme.spacing[4]};
@@ -110,7 +110,7 @@ const Element = styled(NavigationMenu.Link)``;
 
 const User = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     color: ${theme.color.tertiary};
   `}
 `;

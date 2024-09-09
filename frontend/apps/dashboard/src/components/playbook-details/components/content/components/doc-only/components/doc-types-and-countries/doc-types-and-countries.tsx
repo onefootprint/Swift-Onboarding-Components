@@ -16,7 +16,7 @@ const DocTypesAndCountries = ({ documentTypesAndCountries, hasSelfie }: DocTypes
   return (
     <Stack gap={5} direction="column">
       <Stack gap={4} direction="column">
-        <Text variant="label-4">{t('gov-docs.title')}</Text>
+        <Text variant="label-3">{t('gov-docs.title')}</Text>
         <Divider variant="secondary" />
       </Stack>
       <Global global={global} hasSelfie={hasSelfie} />

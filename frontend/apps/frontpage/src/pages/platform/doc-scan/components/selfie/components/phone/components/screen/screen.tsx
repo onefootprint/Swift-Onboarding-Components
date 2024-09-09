@@ -81,7 +81,7 @@ const Screen = ({ shouldAnimate }: ScreenProps) => {
           <Message>
             <IcoCheckCircle24 color="success" />
             <Stack gap={1} direction="column">
-              <Text variant="label-4">Success!</Text>
+              <Text variant="label-3">Success!</Text>
             </Stack>
           </Message>
           <Blur>
@@ -243,7 +243,7 @@ const Frame = styled(motion.svg)`
 
 const PromptContainer = styled(Box)`
   ${({ theme }) => css`
-  ${createFontStyles('label-4')}
+  ${createFontStyles('label-3')}
     position: absolute;
     bottom: ${theme.spacing[3]};
     left: 50%;

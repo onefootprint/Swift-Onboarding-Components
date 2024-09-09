@@ -8,7 +8,7 @@ type H5Props = {
 const H5 = ({ children }: H5Props) => {
   const { id, label } = getSectionMeta(children);
   return (
-    <HeadingAnchor id={id} variant="label-3" tag="h5">
+    <HeadingAnchor id={id} variant="heading-5" tag="h5">
       {label}
     </HeadingAnchor>
   );

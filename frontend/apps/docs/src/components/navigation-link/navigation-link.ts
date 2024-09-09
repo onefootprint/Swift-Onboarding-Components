@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 
 const NavigationLink = styled.div<{ $isSelected?: boolean }>`
   ${({ theme, $isSelected }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     border-radius: ${theme.borderRadius.default};
     display: block;
     margin-bottom: ${theme.spacing[2]};

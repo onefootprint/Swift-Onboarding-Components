@@ -100,7 +100,7 @@ const Container = styled.button<{
 
     return css`
       all: unset;
-      ${createFontStyles('body-4')};
+      ${createFontStyles('body-3')};
       cursor: pointer;
       user-select: none;
       position: relative;

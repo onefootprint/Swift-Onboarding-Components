@@ -34,7 +34,7 @@ const ProtectedDetails = ({ entity, onClick, isLoading }: ProtectedDetailsProps)
         </Box>
       ) : (
         <InstructionsBox>
-          <Text variant="body-4" color="tertiary">
+          <Text variant="body-3" color="tertiary">
             {t('no-permission.message')}
           </Text>
           <LinkButton href={`${DASHBOARD_BASE_URL}/settings`} target="_blank" $marginTop={3}>

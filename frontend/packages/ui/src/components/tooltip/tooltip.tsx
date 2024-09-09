@@ -67,7 +67,7 @@ const Tooltip = ({
 
 const TooltipContainer = styled(TooltipPrimitive.Content)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('caption-3')}
     background: ${theme.backgroundColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[2]};

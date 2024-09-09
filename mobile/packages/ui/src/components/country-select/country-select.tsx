@@ -61,12 +61,12 @@ const CountrySelect = forwardRef(
         renderTrigger={(triggerPlaceholder, selectedOption) => {
           return selectedOption ? (
             <Box gap={4} flexDirection="row" center>
-              <Typography variant="body-4" color={disabled ? 'quaternary' : 'primary'}>
+              <Typography variant="body-3" color={disabled ? 'quaternary' : 'primary'}>
                 {selectedOption.label}
               </Typography>
             </Box>
           ) : (
-            <Typography variant="body-4">{triggerPlaceholder}</Typography>
+            <Typography variant="body-3">{triggerPlaceholder}</Typography>
           );
         }}
         ref={ref}

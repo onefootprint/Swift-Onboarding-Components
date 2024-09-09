@@ -31,7 +31,7 @@ const ValidationTimelineItemHeader = ({ attribute, matchLevel }: ValidationTimel
   return (
     <HeaderContainer>
       <Text variant="label-3">{t(`attributes.${attribute}` as ParseKeys<'common'>)}</Text>
-      <Text variant="body-4" color={matchColors[matchLevel]}>
+      <Text variant="body-3" color={matchColors[matchLevel]}>
         {t(`match-level.${matchLevel}` as ParseKeys<'common'>)}
       </Text>
     </HeaderContainer>

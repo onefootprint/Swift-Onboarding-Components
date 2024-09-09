@@ -46,7 +46,7 @@ const CardMotionVariants = {
 
 const ColorSelection: React.FC<ColorSelectionProps> = ({ onChange, title, colorList, activeHex, className }) => (
   <Card className={className} variants={CardMotionVariants} initial="floating" animate="floating">
-    <Text variant="label-4">{title}</Text>
+    <Text variant="label-3">{title}</Text>
     <Stack direction="row" inline gap={2}>
       {colorList.map(({ name, hex }) => (
         <Box key={name} width="100%">

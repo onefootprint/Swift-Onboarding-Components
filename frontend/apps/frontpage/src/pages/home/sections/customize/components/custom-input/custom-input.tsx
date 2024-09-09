@@ -47,7 +47,7 @@ const CustomInput = ({ title, type, value, onChange, className }: CustomInputTyp
   return (
     <Card className={className} variants={CardMotionVariants} initial="floating" animate="floating">
       <label htmlFor={inputId}>
-        <Text variant="label-4">{title}</Text>
+        <Text variant="label-3">{title}</Text>
       </label>
       <StyledInput id={inputId} type={type} onChange={onChange} value={formattedValue} />
     </Card>

@@ -34,7 +34,7 @@ export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
 const Timeline = ({ items, isLoading }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   if (!isLoading && !items.length) {
-    return <Text variant="body-4">{t('empty')}</Text>;
+    return <Text variant="body-3">{t('empty')}</Text>;
   }
 
   return (

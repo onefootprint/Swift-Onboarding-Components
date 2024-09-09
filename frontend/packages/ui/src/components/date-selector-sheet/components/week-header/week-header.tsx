@@ -13,7 +13,7 @@ const WeekHeader = () => {
     <Container columns={['repeat(7,40px)']} rows={['32px']}>
       {dayTranslations.map(day => (
         <Stack key={day} justify="center">
-          <Text variant="label-4" color="tertiary">
+          <Text variant="label-3" color="tertiary">
             {t(`global.days-short.${day}`, { defaultValue: day })}
           </Text>
         </Stack>

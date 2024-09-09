@@ -87,7 +87,7 @@ const Option = ({ children, value, onClick, onDelete, isEdit }: OptionProps) => 
           transition={{ duration: 0.1 }}
         >
           <ConfirmationFooter>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('warning')}
             </Text>
             <Button onClick={handleDelete}>{t('delete')}</Button>

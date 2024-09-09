@@ -161,7 +161,7 @@ const Description = styled.p<{
     } = theme;
 
     return css`
-      ${createFontStyles('body-4')}
+      ${createFontStyles('body-3')}
       color: ${radioSelect.color};
 
       ${

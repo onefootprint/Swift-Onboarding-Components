@@ -20,7 +20,7 @@ const Tag = ({ children, icon: Icon }: TagProps) => {
 
 const Container = styled(motion.span)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     color: ${theme.color.primary};
     display: flex;
     align-items: center;

@@ -62,7 +62,7 @@ const Table = ({ options }: TableProps) => (
                       {typeof content === 'string' ? <Typography variant="body-2">{content}</Typography> : content}
                     </Box>
                     {endText && (
-                      <Typography color="tertiary" variant="body-4">
+                      <Typography color="tertiary" variant="body-3">
                         {endText}
                       </Typography>
                     )}

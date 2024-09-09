@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 
 const ComponentNameBadge = styled(Stack)<{ className?: string }>`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     border-radius: ${theme.borderRadius.full};
     background-color: ${theme.backgroundColor.secondary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

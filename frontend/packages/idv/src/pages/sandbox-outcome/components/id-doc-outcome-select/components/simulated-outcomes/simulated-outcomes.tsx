@@ -26,7 +26,7 @@ const SimulatedOutcomes = () => {
 
   return (
     <Stack flexDirection="column" gap={5}>
-      <Text variant="body-4" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('description')}
       </Text>
       <Box
@@ -39,7 +39,7 @@ const SimulatedOutcomes = () => {
       >
         <Stack alignItems="center" justifyContent="space-between">
           <label htmlFor="idDocOutcome">
-            <Text variant="label-4" color="primary">
+            <Text variant="label-3" color="primary">
               {t('label')}
             </Text>
           </label>
@@ -57,7 +57,7 @@ const SimulatedOutcomes = () => {
           <Box>
             <IcoWarning16 color="warning" />
           </Box>
-          <Text variant="body-4" color="warning">
+          <Text variant="body-3" color="warning">
             {t('options.fail.description')}
           </Text>
         </Stack>

@@ -1,5 +1,5 @@
 import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
-import { IcoInfo24, IcoWarning24 } from '@onefootprint/icons';
+import { IcoInfo16, IcoWarning16 } from '@onefootprint/icons';
 import { css } from 'styled-components';
 
 import type { InlineAlertVariant } from './inline-alert.types';
@@ -27,21 +27,34 @@ export const inlineAlertVariantStyles: Record<
 
 export const getIconForVariant = (variant: InlineAlertVariant) => {
   if (variant === 'error' || variant === 'warning') {
-    return IcoWarning24;
+    return IcoWarning16;
   }
-  return IcoInfo24;
+  return IcoInfo16;
 };
 
-export const createVariantStyles = (variant: InlineAlertVariant) => {
+export const createBackgroundStyles = (variant: InlineAlertVariant) => {
   const style = inlineAlertVariantStyles[variant];
   if (!style) {
     return '';
   }
-  const { backgroundColor, color } = style;
+  const { backgroundColor } = style;
 
   return css`
     ${({ theme }) => css`
       background-color: ${theme.backgroundColor[backgroundColor]};
+    `}
+  `;
+};
+
+export const createTextStyles = (variant: InlineAlertVariant) => {
+  const style = inlineAlertVariantStyles[variant];
+  if (!style) {
+    return '';
+  }
+  const { color } = style;
+
+  return css`
+    ${({ theme }) => css`
       color: ${theme.color[color]};
     `}
   `;

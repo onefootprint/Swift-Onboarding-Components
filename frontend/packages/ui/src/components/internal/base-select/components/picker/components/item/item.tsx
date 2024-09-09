@@ -18,7 +18,7 @@ const Item = ({ option, value, onSelect }: ItemProps) => {
   return (
     <Box role="option" onClick={onSelect} tabIndex={0}>
       <ItemContainer>
-        <Label variant="body-4">{label}</Label>
+        <Label variant="body-3">{label}</Label>
         <Box>{selected ? <IcoCheck24 /> : null}</Box>
       </ItemContainer>
     </Box>

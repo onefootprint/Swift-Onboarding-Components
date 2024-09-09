@@ -66,7 +66,7 @@ const Template: StoryFn<GridContainerProps & GridItemProps> = ({
         borderPosition="all"
         borderWidth={1}
         borderRadius="default"
-        fontStyle="body-4"
+        fontStyle="body-3"
         gridArea={item.gridArea}
       >
         {item.content}

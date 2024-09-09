@@ -59,14 +59,14 @@ const RulesTable = () => (
   <TableContainer direction="column">
     {ruleTableContent.map((row, rowIndex) => (
       <Row direction="row" align="center" gap={3} flexWrap="wrap" key={uniqueId(`row-${rowIndex}-`)}>
-        <Text variant="body-4" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           if
         </Text>
         {row.map(({ signal, op, list }, index) => (
           <React.Fragment key={uniqueId(`rule-${index}-`)}>
             <RuleTag signal={signal} op={op} list={list} />
             {index < row.length - 1 && (
-              <Text variant="body-4" color="tertiary">
+              <Text variant="body-3" color="tertiary">
                 and
               </Text>
             )}

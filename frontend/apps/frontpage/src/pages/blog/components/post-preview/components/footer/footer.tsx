@@ -56,7 +56,7 @@ const Separator = styled.span`
     display: flex;
     align-items: center;
     justify-content: center;
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     color: ${theme.color.tertiary};
     grid-area: separator;
   `}
@@ -84,7 +84,7 @@ const Avatar = styled(Image)`
 
 const AuthorsName = styled.div<{ $verticalStack: boolean }>`
   ${({ theme, $verticalStack }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     color: ${theme.color.tertiary};
     grid-area: name;
     margin-left: ${$verticalStack ? 0 : theme.spacing[2]};
@@ -93,7 +93,7 @@ const AuthorsName = styled.div<{ $verticalStack: boolean }>`
 
 const DateComponent = styled.time`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     color: ${theme.color.tertiary};
     grid-area: date;
   `}

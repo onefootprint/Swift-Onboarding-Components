@@ -92,7 +92,7 @@ const UploadFile = ({
           <>
             <Stack align="center" gap={3} marginTop={5} marginBottom={5}>
               <Divider />
-              <Text color="quaternary" variant="body-4">
+              <Text color="quaternary" variant="body-3">
                 {t('or')}
               </Text>
               <Divider />

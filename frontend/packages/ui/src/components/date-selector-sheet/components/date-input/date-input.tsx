@@ -93,7 +93,7 @@ const DateInput = ({ autoFocus, value, hasError, onChange, onFocus }: DateInputP
         type="number"
         value={month}
       />
-      <Text color="tertiary" variant="body-4">
+      <Text color="tertiary" variant="body-3">
         /
       </Text>
       <Day
@@ -105,7 +105,7 @@ const DateInput = ({ autoFocus, value, hasError, onChange, onFocus }: DateInputP
         type="number"
         value={day}
       />
-      <Text color="tertiary" variant="body-4">
+      <Text color="tertiary" variant="body-3">
         /
       </Text>
       <Year
@@ -151,7 +151,7 @@ const Container = styled(Stack)`
 
 const Input = styled.input`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
       -webkit-appearance: none;

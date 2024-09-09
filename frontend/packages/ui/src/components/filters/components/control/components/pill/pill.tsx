@@ -14,7 +14,7 @@ export type PillProps = {
 
 const Pill = styled.button<PillProps>`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')};
+    ${createFontStyles('label-3')};
     align-items: center;
     border-color: ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};

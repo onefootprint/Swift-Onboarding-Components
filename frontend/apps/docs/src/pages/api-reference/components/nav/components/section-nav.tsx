@@ -24,7 +24,7 @@ const Section = ({ section, onLinkClick }: SubsectionProps) => {
       {subsections.map(subsection => (
         <Box marginLeft={3}>
           <NavigationScrollLink id={subsection.id} onClick={onLinkClick}>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {subsection.title}
             </Text>
           </NavigationScrollLink>

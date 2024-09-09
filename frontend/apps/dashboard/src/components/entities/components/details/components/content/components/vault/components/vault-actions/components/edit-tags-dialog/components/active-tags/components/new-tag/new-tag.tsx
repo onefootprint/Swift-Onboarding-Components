@@ -40,7 +40,7 @@ const NewTag = ({ onRemove, onAdd }: NewTagProps) => {
   return (
     <Container ref={ref}>
       <TagContainer>
-        <Text variant="label-4" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           #
         </Text>
         <StyledInput
@@ -91,7 +91,7 @@ const StyledInput = styled(TextInput)`
     &[data-size="compact"] {
       height: fit-content;
       width: 100px;
-      ${createFontStyles('label-4')};
+      ${createFontStyles('label-3')};
     }
   `};
 `;

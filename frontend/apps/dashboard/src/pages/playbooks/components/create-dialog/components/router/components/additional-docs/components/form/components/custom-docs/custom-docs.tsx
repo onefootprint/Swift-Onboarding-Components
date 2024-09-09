@@ -68,7 +68,7 @@ const CustomDocs = () => {
                 <Stack gap={3} alignItems="center" justifyContent="space-between">
                   <Text variant="label-3">{t('form.title')}</Text>
                   <LinkButton
-                    variant="label-4"
+                    variant="label-3"
                     onClick={handleEdit(index)}
                     iconPosition="left"
                     iconComponent={IcoPencil16}
@@ -85,7 +85,7 @@ const CustomDocs = () => {
               </Stack>
             </Box>
           ))}
-          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" variant="label-4" onClick={handleAdd}>
+          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" variant="label-3" onClick={handleAdd}>
             {allT('add')}
           </LinkButton>
         </Stack>

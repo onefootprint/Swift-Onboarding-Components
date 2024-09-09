@@ -26,7 +26,7 @@ const SegmentedControlOption = ({
         <IconComponent color={selected ? 'quinary' : 'tertiary'} />
       </IconContainer>
     )}
-    <Text variant="label-4">{label}</Text>
+    <Text variant="label-3">{label}</Text>
   </OptionTrigger>
 );
 

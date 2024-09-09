@@ -65,7 +65,7 @@ const CountrySpecificIdDocPicker = () => {
     <>
       <Stack direction="column" gap={1}>
         <Text variant="label-3">{t('title')}</Text>
-        <Text variant="body-4">{t('subtitle')}</Text>
+        <Text variant="body-3">{t('subtitle')}</Text>
       </Stack>
       <Stack direction="column" gap={4}>
         {!isEmptyMap && <ExistingCountryDocMappings countryDocMappings={countryDocMap} onEdit={handleEdit} />}

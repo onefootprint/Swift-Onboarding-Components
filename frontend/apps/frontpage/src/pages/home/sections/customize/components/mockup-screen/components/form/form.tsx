@@ -25,7 +25,7 @@ const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
     <FormContainer>
       <Stack direction="column" gap={3} width="100%">
         <Text variant="label-3">{t('title')}</Text>
-        <Text variant="body-4" color="secondary">
+        <Text variant="body-3" color="secondary">
           {t('subtitle')}
         </Text>
       </Stack>

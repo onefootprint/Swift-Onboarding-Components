@@ -1,4 +1,4 @@
-import { IcoBuilding24, IcoFileText24, IcoFileText224, IcoUsers24 } from '@onefootprint/icons';
+import { IcoBuilding16, IcoFileText16, IcoFileText216, IcoUsers16 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ const useFieldsets = (): Fieldset => {
   return {
     basic: {
       title: t('basic.title'),
-      iconComponent: IcoFileText224,
+      iconComponent: IcoFileText216,
       fields: [
         { di: BusinessDI.name },
         { di: BusinessDI.doingBusinessAs },
@@ -45,7 +45,7 @@ const useFieldsets = (): Fieldset => {
     },
     bos: {
       title: t('bos.title'),
-      iconComponent: IcoBuilding24,
+      iconComponent: IcoBuilding16,
       fields: [
         {
           di: BusinessDI.beneficialOwners,
@@ -55,7 +55,7 @@ const useFieldsets = (): Fieldset => {
     },
     address: {
       title: t('address.title'),
-      iconComponent: IcoUsers24,
+      iconComponent: IcoUsers16,
       fields: [
         { di: BusinessDI.country },
         { di: BusinessDI.addressLine1 },
@@ -67,7 +67,7 @@ const useFieldsets = (): Fieldset => {
     },
     custom: {
       title: t('custom.title'),
-      iconComponent: IcoFileText24,
+      iconComponent: IcoFileText16,
       fields: [],
     },
   };

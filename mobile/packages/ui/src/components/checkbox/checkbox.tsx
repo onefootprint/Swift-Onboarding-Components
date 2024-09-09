@@ -33,7 +33,7 @@ const Checkbox = ({ label, value, onValueChange }: CheckboxProps) => {
           {value ? <IcoCheckSmall16 color="quinary" /> : null}
         </Box>
         {label && (
-          <Typography variant="body-4" flexShrink={1}>
+          <Typography variant="body-3" flexShrink={1}>
             {label}
           </Typography>
         )}

@@ -104,7 +104,7 @@ const Select = <T extends BaseOption = BaseOption<string>>(
           {renderTrigger ? (
             renderTrigger(placeholder, value)
           ) : (
-            <Typography variant="body-4">{selectedValueText || placeholder}</Typography>
+            <Typography variant="body-3">{selectedValueText || placeholder}</Typography>
           )}
           <IcoChevronDown16 />
         </Box>

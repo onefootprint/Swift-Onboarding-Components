@@ -16,7 +16,7 @@ const Progress = ({ details, value }: ProgressProps) => {
         <Text variant="label-3" color="secondary">
           {`${value.toFixed(0)}${t('percentage-completed')}`}
         </Text>
-        <Text variant="label-4" color="tertiary">
+        <Text variant="label-3" color="tertiary">
           {details}
         </Text>
       </Stack>

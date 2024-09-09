@@ -17,7 +17,7 @@ const CountrySpecific = ({ countrySpecific }: CountrySpecificProps) => {
 
   return (
     <Stack gap={3} direction="column">
-      <Text variant="label-4">{t('gov-docs.country-specific.scans')}</Text>
+      <Text variant="label-3">{t('gov-docs.country-specific.scans')}</Text>
       <Stack direction="row" gap={8} paddingLeft={3}>
         {countries.length === 0 ? (
           <Text variant="body-3">{t('gov-docs.country-specific.none')}</Text>

@@ -36,13 +36,13 @@ const Content = () => {
         <Box marginBottom={7}>
           <Banner isDisabled={isHeadingDisabled} />
         </Box>
-        <Box marginBottom={7}>
+        <Box marginBottom={5}>
           <Breadcrumb isDisabled={isHeadingDisabled} />
         </Box>
         <Box>
           <PinnedNotes isDisabled={isHeadingDisabled} />
         </Box>
-        <Box marginBottom={5}>
+        <Box marginBottom={3}>
           <Header isDisabled={isHeadingDisabled} />
         </Box>
         <Box marginBottom={5}>

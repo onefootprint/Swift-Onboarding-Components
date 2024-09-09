@@ -20,7 +20,7 @@ const RequestDocument = ({ visible }: RequestDocumentProps) => {
   return (
     <AnimatedContainer isExpanded={visible}>
       <Stack direction="column" gap={5}>
-        <Text variant="label-4">{t('title')}</Text>
+        <Text variant="label-3">{t('title')}</Text>
         <Stack direction="column" gap={4}>
           <Checkbox label={t('id-photo.title')} value={RequestMoreInfoKind.IdDocument} {...register('kinds')} />
           <AnimatedContainer isExpanded={triggerKinds.includes(RequestMoreInfoKind.IdDocument)} marginLeft={7}>

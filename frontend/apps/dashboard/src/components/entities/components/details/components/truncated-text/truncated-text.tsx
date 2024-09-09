@@ -27,7 +27,7 @@ const TruncatedText = ({ text, maxTextViewHeight, textFontVariant, textStyleProp
     <Text ref={textContainerRef} variant={textFontVariant} {...textStyleProps}>
       <bdi>{currShownText}</bdi>
       {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
-        <LinkButton variant="label-4" onClick={showMoreOrLessText} $marginLeft={2}>
+        <LinkButton variant="label-3" onClick={showMoreOrLessText} $marginLeft={2}>
           {shownTextState === ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT ? t('see-more') : t('see-less')}
         </LinkButton>
       )}

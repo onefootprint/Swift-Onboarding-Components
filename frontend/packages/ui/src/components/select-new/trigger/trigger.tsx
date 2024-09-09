@@ -70,7 +70,7 @@ const StyledTrigger = styled(Select.Trigger)<{
       ${
         size === 'compact' &&
         css`
-        ${createFontStyles('body-4')}
+        ${createFontStyles('body-3')} 
         height: ${input.size.compact.height};
         padding: ${theme.spacing[2]} ${theme.spacing[3]};
       `
@@ -79,7 +79,7 @@ const StyledTrigger = styled(Select.Trigger)<{
       ${
         size === 'default' &&
         css`
-        ${createFontStyles('body-3')}
+        ${createFontStyles('body-2')}
         height: ${input.size.default.height};
         padding: ${theme.spacing[3]} ${theme.spacing[4]};
       `

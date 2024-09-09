@@ -9,7 +9,7 @@ type FeedbackProps = {
 const Feedback = ({ children }: FeedbackProps) => {
   return (
     <Container>
-      <Typography variant="label-4" color="quinary">
+      <Typography variant="label-3" color="quinary">
         {children}
       </Typography>
     </Container>

@@ -10,17 +10,17 @@ export type RuleTagProps = {
 
 const RuleTag = ({ signal, op, list, $elevated }: RuleTagProps) => (
   <Container direction="row" gap={3} $elevated={$elevated}>
-    <Text variant="label-4">{signal}</Text>
-    <Text variant="label-4">{op}</Text>
+    <Text variant="label-3">{signal}</Text>
+    <Text variant="label-3">{op}</Text>
     {list ? (
       <>
-        <Text variant="body-4" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           in
         </Text>
-        <Text variant="body-4">{list}</Text>
+        <Text variant="body-3">{list}</Text>
       </>
     ) : (
-      <Text variant="body-4">triggered</Text>
+      <Text variant="body-3">triggered</Text>
     )}
   </Container>
 );

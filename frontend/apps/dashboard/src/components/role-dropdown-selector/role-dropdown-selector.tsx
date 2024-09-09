@@ -33,7 +33,7 @@ const Scopes = styled.span`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     gap: ${theme.spacing[2]};
     color: ${theme.color.tertiary};
 

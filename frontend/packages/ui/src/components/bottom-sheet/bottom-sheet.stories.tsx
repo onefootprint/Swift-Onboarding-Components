@@ -63,7 +63,7 @@ const Template: StoryFn<BottomSheetProps> = ({ children, onClose, open: initialO
         open={open}
         title={title}
       >
-        <Text variant="body-4">{children}</Text>
+        <Text variant="body-3">{children}</Text>
       </BottomSheet>
       <Button onClick={() => setOpen(true)}>Open bottom sheet</Button>
     </>
@@ -103,7 +103,7 @@ const LinkTemplate: StoryFn<BottomSheetProps> = ({ title, onClose, open: initial
         }}
         open={open}
       >
-        <Text variant="body-4">Content</Text>
+        <Text variant="body-3">Content</Text>
       </BottomSheet>
       <Button onClick={() => setOpen(true)}>Open bottom sheet</Button>
     </>

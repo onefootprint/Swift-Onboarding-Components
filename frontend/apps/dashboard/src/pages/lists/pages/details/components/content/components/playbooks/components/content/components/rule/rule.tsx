@@ -19,7 +19,7 @@ const RuleComponent = ({ rule }: RuleProps) => {
 
   return (
     <Stack gap={3} direction="row" flexWrap="wrap" align="center">
-      <Text variant="body-4" color="primary">
+      <Text variant="body-3" color="primary">
         {t('if')}
       </Text>
       {rule.ruleExpression.map((expression, index) => (

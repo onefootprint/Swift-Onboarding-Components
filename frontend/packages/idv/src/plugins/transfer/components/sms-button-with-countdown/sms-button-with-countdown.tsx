@@ -93,7 +93,7 @@ const SmsButtonWithCountdown = ({ url, authToken }: SmsButtonWithCountdownProps)
         {t('cta')}
       </Button>
       {countdown > 0 && (
-        <Text variant="body-4" color="quaternary">
+        <Text variant="body-3" color="quaternary">
           {t('subtitleWithCount', {
             count: countdown,
           })}

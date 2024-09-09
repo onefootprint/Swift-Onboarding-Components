@@ -52,13 +52,13 @@ const PillContainer = styled.div`
 
 const Pill = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('body-3')};
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
     padding: ${theme.spacing[2]} ${theme.spacing[4]};
 
     span {
-      ${createFontStyles('label-4')};
+      ${createFontStyles('label-3')};
     }
   `}
 `;

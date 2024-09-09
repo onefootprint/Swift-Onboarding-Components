@@ -59,7 +59,7 @@ const IntroStep = ({ onHandoff, onFillout }: IntroStepProps) => {
         </Stack>
         <Stack alignItems="center" marginBlock={5}>
           <Divider />
-          <Text variant="body-4" color="tertiary" width="50px">
+          <Text variant="body-3" color="tertiary" width="50px">
             or
           </Text>
           <Divider />

@@ -162,7 +162,7 @@ const DrawerTimeline = ({
                           </Text>
                         ) : null}
                       </DivWithRightPadding>
-                      <Text tag="span" variant="body-4" color="tertiary" flexShrink={0}>
+                      <Text tag="span" variant="body-3" color="tertiary" flexShrink={0}>
                         {dateFormatter(lang, i.timestamp)}
                       </Text>
                     </Stack>

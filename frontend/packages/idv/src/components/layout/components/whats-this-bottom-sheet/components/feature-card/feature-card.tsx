@@ -22,9 +22,9 @@ const FeatureCard = ({ title, subtitle, icon: Icon }: FeatureCardProps) => {
     >
       <Stack direction="row" gap={3} align="center" justify="start">
         {renderedIcon}
-        <Text variant="label-4">{title}</Text>
+        <Text variant="label-3">{title}</Text>
       </Stack>
-      <Text variant="body-4" color="secondary">
+      <Text variant="body-3" color="secondary">
         {subtitle}
       </Text>
     </Stack>

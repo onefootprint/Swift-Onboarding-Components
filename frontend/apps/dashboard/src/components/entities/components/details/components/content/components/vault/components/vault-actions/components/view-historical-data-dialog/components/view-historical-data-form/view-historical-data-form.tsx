@@ -66,7 +66,7 @@ const TimeContainer = styled.div`
     > div {
       gap: ${theme.spacing[2]};
       p {
-        ${createFontStyles('body-4')};
+        ${createFontStyles('body-3')};
         min-width: 0;
       }
       p:not(:last-child)::after {

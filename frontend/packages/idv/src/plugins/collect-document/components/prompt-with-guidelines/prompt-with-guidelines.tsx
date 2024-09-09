@@ -52,7 +52,7 @@ const PromptWithGuidelines = ({
           <Stack height="21px" justifyContent="center" alignItems="center">
             <IcoWarning16 />
           </Stack>
-          <Text variant="label-4" textAlign="left">
+          <Text variant="label-3" textAlign="left">
             {alertMessage}
           </Text>
         </AlertContainer>

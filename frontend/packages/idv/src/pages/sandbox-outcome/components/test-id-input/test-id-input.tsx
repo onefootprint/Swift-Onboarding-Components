@@ -45,7 +45,7 @@ const TestIdInput = () => {
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="testID">
           <Stack gap={2}>
-            <Text variant="label-4">{t('test-id.label')}</Text>
+            <Text variant="label-3">{t('test-id.label')}</Text>
             <Tooltip text={t('test-id.description')} alignment="start" position="top">
               <IcoInfo16 testID="infoIcon" />
             </Tooltip>

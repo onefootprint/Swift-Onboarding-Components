@@ -126,13 +126,13 @@ const RulesActionRow = ({ isEditing, rule, onDelete, onEdit, onUndoDelete, onUnd
     <RulesListItem role="row" aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}>
       <Stack justify="space-between" align="start">
         <Stack align="center" gap={3} flexWrap="wrap">
-          <Text variant="body-4">{t('if')}</Text>
+          <Text variant="body-3">{t('if')}</Text>
           {expressions.length ? (
             expressions.map((expression, index) => (
               // eslint-disable-next-line react/no-array-index-key
               <React.Fragment key={`${index} ${expression.field}`}>
                 {index > 0 && (
-                  <Text variant="body-4" paddingLeft={2} paddingRight={2}>
+                  <Text variant="body-3" paddingLeft={2} paddingRight={2}>
                     {t('and')}
                   </Text>
                 )}
@@ -226,7 +226,7 @@ const RulesListItem = styled(Stack)`
     flex-direction: column;
     gap: ${theme.spacing[6]};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     line-height: 240%;
 
     &:not(:last-child) {

@@ -25,15 +25,12 @@ export type FontVariant =
   | 'body-1'
   | 'body-2'
   | 'body-3'
-  | 'body-4'
   | 'label-1'
   | 'label-2'
   | 'label-3'
-  | 'label-4'
   | 'caption-1'
   | 'caption-2'
-  | 'caption-3'
-  | 'caption-4';
+  | 'caption-3';
 
 type Typography = string;
 

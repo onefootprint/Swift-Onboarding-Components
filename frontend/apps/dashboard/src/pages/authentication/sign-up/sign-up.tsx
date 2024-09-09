@@ -28,13 +28,13 @@ const Signup = () => {
             <SocialButtons />
             <Stack direction="row" center gap={4}>
               <Divider />
-              <Text variant="body-4" color="tertiary">
+              <Text variant="body-3" color="tertiary">
                 {t('or')}
               </Text>
               <Divider />
             </Stack>
             <EmailForm />
-            <Text color="secondary" variant="body-4" gap={2} display="inline-flex">
+            <Text color="secondary" variant="body-3" gap={2} display="inline-flex">
               <span>{t('already-have-an-account')}</span>
               <Link href="/authentication/sign-in">{t('sign-in')}</Link>
             </Text>

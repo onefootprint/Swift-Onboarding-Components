@@ -169,11 +169,11 @@ const Label = styled.label`
     cursor: pointer;
 
     &[data-size='compact'] {
-      ${createFontStyles('body-4')};
+      ${createFontStyles('label-3')};
     }
 
     &[data-size='default'] {
-      ${createFontStyles('body-3')};
+      ${createFontStyles('label-2')};
     }
   `}
 `;
@@ -256,11 +256,11 @@ const Hint = styled.div`
       text-align: left;
 
       &[data-size='compact'] {
-        ${createFontStyles('body-4')};
+        ${createFontStyles('body-3')};
       }
 
       &[data-size='default'] {
-        ${createFontStyles('body-3')};
+        ${createFontStyles('body-2')};
       }
     `;
   }}

@@ -13,7 +13,7 @@ const Layout = ({ children }: LayoutProps) => (
     </Stack>
     <Stack tag="footer" alignItems="center" gap={3}>
       <IcoFootprintShield16 />
-      <Text variant="label-4">Powered by Footprint</Text>
+      <Text variant="label-3">Powered by Footprint</Text>
     </Stack>
   </Stack>
 );

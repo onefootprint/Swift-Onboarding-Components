@@ -39,15 +39,15 @@ const RiskSignalsGlossary = ({ open, onClose }: RiskSignalsGlossaryProps) => {
       <Stack direction="column" gap={3}>
         {filteredRiskSignals?.length === 0 && (
           <Stack paddingTop={5} paddingBottom={5}>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {t('no-results')}
             </Text>
           </Stack>
         )}
         {filteredRiskSignals?.map(riskSignal => (
           <Stack key={riskSignal.reasonCode} direction="column" gap={2} paddingTop={2} paddingBottom={2}>
-            <Text variant="label-4">{riskSignal.reasonCode}</Text>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="label-3">{riskSignal.reasonCode}</Text>
+            <Text variant="body-3" color="tertiary">
               {riskSignal.description}
             </Text>
           </Stack>

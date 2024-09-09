@@ -3,7 +3,7 @@ import { GoogleTagManager } from '@next/third-parties/google';
 
 import Intercom from '@intercom/messenger-js-sdk';
 import type { AppProps } from 'next/app';
-import { DM_Sans, Source_Code_Pro } from 'next/font/google';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useEffect } from 'react';
@@ -21,11 +21,12 @@ const defaultFont = DM_Sans({
   fallback: ['Inter'],
 });
 
-const codeFont = Source_Code_Pro({
+const codeFont = DM_Mono({
   display: 'swap',
   preload: true,
   subsets: ['latin'],
   variable: '--font-family-code',
+  weight: ['300', '400', '500'],
   fallback: ['Courier New'],
 });
 

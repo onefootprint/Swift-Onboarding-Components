@@ -24,7 +24,7 @@ const Item = ({ option, size, isLast, isFirst }: ItemProps) => (
 
 const StyledItem = styled(Select.Item)<{ size?: string; disabled?: boolean; $isLast?: boolean; $isFirst?: boolean }>`
   ${({ theme, size, disabled, $isLast, $isFirst }) => css`  
-    ${createFontStyles(size === 'compact' ? 'body-4' : 'body-3')};
+    ${createFontStyles(size === 'compact' ? 'body-3' : 'body-2')};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     border-radius: calc(${theme.borderRadius.default} - 2px);
     cursor: pointer;

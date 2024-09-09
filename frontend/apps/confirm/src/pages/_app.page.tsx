@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app';
 
-import { DM_Sans, Source_Code_Pro } from 'next/font/google';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import { createGlobalStyle } from 'styled-components';
 import Providers from '../components/providers';
 
@@ -12,10 +12,11 @@ const defaultFont = DM_Sans({
   fallback: ['Inter'],
 });
 
-const codeFont = Source_Code_Pro({
+const codeFont = DM_Mono({
   display: 'swap',
   preload: true,
   subsets: ['latin'],
+  weight: ['300', '400', '500'],
   variable: '--font-family-code',
   fallback: ['Courier New'],
 });

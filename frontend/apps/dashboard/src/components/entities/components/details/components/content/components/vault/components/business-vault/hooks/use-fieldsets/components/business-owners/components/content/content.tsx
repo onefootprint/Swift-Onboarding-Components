@@ -55,7 +55,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
       {businessOwner.id && (
         <>
           <span>·</span>
-          <Text color="accent" variant="label-4">
+          <Text color="accent" variant="label-3">
             <Link target="_blank" href={`/users/${businessOwner.id}`}>
               {t('link')}
             </Link>

@@ -28,15 +28,15 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
       </LogoContainer>
       <Stack flex={1} position="relative">
         <PositionedQuoteIcon />
-        <Text variant="body-3" zIndex={1} paddingTop={3} tag="blockquote">
+        <Text variant="body-1" zIndex={1} paddingTop={3} tag="blockquote">
           {t(`${company}.quote` as unknown as ParseKeys<'common'>)}&quot;
         </Text>
       </Stack>
       <Stack direction="column" align="flex-start" justify="flex-start" position="relative" gap={2}>
-        <Text variant="label-3" tag="h4">
+        <Text variant="label-1" tag="h4">
           {t(`${company}.name` as unknown as ParseKeys<'common'>)}
         </Text>
-        <Text variant="body-3" color="tertiary" tag="h5">
+        <Text variant="body-1" color="tertiary" tag="h5">
           {t(`${company}.role` as unknown as ParseKeys<'common'>)}
         </Text>
         <AuthorImageContainer>

@@ -48,7 +48,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((_props, ref) => {
   return (
     <>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Text variant="body-4" color="secondary" marginBottom={5} marginTop={7}>
+      <Text variant="body-3" color="secondary" marginBottom={5} marginTop={7}>
         <Trans
           ns="idv"
           i18nKey="document-flow.id-doc.components.image-consent.description"
@@ -89,7 +89,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((_props, ref) => {
           checked={isThirdPartyConsented}
         />
         <LabelContainer onClick={handleThirdPartyConsent}>
-          <Text variant="body-4" color="secondary">
+          <Text variant="body-3" color="secondary">
             {t('third-party-consent')}
           </Text>
         </LabelContainer>

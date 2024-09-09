@@ -40,7 +40,7 @@ const Frame = styled.svg`
 
 const PromptContainer = styled(Box)`
   ${({ theme }) => css`
-  ${createFontStyles('label-4')}
+  ${createFontStyles('label-3')}
     position: absolute;
     bottom: ${theme.spacing[3]};
     left: 50%;

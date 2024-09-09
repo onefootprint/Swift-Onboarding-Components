@@ -370,20 +370,20 @@ const tokens: Tokens = {
           height: p.buttonHeights.large,
           paddingHorizontal: p.spacing[7],
           typography: {
-            fontSize: p.typography['label-3'].fontSize,
-            fontWeight: p.typography['label-3'].fontWeight,
-            lineHeight: p.typography['label-3'].lineHeight,
+            fontSize: p.typography['label-2'].fontSize,
+            fontWeight: p.typography['label-2'].fontWeight,
+            lineHeight: p.typography['label-2'].lineHeight,
           },
         },
         default: {
           height: p.buttonHeights.default,
           paddingHorizontal: p.spacing[4],
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
         compact: {
           height: p.buttonHeights.compact,
           paddingHorizontal: p.spacing[3],
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
       },
     },
@@ -476,7 +476,7 @@ const tokens: Tokens = {
         },
         compact: {
           height: p.inputHeights.compact,
-          typography: p.typography['body-4'],
+          typography: p.typography['body-3'],
         },
       },
     },
@@ -491,7 +491,7 @@ const tokens: Tokens = {
       },
       size: {
         default: {
-          typography: p.typography['label-4'],
+          typography: p.typography['label-3'],
         },
         compact: {
           typography: p.typography['caption-1'],

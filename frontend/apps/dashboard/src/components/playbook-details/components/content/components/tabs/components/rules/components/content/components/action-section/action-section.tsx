@@ -128,7 +128,7 @@ const ActionSection = ({
         {addedRules.length > 0 ? (
           emptyRows
         ) : (
-          <Text variant="body-4" paddingTop={3} paddingBottom={3} paddingLeft={4} paddingRight={4}>
+          <Text variant="body-3" paddingTop={3} paddingBottom={3} paddingLeft={4} paddingRight={4}>
             {t('empty-rules')}
           </Text>
         )}
@@ -148,7 +148,7 @@ const ActionSection = ({
         {isStepUpSubsection ? (
           <Stack align="center" gap={3}>
             <IcoFileText16 />
-            <Text variant="label-4">{t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}</Text>
+            <Text variant="label-3">{t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}</Text>
           </Stack>
         ) : (
           actionTitle

@@ -25,14 +25,14 @@ const WatchlistCheckEventsDrawerContent = ({ data }: WatchlistCheckEventsDrawerC
             {t('drawer-title')}
           </Text>
           <Stack gap={2}>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {`${new Date(timestamp).toLocaleString('en-us', {
                 month: '2-digit',
                 day: '2-digit',
                 year: '2-digit',
               })},`}
             </Text>
-            <Text variant="body-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {new Date(timestamp).toLocaleString('en-us', {
                 hour: 'numeric',
                 minute: 'numeric',

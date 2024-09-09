@@ -15,16 +15,16 @@ const Field = ({ label, firstString, diff, secondString, className }: FieldProps
       {label}
     </Text>
     <Stack direction="row" inline gap={2} align="center">
-      <Text variant="body-4" color="secondary">
+      <Text variant="body-3" color="secondary">
         {firstString}
       </Text>
       {diff && (
-        <StyledDiff variant="label-4" color="error">
+        <StyledDiff variant="label-3" color="error">
           {diff}
         </StyledDiff>
       )}
       {secondString && (
-        <Text variant="body-4" color="primary">
+        <Text variant="body-3" color="primary">
           {secondString}
         </Text>
       )}

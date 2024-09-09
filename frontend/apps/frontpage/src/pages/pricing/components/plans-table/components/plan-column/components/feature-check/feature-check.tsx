@@ -1,4 +1,4 @@
-import { IcoCheck16 } from '@onefootprint/icons';
+import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Badge, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -10,14 +10,12 @@ type FeatureCheckProps = {
 const FeatureCheck = ({ children, soon }: FeatureCheckProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
   return (
-    <Stack direction="row" marginTop={2} justify="space-between">
-      <Stack direction="row" gap={2} align="start">
-        <Stack flexGrow={0} marginTop={2}>
-          <IcoCheck16 />
+    <Stack direction="row" justify="space-between">
+      <Stack direction="row" gap={2} align="start" flexGrow={1}>
+        <Stack flex={0} height="20px" align="center" justify="center">
+          <IcoCheckSmall16 />
         </Stack>
-        <Stack flexGrow={1}>
-          <Text variant="label-3">{children}</Text>
-        </Stack>
+        <Text variant="label-2">{children}</Text>
       </Stack>
       {soon && <Badge variant="info">{t('soon')}</Badge>}
     </Stack>

@@ -47,10 +47,10 @@ const Header = () => {
           )}
         </Stack>
         <Stack align="center" gap={2}>
-          <Text variant="body-4" color="secondary">
+          <Text variant="body-3" color="secondary">
             {t('kind')}
           </Text>
-          <Text variant="label-4" color="secondary">
+          <Text variant="label-3" color="secondary">
             {data.kind}
           </Text>
         </Stack>

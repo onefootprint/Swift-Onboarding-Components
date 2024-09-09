@@ -11,11 +11,11 @@ const Cta = ({ onClick, hasAdded }: CtaProps) => {
   const { t } = useTranslation('common');
 
   return hasAdded ? (
-    <LinkButton iconComponent={IcoPencil16} iconPosition="left" onClick={onClick} variant="label-4">
+    <LinkButton iconComponent={IcoPencil16} iconPosition="left" onClick={onClick} variant="label-3">
       {t('edit')}
     </LinkButton>
   ) : (
-    <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={onClick} variant="label-4">
+    <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={onClick} variant="label-3">
       {t('add')}
     </LinkButton>
   );

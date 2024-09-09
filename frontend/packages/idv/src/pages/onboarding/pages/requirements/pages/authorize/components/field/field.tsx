@@ -23,7 +23,7 @@ const IconContainer = styled.span`
 `;
 
 const LabelContainer = styled.span`
-  ${createFontStyles('body-4')};
+  ${createFontStyles('body-3')};
 
   ${media.greaterThan('md')`
     ${createFontStyles('label-3')};

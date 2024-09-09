@@ -72,7 +72,7 @@ const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
               {t('title')}
             </Typography>
           </Box>
-          <Typography variant="label-4" center>
+          <Typography variant="label-3" center>
             {t('subtitle')}
           </Typography>
           <Box marginTop={5} paddingHorizontal={6}>

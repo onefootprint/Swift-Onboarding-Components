@@ -48,7 +48,7 @@ const AppNav = ({ navigation, onItemClick }: AppNavProps) => {
 
 const NavigationSectionTitle = styled.header`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-transform: capitalize;
   `}

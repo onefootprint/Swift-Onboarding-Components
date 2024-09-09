@@ -68,7 +68,7 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
                 <SubLink href={subLink.href}>
                   <Text
                     color={router.pathname.startsWith(subLink.href) ? 'primary' : 'tertiary'}
-                    variant={router.pathname.startsWith(subLink.href) ? 'label-4' : 'body-4'}
+                    variant={router.pathname.startsWith(subLink.href) ? 'label-3' : 'body-3'}
                   >
                     {subLink.text}
                   </Text>

@@ -33,8 +33,8 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
         <Dropdown.Trigger aria-label="Open card options" variant="chevron">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
-            <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
-            <Text variant="body-4">({selectedCard.alias})</Text>
+            <Text variant="body-3">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : '••••'}</Text>
+            <Text variant="body-3">({selectedCard.alias})</Text>
           </CardLine>
         </Dropdown.Trigger>
         <Dropdown.Content align="end" $width="240px">
@@ -47,8 +47,8 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
               >
                 <Stack direction="row" align="center" justify="between" gap={4}>
                   <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
-                  <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
-                  <Text variant="body-4">({card.alias})</Text>
+                  <Text variant="body-3">{card?.number_last4 ? `••••${card.number_last4}` : '••••'}</Text>
+                  <Text variant="body-3">({card.alias})</Text>
                 </Stack>
               </CardAndNumber>
             ))}

@@ -93,7 +93,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
 const Label = styled.label<Pick<CheckboxProps, 'hasError'>>`
   ${({ theme, hasError }) => css`
-    ${createFontStyles('body-3')};
+    ${createFontStyles('body-2')};
     align-items: center;
     color: ${hasError ? theme.color.error : theme.color.primary};
     display: inline-flex;

@@ -23,7 +23,7 @@ const RuleList = ({ rules, stepUpAction }: RuleListProps) => {
       {stepUpAction && (
         <Stack align="center" gap={3}>
           <IcoFileText16 />
-          <Text variant="label-4">{t(`step-up.${actionName}` as ParseKeys<'common'>)}</Text>
+          <Text variant="label-3">{t(`step-up.${actionName}` as ParseKeys<'common'>)}</Text>
         </Stack>
       )}
       {rules.length ? (

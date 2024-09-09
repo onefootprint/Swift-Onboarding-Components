@@ -21,7 +21,7 @@ const LinkingButton = styled(Link)<LinkingButtonProps>`
         large: 'label-2',
         default: 'label-2',
         compact: 'label-3',
-        small: 'label-4',
+        small: 'caption-1',
       };
       const heights = {
         large: '48px',

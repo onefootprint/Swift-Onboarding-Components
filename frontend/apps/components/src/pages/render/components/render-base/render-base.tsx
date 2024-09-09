@@ -58,7 +58,7 @@ const RenderBase = ({ isHidden, label, mask, onToggleHidden, value, canCopy }: R
     <Container>
       <FieldContainer>
         {label && (
-          <Text color="tertiary" variant="label-4">
+          <Text color="tertiary" variant="label-3">
             {label}
           </Text>
         )}

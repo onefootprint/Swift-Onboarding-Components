@@ -147,7 +147,7 @@ const Template: StoryFn<DialogProps> = ({
         title={title}
         isConfirmation={isConfirmation}
       >
-        <Text variant="body-4">{children}</Text>
+        <Text variant="body-3">{children}</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog
@@ -223,7 +223,7 @@ const OnlyPrimaryTemplate: StoryFn<DialogProps> = ({
         title={title}
         isConfirmation={isConfirmation}
       >
-        <Text variant="body-4">{children}</Text>
+        <Text variant="body-3">{children}</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog
@@ -276,7 +276,7 @@ const LinkTemplate: StoryFn<DialogProps> = ({
         open={open}
         isConfirmation={isConfirmation}
       >
-        <Text variant="body-4">Content</Text>
+        <Text variant="body-3">Content</Text>
       </Dialog>
       <Button onClick={() => setOpen(true)} size="default">
         Open dialog

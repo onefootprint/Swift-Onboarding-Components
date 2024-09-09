@@ -18,7 +18,7 @@ const Scores = ({ document, ocr, selfie }: ScoresProps) => {
     <Section title="Scores" IconComponent={IcoSpeedometer24} id="scores">
       <Container>
         <Item aria-label={t('document')} aria-hidden>
-          <Text color="tertiary" variant="body-4">
+          <Text color="tertiary" variant="body-3">
             {t('document')}
           </Text>
           <Text color="success" variant="heading-1">
@@ -29,7 +29,7 @@ const Scores = ({ document, ocr, selfie }: ScoresProps) => {
           </Text>
         </Item>
         <Item aria-label={t('ocr')} aria-hidden>
-          <Text color="tertiary" variant="body-4">
+          <Text color="tertiary" variant="body-3">
             {t('ocr')}
           </Text>
           <Text color="success" variant="heading-1">
@@ -40,7 +40,7 @@ const Scores = ({ document, ocr, selfie }: ScoresProps) => {
           </Text>
         </Item>
         <Item aria-label={t('selfie')} aria-hidden>
-          <Text color="tertiary" variant="body-4">
+          <Text color="tertiary" variant="body-3">
             {t('selfie')}
           </Text>
           <Text color="success" variant="heading-1">

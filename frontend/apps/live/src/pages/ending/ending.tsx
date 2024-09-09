@@ -20,7 +20,7 @@ const Ending = () => {
       <StyledContainer>
         <HeadingContainer>
           <Stack
-            fontStyle="label-4"
+            fontStyle="label-3"
             borderWidth={1}
             borderColor="tertiary"
             borderRadius="full"

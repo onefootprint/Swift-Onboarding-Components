@@ -44,8 +44,8 @@ const Billing = () => {
       <Stack direction="column" gap={7} marginTop={3}>
         <Text variant="heading-2">{t('meta-title')}</Text>
         <Stack direction="column">
-          <Text variant="label-1">{t('title')}</Text>
-          <Text variant="body-3" marginTop={2}>
+          <Text variant="heading-5">{t('title')}</Text>
+          <Text variant="body-2" marginTop={2}>
             {t('subtitle')}
           </Text>
           <Divider marginTop={5} marginBottom={7} />

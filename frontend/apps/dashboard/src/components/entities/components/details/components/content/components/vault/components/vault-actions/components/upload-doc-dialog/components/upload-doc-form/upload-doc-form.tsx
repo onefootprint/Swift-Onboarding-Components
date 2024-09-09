@@ -63,7 +63,7 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
           <Stack justifyContent="space-between" align="center">
             <Form.Label htmlFor="title">{t('form.file.label')}</Form.Label>
             {doc && (
-              <LinkButton variant="label-4" onClick={handleOpenFile} $marginBottom={3}>
+              <LinkButton variant="label-3" onClick={handleOpenFile} $marginBottom={3}>
                 {t('form.file.upload-new')}
               </LinkButton>
             )}
@@ -90,7 +90,7 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
               <LinkButton variant="label-3" onClick={handleOpenFile}>
                 {t('form.file.cta')}
               </LinkButton>
-              <Text variant="body-4" color="quaternary">
+              <Text variant="body-3" color="quaternary">
                 {t('form.file.supported-formats')}
               </Text>
             </DocUpload>

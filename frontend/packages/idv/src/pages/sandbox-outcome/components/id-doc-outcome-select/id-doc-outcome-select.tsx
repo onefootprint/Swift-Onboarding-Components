@@ -27,7 +27,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
     <Stack flexDirection="column" gap={5} borderStyle="dashed" borderTopWidth={1} paddingTop={5} borderColor="tertiary">
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="docVerificationOutcome">
-          <Text variant="label-4" color="primary">
+          <Text variant="label-3" color="primary">
             {t('title')}
           </Text>
         </label>
@@ -44,7 +44,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
         )}
       </Stack>
       {docVerificationOutcome === IdVerificationOutcome.real ? (
-        <Text variant="body-4" color="tertiary">
+        <Text variant="body-3" color="tertiary">
           {t('real-outcome.description')}
         </Text>
       ) : (

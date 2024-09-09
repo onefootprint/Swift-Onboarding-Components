@@ -55,7 +55,7 @@ const Security = ({ type }: SecurityProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
@@ -64,7 +64,7 @@ const Container = styled.div`
 
 const Title = styled.div`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')}
+    ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
     display: flex;

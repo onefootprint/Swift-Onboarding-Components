@@ -74,7 +74,7 @@ const Form = ({ onClose }: FormProps) => {
             iconComponent={IcoTrash16}
             iconPosition="left"
             onClick={handleRemoveAll}
-            variant="label-4"
+            variant="label-3"
             disabled={!hasDoc}
           >
             {t('remove-all')}

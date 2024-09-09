@@ -18,12 +18,12 @@ const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardPro
 
   return (
     <Container role="group" aria-label={`${sectionAction} correlation card`}>
-      <Text variant="label-4" marginTop={4} marginBottom={5}>
+      <Text variant="label-3" marginTop={4} marginBottom={5}>
         <Trans
           ns="playbooks"
           i18nKey="details.rules.backtesting.correlation.action-list"
           components={{
-            color: <ActionText variant="label-4" color={getActionVariant(sectionActionValue)} />,
+            color: <ActionText variant="label-3" color={getActionVariant(sectionActionValue)} />,
           }}
           values={{ action: getActionText(sectionActionValue) }}
         />

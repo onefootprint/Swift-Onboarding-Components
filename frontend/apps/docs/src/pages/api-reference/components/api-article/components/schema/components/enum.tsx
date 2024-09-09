@@ -29,7 +29,7 @@ const Enum = ({ enums }: EnumProps) => {
 
   return (
     <Container>
-      <Text variant="body-4" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('allowed-values')}
       </Text>
       {groupedItems.map((group: string[]) => (
@@ -71,7 +71,7 @@ const Container = styled.div`
 
 const List = styled(Stack)`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     color: ${theme.color.primary};
     gap: ${theme.spacing[2]};
   `}
@@ -97,7 +97,7 @@ const ButtonContainer = styled.div<{ expanded: boolean }>`
 
 const ShowAllButton = styled.button`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')}
+    ${createFontStyles('body-3')}
     color: ${theme.color.secondary};
     display: flex;
     align-items: center;

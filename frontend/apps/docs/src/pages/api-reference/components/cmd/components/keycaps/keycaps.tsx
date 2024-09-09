@@ -10,7 +10,7 @@ const Keycaps = () => {
         <KeyCap>⌘</KeyCap>
         <KeyCap>K</KeyCap>
       </KeyCaps>
-      <Text variant="body-4" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('jump-to-section')}
       </Text>
     </Container>

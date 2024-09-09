@@ -24,14 +24,14 @@ const SignUp = () => {
         <Stack flexDirection="column" gap={3}>
           <Stack gap={3} alignItems="center">
             <IcoEmail16 />
-            <Text variant="body-4" color="secondary">
+            <Text variant="body-3" color="secondary">
               {t('sign-up.email.label')}
             </Text>
           </Stack>
 
           <Stack gap={3} alignItems="center">
             <IcoSmartphone216 />
-            <Text variant="body-4" color="secondary">
+            <Text variant="body-3" color="secondary">
               {t('sign-up.phone-number.label')}
             </Text>
           </Stack>

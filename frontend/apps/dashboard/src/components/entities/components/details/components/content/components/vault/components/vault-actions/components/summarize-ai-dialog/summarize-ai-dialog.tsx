@@ -106,7 +106,7 @@ const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
               <IcoWand24 color="info" />
             </Stack>
             <Stack direction="column" alignItems="flex-start">
-              <Text variant="body-4">{t('detail')}</Text>
+              <Text variant="body-3">{t('detail')}</Text>
             </Stack>
           </InlineMessage>
         </AnimatePresence>

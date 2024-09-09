@@ -106,10 +106,12 @@ const Content = ({ organization }: ContentProps) => {
             </Stack>
             <Stack direction="column" gap={7} style={{ maxWidth: '640px' }}>
               <Stack direction="column" gap={3}>
-                <Text variant="label-2">{t('support-links.title')}</Text>
+                <Text variant="heading-5">{t('support-links.title')}</Text>
                 <Stack direction="row" inline gap={2} align="center">
-                  <Text variant="body-3">{t('support-links.subtitle')}</Text>
-                  <LinkButton onClick={handleHelpDialogOpen}>{t('support-links.more-details')}</LinkButton>
+                  <Text variant="body-2">{t('support-links.subtitle')}</Text>
+                  <LinkButton variant="label-2" onClick={handleHelpDialogOpen}>
+                    {t('support-links.more-details')}
+                  </LinkButton>
                   <HelpDialog open={helpDialogOpen} onClose={handleHelpDialogClose} />
                 </Stack>
               </Stack>
