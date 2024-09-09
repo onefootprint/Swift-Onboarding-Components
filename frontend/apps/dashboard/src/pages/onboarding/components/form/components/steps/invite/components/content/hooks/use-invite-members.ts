@@ -19,8 +19,8 @@ const inviteMember = async (authHeaders: AuthHeaders, payload: CreateMembersRequ
 
 const useInviteMembers = () => {
   const isMutating = useIsMutating(['inviteMember']);
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite',
   });
   const toast = useToast();
   const session = useSession();

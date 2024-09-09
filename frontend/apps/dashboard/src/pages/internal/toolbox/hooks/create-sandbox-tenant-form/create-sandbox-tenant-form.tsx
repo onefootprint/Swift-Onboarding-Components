@@ -28,10 +28,10 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
   } = methods;
   const router = useRouter();
   const { logIn } = useSession();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('onboarding');
   const SIZE_OPTIONS = Object.values(OrganizationSize).map(size => ({
     value: size,
-    label: t(`pages.onboarding.company-data.form.size.values.${size}`),
+    label: t(`company-data.form.size.values.${size}`),
   }));
 
   const handleBeforeSubmit = async (data: CreateSandboxTenantFormData) => {

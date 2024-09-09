@@ -14,8 +14,8 @@ export type InviteProps = {
 };
 
 const Invite = ({ onBack, onComplete }: InviteProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite',
   });
   const rolesQuery = useRoles(RoleKind.dashboardUser);
   const orgQuery = useOrg();

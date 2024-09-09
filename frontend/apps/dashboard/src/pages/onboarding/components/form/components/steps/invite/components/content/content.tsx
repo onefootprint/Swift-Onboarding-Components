@@ -26,8 +26,8 @@ type FormData = {
 
 const Content = ({ defaultRole, onBack, onComplete, org, roles }: ContentProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite',
   });
   const inviteMembersMutations = useInviteMembers();
   const updateOrgMutation = useUpdateOrg();

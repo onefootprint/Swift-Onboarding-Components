@@ -9,8 +9,8 @@ export type HeaderProps = {
 };
 
 const Header = ({ userEmail, onLogout }: HeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.header',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'header',
   });
 
   return (

@@ -11,6 +11,7 @@ import type entityDocuments from '../config/locales/en/entity-documents.json';
 import type homeResource from '../config/locales/en/home.json';
 import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
+import type onboardingResource from '../config/locales/en/onboarding.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
 import type settingsResource from '../config/locales/en/settings.json';
 import type switchOrgresource from '../config/locales/en/switch-org.json';
@@ -37,6 +38,7 @@ declare module 'i18next' {
       users: typeof usersResource;
       home: typeof homeResource;
       settings: typeof settingsResource;
+      onboarding: typeof onboardingResource;
     };
   }
 }

@@ -9,7 +9,7 @@ import Form from './components/form';
 import Header from './components/header';
 
 const Onboarding = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.onboarding' });
+  const { t } = useTranslation('onboarding');
   const router = useRouter();
   const session = useSession();
 

@@ -14,7 +14,7 @@ export type FormProps = {
 };
 
 const Form = ({ onComplete }: FormProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.onboarding' });
+  const { t } = useTranslation('onboarding');
   const options = [
     { value: 'welcome', label: t('welcome.nav') },
     { value: 'user', label: t('user-data.nav') },

@@ -19,8 +19,8 @@ type FormData = {
 const UserData = ({ onBack, onComplete }: UserDataProps) => {
   const { data, dangerouslyCastedData, mutation } = useUserSession();
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.user-data',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'user-data',
   });
   const {
     register,

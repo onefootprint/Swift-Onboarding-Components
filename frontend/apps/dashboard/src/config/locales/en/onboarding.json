@@ -1,0 +1,119 @@
+{
+  "back": "Back",
+  "next": "Next",
+  "page-title": "Footprint | Onboarding",
+  "header": {
+    "logged-as": "Logged in as",
+    "logout": "Log out"
+  },
+  "stepper": {
+    "aria-label": "An onboarding process with 4 steps"
+  },
+  "welcome": {
+    "img-alt": "A Penguin using a cellphone",
+    "nav": "Welcome",
+    "title": "Welcome to Footprint!",
+    "subtitle": "Your account is almost ready. We just need a bit more information about you and your company."
+  },
+  "user-data": {
+    "nav": "About you",
+    "title": "Tell us about you",
+    "subtitle": "Please provide some basic personal information",
+    "form": {
+      "email": {
+        "label": "Email address",
+        "placeholder": "jane.doe@acme.com"
+      },
+      "first-name": {
+        "label": "First name",
+        "placeholder": "Jane",
+        "errors": {
+          "required": "Please enter a first name"
+        }
+      },
+      "last-name": {
+        "label": "Last name",
+        "placeholder": "Doe",
+        "errors": {
+          "required": "Please enter a last name"
+        }
+      }
+    }
+  },
+  "company-data": {
+    "nav": "About your company",
+    "title": "Tell us about your company",
+    "subtitle": "Please provide some basic company information",
+    "form": {
+      "name": {
+        "label": "Company name",
+        "placeholder": "Acme Bank",
+        "errors": {
+          "required": "Please enter a name"
+        }
+      },
+      "website": {
+        "label": "Company website",
+        "placeholder": "https://www.acme.com",
+        "errors": {
+          "required": "Please enter a website"
+        }
+      },
+      "size": {
+        "label": "Company size",
+        "placeholder": "Select",
+        "errors": {
+          "required": "Please select one option"
+        },
+        "values": {
+          "s1_to10": "1-10",
+          "s11_to50": "11-50",
+          "s51_to100": "51-100",
+          "s101_to1000": "101-1000",
+          "s1001_plus": "> 1000"
+        }
+      }
+    }
+  },
+  "invite": {
+    "nav": "Invite teammates",
+    "title": "Invite teammates",
+    "subtitle": "Invite your teammates to join you on Footprint",
+    "form": {
+      "email": {
+        "label": "Email address",
+        "placeholder": "jane.doe@acme.com",
+        "errors": {
+          "required": "Please enter an email"
+        }
+      },
+      "role": {
+        "label": "Role",
+        "placeholder": "Select",
+        "errors": {
+          "required": "Please select a role"
+        }
+      },
+      "errors": {
+        "invalid": "Please complete the fields above."
+      }
+    },
+    "allow-domain-access": {
+      "title": "Allow domain access",
+      "subtitle": "Allow users with email addresses with this domain to join your team with read-only access without requiring an invite.",
+      "action": "Enable access for",
+      "toggle": {
+        "cta-not-allowed": "You're not allowed to toggle domain access",
+        "domain-already-claimed": "Domain access for {{domain}} has already been claimed. Please contact your admin to invite you to the existing organization."
+      }
+    },
+    "add-more": "Add more",
+    "notification": {
+      "error": {
+        "title_one": "Invitation wasn't sent",
+        "title_other": "Invitations weren't sent"
+      }
+    },
+    "cta": "Go to dashboard"
+  }
+}

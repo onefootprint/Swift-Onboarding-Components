@@ -9,8 +9,8 @@ export type InviteFieldsProps = {
 };
 
 const InviteFields = ({ index, roles }: InviteFieldsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite',
   });
   const { register, control } = useFormContext();
   const shouldShowLabel = index === 0;

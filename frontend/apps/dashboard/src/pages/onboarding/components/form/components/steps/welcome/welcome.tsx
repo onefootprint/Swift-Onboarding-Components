@@ -11,8 +11,8 @@ export type WelcomeProps = {
 
 const Welcome = ({ onComplete }: WelcomeProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.welcome',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'welcome',
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

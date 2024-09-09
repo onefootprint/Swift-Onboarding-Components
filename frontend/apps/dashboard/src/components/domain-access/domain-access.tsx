@@ -15,8 +15,8 @@ export type DomainAccessProps = {
 };
 
 const DomainAccess = ({ org }: DomainAccessProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite.allow-domain-access',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite.allow-domain-access',
   });
   const updateOrgMutation = useUpdateOrg();
   const showRequestErrorToast = useRequestErrorToast();

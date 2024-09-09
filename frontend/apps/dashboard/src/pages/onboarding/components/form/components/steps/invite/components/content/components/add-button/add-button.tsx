@@ -7,8 +7,8 @@ type AddButtonProps = {
 };
 
 const AddButton = ({ onClick }: AddButtonProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.invite',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'invite',
   });
 
   return (

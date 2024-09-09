@@ -13,8 +13,8 @@ export type CompanyDataProps = {
 
 const CompanyData = ({ onBack, onComplete }: CompanyDataProps) => {
   const orgQuery = useOrg();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.onboarding.company-data',
+  const { t } = useTranslation('onboarding', {
+    keyPrefix: 'company-data',
   });
 
   return (
