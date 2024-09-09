@@ -67,6 +67,7 @@ pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
 }
 
 
+#[tracing::instrument("vault_dr::run_batch_for_config", skip_all)]
 async fn run_batch_for_config(state: &State, knobs: Knobs, config_id: &VaultDrConfigId) -> FpResult<()> {
     let vdr_writer = VaultDrWriter::new(state, config_id, knobs).await?;
 

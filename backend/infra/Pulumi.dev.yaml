@@ -199,9 +199,9 @@ config:
           - vault-dr-worker
           - --batch-size=1000
           - --poll-period-ms=5000
-          - --record-task-concurrency=256
-        cpuUnits: 1024
-        memoryMB: 2048
+          - --record-task-concurrency=32
+        cpuUnits: 4096
+        memoryMB: 16384
         name: vault-dr
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88

@@ -32,6 +32,7 @@ use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
 use std::collections::HashMap;
 use std::fmt::Debug;
+use tokio::time::Instant;
 
 // https://www.iana.org/assignments/media-types/application/vnd.age
 const AGE_CONTENT_TYPE: &str = "application/vnd.age";
@@ -319,11 +320,13 @@ impl VaultDrWriter {
             .key(&key)
             .body(body);
 
+        let start = Instant::now();
         let result = req.send().await.map_err(|e| -> Error {
             let svc_error = e.into_service_error();
             tracing::error!(error = ?svc_error, "S3 PutObject failed");
             Box::new(svc_error).into()
         })?;
+        let elapsed = start.elapsed();
 
         tracing::info!(
             config_id=%self.config_id,
@@ -340,6 +343,8 @@ impl VaultDrWriter {
             blob.content_length = content_length,
             blob.etag = result.e_tag.as_deref().unwrap_or(""),
             blob.doc_mime_type =? document_mime_type.map(|s| s.leak_to_string()),
+            elapsed_ms = elapsed.as_millis(),
+            bytes_per_second = content_length as f64 / elapsed.as_secs_f64(),
             "Wrote blob to S3",
         );
 
