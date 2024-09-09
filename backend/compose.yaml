@@ -49,6 +49,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
       ENCLAVE_PROXY_ENDPOINT: http://enclave_proxy:3668
+      OTEL_ENDPOINT: http://jaeger:4317
       # Use localstack for Dockerized Vault DR integration tests.
       VAULT_DR_USE_LOCALSTACK: "1"
       VAULT_DR_AWS_REGION: "us-east-1"
@@ -170,3 +171,14 @@ services:
     profiles:
       # Don't run by default.
       - test
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    networks:
+      - footprint
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
