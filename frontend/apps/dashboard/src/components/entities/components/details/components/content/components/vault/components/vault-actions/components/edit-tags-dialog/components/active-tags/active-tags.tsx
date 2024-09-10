@@ -20,7 +20,7 @@ const ActiveTags = ({ activeTags, isAddingTag, onRemove, onRemoveNew, onAddNew }
   });
 
   return (
-    <Content>
+    <Content role="group" aria-label="Active tags">
       {!activeTags.length && !isAddingTag ? (
         <Text variant="body-3" color="tertiary" center width="100%">
           {t('empty-active-tags')}

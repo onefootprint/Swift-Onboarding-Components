@@ -9,7 +9,7 @@ type ActiveTagProps = {
 
 const ActiveTag = ({ text, onClick }: ActiveTagProps) => {
   return (
-    <Container>
+    <Container aria-label={text}>
       <TagContainer>
         <Text variant="label-3" color="tertiary">
           #

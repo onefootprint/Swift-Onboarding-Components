@@ -9,7 +9,7 @@ type InactiveTagProps = {
 
 const InactiveTag = ({ text, onClick }: InactiveTagProps) => {
   return (
-    <Container>
+    <Container aria-label={text}>
       <TagContainer>
         <Text variant="label-3" color="tertiary">
           #

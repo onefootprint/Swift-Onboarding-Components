@@ -29,7 +29,7 @@ const InactiveTags = ({ entityKind, activeTags, onClick }: InactiveTagsProps) =>
 
   if (error || inactiveTags?.length) {
     return (
-      <Stack direction="column" justify="flex-start" gap={5}>
+      <Stack direction="column" justify="flex-start" gap={5} role="group" aria-label="Inactive tags">
         <Text variant="label-3" color="tertiary">
           {t('inactive-tags', { org: org?.name })}
         </Text>

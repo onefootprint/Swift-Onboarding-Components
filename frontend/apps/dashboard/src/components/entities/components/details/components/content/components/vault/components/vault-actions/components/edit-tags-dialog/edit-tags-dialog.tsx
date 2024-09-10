@@ -18,14 +18,15 @@ import Loading from './components/loading';
 import useAddTag from './hooks/use-add-tag';
 import useCreateOrgTag from './hooks/use-create-org-tag';
 import useRemoveTag from './hooks/use-remove-tag';
-import type { EditedTag } from './types';
+import type { EditTagsData, EditedTag } from './types';
 
 export type EditTagsDialogProps = WithEntityProps & {
   open: boolean;
   onClose: () => void;
+  onSave?: (data: EditTagsData) => void;
 };
 
-const EditTagsDialog = ({ entity, open, onClose }: EditTagsDialogProps) => {
+const EditTagsDialog = ({ entity, open, onClose, onSave }: EditTagsDialogProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'header.actions.edit-tags',
   });
@@ -92,33 +93,38 @@ const EditTagsDialog = ({ entity, open, onClose }: EditTagsDialogProps) => {
       errors[tagText] = getErrorMessage(e);
     };
 
+    const allRequests = {
+      create: [],
+      add: [],
+      remove: [],
+    } as EditTagsData;
+
     tagsToCreate.forEach(({ text }, index) => {
-      createTagMutation.mutate(
-        { kind: entity.kind, text },
-        {
-          onSuccess: () => onSuccess(index),
-          onError: (e: unknown) => onError(text, e),
-        },
-      );
+      const request = { kind: entity.kind, text };
+      allRequests.create.push(request);
+      createTagMutation.mutate(request, {
+        onSuccess: () => onSuccess(index),
+        onError: (e: unknown) => onError(text, e),
+      });
     });
     tagsToAdd.forEach(({ text }, index) => {
-      addTagMutation.mutate(
-        { id: entity.id, text },
-        {
-          onSuccess: () => onSuccess(index + tagsToCreate.length),
-          onError: (e: unknown) => onError(text, e),
-        },
-      );
+      const request = { id: entity.id, text };
+      allRequests.add.push(request);
+      addTagMutation.mutate(request, {
+        onSuccess: () => onSuccess(index + tagsToCreate.length),
+        onError: (e: unknown) => onError(text, e),
+      });
     });
     tagsToRemove.forEach(({ id, text }, index) => {
-      removeTagMutation.mutate(
-        { id: entity.id, tagId: id },
-        {
-          onSuccess: () => onSuccess(index + tagsToCreate.length + tagsToAdd.length),
-          onError: (e: unknown) => onError(text, e),
-        },
-      );
+      const request = { id: entity.id, tagId: id };
+      allRequests.remove.push(request);
+      removeTagMutation.mutate(request, {
+        onSuccess: () => onSuccess(index + tagsToCreate.length + tagsToAdd.length),
+        onError: (e: unknown) => onError(text, e),
+      });
     });
+
+    onSave?.(allRequests);
 
     if (Object.keys(errors).length) {
       toast.show({
@@ -167,7 +173,7 @@ const EditTagsDialog = ({ entity, open, onClose }: EditTagsDialogProps) => {
               onAddNew={handleAddNewTag}
             />
             <InactiveTags entityKind={entity.kind} activeTags={activeTags} onClick={handleTagVault} />
-            <LinkButton onClick={handleClickAdd} disabled={isAddingTag}>
+            <LinkButton onClick={handleClickAdd} disabled={isAddingTag} ariaLabel={t('add-tag')}>
               {t('add-tag')}
             </LinkButton>
           </>
