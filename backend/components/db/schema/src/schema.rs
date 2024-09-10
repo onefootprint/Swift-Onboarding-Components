@@ -1153,6 +1153,8 @@ diesel::table! {
         scoped_vault_id -> Text,
         seqno -> Int8,
         version -> Int8,
+        tenant_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 
@@ -1912,6 +1914,7 @@ diesel::joinable!(scoped_vault -> vault (vault_id));
 diesel::joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
 diesel::joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
 diesel::joinable!(scoped_vault_version -> scoped_vault (scoped_vault_id));
+diesel::joinable!(scoped_vault_version -> tenant (tenant_id));
 diesel::joinable!(socure_device_session -> workflow (workflow_id));
 diesel::joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(stytch_fingerprint_event -> vault (vault_id));

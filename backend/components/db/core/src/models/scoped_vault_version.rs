@@ -13,6 +13,7 @@ use newtypes::Locked;
 use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
 use newtypes::ScopedVaultVersionNumber;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = scoped_vault_version)]
@@ -23,8 +24,10 @@ pub struct ScopedVaultVersion {
 
     pub scoped_vault_id: ScopedVaultId,
     pub seqno: DataLifetimeSeqno,
-
     pub version: ScopedVaultVersionNumber,
+
+    pub tenant_id: Option<TenantId>,
+    pub is_live: Option<bool>,
 }
 
 #[derive(Clone, Insertable)]
@@ -33,6 +36,8 @@ struct NewScopedVaultVersion {
     pub scoped_vault_id: ScopedVaultId,
     pub seqno: DataLifetimeSeqno,
     pub version: ScopedVaultVersionNumber,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
 }
 
 impl ScopedVaultVersion {
@@ -43,6 +48,8 @@ impl ScopedVaultVersion {
         seqno: DataLifetimeSeqno,
     ) -> DbResult<Self> {
         let scoped_vault_id = &scoped_vault.id;
+        let tenant_id = scoped_vault.tenant_id.clone();
+        let is_live = scoped_vault.is_live;
 
         let existing: Option<Self> = scoped_vault_version::table
             .filter(scoped_vault_version::scoped_vault_id.eq(scoped_vault_id))
@@ -79,6 +86,8 @@ impl ScopedVaultVersion {
             scoped_vault_id: scoped_vault_id.clone(),
             seqno,
             version,
+            tenant_id,
+            is_live,
         };
         let result = diesel::insert_into(scoped_vault_version::table)
             .values(new)
