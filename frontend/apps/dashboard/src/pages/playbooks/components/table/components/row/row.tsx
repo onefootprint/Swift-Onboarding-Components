@@ -21,17 +21,15 @@ const Row = ({ playbook }: RowProps) => {
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt, kind } = playbook;
   const { sandbox } = useOrgSession();
-  const canShowLink =
-    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb || kind === OnboardingConfigKind.document;
 
   return (
     <>
       <td>
         {sandbox.isSandbox ? (
           <>
-            {status === 'enabled' && canShowLink ? (
+            {status === 'enabled' ? (
               <StyledLink
-                href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
+                href={`${DEMO_BASE_URL}/preview?kind=${kind}&ob_key=${key}`}
                 target="_blank"
                 onClick={event => event.stopPropagation()}
               >
