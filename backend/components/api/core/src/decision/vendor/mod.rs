@@ -16,7 +16,6 @@ pub mod build_request;
 pub mod fp_device_attestation;
 pub mod incode;
 pub mod kyc;
-pub mod make_request;
 pub mod middesk;
 pub mod neuro_id;
 pub mod samba;

@@ -1,4 +1,3 @@
-use super::make_request::VerificationRequestWithVendorResponse;
 use super::VendorAPIError;
 use crate::enclave_client::EnclaveClient;
 use crate::FpResult;
@@ -24,6 +23,8 @@ use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
 use newtypes::VerificationResultId;
 use std::slice;
+
+type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 
 /// Save a verification result, encrypting the response payload in the process
 pub fn save_verification_results(
