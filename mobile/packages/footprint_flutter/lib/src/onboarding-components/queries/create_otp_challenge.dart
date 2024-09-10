@@ -85,6 +85,7 @@ Future<ChallengeResponse> signupChallenge(
   final headers = {
     'Content-Type': 'application/json',
     'X-Onboarding-Config-Key': requestData.obConfig,
+    'X-Fp-Is-Components-Sdk': 'true'
   };
   if (requestData.sandboxId != null) {
     headers['X-Sandbox-Id'] = requestData.sandboxId!;
