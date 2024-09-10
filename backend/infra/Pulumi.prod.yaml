@@ -201,9 +201,9 @@ config:
         name: execute-tasks
       - args:
           - vault-dr-worker
-          - --batch-size=1000
+          - --batch-size=1024
           - --poll-period-ms=5000
-          - --record-task-concurrency=32
+          - --record-task-concurrency=128
         cpuUnits: 4096
         memoryMB: 16384
         name: vault-dr

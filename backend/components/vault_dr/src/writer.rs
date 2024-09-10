@@ -23,7 +23,6 @@ use db::models::vault_dr::NewVaultDrBlob;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
-use futures::StreamExt;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use newtypes::FpId;
@@ -168,27 +167,31 @@ impl VaultDrWriter {
             "Encrypting and writing records to S3 in parallel"
         );
 
-        let mut blob_tasks = vec![];
-        for (dl_id, pii) in pii_by_dl {
-            let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
-                "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
-            ))?;
+        let blob_futs = pii_by_dl
+            .into_iter()
+            .map(|(dl_id, pii)| {
+                let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
+                    "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
+                ))?;
 
-            let fp_id = sv_id_to_fp_id
-                .get(&dl.scoped_vault_id)
-                .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
-                .clone();
+                let fp_id = sv_id_to_fp_id
+                    .get(&dl.scoped_vault_id)
+                    .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?
+                    .clone();
 
-            let writer = self.clone();
-            let task =
-                tokio::task::spawn(
-                    async move { writer.encrypt_and_write_record_to_s3(fp_id, dl, pii).await },
-                );
-            blob_tasks.push(task);
-        }
+                let writer = self.clone();
+                Ok(async move { writer.encrypt_and_write_record_to_s3(fp_id, dl, pii).await })
+            })
+            .collect::<FpResult<Vec<_>>>()?;
 
-        let new_blobs = futures::stream::iter(blob_tasks)
-            .buffer_unordered(concurrency_limit)
+        // n.b. Constructing an iterator, tasks are not spawned until the iterator is consumed.
+        let blob_tasks_iter = blob_futs.into_iter().map(|blob_fut| {
+            let task = tokio::task::spawn(blob_fut);
+            Ok(task)
+        });
+
+        let new_blobs = futures::stream::iter(blob_tasks_iter)
+            .try_buffer_unordered(concurrency_limit)
             .try_collect::<Vec<_>>()
             .await?
             .into_iter()
