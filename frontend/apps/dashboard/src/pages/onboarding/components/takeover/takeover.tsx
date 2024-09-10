@@ -1,15 +1,24 @@
 import { LogoFpCompact } from '@onefootprint/icons';
+import type { InProgressOnboarding } from '@onefootprint/types';
 import { Box, Button, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type TakeoverProps = {
-  tenantName: string;
+  inProgressOnboardings: InProgressOnboarding[];
 };
 
-const Takeover = ({ tenantName }: TakeoverProps) => {
+const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
   const { t } = useTranslation('onboarding', { keyPrefix: 'in-progresss' });
+  const isSingleTenant = inProgressOnboardings.length === 1;
+
+  const handleOpenWebsite = (url: string | undefined) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <Stack width="100vw" height="100vh" center backgroundColor="secondary">
       <Box position="relative" maxWidth="400px">
@@ -34,18 +43,53 @@ const Takeover = ({ tenantName }: TakeoverProps) => {
               <Text center variant="label-2">
                 {t('title')}
               </Text>
-              <Text variant="body-3" textAlign="center">
-                <Trans
-                  ns="onboarding"
-                  i18nKey="in-progresss.description"
-                  values={{ tenantName }}
-                  components={{
-                    bold: <Bold as="span" />,
-                  }}
-                />
-              </Text>
+              {isSingleTenant ? (
+                <Text variant="body-3" textAlign="center" aria-label="description">
+                  <Trans
+                    ns="onboarding"
+                    i18nKey="in-progresss.description"
+                    values={{ tenantName: inProgressOnboardings[0].tenant.name }}
+                    components={{
+                      bold: <Bold as="span" />,
+                    }}
+                  />
+                </Text>
+              ) : (
+                <Text variant="body-3" textAlign="center" aria-label="description">
+                  <Trans
+                    ns="onboarding"
+                    i18nKey="in-progresss.description-many"
+                    values={{
+                      tenantNameFirst: inProgressOnboardings
+                        .slice(0, -1)
+                        .map(o => o.tenant.name)
+                        .join(', '),
+                      tenantNameSecond: inProgressOnboardings[inProgressOnboardings.length - 1].tenant.name,
+                    }}
+                    components={{
+                      bold: <Bold as="span" />,
+                    }}
+                  />
+                </Text>
+              )}
             </Stack>
-            <Button variant="primary">{t('cta-single', { tenantName })}</Button>
+            {isSingleTenant ? (
+              <Button variant="primary" onClick={() => handleOpenWebsite(inProgressOnboardings[0].tenant.websiteUrl)}>
+                {t('cta-single', { tenantName: inProgressOnboardings[0].tenant.name })}
+              </Button>
+            ) : (
+              <Stack flexDirection="column" gap={3}>
+                {inProgressOnboardings.map(onboarding => (
+                  <Button
+                    key={onboarding.fpId}
+                    variant="secondary"
+                    onClick={() => handleOpenWebsite(onboarding.tenant.websiteUrl)}
+                  >
+                    {t('cta-single', { tenantName: onboarding.tenant.name })}
+                  </Button>
+                ))}
+              </Stack>
+            )}
             <Box display="flex" justifyContent="center" alignItems="center">
               <LinkButton>{t('cta-alternative')}</LinkButton>
             </Box>
@@ -75,4 +119,5 @@ const PenguinImageContainer = styled(Box)`
     height: 100%;
   }
 `;
+
 export default Takeover;
