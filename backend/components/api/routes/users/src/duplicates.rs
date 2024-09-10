@@ -74,8 +74,8 @@ pub async fn get(
         .into_group_map();
 
     let responses = fingerprints
-        .iter()
-        .map(|fingerprint| {
+        .into_iter()
+        .filter_map(|fingerprint| {
             let tags = sv_id_to_tag
                 .get(&fingerprint.scoped_vault_id)
                 .cloned()
@@ -91,12 +91,17 @@ pub async fn get(
                 .cloned()
                 .unwrap_or_default();
 
-            let kind = DupeKind::try_from(fingerprint.kind.clone()).ok();
-            PublicDuplicateFingerprint {
-                fp_id: fp_id.clone(),
-                labels,
-                tags,
-                kind,
+            match DupeKind::try_from(fingerprint.kind) {
+                Ok(kind) => Some(PublicDuplicateFingerprint {
+                    fp_id: fp_id.clone(),
+                    labels,
+                    tags,
+                    kind,
+                }),
+                Err(err) => {
+                    tracing::error!(?err, "Unable to parse fingeprint kind");
+                    None
+                }
             }
         })
         .collect_vec();

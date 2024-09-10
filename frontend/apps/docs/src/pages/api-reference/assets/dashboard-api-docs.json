@@ -13683,7 +13683,9 @@
                                             "cookie_id",
                                             "selfie",
                                             "name_ssn4",
-                                            "dob_ssn4"
+                                            "dob_ssn4",
+                                            "bank_routing_account",
+                                            "card_number_cvc"
                                         ]
                                     }
                                 },

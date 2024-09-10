@@ -10,5 +10,5 @@ pub struct PublicDuplicateFingerprint {
     pub fp_id: FpId,
     pub labels: Vec<LabelKind>,
     pub tags: Vec<TagKind>,
-    pub kind: Option<DupeKind>,
+    pub kind: DupeKind,
 }
