@@ -3,6 +3,7 @@ use crate::fingerprint_salt::GlobalFingerprintKind;
 use crate::fingerprint_salt::TransientGlobalFingerprintKind;
 use crate::fingerprint_salt::TransientTenantFingerprintKind;
 use crate::util::impl_enum_string_diesel;
+use crate::AliasId;
 use crate::DataIdentifier;
 use crate::Fingerprint;
 use crate::FingerprintScope;
@@ -84,11 +85,11 @@ impl std::fmt::Display for FingerprintKind {
     }
 }
 
-#[derive(strum_macros::EnumDiscriminants)]
+#[derive(strum_macros::EnumDiscriminants, Debug)]
 #[strum_discriminants(
     name(CompositeFingerprintKind),
     vis(pub),
-    derive(strum_macros::Display, EnumIter, EnumString, Hash,),
+    derive(strum_macros::Display, EnumIter, EnumString, Hash),
     strum(serialize_all = "snake_case")
 )]
 pub enum CompositeFingerprint {
@@ -100,6 +101,10 @@ pub enum CompositeFingerprint {
     NameSsn4(TenantId),
     #[strum_discriminants(strum(serialize = "composite.dob_ssn4"))]
     DobSsn4(TenantId),
+    #[strum_discriminants(strum(serialize = "composite.bank_routing_account"))]
+    BankRoutingAccount(AliasId, TenantId),
+    #[strum_discriminants(strum(serialize = "composite.card_number_cvc"))]
+    CardNumberCvc(AliasId, TenantId),
 }
 
 impl CompositeFingerprint {
@@ -109,13 +114,31 @@ impl CompositeFingerprint {
         70, 111, 111, 116, 112, 114, 105, 110, 116, 32, 114, 111, 99, 107, 115, 33,
     ];
 
-    pub fn list(t_id: &TenantId) -> Vec<Self> {
+    pub fn list(t_id: &TenantId, updated_dis: &[&DataIdentifier]) -> Vec<Self> {
         CompositeFingerprintKind::iter()
-            .map(|cfpk| match cfpk {
-                CompositeFingerprintKind::NameDob => Self::NameDob,
-                CompositeFingerprintKind::Name => Self::Name(t_id.clone()),
-                CompositeFingerprintKind::NameSsn4 => Self::NameSsn4(t_id.clone()),
-                CompositeFingerprintKind::DobSsn4 => Self::DobSsn4(t_id.clone()),
+            .flat_map(|cfpk| match cfpk {
+                CompositeFingerprintKind::NameDob => vec![Self::NameDob],
+                CompositeFingerprintKind::Name => vec![Self::Name(t_id.clone())],
+                CompositeFingerprintKind::NameSsn4 => vec![Self::NameSsn4(t_id.clone())],
+                CompositeFingerprintKind::DobSsn4 => vec![Self::DobSsn4(t_id.clone())],
+                CompositeFingerprintKind::BankRoutingAccount => updated_dis
+                    .iter()
+                    .filter_map(|di| match di {
+                        DataIdentifier::Bank(bi) => Some(bi.alias.clone()),
+                        _ => None,
+                    })
+                    .unique()
+                    .map(|alias_id| Self::BankRoutingAccount(alias_id, t_id.clone()))
+                    .collect_vec(),
+                CompositeFingerprintKind::CardNumberCvc => updated_dis
+                    .iter()
+                    .filter_map(|di| match di {
+                        DataIdentifier::Card(ci) => Some(ci.alias.clone()),
+                        _ => None,
+                    })
+                    .unique()
+                    .map(|alias_id| Self::CardNumberCvc(alias_id, t_id.clone()))
+                    .collect_vec(),
             })
             .collect()
     }
@@ -141,6 +164,26 @@ impl CompositeFingerprint {
             Self::DobSsn4(tenant_id) => vec![
                 FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Dob, tenant_id.clone()),
                 FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Ssn4, tenant_id.clone()),
+            ],
+            Self::BankRoutingAccount(alias_id, tenant_id) => vec![
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::BankRouting(alias_id.clone()),
+                    tenant_id.clone(),
+                ),
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::BankAccount(alias_id.clone()),
+                    tenant_id.clone(),
+                ),
+            ],
+            Self::CardNumberCvc(alias_id, tenant_id) => vec![
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::CardNumber(alias_id.clone()),
+                    tenant_id.clone(),
+                ),
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::CardCvc(alias_id.clone()),
+                    tenant_id.clone(),
+                ),
             ],
         }
     }
@@ -188,6 +231,8 @@ impl CompositeFingerprintKind {
             Self::NameDob => FingerprintScope::Global,
             Self::NameSsn4 => FingerprintScope::Tenant,
             Self::DobSsn4 => FingerprintScope::Tenant,
+            Self::BankRoutingAccount => FingerprintScope::Tenant,
+            Self::CardNumberCvc => FingerprintScope::Tenant,
         }
     }
 }
@@ -201,6 +246,11 @@ mod test {
     use crate::fingerprint_salt::FingerprintSalt;
     use crate::fingerprint_salt::TransientGlobalFingerprintKind;
     use crate::fingerprint_salt::TransientTenantFingerprintKind;
+    use crate::AliasId;
+    use crate::BankDataKind;
+    use crate::BankInfo;
+    use crate::CardDataKind;
+    use crate::CardInfo;
     use crate::CompositeFingerprint;
     use crate::DataIdentifier;
     use crate::Fingerprint;
@@ -243,6 +293,34 @@ mod test {
                 FingerprintSalt::TransientTenant(TransientTenantFingerprintKind::Dob, test_tenant_id()),
                 Fingerprint(vec![7]),
             ),
+            (
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::BankRouting(AliasId::fixture()),
+                    test_tenant_id(),
+                ),
+                Fingerprint(vec![8]),
+            ),
+            (
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::BankAccount(AliasId::fixture()),
+                    test_tenant_id(),
+                ),
+                Fingerprint(vec![9]),
+            ),
+            (
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::CardNumber(AliasId::fixture()),
+                    test_tenant_id(),
+                ),
+                Fingerprint(vec![10]),
+            ),
+            (
+                FingerprintSalt::TransientTenant(
+                    TransientTenantFingerprintKind::CardCvc(AliasId::fixture()),
+                    test_tenant_id(),
+                ),
+                Fingerprint(vec![11]),
+            ),
         ]
         .into_iter()
         .collect();
@@ -250,27 +328,39 @@ mod test {
         // NOTE: if this test failed, either
         // - You've added a new composite fingerprint and need to add a test for it here OR
         // - You've modified the scheme for an existing composite fingerprint. Don't do this
-        CompositeFingerprint::list(&test_tenant_id())
-            .into_iter()
-            .for_each(|cfp| {
-                let computed = cfp.compute(&fingerprints).unwrap();
-                let computed = crypto::hex::encode(computed);
-                let expected = match cfp {
-                    CompositeFingerprint::NameDob => {
-                        "1f70b71ed31cd17da9594786cc557dea51f382507eae92a8e02880ed5089147e"
-                    }
-                    CompositeFingerprint::Name(_) => {
-                        "e650e2487086bac8d363ee1cb5a799ba7004ac92df2ee217a6a8df7c3af72f98"
-                    }
-                    CompositeFingerprint::NameSsn4(_) => {
-                        "db657b5e5a961a3a2f14dc50b9962e9b2a6a7152d0ce76a5b37d05e152e1d677"
-                    }
-                    CompositeFingerprint::DobSsn4(_) => {
-                        "7dc712d8d0ef8b72dc4fbafb92d7de33cc14dbc80b266a702224d4397494e2e9"
-                    }
-                };
-                assert_eq!(expected, computed);
-            });
+        CompositeFingerprint::list(
+            &test_tenant_id(),
+            &[&DataIdentifier::from(BankInfo {
+                alias: AliasId::fixture(),
+                kind: BankDataKind::AchAccountNumber,
+            })],
+        )
+        .into_iter()
+        .for_each(|cfp| {
+            let computed = cfp.compute(&fingerprints).unwrap();
+            let computed = crypto::hex::encode(computed);
+            let expected = match cfp {
+                CompositeFingerprint::NameDob => {
+                    "1f70b71ed31cd17da9594786cc557dea51f382507eae92a8e02880ed5089147e"
+                }
+                CompositeFingerprint::Name(_) => {
+                    "e650e2487086bac8d363ee1cb5a799ba7004ac92df2ee217a6a8df7c3af72f98"
+                }
+                CompositeFingerprint::NameSsn4(_) => {
+                    "db657b5e5a961a3a2f14dc50b9962e9b2a6a7152d0ce76a5b37d05e152e1d677"
+                }
+                CompositeFingerprint::DobSsn4(_) => {
+                    "7dc712d8d0ef8b72dc4fbafb92d7de33cc14dbc80b266a702224d4397494e2e9"
+                }
+                CompositeFingerprint::BankRoutingAccount(_, _) => {
+                    "9efd6eb3077c2c2489488b8698085c1529e40e17c1360a7591e3c7706bdbbdea"
+                }
+                CompositeFingerprint::CardNumberCvc(_, _) => {
+                    "ce90be23fd7c4f3687daec18636ca5a952819cec011a3079ad1b495c8baa1ccc"
+                }
+            };
+            assert_eq!(expected, computed);
+        });
     }
 
     #[test]
@@ -294,39 +384,65 @@ mod test {
         );
     }
 
-    #[test_case(CompositeFingerprint::NameDob, vec ! [], vec ! [] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec ! [] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Dob.into()], vec ![] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName.into(), IDK::LastName.into()], vec![IDK::Dob.into()] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName.into()], vec ! [IDK::LastName.into(), IDK::Dob.into()] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Dob.into()] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::LastName.into(), IDK::Dob.into()] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::LastName.into()], vec![IDK::LastName.into(), IDK::Dob.into()] => false)]
+    #[test_case(CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::LastName.into(), IDK::FirstName.into()], vec![IDK::Ssn4.into()] => true)]
+    #[test_case(CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec![], vec![IDK::Ssn4.into()] => false)]
+    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::Dob.into()], vec![IDK::Ssn4.into()] => true)]
+    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![], vec![IDK::Ssn4.into()] => false)]
+    #[test_case(CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec![IDK::Dob.into()], vec![] => false)]
     #[test_case(
-        CompositeFingerprint::NameDob, vec ! [IDK::FirstName, IDK::LastName, IDK::Dob], vec ! [] => false
+        CompositeFingerprint::BankRoutingAccount(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![BankInfo {
+        alias: AliasId::fixture(),
+        kind: BankDataKind::AchAccountNumber,
+        }.into()], vec ! [BankInfo {
+        alias: AliasId::fixture(),
+        kind: BankDataKind::AchRoutingNumber,
+        }.into()] => true
     )]
     #[test_case(
-        CompositeFingerprint::NameDob, vec ! [IDK::FirstName, IDK::LastName], vec ! [IDK::Dob] => true
+        CompositeFingerprint::BankRoutingAccount(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![], vec![BankInfo {
+        alias: AliasId::fixture(),
+        kind: BankDataKind::AchRoutingNumber,
+        }.into()] => false
     )]
     #[test_case(
-        CompositeFingerprint::NameDob, vec ! [IDK::FirstName], vec ! [IDK::LastName, IDK::Dob] => true
+        CompositeFingerprint::BankRoutingAccount(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![BankInfo {
+        alias: AliasId::fixture(),
+        kind: BankDataKind::AchAccountNumber,
+        }.into()], vec ! [] => false
     )]
     #[test_case(
-        CompositeFingerprint::NameDob, vec ! [], vec ! [IDK::FirstName, IDK::LastName, IDK::Dob] => true
-    )]
-    #[test_case(CompositeFingerprint::NameDob, vec ! [], vec ! [IDK::LastName, IDK::Dob] => false)]
-    #[test_case(
-        CompositeFingerprint::NameDob, vec ! [IDK::LastName], vec ! [IDK::LastName, IDK::Dob] => false
-    )]
-    #[test_case(
-        CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::LastName, IDK::FirstName], vec ! [IDK::Ssn4] => true
-    )]
-    #[test_case(
-        CompositeFingerprint::NameSsn4(TenantId::test_data("foo_bar".into())), vec ! [], vec ! [IDK::Ssn4] => false
+        CompositeFingerprint::CardNumberCvc(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![CardInfo {
+        alias: AliasId::fixture(),
+        kind: CardDataKind::Number,
+        }.into()], vec ! [CardInfo {
+        alias: AliasId::fixture(),
+        kind: CardDataKind::Cvc,
+        }.into()] => true
     )]
     #[test_case(
-        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::Dob], vec ! [IDK::Ssn4] => true
+        CompositeFingerprint::CardNumberCvc(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![], vec![CardInfo {
+        alias: AliasId::fixture(),
+        kind: CardDataKind::Number,
+        }.into()] => false
     )]
     #[test_case(
-        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [], vec ! [IDK::Ssn4] => false
+        CompositeFingerprint::CardNumberCvc(AliasId::fixture(), TenantId::test_data("foo_bar".into())), vec![CardInfo {
+        alias: AliasId::fixture(),
+        kind: CardDataKind::Cvc,
+        }.into()], vec ! [] => false
     )]
-    #[test_case(
-        CompositeFingerprint::DobSsn4(TenantId::test_data("foo_bar".into())), vec ! [IDK::Dob], vec ! [] => false
-    )]
-    fn test_should_generate(cfp: CompositeFingerprint, existing: Vec<IDK>, new: Vec<IDK>) -> bool {
+    fn test_should_generate(
+        cfp: CompositeFingerprint,
+        existing: Vec<DataIdentifier>,
+        new: Vec<DataIdentifier>,
+    ) -> bool {
         let existing = existing.into_iter().map(DataIdentifier::from).collect_vec();
         let new = new.into_iter().map(DataIdentifier::from).collect_vec();
         let new = new.iter().collect_vec();

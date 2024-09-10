@@ -9,6 +9,8 @@ export enum DupeKind {
   cookieId = 'cookie_id',
   nameSsn4 = 'name_ssn4',
   dobSsn4 = 'dob_ssn4',
+  bankRoutingAccount = 'bank_routing_account',
+  cardNumberCvc = 'card_number_cvc',
 }
 
 export type DuplicateDataItem = {

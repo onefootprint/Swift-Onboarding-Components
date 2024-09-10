@@ -208,14 +208,14 @@ impl Fingerprint {
         use db_schema::schema::fingerprint;
         // Be careful changing these fingerprint queries - they're optimized to use a specific index
         fingerprint::table
-        .filter(fingerprint::sh_data.is_not_null())
-        .filter(fingerprint::sh_data.eq_any(sh_data))
-        .filter(fingerprint::is_hidden.eq(false))
-        .filter(fingerprint::is_live.eq(is_live))
-        // When we allow replacing contact info, we might want to support finding the vault on
-        // deactivated fingerprints in case the portable data is replaced by tenant-specific data
-        .filter(fingerprint::deactivated_at.is_null())
-        .into_boxed()
+            .filter(fingerprint::sh_data.is_not_null())
+            .filter(fingerprint::sh_data.eq_any(sh_data))
+            .filter(fingerprint::is_hidden.eq(false))
+            .filter(fingerprint::is_live.eq(is_live))
+            // When we allow replacing contact info, we might want to support finding the vault on
+            // deactivated fingerprints in case the portable data is replaced by tenant-specific data
+            .filter(fingerprint::deactivated_at.is_null())
+            .into_boxed()
     }
 }
 
@@ -234,13 +234,15 @@ pub struct ExternalDupes {
 }
 
 impl Fingerprint {
-    const DUPLICATE_FINGERPRINT_KINDS: [FingerprintKind; 6] = [
+    const DUPLICATE_FINGERPRINT_KINDS: [FingerprintKind; 8] = [
         FingerprintKind::DI(DI::Id(IDK::PhoneNumber)),
         FingerprintKind::DI(DI::Id(IDK::Email)),
         FingerprintKind::DI(DI::Id(IDK::Ssn9)),
         FingerprintKind::Composite(CompositeFingerprintKind::NameDob),
         FingerprintKind::Composite(CompositeFingerprintKind::NameSsn4),
         FingerprintKind::Composite(CompositeFingerprintKind::DobSsn4),
+        FingerprintKind::Composite(CompositeFingerprintKind::BankRoutingAccount),
+        FingerprintKind::Composite(CompositeFingerprintKind::CardNumberCvc),
     ];
 
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]

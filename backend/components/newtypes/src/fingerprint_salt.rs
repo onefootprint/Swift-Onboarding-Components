@@ -1,7 +1,13 @@
+use crate::AliasId;
+use crate::BankDataKind;
+use crate::BankInfo;
 use crate::BusinessDataKind as BDK;
+use crate::CardDataKind;
+use crate::CardInfo;
 use crate::DataIdentifier;
 use crate::FingerprintScope;
 use crate::IdentityDataKind as IDK;
+use crate::IdentityDataKind;
 use crate::TenantId;
 use itertools::chain;
 use itertools::Itertools;
@@ -68,15 +74,32 @@ impl FingerprintSalt {
     /// The fingerprint scope is used to salt fingerprints in the enclave.
     /// This returns the salt we send to the enclave when generating fingerprints.
     pub fn salt_bytes(&self) -> Vec<u8> {
+        // When serializing, we want to strip out the AliasId, so that fingerprints of card and bank
+        // accounts won't be scoped to a specific alias across users.
+        let salt_di = |di| {
+            let di = match di {
+                DataIdentifier::Card(ci) => DataIdentifier::from(CardInfo {
+                    alias: AliasId::default(),
+                    kind: ci.kind,
+                }),
+                DataIdentifier::Bank(bi) => DataIdentifier::from(BankInfo {
+                    alias: AliasId::default(),
+                    kind: bi.kind,
+                }),
+                _ => di,
+            };
+            di.to_string()
+        };
+
         match self {
-            Self::Global(s) => crypto::sha256(s.di().to_string().as_bytes()).to_vec(),
+            Self::Global(s) => crypto::sha256(salt_di(s.di()).as_bytes()).to_vec(),
             Self::TransientGlobal(s) => {
-                crypto::sha256(&[s.di().to_string().as_bytes(), Self::TRANSIENT_FINGERPRINT_SALT].concat())
+                crypto::sha256(&[salt_di(s.di()).as_bytes(), Self::TRANSIENT_FINGERPRINT_SALT].concat())
                     .to_vec()
             }
             Self::Tenant(di, tenant_id) => crypto::sha256(
                 &[
-                    crypto::sha256(di.to_string().as_bytes()),
+                    crypto::sha256(salt_di(di.clone()).as_bytes()),
                     crypto::sha256(tenant_id.to_string().as_bytes()),
                 ]
                 .concat(),
@@ -84,7 +107,7 @@ impl FingerprintSalt {
             .to_vec(),
             Self::TransientTenant(s, tenant_id) => crypto::sha256(
                 &[
-                    &crypto::sha256(s.di().to_string().as_bytes()),
+                    &crypto::sha256(salt_di(s.di()).as_bytes()),
                     &crypto::sha256(tenant_id.to_string().as_bytes()),
                     Self::TRANSIENT_FINGERPRINT_SALT,
                 ]
@@ -182,13 +205,17 @@ impl<'a> TryFrom<&'a DataIdentifier> for TransientGlobalFingerprintKind {
     }
 }
 
-#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
+#[derive(Clone, Debug, EnumIter, Eq, PartialEq, Hash, strum::Display)]
 #[strum(serialize_all = "snake_case")]
 /// Represents pieces of data that are fingerprinted at the tenant scope in order to build a
 /// composite fingerprint. These are NOT saved to the database.
 pub enum TransientTenantFingerprintKind {
     Ssn4,
     Dob,
+    BankAccount(AliasId),
+    BankRouting(AliasId),
+    CardNumber(AliasId),
+    CardCvc(AliasId),
 }
 
 impl TransientTenantFingerprintKind {
@@ -196,6 +223,22 @@ impl TransientTenantFingerprintKind {
         match self {
             TransientTenantFingerprintKind::Ssn4 => DataIdentifier::from(IDK::Ssn4),
             TransientTenantFingerprintKind::Dob => DataIdentifier::from(IDK::Dob),
+            TransientTenantFingerprintKind::BankAccount(alias) => DataIdentifier::from(BankInfo {
+                alias: (*alias).clone(),
+                kind: BankDataKind::AchAccountNumber,
+            }),
+            TransientTenantFingerprintKind::BankRouting(alias) => DataIdentifier::from(BankInfo {
+                alias: (*alias).clone(),
+                kind: BankDataKind::AchRoutingNumber,
+            }),
+            TransientTenantFingerprintKind::CardNumber(alias) => DataIdentifier::from(CardInfo {
+                alias: (*alias).clone(),
+                kind: CardDataKind::Number,
+            }),
+            TransientTenantFingerprintKind::CardCvc(alias) => DataIdentifier::from(CardInfo {
+                alias: (*alias).clone(),
+                kind: CardDataKind::Cvc,
+            }),
         }
     }
 }
@@ -204,11 +247,29 @@ impl<'a> TryFrom<&'a DataIdentifier> for TransientTenantFingerprintKind {
     type Error = crate::Error;
 
     fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
-        Self::iter()
-            .find(|g| &g.di() == value)
-            .ok_or(crate::Error::Custom(
+        match value {
+            DataIdentifier::Id(IdentityDataKind::Dob) => Ok(TransientTenantFingerprintKind::Dob),
+            DataIdentifier::Id(IdentityDataKind::Ssn4) => Ok(TransientTenantFingerprintKind::Ssn4),
+            DataIdentifier::Card(CardInfo {
+                alias,
+                kind: CardDataKind::Number,
+            }) => Ok(TransientTenantFingerprintKind::CardNumber(alias.clone())),
+            DataIdentifier::Card(CardInfo {
+                alias,
+                kind: CardDataKind::Cvc,
+            }) => Ok(TransientTenantFingerprintKind::CardCvc(alias.clone())),
+            DataIdentifier::Bank(BankInfo {
+                alias,
+                kind: BankDataKind::AchRoutingNumber,
+            }) => Ok(TransientTenantFingerprintKind::BankRouting(alias.clone())),
+            DataIdentifier::Bank(BankInfo {
+                alias,
+                kind: BankDataKind::AchAccountNumber,
+            }) => Ok(TransientTenantFingerprintKind::BankAccount(alias.clone())),
+            _ => Err(crate::Error::Custom(
                 "Cannot make transient tenant-scoped fingerprint from data".into(),
-            ))
+            )),
+        }
     }
 }
 

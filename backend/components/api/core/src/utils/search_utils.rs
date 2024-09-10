@@ -154,6 +154,8 @@ pub async fn parse_search(
                 CompositeFingerprintKind::NameDob => None,
                 CompositeFingerprintKind::NameSsn4 => None,
                 CompositeFingerprintKind::DobSsn4 => None,
+                CompositeFingerprintKind::BankRoutingAccount => None,
+                CompositeFingerprintKind::CardNumberCvc => None,
             },
         })
         .collect_vec();

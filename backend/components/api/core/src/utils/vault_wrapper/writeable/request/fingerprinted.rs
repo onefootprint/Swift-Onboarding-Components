@@ -44,13 +44,14 @@ impl FingerprintedDataRequest {
         // fingerprints from the existing data in the vault for all other DIs that make up the
         // composite fingerprint
         let new_dis = res.data.keys().collect_vec();
-        let needed_fps = CompositeFingerprint::list(t_id)
+        let needed_fps = CompositeFingerprint::list(t_id, &new_dis)
             .into_iter()
             .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &new_dis))
             .flat_map(|cfp| cfp.salts())
             .map(|pfpk| pfpk.di())
             .unique()
             .collect_vec();
+
         let missing_fps = needed_fps.iter().filter(|di| !new_dis.contains(di)).collect_vec();
         let (addl_fingerprints, salt_to_dl_id) = vw.fingerprint_ciphertext(state, missing_fps, t_id).await?;
         res.fingerprints.extend(addl_fingerprints, salt_to_dl_id);

@@ -101,7 +101,8 @@ impl Fingerprints {
         let fps: HashMap<_, _> = fps.into_iter().collect();
         let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
         let vd_kinds = new_vd.keys().cloned().collect_vec();
-        let composite_fingerprints = CompositeFingerprint::list(&vw.sv.tenant_id)
+
+        let composite_fingerprints = CompositeFingerprint::list(&vw.sv.tenant_id, &vd_kinds)
             .into_iter()
             .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
             .map(|cfp| -> FpResult<_> {
