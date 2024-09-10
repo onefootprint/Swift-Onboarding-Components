@@ -1,5 +1,6 @@
+import type { SandboxOutcome } from '@onefootprint/footprint-js';
 import type { UpdateContext } from '../components/provider';
-import { createVaultingToken, identify } from '../queries/challenge';
+import { createVaultingToken, getValidationToken, identify, initOnboarding } from '../queries/challenge';
 import AuthTokenStatus from '../types/auth-token-status';
 
 type ValidateAuthTokenProps = {
@@ -7,6 +8,7 @@ type ValidateAuthTokenProps = {
   authToken: string;
   sandboxId?: string;
   setContext: UpdateContext;
+  sandboxOutcome?: SandboxOutcome;
 };
 
 const validateAuthToken = async ({
@@ -14,6 +16,7 @@ const validateAuthToken = async ({
   authToken,
   sandboxId,
   setContext,
+  sandboxOutcome,
 }: ValidateAuthTokenProps): Promise<AuthTokenStatus> => {
   try {
     const identifyResponse = await identify(
@@ -35,6 +38,8 @@ const validateAuthToken = async ({
     // We just check if the tokenScopes is not empty
     // Relevant code in FE: frontend/packages/idv/src/components/identify/components/init-auth-token/init-auth-token.tsx
     if (tokenScopes?.length) {
+      await getValidationToken({ token: authToken });
+      await initOnboarding({ token: authToken, sandboxOutcome });
       const vaultingTokenResponse = await createVaultingToken({
         authToken,
       });

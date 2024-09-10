@@ -58,6 +58,7 @@ const useOtp = () => {
           publicKey: context.publicKey,
           authToken,
           sandboxId: context.sandboxId,
+          sandboxOutcome: context.sandboxOutcome,
           setContext,
         });
         setContext(prev => ({ ...prev, didCallRequiresAuth: true }));

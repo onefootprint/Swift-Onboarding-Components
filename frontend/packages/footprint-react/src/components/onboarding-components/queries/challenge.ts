@@ -111,7 +111,7 @@ const verify = async (payload: { challenge: string; challengeToken: string }, op
   return response;
 };
 
-const getValidationToken = async (options: { token: string }) => {
+export const getValidationToken = async (options: { token: string }) => {
   const response = await request<{ validationToken: string }>({
     url: '/hosted/identify/validation_token',
     method: 'POST',
@@ -122,7 +122,7 @@ const getValidationToken = async (options: { token: string }) => {
   return response;
 };
 
-const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
+export const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/onboarding',
     method: 'POST',
