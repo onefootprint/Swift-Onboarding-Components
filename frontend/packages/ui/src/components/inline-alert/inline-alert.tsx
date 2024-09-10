@@ -12,7 +12,6 @@ export type InlineAlertProps = BoxProps & {
   variant: InlineAlertVariant;
   cta?: {
     label: string;
-
     onClick: () => void;
   };
 };

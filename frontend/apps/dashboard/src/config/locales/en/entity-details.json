@@ -12,6 +12,124 @@
       }
     },
     "actions": {
+      "edit-vault-drawer": {
+        "user-title": "Edit user info",
+        "business-title": "Edit business info",
+        "decrypt-alert": {
+          "text": "Only decrypted data can be edited.",
+          "cta": "Decrypt all"
+        },
+        "cancel": "Cancel",
+        "cta": "Save",
+        "success-toast": {
+          "title": "Success!",
+          "description": "Edit saved."
+        },
+        "error-toast": {
+          "title": "Uh-oh!"
+        },
+        "fieldsets": {
+          "not-allowed": "This can't be edited",
+          "decrypt-first": "Only decrypted data can be edited",
+          "legal-status": {
+            "legal-status-mapping": {
+              "none": "Select",
+              "citizen": "Citizen",
+              "permanent_resident": "Green Card/permanent resident",
+              "visa": "Visa"
+            },
+            "nationality-mapping": {
+              "none": "Select"
+            },
+            "visa-kind-mapping": {
+              "none": "Select",
+              "e1": "E-1",
+              "e2": "E-2",
+              "e3": "E-3",
+              "f1": "F-1",
+              "g4": "G-4",
+              "h1b": "H-1B",
+              "l1": "L-1",
+              "o1": "O-1",
+              "tn1": "TN-1",
+              "other": "Other"
+            }
+          },
+          "state-mapping": {
+            "none": "Select"
+          },
+          "errors": {
+            "name": {
+              "special-chars": "Cannot contain special characters",
+              "required": "Cannot be empty"
+            },
+            "email": "Cannot be empty",
+            "phone-number": {
+              "required": "Cannot be empty",
+              "pattern": "Must include a '+' and country code (e.g. +1555550100)"
+            },
+            "dob": {
+              "hint": "Must be formatted YYYY-MM-DD",
+              "required": "Cannot be empty",
+              "pattern": "Must be formatted YYYY-MM-DD",
+              "invalid": "Cannot be invalid",
+              "future-date": "Cannot be in the future",
+              "too-young": "Must be at least 18 years old",
+              "too-old": "Cannot be before 1900"
+            },
+            "ssn": {
+              "required": "Cannot be empty",
+              "pattern": "Must be of format 123-45-6789"
+            },
+            "address-line": {
+              "required": "Cannot be empty",
+              "pattern": "Must be a residential address (e.g. cannot be a P.O. Box)"
+            },
+            "country": {
+              "required": "Cannot be empty"
+            },
+            "city": "Cannot be empty",
+            "state": {
+              "required": "Cannot be empty",
+              "should-be-empty": "Please leave blank unless the country is the US"
+            },
+            "zip": {
+              "pattern": "Cannot be invalid",
+              "required": "Cannot be empty"
+            },
+            "nationality": "Cannot be empty",
+            "us-legal-status": "Cannot be empty",
+            "visa-kind": {
+              "required": "Cannot be empty if the legal status is Visa",
+              "should-be-empty": "Please leave blank unless the legal status is Visa"
+            },
+            "visa-expiration": {
+              "hint": "Must be formatted YYYY-MM-DD",
+              "required": "Cannot be empty if the legal status is Visa",
+              "pattern": "Must be formatted YYYY-MM-DD",
+              "should-be-empty": "Please leave blank unless the legal status is Visa",
+              "invalid": "Cannot be invalid date",
+              "invalid-timeframe": "Cannot be invalid date"
+            },
+            "citizenships": {
+              "hint": "List 2-letter country codes separated by commas \n(e.g. 'CA' or 'CA, MX')",
+              "required": "Cannot be empty if the legal status is Green Card or Visa",
+              "should-be-empty": "Please leave blank unless the legal status is Green Card or Visa",
+              "us-citizenship": "If user is a US citizen, select the Citizen legal status option",
+              "invalid": "Invalid country code: {{ countries }}"
+            },
+            "website": {
+              "placeholder": "https://www.acmebank.com",
+              "invalid": "Invalid website URL"
+            },
+            "tin": {
+              "hint": "Cannot contain special characters",
+              "required": "Cannot be empty",
+              "invalid": "Cannot be invalid or contain special characters"
+            }
+          }
+        }
+      },
       "edit-tags": {
         "edit-title": "Edit tags",
         "add-title": "Add tags",
