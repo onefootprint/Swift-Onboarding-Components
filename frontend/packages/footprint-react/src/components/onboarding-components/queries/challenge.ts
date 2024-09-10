@@ -1,5 +1,10 @@
 import type { SandboxOutcome } from '@onefootprint/footprint-js';
-import type { IdentifyResponse, LoginChallengeResponse, SignupChallengeResponse } from '@onefootprint/types';
+import {
+  AuthMethodKind,
+  type IdentifyResponse,
+  type LoginChallengeResponse,
+  type SignupChallengeResponse,
+} from '@onefootprint/types';
 import { InlineOtpNotSupported } from '../../../types/request';
 import request from '../utils/request';
 
@@ -80,13 +85,21 @@ export const createChallenge = async (payload: CreateChallengeRequestPayload, op
       const hasEmail = identifyResponse.user.authMethods.some(
         authMethod => authMethod.kind === 'email' && authMethod.isVerified,
       );
+      if (options.requiredAuthMethods) {
+        if (options.requiredAuthMethods.includes(AuthMethodKind.phone) && !hasPhone) {
+          throw new InlineOtpNotSupported('Inline OTP not supported - phone is required but has not been verified');
+        }
+        if (options.requiredAuthMethods.includes(AuthMethodKind.email) && !hasEmail) {
+          throw new InlineOtpNotSupported('Inline OTP not supported - email is required but has not been verified');
+        }
+      }
       if (hasPhone) {
         const loginResponse = await loginChallenge({ kind: 'sms' }, { token: identifyResponse.user.token });
         return loginResponse;
       }
       if (hasEmail) {
-        const signupResponse = await loginChallenge({ kind: 'email' }, { token: identifyResponse.user.token });
-        return signupResponse;
+        const loginResponse = await loginChallenge({ kind: 'email' }, { token: identifyResponse.user.token });
+        return loginResponse;
       }
       throw new InlineOtpNotSupported('Cannot verify inline');
     }
