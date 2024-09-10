@@ -1,9 +1,8 @@
 import '../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-
-import type { StepperOption, StepperProps } from './stepper';
 import Stepper from './stepper';
+import type { StepperOption, StepperProps } from './stepper.types';
 
 const renderStepper = (props: Partial<StepperProps> = {}) => {
   const defaultOptions: StepperOption[] = [

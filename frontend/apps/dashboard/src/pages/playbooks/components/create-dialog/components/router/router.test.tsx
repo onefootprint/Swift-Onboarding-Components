@@ -10,6 +10,12 @@ const renderRouter = (
   },
 ) => customRender(<Router onCreate={onCreate} />);
 
+const mockWindowScrollTo = jest.fn();
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: mockWindowScrollTo,
+});
+
 describe('<Router />', () => {
   describe('Auth playbook', () => {
     it('should create an onboarding config and show a confirmation', async () => {

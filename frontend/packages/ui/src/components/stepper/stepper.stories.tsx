@@ -5,8 +5,8 @@ import Box from '../box';
 import Button from '../button';
 import Divider from '../divider';
 import Stack from '../stack';
-import type { StepperProps } from './stepper';
 import Stepper from './stepper';
+import type { StepperProps } from './stepper.types';
 
 export default {
   component: Stepper,
