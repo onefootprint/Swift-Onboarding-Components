@@ -1,1 +1,6 @@
-export { default, getSessionIdFromStorage, addSessionIdToQueryParam } from './session-id';
+export {
+  addSessionIdToQueryParam,
+  default,
+  getSessionIdFromQueryParam,
+  getSessionIdFromStorage,
+} from './session-id';

@@ -24,6 +24,7 @@
   "dependencies": {
     "@onefootprint/appearance": "*",
     "@onefootprint/core": "*",
+    "@onefootprint/dev-tools": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/idv": "*",

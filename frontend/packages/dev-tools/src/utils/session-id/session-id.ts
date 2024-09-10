@@ -25,10 +25,10 @@ const getParamFromHost = (param: string) => {
   }
 };
 
-const getParamFromQuery = (param: string): string | null => {
+export const getSessionIdFromQueryParam = (): string | null => {
   if (!isBrowser) return null;
 
-  return getParamValue(param, window.location.href) || getParamFromHost(param);
+  return getParamValue(queryParamKey, window.location.href) || getParamFromHost(queryParamKey);
 };
 
 const isSessionStorageAvailable = (): boolean => {
@@ -45,7 +45,7 @@ const isSessionStorageAvailable = (): boolean => {
 };
 
 const create = (): string => {
-  const sessionId = getParamFromQuery(queryParamKey) || uuidv4();
+  const sessionId = getSessionIdFromQueryParam() || uuidv4();
   if (isSessionStorageAvailable()) {
     try {
       sessionStorage.setItem(key, sessionId);
@@ -57,7 +57,7 @@ const create = (): string => {
 };
 
 const get = () => {
-  const querySessionId = getParamFromQuery(queryParamKey);
+  const querySessionId = getSessionIdFromQueryParam();
 
   if (querySessionId) return querySessionId;
 

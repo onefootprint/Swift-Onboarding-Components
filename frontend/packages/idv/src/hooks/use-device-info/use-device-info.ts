@@ -55,7 +55,7 @@ export const checkDeviceInfo = async () => {
   return { hasSupportForWebauthn, ...basicInfo };
 };
 
-const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void, onError?: () => void) => {
+const useDeviceInfo = (onComplete: (deviceInfo: DeviceInfo) => void, onError?: (error: unknown) => void) => {
   useEffectOnce(() => {
     Promise.all([checkDeviceInfo(), getCameraPermissionState()])
       .then(([deviceInfo, initialCameraPermissionState]) => onComplete({ ...deviceInfo, initialCameraPermissionState }))
