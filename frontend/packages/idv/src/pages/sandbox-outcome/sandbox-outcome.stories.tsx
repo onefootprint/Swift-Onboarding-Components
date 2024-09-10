@@ -1,6 +1,6 @@
+import { expect, fn, userEvent } from '@onefootprint/storybook-utils';
 import { OnboardingConfigStatus, type PublicOnboardingConfig } from '@onefootprint/types';
 import type { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent } from '@storybook/test';
 import noop from 'lodash/noop';
 import getRandomID from '../../utils/get-random-id/get-random-id.mock';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
