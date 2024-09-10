@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/models/internal/auth_method.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_kind.dart';
@@ -35,11 +36,21 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final requiredAuthMethods = fpContext.onboardingConfig?.requiredAuthMethods;
     final authToken = fpContext.authToken;
 
-    if (email == null ||
-        phoneNumber == null ||
-        email.isEmpty ||
-        phoneNumber.isEmpty) {
-      throw Exception('Email and phone number is required');
+    final hasEmail = email != null && email.isNotEmpty;
+    final hasPhoneNumber = phoneNumber != null && phoneNumber.isNotEmpty;
+
+    if (!hasEmail && !hasPhoneNumber) {
+      throw Exception('Email and/or phone number is required');
+    }
+
+    if (requiredAuthMethods?.length == 1) {
+      if (requiredAuthMethods?.first == AuthMethodKind.email && !hasEmail) {
+        throw Exception('Email is required');
+      }
+      if (requiredAuthMethods?.first == AuthMethodKind.phone &&
+          !hasPhoneNumber) {
+        throw Exception('Phone number is required');
+      }
     }
 
     // If there is a valid auth token, we should not be using email/phone number

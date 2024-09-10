@@ -1,4 +1,5 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
+import { AuthMethodKind } from '@onefootprint/types';
 import { useContext } from 'react';
 import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
@@ -166,7 +167,19 @@ const useOtp = () => {
     if (!email && !phoneNumber) {
       throw new Error('Email and/or phone number are required');
     }
+
     const requiredAuthMethods = onboardingConfig.requiredAuthMethods;
+
+    // If we only have one auth method, we need to make sure that the user has provided the credential for the required method
+    if (requiredAuthMethods?.length === 1) {
+      if (!email && requiredAuthMethods.includes(AuthMethodKind.email)) {
+        throw new Error('Email is required');
+      }
+      if (!phoneNumber && requiredAuthMethods.includes(AuthMethodKind.phone)) {
+        throw new Error('Phone number is required');
+      }
+    }
+
     const response = await createChallenge(
       { email, phoneNumber },
       {
