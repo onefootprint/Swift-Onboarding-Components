@@ -53,9 +53,8 @@ describe('<InfoSection />', () => {
 
       const edit = screen.getByText('Edit playbook name');
       await userEvent.hover(edit);
-      await waitFor(() => {
-        expect(screen.getAllByText("You're not allowed to edit Playbooks").length).toBeGreaterThan(0);
-      });
+      const notAllowedText = await screen.findAllByText("You're not allowed to edit Playbooks");
+      expect(notAllowedText.length).toBeGreaterThan(0);
 
       await userEvent.click(edit);
       await waitFor(() => {

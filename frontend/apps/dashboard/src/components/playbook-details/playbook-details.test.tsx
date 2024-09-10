@@ -1,4 +1,4 @@
-import { customRender, mockRouter, screen, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
+import { customRender, mockRouter, screen, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
 
 import PlaybookDetails from './playbook-details';
 import {
@@ -32,10 +32,8 @@ describe('<PlaybookDetails />', () => {
     it('should show the error message', async () => {
       renderDetails();
 
-      await waitFor(() => {
-        const feedback = screen.getByText('Something went wrong');
-        expect(feedback).toBeInTheDocument();
-      });
+      const feedback = await screen.findByText('Something went wrong');
+      expect(feedback).toBeInTheDocument();
     });
   });
 
