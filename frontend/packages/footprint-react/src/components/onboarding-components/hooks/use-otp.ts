@@ -84,12 +84,28 @@ const useOtp = () => {
       onError?: (error: unknown) => void;
     } = {},
   ) => {
-    // TODO: we need to pass sandbox id from context here too. We will need to wait until the BE is ready
+    if (context.authToken && (phoneNumber || email)) {
+      onError?.(
+        new Error(
+          'You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number',
+        ),
+      );
+      return;
+    }
+
+    const verifyAuthVariantProps = context.authToken
+      ? {
+          authToken: context.authToken,
+        }
+      : {
+          publicKey: context.publicKey,
+        };
+
     const fp = footprint.init({
-      appearance: context.appearance,
-      publicKey: context.publicKey,
-      sandboxOutcome: context.sandboxOutcome,
+      ...verifyAuthVariantProps,
       sandboxId: context.sandboxId,
+      sandboxOutcome: context.sandboxOutcome,
+      appearance: context.appearance,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,
