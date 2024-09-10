@@ -1,163 +1,20 @@
 'use client';
 
-import { type FootprintAuthDataProps, FootprintPublicEvent } from '@onefootprint/footprint-js';
-import type { DeviceInfo } from '@onefootprint/idv';
-import { getLogger, isAuth, useDeviceInfo } from '@onefootprint/idv';
-import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
-import { Identify, IdentifyVariant } from '@onefootprint/idv/src/components/identify';
-import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
-import { CLIENT_PUBLIC_KEY_HEADER, type PublicOnboardingConfig } from '@onefootprint/types';
-import { useConfirmationDialog } from '@onefootprint/ui';
-import { useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import type { Variant } from '@/src/types';
+import Layout from './layout';
+import Router from './router';
+import type { AuthIdentifyAppMachineArgs } from './state';
+import { AuthIdentifyAppMachineProvider } from './state';
 
-import { useOnboardingValidate } from '@/src/queries';
-import { getAuthBootstrapData, isSdkUrlAllowed } from '@/src/utils';
+type IdentifyAppProps = AuthIdentifyAppMachineArgs & { variant?: Variant };
 
-import { useFootprintProvider } from '../../provider-footprint';
-import useProps from '../../provider-footprint/hooks/use-props';
-import type { Variant } from '../../types';
-import Layout from '../client-layout';
-import type { NotificationProps } from '../notification';
-import Notification from '../notification';
-
-type AuthDataPropsWithToken = FootprintAuthDataProps & { authToken?: string };
-type IdentifyAppProps = { variant?: Variant; fallback: JSX.Element };
-
-const voidObj: Record<string, never> = {};
-const { canceled, closed, completed } = FootprintPublicEvent;
-const { logError, logInfo, logWarn } = getLogger({ location: 'identify-app' });
-
-const onValidationTokenError = (error: unknown) => {
-  logError('Error while validating auth token', error);
-};
-
-const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
-  key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;
-
-const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
-  const isDoneRef = useRef(false);
-  const confirmationDialog = useConfirmationDialog();
-  const mutOnboardingValidate = useOnboardingValidate();
-
-  const [notification, setNotification] = useState<NotificationProps | undefined>();
-
-  const [props, setProps] = useState<AuthDataPropsWithToken>();
-  const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
-  const { t } = useTranslation('common');
-  const [device, setDevice] = useState<DeviceInfo>();
-
-  useDeviceInfo(
-    (info: DeviceInfo) => {
-      setDevice(info);
-      logInfo(`Webauthn support:${info.hasSupportForWebauthn}`, info);
-    },
-    () => logWarn('Unable to collect device info'),
-  );
-
-  useProps<AuthDataPropsWithToken>(
-    (authProps, authConfig) => {
-      setProps(authProps);
-      setConfig(authConfig);
-
-      if (notification) return;
-      if (!isAuth(authConfig?.kind)) {
-        logError(`Invalid auth kind, ${authConfig?.kind}`);
-        setNotification({
-          title: t('notification.invalid-kind-title'),
-          subtitle: t('notification.invalid-kind-description'),
-        });
-      } else if (!isSdkUrlAllowed(fpProvider, authConfig?.allowedOrigins)) {
-        logError(`SDK URL not allowed, ${authConfig?.allowedOrigins?.join(', ')}`);
-        setNotification({
-          title: t('notification.invalid-domain-title'),
-          subtitle: t('notification.invalid-domain-description'),
-        });
-      }
-    },
-    (error: unknown) => {
-      logError('Error fetching auth sdk args', error);
-      setNotification({
-        title: t('notification.invalid-config-title'),
-        subtitle: t('notification.invalid-config-subtitle'),
-      });
-    },
-  );
-
-  const handlers = useMemo(
-    () => ({
-      complete: (args: DoneArgs) => {
-        isDoneRef.current = true;
-        mutOnboardingValidate.mutate(
-          { authToken: args.authToken },
-          {
-            onError: onValidationTokenError,
-            onSuccess: ({ validationToken }) => {
-              fpProvider.send(completed, validationToken);
-              fpProvider.send(closed);
-            },
-          },
-        );
-      },
-      confirmCloseAndCancel: () => {
-        isDoneRef.current = true;
-        confirmationDialog.open({
-          description: t('confirm-close-description'),
-          title: t('confirm-close-title'),
-          secondaryButton: { label: t('no') },
-          primaryButton: {
-            label: t('yes'),
-            onClick: () => {
-              fpProvider.send(closed);
-              fpProvider.send(canceled);
-            },
-          },
-        });
-      },
-    }),
-    [],
-  );
-
-  const { authToken, options = voidObj, publicKey } = props || voidObj;
-  const isSandbox = !config?.isLive;
-
-  const fpProvider = useFootprintProvider();
-
-  if (isDoneRef.current) return null;
-
-  if (notification) {
-    return (
-      <Layout config={config} isSandbox={isSandbox} onClose={handlers.confirmCloseAndCancel} variant={paramVariant}>
-        <Notification subtitle={notification.subtitle} title={notification.title} />
-      </Layout>
-    );
-  }
-
-  if (!config || !device) {
-    return fallback;
-  }
-
+const IdentifyApp = ({ variant, ...args }: IdentifyAppProps): JSX.Element | null => {
   return (
-    <Layout config={config} isSandbox={isSandbox} onClose={handlers.confirmCloseAndCancel} variant={paramVariant}>
-      <Identify
-        variant={IdentifyVariant.auth}
-        device={device}
-        obConfigAuth={getOnboardConfigurationKey(publicKey)}
-        initialAuthToken={authToken}
-        config={config}
-        isLive={config.isLive}
-        bootstrapData={getAuthBootstrapData(props || voidObj)}
-        logoConfig={
-          options.showLogo
-            ? {
-                logoUrl: config.logoUrl ?? undefined,
-                orgName: config.orgName,
-              }
-            : undefined
-        }
-        onDone={handlers.complete}
-      />
-    </Layout>
+    <AuthIdentifyAppMachineProvider args={args}>
+      <Layout variant={variant}>
+        <Router />
+      </Layout>
+    </AuthIdentifyAppMachineProvider>
   );
 };
 

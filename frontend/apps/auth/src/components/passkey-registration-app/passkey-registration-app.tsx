@@ -65,6 +65,7 @@ const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.E
 
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const d2dStatus = useRef<D2PStatus | undefined>();
+  const isOptimisticCompleted = useRef<boolean>(false);
   const isDone = state === 'done';
 
   useDeviceInfo(
@@ -153,18 +154,21 @@ const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.E
   return (
     <Layout config={EmptyConfig} variant={variant || undefined}>
       <Box height="56px" />
-      {state === 'inProgress' && authToken && device ? (
+      {state === 'inProgress' && authToken && device && !isOptimisticCompleted.current ? (
         <>
           <NavigationHeader leftButton={{ variant: 'close' }} />
           <Liveness
             actionKind={UserChallengeActionKind.addPrimary}
             idvContext={{ authToken, device, isInIframe }}
             onCustomSkip={() => setState('canceled')}
-            onDone={() => setState('completed')}
+            onDone={() => {
+              isOptimisticCompleted.current = true;
+              setState('completed');
+            }}
           />
         </>
       ) : null}
-      {state === 'completed' ? <PasskeySuccess /> : null}
+      {state === 'completed' || isOptimisticCompleted.current ? <PasskeySuccess /> : null}
       {state === 'canceled' ? <PasskeyCancelled /> : null}
       {state === 'expired' ? <SessionExpired /> : null}
       {state === 'error' ? <PasskeyError /> : null}
