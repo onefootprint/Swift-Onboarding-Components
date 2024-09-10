@@ -1,7 +1,7 @@
 import '../static/globals.css';
 
 import type { Metadata } from 'next';
-import { DM_Sans } from 'next/font/google';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import type React from 'react';
 
@@ -17,7 +17,16 @@ const DMSans = DM_Sans({
   preload: true,
   subsets: ['latin'],
   variable: '--font-family-default',
-  weight: ['400', '500', '700'],
+  fallback: ['Inter'],
+});
+
+const codeFont = DM_Mono({
+  display: 'swap',
+  preload: true,
+  weight: ['300', '400', '500'],
+  subsets: ['latin'],
+  variable: '--font-family-code',
+  fallback: ['Courier New'],
 });
 
 const mapsSrc = GOOGLE_MAPS_KEY
@@ -35,7 +44,7 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = ({ children }: RootLayoutProps) => (
-  <html lang="en" className={DMSans.variable}>
+  <html lang="en" className={`${DMSans.variable} ${codeFont.variable}`}>
     <head>
       <link rel="shortcut icon" href="/favicon.ico" />
       <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
