@@ -8,7 +8,9 @@ const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 
 const DEV_FRAME_SRC = (
-  IS_DEV || IS_CI ? ['http://localhost:3000', 'http://localhost:3010', 'http://localhost:3011'] : []
+  IS_DEV || IS_CI
+    ? ['http://localhost:3000', 'http://localhost:3010', 'http://localhost:3011', 'http://localhost:3013']
+    : []
 ).join(' ');
 
 const ContentSecurityPolicy = `
