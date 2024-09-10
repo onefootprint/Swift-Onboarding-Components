@@ -6,4 +6,4 @@ ALTER TABLE scoped_vault_version
 ALTER TABLE scoped_vault_version
 	ADD CONSTRAINT fk_scoped_vault_version_tenant_id
 	FOREIGN KEY (tenant_id)
-	REFERENCES tenant (id);
+	REFERENCES tenant (id) NOT VALID;
