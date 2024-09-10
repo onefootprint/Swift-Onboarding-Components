@@ -1,0 +1,1 @@
+DROP INDEX scoped_vault_version_tenant_id_is_live_seqno;

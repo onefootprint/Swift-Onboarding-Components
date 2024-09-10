@@ -1,0 +1,2 @@
+ALTER TABLE scoped_vault_version
+  VALIDATE CONSTRAINT fk_scoped_vault_version_tenant_id;
