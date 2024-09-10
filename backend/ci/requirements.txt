@@ -26,3 +26,4 @@ flaky==3.7.0
 pexpect==4.9
 awscli-local[ver1]==0.22.0
 boto3==1.34.126
+Faker==28.4.1

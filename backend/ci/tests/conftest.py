@@ -3,6 +3,8 @@ import requests
 import time
 import pytest
 from twilio.rest import Client
+from faker import Faker
+from faker.providers import credit_card, bank, date_time
 from tests.constants import (
     IT_TWILIO_ACCOUNT_SID,
     IT_TWILIO_SECRET_AUTH_TOKEN,
@@ -274,3 +276,12 @@ def auth_playbook(sandbox_tenant):
     return create_ob_config(
         sandbox_tenant, "Auth playbook", ["phone_number", "email"], kind="auth"
     )
+
+
+@pytest.fixture
+def faker():
+    faker = Faker()
+    faker.add_provider(credit_card)
+    faker.add_provider(bank)
+    faker.add_provider(date_time)
+    return faker

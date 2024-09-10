@@ -1,3 +1,6 @@
+import pytest
+from tests.headers import SandboxId, IgnoreCardValidation
+from tests.utils import post, patch, get
 from tests.utils import (
     _gen_random_str,
     _gen_random_ssn,
@@ -7,7 +10,6 @@ from tests.utils import (
     patch,
 )
 from tests.constants import FIXTURE_PHONE_NUMBER
-from tests.headers import SandboxId, IgnoreCardValidation
 from tests.bifrost_client import BifrostClient
 from tests.identify_client import IdentifyClient
 
@@ -46,36 +48,20 @@ def test_dupes(sandbox_tenant):
     bifrost = BifrostClient(obc, auth_token, sandbox_id)
     fp_id3 = bifrost.run().fp_id
 
-    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
-    assert len(dupes["same_tenant"]) == 2
+    dupes = get(f"users/{fp_id1}/duplicates", None, sandbox_tenant.s_sk)
+    assert len(dupes["data"]) == 2
 
     # Check dupe made via API
-    dupe2 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id2)
-    assert dupe2["dupe_kinds"] == ["email"]
-    assert dupe2["status"] == "none"
-    assert (
-        next(d for d in dupe2["data"] if d["identifier"] == "id.first_name")["value"]
-        == "Bob2"
-    )
+    dupe2 = next(d for d in dupes["data"] if d["fp_id"] == fp_id2)
+    assert dupe2["kind"] == "email"
 
     # Check dupe made via Bifrost
-    dupe3 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id3)
-    assert dupe3["dupe_kinds"] == ["email"]
-    assert dupe3["status"] == "pass"
-    assert (
-        next(d for d in dupe3["data"] if d["identifier"] == "id.first_name")["value"]
-        == bifrost.data["id.first_name"]
-    )
-
-    assert not any(
-        d["identifier"] == "id.email" for d in dupes["same_tenant"][0]["data"]
-    )
-    assert dupes["other_tenant"] is None, "Shouldn't have other_tenant dupes in sandbox"
+    dupe3 = next(d for d in dupes["data"] if d["fp_id"] == fp_id3)
+    assert dupe3["kind"] == "email"
 
     # the singular live vault is shown as having no dupes
-    live_dupes = get(f"entities/{live_fp_id}/dupes", None, sandbox_tenant.l_sk)
-    assert live_dupes["same_tenant"] == []
-    assert live_dupes["other_tenant"] == {"num_matches": 0, "num_tenants": 0}
+    live_dupes = get(f"users/{live_fp_id}/duplicates", None, sandbox_tenant.l_sk)
+    assert live_dupes["data"] == []
 
 
 def test_composite_dupes(sandbox_tenant, faker):
@@ -114,10 +100,10 @@ def test_composite_dupes(sandbox_tenant, faker):
         "users", other_data, sandbox_tenant.s_sk, IgnoreCardValidation("true")
     )["id"]
 
-    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
-    assert len(dupes["same_tenant"]) == 1
-    assert dupes["same_tenant"][0]["fp_id"] == fp_id2
-    assert set(dupes["same_tenant"][0]["dupe_kinds"]) == {
+    dupes = get(f"users/{fp_id1}/duplicates", None, sandbox_tenant.s_sk)
+    assert len(dupes["data"]) == 5
+    assert dupes["data"][0]["fp_id"] == fp_id2
+    assert set(map(lambda dupe: dupe["kind"], dupes["data"])) == {
         "name_dob",
         "name_ssn4",
         "dob_ssn4",
@@ -126,15 +112,18 @@ def test_composite_dupes(sandbox_tenant, faker):
     }
 
     # When we update fp_id3's first name, it will make a new composite fingerprint that matches.
-    data = {"id.first_name": data["id.first_name"]}
+    patch_data = {"id.first_name": data["id.first_name"]}
     patch(
-        f"users/{fp_id3}/vault", data, sandbox_tenant.s_sk, IgnoreCardValidation("true")
+        f"users/{fp_id3}/vault",
+        patch_data,
+        sandbox_tenant.s_sk,
+        IgnoreCardValidation("true"),
     )
 
-    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
-    assert len(dupes["same_tenant"]) == 2
-    dupe2 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id2)
-    assert set(dupe2["dupe_kinds"]) == {
+    dupes = get(f"users/{fp_id1}/duplicates", None, sandbox_tenant.s_sk)
+    assert len(dupes["data"]) == 6
+    dupes2 = list(filter(lambda dupe: dupe["fp_id"] == fp_id2, dupes["data"]))
+    assert set(map(lambda dupe: dupe["kind"], dupes2)) == {
         "name_dob",
         "name_ssn4",
         "dob_ssn4",
@@ -142,22 +131,45 @@ def test_composite_dupes(sandbox_tenant, faker):
         "bank_routing_account",
     }
 
-    dupe3 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id3)
-    assert set(dupe3["dupe_kinds"]) == {
+    dupes3 = list(filter(lambda dupe: dupe["fp_id"] == fp_id3, dupes["data"]))
+    assert set(map(lambda dupe: dupe["kind"], dupes3)) == {
         "name_dob",
     }
 
-    # Updating the last name, credit card number, ssn4, and ach account will deactivate the matching composite fingerprint and make a
+    # Updating the last name, credit card number, and ach account will deactivate the matching composite fingerprint and make a
     # new composite fingerprint that doesn't match
-    ssn3 = _gen_random_ssn()
-    data = {
+    patch_data = {
         "id.last_name": "Hill",
-        "id.ssn4": ssn3[-4:],
         "card.hayes.number": faker.credit_card_number("visa"),
         "bank.hayes.ach_account_number": faker.bban(),
     }
     patch(
-        f"users/{fp_id3}/vault", data, sandbox_tenant.s_sk, IgnoreCardValidation("true")
+        f"users/{fp_id3}/vault",
+        patch_data,
+        sandbox_tenant.s_sk,
+        IgnoreCardValidation("true"),
     )
-    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
-    assert not any(i["fp_id"] == fp_id3 for i in dupes["same_tenant"])
+    dupes = get(f"users/{fp_id1}/duplicates", None, sandbox_tenant.s_sk)
+    assert not any(i["fp_id"] == fp_id3 for i in dupes["data"])
+
+    # Add an additional card and bank account, ensure that dupes with the original card are not affected
+    ssn3 = _gen_random_ssn()
+    multi_cards_banks = {
+        **data,
+        "id.first_name": f"Mountain {nonce}",
+        "id.ssn4": ssn3[-4:],
+        "card.mountain.number": faker.credit_card_number("visa"),
+        "card.mountain.expiration": faker.credit_card_expire(),
+        "card.mountain.cvc": faker.credit_card_security_code("visa"),
+        "bank.mountain.ach_routing_number": faker.aba(),
+        "bank.mountain.ach_account_number": faker.bban(),
+    }
+    fp_id4 = post(
+        "users", multi_cards_banks, sandbox_tenant.s_sk, IgnoreCardValidation("true")
+    )["id"]
+    dupes = get(f"users/{fp_id1}/duplicates", None, sandbox_tenant.s_sk)
+    dupes4 = list(filter(lambda dupe: dupe["fp_id"] == fp_id4, dupes["data"]))
+    assert set(map(lambda dupe: dupe["kind"], dupes4)) == {
+        "card_number_cvc",
+        "bank_routing_account",
+    }
