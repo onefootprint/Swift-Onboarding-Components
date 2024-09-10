@@ -26,8 +26,8 @@ pub struct ScopedVaultVersion {
     pub seqno: DataLifetimeSeqno,
     pub version: ScopedVaultVersionNumber,
 
-    pub tenant_id: Option<TenantId>,
-    pub is_live: Option<bool>,
+    pub tenant_id: TenantId,
+    pub is_live: bool,
 }
 
 #[derive(Clone, Insertable)]

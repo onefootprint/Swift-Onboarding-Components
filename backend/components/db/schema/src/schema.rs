@@ -1153,8 +1153,8 @@ diesel::table! {
         scoped_vault_id -> Text,
         seqno -> Int8,
         version -> Int8,
-        tenant_id -> Nullable<Text>,
-        is_live -> Nullable<Bool>,
+        tenant_id -> Text,
+        is_live -> Bool,
     }
 }
 
