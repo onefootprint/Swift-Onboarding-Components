@@ -9,9 +9,7 @@ type IdDropdownProps = {
 };
 
 const IdDropdown = ({ entity }: IdDropdownProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.header.id-dropdown',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header.id-dropdown' });
   const toast = useToast();
   const ids = [
     {
@@ -31,10 +29,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
   const hasSingleId = ids.length === 1;
   const mainId = hasSingleId ? ids.find(item => item.value) : ids[0];
 
-  const handleCopy = async (item: {
-    label: string;
-    value: string | undefined;
-  }) => {
+  const handleCopy = async (item: { label: string; value: string | undefined }) => {
     try {
       navigator.clipboard.writeText(item.value || '');
       toast.show({
@@ -49,7 +44,7 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
   return (
     <Container>
       <Main>
-        <Text variant="snippet-1">{mainId?.value}</Text>
+        <Text variant="snippet-2">{mainId?.value}</Text>
         <CopyButton size="compact" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
       </Main>
       {hasSingleId ? null : (
@@ -92,7 +87,7 @@ const Container = styled(Stack)`
 
 const Main = styled(Stack)`
   ${({ theme }) => css`
-    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} ${theme.spacing[4]};
+    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} calc(${theme.spacing[4]} - ${theme.spacing[1]});
     gap: ${theme.spacing[3]};
     align-items: center;
   `}

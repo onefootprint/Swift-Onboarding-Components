@@ -20,7 +20,9 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewT
   return (
     <Dropdown.Root>
       <Dropdown.Trigger asChild disabled={disabled}>
-        <Button>{kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}</Button>
+        <Button size="compact">
+          {kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}
+        </Button>
       </Dropdown.Trigger>
       <Dropdown.Content align="end" sideOffset={12} $minWidth="220px">
         <Dropdown.Group>

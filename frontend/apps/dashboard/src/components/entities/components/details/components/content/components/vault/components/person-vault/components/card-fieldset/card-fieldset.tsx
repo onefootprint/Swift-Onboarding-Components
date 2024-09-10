@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import type { EntityCard, VaultValue } from '@onefootprint/types';
-import { Box, LinkButton, Text } from '@onefootprint/ui';
+import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,25 +77,25 @@ const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps
 
   return (
     <Container aria-label={title}>
-      <Box>
-        <Header>
-          <Title>
-            <IconComponent />
-            <Text whiteSpace="nowrap" variant="label-3">
-              {getCardTitle(cards.length)}
-            </Text>
-          </Title>
-          {!decrypt.inProgress && cards.length > 1 && (
-            <CardHeader cards={cards} selectedCard={selectedCard} onChange={setSelectedCard} />
-          )}
-          {shouldShowSelectAll && (
-            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
-              {allSelected ? t('deselect-all') : t('select-all')}
-            </LinkButton>
-          )}
-        </Header>
-        <Content>{fields.map(renderField)}</Content>
-      </Box>
+      <Header>
+        <Title>
+          <IconComponent />
+          <Text whiteSpace="nowrap" variant="label-3">
+            {getCardTitle(cards.length)}
+          </Text>
+        </Title>
+        {!decrypt.inProgress && cards.length > 1 && (
+          <CardHeader cards={cards} selectedCard={selectedCard} onChange={setSelectedCard} />
+        )}
+        {shouldShowSelectAll && (
+          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
+            {allSelected ? t('deselect-all') : t('select-all')}
+          </LinkButton>
+        )}
+      </Header>
+      <Stack direction="column" gap={4} padding={5} flex={1}>
+        {fields.map(renderField)}
+      </Stack>
     </Container>
   );
 };
@@ -107,7 +107,6 @@ const Container = styled.fieldset`
     display: flex;
     flex-direction: column;
     height: 100%;
-    justify-content: space-between;
   `};
 `;
 
@@ -116,6 +115,7 @@ const Header = styled.header`
     background-color: ${theme.backgroundColor.secondary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
+    flex: 0;
     display: flex;
     justify-content: space-between;
     gap: ${theme.spacing[4]};
@@ -128,15 +128,6 @@ const Title = styled.div`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[3]};
-  `};
-`;
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
   `};
 `;
 

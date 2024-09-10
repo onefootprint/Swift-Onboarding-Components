@@ -58,6 +58,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
+              size="compact"
               options={[
                 {
                   label: t('pages.entity.decrypt.start'),

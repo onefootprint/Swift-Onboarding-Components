@@ -87,7 +87,7 @@ const Container = styled(Stack)<{ $size: ButtonSize; $variant: ButtonVariant }>`
         position: absolute;
         top: 0;
         height: 100%;
-        width: 1px;
+        width: ${theme.borderWidth[1]};
         right: ${triggerWidths[$size]};
         background-color: ${button.variant[$variant].borderColor};
         z-index: 2;

@@ -154,8 +154,8 @@ const DotsButton = styled.button`
     const { button } = theme.components;
     return css`
       all: unset;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;

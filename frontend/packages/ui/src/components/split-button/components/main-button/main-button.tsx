@@ -75,7 +75,7 @@ const Container = styled.button<{
       flex: 1;
       height: 100%;
       outline-offset: ${theme.spacing[2]};
-      padding: 0 ${theme.spacing[4]};
+      padding: 0 ${$size === 'compact' ? theme.spacing[3] : theme.spacing[4]};
       position: relative;
       user-select: none;
       width: fit-content;

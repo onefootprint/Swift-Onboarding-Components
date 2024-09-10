@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { Box, LinkButton, Text } from '@onefootprint/ui';
+import { Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,23 +54,28 @@ const Fieldset = ({ children, entity, fields, footer, iconComponent: IconCompone
 
   return (
     <Container aria-label={title} data-primary-background={isViewingHistorical}>
-      <Box>
-        <Header data-primary-background={isViewingHistorical}>
-          <Title>
-            <IconComponent />
-            <Text variant="label-2" tag="h2">
-              {title}
-            </Text>
-          </Title>
-          {shouldShowSelectAll && (
-            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
-              {allSelected ? t('deselect-all') : t('select-all')}
-            </LinkButton>
-          )}
-        </Header>
-        <Content>{children || fields.map(renderField)}</Content>
-      </Box>
-      {footer && <Footer>{footer}</Footer>}
+      <Header data-primary-background={isViewingHistorical}>
+        <Title>
+          <IconComponent />
+          <Text variant="label-2" tag="h2">
+            {title}
+          </Text>
+        </Title>
+        {shouldShowSelectAll && (
+          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
+            {allSelected ? t('deselect-all') : t('select-all')}
+          </LinkButton>
+        )}
+      </Header>
+      <Stack direction="column" gap={4} padding={5} flex={1}>
+        {children || fields.map(renderField)}
+      </Stack>
+      {footer && (
+        <Footer tag="footer">
+          <Divider />
+          {footer}
+        </Footer>
+      )}
     </Container>
   );
 };
@@ -114,19 +119,12 @@ const Title = styled.div`
   `};
 `;
 
-const Content = styled.div`
+const Footer = styled(Stack)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[5]};
-  `};
-`;
-
-const Footer = styled.footer`
-  ${({ theme }) => css`
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    padding: 0 ${theme.spacing[5]} ${theme.spacing[4]} ${theme.spacing[5]};
   `};
 `;
 
