@@ -115,5 +115,11 @@
       }
     },
     "cta": "Go to dashboard"
+  },
+  "in-progresss": {
+    "title": "Onboarding pending",
+    "description": "We noticed that you have an incomplete onboarding with <bold>{{tenantName}}</bold>. If you want to finalize your onboarding, or need support, please continue on their website or app instead.",
+    "cta-single": "Go to {{tenantName}}",
+    "cta-alternative": "No, create a Footprint business account"
   }
 }
