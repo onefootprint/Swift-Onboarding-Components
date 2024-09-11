@@ -42,7 +42,7 @@ function App() {
 }
 
 const Intro = ({ onDone }) => {
-  const [tel, setTel] = useState('+5548988124050');
+  const [tel, setTel] = useState('');
   const [requestState, setRequestState] = useState({ isLoading: false, error: '' });
   const [validationErrors, setValidationErrors] = useState('');
 
