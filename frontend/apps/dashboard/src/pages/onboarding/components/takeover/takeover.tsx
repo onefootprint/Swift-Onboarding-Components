@@ -2,16 +2,28 @@ import { LogoFpCompact } from '@onefootprint/icons';
 import type { InProgressOnboarding } from '@onefootprint/types';
 import { Box, Button, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import AreYouSure from './components/are-you-sure';
 
 type TakeoverProps = {
   inProgressOnboardings: InProgressOnboarding[];
 };
 
 const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
-  const { t } = useTranslation('onboarding', { keyPrefix: 'in-progresss' });
+  const { t } = useTranslation('onboarding', { keyPrefix: 'in-progress' });
   const isSingleTenant = inProgressOnboardings.length === 1;
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const closeDialog = () => {
+    setIsConfirmOpen(false);
+  };
+
+  // placeholder
+  const createBusinessAccount = () => {
+    console.log('createBusinessAccount');
+  };
 
   const handleOpenWebsite = (url: string | undefined) => {
     if (url) {
@@ -47,7 +59,7 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
                 <Text variant="body-3" textAlign="center" aria-label="description">
                   <Trans
                     ns="onboarding"
-                    i18nKey="in-progresss.description"
+                    i18nKey="in-progress.description"
                     values={{ tenantName: inProgressOnboardings[0].tenant.name }}
                     components={{
                       bold: <Bold as="span" />,
@@ -58,7 +70,7 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
                 <Text variant="body-3" textAlign="center" aria-label="description">
                   <Trans
                     ns="onboarding"
-                    i18nKey="in-progresss.description-many"
+                    i18nKey="in-progress.description-many"
                     values={{
                       tenantNameFirst: inProgressOnboardings
                         .slice(0, -1)
@@ -96,6 +108,13 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
           </Stack>
         </Box>
       </Box>
+      <AreYouSure
+        isOpen={isConfirmOpen}
+        onCancel={closeDialog}
+        // placeholder
+        onCreateBusinessAccount={createBusinessAccount}
+        inProgressOnboardings={inProgressOnboardings}
+      />
     </Stack>
   );
 };
