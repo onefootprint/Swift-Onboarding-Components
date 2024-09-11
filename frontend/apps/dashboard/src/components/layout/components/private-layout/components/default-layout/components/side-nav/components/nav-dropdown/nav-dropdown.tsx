@@ -74,7 +74,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
           <IcoDotsHorizontal24 testID="nav-dropdown-button" />
         </Dropdown.Trigger>
         {isOpen && (
-          <Dropdown.Content sideOffset={8} $maxWidth="260px">
+          <Dropdown.Content sideOffset={8} $maxWidth="260px" align="start">
             <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
             <Dropdown.Separator />
             {tenants?.length > 1 ? (

@@ -38,7 +38,7 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
           <IcoDotsHorizontal24 testID="nav-dropdown-button" />
         </Dropdown.Trigger>
         {isOpen && (
-          <Dropdown.Content sideOffset={8} $maxWidth="260px">
+          <Dropdown.Content sideOffset={8} $maxWidth="260px" align="start">
             <Dropdown.Group>
               <Box paddingTop={3} paddingBottom={3} paddingLeft={4} paddingRight={4}>
                 {name && (

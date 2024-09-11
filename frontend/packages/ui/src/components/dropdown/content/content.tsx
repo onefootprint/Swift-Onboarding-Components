@@ -27,7 +27,6 @@ const translateOut = keyframes`
 
 const Content = styled(RadixDropdown.Content).attrs({
   sideOffset: 4,
-  align: 'start',
 })<{
   $minWidth?: string;
   $maxWidth?: string;
