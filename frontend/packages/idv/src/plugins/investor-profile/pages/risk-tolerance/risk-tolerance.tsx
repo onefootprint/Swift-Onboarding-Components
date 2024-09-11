@@ -42,7 +42,13 @@ const RiskTolerance = ({ onSuccess, renderFooter }: RiskToleranceProps) => {
   return (
     <RiskToleranceForm
       defaultValues={{ [DiRiskTolerance]: data?.[DiRiskTolerance] || InvestorProfileRiskTolerance.conservative }}
-      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      footer={
+        renderFooter ? (
+          renderFooter(mutation.isLoading)
+        ) : (
+          <ContinueButton isLoading={mutation.isLoading} trackActionName="investor-profile:risk-tolerance-continue" />
+        )
+      }
       onSubmit={handleSubmit}
     />
   );

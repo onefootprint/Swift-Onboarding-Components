@@ -42,7 +42,13 @@ const NetWorth = ({ onSuccess, renderFooter }: NetWorthProps) => {
   return (
     <NetWorthForm
       defaultValues={{ [netWorth]: data?.[netWorth] || InvestorProfileNetWorth.le50k }}
-      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      footer={
+        renderFooter ? (
+          renderFooter(mutation.isLoading)
+        ) : (
+          <ContinueButton isLoading={mutation.isLoading} trackActionName="investor-profile:net-worth-continue" />
+        )
+      }
       onSubmit={handleSubmit}
     />
   );

@@ -53,7 +53,13 @@ const Declarations = ({ onSuccess, renderFooter }: DeclarationsProps) => {
         [InvestorProfileDI.familyMemberNames]: data?.[InvestorProfileDI.familyMemberNames],
         [InvestorProfileDI.politicalOrganization]: data?.[InvestorProfileDI.politicalOrganization],
       }}
-      footer={renderFooter ? renderFooter(isLoading) : <ContinueButton isLoading={isLoading} />}
+      footer={
+        renderFooter ? (
+          renderFooter(isLoading)
+        ) : (
+          <ContinueButton isLoading={isLoading} trackActionName="investor-profile:declarations-continue" />
+        )
+      }
     />
   );
 };

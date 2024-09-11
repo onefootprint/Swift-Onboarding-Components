@@ -72,7 +72,7 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
 
   return (
     <FormWithErrorAndFooter
-      footer={<ContinueButton isLoading={isLoading} />}
+      footer={<ContinueButton isLoading={isLoading} trackActionName="investor-profile:employment-continue" />}
       formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
     >
       <Controller
