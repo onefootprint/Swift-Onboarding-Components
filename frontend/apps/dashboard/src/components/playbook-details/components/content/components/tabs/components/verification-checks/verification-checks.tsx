@@ -1,7 +1,6 @@
 import { CollectedKybDataOption, type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
-import { Stack, createFontStyles } from '@onefootprint/ui';
-import { Trans, useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import { Stack } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 import Info from '../info';
 import { isAmlCheck, isKybCheck, isKycCheck } from './verification-checks.utils';
 
@@ -23,44 +22,17 @@ const VerificationChecks = ({
     if (kyb?.data) {
       return kyb.data.einOnly ? t('kyb.ein-only') : t('kyb.full');
     }
-    return (
-      <Trans
-        ns="playbooks"
-        i18nKey="details.verification-checks.kyb.none"
-        components={{
-          b: <Bold />,
-        }}
-      />
-    );
+    return t('kyb.none');
   })();
 
   const kycText = (() => {
     if (kind === OnboardingConfigKind.kyb) {
-      if (skipKyc)
-        return (
-          <Trans
-            ns="playbooks"
-            i18nKey="details.verification-checks.kyb.kyc.none"
-            components={{
-              b: <Bold />,
-            }}
-          />
-        );
+      if (skipKyc) return t('kyb.kyc.none');
       if (mustCollectData.includes(CollectedKybDataOption.beneficialOwners)) return t('kyb.kyc.primary-only');
       if (mustCollectData.includes(CollectedKybDataOption.kycedBeneficialOwners)) return t('kyb.kyc.full');
     }
     if (kind === OnboardingConfigKind.kyc) {
-      return kyc ? (
-        t('kyc.full')
-      ) : (
-        <Trans
-          ns="playbooks"
-          i18nKey="details.verification-checks.kyc.none"
-          components={{
-            b: <Bold />,
-          }}
-        />
-      );
+      return kyc ? t('kyc.full') : t('kyc.none');
     }
     return null;
   })();
@@ -69,12 +41,12 @@ const VerificationChecks = ({
     <Stack flexDirection="column" gap={8}>
       {kybText && (
         <Info.Group title={t('kyb.title')}>
-          <InfoText>{kybText}</InfoText>
+          <Info.Item label={kybText} checked={!!kyb?.data} />
         </Info.Group>
       )}
       {kycText && (
         <Info.Group title={t('kyc.title')}>
-          <InfoText>{kycText}</InfoText>
+          <Info.Item label={kycText} checked={kyc && !skipKyc} />
         </Info.Group>
       )}
       <Info.Group title={t('aml.title')}>
@@ -85,33 +57,11 @@ const VerificationChecks = ({
             <Info.Item label={t('aml.adverse-media')} checked={aml.data.adverseMedia} />
           </>
         ) : (
-          <Info.EmptyItem>
-            <Trans
-              ns="playbooks"
-              i18nKey="details.verification-checks.aml.none"
-              components={{
-                b: <Bold />,
-              }}
-            />
-          </Info.EmptyItem>
+          <Info.Item label={t('aml.none')} checked={false} />
         )}
       </Info.Group>
     </Stack>
   );
 };
-
-const Bold = styled.b`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')};
-    color: ${theme.color.primary};
-  `}
-`;
-
-const InfoText = styled.p`
-  ${({ theme }) => css`
-    ${createFontStyles('body-3')};
-    color: ${theme.color.tertiary};
-  `}
-`;
 
 export default VerificationChecks;

@@ -41,11 +41,14 @@ describe('<Content />', () => {
   });
 
   describe('Auth playbook', () => {
-    it('renders Tabs', async () => {
+    it('renders single page instead of tablist', async () => {
       renderContent(authPlaybookFixture);
 
-      const tablist = screen.getByRole('tablist');
-      expect(tablist).toBeInTheDocument();
+      const signUpText = await screen.findByText('Sign up information');
+      expect(signUpText).toBeInTheDocument();
+
+      const tablist = screen.queryByRole('tablist');
+      expect(tablist).not.toBeInTheDocument();
     });
   });
 });

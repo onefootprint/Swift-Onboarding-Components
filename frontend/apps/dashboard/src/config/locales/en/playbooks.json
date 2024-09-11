@@ -522,13 +522,12 @@
         "global": {
           "title": "Globally accepted government-issued ID",
           "scans": "Globally accepted doc scans",
-          "empty": "No globally accepted document types are available for scanning."
+          "empty": "No globally accepted doc scans configured"
         },
         "country-specific": {
           "title": "Country-based accepted government-issued ID",
           "scans": "Country-based accepted doc scans",
-          "empty": "No country-specific document types are available for scanning.",
-          "none": "No country-specific rules; all globally accepted documents are accepted."
+          "none": "No country specific accepted doc scans configured"
         },
         "none": "None"
       },
@@ -718,17 +717,17 @@
         "kyc": {
           "full": "On all business owners.",
           "primary-only": "Only on business’ primary owner (the person who filled out the KYB form).",
-          "none": "KYC is <b>not</b> being conducted on beneficial owners."
+          "none": "KYC is not being conducted on beneficial owners."
         }
       },
       "kyc": {
         "title": "Know Your Customer (KYC)",
         "full": "Database checks with collected identity data are being performed.",
-        "none": "Database checks with collected identity data are <b>not</b> being performed."
+        "none": "Database checks with collected identity data are not being performed."
       },
       "aml": {
         "title": "Anti-Money Laundering (AML)",
-        "none": "AML checks are <b>not</b> enabled.",
+        "none": "AML checks are not enabled.",
         "ofac": "Office of Foreign Assets Control (OFAC)",
         "pep": "Politically Exposed Person (PEP)",
         "adverse-media": "Adverse media"

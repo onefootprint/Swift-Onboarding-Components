@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import AdditionalDocs from '../../../additional-docs';
 import CountrySpecific from '../../../country-specific';
 import Global from '../../../global';
-import Auth from './components/auth';
 import Section from './components/section';
 import SingleItem from './components/single-item';
 
@@ -31,7 +30,6 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = kind === 'kyb';
-  const isAuth = kind === 'auth';
   const hasAnyRequiredAuthMethods = !!requiredAuthMethods && requiredAuthMethods.length > 0;
   const hasBusinessDocumentsToCollect = !!businessDocumentsToCollect && businessDocumentsToCollect.length > 0;
   const hasKYCDocsToCollect = !!documentsToCollect && documentsToCollect.length > 0;
@@ -39,16 +37,6 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
   const kycOnlyPrimaryBusinessOwner = mustCollectData.includes('business_beneficial_owners');
   const kycAllBusinessOwners = mustCollectData.includes('business_kyced_beneficial_owners');
   const collectBoInfo = kycOnlyPrimaryBusinessOwner || kycAllBusinessOwners;
-
-  if (isAuth) {
-    return (
-      <Auth
-        requiredAuthMethods={requiredAuthMethods}
-        mustCollectData={mustCollectData}
-        allowUsTerritoryResidents={allowUsTerritoryResidents}
-      />
-    );
-  }
 
   return (
     <Stack direction="column" gap={5}>
@@ -78,7 +66,7 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
         title={isKYB ? t('kyb.business_beneficial_owners') : undefined}
         variant={isKYB ? 'withDivider' : 'default'}
       >
-        <Stack direction="column" gap={7}>
+        <Stack direction="column" gap={8}>
           <CollectedInformation
             title={t('sign-up-information')}
             options={{
@@ -119,10 +107,16 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
           <SingleItem name="nonUSResidents" value={allowInternationalResidents} />
           {hasInvestorProfile && <SingleItem name="investorProfile" value={hasInvestorProfile} />}
           {documentTypesAndCountries?.global && (
-            <Global global={documentTypesAndCountries.global} hasSelfie={mustCollectData.includes('document_selfie')} />
+            <Global
+              global={documentTypesAndCountries.global}
+              hasSelfie={mustCollectData.includes('document_and_selfie')}
+            />
           )}
           {documentTypesAndCountries?.countrySpecific && (
-            <CountrySpecific countrySpecific={documentTypesAndCountries.countrySpecific} />
+            <CountrySpecific
+              countrySpecific={documentTypesAndCountries.countrySpecific}
+              hasSelfie={mustCollectData.includes('document_and_selfie')}
+            />
           )}
           {hasKYCDocsToCollect && <AdditionalDocs docs={documentsToCollect} />}
         </Stack>

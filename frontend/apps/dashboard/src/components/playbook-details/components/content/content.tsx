@@ -3,6 +3,7 @@ import { Box } from '@onefootprint/ui';
 import { useState } from 'react';
 
 import { OnboardingConfigKind } from '@onefootprint/types';
+import AuthOnly from './components/auth-only';
 import Breadcrumb from './components/breadcrumb';
 import DocOnly from './components/doc-only';
 import Header from './components/header';
@@ -24,9 +25,9 @@ const Content = ({ playbook }: ContentProps) => {
       <Box marginBottom={7}>
         <Header playbook={playbook} isDisabled={isHeadingDisabled} />
       </Box>
-      {kind === OnboardingConfigKind.document ? (
-        <DocOnly playbook={playbook} />
-      ) : (
+      {kind === OnboardingConfigKind.document && <DocOnly playbook={playbook} />}
+      {kind === OnboardingConfigKind.auth && <AuthOnly playbook={playbook} />}
+      {(kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb) && (
         <Tabs playbook={playbook} isTabsDisabled={isHeadingDisabled} toggleDisableHeading={setIsHeadingDisabled} />
       )}
     </Box>

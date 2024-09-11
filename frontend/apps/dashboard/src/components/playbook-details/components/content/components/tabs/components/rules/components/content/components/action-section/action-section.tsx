@@ -59,10 +59,10 @@ const ActionSection = ({
   };
   const actionTitle = (
     <Stack direction="column" gap={1} textAlign="left" paddingBottom={showStepUpTitle ? 5 : 0}>
-      <Text variant="label-3" color={textColors[actionName]}>
+      <Text variant="label-2" color={textColors[actionName]}>
         {t(`${actionName}.title` as ParseKeys<'common'>)}
       </Text>
-      <Text variant="body-3" color="secondary">
+      <Text variant="body-2" color="secondary">
         {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
       </Text>
     </Stack>

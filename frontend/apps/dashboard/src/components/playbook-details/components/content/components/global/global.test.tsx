@@ -1,3 +1,4 @@
+import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import Global from './global';
@@ -13,19 +14,25 @@ describe('<Global />', () => {
       customRender(<Global global={globalDocs} />);
       const title = screen.getByText('Globally accepted doc scans');
       expect(title).toBeInTheDocument();
-      const docs = screen.getByText(`ID card, Driver\'s license, Passport`);
+      const docs = screen.getByText(`Driver's license, ID card, Passport`);
       expect(docs).toBeInTheDocument();
     });
 
-    it('renders "+ Selfie" when has selfie', () => {
+    it('renders selfie with correct styling', () => {
       const globalDocs: SupportedIdDocTypes[] = [
         SupportedIdDocTypes.idCard,
         SupportedIdDocTypes.driversLicense,
         SupportedIdDocTypes.passport,
       ];
       customRender(<Global global={globalDocs} hasSelfie={true} />);
-      const docsWithSelfie = screen.getByText(`ID card, Driver\'s license, Passport + Selfie`);
-      expect(docsWithSelfie).toBeInTheDocument();
+      const docs = screen.getByText(`Driver's license, ID card, Passport`);
+      expect(docs).toBeInTheDocument();
+      const plus = screen.getByText('+');
+      expect(plus).toBeInTheDocument();
+      expect(plus).toHaveStyle(`color: ${themes.light.color.primary}`);
+      const selfie = screen.getByText('Selfie');
+      expect(selfie).toBeInTheDocument();
+      expect(selfie).toHaveStyle(`color: ${themes.light.color.secondary}`);
     });
   });
 

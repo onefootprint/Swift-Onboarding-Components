@@ -34,7 +34,7 @@ const Passkeys = ({ playbook }: PasskeysProps) => {
   return (
     <Stack gap={8} flexDirection="column">
       <Stack gap={5} flexDirection="column">
-        <Text variant="label-3">{t('title')}</Text>
+        <Text variant="label-2">{t('title')}</Text>
         <Stack>
           <Toggle
             label={t('form.enable.label')}
@@ -49,7 +49,7 @@ const Passkeys = ({ playbook }: PasskeysProps) => {
           <Box position="relative" top="2px">
             <IcoLightBulb16 />
           </Box>
-          <Text variant="label-3" gap={2}>
+          <Text variant="label-2" gap={2}>
             {t('about.title')}
           </Text>
         </Stack>

@@ -1,7 +1,7 @@
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useIdDocText from 'src/hooks/use-id-doc-text';
+import useIdDocList from 'src/hooks/use-id-doc-list';
 
 type GlobalProps = {
   global?: SupportedIdDocTypes[];
@@ -10,17 +10,35 @@ type GlobalProps = {
 
 const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection' });
-  const idDocText = useIdDocText();
-
-  const documentTypes = global.map(key => idDocText(key));
-  const displayText = documentTypes.join(', ') + (hasSelfie ? ` + ${t('gov-docs.selfie')}` : '');
+  const getIdDocList = useIdDocList();
+  const documentTypes = getIdDocList(global);
 
   return (
     <Stack gap={3} direction="column">
-      <Text variant="label-3">{t('gov-docs.global.scans')}</Text>
-      <Text paddingLeft={3} variant="body-3" color="secondary">
-        {documentTypes.length === 0 ? t('gov-docs.none') : displayText}
-      </Text>
+      <Text variant="label-2">{t('gov-docs.global.scans')}</Text>
+      {documentTypes.length === 0 ? (
+        <Text variant="body-2" color="secondary">
+          {t('gov-docs.none')}
+        </Text>
+      ) : (
+        <Text variant="body-2" tag="span">
+          <Stack direction="row" gap={3}>
+            <Text variant="body-2" tag="span" color="secondary">
+              {documentTypes.join(', ')}
+            </Text>
+            {hasSelfie && (
+              <>
+                <Text variant="body-2" color="primary" tag="span">
+                  +
+                </Text>
+                <Text variant="body-2" color="secondary" tag="span">
+                  {t('gov-docs.selfie')}
+                </Text>
+              </>
+            )}
+          </Stack>
+        </Text>
+      )}
     </Stack>
   );
 };

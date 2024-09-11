@@ -17,7 +17,11 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
 
   return (
     <Container>
-      {title && <Text variant="label-3">{title}</Text>}
+      {title && (
+        <Text variant="label-2" color="secondary">
+          {title}
+        </Text>
+      )}
       {options && (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
@@ -34,7 +38,7 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
         </OptionsContainer>
       )}
       {subtitle && (
-        <Text color="tertiary" variant="body-3">
+        <Text color="secondary" variant="body-2">
           {subtitle}
         </Text>
       )}
@@ -46,7 +50,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[4]};
   `}
 `;
 

@@ -45,11 +45,8 @@ describe('<VerificationChecks />', () => {
       const full = within(kyb).getByText('Full KYB (data collection + verification checks).');
       expect(full).toBeInTheDocument();
 
-      const kyc = screen.getByRole('group', { name: 'Know Your Customer (KYC)' });
-      const noneStart = within(kyc).getByText('not');
-      const noneEnd = within(kyc).getByText('being conducted on beneficial owners', { exact: false });
-      expect(noneStart).toBeInTheDocument();
-      expect(noneEnd).toBeInTheDocument();
+      const kycChecks = screen.getByText('KYC is not being conducted on beneficial owners.');
+      expect(kycChecks).toBeInTheDocument();
     });
 
     it('should show the correct text when EIN-only KYB is enabled and primary-only KYC checks are enabled', () => {
@@ -86,11 +83,8 @@ describe('<VerificationChecks />', () => {
     it('should show a fallback text when AML monitoring is disabled', () => {
       renderVerificationChecks({});
 
-      const aml = screen.getByRole('group', { name: 'Anti-Money Laundering (AML)' });
-      const noneStart = within(aml).getByText('not');
-      const noneEnd = within(aml).getByText('enabled', { exact: false });
-      expect(noneStart).toBeInTheDocument();
-      expect(noneEnd).toBeInTheDocument();
+      const noAMLChecks = screen.getByText('AML checks are not enabled.');
+      expect(noAMLChecks).toBeInTheDocument();
     });
 
     describe('ofac', () => {

@@ -20,7 +20,10 @@ const DocTypesAndCountries = ({ documentTypesAndCountries, hasSelfie }: DocTypes
         <Divider variant="secondary" />
       </Stack>
       <Global global={global} hasSelfie={hasSelfie} />
-      <CountrySpecific countrySpecific={countrySpecific as Record<string, SupportedIdDocTypes[]>} />
+      <CountrySpecific
+        countrySpecific={countrySpecific as Record<string, SupportedIdDocTypes[]>}
+        hasSelfie={hasSelfie}
+      />
     </Stack>
   );
 };

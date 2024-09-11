@@ -12,7 +12,7 @@ const Label = ({ name, value }: LabelProps) => {
   const getLabel = useInfoLabel();
 
   return (
-    <StyledLabel variant="body-3" color="secondary">
+    <StyledLabel variant="body-2" color="secondary">
       {getLabel(name, value)}
     </StyledLabel>
   );

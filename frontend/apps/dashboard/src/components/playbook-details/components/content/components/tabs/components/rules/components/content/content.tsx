@@ -165,8 +165,8 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
       <Stack direction="column" gap={7}>
         <Stack justify="space-between" align="center">
           <Stack direction="column" gap={1}>
-            <Text variant="label-3">{t('title')}</Text>
-            <Text variant="body-3" color="secondary">
+            <Text variant="label-2">{t('title')}</Text>
+            <Text variant="body-2" color="secondary">
               {t('description')}
             </Text>
           </Stack>
@@ -207,7 +207,7 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
           <EditBar>
             <Stack justify="space-between" align="center">
               <Stack gap={2} align="center">
-                <Text variant="label-3">{t('edit-bar.editing-rules')}</Text>
+                <Text variant="label-2">{t('edit-bar.editing-rules')}</Text>
                 <Tooltip text={t('edit-bar.tooltip')}>
                   <IcoInfo16 />
                 </Tooltip>

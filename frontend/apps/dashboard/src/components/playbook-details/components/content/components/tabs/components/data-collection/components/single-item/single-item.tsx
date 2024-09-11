@@ -35,11 +35,13 @@ const SingleItem = ({ name, value }: SingleItemProps) => {
 
   return (
     <Container>
-      {item && <Text variant="label-3">{item.title}</Text>}
+      {item && <Text variant="label-2">{item.title}</Text>}
       <OptionsContainer>
         <OptionItem>
           {value ? <IcoCheckSmall24 /> : <IcoCloseSmall24 />}
-          <Label variant="body-2">{value ? item.enabled : item.disabled}</Label>
+          <Label variant="body-2" color="secondary">
+            {value ? item.enabled : item.disabled}
+          </Label>
         </OptionItem>
       </OptionsContainer>
     </Container>
