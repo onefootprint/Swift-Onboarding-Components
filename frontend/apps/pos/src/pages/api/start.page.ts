@@ -17,6 +17,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   });
 
+  if (req.method === 'GET') {
+    res.status(200).json({ fpId: 'test' });
+  }
+
   const phone = req.body.phoneNumber.replace(/[\(\)\s\-]/g, '');
 
   // 1. create a user
