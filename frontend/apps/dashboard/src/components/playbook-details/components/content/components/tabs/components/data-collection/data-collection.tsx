@@ -42,24 +42,26 @@ const DataCollection = ({ playbook }: DataCollectionProps) => {
     <Stack direction="column" gap={5}>
       {isKYB && (
         <Section title={t('kyb.business')} variant="withDivider">
-          <CollectedInformation
-            title={t('kyb.basic_information')}
-            options={{
-              businessName: mustCollectData.includes('business_name'),
-              businessAddress: mustCollectData.includes('business_address'),
-              businessBeneficialOwners: collectBoInfo,
-              businessTin: mustCollectData.includes('business_tin'),
-            }}
-          />
-          <CollectedInformation
-            title={t('kyb.other')}
-            options={{
-              businessPhoneNumber: mustCollectData.includes('business_phone_number'),
-              businessWebsite: mustCollectData.includes('business_website'),
-              businessType: mustCollectData.includes('business_corporation_type'),
-            }}
-          />
-          {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
+          <Stack direction="column" gap={8}>
+            <CollectedInformation
+              title={t('kyb.basic_information')}
+              options={{
+                businessName: mustCollectData.includes('business_name'),
+                businessAddress: mustCollectData.includes('business_address'),
+                businessBeneficialOwners: collectBoInfo,
+                businessTin: mustCollectData.includes('business_tin'),
+              }}
+            />
+            <CollectedInformation
+              title={t('kyb.other')}
+              options={{
+                businessPhoneNumber: mustCollectData.includes('business_phone_number'),
+                businessWebsite: mustCollectData.includes('business_website'),
+                businessType: mustCollectData.includes('business_corporation_type'),
+              }}
+            />
+            {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
+          </Stack>
         </Section>
       )}
       <Section
