@@ -22,7 +22,7 @@ export interface Typegen0 {
     setKybDataCollected: 'error' | 'xstate.stop';
     setKycDataCollected: 'error' | 'xstate.stop';
     setRequirementRouterVisited: 'error' | 'xstate.stop';
-    setTransferVisited: 'continueOnDesktop' | 'error' | 'xstate.stop';
+    setTransferVisited: 'error' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

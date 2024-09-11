@@ -1,4 +1,5 @@
 import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
+import { OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { BootstrapBusinessData, UserData } from '../../../../../../types';
@@ -156,6 +157,9 @@ const createOnboardingRequirementsMachine = ({
             // If the highest priority requirement hasn't changed after a refetch, the user is
             // stuck on a screen
             logError(`User is stuck on ${ctx.lastHandledRequirement?.kind} requirement`);
+            if (event.payload[0].kind === OnboardingRequirementKind.document) {
+              logError(`Event payload kind: ${JSON.stringify(event.payload[0].config)}`);
+            }
           }
           return {
             ...ctx,
