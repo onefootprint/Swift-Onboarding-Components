@@ -1,3 +1,5 @@
+mod composite_fingerprint_batch;
+
 use actix_web::web;
 use std::hash::DefaultHasher;
 use std::hash::Hasher;
@@ -54,4 +56,6 @@ struct CursorBackfillResponse<T, TCursor> {
 struct BatchBackfillResponse {}
 
 #[allow(unused)]
-pub fn configure(config: &mut web::ServiceConfig) {}
+pub fn configure(config: &mut web::ServiceConfig) {
+    config.service(composite_fingerprint_batch::post);
+}
