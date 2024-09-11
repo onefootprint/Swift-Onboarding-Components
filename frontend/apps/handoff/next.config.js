@@ -16,7 +16,7 @@ const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:80
 
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
-  connect-src 'self' data: ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${DATADOG_SRC};
+  connect-src 'self' data: ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${DATADOG_SRC};
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com i.onefp.net;
   form-action 'self';
@@ -24,7 +24,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net cdn.jsdelivr.net;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net js.dvnfo.com blob: https://cdn.jsdelivr.net docs.opencv.org elements.stytch.com ${DATADOG_SRC};
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com fpnpmcdn.net blob: https://cdn.jsdelivr.net docs.opencv.org elements.stytch.com ${DATADOG_SRC};
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net i.onefp.net;
   worker-src 'self' blob:;
 `;
