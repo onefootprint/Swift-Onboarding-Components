@@ -31,11 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     return;
   }
 
-  if (req.method === 'GET') {
-    res.status(200).json({ fpId: 'test' });
-    return;
-  }
-
   const phone = req.body.phoneNumber.replace(/[\(\)\s\-]/g, '');
 
   // 1. create a user
