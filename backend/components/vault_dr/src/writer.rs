@@ -15,7 +15,8 @@ use api_errors::AssertionError;
 use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::primitives::SdkBody;
 use db::errors::FpOptionalExtension;
-use db::helpers::load_vault_dr_data_lifetime_batch;
+use db::helpers::get_vault_dr_data_lifetime_batch;
+use db::helpers::get_vault_dr_scoped_vault_version_batch;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
@@ -126,16 +127,39 @@ impl VaultDrWriter {
         Ok(writer)
     }
 
-    pub async fn write_blobs_batch(&self, state: &State, fp_id_filter: Option<Vec<FpId>>) -> FpResult<u32> {
+    pub async fn write_batch(&self, state: &State, fp_id_filter: Option<Vec<FpId>>) -> FpResult<u32> {
+        let num_blobs = self
+            .write_blob_batch(state, self.knobs.batch_size, fp_id_filter.clone())
+            .await?;
+
+        // The number of new manifests/scoped vault versions is <= the number of new blobs, since
+        // there can be at most one manifest per blob already written to the DB. Therefore, under
+        // ideal conditions, equal batch sizes would allow for the writer to stay up to date on
+        // writing manifests. However, since writing manifests may fail after successfully writing
+        // blobs, the queue of manifests to write may grow larger than the blob batch size. So to
+        // allow the writer to catch up a modest backlog of manifests without intervention, we use
+        // a greater batch size limit for manifests.
+        self.write_manifest_batch(state, self.knobs.batch_size * 2, fp_id_filter.clone())
+            .await?;
+
+        Ok(num_blobs)
+    }
+
+    #[tracing::instrument("VaultDrWriter::write_blob_batch", skip_all)]
+    async fn write_blob_batch(
+        &self,
+        state: &State,
+        batch_size: u32,
+        fp_id_filter: Option<Vec<FpId>>,
+    ) -> FpResult<u32> {
         let tenant_id = self.tenant_id.clone();
         let config_id = self.config_id.clone();
         let is_live = self.is_live;
-        let batch_size = self.knobs.batch_size;
 
         let (dls, sv_id_to_fp_id) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let dls = load_vault_dr_data_lifetime_batch(
+                let dls = get_vault_dr_data_lifetime_batch(
                     conn,
                     &tenant_id,
                     is_live,
@@ -376,6 +400,35 @@ impl VaultDrWriter {
             content_length_bytes: content_length as i64,
         };
         Ok(new_blob)
+    }
+
+    #[tracing::instrument("VaultDrWriter::write_manifest_batch", skip_all)]
+    async fn write_manifest_batch(
+        &self,
+        state: &State,
+        batch_size: u32,
+        fp_id_filter: Option<Vec<FpId>>,
+    ) -> FpResult<()> {
+        let tenant_id = self.tenant_id.clone();
+        let config_id = self.config_id.clone();
+        let is_live = self.is_live;
+
+        let _svvs = state
+            .db_pool
+            .db_query(move |conn| -> FpResult<_> {
+                let svvs = get_vault_dr_scoped_vault_version_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &config_id,
+                    batch_size,
+                    fp_id_filter,
+                )?;
+                Ok(svvs)
+            })
+            .await?;
+
+        Ok(())
     }
 }
 

@@ -1,13 +1,17 @@
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::ob_configuration::IsLive;
+use crate::models::scoped_vault_version::ScopedVaultVersion;
 use crate::DbResult;
 use crate::PgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::data_lifetime;
 use db_schema::schema::scoped_vault;
+use db_schema::schema::scoped_vault_version;
 use db_schema::schema::vault_dr_blob;
+use db_schema::schema::vault_dr_manifest;
 use diesel::prelude::*;
+use diesel::sql_types::Integer;
 use diesel::QueryDsl;
 use newtypes::DataLifetimeSeqno;
 use newtypes::FpId;
@@ -17,7 +21,14 @@ use newtypes::VaultDrConfigId;
 
 // Load up to `batch_size` DataLifetime records for the given tenant/is_live that do not have
 // corresponding blobs for the given config.
-pub fn load_vault_dr_data_lifetime_batch(
+#[tracing::instrument(skip_all, fields(
+    tenant_id = %tenant_id,
+    is_live = %is_live,
+    config_id = %config_id,
+    batch_size = %batch_size,
+    fp_id_filter = ?fp_id_filter,
+))]
+pub fn get_vault_dr_data_lifetime_batch(
     conn: &mut PgConn,
     tenant_id: &TenantId,
     is_live: IsLive,
@@ -65,6 +76,90 @@ pub fn load_vault_dr_data_lifetime_batch(
     Ok(dls)
 }
 
+// Fetch up to `batch_size` ScopedVaultVersion records that have all corresponding VaultDrBlobs
+// written.
+#[tracing::instrument(skip_all, fields(
+    tenant_id = %tenant_id,
+    is_live = %is_live,
+    config_id = %config_id,
+    batch_size = %batch_size,
+    fp_id_filter = ?fp_id_filter,
+))]
+pub fn get_vault_dr_scoped_vault_version_batch(
+    conn: &mut PgConn,
+    tenant_id: &TenantId,
+    is_live: IsLive,
+    config_id: &VaultDrConfigId,
+    batch_size: u32,
+    fp_id_filter: Option<Vec<FpId>>,
+) -> DbResult<Vec<ScopedVaultVersion>> {
+    // Query performance optimization:
+    //
+    // We know that we process ScopedVaultVersions in order of ascending seqno and transactionally
+    // commit entire successfully-processed batches of SVVs as vault_dr_manifest rows, so we can
+    // bound the search space for the next batch of SVVs by the maximum processed seqno.
+    //
+    // With the Read Committed isolation level, this seqno may be a bit stale (e.g. if more SVVs
+    // are processed after finding this seqno and before the following batch query). However, the
+    // SVV batch query will still return the correct rows. The seqno search bound will just be low.
+    let max_processed_seqno = vault_dr_manifest::table
+        .filter(vault_dr_manifest::config_id.eq(config_id))
+        .select(diesel::dsl::max(vault_dr_manifest::seqno))
+        .first::<Option<DataLifetimeSeqno>>(conn)?
+        .unwrap_or(DataLifetimeSeqno::from(0));
+
+    let query = scoped_vault_version::table
+            .inner_join(scoped_vault::table)
+            .filter(scoped_vault_version::tenant_id.eq(tenant_id))
+            .filter(scoped_vault_version::is_live.eq(is_live))
+            .filter(scoped_vault_version::seqno.ge(max_processed_seqno))
+            // Where there is no matching manifest:
+            .filter(diesel::dsl::not(diesel::dsl::exists(
+                vault_dr_manifest::table
+                    .filter(vault_dr_manifest::scoped_vault_version_id.eq(scoped_vault_version::id))
+                    .filter(vault_dr_manifest::config_id.eq(config_id.clone())),
+            )))
+            // Where all corresponding data_lifetimes have a vault_dr_blob written:
+            .filter(
+                // The `exists()`, `SELECT 1`, `GROUP BY 1`, and `having()` are effectively doing:
+                //   SELECT
+                //      COUNT(DISTINCT data_lifetime.id) = COUNT(DISTINCT vault_dr_blob.data_lifetime)
+                //   FROM ...
+                // but Diesel doesn't support using a single-row `SELECT <bool>` as a filter
+                // expression. The group aggregation yields roughly the same inner query plan.
+                diesel::dsl::exists(
+                    data_lifetime::table
+                        .left_join(vault_dr_blob::table)
+                        .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_version::scoped_vault_id))
+                        .filter(
+                            scoped_vault_version::seqno.eq(data_lifetime::created_seqno).or(
+                                data_lifetime::deactivated_seqno
+                                    .assume_not_null()
+                                    .eq(scoped_vault_version::seqno),
+                            ),
+                        )
+                        .select(1.into_sql::<Integer>())
+                        .group_by(1.into_sql::<Integer>())
+                        .having(diesel::dsl::count_distinct(data_lifetime::id).eq(
+                            diesel::dsl::count_distinct(vault_dr_blob::data_lifetime_id.assume_not_null()),
+                        )),
+                ),
+            )
+            .select(ScopedVaultVersion::as_select())
+            .order(scoped_vault_version::seqno)
+            .limit(batch_size as i64)
+            .into_boxed();
+
+    let query = match fp_id_filter {
+        Some(fp_ids) => query.filter(scoped_vault::fp_id.eq_any(fp_ids)),
+        None => query,
+    };
+
+    let svvs = query.load(conn)?;
+
+    Ok(svvs)
+}
+
 pub fn get_latest_vault_dr_backup_record_timestamp(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
@@ -85,9 +180,11 @@ mod tests {
     use crate::models::vault_dr::NewVaultDrAwsPreEnrollment;
     use crate::models::vault_dr::NewVaultDrBlob;
     use crate::models::vault_dr::NewVaultDrConfig;
+    use crate::models::vault_dr::NewVaultDrManifest;
     use crate::models::vault_dr::VaultDrAwsPreEnrollment;
     use crate::models::vault_dr::VaultDrBlob;
     use crate::models::vault_dr::VaultDrConfig;
+    use crate::models::vault_dr::VaultDrManifest;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
@@ -96,6 +193,7 @@ mod tests {
     use macros::db_test;
     use newtypes::DataIdentifier;
     use newtypes::IdentityDataKind;
+    use newtypes::ScopedVaultVersionNumber;
 
     #[db_test]
     fn test_vault_dr_batch_query(conn: &mut TestPgConn) {
@@ -185,16 +283,50 @@ mod tests {
         // for a seqno.
         assert_eq!(dls[batch_size - 1].created_seqno, dls[batch_size].created_seqno);
 
-        let expected_batch_sizes = vec![batch_size, batch_size, batch_size, 3, 0, 0];
+        // Deactivate the last DL.
+        let deactivate_seqno = DataLifetime::get_next_seqno(conn).unwrap();
+        DataLifetime::bulk_deactivate_kinds(
+            conn,
+            &sv1,
+            vec![DataIdentifier::Id(IdentityDataKind::FirstName)],
+            deactivate_seqno,
+        )
+        .unwrap();
+
+        let expected_batch_sizes = vec![
+            // (blob count, svv/manifest count)
+            (batch_size, 3),
+            (batch_size, 4),
+            (batch_size, 3),
+            (3, 3),
+            (0, 0),
+            (0, 0),
+        ];
+
         assert_eq!(
             // We should be writing one blob per DL.
-            expected_batch_sizes.iter().sum::<usize>(),
+            expected_batch_sizes.iter().map(|s| s.0).sum::<usize>(),
             dls.len()
         );
 
+        let unique_seqnos = dls
+            .iter()
+            .map(|dl| dl.created_seqno)
+            .chain(Some(deactivate_seqno).into_iter())
+            .unique()
+            .collect_vec();
+        assert_eq!(
+            // We should be writing one manifest per seqno.
+            expected_batch_sizes.iter().map(|s| s.1).sum::<usize>(),
+            unique_seqnos.len(),
+        );
+
+        let mut expected_svvns = (1..=(unique_seqnos.len() as i64)).map(ScopedVaultVersionNumber::from);
+        let mut expected_svv_seqnos = unique_seqnos.into_iter();
         let mut dl_created_seqnos = dls.iter().map(|dl| dl.created_seqno);
-        for (i, expected_batch_size) in expected_batch_sizes.into_iter().enumerate() {
-            let got_dl_batch = load_vault_dr_data_lifetime_batch(
+
+        for (i, (expected_batch_size, expected_svv_count)) in expected_batch_sizes.into_iter().enumerate() {
+            let got_dl_batch = get_vault_dr_data_lifetime_batch(
                 conn,
                 &tenant_id,
                 is_live,
@@ -225,6 +357,34 @@ mod tests {
             }
 
             write_fake_blobs(conn, &vdr_config.id, got_dl_batch);
+
+            let svv_batch = get_vault_dr_scoped_vault_version_batch(
+                conn,
+                &tenant_id,
+                is_live,
+                &vdr_config.id,
+                batch_size as u32,
+                Some(vec![sv1.fp_id.clone()]),
+            )
+            .unwrap();
+            assert_eq!(svv_batch.len(), expected_svv_count, "Batch {} size", i);
+
+            let expected_svvns = (&mut expected_svvns).take(expected_svv_count).collect_vec();
+            assert_have_same_elements(
+                svv_batch.iter().map(|svv| svv.version).collect_vec(),
+                expected_svvns,
+            );
+
+            let expected_seqnos = (&mut expected_svv_seqnos).take(expected_svv_count).collect_vec();
+            assert_have_same_elements(
+                svv_batch.iter().map(|svv| svv.seqno).collect_vec(),
+                expected_seqnos,
+            );
+
+            assert!(svv_batch.iter().all(|svv| svv.scoped_vault_id == sv1.id));
+            assert!(svv_batch.iter().all(|svv| svv.scoped_vault_id == sv1.id));
+
+            write_fake_manifests(conn, &vdr_config.id, svv_batch);
         }
     }
 
@@ -243,5 +403,25 @@ mod tests {
             .collect_vec();
 
         VaultDrBlob::bulk_create(conn, new_blobs).unwrap();
+    }
+
+    fn write_fake_manifests(
+        conn: &mut TestPgConn,
+        config_id: &VaultDrConfigId,
+        svvs: Vec<ScopedVaultVersion>,
+    ) {
+        let new_manifests = svvs
+            .into_iter()
+            .map(|svv| NewVaultDrManifest {
+                config_id: config_id.clone(),
+                scoped_vault_version_id: svv.id,
+                bucket_path: crypto::random::gen_rand_bytes(32).encode_hex(),
+                content_etag: "content-etag".to_owned(),
+                content_length_bytes: 123,
+                seqno: svv.seqno,
+            })
+            .collect_vec();
+
+        VaultDrManifest::bulk_create(conn, new_manifests).unwrap();
     }
 }

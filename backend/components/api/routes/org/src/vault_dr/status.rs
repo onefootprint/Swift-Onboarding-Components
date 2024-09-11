@@ -8,7 +8,7 @@ use api_core::State;
 use chrono::Utc;
 use db::errors::FpOptionalExtension;
 use db::helpers::get_latest_vault_dr_backup_record_timestamp;
-use db::helpers::load_vault_dr_data_lifetime_batch;
+use db::helpers::get_vault_dr_data_lifetime_batch;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
@@ -41,7 +41,7 @@ pub async fn get(
             let latest_backup_record_timestamp =
                 get_latest_vault_dr_backup_record_timestamp(conn, &config.id)?;
 
-            let next_batch = load_vault_dr_data_lifetime_batch(
+            let next_batch = get_vault_dr_data_lifetime_batch(
                 conn,
                 &config.tenant_id,
                 config.is_live,

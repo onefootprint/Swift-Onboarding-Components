@@ -71,7 +71,7 @@ pub async fn run_batch(state: &State, knobs: Knobs) -> FpResult<()> {
 async fn run_batch_for_config(state: &State, knobs: Knobs, config_id: &VaultDrConfigId) -> FpResult<()> {
     let vdr_writer = VaultDrWriter::new(state, config_id, knobs).await?;
 
-    vdr_writer.write_blobs_batch(state, None).await?;
+    vdr_writer.write_batch(state, None).await?;
 
     Ok(())
 }

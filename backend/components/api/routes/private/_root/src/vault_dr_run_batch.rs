@@ -62,7 +62,6 @@ pub async fn post(
 
     let writer = VaultDrWriter::new(&state, &config.id, knobs).await?;
 
-    let num_blobs = writer.write_blobs_batch(&state, fp_ids).await?;
-
+    let num_blobs = writer.write_batch(&state, fp_ids).await?;
     Ok(VaultDrRunBatchResponse { num_blobs })
 }
