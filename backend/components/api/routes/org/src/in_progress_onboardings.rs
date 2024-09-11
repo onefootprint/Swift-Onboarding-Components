@@ -13,7 +13,15 @@ use newtypes::IdentityDataKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
+use serde::Deserialize;
 use std::str::FromStr;
+
+#[derive(Deserialize, Apiv2Schema)]
+pub struct InProgressOnboardingsRequest {
+    #[serde(default)]
+    is_live: bool,
+}
 
 #[api_v2_operation(
     tags(Members, Private),
@@ -22,11 +30,12 @@ use std::str::FromStr;
 #[get("/org/member/in_progress_onboardings")]
 async fn get(
     state: web::Data<State>,
+    request: web::Query<InProgressOnboardingsRequest>,
     auth: TenantSessionAuth,
 ) -> ApiListResponse<api_wire_types::InProgressOnboarding> {
     let auth = auth.check_guard(Any)?;
     let tu_id = auth.actor().tenant_user_id()?.clone();
-    let is_live = auth.is_live()?;
+    let InProgressOnboardingsRequest { is_live } = request.into_inner();
     let tenant_user = state
         .db_pool
         .db_query(move |conn| TenantUser::get(conn, &tu_id))

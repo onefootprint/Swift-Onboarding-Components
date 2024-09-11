@@ -5078,6 +5078,17 @@
                     "Private"
                 ],
                 "description": "Returns the list of in-progress KYC/KYB onboardings for the email associated with the logged-in dashboard user.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "is_live",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

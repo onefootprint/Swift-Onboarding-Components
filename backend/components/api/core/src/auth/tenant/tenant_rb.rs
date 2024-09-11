@@ -135,7 +135,7 @@ impl<const IS_SECONDARY: bool> CanCheckTenantGuard for TenantRbAuthContext<IS_SE
 impl TenantAuth for SessionContext<TenantRbAuth> {
     fn is_live(&self) -> FpResult<bool> {
         if self.tenant().sandbox_restricted && self.is_live {
-            // error if the tenant is sandbox-restricted but is requesting live data
+            // Error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
         }
         if self.data.data.purpose == TenantSessionPurpose::Docs && self.is_live {
