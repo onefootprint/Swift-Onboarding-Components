@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import NextCors from 'nextjs-cors';
 import { Twilio } from 'twilio';
 
 type ResponseData = {
@@ -11,14 +10,30 @@ const PLAYBOOK_KEY = process.env.FOOTPRINT_PLAYBOOK_KEY;
 const API_KEY = process.env.FOOTPRINT_API_KEY;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
-  await NextCors(req, res, {
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    origin: '*',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  });
+  // Set CORS headers manually
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+  );
+
+  // Add IE11 specific headers
+  res.setHeader('X-UA-Compatible', 'IE=edge');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  // Handle OPTIONS method for preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
 
   if (req.method === 'GET') {
     res.status(200).json({ fpId: 'test' });
+    return;
   }
 
   const phone = req.body.phoneNumber.replace(/[\(\)\s\-]/g, '');
