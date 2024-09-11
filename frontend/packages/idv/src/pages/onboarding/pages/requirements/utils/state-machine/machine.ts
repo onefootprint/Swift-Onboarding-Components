@@ -2,11 +2,17 @@ import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onef
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import type { BootstrapBusinessData, UserData } from '../../../../../../types';
 import { getLogger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
-import { NextRequirementTargets, RequirementCompletedTransition, shouldWaitForComponentsSdk } from './machine.utils';
+import {
+  NextRequirementTargets,
+  RequirementCompletedTransition,
+  getPreferUploadDoc,
+  shouldWaitForComponentsSdk,
+} from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
@@ -157,9 +163,6 @@ const createOnboardingRequirementsMachine = ({
             // If the highest priority requirement hasn't changed after a refetch, the user is
             // stuck on a screen
             logError(`User is stuck on ${ctx.lastHandledRequirement?.kind} requirement`);
-            if (event.payload[0].kind === OnboardingRequirementKind.document) {
-              logError(`Event payload kind: ${JSON.stringify(event.payload[0].config)}`);
-            }
           }
           return {
             ...ctx,
@@ -167,7 +170,14 @@ const createOnboardingRequirementsMachine = ({
           };
         }),
         setTransferVisited: assign(ctx => ({ ...ctx, isTransferVisited: true })),
-        markLastHandledRequirement: assign(ctx => ({ ...ctx, lastHandledRequirement: ctx.requirements[0] })),
+        markLastHandledRequirement: assign(ctx => {
+          let lastHandledRequirement = ctx.requirements[0];
+          if (lastHandledRequirement.kind === OnboardingRequirementKind.document) {
+            const idDocReqs = getRequirements(ctx.requirements, OnboardingRequirementKind.document);
+            lastHandledRequirement = getPreferUploadDoc(idDocReqs) || idDocReqs[0];
+          }
+          return { ...ctx, lastHandledRequirement };
+        }),
         setInvestorProfileCollected: assign(ctx => ({ ...ctx, isInvestorProfileCollected: true })),
         setKycDataCollected: assign(ctx => ({ ...ctx, isKycDataCollected: true })),
         setKybDataCollected: assign(ctx => ({ ...ctx, isKybDataCollected: true })),
