@@ -19,7 +19,6 @@ use std::str::FromStr;
 
 #[derive(Deserialize, Apiv2Schema)]
 pub struct InProgressOnboardingsRequest {
-    #[serde(default)]
     is_live: bool,
 }
 

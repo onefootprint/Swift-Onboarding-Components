@@ -33,7 +33,8 @@ def test_in_progress_onboardings(sandbox_tenant, foo_sandbox_tenant):
     fp_id3 = get("hosted/user/private_info", None, bifrost.auth_token)["fp_id"]
 
     # Only fp_id3 should show in in-progress onboardings
-    body = get("org/member/in_progress_onboardings", None, *sandbox_tenant.db_auths)
+    data = dict(is_live="false")
+    body = get("org/member/in_progress_onboardings", data, *sandbox_tenant.db_auths)
     assert not any(i["fp_id"] == fp_id1 for i in body)
     assert not any(i["fp_id"] == fp_id2 for i in body)
     ob = next(i for i in body if i["fp_id"] == fp_id3)
