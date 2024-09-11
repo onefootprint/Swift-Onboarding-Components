@@ -273,6 +273,8 @@ pub struct VaultDrManifest {
     pub bucket_path: String,
     pub content_etag: String,
     pub content_length_bytes: i64,
+
+    pub seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -284,6 +286,8 @@ pub struct NewVaultDrManifest {
     pub bucket_path: String,
     pub content_etag: String,
     pub content_length_bytes: i64,
+
+    pub seqno: DataLifetimeSeqno,
 }
 
 impl VaultDrManifest {

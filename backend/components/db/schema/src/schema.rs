@@ -1611,6 +1611,7 @@ diesel::table! {
         bucket_path -> Text,
         content_etag -> Text,
         content_length_bytes -> Int8,
+        seqno -> Int8,
     }
 }
 
