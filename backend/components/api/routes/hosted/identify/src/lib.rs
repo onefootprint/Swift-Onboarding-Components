@@ -146,9 +146,7 @@ async fn get_identify_challenge_context(
             // through the obc
             let (tenant, sv) = if let Some(sv_id) = sv_id.as_ref() {
                 let sv = ScopedVault::get(conn, sv_id)?;
-                root_span.record("tenant_id", sv.tenant_id.to_string());
-                root_span.record("is_live", sv.is_live);
-                root_span.record("fp_id", sv.fp_id.to_string());
+                root_span.record_su(&sv);
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
                 (Some(tenant), Some(sv))
             } else if let Some(obc) = obc {
@@ -159,7 +157,7 @@ async fn get_identify_challenge_context(
                 // If there's already a SV for this (user, tenant) pair, log the fp_id
                 let sv = ScopedVault::get(conn, (&v_id, t_id)).optional()?;
                 if let Some(sv) = sv.as_ref() {
-                    root_span.record("fp_id", sv.fp_id.to_string());
+                    root_span.record_su(sv);
                 }
                 (Some(tenant), sv)
             } else {

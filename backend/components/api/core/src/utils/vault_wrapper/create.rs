@@ -118,10 +118,7 @@ impl VaultWrapper<Person> {
         let su = ScopedVault::create_for_playbook(conn, &uv, obc, args)?;
 
         // Record some properties on the root span
-        root_span.record("tenant_id", su.tenant_id.to_string());
-        root_span.record("fp_id", su.fp_id.to_string());
-        root_span.record("vault_id", su.vault_id.to_string());
-        root_span.record("is_live", su.is_live);
+        root_span.record_su(&su);
 
         // This performs some superfluous DB queries to rebuild the UVW, but allows us to share code
         // to add data to the vault

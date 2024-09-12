@@ -5,7 +5,6 @@ use crate::auth::tenant::AuthActor;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::PieceOfData;
-use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -41,23 +40,23 @@ pub struct PrefillData {
     phantom: PhantomData<()>,
 }
 
-pub enum PrefillKind {
+pub enum PrefillKind<'a> {
     /// After the identify flow, prefill login methods
     Identify,
     /// When starting onboarding, prefill all data required by the playbook. We shouldn't do this
     /// before creating the Workflow in the database, otherwise we'll unintentionally give decrypt
     /// access to all prefilled data.
-    Onboarding,
+    Onboarding(&'a ScopedVault),
 }
 
-impl PrefillKind {
+impl<'a> PrefillKind<'a> {
     fn allow_prefilling(&self, di: &DataIdentifier) -> bool {
         match self {
             Self::Identify => matches!(
                 di,
                 DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
             ),
-            Self::Onboarding => true,
+            Self::Onboarding(_) => true,
         }
     }
 }
@@ -73,22 +72,30 @@ impl<Type> VaultWrapper<Type> {
     pub async fn get_data_to_prefill<'a>(
         &'a self,
         state: &'a State,
-        destination_sv: &'a ScopedVault,
         pb: &'a ObConfiguration,
-        kind: PrefillKind,
+        kind: PrefillKind<'a>,
     ) -> FpResult<PrefillData> {
-        if self.vault.id != destination_sv.vault_id {
+        let destination_vw = match kind {
+            // No existing destination ScopedVault when we're prefilling login methods
+            PrefillKind::Identify => None,
+            // There's only an existing destination ScopedVault during Onboarding time
+            PrefillKind::Onboarding(sv) => {
+                let sv_id = sv.id.clone();
+                let vw = state
+                    .db_pool
+                    .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
+                    .await?;
+                Some(vw)
+            }
+        };
+        let destination_vw = destination_vw.as_ref();
+
+        if destination_vw.is_some_and(|vw| vw.scoped_vault.vault_id != self.vault.id) {
             return Err(AssertionError("Cannot prefill data into a separate vault").into());
         }
         if self.vault.kind != VaultKind::Person {
             return Err(AssertionError("Can't prefill business vaults").into());
         }
-
-        let sv_id = destination_sv.id.clone();
-        let destination_vw: TenantVw<Any> = state
-            .db_pool
-            .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
-            .await?;
 
         // Collect all of the portable data that we can prefill
         let data = self
@@ -96,16 +103,18 @@ impl<Type> VaultWrapper<Type> {
             .into_iter()
             .filter_map(|di| self.data(&di))
             .filter(|d| d.is_portable())
-            // Don't prefill data into a tenant that is already owned by the tenant.
+            // Don't prefill data into a tenant that is already owned by the destination tenant.
             // For ex, will prevent us from prefilling PhoneNumber and Email that were just recently
             // added at this tenant
             // TODO this won't always no-op like we want if the data was portablized at another tenant
             // but is the same data
-            .filter(|d| d.lifetime.scoped_vault_id != destination_sv.id)
+            .filter(|d| !destination_vw.is_some_and(|vw| vw.scoped_vault.id == d.lifetime.scoped_vault_id))
             // Don't prefill data into this tenant if the exact same data has already been prefilled
             .filter(|d| {
-                let existing_dl = destination_vw.get_lifetime(&d.lifetime.kind);
-                !existing_dl.and_then(|dl| dl.origin_id.as_ref()).is_some_and(|id| &d.lifetime.id == id)
+                !destination_vw
+                    .and_then(|vw| vw.get_lifetime(&d.lifetime.kind))
+                    .and_then(|dl| dl.origin_id.as_ref())
+                    .is_some_and(|id| &d.lifetime.id == id)
             })
             // Only autofill data into the that must be collected by the tenant's playbook
             .filter(|d| pb.must_collect_data.iter().any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(&d.lifetime.kind)))
@@ -117,7 +126,7 @@ impl<Type> VaultWrapper<Type> {
         //
         // Compute the fingerprints for all data we're going to prefill
         //
-        let t_id = &destination_sv.tenant_id;
+        let t_id = &pb.tenant_id;
         let dis = data.iter().map(|d| &d.kind).collect_vec();
         // Specifically throw out the mapping from sh_data -> lifetime_id. The lifetime_ids here
         // belong to the source SV, not the destination SV

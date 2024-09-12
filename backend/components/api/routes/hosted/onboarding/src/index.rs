@@ -85,7 +85,7 @@ pub async fn post(
     };
 
     let prefill_data = vw
-        .get_data_to_prefill(&state, &scoped_user, &ob_config, PrefillKind::Onboarding)
+        .get_data_to_prefill(&state, &ob_config, PrefillKind::Onboarding(&scoped_user))
         .await?;
 
     let insight_event = CreateInsightEvent::from(insights);

@@ -5,6 +5,7 @@ use actix_web::FromRequest;
 use anyhow::Result;
 use chrono::SecondsFormat;
 use chrono::Utc;
+use db::models::scoped_vault::ScopedVault;
 use futures_util::Future;
 use itertools::Itertools;
 use opentelemetry::global;
@@ -217,6 +218,15 @@ impl paperclip::v2::schema::Apiv2Schema for RootSpan {
 
     fn description() -> &'static str {
         "Wrapper around tracing_actix_web::RootSpan that also implements paperclip Apiv2Schema"
+    }
+}
+
+impl RootSpan {
+    pub fn record_su(&self, su: &ScopedVault) {
+        self.record("vault_id", su.vault_id.to_string());
+        self.record("fp_id", su.fp_id.to_string());
+        self.record("tenant_id", su.tenant_id.to_string());
+        self.record("is_live", su.is_live);
     }
 }
 

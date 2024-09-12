@@ -85,11 +85,7 @@ pub async fn post(
         })
         .await?;
 
-    // Some logging metadata
-    root_span.record("fp_id", sv.fp_id.to_string());
-    root_span.record("vault_id", sv.vault_id.to_string());
-    root_span.record("tenant_id", sv.tenant_id.to_string());
-    root_span.record("is_live", sv.is_live);
+    root_span.record_su(&sv);
 
     // Composer integrated with an old version of this API that expects the obc ID...
     // https://onefootprint.slack.com/archives/C04QDTDM7TR/p1716407736679449?thread_ts=1710368278.003619&cid=C04QDTDM7TR

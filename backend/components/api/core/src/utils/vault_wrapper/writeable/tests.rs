@@ -57,7 +57,7 @@ async fn test_prefill_data(state: &mut State) {
     // su1 then goes through onboarding. When su1 triggers onboarding, we'll compose prefill data,
     // but it should be empty since the only data exists at the current tenant
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su1, &data.pb1, PrefillKind::Onboarding)
+        .get_data_to_prefill(state, &data.pb1, PrefillKind::Onboarding(&data.su1))
         .await
         .unwrap();
     assert!(prefill_data.data.is_empty());
@@ -68,7 +68,7 @@ async fn test_prefill_data(state: &mut State) {
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
     assert_have_same_elements(
@@ -115,7 +115,7 @@ async fn test_prefill_data(state: &mut State) {
 
     // When the user starts onboarding onto tenant2, we should have prefill data!
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
 
@@ -277,7 +277,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // We should only prefill phone and email from this auth playbook
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su2, &data.auth_pb2, PrefillKind::Onboarding)
+        .get_data_to_prefill(state, &data.auth_pb2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
     assert_have_same_elements(
@@ -301,7 +301,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // Then, prefill data for KYC playbook shouldn't prefill phone and email again
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.su2, &data.pb2, PrefillKind::Onboarding)
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
     assert_have_same_elements(

@@ -4,10 +4,12 @@ use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::user::allowed_user_scopes;
+use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
+use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -15,6 +17,7 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::PrefillData;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::WriteableVw;
@@ -22,6 +25,7 @@ use api_core::FpResult;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
+use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
@@ -108,62 +112,36 @@ pub async fn post(
         }
     };
 
-    // Create the ScopedVault if we're onboarding an existing user onto a new tenant
-    let (su, user_auth, portable_vw) = state
-        .db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
-            let uv_id = &user_auth.user_vault_id;
-            let (su, is_new_su) = if let Some(sv_id) = user_auth.scoped_user_id() {
-                let su = ScopedVault::get(conn, &sv_id)?;
-                (Some(su), false)
-            } else if let Some(obc) = user_auth.ob_config() {
-                // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
-                let uv = Vault::lock(conn, uv_id)?;
-                let (su, is_new_su) = ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?;
-                (Some(su), is_new_su)
-            } else {
-                // We're allowed to not have a ScopedVault only for my1fp
-                (None, false)
-            };
-
-            let portable_vw = is_new_su
-                .then(|| VaultWrapper::<Any>::build_portable(conn, uv_id))
-                .transpose()?;
-            Ok((su, user_auth, portable_vw))
-        })
-        .await?;
-
-    // Record some properties on the root span
-    root_span.record("vault_id", user_auth.user_vault_id.to_string());
-    if let Some(su) = su.as_ref() {
-        root_span.record("fp_id", su.fp_id.to_string());
-        root_span.record("tenant_id", su.tenant_id.to_string());
-        root_span.record("is_live", su.is_live);
-    }
-
-    // For new scoped vaults, we may need to prefill some existing info into the new vault
-    let obc = user_auth.ob_config();
-    let prefill_data = if let Some(((su, obc), portable_vw)) = su.clone().zip(obc).zip(portable_vw) {
-        // If we just created this scoped vault, prefill login methods if any are portable
-        let prefill_data = portable_vw
-            .get_data_to_prefill(&state, &su, obc, PrefillKind::Identify)
-            .await?;
-        Some((su, prefill_data))
-    } else {
-        None
-    };
+    let prefill_data = get_prefill_data(&state, &user_auth).await?;
 
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uv_id = &user_auth.user_vault_id;
-            // If we made a new scoped vault here, prefill its data
-            if let Some((su, prefill_data)) = prefill_data {
-                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
-                WebauthnCredential::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
-            }
+
+            // Get or create the ScopedVault for non-my1fp flows
+            let su = if let Some(sv_id) = user_auth.scoped_user_id() {
+                let su = ScopedVault::get(conn, &sv_id)?;
+                Some(su)
+            } else if let Some(obc) = user_auth.ob_config() {
+                // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
+                let uv = Vault::lock(conn, uv_id)?;
+                let (su, is_new_su) = ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?;
+                root_span.record_su(&su);
+                if is_new_su {
+                    // If the scoped vault is brand new, prefill its data
+                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+                    let prefill_data =
+                        prefill_data.ok_or(AssertionError("Missing prefill data for new SV"))?;
+                    tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
+                    WebauthnCredential::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
+                }
+                Some(su)
+            } else {
+                // We're allowed to not have a ScopedVault only for my1fp
+                None
+            };
 
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
@@ -258,6 +236,43 @@ pub async fn post(
         .await?;
 
     Ok(IdentifyVerifyResponse { auth_token })
+}
+
+/// If we're about to make a new ScopedVault because this user is onboarding onto a new tenant,
+/// calculate the prefill data
+async fn get_prefill_data(
+    state: &State,
+    user_auth: &CheckedUserAuthContext,
+) -> FpResult<Option<PrefillData>> {
+    let Some(obc) = user_auth.ob_config() else {
+        // My1fp
+        return Ok(None);
+    };
+    if user_auth.scoped_user_id().is_some() {
+        // ScopedVault already exists, no need to prefill
+        return Ok(None);
+    }
+    let t_id = obc.tenant_id.clone();
+    let uv_id = user_auth.user_vault_id.clone();
+    let portable_vw = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            let existing_sv = ScopedVault::get(conn, (&uv_id, &t_id)).optional()?;
+            let portable_vw = existing_sv
+                .is_none()
+                .then(|| VaultWrapper::<Any>::build_portable(conn, &uv_id))
+                .transpose()?;
+            Ok(portable_vw)
+        })
+        .await?;
+    let Some(portable_vw) = portable_vw else {
+        // ScopedVault for this tenant exists, it just wasn't yet bound in the session
+        return Ok(None);
+    };
+    let prefill_data = portable_vw
+        .get_data_to_prefill(state, obc, PrefillKind::Identify)
+        .await?;
+    Ok(Some(prefill_data))
 }
 
 /// After logging into a vault in the context of multi-KYC KYB, save the authed vault as a business
