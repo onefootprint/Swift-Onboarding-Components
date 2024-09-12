@@ -1,6 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Any;
+use api_core::telemetry::RootSpan;
 use api_core::types::ApiListResponse;
 use api_core::State;
 use api_wire_types::InProgressOnboardingTenant;
@@ -31,6 +32,7 @@ async fn get(
     state: web::Data<State>,
     request: web::Query<InProgressOnboardingsRequest>,
     auth: TenantSessionAuth,
+    root_span: RootSpan,
 ) -> ApiListResponse<api_wire_types::InProgressOnboarding> {
     let auth = auth.check_guard(Any)?;
     let tu_id = auth.actor().tenant_user_id()?.clone();
@@ -57,6 +59,7 @@ async fn get(
         .db_query(move |conn| Workflow::get_in_progress(conn, &sh_datas, is_live))
         .await?;
 
+    root_span.record("meta", workflows.len());
     let response = workflows
         .into_iter()
         .map(|(wf, sv, tenant)| api_wire_types::InProgressOnboarding {
