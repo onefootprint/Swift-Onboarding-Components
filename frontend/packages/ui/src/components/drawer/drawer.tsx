@@ -15,6 +15,14 @@ import ScrollArea from '../scroll-area';
 import Stack from '../stack';
 import Header from './components/header';
 
+type DrawerButton = {
+  label: string;
+  onClick?: () => void;
+  loading?: boolean;
+  form?: string;
+  type?: 'button' | 'submit' | 'reset';
+};
+
 export type DrawerProps = {
   children?: React.ReactNode;
   headerComponent?: React.ReactNode;
@@ -24,14 +32,8 @@ export type DrawerProps = {
   closeIconComponent?: Icon;
   onClose: () => void;
   onClickOutside?: () => void;
-  primaryButton?: {
-    label: string;
-    onClick: () => void;
-  };
-  secondaryButton?: {
-    label: string;
-    onClick: () => void;
-  };
+  primaryButton?: DrawerButton;
+  secondaryButton?: DrawerButton;
   linkButton?: {
     label: string;
     onClick: () => void;
@@ -83,12 +85,24 @@ const Drawer = ({
               </Stack>
               <Stack direction="row" gap={3}>
                 {secondaryButton && (
-                  <Button onClick={secondaryButton.onClick} variant="secondary">
+                  <Button
+                    form={secondaryButton.form}
+                    loading={secondaryButton.loading}
+                    onClick={secondaryButton.onClick}
+                    type={secondaryButton.type}
+                    variant="secondary"
+                  >
                     {secondaryButton.label}
                   </Button>
                 )}
                 {primaryButton && (
-                  <Button onClick={primaryButton.onClick} variant="primary">
+                  <Button
+                    form={primaryButton.form}
+                    loading={primaryButton.loading}
+                    onClick={primaryButton.onClick}
+                    type={primaryButton.type}
+                    variant="primary"
+                  >
                     {primaryButton.label}
                   </Button>
                 )}
