@@ -1,6 +1,5 @@
 export { GenericTransition, IdAnimation } from './animations';
 export { default as AppErrorBoundary } from './app-error-boundary';
-export { default as DeviceSignals } from './device-signals';
 export { default as EmailForm } from './email-form';
 export { default as EmailPreview } from './email-preview';
 export type {
