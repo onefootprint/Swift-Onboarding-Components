@@ -1,5 +1,5 @@
 import type { Tenant } from '@onefootprint/types';
-import { Pagination, Stack, Table, Text } from '@onefootprint/ui';
+import { Pagination, SegmentedControl, Stack, Table, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -30,6 +30,9 @@ const Tenants = () => {
 
   const handleSearchChange = (search: string) => {
     filters.push({ tenants_search: search });
+  };
+  const handleLiveOnlyChange = (value: string) => {
+    filters.push({ tenants_live_only: value });
   };
 
   const useAssumeTenantMutation = useAssumeTenant();
@@ -63,11 +66,28 @@ const Tenants = () => {
         <title>{t('page-title')}</title>
       </Head>
       <Container>
-        <Stack gap={2} marginBottom={7} direction="column">
-          <Text variant="heading-2">{t('title')}</Text>
-          <Text variant="body-2" color="secondary">
-            {t('subtitle')}
-          </Text>
+        <Stack direction="column" marginBottom={7}>
+          <Stack gap={2} marginBottom={4} direction="column">
+            <Text variant="heading-2">{t('title')}</Text>
+            <Text variant="body-2" color="secondary">
+              {t('subtitle')}
+            </Text>
+          </Stack>
+          <SegmentedControl
+            aria-label="Live Tenants"
+            onChange={handleLiveOnlyChange}
+            options={[
+              {
+                label: 'All',
+                value: 'false',
+              },
+              {
+                label: 'Live only',
+                value: 'true',
+              },
+            ]}
+            value={filters.values.liveOnly ? 'true' : 'false'}
+          />
         </Stack>
         <Table<Tenant>
           aria-label={t('table.aria-label')}
