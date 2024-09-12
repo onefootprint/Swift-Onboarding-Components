@@ -1,7 +1,6 @@
 import type { FormValues } from '@onefootprint/footprint-react';
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, LoadingSpinner, Shimmer, Stack, Stepper, Text } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import Header from './components/header';
@@ -23,24 +22,19 @@ const steps = [
   },
 ];
 
-const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_DOBM63fG6uDzNUj62SRJkF';
+const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_Rf4pMIvfohE1qvzgPv3RwG';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
-  const router = useRouter();
-  const { ob_key: obKey } = router.query;
-  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
 
   const isIdentify = option.value === 'identify';
   const isPersonalData = option.value === 'personal-data';
   const isSuccess = option.value === 'confirmation';
 
-  if (!router.isReady) return <Loading />;
-
   return (
     <>
       <GlobalStyles />
-      <Fp.Provider publicKey={publicKey}>
+      <Fp.Provider publicKey={publicKeyEnv}>
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>
@@ -253,7 +247,7 @@ const Success = () => (
   </Layout>
 );
 
-const Loading = () => {
+const _Loading = () => {
   return (
     <Stack direction="row" width="100%">
       <Stack direction="column" width="100%">
