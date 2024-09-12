@@ -2,7 +2,7 @@ import './app.css';
 
 import { dir } from 'i18next';
 import type { Metadata } from 'next';
-import { DM_Sans } from 'next/font/google';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import type React from 'react';
 
 import ClientProviders from '@/components/client-providers';
@@ -21,7 +21,15 @@ const DMSans = DM_Sans({
   preload: true,
   subsets: ['latin'],
   variable: '--font-family-default',
-  weight: ['400', '500', '700'],
+});
+
+const codeFont = DM_Mono({
+  display: 'swap',
+  preload: true,
+  weight: ['300', '400', '500'],
+  subsets: ['latin'],
+  variable: '--font-family-code',
+  fallback: ['Courier New'],
 });
 
 export const metadata: Metadata = {
@@ -41,7 +49,7 @@ export async function generateStaticParams() {
 const RootLayout = ({ children, params }: RootLayoutProps) => {
   const lang = params.lang || LangFallback;
   return (
-    <html lang={lang} dir={dir(lang)} className={DMSans.variable}>
+    <html lang={lang} dir={dir(lang)} className={`${DMSans.className} ${codeFont.className}`}>
       <head>
         <link rel="shortcut icon" href="/favicon.ico" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
