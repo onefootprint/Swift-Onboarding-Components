@@ -1,5 +1,6 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
+use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::user::UserError;
 use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
@@ -35,6 +36,16 @@ pub type SecondsBeforeRetry = Duration;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneEmailChallengeState {
     pub h_code: Vec<u8>,
+}
+
+impl PhoneEmailChallengeState {
+    pub fn verify_response(self, challenge_response: &str) -> FpResult<()> {
+        let PhoneEmailChallengeState { h_code } = self;
+        if h_code != sha256(challenge_response.as_bytes()).to_vec() {
+            return Err(ErrorWithCode::IncorrectPin.into());
+        };
+        Ok(())
+    }
 }
 
 #[derive(Clone)]

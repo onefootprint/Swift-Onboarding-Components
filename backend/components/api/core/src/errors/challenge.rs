@@ -1,13 +1,12 @@
 use newtypes::IdentifyScope;
-use newtypes::ObConfigurationKind;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ChallengeError {
     #[error("Email verification token invalid")]
     EmailVerificationTokenInvalid,
-    #[error("Incorrect playbook kind {0} for identify scope {1}")]
-    IncorrectPlaybookKind(ObConfigurationKind, IdentifyScope),
+    #[error("Invalid playbook for identify scope {0}")]
+    InvalidPlaybook(IdentifyScope),
 }
 
 impl api_errors::FpErrorTrait for ChallengeError {

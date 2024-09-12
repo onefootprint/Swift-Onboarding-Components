@@ -1,19 +1,13 @@
-use super::BiometricChallengeState;
-use super::PhoneEmailChallengeState;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::user::allowed_user_scopes;
-use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
-use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::user::UserError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -28,8 +22,6 @@ use api_core::FpResult;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
-use crypto::sha256;
-use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
@@ -45,13 +37,13 @@ use newtypes::DataIdentifier;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKind;
-use newtypes::WebauthnCredentialId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
 };
+use webauthn_rs_core::proto::AuthenticationResult as WebauthnAuthenticationResult;
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -69,6 +61,7 @@ pub async fn post(
     insight_headers: InsightHeaders,
     root_span: RootSpan,
 ) -> ApiResponse<IdentifyVerifyResponse> {
+    let user_auth = user_auth.check_guard(Any)?;
     // Note: Challenge::unseal checks for challenge token expiry as well
     let IdentifyVerifyRequest {
         challenge_token,
@@ -78,99 +71,130 @@ pub async fn post(
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
-    let user_auth = user_auth.check_guard(Any)?;
+    let event_kind = AuthEventKind::from(&challenge_state.data);
 
-    let config = state.config.clone();
-    let session_key = state.session_sealing_key.clone();
-    let (auth_token, portable_vw, su, obc) = state
+    // Validate the playbook is consistent with the requested IdentifyScope
+    let obc = user_auth.ob_config();
+    match scope {
+        IdentifyScope::Auth if obc.is_some_and(|obc| obc.kind != ObConfigurationKind::Auth) => {
+            // Playbook can be None in update_auth_methods flow
+            return Err(ChallengeError::InvalidPlaybook(scope).into());
+        }
+        IdentifyScope::Onboarding if obc.is_some_and(|obc| obc.kind == ObConfigurationKind::Auth) => {
+            // Playbook can be None for user-specific sessions with playbook specified in SDK
+            return Err(ChallengeError::InvalidPlaybook(scope).into());
+        }
+        IdentifyScope::My1fp if obc.is_some() => {
+            return Err(ChallengeError::InvalidPlaybook(scope).into());
+        }
+        _ => (),
+    }
+
+    // Verify the challenge response
+    let verified_credential = match challenge_state.data {
+        ChallengeData::Sms(s) => {
+            s.verify_response(&c_response)?;
+            VerifiedCredential::ContactInfo(IDK::PhoneNumber.into())
+        }
+        ChallengeData::Email(s) => {
+            s.verify_response(&c_response)?;
+            VerifiedCredential::ContactInfo(IDK::Email.into())
+        }
+        ChallengeData::Passkey(context) => {
+            let webauthn = WebauthnConfig::new(&state.config);
+            let auth_resp = serde_json::from_str(&c_response)?;
+
+            let result = webauthn
+                .webauthn()
+                .authenticate_credential(&auth_resp, &context.state)?;
+            VerifiedCredential::Passkey(result)
+        }
+    };
+
+    // Create the ScopedVault if we're onboarding an existing user onto a new tenant
+    let (su, user_auth, portable_vw) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let (event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
-                ChallengeData::Sms(s) => {
-                    let added_auth_method =
-                        validate(conn, s, &user_auth, &c_response, IDK::PhoneNumber.into())?;
-                    (AuthEventKind::Sms, None, added_auth_method)
-                }
-                ChallengeData::Email(s) => {
-                    let added_auth_method = validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
-                    (AuthEventKind::Email, None, added_auth_method)
-                }
-                ChallengeData::Passkey(context) => {
-                    let cred = validate_biometric_challenge(conn, &config, context, &user_auth, &c_response)?;
-                    (AuthEventKind::Passkey, Some(cred), false)
-                }
+            let uv_id = &user_auth.user_vault_id;
+            let (su, is_new_su) = if let Some(sv_id) = user_auth.scoped_user_id() {
+                let su = ScopedVault::get(conn, &sv_id)?;
+                (Some(su), false)
+            } else if let Some(obc) = user_auth.ob_config() {
+                // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
+                let uv = Vault::lock(conn, uv_id)?;
+                let (su, is_new_su) = ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?;
+                (Some(su), is_new_su)
+            } else {
+                // We're allowed to not have a ScopedVault only for my1fp
+                (None, false)
             };
 
-            let uv_id = user_auth.user_vault_id.clone();
-            // Determine which scopes to issue on the auth token
-            let (context, su, new_su) = match scope {
-                IdentifyScope::Auth => {
-                    let (su, new_su) = if let Some(obc) = user_auth.ob_config() {
-                        if obc.kind != ObConfigurationKind::Auth {
-                            return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
-                        }
-                        let uv = Vault::lock(conn, &uv_id)?;
-                        ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?
-                    } else {
-                        let Some(su_from_token) = user_auth.scoped_user() else {
-                            // A playbook MUST be provided if we're not stepping up
-                            return Err(UserError::PlaybookMissingForAuth.into());
-                        };
-                        (su_from_token.clone(), false)
-                    };
+            let portable_vw = is_new_su
+                .then(|| VaultWrapper::<Any>::build_portable(conn, uv_id))
+                .transpose()?;
+            Ok((su, user_auth, portable_vw))
+        })
+        .await?;
 
-                    let context = NewUserSessionContext {
-                        su_id: Some(su.id.clone()),
-                        ..Default::default()
-                    };
-                    (context, Some(su), new_su)
-                }
-                IdentifyScope::Onboarding => {
-                    let obc = user_auth.ob_config();
-                    let su_id = user_auth.scoped_user_id();
-                    let (su, new_su) = if let Some(su_id) = su_id {
-                        // We are stepping up an existing token already attached to a SU
-                        (ScopedVault::get(conn, &su_id)?, false)
-                    } else if let Some(obc) = obc.as_ref() {
-                        // We are adding the SU to a token that doesn't have it
-                        if obc.kind == ObConfigurationKind::Auth {
-                            return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
-                        }
-                        // Since only some codepaths above will create a SU, we need to always get_or_create a
-                        // SU if created with an ob config. This will create a SU when
-                        // we are one-clicking onto this tenant
-                        let uv = Vault::lock(conn, &uv_id)?;
-                        ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?
-                    } else {
-                        return Err(ValidationError("No scoped vault available").into());
-                    };
-                    if let Some(bo_id) = user_auth.bo_id.as_ref() {
-                        register_business_owner(conn, &su, bo_id)?;
-                    }
-                    let context = NewUserSessionContext {
-                        su_id: Some(su.id.clone()),
-                        // wf_id will be added later in POST /hosted/onboarding
-                        ..Default::default()
-                    };
-                    (context, Some(su), new_su)
-                }
-                IdentifyScope::My1fp => {
-                    let context = NewUserSessionContext::default();
-                    (context, None, false)
-                }
-            };
+    // Record some properties on the root span
+    root_span.record("vault_id", user_auth.user_vault_id.to_string());
+    if let Some(su) = su.as_ref() {
+        root_span.record("fp_id", su.fp_id.to_string());
+        root_span.record("tenant_id", su.tenant_id.to_string());
+        root_span.record("is_live", su.is_live);
+    }
 
-            // Record some properties on the root span
-            root_span.record("vault_id", uv_id.to_string());
-            if let Some(su) = su.as_ref() {
-                root_span.record("fp_id", su.fp_id.to_string());
-                root_span.record("tenant_id", su.tenant_id.to_string());
-                root_span.record("is_live", su.is_live);
+    // For new scoped vaults, we may need to prefill some existing info into the new vault
+    let obc = user_auth.ob_config();
+    let prefill_data = if let Some(((su, obc), portable_vw)) = su.clone().zip(obc).zip(portable_vw) {
+        // If we just created this scoped vault, prefill login methods if any are portable
+        let prefill_data = portable_vw
+            .get_data_to_prefill(&state, &su, obc, PrefillKind::Identify)
+            .await?;
+        Some((su, prefill_data))
+    } else {
+        None
+    };
+
+    let session_key = state.session_sealing_key.clone();
+    let auth_token = state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let uv_id = &user_auth.user_vault_id;
+            // If we made a new scoped vault here, prefill its data
+            if let Some((su, prefill_data)) = prefill_data {
+                // TODO in a future PR, will need to prefill passkey when it is tenant-specific
+                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+                tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
             }
 
-            let obc = user_auth.ob_config().cloned();
+            // Apply auth-method-specific updates
+            let (passkey_cred_id, added_auth_method) = match verified_credential {
+                VerifiedCredential::ContactInfo(di) => {
+                    let added_auth_methods = if let Some(su) = su.as_ref() {
+                        // For bifrost logins that already have a SV (created in the signup challenge or via
+                        // API) we can mark the contact info as OTP verified
+                        let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
+                        vw.on_otp_verified(conn, di)?
+                    } else {
+                        false
+                    };
+                    (None, added_auth_methods)
+                }
+                VerifiedCredential::Passkey(result) => {
+                    let cred_id = &result.cred_id().0;
+                    // Since the challenge generated for the client allows using one of multiple webauthn
+                    // credentials, find the exact WebauthnCredential id that was utilized
+                    let credential =
+                        WebauthnCredential::get_by_credential_id(conn, &user_auth.user_vault_id, cred_id)?;
+                    if result.backup_state() {
+                        credential.update_backup_state(conn)?;
+                    }
+                    (Some(credential.id), false)
+                }
+            };
 
-            // record the new auth event
+            // Record the new auth event
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             let ae_args = NewAuthEventArgs {
                 vault_id: uv_id.clone(),
@@ -184,36 +208,52 @@ pub async fn post(
             };
             let event = AuthEvent::save(ae_args, conn)?;
 
+            // Token-specific handling
+            let su_id = match scope {
+                IdentifyScope::Auth => {
+                    let su = su.ok_or(ValidationError("No scoped vault available"))?;
+                    if !user_auth.user.is_portable {
+                        // If this is an auth playbook and the user was previously non-portable, we are
+                        // currently portablizing an NYPID.
+                        //
+                        // This is a little bit different from our portablizing logic for onboarding
+                        // playbooks: Normally, we only portablize after successful
+                        // KYC. This is an arbitrary choice we made to increase the
+                        // probability of the prefill data being accurate when the user
+                        // later onboards.
+                        // In some cases, when portablizing an NYPID backfilled into Footprint, the NYPID has
+                        // already been onboarded onto our tenant, so there is also a good chance the prefill
+                        // data is accurate.
+                        let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
+                        vw.portablize_identity_data(conn)?;
+                    }
+
+                    Some(su.id)
+                }
+                IdentifyScope::Onboarding => {
+                    let su = su.ok_or(ValidationError("No scoped vault available"))?;
+                    if let Some(bo_id) = user_auth.bo_id.as_ref() {
+                        register_business_owner(conn, &su, bo_id)?;
+                    }
+                    Some(su.id)
+                }
+                IdentifyScope::My1fp => None,
+            };
+
+            // Create a new token derived from the provided one, adding new scopes and context
             let scopes = allowed_user_scopes(vec![event.kind], scope.into(), true);
             let ae = AssociatedAuthEvent::explicit(event.id);
-            // Create a new token derived from the provided one, adding new scopes and context
+            let context = NewUserSessionContext {
+                su_id,
+                ..Default::default()
+            };
             let session = user_auth.update(context, scopes, scope.into(), Some(ae))?;
             let (token, _) =
                 user_auth.create_derived(conn, &session_key, session, Some(scope.token_ttl()))?;
-            let portable_vw = if new_su {
-                Some(VaultWrapper::<Any>::build_portable(conn, &uv_id)?)
-            } else {
-                None
-            };
 
-            Ok((token, portable_vw, su, obc))
+            Ok(token)
         })
         .await?;
-
-    if let Some(((su, obc), portable_vw)) = su.zip(obc).zip(portable_vw) {
-        // If we just created this scoped vault, prefill login methods if any are portable
-        let prefill_data = portable_vw
-            .get_data_to_prefill(&state, &su, &obc, PrefillKind::Identify)
-            .await?;
-        state
-            .db_pool
-            .db_transaction(move |conn| -> FpResult<_> {
-                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
-                tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
-                Ok(())
-            })
-            .await?;
-    }
 
     Ok(IdentifyVerifyResponse { auth_token })
 }
@@ -235,80 +275,7 @@ fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId)
     Ok(())
 }
 
-fn validate_biometric_challenge(
-    conn: &mut TxnPgConn,
-    config: &Config,
-    challenge_state: BiometricChallengeState,
-    user_auth: &CheckedUserAuthContext,
-    challenge_response: &str,
-) -> FpResult<WebauthnCredentialId> {
-    // Decode and validate the response to the biometric challenge
-    let webauthn = WebauthnConfig::new(config);
-    let auth_resp = serde_json::from_str(challenge_response)?;
-
-    let result = webauthn
-        .webauthn()
-        .authenticate_credential(&auth_resp, &challenge_state.state)?;
-
-    let credential: WebauthnCredential =
-        WebauthnCredential::get_by_credential_id(conn, &user_auth.user_vault_id, &result.cred_id().0)?;
-
-    // if the credential's backup state has changed:
-    // update the backup state to learn that a credential is now portable across devices
-    if result.backup_state() && challenge_state.non_synced_cred_ids.contains(result.cred_id()) {
-        credential.update_backup_state(conn)?;
-    }
-
-    Ok(credential.id)
-}
-
-/// Identify verify can be used for both log in and sign up.
-pub type AddedAuthMethod = bool;
-
-fn validate(
-    conn: &mut TxnPgConn,
-    challenge_state: PhoneEmailChallengeState,
-    user_auth: &CheckedUserAuthContext,
-    challenge_response: &str,
-    di: DataIdentifier,
-) -> FpResult<AddedAuthMethod> {
-    let PhoneEmailChallengeState { h_code } = challenge_state;
-    if h_code != sha256(challenge_response.as_bytes()).to_vec() {
-        return Err(ErrorWithCode::IncorrectPin.into());
-    };
-
-    let existing_sv = if let Some(existing_su_id) = user_auth.scoped_user_id() {
-        Some(ScopedVault::get(conn, &existing_su_id)?)
-    } else if let Some(obc) = user_auth.ob_config() {
-        ScopedVault::get(conn, (&user_auth.user_vault_id, &obc.tenant_id)).optional()?
-    } else {
-        None
-    };
-
-    let added_auth_method = if let Some(existing_sv) = existing_sv {
-        // For bifrost logins that already have a SV (created in the signup challenge or via API)
-        // we can mark the contact info as OTP verified
-        let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
-        let added_auth_method = vw.on_otp_verified(conn, di)?;
-
-        let obc = user_auth.ob_config();
-        if obc.is_some_and(|obc| obc.kind == ObConfigurationKind::Auth) && !vw.vault.is_portable {
-            // If this is an auth playbook and the user was previously non-portable, we are
-            // currently portablizing an NYPID.
-            //
-            // This is a little bit different from our portablizing logic for onboarding playbooks:
-            // Normally, we only portablize after successful KYC. This is an arbitrary choice
-            // we made to increase the probability of the prefill data being accurate when the user
-            // later onboards.
-            // In some cases, when portablizing an NYPID backfilled into Footprint, the NYPID has
-            // already been onboarded onto our tenant, so there is also a good chance the prefill
-            // data is accurate.
-            vw.portablize_identity_data(conn)?;
-        }
-        added_auth_method
-    } else {
-        false
-    };
-
-    Ok(added_auth_method)
+enum VerifiedCredential {
+    ContactInfo(DataIdentifier),
+    Passkey(WebauthnAuthenticationResult),
 }

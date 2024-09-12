@@ -15,6 +15,7 @@ use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
+use newtypes::AuthEventKind;
 use newtypes::DataIdentifier;
 use newtypes::SandboxId;
 use paperclip::actix::web;
@@ -69,6 +70,16 @@ pub enum ChallengeData {
     #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
     Passkey(BiometricChallengeState),
     Email(PhoneEmailChallengeState),
+}
+
+impl<'a> From<&'a ChallengeData> for AuthEventKind {
+    fn from(value: &'a ChallengeData) -> Self {
+        match value {
+            ChallengeData::Email(_) => AuthEventKind::Email,
+            ChallengeData::Sms(_) => AuthEventKind::Sms,
+            ChallengeData::Passkey(_) => AuthEventKind::Passkey,
+        }
+    }
 }
 
 pub struct GetIdentifyChallengeArgs {
@@ -163,6 +174,8 @@ async fn get_identify_challenge_context(
     let identifier = if let Some(sv) = sv.as_ref() {
         UserIdentifier::ScopedVault(sv.id.clone())
     } else {
+        // Will be missing a scoped vault for myf1p OR when logging into an existing user onboarding onto a
+        // new tenant
         UserIdentifier::Vault(existing_user_id)
     };
     let ctx = state

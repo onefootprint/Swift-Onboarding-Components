@@ -26,6 +26,8 @@ pub struct WebauthnCredential {
     /// a webauthn "key handle" aka as "credential id": https://www.w3.org/TR/webauthn-2/#credential-id
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
+    /// TODO this is not used? It seems like it would be difficult to use properly now that
+    /// WebauthnCredentials are scoped-vault-specific
     pub counter: i32,
     pub attestation_data: Vec<u8>,
 

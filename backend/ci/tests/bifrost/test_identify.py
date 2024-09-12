@@ -561,3 +561,23 @@ def test_double_signup_challenge(sandbox_tenant):
     data = dict(phone_number=dict(value=FIXTURE_PHONE_NUMBER), scope="onboarding")
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
     post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+
+
+def test_failed_verify(sandbox_tenant):
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    obc = sandbox_tenant.default_ob_config
+    data = dict(
+        phone_number=dict(value=FIXTURE_PHONE_NUMBER), scope="onboarding", kind="sms"
+    )
+    body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+
+    data = {
+        "challenge_response": "111111",
+        "challenge_token": body["challenge_data"]["challenge_token"],
+        "scope": "onboarding",
+    }
+    token = FpAuth(body["challenge_data"]["token"])
+    body = post("hosted/identify/verify", data, token, status_code=400)
+    assert body["message"] == "Incorrect PIN code"
+    assert body["code"] == "E102"
