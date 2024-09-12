@@ -1,5 +1,5 @@
-import { IcoCheck16, IcoClose16, IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
-import { Box, CopyButton, Hint, IconButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { IcoCheck16, IcoClose16, IcoPencil16 } from '@onefootprint/icons';
+import { CopyButton, Hint, IconButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,9 @@ const TestIdInput = () => {
     if (errors?.testID) {
       return t('test-id.errors.invalid');
     }
-    if (idInputLocked) return '';
+    if (idInputLocked) {
+      return t('test-id.description');
+    }
     return t('test-id.hint');
   };
 
@@ -34,22 +36,18 @@ const TestIdInput = () => {
   };
 
   return (
-    <Box
+    <Stack
       flexDirection="column"
       justifyContent="flex-end"
       borderStyle="dashed"
       borderTopWidth={1}
       paddingTop={5}
       borderColor="tertiary"
+      gap={3}
     >
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="testID">
-          <Stack gap={2}>
-            <Text variant="label-3">{t('test-id.label')}</Text>
-            <Tooltip text={t('test-id.description')} alignment="start" position="top">
-              <IcoInfo16 testID="infoIcon" />
-            </Tooltip>
-          </Stack>
+          <Text variant="label-3">{t('test-id.label')}</Text>
         </label>
         <Stack gap={3}>
           <TextInput
@@ -111,7 +109,7 @@ const TestIdInput = () => {
         </Stack>
       </Stack>
       <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
-    </Box>
+    </Stack>
   );
 };
 

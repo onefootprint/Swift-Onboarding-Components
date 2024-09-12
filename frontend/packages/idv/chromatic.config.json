@@ -1,0 +1,7 @@
+{
+  "onlyChanged": true,
+  "projectId": "Project:66d212e1b1b1e7df4ee7af2c",
+  "storybookBaseDir": "frontend/packages/idv",
+  "zip": true,
+  "buildScriptName": "build:storybook"
+}
