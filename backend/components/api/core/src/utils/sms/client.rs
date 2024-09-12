@@ -22,7 +22,6 @@ use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::TenantId;
-use newtypes::VaultId;
 use std::fmt::Debug;
 use std::sync::Arc;
 use tokio::sync::oneshot;
@@ -35,7 +34,6 @@ pub type SecondsBeforeRetry = Duration;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneEmailChallengeState {
-    pub vault_id: VaultId,
     pub h_code: Vec<u8>,
 }
 
@@ -296,7 +294,6 @@ impl SmsClient {
         state: &State,
         tenant: Option<&Tenant>,
         destination: PhoneNumber,
-        vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
     ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
@@ -324,7 +321,7 @@ impl SmsClient {
         self.send_message_non_blocking(state, message, destination, t_id, tx)
             .await?;
 
-        let state = PhoneEmailChallengeState { vault_id, h_code };
+        let state = PhoneEmailChallengeState { h_code };
         Ok((rx, state))
     }
 }

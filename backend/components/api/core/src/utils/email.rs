@@ -17,7 +17,6 @@ use newtypes::ContactInfoId;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::TenantId;
-use newtypes::VaultId;
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use reqwest_middleware::ClientWithMiddleware;
@@ -295,7 +294,6 @@ pub async fn send_async_email_challenge(
 pub fn send_email_challenge_non_blocking(
     state: &State,
     email: &Email,
-    vault_id: VaultId,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
 ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
@@ -339,5 +337,5 @@ pub fn send_email_challenge_non_blocking(
     };
     tokio::spawn(fut.in_current_span());
 
-    Ok((rx, PhoneEmailChallengeState { vault_id, h_code }))
+    Ok((rx, PhoneEmailChallengeState { h_code }))
 }

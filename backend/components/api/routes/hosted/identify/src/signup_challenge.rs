@@ -144,7 +144,7 @@ pub async fn post(
                 .value;
             let (rx, challenge_data) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, uv.id, sandbox_id)
+                .send_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, sandbox_id)
                 .await?;
             (rx, ChallengeData::Sms(challenge_data))
         }
@@ -156,7 +156,7 @@ pub async fn post(
                 ))?
                 .value;
             let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, uv.id, ob_context.tenant(), sandbox_id)?;
+                send_email_challenge_non_blocking(&state, &email, ob_context.tenant(), sandbox_id)?;
             (rx, ChallengeData::Email(challenge_data))
         }
         ChallengeKind::Passkey => {

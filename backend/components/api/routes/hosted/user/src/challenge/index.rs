@@ -87,7 +87,7 @@ pub async fn post(
             let e164 = phone_number.e164();
             let (rx, challenge_data) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, tenant, phone_number, uv.id, uv.sandbox_id)
+                .send_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id)
                 .await?;
 
             let challenge_data = RegisterChallengeData::Sms {
@@ -104,7 +104,7 @@ pub async fn post(
             let tenant = tenant.ok_or(AssertionError("Need tenant to initiate email challenge for now"))?;
 
             let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, uv.id, tenant, uv.sandbox_id)?;
+                send_email_challenge_non_blocking(&state, &email, tenant, uv.sandbox_id)?;
             let challenge_data = RegisterChallengeData::Email {
                 h_code: challenge_data.h_code,
                 email: email.email,

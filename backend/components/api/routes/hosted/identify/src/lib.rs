@@ -17,7 +17,6 @@ use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
 use newtypes::DataIdentifier;
 use newtypes::SandboxId;
-use newtypes::VaultId;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
 use strum::EnumDiscriminants;
@@ -43,7 +42,6 @@ pub(crate) enum CreateChallengeRequest {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BiometricChallengeState {
     pub state: AuthenticationState,
-    pub user_vault_id: VaultId,
     #[serde(default)]
     pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
 }

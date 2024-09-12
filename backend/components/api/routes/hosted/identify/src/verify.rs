@@ -45,7 +45,6 @@ use newtypes::DataIdentifier;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKind;
-use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -86,23 +85,23 @@ pub async fn post(
     let (auth_token, portable_vw, su, obc) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let (uv_id, event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
+            let (event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
-                    let (vault_id, added_auth_method) =
+                    let added_auth_method =
                         validate(conn, s, &user_auth, &c_response, IDK::PhoneNumber.into())?;
-                    (vault_id, AuthEventKind::Sms, None, added_auth_method)
+                    (AuthEventKind::Sms, None, added_auth_method)
                 }
                 ChallengeData::Email(s) => {
-                    let (vault_id, added_auth_method) =
-                        validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
-                    (vault_id, AuthEventKind::Email, None, added_auth_method)
+                    let added_auth_method = validate(conn, s, &user_auth, &c_response, IDK::Email.into())?;
+                    (AuthEventKind::Email, None, added_auth_method)
                 }
                 ChallengeData::Passkey(context) => {
-                    let (vault_id, cred) = validate_biometric_challenge(conn, &config, context, &c_response)?;
-                    (vault_id, AuthEventKind::Passkey, Some(cred), false)
+                    let cred = validate_biometric_challenge(conn, &config, context, &user_auth, &c_response)?;
+                    (AuthEventKind::Passkey, Some(cred), false)
                 }
             };
 
+            let uv_id = user_auth.user_vault_id.clone();
             // Determine which scopes to issue on the auth token
             let (context, su, new_su) = match scope {
                 IdentifyScope::Auth => {
@@ -240,8 +239,9 @@ fn validate_biometric_challenge(
     conn: &mut TxnPgConn,
     config: &Config,
     challenge_state: BiometricChallengeState,
+    user_auth: &CheckedUserAuthContext,
     challenge_response: &str,
-) -> FpResult<(VaultId, WebauthnCredentialId)> {
+) -> FpResult<WebauthnCredentialId> {
     // Decode and validate the response to the biometric challenge
     let webauthn = WebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
@@ -251,7 +251,7 @@ fn validate_biometric_challenge(
         .authenticate_credential(&auth_resp, &challenge_state.state)?;
 
     let credential: WebauthnCredential =
-        WebauthnCredential::get_by_credential_id(conn, &challenge_state.user_vault_id, &result.cred_id().0)?;
+        WebauthnCredential::get_by_credential_id(conn, &user_auth.user_vault_id, &result.cred_id().0)?;
 
     // if the credential's backup state has changed:
     // update the backup state to learn that a credential is now portable across devices
@@ -259,7 +259,7 @@ fn validate_biometric_challenge(
         credential.update_backup_state(conn)?;
     }
 
-    Ok((challenge_state.user_vault_id, credential.id))
+    Ok(credential.id)
 }
 
 /// Identify verify can be used for both log in and sign up.
@@ -271,8 +271,8 @@ fn validate(
     user_auth: &CheckedUserAuthContext,
     challenge_response: &str,
     di: DataIdentifier,
-) -> FpResult<(VaultId, AddedAuthMethod)> {
-    let PhoneEmailChallengeState { h_code, vault_id } = challenge_state;
+) -> FpResult<AddedAuthMethod> {
+    let PhoneEmailChallengeState { h_code } = challenge_state;
     if h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ErrorWithCode::IncorrectPin.into());
     };
@@ -280,7 +280,7 @@ fn validate(
     let existing_sv = if let Some(existing_su_id) = user_auth.scoped_user_id() {
         Some(ScopedVault::get(conn, &existing_su_id)?)
     } else if let Some(obc) = user_auth.ob_config() {
-        ScopedVault::get(conn, (&vault_id, &obc.tenant_id)).optional()?
+        ScopedVault::get(conn, (&user_auth.user_vault_id, &obc.tenant_id)).optional()?
     } else {
         None
     };
@@ -310,5 +310,5 @@ fn validate(
         false
     };
 
-    Ok((vault_id, added_auth_method))
+    Ok(added_auth_method)
 }

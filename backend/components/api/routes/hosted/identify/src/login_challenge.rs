@@ -22,7 +22,6 @@ use api_wire_types::UserChallengeData;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::ChallengeKind;
-use newtypes::VaultId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -75,7 +74,6 @@ pub async fn post(
 
     // If we need to create a challenge, extract the phone number for the user
     let sandbox_id = vw.vault.sandbox_id.clone();
-    let vault_id = vw.vault.id.clone();
 
     let challenge_kind = match challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -97,7 +95,7 @@ pub async fn post(
 
     let (rx, challenge_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
         ChallengeKind::Passkey => {
-            let challenge = initiate_passkey_login_challenge(&state, &vw.vault.id, creds).await?;
+            let challenge = initiate_passkey_login_challenge(&state, creds).await?;
             let challenge_data = ChallengeData::Passkey(challenge.state);
             (None, challenge_data, 0, Some(challenge.challenge_json))
         }
@@ -106,7 +104,7 @@ pub async fn post(
             let t = tenant.as_ref();
             let (rx, challenge_state) = state
                 .sms_client
-                .send_challenge_non_blocking(&state, t, phone_number.clone(), vault_id, sandbox_id)
+                .send_challenge_non_blocking(&state, t, phone_number.clone(), sandbox_id)
                 .await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             let time_before_retry = state.config.time_s_between_challenges;
@@ -117,7 +115,7 @@ pub async fn post(
             let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
             let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
+                send_email_challenge_non_blocking(&state, &email, &tenant, sandbox_id)?;
 
             let challenge_data = ChallengeData::Email(challenge_data);
             let time_before_retry = state.config.time_s_between_challenges;
@@ -159,7 +157,6 @@ struct BiometricChallenge {
 
 async fn initiate_passkey_login_challenge(
     state: &web::Data<State>,
-    user_id: &VaultId,
     creds: Vec<WebauthnCredential>,
 ) -> FpResult<BiometricChallenge> {
     if creds.is_empty() {
@@ -206,7 +203,6 @@ async fn initiate_passkey_login_challenge(
     Ok(BiometricChallenge {
         state: BiometricChallengeState {
             state: auth_state,
-            user_vault_id: user_id.clone(),
             non_synced_cred_ids,
         },
         challenge_json: serde_json::to_string(&challenge)?,
