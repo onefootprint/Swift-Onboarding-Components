@@ -45,7 +45,8 @@ const Content = styled(RadixDropdown.Content).attrs({
       z-index: ${theme.zIndex.dropdown};
       animation-duration: ${ANIMATION_DURATION};
       transform-origin: var(--radix-dropdown-menu-content-transform-origin);
-
+      overflow: auto;
+     
       &[data-state="open"] {
         animation: ${translateIn} ${ANIMATION_DURATION} ease-out;
         animation-fill-mode: forwards;

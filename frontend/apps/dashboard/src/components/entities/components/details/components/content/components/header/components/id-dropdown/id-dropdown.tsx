@@ -1,6 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import type { Entity } from '@onefootprint/types';
-import { CopyButton, Dropdown, Stack, Text, Tooltip, useToast } from '@onefootprint/ui';
+import { CopyButton, Dropdown, Stack, Text, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -57,14 +57,12 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
               {ids.map(item => {
                 return (
                   <Dropdown.Item height="56px" key={item.label} onClick={() => handleCopy(item)}>
-                    <Tooltip text={t('copy-to-clipboard')}>
-                      <Stack direction="column" gap={2}>
-                        <Text variant="caption-2" color="tertiary">
-                          {item.label}
-                        </Text>
-                        <Text variant="snippet-2">{item.value}</Text>
-                      </Stack>
-                    </Tooltip>
+                    <Stack direction="column" gap={2}>
+                      <Text variant="caption-2" color="tertiary">
+                        {item.label}
+                      </Text>
+                      <Text variant="snippet-2">{item.value}</Text>
+                    </Stack>
                   </Dropdown.Item>
                 );
               })}

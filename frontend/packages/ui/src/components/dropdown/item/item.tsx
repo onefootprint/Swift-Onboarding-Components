@@ -6,6 +6,7 @@ import { createFontStyles } from '../../../utils';
 
 import type { ItemProps } from '../dropdown.types';
 
+import Stack from '../../stack';
 import { DROPDOWN_ITEM_SIZE } from '../dropdown.types';
 
 const Item = ({
@@ -23,7 +24,9 @@ const Item = ({
   return (
     <StyledDropdownItem size={size} variant={variant} $height={height} {...props}>
       {IconLeft && <IconLeft color={variant === 'destructive' ? 'error' : undefined} />}
-      <Content>{children}</Content>
+      <Stack direction="column" gap={1} flex={1} textDecoration="none">
+        {children}
+      </Stack>
       {IconRight && <IconRight />}
       {checked && <CheckIcon />}
     </StyledDropdownItem>
@@ -115,15 +118,6 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
       }
     `;
   }}
-`;
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    text-decoration: none;
-    flex-direction: column;
-    gap: ${theme.spacing[1]};
-  `}
 `;
 
 const StyledIcoArrowTopRight16 = styled(IcoArrowTopRight16)`
