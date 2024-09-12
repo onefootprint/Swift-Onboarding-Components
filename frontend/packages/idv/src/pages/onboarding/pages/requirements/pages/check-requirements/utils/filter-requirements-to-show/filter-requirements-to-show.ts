@@ -32,6 +32,29 @@ export const shouldShowInvestorProfilePlugin = (ctx: MachineContext, req: Onboar
   !ctx.isComponentsSdk &&
   !ctx.isTransfer;
 
+const swapOrder = (requirements: OnboardingRequirement[], from: number, to: number) => {
+  const newArray = [...requirements];
+
+  const temp = newArray[to];
+  newArray[to] = newArray[from];
+  newArray[from] = temp;
+
+  return newArray;
+};
+
+// If we have a custom document with upload settings set as "prefer_upload",
+// we should first request the user to upload the document before transferring
+const swapPreferUploadWithLiveness = (requirements: OnboardingRequirement[]): OnboardingRequirement[] => {
+  const preferUploadIndex = requirements.findIndex(
+    requirement =>
+      requirement.kind === OnboardingRequirementKind.document && requirement.uploadSettings === 'prefer_upload',
+  );
+  if (preferUploadIndex === -1) return requirements;
+  const livenessIndex = requirements.findIndex(r => r.kind === OnboardingRequirementKind.registerPasskey);
+  if (livenessIndex === -1) return requirements;
+  return swapOrder(requirements, livenessIndex, preferUploadIndex);
+};
+
 /**
  * Given the list of requirements from the backend and some information about which requirements
  * we've already displayed, computes the frontend
@@ -74,7 +97,7 @@ export const filterRequirementsToShow = (
     return false;
   });
 
-  return requirements;
+  return swapPreferUploadWithLiveness(requirements);
 };
 
 export default filterRequirementsToShow;
