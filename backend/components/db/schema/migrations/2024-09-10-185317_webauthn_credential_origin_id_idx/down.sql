@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY webauthn_credential_origin_id;

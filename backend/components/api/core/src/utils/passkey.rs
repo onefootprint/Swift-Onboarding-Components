@@ -249,6 +249,7 @@ impl VerifyChallengeResult {
             backup_state: cred.backup_state,
             attestation_type,
             insight_event_id: ie_id,
+            origin_id: None,
         }
         .save(conn)?;
         Ok(credential)

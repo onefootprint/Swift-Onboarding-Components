@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS webauthn_credential_id_user_vault_id;

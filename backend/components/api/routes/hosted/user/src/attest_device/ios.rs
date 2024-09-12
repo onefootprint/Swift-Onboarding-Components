@@ -4,6 +4,7 @@ use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
 use db::models::apple_device_attest::DeviceMetadata;
 use db::models::apple_device_attest::NewAppleDeviceAttestation;
+use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::tenant_ios_app_meta::TenantIosAppFilters;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
@@ -38,7 +39,7 @@ struct AttestedMetadata {
 pub(super) async fn attest(
     state: &State,
     tenant: &Tenant,
-    vault_id: &VaultId,
+    sv: &ScopedVault,
     challenge: String,
     attestation: String,
     app_bundle_id: Option<String>,
@@ -83,13 +84,13 @@ pub(super) async fn attest(
         )?
     };
 
-    let vault_id_copy = vault_id.clone();
+    let sv_id = sv.id.clone();
     let creds = state
         .db_pool
-        .db_query(move |conn| WebauthnCredential::list(conn, &vault_id_copy))
+        .db_query(move |conn| WebauthnCredential::list(conn, &sv_id))
         .await?;
 
-    let new_attestation = attest_inner(vault_id, &verifier, challenge, attestation, creds).await?;
+    let new_attestation = attest_inner(&sv.vault_id, &verifier, challenge, attestation, creds).await?;
 
     Ok(new_attestation)
 }

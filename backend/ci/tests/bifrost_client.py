@@ -412,7 +412,7 @@ class BifrostClient:
         self.validate_response = body
         return (body["user"]["fp_id"], body.get("business", {}).get("fp_id"))
 
-    def run(self):
+    def run(self) -> "User":
         """
         Simulates all bifrost logic of satisfying requirements and authorizing.
         """

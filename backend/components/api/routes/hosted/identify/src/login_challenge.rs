@@ -21,6 +21,7 @@ use api_wire_types::LoginChallengeResponse;
 use api_wire_types::UserChallengeData;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
+use itertools::Itertools;
 use newtypes::ChallengeKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -167,44 +168,34 @@ async fn initiate_passkey_login_challenge(
     let creds = creds
         .into_iter()
         .map(|cred| {
-            serde_cbor::from_slice(&cred.public_key)
-                .map(|public_key| Credential {
-                    counter: 0,
-                    cred_id: Base64UrlSafeData(cred.credential_id),
-                    registration_policy: UserVerificationPolicy::Required,
-                    user_verified: true,
-                    cred: public_key,
-                    backup_eligible: cred.backup_eligible,
-                    backup_state: false, // ignore
-                    extensions: RegisteredExtensions::none(),
-                    transports: None,
-                    attestation: ParsedAttestation {
-                        data: ParsedAttestationData::None,
-                        metadata: webauthn_rs_core::proto::AttestationMetadata::None,
-                    }, // this doesn't matter for auth now
-                    attestation_format: webauthn_rs_core::AttestationFormat::None, /* also doesn't matter
-                                                                                    * for auth */
-                })
-                .map_err(crypto::Error::from)
+            let pub_key = serde_cbor::from_slice(&cred.public_key).map_err(crypto::Error::from)?;
+            Ok((cred, pub_key))
+        })
+        .map_ok(|(cred, public_key)| Credential {
+            counter: 0,
+            cred_id: Base64UrlSafeData(cred.credential_id),
+            registration_policy: UserVerificationPolicy::Required,
+            user_verified: true,
+            cred: public_key,
+            backup_eligible: cred.backup_eligible,
+            backup_state: false, // ignore
+            extensions: RegisteredExtensions::none(),
+            transports: None,
+            // These don't matter for now
+            attestation: ParsedAttestation {
+                data: ParsedAttestationData::None,
+                metadata: webauthn_rs_core::proto::AttestationMetadata::None,
+            },
+            attestation_format: webauthn_rs_core::AttestationFormat::None,
         })
         .collect::<Result<Vec<Credential>, crypto::Error>>()?;
-
-    // separately keep tracked of devices not backed up
-    let non_synced_cred_ids = creds
-        .iter()
-        .filter(|c| !c.backup_state)
-        .map(|c| c.cred_id.clone())
-        .collect();
 
     // generate the challenge and return it
     let webauthn = WebauthnConfig::new(&state.config);
     let (challenge, auth_state) = webauthn.webauthn().generate_challenge_authenticate(creds, None)?;
 
     Ok(BiometricChallenge {
-        state: BiometricChallengeState {
-            state: auth_state,
-            non_synced_cred_ids,
-        },
+        state: BiometricChallengeState { state: auth_state },
         challenge_json: serde_json::to_string(&challenge)?,
     })
 }

@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS webauthn_credential_pubkey_scoped_vault_id;

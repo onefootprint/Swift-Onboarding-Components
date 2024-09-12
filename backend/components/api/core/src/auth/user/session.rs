@@ -120,6 +120,7 @@ impl UserSessionContext {
     }
 }
 
+#[derive(Debug)]
 pub enum UserIdentifier {
     Vault(VaultId),
     ScopedVault(ScopedVaultId),

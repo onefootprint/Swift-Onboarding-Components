@@ -22,7 +22,6 @@ use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::AuthenticationState;
-use webauthn_rs_core::proto::Base64UrlSafeData;
 
 #[allow(clippy::module_inception)]
 pub mod identify;
@@ -43,8 +42,6 @@ pub(crate) enum CreateChallengeRequest {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BiometricChallengeState {
     pub state: AuthenticationState,
-    #[serde(default)]
-    pub non_synced_cred_ids: Vec<Base64UrlSafeData>,
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

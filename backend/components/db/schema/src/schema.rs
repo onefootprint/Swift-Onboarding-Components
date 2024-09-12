@@ -1720,6 +1720,7 @@ diesel::table! {
         backup_state -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
         scoped_vault_id -> Text,
+        origin_id -> Nullable<Text>,
     }
 }
 

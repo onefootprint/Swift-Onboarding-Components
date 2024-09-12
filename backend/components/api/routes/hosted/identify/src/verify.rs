@@ -100,13 +100,10 @@ pub async fn post(
             s.verify_response(&c_response)?;
             VerifiedCredential::ContactInfo(IDK::Email.into())
         }
-        ChallengeData::Passkey(context) => {
+        ChallengeData::Passkey(s) => {
             let webauthn = WebauthnConfig::new(&state.config);
-            let auth_resp = serde_json::from_str(&c_response)?;
-
-            let result = webauthn
-                .webauthn()
-                .authenticate_credential(&auth_resp, &context.state)?;
+            let c_resp = serde_json::from_str(&c_response)?;
+            let result = webauthn.webauthn().authenticate_credential(&c_resp, &s.state)?;
             VerifiedCredential::Passkey(result)
         }
     };
@@ -163,9 +160,9 @@ pub async fn post(
             let uv_id = &user_auth.user_vault_id;
             // If we made a new scoped vault here, prefill its data
             if let Some((su, prefill_data)) = prefill_data {
-                // TODO in a future PR, will need to prefill passkey when it is tenant-specific
                 let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
                 tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
+                WebauthnCredential::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
             }
 
             // Apply auth-method-specific updates
@@ -183,13 +180,18 @@ pub async fn post(
                 }
                 VerifiedCredential::Passkey(result) => {
                     let cred_id = &result.cred_id().0;
+                    if result.backup_state() {
+                        WebauthnCredential::set_backup_state(conn, uv_id, cred_id)?;
+                    }
+
                     // Since the challenge generated for the client allows using one of multiple webauthn
                     // credentials, find the exact WebauthnCredential id that was utilized
-                    let credential =
-                        WebauthnCredential::get_by_credential_id(conn, &user_auth.user_vault_id, cred_id)?;
-                    if result.backup_state() {
-                        credential.update_backup_state(conn)?;
-                    }
+                    let identifier = if let Some(su_id) = su.as_ref().map(|su| &su.id) {
+                        su_id.into()
+                    } else {
+                        uv_id.into() // Only m1fp
+                    };
+                    let credential = WebauthnCredential::get_by_credential_id(conn, identifier, cred_id)?;
                     (Some(credential.id), false)
                 }
             };

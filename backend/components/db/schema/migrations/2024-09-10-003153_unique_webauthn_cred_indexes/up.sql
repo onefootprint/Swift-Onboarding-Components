@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_id_scoped_vault_id ON webauthn_credential(credential_id, scoped_vault_id);

@@ -110,9 +110,6 @@ pub async fn post_attestation(
         android_package_name,
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
-    let t = auth.tenant();
-    let v_id = auth.user().id.clone();
-
     #[derive(derive_more::From)]
     #[allow(clippy::large_enum_variant)]
     enum NewDeviceAttestation {
@@ -120,12 +117,14 @@ pub async fn post_attestation(
         Android(NewGoogleDeviceAttestation),
     }
 
+    let t = auth.tenant();
+    let sv = &auth.scoped_user;
     let new_attestation = match device_type {
-        DeviceAttestationType::Ios => ios::attest(&state, t, &v_id, challenge, attestation, ios_bundle_id)
+        DeviceAttestationType::Ios => ios::attest(&state, t, sv, challenge, attestation, ios_bundle_id)
             .await?
             .into(),
         DeviceAttestationType::Android => {
-            android::attest(&state, t, &v_id, challenge, attestation, android_package_name)
+            android::attest(&state, t, sv, challenge, attestation, android_package_name)
                 .await?
                 .into()
         }
@@ -135,6 +134,7 @@ pub async fn post_attestation(
     let wf_id = auth.workflow().id.clone();
     let vault_key = auth.user().public_key.clone();
     let is_live = auth.user().is_live;
+    let v_id = auth.user().id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<()> {

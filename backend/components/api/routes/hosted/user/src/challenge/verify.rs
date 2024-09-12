@@ -199,10 +199,10 @@ impl Action {
             Self::RegisterWebauthnCred(res) => {
                 match action_kind {
                     ActionKind::Replace => {
-                        WebauthnCredential::deactivate(conn, vault_id)?;
+                        WebauthnCredential::deactivate(conn, sv_id)?;
                     }
                     ActionKind::AddPrimary => {
-                        let existing = WebauthnCredential::list(conn, vault_id)?;
+                        let existing = WebauthnCredential::list(conn, sv_id)?;
                         if !existing.is_empty() {
                             return ValidationError("Cannot add primary passkey when one already exists.")
                                 .into();

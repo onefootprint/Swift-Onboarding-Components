@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS webauthn_credential_origin_id ON webauthn_credential(origin_id);

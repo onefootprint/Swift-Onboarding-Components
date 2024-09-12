@@ -1,0 +1,1 @@
+ALTER TABLE webauthn_credential DROP COLUMN origin_id TEXT;

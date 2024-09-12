@@ -35,15 +35,24 @@ pub struct AuthMethod {
 /// database. So we have to assemble it from a combination of vault data, ContactInfo, and
 /// WebauthnCredentials. Eventually, we should create a table of registered AuthMethods in the
 /// database.
+///
+/// NOTE: this method needs to service two contexts: user-specific contexts (like my1fp or logging
+/// into an existing vault in order to onboard onto a new tenant) AND scoped-user-specific contexts.
+#[tracing::instrument(skip_all, fields(identifier))]
 pub fn get_user_auth_methods(
     conn: &mut PgConn,
     identifier: UserIdentifier,
     user_auth: Option<CheckedUserAuthContext>,
 ) -> FpResult<UserAuthMethodsContext> {
+    // TODO make this closer to the source of truth - challenges should be initiated from this returned
+    // list of what's available, and these should include the phone / email
     let args = VwArgs::from(&identifier);
     let uvw = VaultWrapper::build(conn, args)?;
 
-    let passkeys = WebauthnCredential::list(conn, &uvw.vault.id)?;
+    let passkeys = match identifier {
+        UserIdentifier::Vault(v_id) => WebauthnCredential::list(conn, &v_id)?,
+        UserIdentifier::ScopedVault(sv_id) => WebauthnCredential::list(conn, &sv_id)?,
+    };
 
     let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
         .into_iter()

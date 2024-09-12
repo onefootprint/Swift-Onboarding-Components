@@ -524,7 +524,7 @@ fn get_requirement_inner(
             if !obc.prompt_for_passkey {
                 return Ok(vec![]);
             }
-            let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
+            let credentials = WebauthnCredential::list(conn, &wf.scoped_vault_id)?;
 
             // Note: we should probably represent this another way, but for now we can determine if we
             // want to skip passkey reg by checking for this liveness event on the

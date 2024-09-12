@@ -6,14 +6,14 @@ from tests.utils import (
     patch,
     post,
 )
-from tests.bifrost_client import BifrostClient
+from tests.bifrost_client import BifrostClient, User
 from tests.headers import FpAuth, SandboxId
 
 
 class DualOnboardedUser(NamedTuple):
     fp_id: str
     foo_fp_id: str
-    user: any
+    user: User
 
 
 @pytest.fixture(scope="module")
@@ -98,6 +98,18 @@ def test_prefill_timeline_events(
         "phone_number",
         "email",
     }
+
+
+def test_prefill_passkeys(dual_onboarded_user, foo_sandbox_tenant):
+    """
+    Should be able to log into the user created at foo_sandbox_tenant with the passkey registered at sandbox_tenant
+    """
+    bifrost = dual_onboarded_user.user.client
+    IdentifyClient(
+        foo_sandbox_tenant.default_ob_config,
+        bifrost.sandbox_id,
+        webauthn=bifrost.webauthn_device,
+    ).inherit(kind="biometric")
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
