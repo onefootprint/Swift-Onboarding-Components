@@ -1,8 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
-import type { ButtonHTMLAttributes } from 'react';
-import type React from 'react';
+import type { ButtonHTMLAttributes, ReactElement } from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -13,7 +12,7 @@ import Stack from '../stack';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
 export type ButtonProps = {
-  children: React.ReactNode;
+  children: string | ReactElement<Icon>;
   className?: string;
   disabled?: boolean;
   form?: string;
@@ -109,9 +108,11 @@ const ButtonContainer = styled.button<{
       border-color: ${button.variant[$variant].borderColor};
       border-radius: ${button.borderRadius};
       height: ${button.size[size].height};
+      width: auto;
       padding: 0 ${button.size[size].paddingHorizontal};
       box-shadow: ${button.variant[$variant].boxShadow};
       transition: ${button.transition};
+      box-sizing: border-box;
 
       &:hover:enabled {
         background-color: ${button.variant[$variant].hover.bg};

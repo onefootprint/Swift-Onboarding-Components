@@ -1,6 +1,6 @@
 import { IcoDotsHorizontal24, IcoPencil16 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
-import { Button, Dropdown, Stack } from '@onefootprint/ui';
+import { Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -8,7 +8,6 @@ import PermissionGate from 'src/components/permission-gate';
 import useTags from '@/entity/hooks/use-tags';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
@@ -32,7 +31,9 @@ enum ActionDialog {
 
 const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actions' });
-  const { t: newT } = useTranslation('entity-details', { keyPrefix: 'header.actions' });
+  const { t: newT } = useTranslation('entity-details', {
+    keyPrefix: 'header.actions',
+  });
   const editControls = useEditControls();
   const { data: tags } = useTags(entity.id);
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
@@ -78,10 +79,10 @@ const Actions = ({ entity }: WithEntityProps) => {
   return entity.kind === EntityKind.person ? (
     <>
       <Dropdown.Root>
-        <Dropdown.Trigger aria-label={t('cta')} asChild>
-          <DotsButton>
+        <Dropdown.Trigger>
+          <IconButton variant="secondary" aria-label={t('cta')} height="28px" width="28px">
             <IcoDotsHorizontal24 />
-          </DotsButton>
+          </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Content align="end" sideOffset={8}>
           <Dropdown.Group>
@@ -138,60 +139,11 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : (
     <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
-      <EditContainer>
-        <Button variant="secondary" onClick={editControls.start}>
-          <Stack align="center" justify="center">
-            <IcoPencil16 />
-          </Stack>
-        </Button>
-      </EditContainer>
+      <IconButton variant="secondary" aria-label={t('edit-business.label')} height="28px" width="28px">
+        <IcoPencil16 />
+      </IconButton>
     </PermissionGate>
   );
 };
-
-const DotsButton = styled.button`
-  ${({ theme }) => {
-    const { button } = theme.components;
-    return css`
-      all: unset;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: ${button.borderRadius};
-      background-color: ${button.variant.secondary.bg};
-      color: ${button.variant.secondary.color};
-      border: ${button.borderWidth} solid ${button.variant.secondary.borderColor};
-
-      &:not([data-disabled]) {
-        &:hover {
-          background-color: ${button.variant.secondary.hover.bg};
-          color: ${button.variant.secondary.hover.color};
-          border-color: ${button.variant.secondary.hover.borderColor};
-        }
-
-        &:active {
-          background-color: ${button.variant.secondary.active.bg};
-          color: ${button.variant.secondary.active.color};
-          border-color: ${button.variant.secondary.active.borderColor};
-        }
-      }
-
-      &[data-disabled] {
-        cursor: initial;
-        opacity: 0.5;
-      }
-    `;
-  }}
-`;
-
-const EditContainer = styled.div`
-  ${({ theme }) => css`
-    > button {
-      padding: 0 ${theme.spacing[3]} !important;
-    }
-  `}
-`;
 
 export default Actions;

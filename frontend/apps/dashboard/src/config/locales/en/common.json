@@ -1382,6 +1382,7 @@
           }
         },
         "edit-business": {
+          "label": "Edit business information",
           "not-allowed": "You're not allowed to edit business information"
         }
       },
