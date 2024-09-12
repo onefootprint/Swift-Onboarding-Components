@@ -1,6 +1,6 @@
 'use client';
 
-import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
+import { PHONE_COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { forwardRef, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       selectEmptyStateText,
       value,
       locale,
-      options = COUNTRIES,
+      options = PHONE_COUNTRIES,
       ...props
     }: PhoneInputProps,
     ref,

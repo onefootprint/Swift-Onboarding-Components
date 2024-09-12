@@ -1,8 +1,8 @@
-import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
 import { Box, Grid, Stack, Text, Tooltip, createFontStyles, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import { COUNTRIES } from './supported-id-documents.constants';
 
 import SEO from '../../components/seo';
 import ContactUsBanner from './components/contact-us-banner';

@@ -292,7 +292,6 @@ export type {
   CollectedDataOption,
   CombinedWatchlistChecksEvent,
   CountryCode,
-  CountryCode3,
   CustomDI,
   CustomDocumentIdentifier,
   D2PMeta,
