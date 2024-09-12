@@ -25,7 +25,9 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
   const headerTitle = useGetHeaderText();
   const displayEmail = getDisplayEmail({ identify, email });
   const headerSubtitle = displayEmail ? (
-    <span data-dd-privacy="mask">{t('email-challenge.prompt-with-email', { email: displayEmail })}</span>
+    <span data-dd-privacy="mask" data-dd-action-name="Subtitle with email">
+      {t('email-challenge.prompt-with-email', { email: displayEmail })}
+    </span>
   ) : (
     t('email-challenge.prompt-without-email')
   );

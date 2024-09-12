@@ -23,7 +23,9 @@ const UpdateVerifyEmail = ({
 }: UpdateVerifyEmailProps) => {
   const { t } = useTranslation('identify');
   const subtitle = email ? (
-    <span data-dd-privacy="mask">{t('email-challenge.prompt-with-email', { email })}</span>
+    <span data-dd-privacy="mask" data-dd-action-name="Subtitle with email">
+      {t('email-challenge.prompt-with-email', { email })}
+    </span>
   ) : (
     t('email-challenge.prompt-without-email')
   );

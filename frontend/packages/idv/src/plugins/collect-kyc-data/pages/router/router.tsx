@@ -69,7 +69,7 @@ const Router = ({ onDone }: { onDone: () => void }) => {
         Header={VerifyHeader}
         headerTitle={t('identify.pages.sms-challenge.title')}
         headerSubtitle={
-          <span data-dd-privacy="mask">
+          <span data-dd-privacy="mask" data-dd-action-name="Subtitle with phone">
             {t('identify.pages.sms-challenge.prompt-with-phone', {
               scrubbedPhoneNumber: phoneValue,
             })}
@@ -95,7 +95,7 @@ const Router = ({ onDone }: { onDone: () => void }) => {
         Header={VerifyHeader}
         headerTitle={t('identify.pages.email-challenge.title')}
         headerSubtitle={
-          <span data-dd-privacy="mask">
+          <span data-dd-privacy="mask" data-dd-action-name="Subtitle with email">
             {t('identify.pages.email-challenge.prompt-with-email', { email: emailValue })}
           </span>
         }

@@ -26,7 +26,9 @@ const SmsChallenge = ({ Header }: SmsChallengeProps) => {
   const displayPhone = getDisplayPhone({ identify, phoneNumber });
 
   const formTitle = displayPhone ? (
-    <span data-dd-privacy="mask">{t('sms-challenge.prompt-with-phone', { phone: displayPhone })}</span>
+    <span data-dd-privacy="mask" data-dd-action-name="Subtitle with phone">
+      {t('sms-challenge.prompt-with-phone', { phone: displayPhone })}
+    </span>
   ) : (
     t('sms-challenge.prompt-without-phone')
   );
