@@ -88,6 +88,8 @@ pub enum TenantScope {
     DecryptDocumentAndSelfie,
     /// Allows decrypting all data
     DecryptAll,
+    /// Allows decrypting all data except PCI card data
+    DecryptAllExceptPciData,
     /// Create new vaults and update existing vaults' information
     WriteEntities,
 
@@ -116,6 +118,7 @@ impl TenantScope {
             Self::DecryptDocument => vec![ApiKey, DashboardUser],
             Self::DecryptDocumentAndSelfie => vec![ApiKey, DashboardUser],
             Self::DecryptAll => vec![ApiKey, DashboardUser],
+            Self::DecryptAllExceptPciData => vec![ApiKey, DashboardUser],
             Self::WriteEntities => vec![ApiKey, DashboardUser],
 
             Self::ApiKeys => vec![DashboardUser],

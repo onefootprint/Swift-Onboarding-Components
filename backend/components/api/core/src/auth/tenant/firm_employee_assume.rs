@@ -144,7 +144,7 @@ impl FirmEmployeeAssumeAuth {
                 // Outside of sandbox, "risk ops" employees have some extended permissions
                 vec![
                     TenantScope::OrgSettings,
-                    TenantScope::DecryptAll,
+                    TenantScope::DecryptAllExceptPciData,
                     TenantScope::ManualReview,
                     TenantScope::WriteEntities,
                     TenantScope::OnboardingConfiguration,
@@ -236,7 +236,7 @@ mod test {
     #[db_test_case(true, true, true => vec![
         TenantScope::Read,
         TenantScope::OrgSettings,
-        TenantScope::DecryptAll,
+        TenantScope::DecryptAllExceptPciData,
         TenantScope::ManualReview,
         TenantScope::WriteEntities,
         TenantScope::OnboardingConfiguration,

@@ -167,6 +167,13 @@ impl IsGuardMet<TenantScope> for CanDecrypt {
         if token_scopes.contains(&TenantScope::Admin) || token_scopes.contains(&TenantScope::DecryptAll) {
             return true;
         }
+        if token_scopes.contains(&TenantScope::DecryptAllExceptPciData) {
+            if self.0.iter().any(|di| matches!(di, DataIdentifier::Card(_))) {
+                return false;
+            }
+            return true;
+        }
+
         // Otherwise, check fine-grained decryption permissions.
         self.0.iter().all(|di| can_decrypt(di, token_scopes))
     }
