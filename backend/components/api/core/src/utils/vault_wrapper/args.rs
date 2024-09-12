@@ -36,7 +36,6 @@ impl<'a> From<&'a UserIdentifier> for VwArgs<'a> {
         match value {
             UserIdentifier::Vault(sv_id) => Self::Vault(sv_id),
             UserIdentifier::ScopedVault(sv_id) => Self::Tenant(sv_id),
-            UserIdentifier::VersionedScopedVault(sv_id, seqno) => Self::Historical(sv_id, *seqno),
         }
     }
 }

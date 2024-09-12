@@ -391,7 +391,6 @@ pub fn get_register_auth_method_requirements(
         return Ok(vec![]);
     }
 
-    // let identifier = UserIdentifier::VersionedScopedVault(sv_id.clone(), seqno);
     let ctx = get_user_auth_methods(conn, user_identifier, None)?;
     let verified_auth_methods = ctx
         .auth_methods
@@ -439,7 +438,7 @@ fn get_requirement_inner(
     } = opts;
     let req = match k {
         OnboardingRequirementKind::RegisterAuthMethod => {
-            let user_identifier = UserIdentifier::VersionedScopedVault(wf.scoped_vault_id.clone(), vw.seqno);
+            let user_identifier = UserIdentifier::ScopedVault(wf.scoped_vault_id.clone());
             get_register_auth_method_requirements(conn, obc, user_identifier, auth_events)?
         }
         OnboardingRequirementKind::CollectData => {
