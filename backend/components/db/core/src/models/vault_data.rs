@@ -44,6 +44,7 @@ pub struct VaultData {
     pub format: VaultDataFormat,
 }
 
+#[derive(Debug)]
 pub struct NewVaultData {
     pub kind: DataIdentifier,
     pub e_data: SealedVaultBytes,

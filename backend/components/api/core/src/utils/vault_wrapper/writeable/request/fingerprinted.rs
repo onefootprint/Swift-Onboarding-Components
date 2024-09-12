@@ -51,9 +51,26 @@ impl FingerprintedDataRequest {
             .map(|pfpk| pfpk.di())
             .unique()
             .collect_vec();
-
-        let missing_fps = needed_fps.iter().filter(|di| !new_dis.contains(di)).collect_vec();
-        let (addl_fingerprints, salt_to_dl_id) = vw.fingerprint_ciphertext(state, missing_fps, t_id).await?;
+        let data_to_fp = needed_fps
+            .iter()
+            .filter(|di| !new_dis.contains(di))
+            .flat_map(|di| vw.data(di))
+            .filter_map(|d| d.data.vd())
+            // Add verified phone number here?
+            .flat_map(|d| {
+                let fps = d.kind.get_fingerprint_payload(&d.e_data, Some(t_id));
+                // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
+                fps.into_iter().map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
+            })
+            .collect_vec();
+        let fingerprints = state
+            .enclave_client
+            .batch_fingerprint_sealed(&vw.vault.e_private_key, data_to_fp)
+            .await?;
+        let (addl_fingerprints, salt_to_dl_id) = fingerprints
+            .into_iter()
+            .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
+            .unzip();
         res.fingerprints.extend(addl_fingerprints, salt_to_dl_id);
         Ok(res)
     }

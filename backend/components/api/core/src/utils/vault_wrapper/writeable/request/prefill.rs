@@ -4,7 +4,6 @@ use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::PieceOfData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -14,13 +13,10 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::NewVaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::output::Csv;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSource;
-use newtypes::Fingerprint;
-use newtypes::TenantId;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::VaultKind;
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -43,7 +39,7 @@ pub struct PrefillData {
 /// we prefill auth methods into the newly created ScopedVault. Second, when onboarding begins, we
 /// prefill other KYC data that's used by the playbook.
 pub enum PrefillKind<'a> {
-    /// After the identify flow, prefill login methods
+    /// After the identify flow, prefill login methods.
     LoginMethods,
     /// When starting onboarding, prefill all data required by the playbook. We shouldn't do this
     /// before creating the Workflow in the database, otherwise we'll unintentionally give decrypt
@@ -72,12 +68,13 @@ impl<Type> VaultWrapper<Type> {
     /// vault
     #[tracing::instrument(skip_all)]
     pub async fn get_data_to_prefill<'a>(
+        // NOTE: self here is a user-scoped VW with only portable data
         &'a self,
         state: &'a State,
         pb: &'a ObConfiguration,
-        kind: PrefillKind<'a>,
+        prefill_kind: PrefillKind<'a>,
     ) -> FpResult<PrefillData> {
-        let destination_vw = match kind {
+        let destination_vw = match prefill_kind {
             // No existing destination ScopedVault when we're prefilling login methods
             PrefillKind::LoginMethods => None,
             // There's only an existing destination ScopedVault during Onboarding time
@@ -100,9 +97,33 @@ impl<Type> VaultWrapper<Type> {
         }
 
         // Collect all of the portable data that we can prefill
-        let data = self
-            .populated_dis()
+        let mut dis_to_prefill = self.populated_dis();
+
+        // Tenants may have different _unverified_ contact info from _verified_ contact info.
+        // If there's a _verified_ piece of contact info, prefill only that and omit any unverified info to
+        // prevent prefilling, for ex, id.verified_email that's different from id.email.
+        // The unverified DIs will be derived from the verified information below.
+        if dis_to_prefill.contains(&IDK::VerifiedPhoneNumber.into()) {
+            dis_to_prefill.retain(|di| di != &IDK::PhoneNumber.into())
+        }
+        if dis_to_prefill.contains(&IDK::VerifiedEmail.into()) {
+            dis_to_prefill.retain(|di| di != &IDK::Email.into())
+        }
+
+        let dis_to_prefill = dis_to_prefill
             .into_iter()
+            .filter(|d| prefill_kind.allow_prefilling(d))
+            .filter(|d| {
+                let collected_by_pb = pb
+                    .must_collect_data
+                    .iter()
+                    .any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(d));
+                // Only prefill data into the that must be collected by the tenant's playbook.
+                // Except verified CI, we should always prefill
+                collected_by_pb || d.is_verified_ci()
+            });
+
+        let data = dis_to_prefill
             .filter_map(|di| self.data(&di))
             .filter(|d| d.is_portable())
             // Don't prefill data into a tenant that is already owned by the destination tenant.
@@ -118,26 +139,53 @@ impl<Type> VaultWrapper<Type> {
                     .and_then(|dl| dl.origin_id.as_ref())
                     .is_some_and(|id| &d.lifetime.id == id)
             })
-            .filter(|d| {
-                let collected_by_pb =
-                    pb.must_collect_data.iter().flat_map(|cdo| cdo.data_identifiers()).flatten().contains(&d.lifetime.kind);
-                // Only prefill data into the that must be collected by the tenant's playbook.
-                // Except verified CI, we should always prefill
-                collected_by_pb || d.lifetime.kind.is_verified_ci()
-            })
-            .filter(|d| kind.allow_prefilling(&d.lifetime.kind))
             // Note: this won't support portable documents
-            .filter_map(|d| if let PieceOfData::Vd(d) = &d.data { Some(d) } else { None })
+            .filter_map(|d| d.data.vd())
+            .collect_vec();
+
+        //
+        // Compute the set of NewVaultData we're going to save.
+        //
+
+        let data = data
+            .into_iter()
+            .map(|vd| {
+                let mut dis = vec![vd.kind.clone()];
+                // If we're prefilling a piece of verified contact info, derive the unverified info too
+                match vd.kind {
+                    DataIdentifier::Id(IDK::VerifiedPhoneNumber) => dis.push(IDK::PhoneNumber.into()),
+                    DataIdentifier::Id(IDK::VerifiedEmail) => dis.push(IDK::Email.into()),
+                    _ => (),
+                }
+                (vd, dis)
+            })
+            .flat_map(|(vd, dis)| {
+                dis.into_iter().map(|di| NewVaultData {
+                    kind: di,
+                    e_data: vd.e_data.clone(),
+                    p_data: vd.p_data.clone(),
+                    format: vd.format,
+                    // Since we're copying the data from elsewhere, save the lifetime ID
+                    origin_id: Some(vd.lifetime_id.clone()),
+                    source: DataLifetimeSource::Prefill,
+                })
+            })
             .collect_vec();
 
         //
         // Compute the fingerprints for all data we're going to prefill
         //
-        let t_id = &pb.tenant_id;
-        let dis = data.iter().map(|d| &d.kind).collect_vec();
-        // Specifically throw out the mapping from sh_data -> lifetime_id. The lifetime_ids here
-        // belong to the source SV, not the destination SV
-        let (fingerprints, _) = self.fingerprint_ciphertext(state, dis, t_id).await?;
+
+        let data_to_fp = data
+            .iter()
+            .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, Some(&pb.tenant_id)))
+            // Attach a Key to each fingerprint payload that includes the salt
+            .map(|(salt, e_data)| (salt.clone(), (salt, e_data)))
+            .collect_vec();
+        let fingerprints = state
+            .enclave_client
+            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
+            .await?;
         let fingerprints = Fingerprints::new(fingerprints);
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
@@ -164,19 +212,6 @@ impl<Type> VaultWrapper<Type> {
             })
             .await?;
 
-        let data = data
-            .into_iter()
-            .map(|vd| NewVaultData {
-                kind: vd.kind.clone(),
-                e_data: vd.e_data.clone(),
-                p_data: vd.p_data.clone(),
-                format: vd.format,
-                // Since we're copying the data from elsewhere, save the lifetime ID
-                origin_id: Some(vd.lifetime_id.clone()),
-                source: DataLifetimeSource::Prefill,
-            })
-            .collect_vec();
-
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Computed prefill data");
 
         let result = PrefillData {
@@ -186,47 +221,6 @@ impl<Type> VaultWrapper<Type> {
             phantom: PhantomData,
         };
         Ok(result)
-    }
-
-    /// Generates fingerprints for the provided DIs from the encrypted data currently in the vault.
-    /// Also returns a HashMap that specifies the DataLifetimeId from which each Fingerprint was
-    /// generated
-    pub async fn fingerprint_ciphertext(
-        &self,
-        state: &State,
-        dis: Vec<&DataIdentifier>,
-        tenant_id: &TenantId,
-    ) -> FpResult<(
-        Vec<(FingerprintSalt, Fingerprint)>,
-        HashMap<FingerprintSalt, DataLifetimeId>,
-    )> {
-        let data_to_fp = dis
-            .iter()
-            .flat_map(|di| self.data(di))
-            .filter_map(|d| {
-                if let PieceOfData::Vd(d) = &d.data {
-                    Some(d)
-                } else {
-                    None
-                }
-            })
-            .flat_map(|d| {
-                d.kind
-                    .get_fingerprint_payload(&d.e_data, Some(tenant_id))
-                    .into_iter()
-                    // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
-                    .map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
-            })
-            .collect_vec();
-        let fingerprints = state
-            .enclave_client
-            .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
-            .await?;
-        let (fingerprints, salt_to_lifetime_id) = fingerprints
-            .into_iter()
-            .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
-            .unzip();
-        Ok((fingerprints, salt_to_lifetime_id))
     }
 }
 

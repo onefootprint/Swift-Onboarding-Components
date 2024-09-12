@@ -90,14 +90,14 @@ def test_prefill_timeline_events(
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
     assert len(collect_data_events) == 2
     assert all(e["event"]["data"]["is_prefill"] for e in collect_data_events)
-    assert set(collect_data_events[0]["event"]["data"]["attributes"]) == (
-        set(foo_sandbox_tenant.default_ob_config.must_collect_data)
-        - {"phone_number", "email"}
-    )
     assert set(collect_data_events[1]["event"]["data"]["attributes"]) == {
         "phone_number",
         "email",
-    }
+    }, "Prefill at auth populates auth methods"
+    assert set(collect_data_events[0]["event"]["data"]["attributes"]) == (
+        set(foo_sandbox_tenant.default_ob_config.must_collect_data)
+        - {"phone_number", "email"}
+    ), "Prefill at onboarding time populates all remaining attributes"
 
 
 def test_prefill_passkeys(dual_onboarded_user, foo_sandbox_tenant):
@@ -110,6 +110,18 @@ def test_prefill_passkeys(dual_onboarded_user, foo_sandbox_tenant):
         bifrost.sandbox_id,
         webauthn=bifrost.webauthn_device,
     ).inherit(kind="biometric")
+
+
+def test_prefill_phone_auth_method(dual_onboarded_user, foo_sandbox_tenant):
+    """
+    Should be able to log into the user created at foo_sandbox_tenant with the phone registered at sandbox_tenant
+    """
+    bifrost = dual_onboarded_user.user.client
+    IdentifyClient(
+        foo_sandbox_tenant.default_ob_config,
+        bifrost.sandbox_id,
+        webauthn=bifrost.webauthn_device,
+    ).inherit(kind="sms")
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):

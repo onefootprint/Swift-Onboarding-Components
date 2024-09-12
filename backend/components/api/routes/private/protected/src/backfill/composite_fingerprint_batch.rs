@@ -106,9 +106,25 @@ async fn backfill_composite_fingerprints(state: &State, sv_id: ScopedVaultId) ->
         })
         .await?;
 
-    let dis = sv_dis.iter().collect_vec();
-    let (fps, salt_to_dl_id) = vw.fingerprint_ciphertext(state, dis.clone(), tenant_id).await?;
-    let fps: HashMap<_, _> = fps.into_iter().collect();
+    let data_to_fp = sv_dis
+        .iter()
+        .flat_map(|di| vw.data(di))
+        .filter_map(|d| d.data.vd())
+        .flat_map(|d| {
+            let fps = d.kind.get_fingerprint_payload(&d.e_data, Some(tenant_id));
+            // Attach a Key to each fingerprint payload that includes the lifetime ID and salt
+            fps.into_iter()
+                .map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
+        })
+        .collect_vec();
+    let fingerprints = state
+        .enclave_client
+        .batch_fingerprint_sealed(&vw.vault.e_private_key, data_to_fp)
+        .await?;
+    let (fps, salt_to_dl_id): (HashMap<_, _>, HashMap<_, _>) = fingerprints
+        .into_iter()
+        .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
+        .unzip();
 
     let sv_clone = sv.clone();
     state
