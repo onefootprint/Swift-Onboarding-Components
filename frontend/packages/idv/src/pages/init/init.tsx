@@ -22,11 +22,14 @@ const Init = () => {
   );
 
   useEffect(() => {
+    const populatedBootstrapKeys = Object.entries(bootstrapData)
+      .filter(([_key, value]) => (Array.isArray(value) ? value.length > 0 : !!value))
+      .map(([key]) => key);
+
     trackAction('onboarding:started', {
-      hasBootstrapData: Object.entries(bootstrapData).some(([, value]) => value),
+      hasBootstrapData: populatedBootstrapKeys.length > 0,
+      populatedBootstrapKeys: populatedBootstrapKeys,
     });
-    // TODO: Deprecate this action
-    trackAction('idv:started');
   }, []);
 
   useGetOnboardingConfig(

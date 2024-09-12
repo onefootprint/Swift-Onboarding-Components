@@ -20,7 +20,18 @@ import useProps from './hooks/use-props';
 
 const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 
-const { logError, logInfo } = getLogger({ location: 'bifrost-init' });
+const { logError, logInfo, logTrack } = getLogger({ location: 'bifrost-init' });
+
+const logPopulatedBootstrapKeys = (bootstrapData: IdvBootstrapData): void => {
+  const populatedBootstrapKeys = Object.entries(bootstrapData)
+    .filter(([_key, value]) => (Array.isArray(value) ? value.length > 0 : !!value))
+    .map(([key]) => key)
+    .join(',');
+
+  if (populatedBootstrapKeys) {
+    logTrack(`Populated bootstrap keys ${populatedBootstrapKeys}`);
+  }
+};
 
 const isPropsSaved = (context: Record<string, unknown>) => {
   const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } = context;
@@ -112,6 +123,8 @@ const Init = () => {
         documentFixtureResult,
         shouldRelayToComponents,
       } = props;
+      /** userData deprecated after 3.11.0 */
+      const bootstrapData = (props?.bootstrapData || props?.userData || {}) as IdvBootstrapData;
       const { showCompletionPage = false, showLogo = false } = options || {};
       const isValidPredefinedSandboxId = sandboxId && isAlphanumeric(sandboxId);
       if (sandboxId && !isValidPredefinedSandboxId) {
@@ -126,8 +139,7 @@ const Init = () => {
         type: 'initContextUpdated',
         payload: {
           authToken,
-          /** userData deprecated after 3.11.0 */
-          bootstrapData: (props?.bootstrapData || props?.userData || {}) as IdvBootstrapData,
+          bootstrapData,
           isComponentsSdk,
           l10n,
           publicKey,
@@ -139,6 +151,8 @@ const Init = () => {
           shouldRelayToComponents,
         },
       });
+
+      logPopulatedBootstrapKeys(bootstrapData);
     },
     onError: (error: unknown) => {
       console.error(error);
