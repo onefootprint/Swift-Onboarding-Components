@@ -65,55 +65,57 @@ const Drawer = ({
 
   return (
     <DrawerPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-      <DrawerContainer onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} role="dialog">
-        <DrawerSurface>
-          <Header
-            closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
-            closeIconComponent={CloseIconComponent}
-            onClose={onClose}
-          >
-            {title}
-          </Header>
-          {headerComponent}
-          <Body padding={7} hideBottomLine hideTopLine>
-            {children}
-          </Body>
-          {(primaryButton || secondaryButton || linkButton) && (
-            <Footer justify="space-between" align="center" tag="footer">
-              <Stack flex={1}>
-                {linkButton && <LinkButton onClick={linkButton.onClick}>{linkButton.label}</LinkButton>}
-              </Stack>
-              <Stack direction="row" gap={3}>
-                {secondaryButton && (
-                  <Button
-                    form={secondaryButton.form}
-                    loading={secondaryButton.loading}
-                    onClick={secondaryButton.onClick}
-                    type={secondaryButton.type}
-                    variant="secondary"
-                  >
-                    {secondaryButton.label}
-                  </Button>
-                )}
-                {primaryButton && (
-                  <Button
-                    form={primaryButton.form}
-                    loading={primaryButton.loading}
-                    onClick={primaryButton.onClick}
-                    type={primaryButton.type}
-                    variant="primary"
-                  >
-                    {primaryButton.label}
-                  </Button>
-                )}
-              </Stack>
-            </Footer>
-          )}
-        </DrawerSurface>
-      </DrawerContainer>
-      <DrawerPrimitive.Overlay asChild>
-        <Overlay isVisible={open} />
-      </DrawerPrimitive.Overlay>
+      <DrawerPrimitive.Portal>
+        <DrawerContainer onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} role="dialog">
+          <DrawerSurface>
+            <Header
+              closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
+              closeIconComponent={CloseIconComponent}
+              onClose={onClose}
+            >
+              {title}
+            </Header>
+            {headerComponent}
+            <Body padding={7} hideBottomLine hideTopLine>
+              {children}
+            </Body>
+            {(primaryButton || secondaryButton || linkButton) && (
+              <Footer justify="space-between" align="center" tag="footer">
+                <Stack flex={1}>
+                  {linkButton && <LinkButton onClick={linkButton.onClick}>{linkButton.label}</LinkButton>}
+                </Stack>
+                <Stack direction="row" gap={3}>
+                  {secondaryButton && (
+                    <Button
+                      form={secondaryButton.form}
+                      loading={secondaryButton.loading}
+                      onClick={secondaryButton.onClick}
+                      type={secondaryButton.type}
+                      variant="secondary"
+                    >
+                      {secondaryButton.label}
+                    </Button>
+                  )}
+                  {primaryButton && (
+                    <Button
+                      form={primaryButton.form}
+                      loading={primaryButton.loading}
+                      onClick={primaryButton.onClick}
+                      type={primaryButton.type}
+                      variant="primary"
+                    >
+                      {primaryButton.label}
+                    </Button>
+                  )}
+                </Stack>
+              </Footer>
+            )}
+          </DrawerSurface>
+        </DrawerContainer>
+        <DrawerPrimitive.Overlay asChild>
+          <Overlay isVisible={open} />
+        </DrawerPrimitive.Overlay>
+      </DrawerPrimitive.Portal>
     </DrawerPrimitive.Root>
   );
 };
