@@ -56,6 +56,10 @@ const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }
                 position={position}
                 isLastItem={isLastItem}
                 hasSubOptions={hasSubOptions}
+                disabled={status !== 'completed'}
+                aria-disabled={status !== 'completed'}
+                aria-selected={status === 'selected'}
+                aria-label={option.label}
               >
                 {option.label}
               </Item>
@@ -76,6 +80,10 @@ const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }
                           status={subStatus}
                           key={suboption.value}
                           isLastOption={isLastOption}
+                          disabled={subStatus !== 'completed'}
+                          aria-disabled={subStatus !== 'completed'}
+                          aria-selected={subStatus === 'selected'}
+                          aria-label={suboption.label}
                         >
                           {suboption.label}
                         </SubItem>

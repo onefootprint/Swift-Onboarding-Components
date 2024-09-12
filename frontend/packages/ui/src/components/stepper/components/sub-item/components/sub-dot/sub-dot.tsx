@@ -8,7 +8,7 @@ type SubDotProps = {
 
 const SubDot = ({ status }: SubDotProps) => {
   return (
-    <Stack direction="row" alignItems="center" justifyContent="center" width="20px" height="14px">
+    <Stack direction="row" alignItems="center" justifyContent="center" width="20px">
       <SmallDot $status={status} />
     </Stack>
   );

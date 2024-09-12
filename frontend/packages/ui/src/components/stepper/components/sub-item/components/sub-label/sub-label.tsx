@@ -12,7 +12,7 @@ const SubLabel: React.FC<SubLabelProps> = ({ status, children }) => {
   const color = isAccent ? 'accent' : 'secondary';
 
   return (
-    <Text variant={variant} color={color}>
+    <Text variant={variant} color={color} paddingLeft={3}>
       {children}
     </Text>
   );

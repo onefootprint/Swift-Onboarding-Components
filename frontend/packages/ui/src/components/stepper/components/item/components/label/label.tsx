@@ -7,7 +7,7 @@ type LabelProps = {
 };
 
 const Label: React.FC<LabelProps> = ({ status, children }) => {
-  const isAccent = status === 'selected' || status === 'completed';
+  const isAccent = status === 'selected';
   const variant = isAccent ? 'label-3' : 'body-3';
   const color = isAccent ? 'accent' : 'primary';
 

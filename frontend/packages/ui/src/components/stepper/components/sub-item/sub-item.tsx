@@ -8,15 +8,16 @@ type SubItemProps = {
   onClick: () => void;
   children: string;
   isLastOption?: boolean;
+  disabled?: boolean;
 };
-const SubItem = ({ status, onClick, children, isLastOption }: SubItemProps) => {
+const SubItem = ({ status, onClick, children, isLastOption, disabled }: SubItemProps) => {
   return (
     <li data-status={status}>
-      <Container type="button" onClick={onClick}>
+      <Container type="button" onClick={onClick} data-disabled={disabled}>
         <SubDot status={status} />
         <SubLabel status={status}>{children}</SubLabel>
       </Container>
-      {!isLastOption && <LineContainer>{<Line />}</LineContainer>}
+      {!isLastOption && <LineContainer>{<Line status={status} />}</LineContainer>}
     </li>
   );
 };
@@ -27,11 +28,29 @@ const Container = styled.button`
     display: flex;
     align-items: center;
     gap: ${theme.spacing[5]};
+    max-height: ${theme.spacing[3]};
+    cursor: pointer;
+    pointer-events: auto;
+
+    &[data-disabled='true'] {
+      cursor: initial;
+      pointer-events: none;
+    }
   `};
 `;
 
-const Line = styled.div`
-  ${({ theme }) => css`
+const Line = styled.div<{ status: StepperStatus }>`
+  ${({ theme, status }) => {
+    const getLineColor = () => {
+      if (status === 'completed') {
+        return theme.color.accent;
+      }
+      if (status === 'selected') {
+        return theme.color.secondary;
+      }
+      return theme.color.secondary;
+    };
+    return css`
     position: absolute;
     top: 0;
     bottom: 0;
@@ -39,8 +58,10 @@ const Line = styled.div`
     transform: translateX(-50%);
     height: ${theme.spacing[4]};
     width: ${theme.spacing[1]};
-    background-color: ${theme.color.secondary};
-  `}
+    border-radius: ${theme.borderRadius.full};
+    background-color: ${getLineColor()};
+  `;
+  }}
 `;
 
 const LineContainer = styled.div`
