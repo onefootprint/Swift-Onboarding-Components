@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS webauthn_credential_per_scoped_vault;
