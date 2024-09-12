@@ -1,20 +1,13 @@
 use super::WriteableVw;
-use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
-use db::models::contact_info::ContactInfo;
-use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
-use db::models::scoped_vault::ScopedVault;
-use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
-use newtypes::ScopedVaultId;
-use newtypes::VaultId;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -116,44 +109,6 @@ impl WriteableVw<Person> {
 
         Ok(seqno)
     }
-
-    /// Mark the provided CI as verified.
-    /// Note: VW could be stale after this
-    pub fn on_otp_verified(
-        &self,
-        conn: &mut TxnPgConn,
-        di: DataIdentifier,
-    ) -> FpResult<IsFirstTimeVerifying> {
-        let lifetime = self
-            .get_lifetime(&di)
-            .ok_or(AssertionError("No lifetime for CI"))?;
-        let ci = ContactInfo::get(conn, &lifetime.id)?;
-        let is_first_time_verifying_ci = on_otp_verified(conn, ci, &self.sv.id, &self.vault.id)?;
-        Ok(is_first_time_verifying_ci)
-    }
-}
-
-pub type IsFirstTimeVerifying = bool;
-
-pub(super) fn on_otp_verified(
-    conn: &mut TxnPgConn,
-    ci: ContactInfo,
-    sv_id: &ScopedVaultId,
-    v_id: &VaultId,
-) -> FpResult<IsFirstTimeVerifying> {
-    let is_first_time_verifying_ci = !ci.is_otp_verified;
-    if is_first_time_verifying_ci {
-        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
-        let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
-    }
-    Vault::mark_verified(conn, v_id)?;
-    let update = ScopedVaultUpdate {
-        is_active: Some(true),
-        ..ScopedVaultUpdate::default()
-    };
-    ScopedVault::update(conn, sv_id, update)?;
-    Ok(is_first_time_verifying_ci)
 }
 
 #[cfg(test)]

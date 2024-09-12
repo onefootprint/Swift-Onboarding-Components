@@ -14,6 +14,7 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
+use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_wire_types::UserChallengeRequest;
 use api_wire_types::UserChallengeResponse;
 use itertools::Itertools;
@@ -85,10 +86,8 @@ pub async fn post(
                 "Phone number required to initiate sign up challenge",
             ))?;
             let e164 = phone_number.e164();
-            let (rx, challenge_data) = state
-                .sms_client
-                .send_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id)
-                .await?;
+            let (rx, challenge_data) =
+                send_sms_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id).await?;
 
             let challenge_data = RegisterChallengeData::Sms {
                 h_code: challenge_data.h_code,

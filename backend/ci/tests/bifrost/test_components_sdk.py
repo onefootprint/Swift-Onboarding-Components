@@ -92,7 +92,15 @@ def test_components_sdk(sandbox_tenant):
 
     # Ensure that the source of the saved data is components, including phone and email
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
-    assert all(d["source"] == "components_sdk" for d in body["data"])
+    assert all(
+        d["source"] == "components_sdk"
+        for d in body["data"]
+        if d["identifier"] != "id.verified_phone_number"
+    )
+    verified_phone = next(
+        d for d in body["data"] if d["identifier"] == "id.verified_phone_number"
+    )
+    assert verified_phone["source"] == "hosted"
 
     # Ensure that we can log into the user we just created
     IdentifyClient.from_user(user).inherit()

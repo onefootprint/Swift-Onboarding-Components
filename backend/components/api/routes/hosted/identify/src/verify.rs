@@ -16,6 +16,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::PrefillData;
 use api_core::utils::vault_wrapper::PrefillKind;
@@ -37,16 +38,22 @@ use db::TxnPgConn;
 use newtypes::ActionKind;
 use newtypes::AuthEventKind;
 use newtypes::BoId;
-use newtypes::DataIdentifier;
+use newtypes::ContactInfoKind;
+use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKind;
+use newtypes::PiiString;
+use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
 };
+use std::collections::HashMap;
 use webauthn_rs_core::proto::AuthenticationResult as WebauthnAuthenticationResult;
 
 #[api_v2_operation(
@@ -98,11 +105,11 @@ pub async fn post(
     let verified_credential = match challenge_state.data {
         ChallengeData::Sms(s) => {
             s.verify_response(&c_response)?;
-            VerifiedCredential::ContactInfo(IDK::PhoneNumber.into())
+            on_otp_verify(&state, &user_auth, s.contact_info, ContactInfoKind::Phone).await?
         }
         ChallengeData::Email(s) => {
             s.verify_response(&c_response)?;
-            VerifiedCredential::ContactInfo(IDK::Email.into())
+            on_otp_verify(&state, &user_auth, s.contact_info, ContactInfoKind::Email).await?
         }
         ChallengeData::Passkey(s) => {
             let webauthn = WebauthnConfig::new(&state.config);
@@ -145,12 +152,13 @@ pub async fn post(
 
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
-                VerifiedCredential::ContactInfo(di) => {
-                    let added_auth_methods = if let Some(su) = su.as_ref() {
+                VerifiedCredential::Otp(cik, verified_data) => {
+                    let added_auth_methods = if let Some((su, data)) = su.as_ref().zip(verified_data) {
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
-                        vw.on_otp_verified(conn, di)?
+                        // TODO use vw.replace_verified_ci
+                        vw.mark_ci_as_verified(conn, data, DataLifetimeSource::LikelyHosted, cik)?
                     } else {
                         false
                     };
@@ -270,7 +278,7 @@ async fn get_prefill_data(
         return Ok(None);
     };
     let prefill_data = portable_vw
-        .get_data_to_prefill(state, obc, PrefillKind::Identify)
+        .get_data_to_prefill(state, obc, PrefillKind::LoginMethods)
         .await?;
     Ok(Some(prefill_data))
 }
@@ -292,7 +300,27 @@ fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId)
     Ok(())
 }
 
+async fn on_otp_verify(
+    state: &State,
+    user_auth: &CheckedUserAuthContext,
+    pii: PiiString,
+    cik: ContactInfoKind,
+) -> FpResult<VerifiedCredential> {
+    let data = if let Some(obc) = user_auth.ob_config() {
+        let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
+        let data = HashMap::from_iter([(cik.verified_di(), pii)]);
+        // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.
+        let data = DataRequest::clean_and_validate_str(data, args)?
+            .filter(|di| !matches!(di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)));
+        let data = FingerprintedDataRequest::build_for_new_user(state, data, &obc.tenant_id).await?;
+        Some(data)
+    } else {
+        None
+    };
+    Ok(VerifiedCredential::Otp(cik, data))
+}
+
 enum VerifiedCredential {
-    ContactInfo(DataIdentifier),
+    Otp(ContactInfoKind, Option<FingerprintedDataRequest>),
     Passkey(WebauthnAuthenticationResult),
 }

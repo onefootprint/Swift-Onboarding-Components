@@ -35,6 +35,8 @@ pub enum IdentityData {
     Sss9(PiiString),
     Itin(PiiString),
     UsTaxId(SsnOrItin),
+    VerifiedPhoneNumber(PiiString),
+    VerifiedEmail(PiiString),
 }
 
 impl CleanAndValidate for IDK {
@@ -60,7 +62,23 @@ impl CleanAndValidate for IDK {
             IDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
             IDK::Country => utils::clean_and_validate_country(value.as_string()?)?,
             IDK::Email => clean_and_validate_email(value.as_string()?)?,
+            IDK::VerifiedEmail => {
+                let value = clean_and_validate_email(value.as_string()?)?;
+                return Ok(DataIdentifierValue {
+                    di: self.into(),
+                    value: value.clone(),
+                    parsed: Some(IdentityData::VerifiedEmail(value)),
+                });
+            }
             IDK::PhoneNumber => clean_and_validate_phone(value.as_string()?)?,
+            IDK::VerifiedPhoneNumber => {
+                let value = clean_and_validate_phone(value.as_string()?)?;
+                return Ok(DataIdentifierValue {
+                    di: self.into(),
+                    value: value.clone(),
+                    parsed: Some(IdentityData::VerifiedPhoneNumber(value)),
+                });
+            }
             IDK::Nationality => utils::clean_and_validate_country(value.as_string()?)?,
             IDK::UsLegalStatus => utils::parse_enum::<UsLegalStatus>(value.as_string()?)?,
             IDK::VisaKind => utils::parse_enum::<VisaKind>(value.as_string()?)?,

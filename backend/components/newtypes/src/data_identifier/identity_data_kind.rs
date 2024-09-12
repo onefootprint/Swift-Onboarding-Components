@@ -23,7 +23,10 @@ pub enum IdentityDataKind {
     Zip,
     Country,
     Email,
+    // TODO backfill these
+    VerifiedEmail,
     PhoneNumber,
+    VerifiedPhoneNumber,
 
     UsLegalStatus,
     VisaKind,
@@ -70,7 +73,9 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
             Self::Zip => Some(CollectedData::Address),
             Self::Country => Some(CollectedData::Address),
             Self::Email => Some(CollectedData::Email),
+            Self::VerifiedEmail => None,
             Self::PhoneNumber => Some(CollectedData::PhoneNumber),
+            Self::VerifiedPhoneNumber => None,
             Self::Nationality => Some(CollectedData::UsLegalStatus),
             Self::UsLegalStatus => Some(CollectedData::UsLegalStatus),
             Self::VisaKind => Some(CollectedData::UsLegalStatus),
@@ -90,6 +95,8 @@ impl IdentityDataKind {
         vec![
             Self::PhoneNumber,
             Self::Email,
+            Self::VerifiedPhoneNumber,
+            Self::VerifiedEmail,
             Self::Ssn9,
             Self::FirstName,
             Self::MiddleName,

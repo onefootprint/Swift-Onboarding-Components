@@ -76,6 +76,8 @@ impl IdvData {
             | IdentityDataKind::UsLegalStatus
             | IdentityDataKind::VisaKind
             | IdentityDataKind::VisaExpirationDate
+            | IdentityDataKind::VerifiedPhoneNumber
+            | IdentityDataKind::VerifiedEmail
             | IdentityDataKind::Citizenships => None,
         }
     }

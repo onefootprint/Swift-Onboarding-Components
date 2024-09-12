@@ -32,7 +32,8 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> FpResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
-        if let Some(dl) = self.get_lifetime(&kind.into()) {
+        // TODO eventually only decrypt verified?
+        if let Some(dl) = self.get_lifetime(&kind.di()) {
             let dl_id = dl.id.clone();
             let ci = state
                 .db_pool
@@ -40,7 +41,7 @@ impl<Type> VaultWrapper<Type> {
                 .await?;
 
             let data = self
-                .decrypt_unchecked_single(&state.enclave_client, kind.into())
+                .decrypt_unchecked_single(&state.enclave_client, kind.di())
                 .await?
                 .ok_or(FpError::from(DbError::ObjectNotFound))?;
             Ok(Some((data, ci, dl.clone())))

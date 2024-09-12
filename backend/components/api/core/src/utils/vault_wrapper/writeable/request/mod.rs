@@ -107,7 +107,7 @@ impl ValidatedDataRequest {
         // Add contact info for the new CIs added
         let new_contact_info = vd
             .iter()
-            .filter(|vd| vd.kind.is_contact_info())
+            .filter(|vd| vd.kind.is_unverified_ci())
             .map(|vd| {
                 let old_ci = old_ci.get(&vd.kind);
                 NewContactInfoArgs {

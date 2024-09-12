@@ -16,6 +16,7 @@ use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::identify::UserAuthMethodsContext;
 use api_core::utils::sms::rx_background_error;
+use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -142,10 +143,8 @@ pub async fn post(
                     "Phone number required to initiate sign up challenge",
                 ))?
                 .value;
-            let (rx, challenge_data) = state
-                .sms_client
-                .send_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, sandbox_id)
-                .await?;
+            let (rx, challenge_data) =
+                send_sms_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, sandbox_id).await?;
             (rx, ChallengeData::Sms(challenge_data))
         }
         ChallengeKind::Email => {

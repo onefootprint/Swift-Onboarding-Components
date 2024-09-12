@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
-from tests.utils import _gen_random_sandbox_id, create_ob_config, post, get
+from tests.utils import _gen_random_sandbox_id, create_ob_config, post, get, patch
 from tests.identify_client import IdentifyClient
 from tests.headers import SandboxId, FpAuth, IsLive
 
@@ -581,3 +581,16 @@ def test_failed_verify(sandbox_tenant):
     body = post("hosted/identify/verify", data, token, status_code=400)
     assert body["message"] == "Incorrect PIN code"
     assert body["code"] == "E102"
+
+
+def test_cannot_set_verified_ci(sandbox_tenant):
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
+    for data in [
+        {"id.verified_phone_number": FIXTURE_PHONE_NUMBER},
+        {"id.verified_email": FIXTURE_EMAIL},
+    ]:
+        body = patch("hosted/user/vault", data, bifrost.auth_token, status_code=400)
+        assert (
+            body["message"]
+            == "Can only set verified CI in tenant-facing API or challenge verification flow"
+        )

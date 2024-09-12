@@ -56,7 +56,8 @@ pub fn get_user_auth_methods(
 
     let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
         .into_iter()
-        .filter_map(|ci| uvw.get_lifetime(&ci.into()).map(|d| (ci, d.clone())))
+        // TODO eventually only decrypt ci.verified_di()
+        .filter_map(|ci| uvw.get_lifetime(&ci.di()).map(|d| (ci, d.clone())))
         .collect_vec();
 
     let cis = ci

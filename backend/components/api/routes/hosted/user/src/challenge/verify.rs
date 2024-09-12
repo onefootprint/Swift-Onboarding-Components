@@ -154,7 +154,7 @@ impl Action {
         sv_id: &ScopedVaultId,
     ) -> FpResult<Self> {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
-        let data = HashMap::from_iter([(ci_kind.into(), value)]);
+        let data = HashMap::from_iter([(ci_kind.verified_di(), value)]);
         let data = DataRequest::clean_and_validate_str(data, args)?;
         let data = FingerprintedDataRequest::build(state, data, sv_id).await?;
         Ok(Self::ReplaceContactInfo {

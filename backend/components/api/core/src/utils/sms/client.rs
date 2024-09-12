@@ -36,12 +36,13 @@ pub type SecondsBeforeRetry = Duration;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneEmailChallengeState {
     pub h_code: Vec<u8>,
+    pub contact_info: PiiString,
 }
 
 impl PhoneEmailChallengeState {
-    pub fn verify_response(self, challenge_response: &str) -> FpResult<()> {
-        let PhoneEmailChallengeState { h_code } = self;
-        if h_code != sha256(challenge_response.as_bytes()).to_vec() {
+    pub fn verify_response(&self, challenge_response: &str) -> FpResult<()> {
+        let PhoneEmailChallengeState { h_code, .. } = self;
+        if h_code != &sha256(challenge_response.as_bytes()).to_vec() {
             return Err(ErrorWithCode::IncorrectPin.into());
         };
         Ok(())
@@ -298,43 +299,43 @@ impl SmsClient {
     }
 }
 
-impl SmsClient {
-    #[tracing::instrument(skip_all)]
-    pub async fn send_challenge_non_blocking(
-        &self,
-        state: &State,
-        tenant: Option<&Tenant>,
-        destination: PhoneNumber,
-        sandbox_id: Option<SandboxId>,
-    ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
-        // Send non-blocking to prevent us from returning the challenge data to the frontend while
-        // we wait for twilio latency
-        if destination.is_fixture_phone_number() && sandbox_id.is_none() {
-            return Err(UserError::FixtureCIInLive.into());
-        }
-        let code = if destination.is_fixture_phone_number() {
-            // For our one fixture number in sandbox mode, we want the 2fac code to be fixed
-            // to make it easy to test
-            PiiString::from("000000")
-        } else {
-            PiiString::from(crypto::random::gen_rand_n_digit_code(6))
-        };
-        let h_code = sha256(code.leak().as_bytes()).to_vec();
-
-        // Oneshot channel to send an error back from async message sending
-        let (tx, rx) = oneshot::channel();
-
-        let message = SmsMessage::Otp {
-            tenant_name: tenant.map(|t| t.name.clone()),
-            code,
-        };
-        let t_id = tenant.map(|t| t.id.clone());
-        self.send_message_non_blocking(state, message, destination, t_id, tx)
-            .await?;
-
-        let state = PhoneEmailChallengeState { h_code };
-        Ok((rx, state))
+#[tracing::instrument(skip_all)]
+pub async fn send_sms_challenge_non_blocking(
+    state: &State,
+    tenant: Option<&Tenant>,
+    destination: PhoneNumber,
+    sandbox_id: Option<SandboxId>,
+) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
+    // Send non-blocking to prevent us from returning the challenge data to the frontend while
+    // we wait for twilio latency
+    if destination.is_fixture_phone_number() && sandbox_id.is_none() {
+        return Err(UserError::FixtureCIInLive.into());
     }
+    let code = if destination.is_fixture_phone_number() {
+        // For our one fixture number in sandbox mode, we want the 2fac code to be fixed
+        // to make it easy to test
+        PiiString::from("000000")
+    } else {
+        PiiString::from(crypto::random::gen_rand_n_digit_code(6))
+    };
+    let h_code = sha256(code.leak().as_bytes()).to_vec();
+
+    // Oneshot channel to send an error back from async message sending
+    let (tx, rx) = oneshot::channel();
+
+    let contact_info = destination.e164();
+    let message = SmsMessage::Otp {
+        tenant_name: tenant.map(|t| t.name.clone()),
+        code,
+    };
+    let t_id = tenant.map(|t| t.id.clone());
+    state
+        .sms_client
+        .send_message_non_blocking(state, message, destination, t_id, tx)
+        .await?;
+
+    let state = PhoneEmailChallengeState { h_code, contact_info };
+    Ok((rx, state))
 }
 
 pub struct BoSessionSmsInfo<'a> {

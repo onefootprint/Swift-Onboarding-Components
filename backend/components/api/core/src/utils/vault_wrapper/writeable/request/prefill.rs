@@ -20,7 +20,6 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSource;
 use newtypes::Fingerprint;
-use newtypes::IdentityDataKind as IDK;
 use newtypes::TenantId;
 use newtypes::VaultKind;
 use std::collections::HashMap;
@@ -40,9 +39,12 @@ pub struct PrefillData {
     phantom: PhantomData<()>,
 }
 
+/// Prefill happens in two steps: first, when the ScopedVault is created in POST /hosted/identify,
+/// we prefill auth methods into the newly created ScopedVault. Second, when onboarding begins, we
+/// prefill other KYC data that's used by the playbook.
 pub enum PrefillKind<'a> {
     /// After the identify flow, prefill login methods
-    Identify,
+    LoginMethods,
     /// When starting onboarding, prefill all data required by the playbook. We shouldn't do this
     /// before creating the Workflow in the database, otherwise we'll unintentionally give decrypt
     /// access to all prefilled data.
@@ -51,12 +53,12 @@ pub enum PrefillKind<'a> {
 
 impl<'a> PrefillKind<'a> {
     fn allow_prefilling(&self, di: &DataIdentifier) -> bool {
+        let is_ci = di.is_unverified_ci() || di.is_verified_ci();
         match self {
-            Self::Identify => matches!(
-                di,
-                DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
-            ),
-            Self::Onboarding(_) => true,
+            Self::LoginMethods => is_ci,
+            // At onboarding time, we don't want to try to prefill CI again since we already did at
+            // ScopedVault creation time during the identify flow.
+            Self::Onboarding(_) => !is_ci,
         }
     }
 }
@@ -77,7 +79,7 @@ impl<Type> VaultWrapper<Type> {
     ) -> FpResult<PrefillData> {
         let destination_vw = match kind {
             // No existing destination ScopedVault when we're prefilling login methods
-            PrefillKind::Identify => None,
+            PrefillKind::LoginMethods => None,
             // There's only an existing destination ScopedVault during Onboarding time
             PrefillKind::Onboarding(sv) => {
                 let sv_id = sv.id.clone();
@@ -116,8 +118,13 @@ impl<Type> VaultWrapper<Type> {
                     .and_then(|dl| dl.origin_id.as_ref())
                     .is_some_and(|id| &d.lifetime.id == id)
             })
-            // Only autofill data into the that must be collected by the tenant's playbook
-            .filter(|d| pb.must_collect_data.iter().any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(&d.lifetime.kind)))
+            .filter(|d| {
+                let collected_by_pb =
+                    pb.must_collect_data.iter().flat_map(|cdo| cdo.data_identifiers()).flatten().contains(&d.lifetime.kind);
+                // Only prefill data into the that must be collected by the tenant's playbook.
+                // Except verified CI, we should always prefill
+                collected_by_pb || d.lifetime.kind.is_verified_ci()
+            })
             .filter(|d| kind.allow_prefilling(&d.lifetime.kind))
             // Note: this won't support portable documents
             .filter_map(|d| if let PieceOfData::Vd(d) = &d.data { Some(d) } else { None })
@@ -141,7 +148,7 @@ impl<Type> VaultWrapper<Type> {
         let old_ci_dls = data
             .iter()
             .map(|d| d.kind.clone())
-            .filter(|di| di.is_contact_info())
+            .filter(|di| di.is_unverified_ci())
             .filter_map(|di| self.get_lifetime(&di).map(|dl| (di, dl.id.clone())))
             .collect_vec();
         let old_ci = state

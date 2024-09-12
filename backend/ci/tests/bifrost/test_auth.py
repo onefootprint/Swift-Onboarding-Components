@@ -145,6 +145,7 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
     assert body["status"] == "none"
     assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") == {
+        "id.verified_phone_number",
         "id.phone_number",
         "id.email",
     }

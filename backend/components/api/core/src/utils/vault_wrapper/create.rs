@@ -77,7 +77,7 @@ impl VaultWrapper<Person> {
             return Err(UserError::FixtureCIInLive.into());
         }
 
-        if data.iter().any(|(di, _)| !di.is_contact_info()) {
+        if data.iter().any(|(di, _)| !di.is_unverified_ci()) {
             return Err(
                 AssertionError("Cannot create vault with initial data other than phone/email").into(),
             );

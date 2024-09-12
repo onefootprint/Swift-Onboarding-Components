@@ -44,7 +44,9 @@ fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
             | IdentityDataKind::State
             | IdentityDataKind::Zip
             | IdentityDataKind::Email
+            | IdentityDataKind::VerifiedEmail
             | IdentityDataKind::PhoneNumber
+            | IdentityDataKind::VerifiedPhoneNumber
             | IdentityDataKind::VisaExpirationDate
             | IdentityDataKind::Nationality
             | IdentityDataKind::Citizenships

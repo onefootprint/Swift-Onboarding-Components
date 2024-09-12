@@ -155,6 +155,16 @@ impl DeriveValues for IdentityData {
                     parsed: (),
                 }],
             },
+            IdentityData::VerifiedEmail(email) => vec![DataIdentifierValue {
+                di: DataIdentifier::Id(IdentityDataKind::Email),
+                value: email.clone(),
+                parsed: (),
+            }],
+            IdentityData::VerifiedPhoneNumber(phone_number) => vec![DataIdentifierValue {
+                di: DataIdentifier::Id(IdentityDataKind::PhoneNumber),
+                value: phone_number.clone(),
+                parsed: (),
+            }],
         }
     }
 }

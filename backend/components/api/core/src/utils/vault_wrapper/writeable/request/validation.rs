@@ -5,6 +5,7 @@ use crate::utils::vault_wrapper::PrefillData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
+use api_errors::ValidationError;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::scoped_vault::ScopedVault;
@@ -103,7 +104,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.sv.id), None, false)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.sv.id), None, true)?;
         let request = ValidatedDataRequest {
             data,
             old_ci,
@@ -128,6 +129,14 @@ impl<Type> VaultWrapper<Type> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
+
+        let is_setting_verified_ci = dis.iter().any(|x| x.is_verified_ci());
+        if is_setting_verified_ci && actor.is_none() && !for_replacing_ci {
+            return ValidationError(
+                "Can only set verified CI in tenant-facing API or challenge verification flow",
+            )
+            .into();
+        }
 
         let irreplaceable_ci = if !for_replacing_ci {
             vec![IDK::PhoneNumber.into(), IDK::Email.into()]

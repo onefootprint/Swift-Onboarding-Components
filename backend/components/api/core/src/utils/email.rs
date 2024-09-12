@@ -316,11 +316,12 @@ pub fn send_email_challenge_non_blocking(
     let (tx, rx) = oneshot::channel();
 
     let state = state.clone();
-    let email2 = email.email.clone();
+    let email = email.email.clone();
+    let contact_info = email.clone();
     let fut = async move {
         let res = state
             .sendgrid_client
-            .send_email_otp_verify_email(&state, email2, code, tenant_url)
+            .send_email_otp_verify_email(&state, email, code, tenant_url)
             .await;
         let Err(e) = res else {
             return;
@@ -337,5 +338,5 @@ pub fn send_email_challenge_non_blocking(
     };
     tokio::spawn(fut.in_current_span());
 
-    Ok((rx, PhoneEmailChallengeState { h_code }))
+    Ok((rx, PhoneEmailChallengeState { h_code, contact_info }))
 }

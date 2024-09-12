@@ -15,6 +15,7 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
+use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_core::FpResult;
 use api_wire_types::LoginChallengeRequest;
 use api_wire_types::LoginChallengeResponse;
@@ -103,10 +104,8 @@ pub async fn post(
         ChallengeKind::Sms => {
             let phone_number = vw.get_decrypted_phone(&state).await?;
             let t = tenant.as_ref();
-            let (rx, challenge_state) = state
-                .sms_client
-                .send_challenge_non_blocking(&state, t, phone_number.clone(), sandbox_id)
-                .await?;
+            let (rx, challenge_state) =
+                send_sms_challenge_non_blocking(&state, t, phone_number.clone(), sandbox_id).await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)

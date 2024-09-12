@@ -32,11 +32,13 @@ impl DataIdentifier {
         let global_salt = GlobalFingerprintKind::try_from(self)
             .ok()
             .map(FingerprintSalt::from);
-        // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
+        // Generate a globally-scoped fingerprint for use to compute global composite fingerprints, but
+        // don't save it to the DB
         let transient_global_salt = TransientGlobalFingerprintKind::try_from(self)
             .ok()
             .map(FingerprintSalt::from);
-        // Generate a fingerprint for use to compute a composite fingerprint, but don't save it to the DB
+        // Generate a tenant-scoped fingerprint for use to compute tenant-scoped composite fingerprints, but
+        // don't save it to the DB
         let transient_tenant_salt = TransientTenantFingerprintKind::try_from(self)
             .ok()
             .zip(tenant_id)
@@ -140,6 +142,8 @@ impl FingerprintSalt {
 
 #[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq, Hash)]
 pub enum GlobalFingerprintKind {
+    VerifiedPhoneNumber,
+    VerifiedEmail,
     PhoneNumber,
     Email,
     Ssn9,
@@ -153,6 +157,8 @@ impl GlobalFingerprintKind {
 
     pub fn di(&self) -> DataIdentifier {
         match self {
+            GlobalFingerprintKind::VerifiedPhoneNumber => DataIdentifier::from(IDK::VerifiedPhoneNumber),
+            GlobalFingerprintKind::VerifiedEmail => DataIdentifier::from(IDK::VerifiedEmail),
             GlobalFingerprintKind::PhoneNumber => DataIdentifier::from(IDK::PhoneNumber),
             GlobalFingerprintKind::Email => DataIdentifier::from(IDK::Email),
             GlobalFingerprintKind::Ssn9 => DataIdentifier::from(IDK::Ssn9),
@@ -286,6 +292,12 @@ mod tests {
         TenantId::test_data("org_hello_world".into())
     }
 
+    #[test_case(
+        GlobalFingerprintKind::VerifiedPhoneNumber.into() => "8047594722b6d72b52515c3daf8add787ec92f2a2829385fdf705679ae0fc678".to_string()
+    )]
+    #[test_case(
+        GlobalFingerprintKind::VerifiedEmail.into() => "0fc5b25b9556a078d4ef5c9687c43baf3e79cadc61f5cc1cbe5ecee1de61699e".to_string()
+    )]
     #[test_case(
         GlobalFingerprintKind::PhoneNumber.into() => "d3d059cf8cb307035ab86a728dc4a1774a9dad641925d1b54bfd767c75352797".to_string()
     )]

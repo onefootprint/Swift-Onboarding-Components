@@ -19,6 +19,7 @@ use macros::test_state;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::fingerprint_salt::GlobalFingerprintKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
@@ -68,12 +69,12 @@ async fn test_prefill_data(state: &mut State) {
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::LoginMethods)
         .await
         .unwrap();
     assert_have_same_elements(
         prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
-        vec![IDK::PhoneNumber.into()],
+        vec![IDK::VerifiedPhoneNumber.into(), IDK::PhoneNumber.into()],
     );
     assert_have_same_elements(
         prefill_data
@@ -82,6 +83,8 @@ async fn test_prefill_data(state: &mut State) {
             .map(|(s, _)| (s.di(), s.scope()))
             .collect(),
         vec![
+            (IDK::VerifiedPhoneNumber.into(), Some(FingerprintScope::Global)),
+            (IDK::VerifiedPhoneNumber.into(), Some(FingerprintScope::Tenant)),
             (IDK::PhoneNumber.into(), Some(FingerprintScope::Global)),
             (IDK::PhoneNumber.into(), Some(FingerprintScope::Tenant)),
         ],
@@ -89,6 +92,12 @@ async fn test_prefill_data(state: &mut State) {
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
     assert!(phone_ci.is_otp_verified);
     assert!(phone_ci.is_verified);
+
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .await
+        .unwrap();
+    assert!(prefill_data.data.is_empty());
 
     //
     // User finishes onboarding onto tenant1 - adds the rest of data and portablizes it
@@ -113,9 +122,13 @@ async fn test_prefill_data(state: &mut State) {
         .await
         .unwrap();
 
-    // When the user starts onboarding onto tenant2, we should have prefill data!
+    //
+    // When the user starts onboarding onto tenant2, we should have prefill data! We first start
+    // with PrefillKind::LoginMethods which happens when the SV is created in /identify/verify
+    //
+
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::LoginMethods)
         .await
         .unwrap();
 
@@ -125,10 +138,7 @@ async fn test_prefill_data(state: &mut State) {
         vec![
             IDK::Email.into(),
             IDK::PhoneNumber.into(),
-            IDK::FirstName.into(),
-            IDK::LastName.into(),
-            IDK::Ssn4.into(),
-            // Omit ssn9 and dob since the obc didn't request them
+            IDK::VerifiedPhoneNumber.into(),
         ],
     );
     // Check prefill fingerprints
@@ -142,11 +152,8 @@ async fn test_prefill_data(state: &mut State) {
         (IDK::Email.into(), Some(FingerprintScope::Tenant)),
         (IDK::PhoneNumber.into(), Some(FingerprintScope::Global)),
         (IDK::PhoneNumber.into(), Some(FingerprintScope::Tenant)),
-        (IDK::FirstName.into(), Some(FingerprintScope::Tenant)),
-        (IDK::LastName.into(), Some(FingerprintScope::Tenant)),
-        (IDK::FirstName.into(), None),
-        (IDK::LastName.into(), None),
-        (IDK::Ssn4.into(), None),
+        (IDK::VerifiedPhoneNumber.into(), Some(FingerprintScope::Global)),
+        (IDK::VerifiedPhoneNumber.into(), Some(FingerprintScope::Tenant)),
     ];
     assert_have_same_elements(fingerprints, expected_fingerprints);
     // Check prefill contact info
@@ -156,6 +163,48 @@ async fn test_prefill_data(state: &mut State) {
     let email_ci = prefill_data.old_ci.get(&IDK::Email.into()).unwrap();
     assert!(!email_ci.is_otp_verified);
     assert!(!email_ci.is_verified);
+
+    // Write the prefill login methods
+    let su2_id = data.su2.id.clone();
+    state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
+            vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
+            Ok(())
+        })
+        .await
+        .unwrap();
+
+    //
+    // Then prefill the rest of the data in POST /hosted/onboarding
+    //
+
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .await
+        .unwrap();
+
+    // Make sure prefill data has what we expect
+    assert_have_same_elements(
+        prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
+        // Omit ssn9 and dob since the obc didn't request them
+        vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Ssn4.into()],
+    );
+    // Check prefill fingerprints
+    let fingerprints = prefill_data
+        .fingerprints
+        .iter()
+        .map(|(s, _)| (s.di(), s.scope()))
+        .collect();
+    let expected_fingerprints = vec![
+        (IDK::FirstName.into(), Some(FingerprintScope::Tenant)),
+        (IDK::LastName.into(), Some(FingerprintScope::Tenant)),
+        (IDK::FirstName.into(), None),
+        (IDK::LastName.into(), None),
+        (IDK::Ssn4.into(), None),
+    ];
+    assert_have_same_elements(fingerprints, expected_fingerprints);
 
     //
     // User starts onboarding onto tenant
@@ -185,6 +234,7 @@ async fn test_prefill_data(state: &mut State) {
         vec![
             IDK::Email.into(),
             IDK::PhoneNumber.into(),
+            IDK::VerifiedPhoneNumber.into(),
             IDK::FirstName.into(),
             IDK::LastName.into(),
             IDK::Dob.into(),
@@ -196,6 +246,7 @@ async fn test_prefill_data(state: &mut State) {
     let expected_vw2_data = vec![
         IDK::Email.into(),
         IDK::PhoneNumber.into(),
+        IDK::VerifiedPhoneNumber.into(),
         IDK::FirstName.into(),
         IDK::LastName.into(),
         IDK::Ssn4.into(),
@@ -237,6 +288,7 @@ async fn test_prefill_data(state: &mut State) {
         .unwrap();
     let expected_vw2_data = vec![
         IDK::Email.into(),
+        IDK::VerifiedPhoneNumber.into(),
         IDK::PhoneNumber.into(),
         IDK::FirstName.into(),
         IDK::LastName.into(),
@@ -277,12 +329,16 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // We should only prefill phone and email from this auth playbook
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.auth_pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.auth_pb2, PrefillKind::LoginMethods)
         .await
         .unwrap();
     assert_have_same_elements(
         prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
-        vec![IDK::Email.into(), IDK::PhoneNumber.into()],
+        vec![
+            IDK::Email.into(),
+            IDK::PhoneNumber.into(),
+            IDK::VerifiedPhoneNumber.into(),
+        ],
     );
 
     // User finishes auth onto tenant2
@@ -323,6 +379,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
         .unwrap();
     let expected_vw2_data = vec![
         IDK::Email.into(),
+        IDK::VerifiedPhoneNumber.into(),
         IDK::PhoneNumber.into(),
         IDK::FirstName.into(),
         IDK::LastName.into(),
@@ -360,13 +417,28 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
 
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
     // Start w just phone and email for a user that went through identify flow
+    let phone_number = PiiString::new("+15555550100".into());
     let data = vec![
         (IDK::Email.into(), PiiString::new("test1@onefootprint.com".into())),
-        (IDK::PhoneNumber.into(), PiiString::new("+15555550100".into())),
+        (IDK::PhoneNumber.into(), phone_number.clone()),
     ];
     vw.patch_data_test(conn, data, true).unwrap();
+
+    // Mark the phone number as verified
+    let args = ValidateArgs::for_bifrost(false);
+    let data = HashMap::from_iter([(IDK::VerifiedPhoneNumber.into(), phone_number)]);
+    let data = DataRequest::clean_and_validate_str(data, args)
+        .unwrap()
+        .filter(|di| !matches!(di, DataIdentifier::Id(IDK::PhoneNumber)));
+    let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
-    vw.on_otp_verified(conn, IDK::PhoneNumber.into()).unwrap();
+    vw.mark_ci_as_verified(
+        conn,
+        data,
+        DataLifetimeSource::LikelyHosted,
+        ContactInfoKind::Phone,
+    )
+    .unwrap();
 
     TestData {
         su1: su1.into_inner(),

@@ -113,12 +113,14 @@ impl DataRequest {
         }
 
         // Remove any entries that will be overwritten with derived entries.
-        // TODO: I don't love that this has to be independently maintained. But all except ssn4
-        // have protection - ssn4 is unique because it is both derived _and_ can be written
+        // TODO: I don't love that this has to be independently maintained. But these are unique because DIs
+        // can be both derived _and_ can be written explicitly
         let derived_dis = map
             .keys()
             .flat_map(|di| match di {
                 DataIdentifier::Id(IDK::Ssn9) => vec![IDK::Ssn4.into()],
+                DataIdentifier::Id(IDK::VerifiedEmail) => vec![IDK::Email.into()],
+                DataIdentifier::Id(IDK::VerifiedPhoneNumber) => vec![IDK::PhoneNumber.into()],
                 _ => vec![],
             })
             .collect_vec();
@@ -170,5 +172,20 @@ impl DataRequest {
             json_fields,
         };
         Ok(request)
+    }
+
+    /// Filters out the elements that don't match DataIdentifier predicate.
+    /// In other words, filters out all items for which f(&di) returns false.
+    pub fn filter<F>(self, mut f: F) -> Self
+    where
+        F: FnMut(&DataIdentifier) -> bool,
+    {
+        let Self {
+            mut data,
+            mut json_fields,
+        } = self;
+        data.retain(|di, _| f(di));
+        json_fields.retain(f);
+        Self { data, json_fields }
     }
 }

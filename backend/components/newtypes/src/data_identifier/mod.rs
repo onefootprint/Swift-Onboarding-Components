@@ -174,7 +174,14 @@ impl DataIdentifier {
         )
     }
 
-    pub fn is_contact_info(&self) -> bool {
+    pub fn is_verified_ci(&self) -> bool {
+        matches!(
+            self,
+            Self::Id(IdentityDataKind::VerifiedPhoneNumber) | Self::Id(IdentityDataKind::VerifiedEmail)
+        )
+    }
+
+    pub fn is_unverified_ci(&self) -> bool {
         matches!(
             self,
             Self::Id(IdentityDataKind::PhoneNumber) | Self::Id(IdentityDataKind::Email)

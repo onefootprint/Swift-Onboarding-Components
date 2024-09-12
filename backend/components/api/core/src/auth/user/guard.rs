@@ -18,10 +18,12 @@ impl ImplDisplayGuardError for UserAuthScope {}
 fn can_decrypt(di: &DataIdentifier, token_scopes: &[UserAuthScope]) -> bool {
     match di {
         DataIdentifier::Id(id) => match id {
-            IDK::PhoneNumber | IDK::Email => UserAuthScope::BasicProfile
-                .or(UserAuthScope::SignUp)
-                .or(UserAuthScope::Auth)
-                .is_met(token_scopes),
+            IDK::PhoneNumber | IDK::Email | IDK::VerifiedPhoneNumber | IDK::VerifiedEmail => {
+                UserAuthScope::BasicProfile
+                    .or(UserAuthScope::SignUp)
+                    .or(UserAuthScope::Auth)
+                    .is_met(token_scopes)
+            }
             IDK::AddressLine1
             | IDK::AddressLine2
             | IDK::Dob

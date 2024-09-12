@@ -21,6 +21,7 @@ use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
+use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::BusinessDataKind as BDK;
@@ -43,6 +44,7 @@ use newtypes::WebhookEvent;
 type NewContactInfo = (DataIdentifier, ContactInfo);
 
 pub struct PatchDataResult {
+    pub new_vd: Vec<VaultData>,
     pub new_ci: Vec<NewContactInfo>,
     pub seqno: DataLifetimeSeqno,
     pub new_version: ScopedVaultVersionNumber,
@@ -123,7 +125,9 @@ impl<Type> WriteableVw<Type> {
             ScopedVault::update(conn, &self.sv.id, update)?;
         }
 
-        // Add timeline event for all the newly added data
+        // Add timeline event for all the newly added data.
+        // NOTE: this must happen after saving data for the seqno to be correct on the timeline event.
+        // TODO let's make this accept the seqno as an argument
         self.add_timeline_event(conn, keys, actor, is_prefill)?;
 
         // Zip new CIs with their DI
@@ -136,6 +140,7 @@ impl<Type> WriteableVw<Type> {
             .collect();
 
         let result = PatchDataResult {
+            new_vd: vd,
             new_ci,
             seqno,
             new_version,

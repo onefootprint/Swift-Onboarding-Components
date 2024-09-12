@@ -123,11 +123,8 @@ pub async fn create_non_portable_vault(
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
                 let sources = DataLifetimeSources::single(source);
-                let PatchDataResult {
-                    new_ci: _,
-                    seqno: _,
-                    new_version,
-                } = uvw.patch_data(conn, request, sources, Some(actor))?;
+                let PatchDataResult { new_version, .. } =
+                    uvw.patch_data(conn, request, sources, Some(actor))?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 

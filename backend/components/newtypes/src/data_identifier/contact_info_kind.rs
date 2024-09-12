@@ -91,11 +91,18 @@ impl From<ContactInfoKind> for AuthMethodKind {
     }
 }
 
-impl From<ContactInfoKind> for DataIdentifier {
-    fn from(value: ContactInfoKind) -> Self {
-        match value {
-            ContactInfoKind::Phone => DataIdentifier::Id(IdentityDataKind::PhoneNumber),
-            ContactInfoKind::Email => DataIdentifier::Id(IdentityDataKind::Email),
+impl ContactInfoKind {
+    pub fn verified_di(&self) -> DataIdentifier {
+        match self {
+            Self::Phone => IdentityDataKind::VerifiedPhoneNumber.into(),
+            Self::Email => IdentityDataKind::VerifiedEmail.into(),
+        }
+    }
+
+    pub fn di(&self) -> DataIdentifier {
+        match self {
+            Self::Phone => IdentityDataKind::PhoneNumber.into(),
+            Self::Email => IdentityDataKind::Email.into(),
         }
     }
 }
