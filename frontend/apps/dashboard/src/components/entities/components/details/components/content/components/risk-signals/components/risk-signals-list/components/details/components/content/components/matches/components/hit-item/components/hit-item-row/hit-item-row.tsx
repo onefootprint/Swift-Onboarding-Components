@@ -23,7 +23,7 @@ const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlM
   const renderLocationUrlValue = (url: string) => (
     <Stack align="center" justify="space-between">
       <Url>{url}</Url>
-      <CopyButton ariaLabel={t('copy')} contentToCopy={url} tooltipPosition="bottom">
+      <CopyButton ariaLabel={t('copy')} contentToCopy={url} tooltip={{ position: 'bottom' }}>
         <IcoCopy16 />
       </CopyButton>
     </Stack>

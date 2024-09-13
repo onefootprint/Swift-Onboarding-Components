@@ -14,12 +14,15 @@ import Tooltip from '../tooltip';
 export type CopyButtonProps = {
   ariaLabel?: string;
   disable?: boolean;
-  tooltipPosition?: TooltipProps['position'];
-  tooltipText?: string;
-  tooltipTextConfirmation?: string;
   children?: string | React.ReactNode;
   contentToCopy: string;
-  size?: 'compact' | 'default';
+  size?: 'default' | 'large' | 'compact';
+  tooltip?: {
+    position?: TooltipProps['position'];
+    alignment?: TooltipProps['alignment'];
+    text?: string;
+    textConfirmation?: string;
+  };
 };
 
 const HIDE_TIMEOUT = 600;
@@ -29,9 +32,12 @@ let confirmationTimeout: null | ReturnType<typeof setTimeout> = null;
 const CopyButton = ({
   ariaLabel,
   size = 'default',
-  tooltipPosition = 'right',
-  tooltipText,
-  tooltipTextConfirmation,
+  tooltip = {
+    position: 'right',
+    alignment: 'center',
+    text: 'Copy to clipboard',
+    textConfirmation: 'Copied!',
+  },
   children,
   disable,
   contentToCopy,
@@ -39,7 +45,7 @@ const CopyButton = ({
   const { t } = useTranslation('ui');
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
-  const CopyIcon = size === 'compact' ? IcoCopy16 : IcoCopy24;
+  const CopyIcon = size === 'large' ? IcoCopy24 : IcoCopy16;
 
   useEffect(
     () => () => {
@@ -69,12 +75,13 @@ const CopyButton = ({
   };
 
   const handleText = () => {
-    const tooltip = tooltipText ?? t('components.copy-button.tooltip-text-default');
-    const confirmation = tooltipTextConfirmation ?? t('components.copy-button.tooltip-text-confirmation-default');
+    const tooltipText = tooltip.text ?? t('components.copy-button.tooltip-text-default');
+    const tooltipTextConfirmation =
+      tooltip.textConfirmation ?? t('components.copy-button.tooltip-text-confirmation-default');
     if (isMobile) {
-      return confirmation;
+      return tooltipTextConfirmation;
     }
-    return shouldShowConfirmation ? confirmation : tooltip;
+    return shouldShowConfirmation ? tooltipTextConfirmation : tooltipText;
   };
 
   useEffect(() => {
@@ -83,7 +90,7 @@ const CopyButton = ({
 
   return (
     <Tooltip
-      position={tooltipPosition}
+      position={tooltip.position}
       alignment="center"
       text={handleText()}
       disabled={disable}
@@ -104,8 +111,7 @@ const CopyButton = ({
           aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
           disabled={disable}
           onClick={handleClick}
-          height={size === 'compact' ? '16px' : '32px'}
-          width={size === 'compact' ? '16px' : '32px'}
+          size={size}
         >
           <CopyIcon color={disable ? 'tertiary' : undefined} />
         </IconButton>

@@ -1,6 +1,5 @@
 import { IcoClose24 } from '@onefootprint/icons';
 import type { Meta, StoryFn } from '@storybook/react';
-
 import type { IconButtonProps } from './icon-button';
 import IconButton from './icon-button';
 
@@ -11,17 +10,22 @@ export default {
     'aria-label': {
       control: 'text',
       description: 'Aria Label for accessibility',
-      name: 'ariaLabel *',
+      required: true,
+    },
+    children: {
+      control: 'object',
+      description: 'Icon component to be rendered',
+      required: true,
+    },
+    variant: {
+      control: 'select',
+      options: ['ghost', 'primary', 'secondary'],
+      description: 'Button variant',
       required: true,
     },
     onClick: {
+      action: 'clicked',
       description: 'Callback function triggered upon click',
-      required: false,
-    },
-    children: {
-      control: 'select',
-      description: 'Icon to be rendered',
-      name: 'Icon *',
     },
     disabled: {
       control: 'boolean',
@@ -31,23 +35,19 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    variant: {
-      control: 'select',
-      options: ['ghost', 'primary', 'secondary'],
-      description: 'Button variant',
-    },
   },
-} satisfies Meta<typeof IconButton>;
+} as Meta<IconButtonProps>;
 
 const Template: StoryFn<IconButtonProps> = ({
   'aria-label': ariaLabel,
-  disabled,
-  onClick,
-  testID,
+  children,
   variant,
+  onClick,
+  disabled,
+  testID,
 }: IconButtonProps) => (
-  <IconButton aria-label={ariaLabel} disabled={disabled} onClick={onClick} testID={testID} variant={variant}>
-    <IcoClose24 color="tertiary" />
+  <IconButton aria-label={ariaLabel} variant={variant} onClick={onClick} disabled={disabled} testID={testID}>
+    {children}
   </IconButton>
 );
 
@@ -55,25 +55,35 @@ export const Ghost = Template.bind({});
 Ghost.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  onClick: console.log, // eslint-disable-line no-console
-  testID: 'icon-button-test-id',
   variant: 'ghost',
+  onClick: () => console.log('clicked'), // eslint-disable-line no-console
+  testID: 'icon-button-test-id',
 };
 
 export const Primary = Template.bind({});
 Primary.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  onClick: console.log, // eslint-disable-line no-console
-  testID: 'icon-button-test-id',
   variant: 'primary',
+  onClick: () => console.log('clicked'), // eslint-disable-line no-console
+  testID: 'icon-button-test-id',
 };
 
 export const Secondary = Template.bind({});
 Secondary.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  onClick: console.log, // eslint-disable-line no-console
-  testID: 'icon-button-test-id',
   variant: 'secondary',
+  onClick: () => console.log('clicked'), // eslint-disable-line no-console
+  testID: 'icon-button-test-id',
+};
+
+export const Disabled = Template.bind({});
+Disabled.args = {
+  'aria-label': 'Close',
+  children: <IcoClose24 />,
+  variant: 'primary',
+  disabled: true,
+  onClick: () => console.log('clicked'), // eslint-disable-line no-console
+  testID: 'icon-button-test-id',
 };

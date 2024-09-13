@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { createOverlayBackground } from '../../utils/mixins';
+export type IconButtonSize = 'default' | 'large' | 'compact';
 
 export type IconButtonProps = {
   'aria-label': string;
@@ -10,13 +10,21 @@ export type IconButtonProps = {
   disabled?: boolean;
   testID?: string;
   width?: string;
-  height?: string;
+  size?: IconButtonSize;
   variant?: 'primary' | 'secondary' | 'ghost';
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (
-    { 'aria-label': ariaLabel, children, onClick, disabled, testID, width, height, variant = 'ghost' }: IconButtonProps,
+    {
+      'aria-label': ariaLabel,
+      children,
+      onClick,
+      disabled,
+      testID,
+      size = 'default',
+      variant = 'ghost',
+    }: IconButtonProps,
     ref,
   ) => (
     <Container
@@ -27,60 +35,65 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       tabIndex={0}
       type="button"
       disabled={disabled}
-      $width={width}
-      $height={height}
-      $variant={variant}
+      size={size}
+      variant={variant}
     >
       {children}
     </Container>
   ),
 );
 
-const Container = styled.button<{ $width?: string; $height?: string; $variant?: 'primary' | 'secondary' | 'ghost' }>`
-  ${({ $width, $height, $variant, theme }) => {
+const Container = styled.button<{ size: IconButtonSize; variant?: 'primary' | 'secondary' | 'ghost' }>`
+  ${({ size, variant, theme }) => {
     const { button } = theme.components;
 
     const getVariantStyles = () => {
-      if ($variant === 'primary' || $variant === 'secondary') {
+      const buttonSize = css`
+        height: ${button.size[size].height};
+        width: ${button.size[size].height};
+      `;
+
+      if (variant === 'primary' || variant === 'secondary') {
         return css`
-          background-color: ${button.variant[$variant].bg};
-          border: ${theme.borderWidth[1]} solid ${button.variant[$variant].borderColor};
+          ${buttonSize}
+          background-color: ${button.variant[variant].bg};
+          border: ${theme.borderWidth[1]} solid ${button.variant[variant].borderColor};
           border-radius: ${theme.borderRadius.default};
-          box-shadow: ${button.variant[$variant].boxShadow};
+          box-shadow: ${button.variant[variant].boxShadow};
           svg {
             path {
-              fill: ${button.variant[$variant].color};
+              fill: ${button.variant[variant].color};
             }
           }
 
           &:disabled {
-            background-color: ${button.variant[$variant].disabled.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[$variant].disabled.borderColor};
-            box-shadow: ${button.variant[$variant].disabled.boxShadow};
+            background-color: ${button.variant[variant].disabled.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant[variant].disabled.borderColor};
+            box-shadow: ${button.variant[variant].disabled.boxShadow};
             svg {
               path {
-                fill: ${button.variant[$variant].disabled.color};
+                fill: ${button.variant[variant].disabled.color};
               }
             }
           }
 
           &:hover:enabled {
-            background-color: ${button.variant[$variant].hover.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[$variant].hover.borderColor};
-            box-shadow: ${button.variant[$variant].hover.boxShadow};
+            background-color: ${button.variant[variant].hover.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant[variant].hover.borderColor};
+            box-shadow: ${button.variant[variant].hover.boxShadow};
             svg {
               path {
-                fill: ${button.variant[$variant].hover.color};
+                fill: ${button.variant[variant].hover.color};
               }
             }
           }
 
           &:active:enabled { 
-            background-color: ${button.variant[$variant].active.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[$variant].active.borderColor};
+            background-color: ${button.variant[variant].active.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant[variant].active.borderColor};
             svg {
               path {
-                fill: ${button.variant[$variant].active.color};
+                fill: ${button.variant[variant].active.color};
               }
             }
           }
@@ -88,6 +101,7 @@ const Container = styled.button<{ $width?: string; $height?: string; $variant?: 
       }
 
       return css`
+        ${buttonSize}
         background: none;
         border: none;
         border-radius: ${theme.borderRadius.default};
@@ -98,11 +112,11 @@ const Container = styled.button<{ $width?: string; $height?: string; $variant?: 
         }
 
         &:hover:enabled {
-          ${createOverlayBackground('darken-1', 'primary')};
+          background-color: ${theme.backgroundColor.secondary};
         }
 
         &:active:enabled {
-          ${createOverlayBackground('darken-2', 'primary')};
+            background-color: ${theme.backgroundColor.secondary};
         }
       `;
     };
@@ -113,12 +127,9 @@ const Container = styled.button<{ $width?: string; $height?: string; $variant?: 
       cursor: pointer;
       display: flex;
       justify-content: center;
-      height: ${$height || '32px'};
-      width: ${$width || '32px'};
 
       ${getVariantStyles()}
     `;
   }}
 `;
-
 export default IconButton;

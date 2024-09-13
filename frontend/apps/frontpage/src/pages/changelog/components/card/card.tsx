@@ -45,7 +45,14 @@ const Card = ({ post, hideLine }: CardProps) => {
       <TextContent gridArea="content" direction="column" width="100%" gap={7}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" gap={3}>
           <Title href={`/changelog/${post.slug}`}>{post.title}</Title>
-          <CopyButton ariaLabel={t('cta')} tooltipText={t('cta')} contentToCopy={`${BASE_URL}/${post.slug}`} />
+          <CopyButton
+            ariaLabel={t('cta')}
+            tooltip={{
+              position: 'top',
+              text: t('cta'),
+            }}
+            contentToCopy={`${BASE_URL}/${post.slug}`}
+          />
         </Stack>
         <Author authorImg={post.primary_author.profile_image} authorName={post.primary_author.name} />
         {post.html && <HtmlContent html={post.html} />}

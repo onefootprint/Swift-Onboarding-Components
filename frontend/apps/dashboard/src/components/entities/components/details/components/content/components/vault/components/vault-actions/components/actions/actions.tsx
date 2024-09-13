@@ -82,7 +82,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     <>
       <Dropdown.Root>
         <Dropdown.Trigger>
-          <IconButton variant="secondary" aria-label={t('cta')} height="28px" width="28px">
+          <IconButton variant="secondary" aria-label={t('cta')} size="compact">
             <IcoDotsHorizontal24 />
           </IconButton>
         </Dropdown.Trigger>
@@ -163,7 +163,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : (
     <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
-      <IconButton variant="secondary" aria-label={t('edit-business.label')} height="28px" width="28px">
+      <IconButton variant="secondary" aria-label={t('edit-business.label')} size="compact">
         <IcoPencil16 />
       </IconButton>
     </PermissionGate>

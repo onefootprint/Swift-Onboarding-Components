@@ -61,9 +61,11 @@ const SandboxInput = ({ label, placeholder, setValue, texts, value }: SandboxInp
             <CopyButton
               ariaLabel={texts.copy}
               contentToCopy={value}
-              tooltipPosition="top"
-              tooltipText={texts.copy}
-              tooltipTextConfirmation={texts.copyConfirmation}
+              tooltip={{
+                position: 'top',
+                text: texts.copy,
+                textConfirmation: texts.copyConfirmation,
+              }}
             >
               <InlineButton icon={IcoCopy24} />
             </CopyButton>

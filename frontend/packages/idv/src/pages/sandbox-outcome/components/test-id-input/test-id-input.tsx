@@ -78,12 +78,14 @@ const TestIdInput = () => {
                 size="compact"
                 ariaLabel={t('test-id.button.copy')}
                 contentToCopy={getValues('testID')}
-                tooltipText={t('test-id.button.copy')}
-                tooltipPosition="top"
-                tooltipTextConfirmation={t('test-id.button.copy-confirmation')}
+                tooltip={{
+                  position: 'top',
+                  text: t('test-id.button.copy'),
+                  textConfirmation: t('test-id.button.copy-confirmation'),
+                }}
               />
               <Tooltip text={t('test-id.button.edit')}>
-                <IconButton aria-label={t('test-id.button.edit')} onClick={handleSaveOrEdit}>
+                <IconButton aria-label={t('test-id.button.edit')} onClick={handleSaveOrEdit} size="compact">
                   <IcoPencil16 />
                 </IconButton>
               </Tooltip>
@@ -100,7 +102,7 @@ const TestIdInput = () => {
                 </IconButton>
               </Tooltip>
               <Tooltip text={t('test-id.button.reset')}>
-                <IconButton aria-label={t('test-id.button.reset')} onClick={handleReset}>
+                <IconButton aria-label={t('test-id.button.reset')} onClick={handleReset} size="compact">
                   <IcoClose16 />
                 </IconButton>
               </Tooltip>

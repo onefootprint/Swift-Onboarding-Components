@@ -871,9 +871,9 @@
           "on-watchlist-business": "This business is on a watchlist"
         },
         "id-dropdown": {
-          "footprint-id": "FP ID",
-          "sandbox-id": "Sandbox ID",
-          "external-id": "External ID",
+          "footprint-id": "Copy FP ID",
+          "sandbox-id": "Copy Sandbox ID",
+          "external-id": "Copy External ID",
           "copied": "Copied!",
           "copy-to-clipboard": "Copy to clipboard",
           "copied-to-clipboard": "copied to clipboard"

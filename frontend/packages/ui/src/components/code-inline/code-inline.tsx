@@ -39,8 +39,11 @@ const CodeInline = ({
     <CopyButton
       contentToCopy={children}
       ariaLabel={ariaLabel ?? t('components.code-inline.aria-label-default')}
-      tooltipText={tooltipText ?? t('components.code-inline.tooltip-text-default')}
-      tooltipTextConfirmation={tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')}
+      tooltip={{
+        position: 'top',
+        text: tooltipText ?? t('components.code-inline.tooltip-text-default'),
+        textConfirmation: tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+      }}
     >
       <CodeContent data-truncate={truncate} size={size} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
         {children}

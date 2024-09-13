@@ -52,7 +52,11 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
             </Text>
             <Stack align="center" justify="space-between">
               <SourceUrl>{aml.shareUrl}</SourceUrl>
-              <CopyButton ariaLabel={t('source-url.copy')} contentToCopy={aml.shareUrl} tooltipPosition="bottom">
+              <CopyButton
+                ariaLabel={t('source-url.copy')}
+                contentToCopy={aml.shareUrl}
+                tooltip={{ position: 'bottom' }}
+              >
                 <IcoCopy16 />
               </CopyButton>
             </Stack>

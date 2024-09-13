@@ -64,10 +64,12 @@ const CodeBlock = ({
             ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
             contentToCopy={children}
             size="compact"
-            tooltipText={tooltipText ?? t('components.code-block.tooltip-text-default')}
-            tooltipTextConfirmation={
-              tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')
-            }
+            tooltip={{
+              position: 'top',
+              text: tooltipText ?? t('components.code-block.tooltip-text-default'),
+              textConfirmation:
+                tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+            }}
           />
         )}
       </Stack>

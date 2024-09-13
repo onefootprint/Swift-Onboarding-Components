@@ -40,12 +40,12 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
       // do nothing
     }
   };
-
   return (
     <Container>
       <Main>
-        <Text variant="snippet-2">{mainId?.value}</Text>
-        <CopyButton size="compact" tooltipPosition="top" contentToCopy={mainId?.value || ''} />
+        <CopyButton size="compact" tooltip={{ position: 'top' }} contentToCopy={mainId?.value || ''}>
+          <Text variant="snippet-2">{mainId?.value}</Text>
+        </CopyButton>
       </Main>
       {hasSingleId ? null : (
         <Dropdown.Root>
@@ -82,14 +82,20 @@ const Container = styled(Stack)`
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
     display: flex;
+    overflow: hidden;
   `}
 `;
 
 const Main = styled(Stack)`
   ${({ theme }) => css`
-    padding: ${theme.spacing[2]} ${theme.spacing[3]} ${theme.spacing[2]} calc(${theme.spacing[4]} - ${theme.spacing[1]});
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
     gap: ${theme.spacing[3]};
     align-items: center;
+
+    &:hover {
+      p {
+        color: ${theme.color.secondary};
+    }
   `}
 `;
 

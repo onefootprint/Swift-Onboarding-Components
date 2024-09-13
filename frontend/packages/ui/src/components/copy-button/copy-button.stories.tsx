@@ -1,10 +1,10 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
-
 import type { CopyButtonProps } from './copy-button';
 import CopyButton from './copy-button';
 
-export default {
+const meta: Meta<CopyButtonProps> = {
   component: CopyButton,
   title: 'Components/CopyButton',
   argTypes: {
@@ -18,71 +18,89 @@ export default {
       description: 'Content to be displayed',
       required: false,
     },
-    tooltipPosition: {
-      control: 'select',
-      options: ['top', 'bottom', 'left', 'right'],
-      description: 'Tooltip position',
+    tooltip: {
+      control: 'object',
+      description: 'Tooltip configuration',
       required: false,
-    },
-    tooltipText: {
-      control: {
-        type: 'text',
-      },
-      type: { name: 'string', required: false },
-      description: 'Tooltip text',
-    },
-    tooltipTextConfirmation: {
-      control: {
-        type: 'text',
-      },
-      type: { name: 'string', required: false },
-      description: 'Confirmation tooltip text',
     },
     contentToCopy: {
       control: 'text',
       description: 'Content to be copied',
       required: true,
     },
+    size: {
+      control: 'select',
+      options: ['compact', 'default', 'large'],
+      description: 'Size of the copy button',
+    },
+    disable: {
+      control: 'boolean',
+      description: 'Disable the button',
+    },
   },
-} as Meta;
+};
 
-const Template: StoryFn<CopyButtonProps> = ({
-  ariaLabel,
-  children,
-  contentToCopy,
-  tooltipPosition,
-  tooltipText,
-  tooltipTextConfirmation,
-  disable,
-}: CopyButtonProps) => (
-  <Container>
-    <CopyButton
-      ariaLabel={ariaLabel}
-      tooltipText={tooltipText}
-      tooltipPosition={tooltipPosition}
-      tooltipTextConfirmation={tooltipTextConfirmation}
-      contentToCopy={contentToCopy}
-      disable={disable}
-    >
-      {children}
-    </CopyButton>
-  </Container>
-);
+export default meta;
 
-export const Default = Template.bind({});
-Default.args = {
-  ariaLabel: 'Copy to clipboard',
-  children: 'Copy me',
-  contentToCopy: 'Copy me',
-  tooltipPosition: 'right',
-  tooltipText: 'Copy to clipboard',
-  tooltipTextConfirmation: 'Copied!',
-  disable: false,
+type Story = StoryObj<typeof CopyButton>;
+
+export const Default: Story = {
+  args: {
+    size: 'default',
+    ariaLabel: 'Copy to clipboard',
+    contentToCopy: 'Copy me',
+    tooltip: {
+      position: 'right',
+      text: 'Copy to clipboard',
+      textConfirmation: 'Copied!',
+    },
+    disable: false,
+  },
+  render: args => (
+    <Container>
+      <CopyButton {...args} />
+    </Container>
+  ),
+};
+
+export const DefaultActive: Story = {
+  ...Default,
+  parameters: { pseudo: { hover: true } },
+  render: args => {
+    useEffect(() => {
+      document.querySelector<HTMLButtonElement>('button[aria-label="Copy to clipboard"]')?.focus();
+    }, []);
+    return (
+      <Container>
+        <CopyButton {...args} />
+      </Container>
+    );
+  },
+};
+
+export const Disabled: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    disable: true,
+  },
+};
+
+export const WithChildren: Story = {
+  args: {
+    ...Default.args,
+    children: 'Copy me',
+  },
+  render: args => (
+    <Container>
+      <CopyButton {...args}>{args.children}</CopyButton>
+    </Container>
+  ),
 };
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  padding: 20px;
 `;
