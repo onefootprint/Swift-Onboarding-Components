@@ -15,6 +15,7 @@ aws-smithy-async = { workspace = true }
 aws-smithy-runtime-api = { workspace = true }
 clap = { workspace = true }
 chrono = { workspace = true }
+derive_more = { workspace = true }
 env_logger = { workspace = true }
 futures= { workspace = true }
 indicatif = { workspace = true }

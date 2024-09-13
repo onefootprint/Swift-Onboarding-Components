@@ -77,7 +77,7 @@ pub async fn decrypt_cmd(
     };
 
     let mut enc_data_key_stream = s3_client
-        .list_latest_enc_data_keys_unordered(concurrency_limit, records)
+        .enc_data_keys_unordered(concurrency_limit, records)
         .boxed();
 
     // Unwrap all necessary keys upfront so we can take advantage of the YubiKey's "cache" tap
@@ -112,7 +112,12 @@ pub async fn decrypt_cmd(
 
     enc_data_key_stream
         .try_for_each_concurrent(concurrency_limit, |enc_data_key| {
-            let EncDataKey { fp_id, field, key } = enc_data_key;
+            let EncDataKey {
+                fp_id,
+                version,
+                field,
+                key,
+            } = enc_data_key;
 
             let identity = identities.identity(&key).cloned();
             let output_dir = output_dir.clone();
@@ -128,7 +133,11 @@ pub async fn decrypt_cmd(
                     bail!("No identity found for record: {}", key);
                 };
 
-                let record_dir = output_dir.as_path().join(&fp_id.fp_id).join(&field);
+                let record_dir = output_dir
+                    .as_path()
+                    .join(&fp_id.fp_id)
+                    .join(version.to_string())
+                    .join(field.as_str());
 
                 let EncryptedRecord {
                     e_data,
@@ -204,9 +213,17 @@ async fn read_records_file(
         .map(move |line| -> Result<FpIdFields> {
             let line =
                 serde_json::from_str::<ListRecordsLine>(&line?).with_context(|| "malformed record line")?;
-            let ListRecordsLine { fp_id, fields } = line;
+            let ListRecordsLine {
+                fp_id,
+                version,
+                fields,
+            } = line;
             let fp_id = FpId::new(&bucket_prefix, &fp_id)?;
-            Ok(FpIdFields { fp_id, fields })
+            Ok(FpIdFields {
+                fp_id,
+                version,
+                fields,
+            })
         });
 
     Ok(stream)

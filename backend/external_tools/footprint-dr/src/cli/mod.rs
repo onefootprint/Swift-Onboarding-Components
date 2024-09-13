@@ -21,6 +21,7 @@ mod get_external_id;
 mod list_records;
 mod list_vaults;
 mod login;
+mod manifest;
 mod s3_client;
 mod status;
 mod wire_types;

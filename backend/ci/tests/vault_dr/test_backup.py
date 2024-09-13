@@ -8,20 +8,22 @@ from tests.constants import (
     FAKE_WRAPPED_RECOVERY_KEY_B64,
 )
 from tests.vault_dr.utils import *
-from tests.utils import file_contents, patch, post, get
+from tests.utils import file_contents, patch_raw, post, post_raw, get
 
 
-FP_ID_1_DATA = {
+FINAL_FP_ID_1_DATA = {
     "id.first_name": "billy",
     "id.last_name": "bob",
     "id.phone_number": "+123121234",
     "id.email": "abc123@onefootprint.com",
 }
 
-FP_ID_2_DATA = {
+FINAL_FP_ID_2_DATA = {
     "id.first_name": "alice",
     "id.last_name": "wonderland",
     "id.phone_number": "+2222222222",
+    "document.id_card.front.image": file_contents("drivers_license.front.png"),
+    "document.id_card.front.latest_upload": file_contents("drivers_license.front.png"),
 }
 
 INVALID_API_ROOT = "http://127.0.0.1:123"
@@ -35,76 +37,82 @@ def test_footprint_dr_backup(tenant, tmp_path):
     cfg = enroll_tenant_in_live_vdr(tenant)
 
     expected_num_blobs = 0
-    expected_num_manifests = 0
 
     # Vault some data for backup.
-    body = post(
+    resp = post_raw(
         "users",
         {
-            "id.first_name": FP_ID_1_DATA["id.first_name"],
-            "id.last_name": FP_ID_1_DATA["id.last_name"],
+            "id.first_name": FINAL_FP_ID_1_DATA["id.first_name"],
+            "id.last_name": FINAL_FP_ID_1_DATA["id.last_name"],
         },
         tenant.sk.key,
     )
-    fp_id_1 = body["id"]
+    fp_id_1 = resp.json()["id"]
     expected_num_blobs += 2
-    expected_num_manifests += 1
+    fp_id_1_version = int(resp.headers["x-fp-vault-version"])
+    assert fp_id_1_version == 1
 
-    patch(
+    resp = patch_raw(
         f"users/{fp_id_1}/vault",
         {
-            "id.phone_number": FP_ID_1_DATA["id.phone_number"],
-            "id.email": FP_ID_1_DATA["id.email"],
+            "id.phone_number": FINAL_FP_ID_1_DATA["id.phone_number"],
+            "id.email": FINAL_FP_ID_1_DATA["id.email"],
         },
         tenant.sk.key,
     )
     expected_num_blobs += 2
-    expected_num_manifests += 1
+    fp_id_1_version = int(resp.headers["x-fp-vault-version"])
+    assert fp_id_1_version == 2
 
-    body = post(
+    resp = post_raw(
         "users",
         {
-            "id.first_name": FP_ID_2_DATA["id.first_name"],
-            "id.last_name": FP_ID_2_DATA["id.last_name"],
+            "id.first_name": FINAL_FP_ID_2_DATA["id.first_name"],
+            "id.last_name": FINAL_FP_ID_2_DATA["id.last_name"],
         },
         tenant.sk.key,
     )
-    fp_id_2 = body["id"]
+    fp_id_2 = resp.json()["id"]
     expected_num_blobs += 2
-    expected_num_manifests += 1
+    fp_id_2_version = int(resp.headers["x-fp-vault-version"])
+    assert fp_id_2_version == 1
 
-    patch(
+    resp = patch_raw(
         f"users/{fp_id_2}/vault",
         {
+            # Write an initial phone number. We'll update it to the final value next.
             "id.phone_number": "+1234232345",
         },
         tenant.sk.key,
     )
     expected_num_blobs += 1
-    expected_num_manifests += 1
+    fp_id_2_version = int(resp.headers["x-fp-vault-version"])
+    assert fp_id_2_version == 2
 
     # Updating the same data should create another blob.
-    patch(
+    resp = patch_raw(
         f"users/{fp_id_2}/vault",
         {
-            "id.phone_number": FP_ID_2_DATA["id.phone_number"],
+            "id.phone_number": FINAL_FP_ID_2_DATA["id.phone_number"],
         },
         tenant.sk.key,
     )
     expected_num_blobs += 1
-    expected_num_manifests += 1
+    fp_id_2_version = int(resp.headers["x-fp-vault-version"])
+    assert fp_id_2_version == 3
 
     # Upload a file.
     post(
         f"users/{fp_id_2}/vault/document.id_card.front.image/upload",
         None,
         tenant.sk.key,
-        raw_data=file_contents("drivers_license.front.png"),
+        raw_data=FINAL_FP_ID_2_DATA["document.id_card.front.image"],
         addl_headers={"Content-Type": "image/png"},
     )
     # 1 for document.id_card.front.image + 1 for document.id_card.front.latest_upload
     expected_num_blobs += 2
-    expected_num_manifests += 1
+    # FIXME: Uploads don't return vault version header.
+    fp_id_2_version += 1
 
     # Run the VDR batch.
     resp = post(
@@ -121,7 +129,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
 
     assert resp["num_blobs"] == expected_num_blobs
     # 2 manifest.latest.json + number of times we update vault data
-    assert resp["num_manifests"] == 2 + expected_num_manifests
+    assert resp["num_manifests"] == 2 + fp_id_1_version + fp_id_2_version
 
     with footprint_dr("status", "--live") as cmd:
         cmd.expect(r"Latest Backup Record Timestamp: ([0-9:\.\- ]+ UTC)")
@@ -198,7 +206,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
             "list-vaults",
             "--live",
             # Highly unlikely to be flaky unless there are multiple fp_ids that
-            # match except for the lasst character
+            # match except for the last character
             "--fp-id-gt",
             fp_id[:-1],
             "--limit",
@@ -291,6 +299,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
     fp_id_records = [
         {
             "fp_id": fp_id_1,
+            "version": fp_id_1_version,
             "fields": [
                 "id.email",
                 "id.first_name",
@@ -300,6 +309,7 @@ def test_footprint_dr_backup(tenant, tmp_path):
         },
         {
             "fp_id": fp_id_2,
+            "version": fp_id_2_version,
             "fields": [
                 "document.id_card.front.image",
                 "document.id_card.front.latest_upload",
@@ -381,9 +391,46 @@ def test_footprint_dr_backup(tenant, tmp_path):
     assert cmd.exitstatus == 0
 
     # Set up to test decryption.
+    records_to_decrypt = [
+        {
+            "fp_id": fp_id_1,
+            "version": fp_id_1_version,
+            "fields": [
+                "id.email",
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+            ],
+        },
+        {
+            "fp_id": fp_id_2,
+            "version": fp_id_2_version,
+            "fields": [
+                "document.id_card.front.image",
+                "document.id_card.front.latest_upload",
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+                "custom.field_that_doest_exist",
+            ],
+        },
+        {
+            "fp_id": fp_id_2,
+            # Decrypt an old version as well.
+            "version": fp_id_2_version - 1,
+            "fields": [
+                "document.id_card.front.image",
+                "document.id_card.front.latest_upload",
+                "id.first_name",
+                "id.last_name",
+                "id.phone_number",
+            ],
+        },
+    ]
+
     records_file = tmp_path / "records.jsonl"
     with records_file.open("w") as f:
-        for record in fp_id_records:
+        for record in records_to_decrypt:
             json.dump(record, f)
             f.write("\n")
 
@@ -391,8 +438,17 @@ def test_footprint_dr_backup(tenant, tmp_path):
             f.write("   \n")
 
     expected_data = {
-        fp_id_1: FP_ID_1_DATA,
-        fp_id_2: FP_ID_2_DATA,
+        fp_id_1: {
+            fp_id_1_version: FINAL_FP_ID_1_DATA,
+        },
+        fp_id_2: {
+            fp_id_2_version: FINAL_FP_ID_2_DATA,
+            (fp_id_2_version - 1): {
+                field: value
+                for field, value in FINAL_FP_ID_2_DATA.items()
+                if not field.startswith("document.")
+            },
+        },
     }
 
     # Test decryption using the test API using each org identity.
@@ -421,25 +477,31 @@ def test_footprint_dr_backup(tenant, tmp_path):
             cmd.expect(pexpect.EOF)
         assert cmd.exitstatus == 0
 
-        validate_decrypted_data(output_dir, fp_id_records, expected_data)
+        validate_decrypted_data(output_dir, records_to_decrypt, expected_data)
 
         # Check that we generated audit events for the test decryption.
-        for record in fp_id_records:
-            fp_id = record["fp_id"]
-            for field in record["fields"]:
-                resp = get(
-                    f"org/audit_events",
-                    {"names": "decrypt_user_data", "search": fp_id, "targets": field},
-                    *tenant.db_auths,
-                )
+        for record in expected_data:
+            for fp_id, versions in expected_data.items():
+                for version, fields in versions.items():
+                    for field in fields.keys():
+                        resp = get(
+                            f"org/audit_events",
+                            {
+                                "names": "decrypt_user_data",
+                                "search": fp_id,
+                                "targets": field,
+                            },
+                            *tenant.db_auths,
+                        )
 
-                vdr_events = [
-                    event
-                    for event in resp["data"]
-                    if event["detail"]["data"]["reason"] == "Disaster recovery test"
-                ]
-                # Comparing w/ >= since other VDR test events may be present.
-                assert len(vdr_events) >= i + 1
+                        vdr_events = [
+                            event
+                            for event in resp["data"]
+                            if event["detail"]["data"]["reason"]
+                            == "Disaster recovery test"
+                        ]
+                        # Comparing w/ >= since other VDR test events may be present.
+                        assert len(vdr_events) >= i + 1
 
     # Testing full recovery isn't possible since there is no way to get the
     # wrapped recovery key via API (by design). We test as far as we can get
@@ -478,42 +540,34 @@ def test_footprint_dr_backup(tenant, tmp_path):
     assert cmd.exitstatus == 1
 
 
-def validate_decrypted_data(output_dir, fp_id_records, expected_data):
-    for record in fp_id_records:
+def validate_decrypted_data(output_dir, records_to_decrypt, expected_data):
+    for record in records_to_decrypt:
         fp_id = record["fp_id"]
+        version = record["version"]
+
+        num_versions = len(list((output_dir / fp_id).iterdir()))
+        assert num_versions == len(expected_data[fp_id])
 
         for field in record["fields"]:
-            path = output_dir / fp_id / field
-            assert path.exists(), f"Missing path: {path}"
+            path = output_dir / fp_id / str(version) / field
+
+            if field in expected_data[fp_id][version]:
+                assert path.exists(), f"Missing path: {path}"
+            else:
+                assert not path.exists(), f"Unexpected path: {path}"
+                continue
 
             pii_file = list(path.iterdir())
             assert len(pii_file) == 1
             pii_file = pii_file[0]
 
-            if field in [
-                "document.id_card.front.image",
-                "document.id_card.front.latest_upload",
-            ]:
+            if field.startswith("document."):
                 assert pii_file.name == "document.png"
 
                 got_data = pii_file.read_bytes()
-                assert got_data == file_contents("drivers_license.front.png")
+                assert got_data == expected_data[fp_id][version][field]
             else:
                 assert pii_file.name == "value.txt"
 
                 got_data = pii_file.read_text()
-
-                # HACK: Until we implement manifests in the S3 file layout,
-                # there is a race condition where either the first or second
-                # phone number may be returned if they are written with the
-                # same second-granularity timestamp.
-                #
-                # The manifest file will solve this since the latest manifest
-                # will point to a consistent snapshot of the data.
-                if field == "id.phone_number":
-                    assert (
-                        got_data == expected_data[fp_id][field]
-                        or got_data == "+1234232345"
-                    )
-                else:
-                    assert got_data == expected_data[fp_id][field]
+                assert got_data == expected_data[fp_id][version][field]

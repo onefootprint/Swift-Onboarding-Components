@@ -1,9 +1,12 @@
 use super::api_client::get_cli_client;
 use super::api_client::IsLive;
+use super::manifest::Field;
+use super::manifest::Manifest;
 use super::BucketNamespace;
 use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
+use futures::stream::StreamExt;
 use futures::Stream;
 use futures::TryFutureExt;
 use futures::TryStreamExt;
@@ -18,7 +21,6 @@ use std::future::Future;
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use tokio_stream::StreamExt;
 use tokio_util::compat::TokioAsyncReadCompatExt;
 
 
@@ -70,13 +72,15 @@ pub struct FpIdPartition {
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct FpIdFields {
     pub fp_id: FpId,
-    pub fields: Vec<String>,
+    pub version: i64,
+    pub fields: Vec<Field>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct EncDataKey {
     pub fp_id: FpId,
-    pub field: String,
+    pub version: i64,
+    pub field: Field,
     pub key: String,
 }
 
@@ -225,62 +229,6 @@ impl S3Client {
                             svc_error
                         );
                         let _ = tx.send(Err(err)).await;
-                        return;
-                    }
-                }
-            }
-        });
-
-        ReceiverStream::new(rx)
-    }
-
-    fn list_keys(
-        client: &aws_sdk_s3::Client,
-        bucket_name: &str,
-        prefix: &str,
-    ) -> impl Stream<Item = Result<String>> {
-        log::debug!("Listing keys: s3://{}/{}", bucket_name, prefix);
-        let mut obj_stream = client
-            .list_objects_v2()
-            .bucket(bucket_name)
-            .prefix(prefix)
-            .into_paginator()
-            .send();
-
-        let (tx, rx) = mpsc::channel::<Result<String>>(CHANNEL_BUFFER_SIZE);
-
-        let bucket_name = bucket_name.to_owned();
-        tokio::task::spawn(async move {
-            while let Some(resp) = obj_stream.next().await {
-                if tx.is_closed() {
-                    return;
-                }
-
-                let resp = match resp {
-                    Ok(resp) => resp,
-                    Err(e) => {
-                        log::debug!("ListObjectsV2 error: {:?}", &e);
-                        let svc_error = e.into_service_error();
-                        let err = anyhow!(
-                            "failed to list objects in bucket {}: {:?}",
-                            bucket_name,
-                            svc_error
-                        );
-                        let _ = tx.send(Err(err)).await;
-                        return;
-                    }
-                };
-
-                for obj in resp.contents.unwrap_or_default() {
-                    let result = if let Some(key) = obj.key {
-                        Ok(key)
-                    } else {
-                        Err(anyhow!("missing key in ListObjectsV2 response"))
-                    };
-
-                    let stop_tx = result.is_err();
-                    let _ = tx.send(result).await;
-                    if stop_tx {
                         return;
                     }
                 }
@@ -505,7 +453,38 @@ impl S3Client {
         Ok(sample.into_iter().collect())
     }
 
-    // This will eventually be replaced with a read of fp_id's manifest file.
+    async fn read_manifest(
+        client: aws_sdk_s3::Client,
+        bucket_name: String,
+        fp_id: FpId,
+        version: Option<i64>,
+    ) -> Result<Manifest> {
+        let version_str = version
+            .map(|v| v.to_string())
+            .unwrap_or_else(|| "latest".to_string());
+        let key = format!("{}meta/manifest.{}.json", fp_id.path, version_str);
+
+        let obj = client
+            .get_object()
+            .bucket(&bucket_name)
+            .key(&key)
+            .send()
+            .await
+            .map_err(|e| {
+                let svc_error = e.into_service_error();
+                anyhow!("GetObject failed: {:?}", svc_error)
+            })?;
+
+        let body = obj.body.collect().await.map(|data| data.into_bytes())?;
+
+        let manifest: Manifest = serde_json::from_slice(&body)?;
+        if manifest.version <= 0 {
+            bail!("Invalid manifest version {} at key {}", manifest.version, key);
+        }
+
+        Ok(manifest)
+    }
+
     pub async fn list_records(
         &self,
         mut fp_ids: Pin<Box<dyn Stream<Item = Result<FpId>> + Send>>,
@@ -529,30 +508,21 @@ impl S3Client {
                     }
                 };
 
-                // fp_id.path already has a trailing slash.
-                let fp_id_prefix = format!("{}data/", fp_id.path);
-
-                let field_prefixes =
-                    Self::list_common_prefixes(&client, &bucket_name, &fp_id_prefix, None, None)
-                        .collect::<Vec<Result<_>>>()
-                        .await
-                        .into_iter()
-                        .collect::<Result<Vec<_>>>();
-
-                let field_prefixes = match field_prefixes {
-                    Ok(field_prefixes) => field_prefixes,
+                let manifest_result =
+                    Self::read_manifest(client.clone(), bucket_name.clone(), fp_id.clone(), None).await;
+                let manifest = match manifest_result {
+                    Ok(manifest) => manifest,
                     Err(e) => {
                         let _ = tx.send(Err(e)).await;
                         return;
                     }
                 };
 
-                let fields: Vec<_> = field_prefixes
-                    .into_iter()
-                    .map(|field_prefix| field_prefix.partition)
-                    .collect();
-
-                let fp_id_fields = FpIdFields { fp_id, fields };
+                let fp_id_fields = FpIdFields {
+                    fp_id,
+                    version: manifest.version,
+                    fields: manifest.fields.into_keys().sorted().collect(),
+                };
                 if tx.send(Ok(fp_id_fields)).await.is_err() {
                     // Receiver closed.
                     return;
@@ -563,50 +533,52 @@ impl S3Client {
         ReceiverStream::new(rx)
     }
 
-    // Lists the keys for the latest version of each record.
-    // This will eventually be replaced with a read of fp_id's manifest file.
-    pub fn list_latest_enc_data_keys_unordered(
+    // Creates a stream that outputs the keys for each record.
+    pub fn enc_data_keys_unordered(
         &self,
         limit: usize,
         records: Pin<Box<dyn Stream<Item = Result<FpIdFields>> + Send>>,
-    ) -> impl Stream<Item = Result<EncDataKey>> {
+    ) -> impl Stream<Item = Result<EncDataKey>> + Send {
         let client = self.client.clone();
         let bucket_name = self.bucket_name.clone();
 
         records
-            .map_ok(move |record| {
-                let FpIdFields { fp_id, fields } = record;
+            .and_then(move |record| {
+                let FpIdFields {
+                    fp_id,
+                    version,
+                    fields,
+                } = record;
 
                 let client = client.clone();
                 let bucket_name = bucket_name.clone();
-                let fp_id_path = fp_id.path.clone();
-                let fp_id = fp_id.clone();
 
-                futures::stream::iter(fields)
-                    .then(move |field| {
-                        let prefix = format!("{}data/{}/", fp_id_path, field);
+                Box::pin(async move {
+                    // Fetch the manifest before we start processing the fields in the batch.
+                    let manifest =
+                        Self::read_manifest(client, bucket_name, fp_id.clone(), Some(version)).await?;
 
-                        let max_key_for_field = Self::list_keys(&client, &bucket_name, &prefix).fold(
-                            Ok(None),
-                            |max_acc: Result<Option<String>>, next_key| {
-                                let max_acc = max_acc?;
-                                let next_key = next_key?;
+                    let enc_data_key_stream = futures::stream::iter(fields).filter_map(move |field| {
+                        let fp_id = fp_id.clone();
+                        let fp_id_path = fp_id.path.clone();
+                        let manifest = manifest.clone();
 
-                                Ok(max_acc.max(Some(next_key)))
-                            },
-                        );
+                        Box::pin(async move {
+                            // Skip the requested field if it's not present in the manifest.
+                            let data_key_basename = manifest.fields.get(&field)?;
 
-                        Box::pin(async move { (field, max_key_for_field.await) })
-                    })
-                    .filter_map(move |(field, max_key_for_field)| {
-                        let key = max_key_for_field.transpose()?;
+                            let key = format!("{}data/{}/{}", fp_id_path, field, data_key_basename);
 
-                        Some(key.map(|key| EncDataKey {
-                            fp_id: fp_id.clone(),
-                            field,
-                            key,
-                        }))
-                    })
+                            Some(Ok(EncDataKey {
+                                fp_id: fp_id.clone(),
+                                version,
+                                field,
+                                key,
+                            }))
+                        })
+                    });
+                    Ok(enc_data_key_stream)
+                })
             })
             .try_flatten_unordered(limit)
     }

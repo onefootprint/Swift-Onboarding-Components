@@ -1,4 +1,5 @@
 use super::api_client::IsLive;
+use super::manifest::Field;
 use super::s3_client::FpId;
 use super::s3_client::FpIdFields;
 use super::s3_client::S3Client;
@@ -61,15 +62,21 @@ pub async fn list_records_cmd(
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub(crate) struct ListRecordsLine {
     pub(crate) fp_id: String,
-    pub(crate) fields: Vec<String>,
+    pub(crate) version: i64,
+    pub(crate) fields: Vec<Field>,
 }
 
 impl From<FpIdFields> for ListRecordsLine {
     fn from(fp_id_fields: FpIdFields) -> Self {
-        let FpIdFields { fp_id, fields } = fp_id_fields;
+        let FpIdFields {
+            fp_id,
+            version,
+            fields,
+        } = fp_id_fields;
 
         ListRecordsLine {
             fp_id: fp_id.fp_id,
+            version,
             fields,
         }
     }
