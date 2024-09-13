@@ -26,6 +26,7 @@ use strum_macros::EnumIter;
     Ord,
     PartialOrd,
     macros::SerdeAttr,
+    derive_more::IsVariant,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

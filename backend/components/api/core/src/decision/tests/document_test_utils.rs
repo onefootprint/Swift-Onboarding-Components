@@ -96,6 +96,10 @@ pub enum IncodeMockOpts {
     UploadFront {
         add_front_response: Option<IncodeResponse<AddSideResponse>>,
     },
+    UploadBack {
+        add_back_response: Option<IncodeResponse<AddSideResponse>>,
+    },
+    Process,
 }
 
 pub struct IncodeMocker {
@@ -115,7 +119,7 @@ impl IncodeMocker {
             IncodeMockOpts::Full => {
                 self.mock_start(state);
                 self.mock_front(state, None);
-                self.mock_back(state);
+                self.mock_back(state, None);
                 self.mock_selfie(state);
                 self.mock_processing(state);
             }
@@ -126,6 +130,10 @@ impl IncodeMocker {
             IncodeMockOpts::UploadFront { add_front_response } => {
                 self.mock_front(state, add_front_response);
             }
+            IncodeMockOpts::UploadBack { add_back_response } => {
+                self.mock_back(state, add_back_response);
+            }
+            IncodeMockOpts::Process => self.mock_processing(state),
         }
     }
 
@@ -158,7 +166,7 @@ impl IncodeMocker {
         state.set_incode_add_front(Arc::new(mock_incode_add_front));
     }
 
-    fn mock_back(&self, state: &mut State) {
+    fn mock_back(&self, state: &mut State, override_response: Option<IncodeResponse<AddSideResponse>>) {
         if self.id_doc_kind.sides().contains(&DocumentSide::Back) {
             let mut mock_incode_add_back = MockVendorAPICall::<
                 IncodeAddBackRequest,
@@ -168,7 +176,9 @@ impl IncodeMocker {
             mock_incode_add_back
                 .expect_make_request()
                 .times(1)
-                .return_once(move |_| Ok(idv::tests::fixtures::incode::add_side_response()));
+                .return_once(move |_| {
+                    Ok(override_response.unwrap_or(idv::tests::fixtures::incode::add_side_response()))
+                });
             state.set_incode_add_back(Arc::new(mock_incode_add_back));
         }
     }

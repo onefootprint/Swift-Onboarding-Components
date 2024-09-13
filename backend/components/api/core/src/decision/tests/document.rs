@@ -28,6 +28,7 @@ use db::models::tenant::Tenant;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::DbResult;
 use idv::incode::doc::response::AddSideResponse;
@@ -243,9 +244,9 @@ async fn test_adding_side_failures_front(state: &mut State, user_kind: UserKind)
         &doc_id,
         &v,
         DocumentSide::Front,
-        IncodeMockOpts::StopAfterFront {
-            add_front_response: Some(add_front_response_failure("UNKNOWN_DOCUMENT_TYPE")),
-        },
+        vec![IncodeMockOpts::StopAfterFront {
+            add_front_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+        }],
     )
     .await;
 
@@ -262,9 +263,9 @@ async fn test_adding_side_failures_front(state: &mut State, user_kind: UserKind)
         &doc_id,
         &v,
         DocumentSide::Front,
-        IncodeMockOpts::UploadFront {
-            add_front_response: Some(add_front_response_failure("UNKNOWN_DOCUMENT_TYPE")),
-        },
+        vec![IncodeMockOpts::UploadFront {
+            add_front_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+        }],
     )
     .await;
 
@@ -281,9 +282,9 @@ async fn test_adding_side_failures_front(state: &mut State, user_kind: UserKind)
         &doc_id,
         &v,
         DocumentSide::Front,
-        IncodeMockOpts::UploadFront {
-            add_front_response: Some(add_front_response_failure("UNKNOWN_DOCUMENT_TYPE")),
-        },
+        vec![IncodeMockOpts::UploadFront {
+            add_front_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+        }],
     )
     .await;
     assert_eq!(resp.next_side_to_collect, Some(DocumentSide::Back));
@@ -310,6 +311,206 @@ async fn test_adding_side_failures_front(state: &mut State, user_kind: UserKind)
         .unwrap();
 }
 
+#[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real))]
+#[tokio::test]
+async fn test_adding_side_failures_back(state: &mut State, user_kind: UserKind) {
+    let (doc_id, wf, t, sv, v) = setup_document_test(state, user_kind).await;
+
+    // TEST BEGINS HERE
+
+    // Front succeeds
+    let resp = upload_and_process_document(
+        state,
+        &wf,
+        &sv,
+        &t,
+        &doc_id,
+        &v,
+        DocumentSide::Front,
+        vec![IncodeMockOpts::StopAfterFront {
+            add_front_response: None,
+        }],
+    )
+    .await;
+
+    assert_eq!(resp.errors, vec![]);
+    assert_eq!(resp.next_side_to_collect, Some(DocumentSide::Back));
+    assert_ivs_in_state(state, doc_id.clone(), IncodeVerificationSessionState::AddBack).await;
+
+    // First attempt on back: fail to classify
+    let resp = upload_and_process_document(
+        state,
+        &wf,
+        &sv,
+        &t,
+        &doc_id,
+        &v,
+        DocumentSide::Back,
+        vec![IncodeMockOpts::UploadBack {
+            add_back_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+        }],
+    )
+    .await;
+
+    assert_eq!(resp.errors, vec![DocumentImageError::UnknownDocumentType]);
+    assert_eq!(resp.next_side_to_collect, Some(DocumentSide::Back));
+    assert_ivs_in_state(state, doc_id.clone(), IncodeVerificationSessionState::AddBack).await;
+
+    // Second attempt: Succeed and move to next state
+    let _ = upload_and_process_document(
+        state,
+        &wf,
+        &sv,
+        &t,
+        &doc_id,
+        &v,
+        DocumentSide::Back,
+        vec![
+            IncodeMockOpts::UploadBack {
+                add_back_response: None,
+            },
+            IncodeMockOpts::Process,
+        ],
+    )
+    .await;
+
+
+    // ASSERTIONS
+    state
+        .db_pool
+        .db_query(move |conn| -> DbResult<_> {
+            let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
+            let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
+            let doc_uploads = iddoc.images(conn, DocumentImageArgs::default()).unwrap();
+            let front_upload = doc_uploads.iter().find(|d| d.side.is_front()).unwrap();
+            let back_upload = doc_uploads.iter().find(|d| d.side.is_back()).unwrap();
+            // IVS in correct state
+            assert_eq!(ivs.state, IncodeVerificationSessionState::Complete);
+            // ignore reasons from back are on IVS
+            assert_eq!(ivs.ignored_failure_reasons, vec![]);
+            // failure reasons from back are on doc upload
+            assert_eq!(back_upload.failure_reasons, vec![]);
+            // front was fine so no reasons
+            assert_eq!(front_upload.failure_reasons, vec![]);
+
+            Ok(())
+        })
+        .await
+        .unwrap();
+}
+
+#[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Sandbox(DocumentFixtureResult::Real))]
+#[tokio::test]
+async fn test_adding_side_failures_exceed_retries_back_and_front(state: &mut State, user_kind: UserKind) {
+    let (doc_id, wf, t, sv, v) = setup_document_test(state, user_kind).await;
+
+    // TEST BEGINS HERE
+
+    // First attempt on front: fails to classify
+    let _ = upload_and_process_document(
+        state,
+        &wf,
+        &sv,
+        &t,
+        &doc_id,
+        &v,
+        DocumentSide::Front,
+        vec![IncodeMockOpts::StopAfterFront {
+            add_front_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+        }],
+    )
+    .await;
+
+    // Second and 3rd attempts on front: fail to classify, move on
+    for _ in 0..=1 {
+        let _ = upload_and_process_document(
+            state,
+            &wf,
+            &sv,
+            &t,
+            &doc_id,
+            &v,
+            DocumentSide::Front,
+            vec![IncodeMockOpts::UploadFront {
+                add_front_response: Some(add_side_response_failure("UNKNOWN_DOCUMENT_TYPE")),
+            }],
+        )
+        .await;
+    }
+
+    assert_ivs_in_state(state, doc_id.clone(), IncodeVerificationSessionState::AddBack).await;
+
+    // first and second on back: fail to align
+    for _ in 0..=1 {
+        let _ = upload_and_process_document(
+            state,
+            &wf,
+            &sv,
+            &t,
+            &doc_id,
+            &v,
+            DocumentSide::Back,
+            vec![IncodeMockOpts::UploadBack {
+                add_back_response: Some(add_side_response_failure("UNABLE_TO_ALIGN_DOCUMENT")),
+            }],
+        )
+        .await;
+    }
+
+    // third attempt on back: fail to align, and  move on
+    let _ = upload_and_process_document(
+        state,
+        &wf,
+        &sv,
+        &t,
+        &doc_id,
+        &v,
+        DocumentSide::Back,
+        vec![
+            IncodeMockOpts::UploadBack {
+                add_back_response: Some(add_side_response_failure("UNABLE_TO_ALIGN_DOCUMENT")),
+            },
+            IncodeMockOpts::Process,
+        ],
+    )
+    .await;
+
+
+    // ASSERTIONS
+    state
+        .db_pool
+        .db_query(move |conn| -> DbResult<_> {
+            let ivs = IncodeVerificationSession::get(conn, &doc_id).unwrap().unwrap();
+            let (iddoc, _) = Document::get(conn, &ivs.identity_document_id).unwrap();
+            let doc_uploads = iddoc.images(conn, DocumentImageArgs::default()).unwrap();
+            let front_upload = doc_uploads.iter().find(|d| d.side.is_front()).unwrap();
+            let back_upload = doc_uploads.iter().find(|d| d.side.is_back()).unwrap();
+            // IVS in correct state
+            assert_eq!(ivs.state, IncodeVerificationSessionState::Complete);
+            // ignore reasons from back and front are on IVS
+            assert_have_same_elements(
+                ivs.ignored_failure_reasons,
+                vec![
+                    IncodeFailureReason::UnknownDocumentType,
+                    IncodeFailureReason::UnableToAlignDocument,
+                ],
+            );
+            assert_eq!(
+                back_upload.failure_reasons,
+                vec![IncodeFailureReason::UnableToAlignDocument]
+            );
+            assert_eq!(
+                front_upload.failure_reasons,
+                vec![IncodeFailureReason::UnknownDocumentType]
+            );
+
+            Ok(())
+        })
+        .await
+        .unwrap();
+}
 
 async fn setup_document_test(
     state: &mut State,
@@ -389,7 +590,7 @@ async fn upload_and_process_document(
     doc_id: &DocumentId,
     v: &Vault,
     side_to_upload: DocumentSide,
-    incode_call_mock_opts: IncodeMockOpts,
+    incode_call_mock_opts: Vec<IncodeMockOpts>,
 ) -> DocumentResponse {
     let file_upload = FileUpload::new_simple(PiiBytes::new(vec![1, 2, 3, 4]), "f".into(), "image/png");
     mock_s3_put_object(state);
@@ -409,7 +610,9 @@ async fn upload_and_process_document(
     mock_enclave_s3_client(state, doc_id.clone(), &v.e_private_key).await;
 
     let mocker = IncodeMocker::new(IdDocKind::DriversLicense.into(), false);
-    mocker.mock(state, incode_call_mock_opts);
+    for mock in incode_call_mock_opts {
+        mocker.mock(state, mock);
+    }
 
     decision::document::route_handler::handle_document_process(
         state,
@@ -425,8 +628,7 @@ async fn upload_and_process_document(
     .unwrap()
 }
 
-
-fn add_front_response_failure(failure_reason: &str) -> IncodeResponse<AddSideResponse> {
+fn add_side_response_failure(failure_reason: &str) -> IncodeResponse<AddSideResponse> {
     let raw_response = serde_json::json!({
         "sharpness": 100,
         "glare": 100,
