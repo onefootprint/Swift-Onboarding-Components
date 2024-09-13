@@ -20,18 +20,23 @@ pub struct VaultDrWorker {
     pub poll_period_ms: u64,
 
     #[arg(long)]
-    pub batch_size: u32,
+    pub blob_batch_size: u32,
+
+    #[arg(long)]
+    pub manifest_batch_size: u32,
 
     #[arg(long)]
     pub record_task_concurrency: usize,
+
+    #[arg(long)]
+    pub manifest_task_concurrency: usize,
 }
 
 impl VaultDrWorker {
     pub async fn run(self, _config: Config, state: State) -> Result<()> {
         let poll_period = Duration::from_millis(self.poll_period_ms);
         info!(
-            batch_size = self.batch_size,
-            ?poll_period,
+            config = ?self,
             "starting vault-dr worker...",
         );
 
@@ -75,8 +80,10 @@ impl VaultDrWorker {
 
     fn knobs(&self) -> Knobs {
         Knobs {
-            batch_size: self.batch_size,
+            blob_batch_size: self.blob_batch_size,
+            manifest_batch_size: self.manifest_batch_size,
             record_task_concurrency: self.record_task_concurrency,
+            manifest_task_concurrency: self.manifest_task_concurrency,
         }
     }
 

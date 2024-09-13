@@ -12,6 +12,7 @@ use newtypes::FpId;
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
+use vault_dr::BatchResult;
 use vault_dr::VaultDrWriter;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
@@ -21,12 +22,14 @@ struct VaultDrRunBatchRequest {
 
     pub fp_ids: Option<Vec<FpId>>,
 
-    pub batch_size: u32,
+    pub blob_batch_size: u32,
+    pub manifest_batch_size: u32,
 }
 
 #[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
 struct VaultDrRunBatchResponse {
     pub num_blobs: u32,
+    pub num_manifests: u32,
 }
 
 
@@ -39,7 +42,8 @@ pub async fn post(
     let VaultDrRunBatchRequest {
         tenant_id,
         is_live,
-        batch_size,
+        blob_batch_size,
+        manifest_batch_size,
         fp_ids,
     } = request.into_inner();
 
@@ -56,12 +60,20 @@ pub async fn post(
         .await?;
 
     let knobs = vault_dr::Knobs {
-        batch_size,
+        blob_batch_size,
+        manifest_batch_size,
         ..Default::default()
     };
 
     let writer = VaultDrWriter::new(&state, &config.id, knobs).await?;
 
-    let num_blobs = writer.write_batch(&state, fp_ids).await?;
-    Ok(VaultDrRunBatchResponse { num_blobs })
+    let BatchResult {
+        num_blobs,
+        num_manifests,
+    } = writer.write_batch(&state, fp_ids).await?;
+
+    Ok(VaultDrRunBatchResponse {
+        num_blobs,
+        num_manifests,
+    })
 }

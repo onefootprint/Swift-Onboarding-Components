@@ -13,3 +13,6 @@ pub use writer::*;
 
 mod worker;
 pub use worker::*;
+
+mod manifest;
+pub use manifest::*;

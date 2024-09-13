@@ -197,12 +197,24 @@ config:
         name: execute-tasks
       - args:
           - vault-dr-worker
-          - --batch-size=1024
+          - --blob-batch-size=1024
+          - --manifest-batch-size=0
           - --poll-period-ms=5000
           - --record-task-concurrency=64
+          - --manifest-task-concurrency=64
         cpuUnits: 1024
         memoryMB: 2048
         name: vault-dr
+      - args:
+          - vault-dr-worker
+          - --blob-batch-size=0
+          - --manifest-batch-size=1024
+          - --poll-period-ms=5000
+          - --record-task-concurrency=64
+          - --manifest-task-concurrency=64
+        cpuUnits: 1024
+        memoryMB: 2048
+        name: vault-dr-manifest-backfill
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

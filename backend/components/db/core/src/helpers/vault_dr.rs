@@ -13,10 +13,14 @@ use db_schema::schema::vault_dr_manifest;
 use diesel::prelude::*;
 use diesel::sql_types::Integer;
 use diesel::QueryDsl;
+use itertools::Itertools;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::FpId;
+use newtypes::ScopedVaultVersionId;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
+use std::collections::HashMap;
 
 
 // Load up to `batch_size` DataLifetime records for the given tenant/is_live that do not have
@@ -160,10 +164,63 @@ pub fn get_vault_dr_scoped_vault_version_batch(
     Ok(svvs)
 }
 
+#[derive(Debug, Clone, derive_more::From, derive_more::Into)]
+pub struct VdrBlobKey(String);
+
+#[tracing::instrument(skip_all)]
+pub fn bulk_get_vdr_blob_keys_active_at(
+    conn: &mut PgConn,
+    config_id: &VaultDrConfigId,
+    svv_ids: Vec<&ScopedVaultVersionId>,
+) -> DbResult<HashMap<ScopedVaultVersionId, HashMap<DataIdentifier, VdrBlobKey>>> {
+    let svvid_di_blobkey: Vec<(ScopedVaultVersionId, (DataIdentifier, String))> = scoped_vault_version::table
+        .inner_join(
+            // Join with DLs that are active at the SVV's seqno.
+            data_lifetime::table.on(data_lifetime::scoped_vault_id
+                .eq(scoped_vault_version::scoped_vault_id)
+                .and(data_lifetime::created_seqno.le(scoped_vault_version::seqno))
+                .and(
+                    data_lifetime::deactivated_seqno
+                        .gt(scoped_vault_version::seqno.nullable())
+                        .or(data_lifetime::deactivated_seqno.is_null()),
+                )),
+        )
+        .inner_join(
+            // Join with blobs that are written for the active DLs.
+            vault_dr_blob::table.on(vault_dr_blob::data_lifetime_id
+                .eq(data_lifetime::id)
+                .and(vault_dr_blob::config_id.eq(config_id))),
+        )
+        .filter(scoped_vault_version::id.eq_any(svv_ids))
+        .select((
+            scoped_vault_version::id,
+            (data_lifetime::kind, vault_dr_blob::bucket_path),
+        ))
+        .load(conn)?;
+
+    let grouped = svvid_di_blobkey
+        .into_iter()
+        .into_group_map()
+        .into_iter()
+        .map(|(svv_id, di_blobkey)| {
+            let di_to_blobkey = di_blobkey
+                .into_iter()
+                .map(|(di, blob_key)| (di, blob_key.into()))
+                .collect();
+            (svv_id, di_to_blobkey)
+        })
+        .collect();
+
+    Ok(grouped)
+}
+
+
+#[tracing::instrument(skip_all)]
 pub fn get_latest_vault_dr_backup_record_timestamp(
     conn: &mut PgConn,
     config_id: &VaultDrConfigId,
 ) -> DbResult<Option<DateTime<Utc>>> {
+    // TODO: After backfilling manifests, query based on committed manifests, not just blobs.
     let ts = vault_dr_blob::table
         .inner_join(data_lifetime::table)
         .filter(vault_dr_blob::config_id.eq(config_id))

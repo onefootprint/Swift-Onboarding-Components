@@ -34,6 +34,9 @@ INVALID_API_ROOT = "http://127.0.0.1:123"
 def test_footprint_dr_backup(tenant, tmp_path):
     cfg = enroll_tenant_in_live_vdr(tenant)
 
+    expected_num_blobs = 0
+    expected_num_manifests = 0
+
     # Vault some data for backup.
     body = post(
         "users",
@@ -44,6 +47,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         tenant.sk.key,
     )
     fp_id_1 = body["id"]
+    expected_num_blobs += 2
+    expected_num_manifests += 1
 
     patch(
         f"users/{fp_id_1}/vault",
@@ -53,6 +58,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         },
         tenant.sk.key,
     )
+    expected_num_blobs += 2
+    expected_num_manifests += 1
 
     body = post(
         "users",
@@ -63,6 +70,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         tenant.sk.key,
     )
     fp_id_2 = body["id"]
+    expected_num_blobs += 2
+    expected_num_manifests += 1
 
     patch(
         f"users/{fp_id_2}/vault",
@@ -71,6 +80,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         },
         tenant.sk.key,
     )
+    expected_num_blobs += 1
+    expected_num_manifests += 1
 
     # Updating the same data should create another blob.
     patch(
@@ -80,6 +91,8 @@ def test_footprint_dr_backup(tenant, tmp_path):
         },
         tenant.sk.key,
     )
+    expected_num_blobs += 1
+    expected_num_manifests += 1
 
     # Upload a file.
     post(
@@ -89,6 +102,9 @@ def test_footprint_dr_backup(tenant, tmp_path):
         raw_data=file_contents("drivers_license.front.png"),
         addl_headers={"Content-Type": "image/png"},
     )
+    # 1 for document.id_card.front.image + 1 for document.id_card.front.latest_upload
+    expected_num_blobs += 2
+    expected_num_manifests += 1
 
     # Run the VDR batch.
     resp = post(
@@ -96,13 +112,16 @@ def test_footprint_dr_backup(tenant, tmp_path):
         {
             "tenant_id": tenant.id,
             "is_live": True,
-            "batch_size": 100,
+            "blob_batch_size": 100,
+            "manifest_batch_size": 100,
             "fp_ids": [fp_id_1, fp_id_2],
         },
         CUSTODIAN_AUTH,
     )
 
-    assert resp["num_blobs"] == 10
+    assert resp["num_blobs"] == expected_num_blobs
+    # 2 manifest.latest.json + number of times we update vault data
+    assert resp["num_manifests"] == 2 + expected_num_manifests
 
     with footprint_dr("status", "--live") as cmd:
         cmd.expect(r"Latest Backup Record Timestamp: ([0-9:\.\- ]+ UTC)")

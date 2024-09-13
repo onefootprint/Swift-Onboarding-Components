@@ -6,15 +6,29 @@ use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Knobs {
-    pub batch_size: u32,
+    // The number of new manifests/scoped vault versions is <= the number of new blobs, since
+    // there can be at most one manifest per blob already written to the DB. Therefore, under
+    // ideal conditions, equal batch sizes would allow for the writer to stay up to date on
+    // writing manifests. However, since writing manifests may fail after successfully writing
+    // blobs, the queue of manifests to write may grow larger than the blob batch size. So to
+    // allow the writer to catch up a modest backlog of manifests without intervention, we use
+    // a greater batch size limit for manifests.
+    //
+    // We allow for independent control of these batch sizes to facilitate backfills.
+    pub blob_batch_size: u32,
+    pub manifest_batch_size: u32,
+
     pub record_task_concurrency: usize,
+    pub manifest_task_concurrency: usize,
 }
 
 impl Default for Knobs {
     fn default() -> Self {
         Self {
-            batch_size: 1000,
+            blob_batch_size: 1000,
+            manifest_batch_size: 1500,
             record_task_concurrency: 64,
+            manifest_task_concurrency: 64,
         }
     }
 }

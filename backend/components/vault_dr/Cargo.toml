@@ -38,4 +38,6 @@ rand = { workspace = true }
 bech32 = { workspace = true }
 p256 = { workspace = true, features = ["ecdh"] }
 base64 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tempfile = { workspace = true }
