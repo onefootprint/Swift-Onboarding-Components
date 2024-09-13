@@ -19,6 +19,7 @@ type ParentApi = Postmate.ParentAPI;
 
 const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 const baseUrl = ENV === 'production' ? 'https://api.onefootprint.com' : 'https://api.dev.onefootprint.com';
+const sdkVersion = 'dev';
 const getUniqueId = (): string => Math.random().toString(36).substring(2);
 
 const getPostmate = async (
@@ -38,7 +39,7 @@ const getPostmate = async (
       authToken,
       initId: uId,
       sdkUrl: getWindowUrl(),
-      sdkVersion: '0',
+      sdkVersion: sdkVersion,
     },
   });
 
@@ -49,7 +50,7 @@ const sendSdkArgsRecursive = async (
   fetch(`${baseUrl}/org/sdk_args`, {
     method: 'POST',
     headers: {
-      'x-fp-client-version': `'footprint-js' 0 ${payload.kind}`.trim(),
+      'x-fp-client-version': `footprint-js ${sdkVersion} ${payload.kind}`.trim(),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),

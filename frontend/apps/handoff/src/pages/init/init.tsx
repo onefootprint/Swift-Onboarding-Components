@@ -13,8 +13,8 @@ import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
-const logContext = ({ meta }: GetD2PResponse) => {
-  Logger.identify({
+const appendLogContext = ({ meta }: GetD2PResponse) => {
+  Logger.appendGlobalContext({
     fp_session_id: String(meta?.sessionId),
     l10n: JSON.stringify(meta?.l10n),
     opener: String(meta?.opener),
@@ -25,7 +25,7 @@ const logContext = ({ meta }: GetD2PResponse) => {
 const setupLogger = (config: PublicOnboardingConfig, orgIds: Set<string>) => {
   if (config.isLive && !orgIds.has(config.orgId)) {
     Logger.startSessionReplay();
-    Logger.identify({
+    Logger.setGlobalContext({
       // @ts-expect-error: browser support
       deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
       // @ts-expect-error: browser support
@@ -97,7 +97,7 @@ const Init = () => {
     authToken,
     options: {
       onSuccess: (data: GetD2PResponse) => {
-        logContext(data);
+        appendLogContext(data);
 
         if (!state.done) {
           const { meta, status } = data;

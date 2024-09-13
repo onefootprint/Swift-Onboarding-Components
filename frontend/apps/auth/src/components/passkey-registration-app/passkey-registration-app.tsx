@@ -47,7 +47,7 @@ const urlFragmentToken = () => {
 const { logError } = getLogger({ location: 'register-passkey-app' });
 
 const startLogger = ({ meta }: GetD2PResponse) => {
-  Logger.identify({
+  Logger.setGlobalContext({
     fp_session_id: getSessionIdFromQueryParam() || String(meta?.sessionId),
     l10n: JSON.stringify(meta?.l10n),
     opener: String(meta?.opener),

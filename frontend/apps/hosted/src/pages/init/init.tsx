@@ -68,7 +68,7 @@ const Init = () => {
       onSuccess: onboardingConfig => {
         if (onboardingConfig.isLive && !orgIds.has(onboardingConfig.orgId)) {
           Logger.startSessionReplay();
-          Logger.identify({
+          Logger.setGlobalContext({
             appClipExperienceId: onboardingConfig.appClipExperienceId,
             isAppClipEnabled: onboardingConfig.isAppClipEnabled,
             isInstantAppEnabled: onboardingConfig.isInstantAppEnabled,

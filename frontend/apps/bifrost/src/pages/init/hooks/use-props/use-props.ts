@@ -47,7 +47,12 @@ const useProps = ({ onSuccess, onError }: UsePropsProps) => {
   const timerId = useRef<ReturnType<typeof setTimeout>>();
 
   useEffectOnce(() => {
-    fpProvider.load().then(() => {
+    fpProvider.load().then(data => {
+      const sdkVersion = data?.model?.sdkVersion;
+      if (sdkVersion) {
+        Logger.appendGlobalContext({ sdkVersion: `footprint-js@${sdkVersion}` });
+      }
+
       Logger.info('Footprint provider successfully loaded');
       setIsAdapterLoaded(true);
     });

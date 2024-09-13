@@ -12,9 +12,12 @@ type GetSdkArgsResponse<T> = {
 };
 
 const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
-  let optionalSdkVersion;
+  let optionalSdkUrl = '';
+  let optionalSdkVersion = '';
   try {
-    optionalSdkVersion = (await fpProvider.load())?.model?.sdkVersion;
+    const fpModel = await fpProvider.load();
+    optionalSdkUrl = fpModel?.model?.sdkUrl || '';
+    optionalSdkVersion = fpModel?.model?.sdkVersion || '';
   } catch {
     /* empty */
   }
@@ -24,7 +27,7 @@ const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: Provider
     url: '/org/sdk_args',
     headers: optionalSdkVersion
       ? {
-          'x-fp-client-version': `footprint-js ${optionalSdkVersion}`,
+          'x-fp-client-version': `footprint-js ${optionalSdkVersion} ${optionalSdkUrl}`.trim(),
           'x-fp-sdk-args-token': authToken,
         }
       : { 'x-fp-sdk-args-token': authToken },

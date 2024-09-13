@@ -3,6 +3,7 @@ import { datadogRum } from '@datadog/browser-rum';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 
+import { isObject } from '../type-guards';
 import { IS_LOGGING_ENABLED } from './constants';
 import type { ExtraProps, PrimitiveData } from './types';
 import {
@@ -31,6 +32,7 @@ const filterNonEmptyTraits = (traits: PrimitiveData): ExtraProps =>
 
 const LoggerFactory = () => {
   let appName: string = '';
+  let hasGlobalContext: boolean = false;
   let isDDLogsEnabled: boolean = false;
   let isDDRumEnabled: boolean = false;
   let isSessionReplayOn: boolean = false;
@@ -45,7 +47,7 @@ const LoggerFactory = () => {
       isDDRumEnabled = initDataDogRum(appName);
     }
 
-    getEnvInfo().then(identify).catch(console.warn);
+    getEnvInfo().then(setGlobalContext).catch(console.warn);
 
     const onError = (error: Error) => {
       if (isDDLogsEnabled) dataDogErrorEvent(error);
@@ -54,8 +56,10 @@ const LoggerFactory = () => {
     registerErrorHandlers(onError);
   };
 
-  const identify = (traits: PrimitiveData) => {
+  /** Set the entire context for all your loggers */
+  const setGlobalContext = (traits: PrimitiveData) => {
     if (!IS_LOGGING_ENABLED) return;
+    if (!isDDLogsEnabled && !isDDRumEnabled) return;
 
     const sessionId = getSessionId();
     const ddSessionId = datadogLogs.getInternalContext()?.session_id;
@@ -67,9 +71,27 @@ const LoggerFactory = () => {
     };
     const context = appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps;
 
-    if (isDDLogsEnabled || isDDRumEnabled) {
-      datadogLogs.setGlobalContext(context);
-      datadogRum.setGlobalContext(context);
+    if (hasGlobalContext) {
+      return appendGlobalContext(context);
+    }
+
+    datadogLogs.setGlobalContext(context);
+    datadogRum.setGlobalContext(context);
+    hasGlobalContext = true;
+  };
+
+  /** Add a context to all your loggers */
+  const appendGlobalContext = (traits: PrimitiveData) => {
+    if (!IS_LOGGING_ENABLED) return;
+    if (!isDDLogsEnabled && !isDDRumEnabled) return;
+
+    if (isObject(traits)) {
+      Object.entries(traits).forEach(([key, value]) => {
+        if (key && value !== null && value !== undefined && value !== '') {
+          datadogLogs.setGlobalContextProperty(key, value);
+          datadogRum.setGlobalContextProperty(key, value);
+        }
+      });
     }
   };
 
@@ -126,10 +148,11 @@ const LoggerFactory = () => {
   };
 
   return {
+    appendGlobalContext,
     error,
-    identify,
     info,
     init,
+    setGlobalContext,
     startSessionReplay,
     stopSessionReplay,
     track,
