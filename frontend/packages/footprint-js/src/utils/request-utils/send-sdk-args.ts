@@ -3,21 +3,18 @@ import type {
   FormDataProps,
   Props,
   RenderDataProps,
-  UpdateLoginMethodsDataProps,
   VerifyButtonDataProps,
   VerifyDataProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
-import { logError, logInfo } from '../logger';
+import { logInfo } from '../logger';
 import { getBootstrapData } from '../prop-utils';
 import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
 import { API_BASE_URL, SDK_NAME, SDK_VERSION, SdkKind, SdkKindByComponentKind } from './constants';
 import transformKeys from './transform-keys';
 
-const NUM_RETRIES = 3;
 const IS_BACKEND_ACCEPTING_AUTH_TOKEN = false;
 
-type SendSdkArgsResponse = { token: string; expires_at: string };
 type SendSdkArgsRequest =
   | { kind: SdkKind.AuthV1; data: AuthDataProps }
   | { kind: SdkKind.FormV1; data: FormDataProps }
@@ -26,19 +23,12 @@ type SendSdkArgsRequest =
   | { kind: SdkKind.VerifyButtonV1; data: VerifyButtonDataProps }
   | { kind: SdkKind.VerifyV1; data: VerifyDataProps };
 
-type ArgsDataPayload =
-  | AuthDataProps
-  | FormDataProps
-  | RenderDataProps
-  | UpdateLoginMethodsDataProps
-  | VerifyButtonDataProps
-  | VerifyDataProps
-  | undefined;
+type SendSdkArgsResponse = { token: string; expires_at: string };
 
 export const getSdkKind = (props: Props): SdkKind =>
   isUpdateLoginMethods(props) ? SdkKind.UpdateAuthMethodsV1 : SdkKindByComponentKind[props.kind];
 
-export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
+export const getSdkArgsDataPayload = (props: Props): SendSdkArgsRequest['data'] => {
   const { kind } = props;
 
   if (kind === ComponentKind.Verify || kind === ComponentKind.Components) {
@@ -92,7 +82,7 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       options: props.options,
       title: props.title,
       l10n: props.l10n,
-    } as FormDataProps;
+    };
   }
   if (kind === ComponentKind.Render) {
     return {
@@ -103,7 +93,7 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       label: props.label,
       showHiddenToggle: props.showHiddenToggle,
       l10n: props.l10n,
-    } as RenderDataProps;
+    };
   }
   if (kind === ComponentKind.VerifyButton) {
     return {
@@ -113,47 +103,42 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       authToken: props.authToken,
       label: props.label,
       l10n: props.l10n,
-    } as VerifyButtonDataProps;
+    };
   }
 
-  logError(kind, 'Invalid kind provided');
-
-  return undefined;
+  throw new Error('Invalid kind provided');
 };
 
-const sendSdkArgsRecursive = async (payload: SendSdkArgsRequest, numRetries: number): Promise<SendSdkArgsResponse> =>
-  fetch(`${API_BASE_URL}/org/sdk_args`, {
+const sendSdkArgs = async (props: Props): Promise<SendSdkArgsResponse['token']> => {
+  const kind = getSdkKind(props);
+  logInfo(kind, 'Sending SDK args');
+
+  const data = getSdkArgsDataPayload(props);
+  const response = await fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
-      'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION} ${payload.kind}`.trim(),
+      'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION} ${kind}`.trim(),
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
-  }).then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    if (numRetries > 0) {
-      return sendSdkArgsRecursive(payload, numRetries - 1);
-    }
-    return undefined;
+    body: JSON.stringify({
+      data: transformKeys(data),
+      kind: kind,
+    }),
   });
 
-const sendSdkArgs = async (props: Props): Promise<string | undefined> => {
-  logInfo(SdkKindByComponentKind[props.kind], 'Sending SDK args');
-  const data = getSdkArgsDataPayload(props);
-  if (!data) {
-    return undefined;
+  if (!response.ok) {
+    const errorData = await response.json();
+    if (errorData.message && errorData.support_id) {
+      throw new Error(`${errorData.message} (Support ID: ${errorData.support_id})`);
+    }
+    throw new Error('An error occurred while sending SDK args. Please try again later.');
   }
 
-  const result = await sendSdkArgsRecursive(
-    {
-      data: transformKeys(data),
-      kind: getSdkKind(props),
-    },
-    NUM_RETRIES,
-  );
-  return result ? result.token : undefined;
+  const result = await response.json();
+  if (result?.token === undefined) {
+    throw new Error('Token is undefined');
+  }
+  return result.token;
 };
 
 export default sendSdkArgs;

@@ -141,12 +141,15 @@ export const hideContainer = (id: string) => {
   }
 };
 
-export const createErrorModal = (container: HTMLElement) => {
+export const createErrorModal = (
+  container: HTMLElement,
+  bodyText = "It looks like there was an issue loading the page. Try reloading and we'll get things back on track.",
+) => {
   const modalContainer = document.createElement('div');
   modalContainer.classList.add('modal-error-container');
   modalContainer.setAttribute('role', 'dialog');
   modalContainer.setAttribute('aria-modal', 'true');
-  modalContainer.setAttribute('aria-label', 'Oops! Something’s not quite right.');
+  modalContainer.setAttribute('aria-label', "Oops! Something's not quite right.");
 
   const modalContent = document.createElement('div');
   modalContent.classList.add('modal-error');
@@ -196,11 +199,10 @@ export const createErrorModal = (container: HTMLElement) => {
 
   // Texts
   const heading = document.createElement('h2');
-  heading.textContent = 'Oops! Something’s not quite right.';
+  heading.textContent = "Oops! Something's not quite right.";
 
   const paragraph = document.createElement('p');
-  paragraph.textContent =
-    'It looks like there was an issue loading the page. Try reloading and we’ll get things back on track.';
+  paragraph.textContent = bodyText;
 
   modalContent.appendChild(closeButton);
   modalContent.appendChild(contentIcon);

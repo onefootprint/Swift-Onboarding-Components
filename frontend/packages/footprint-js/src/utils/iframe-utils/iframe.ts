@@ -36,6 +36,7 @@ const initIframe = (rawProps: Props): Iframe => {
   const { variant, containerId } = props;
   const hasOverlay = variant === 'modal' || variant === 'drawer';
   const initId = getUniqueId();
+  logInfo(SdkKindByComponentKind[props.kind], getPropsLog(props));
 
   const handleError = (error: string, shouldDestroy?: boolean) => {
     const errorMessage = logError(SdkKindByComponentKind[props.kind], error);
@@ -151,21 +152,19 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const initIframe = async (container: HTMLElement, { url, fallbackUrl }: ReturnType<typeof getURL>) => {
-    logInfo(SdkKindByComponentKind[props.kind], `Initializing iframe with ${new URL(url).host}`);
-    const response = await initializePostmate(container, url);
+    const sdkKind = SdkKindByComponentKind[props.kind];
 
+    logInfo(sdkKind, `Initializing iframe with ${new URL(url).host}`);
+    const response = await initializePostmate(container, url);
     if (response.success) {
       return response.parentApi;
     }
 
-    logInfo(SdkKindByComponentKind[props.kind], `Initializing iframe with ${new URL(fallbackUrl).host} as fallback`);
-
+    logInfo(sdkKind, `Initializing iframe with ${new URL(fallbackUrl).host} as fallback`);
     const responseFallback = await initializePostmate(container, fallbackUrl);
-
     if (!responseFallback.success) {
       throw new Error('Failed to initialize iframe');
     }
-
     return responseFallback.parentApi;
   };
 
@@ -175,24 +174,25 @@ const initIframe = (rawProps: Props): Iframe => {
       return;
     }
     isRendered = true;
-
     const container = getOrCreateContainer();
-
     if (!container) {
       logWarn(SdkKindByComponentKind[props.kind], 'Unable to create container for Footprint component');
       return;
     }
-
     if (container.hasChildNodes()) {
       container.innerHTML = '';
     }
 
     setLoading(container, true);
 
-    const sdkArgsToken = await sendSdkArgs(props);
-    if (!sdkArgsToken) {
-      handleError('Unable to get SDK args token.', true);
+    let sdkArgsToken: string | undefined;
+    try {
+      sdkArgsToken = await sendSdkArgs(props);
+    } catch (error) {
+      const errorMessage = `${error instanceof Error ? error.message : 'Unknown error'}`;
       setLoading(container, false);
+      createErrorModal(container, errorMessage);
+      handleError(`Unable to get SDK args token: ${errorMessage}`, false);
       return;
     }
 
@@ -260,6 +260,28 @@ const initIframe = (rawProps: Props): Iframe => {
     registerOnDestroy,
     registerOnRenderSecondary,
   };
+};
+
+const getPropsLog = (props: Props): string => {
+  const {
+    variant = '-',
+    kind = '-',
+    l10n,
+    authToken,
+    // @ts-expect-error: public key is not expected in some kinds
+    publicKey,
+  } = props;
+
+  return [
+    `variant: ${variant}`,
+    `kind: ${kind}`,
+    l10n && `l10n: ${JSON.stringify(l10n)}`,
+    `hasAuthToken: ${Boolean(authToken)}`,
+    `publicKey: ${publicKey ?? '-'}`,
+    `sdkVersion: ${version}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
 };
 
 export default initIframe;
