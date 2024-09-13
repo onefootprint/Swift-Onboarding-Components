@@ -8,6 +8,7 @@
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
   "ignore": [
+    "@onefootprint/storybook-utils",
     "@onefootprint/appearance",
     "@onefootprint/design-tokens",
     "@onefootprint/dev-tools",
