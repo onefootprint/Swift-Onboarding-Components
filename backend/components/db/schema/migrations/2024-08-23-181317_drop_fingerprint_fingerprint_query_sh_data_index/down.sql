@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS fingerprint_query_sh_data ON fingerprint(is_live, sh_data, tenant_id, vault_id) WHERE deactivated_at IS NULL AND is_hidden = 'f';
