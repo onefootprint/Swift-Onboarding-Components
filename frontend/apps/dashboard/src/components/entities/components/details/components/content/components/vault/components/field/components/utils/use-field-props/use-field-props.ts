@@ -11,9 +11,12 @@ import {
 } from '@onefootprint/core';
 import { COUNTRIES, STATES } from '@onefootprint/global-constants';
 import { BusinessDI, CorporationType, type DataIdentifier, IdDI, UsLegalStatus } from '@onefootprint/types';
-import { useFormContext, useWatch } from 'react-hook-form';
+import get from 'lodash/get';
+import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import EMPTY_SELECT_VALUE from '../../../../../constants';
+import type { EditDetailsFormData } from '../use-form-values';
+import useFormValues from '../use-form-values';
 import validateCitizenships, { CitizenshipsValidationError } from '../validate-citizenships';
 import validateName, { NameValidationError } from '../validate-name';
 
@@ -55,9 +58,10 @@ type FieldProps =
 
 const useFieldProps = (di: DataIdentifier): FieldProps => {
   const { t } = useTranslation('common');
-  const { watch, clearErrors } = useFormContext();
-  const formLegalStatus = useWatch({ name: IdDI.usLegalStatus });
-  const fieldValue = useWatch({ name: di });
+
+  const { clearErrors } = useFormContext<EditDetailsFormData>();
+  const formValues = useFormValues();
+  const fieldValue = get(formValues, di as keyof EditDetailsFormData);
 
   // IdDI fields
   if (di === IdDI.firstName) {
@@ -182,8 +186,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     };
   }
   if (di === IdDI.state) {
-    const formCountryVal = watch(IdDI.country);
-    const isDomestic = formCountryVal === 'US';
+    const isDomestic = get(formValues, IdDI.country) === 'US';
     if (isDomestic) {
       return {
         selectOptions: {
@@ -210,6 +213,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     };
   }
   if (di === IdDI.nationality) {
+    const formLegalStatus = get(formValues, IdDI.usLegalStatus) || '';
     return {
       selectOptions: {
         'aria-label': 'County of birth',
@@ -247,9 +251,11 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     };
   }
   if (di === IdDI.citizenships) {
+    const formLegalStatus = get(formValues, IdDI.usLegalStatus) || '';
     return {
       inputOptions: {
         hint: t('pages.entity.edit.errors.citizenships.hint'),
+        // we expect a string[] of countries - if no array, it's empty!
         defaultValue: Array.isArray(fieldValue) ? fieldValue.join(', ') : '',
         validate: (countriesStr: string) => {
           const validationError = validateCitizenships(countriesStr, formLegalStatus);
@@ -405,8 +411,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     };
   }
   if (di === BusinessDI.state) {
-    const formCountryVal = watch(BusinessDI.country);
-    const isDomestic = formCountryVal === 'US';
+    const isDomestic = get(formValues, BusinessDI.country) === 'US';
     if (isDomestic) {
       return {
         selectOptions: {
@@ -432,8 +437,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     };
   }
   if (di === BusinessDI.formationState) {
-    const formCountryVal = watch(BusinessDI.country);
-    const isDomestic = formCountryVal === 'US';
+    const isDomestic = get(formValues, BusinessDI.country) === 'US';
     if (isDomestic) {
       return {
         selectOptions: {
