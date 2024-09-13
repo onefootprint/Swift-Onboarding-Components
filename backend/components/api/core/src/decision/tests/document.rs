@@ -28,6 +28,7 @@ use newtypes::PiiBytes;
 use newtypes::Selfie;
 use newtypes::WorkflowFixtureResult;
 
+
 /// Test we require consent, or we'll error uploading a side
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
 #[test_state_case(UserKind::Live, Selfie::None)]

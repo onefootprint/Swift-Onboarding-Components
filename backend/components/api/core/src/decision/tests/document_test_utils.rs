@@ -87,140 +87,191 @@ impl DocumentUploadTestCase {
     }
 }
 
-// Mock incode returning various responses to use
-// TODO: a lot of these will be parameterized in future
-pub fn mock_incode_request(state: &mut State, id_doc_kind: DocumentKind, require_selfie: bool) {
-    let mut mock_incode_start_onboarding = MockVendorAPICall::<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_incode_start_onboarding
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::start_onboarding_response()));
-    state.set_incode_start_onboarding(Arc::new(mock_incode_start_onboarding));
 
-    // Add Front
-    let mut mock_incode_add_front = MockVendorAPICall::<
-        IncodeAddFrontRequest,
-        IncodeResponse<AddSideResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_incode_add_front
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::add_side_response()));
-    state.set_incode_add_front(Arc::new(mock_incode_add_front));
+pub enum IncodeMockOpts {
+    Full,
+    StopAfterFront {
+        add_front_response: Option<IncodeResponse<AddSideResponse>>,
+    },
+    UploadFront {
+        add_front_response: Option<IncodeResponse<AddSideResponse>>,
+    },
+}
 
-    // Add Back
-    if id_doc_kind.sides().contains(&DocumentSide::Back) {
-        let mut mock_incode_add_back = MockVendorAPICall::<
-            IncodeAddBackRequest,
+pub struct IncodeMocker {
+    id_doc_kind: DocumentKind,
+    require_selfie: bool,
+}
+impl IncodeMocker {
+    pub fn new(id_doc_kind: DocumentKind, require_selfie: bool) -> Self {
+        Self {
+            id_doc_kind,
+            require_selfie,
+        }
+    }
+
+    pub fn mock(&self, state: &mut State, opts: IncodeMockOpts) {
+        match opts {
+            IncodeMockOpts::Full => {
+                self.mock_start(state);
+                self.mock_front(state, None);
+                self.mock_back(state);
+                self.mock_selfie(state);
+                self.mock_processing(state);
+            }
+            IncodeMockOpts::StopAfterFront { add_front_response } => {
+                self.mock_start(state);
+                self.mock_front(state, add_front_response);
+            }
+            IncodeMockOpts::UploadFront { add_front_response } => {
+                self.mock_front(state, add_front_response);
+            }
+        }
+    }
+
+    fn mock_start(&self, state: &mut State) {
+        let mut mock_incode_start_onboarding = MockVendorAPICall::<
+            IncodeStartOnboardingRequest,
+            IncodeResponse<OnboardingStartResponse>,
+            idv::incode::error::Error,
+        >::new();
+        mock_incode_start_onboarding
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::start_onboarding_response()));
+        state.set_incode_start_onboarding(Arc::new(mock_incode_start_onboarding));
+    }
+
+    fn mock_front(&self, state: &mut State, override_response: Option<IncodeResponse<AddSideResponse>>) {
+        // Add Front
+        let mut mock_incode_add_front = MockVendorAPICall::<
+            IncodeAddFrontRequest,
             IncodeResponse<AddSideResponse>,
             idv::incode::error::Error,
         >::new();
-        mock_incode_add_back
+        mock_incode_add_front
             .expect_make_request()
             .times(1)
-            .return_once(move |_| Ok(idv::tests::fixtures::incode::add_side_response()));
-        state.set_incode_add_back(Arc::new(mock_incode_add_back));
+            .return_once(move |_| {
+                Ok(override_response.unwrap_or(idv::tests::fixtures::incode::add_side_response()))
+            });
+        state.set_incode_add_front(Arc::new(mock_incode_add_front));
     }
 
-    // Process ID
-    let mut mock_incode_process_id = MockVendorAPICall::<
-        IncodeProcessIdRequest,
-        IncodeResponse<ProcessIdResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_incode_process_id
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::process_id_response()));
-    state.set_incode_process_id(Arc::new(mock_incode_process_id));
+    fn mock_back(&self, state: &mut State) {
+        if self.id_doc_kind.sides().contains(&DocumentSide::Back) {
+            let mut mock_incode_add_back = MockVendorAPICall::<
+                IncodeAddBackRequest,
+                IncodeResponse<AddSideResponse>,
+                idv::incode::error::Error,
+            >::new();
+            mock_incode_add_back
+                .expect_make_request()
+                .times(1)
+                .return_once(move |_| Ok(idv::tests::fixtures::incode::add_side_response()));
+            state.set_incode_add_back(Arc::new(mock_incode_add_back));
+        }
+    }
 
-    // Privacy Consent
-    let mut mock_privacy_consent = MockVendorAPICall::<
-        IncodeAddPrivacyConsentRequest,
-        IncodeResponse<AddConsentResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_privacy_consent
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::add_consent_response()));
-    state.set_incode_add_privacy_consent(Arc::new(mock_privacy_consent));
+    fn mock_selfie(&self, state: &mut State) {
+        if self.require_selfie {
+            let mut mock_add_selfie = MockVendorAPICall::<
+                IncodeAddSelfieRequest,
+                IncodeResponse<AddSelfieResponse>,
+                idv::incode::error::Error,
+            >::new();
+            mock_add_selfie
+                .expect_make_request()
+                .times(1)
+                .return_once(move |_| Ok(idv::tests::fixtures::incode::add_selfie_response()));
+            state.set_incode_add_selfie(Arc::new(mock_add_selfie));
 
-    // ML consent
-    let mut mock_ml_consent = MockVendorAPICall::<
-        IncodeAddMLConsentRequest,
-        IncodeResponse<AddConsentResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_ml_consent
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::add_consent_response()));
-    state.set_incode_add_ml_consent(Arc::new(mock_ml_consent));
+            let mut mock_process_face = MockVendorAPICall::<
+                IncodeProcessFaceRequest,
+                IncodeResponse<ProcessFaceResponse>,
+                idv::incode::error::Error,
+            >::new();
+            mock_process_face
+                .expect_make_request()
+                .times(1)
+                .return_once(move |_| Ok(idv::tests::fixtures::incode::process_face_response()));
+            state.set_incode_process_face(Arc::new(mock_process_face));
+        }
+    }
 
-    // Fetch Scores
-    let mut mock_fetch_scores = MockVendorAPICall::<
-        IncodeFetchScoresRequest,
-        IncodeResponse<FetchScoresResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_fetch_scores
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::fetch_scores_response()));
-    state.set_incode_fetch_scores(Arc::new(mock_fetch_scores));
-    // Fetch OCR
-    let mut mock_fetch_ocr = MockVendorAPICall::<
-        IncodeFetchOCRRequest,
-        IncodeResponse<FetchOCRResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_fetch_ocr
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::fetch_ocr_response(None)));
-    state.set_incode_fetch_ocr(Arc::new(mock_fetch_ocr));
-
-    let mut mock_get_ob_status = MockVendorAPICall::<
-        IncodeGetOnboardingStatusRequest,
-        IncodeResponse<GetOnboardingStatusResponse>,
-        idv::incode::error::Error,
-    >::new();
-    mock_get_ob_status
-        .expect_make_request()
-        .times(1)
-        .return_once(move |_| Ok(idv::tests::fixtures::incode::get_onboarding_status_response()));
-    state.set_incode_get_onboarding_status(Arc::new(mock_get_ob_status));
-
-    if require_selfie {
-        let mut mock_add_selfie = MockVendorAPICall::<
-            IncodeAddSelfieRequest,
-            IncodeResponse<AddSelfieResponse>,
+    fn mock_processing(&self, state: &mut State) {
+        // Process ID
+        let mut mock_incode_process_id = MockVendorAPICall::<
+            IncodeProcessIdRequest,
+            IncodeResponse<ProcessIdResponse>,
             idv::incode::error::Error,
         >::new();
-        mock_add_selfie
+        mock_incode_process_id
             .expect_make_request()
             .times(1)
-            .return_once(move |_| Ok(idv::tests::fixtures::incode::add_selfie_response()));
-        state.set_incode_add_selfie(Arc::new(mock_add_selfie));
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::process_id_response()));
+        state.set_incode_process_id(Arc::new(mock_incode_process_id));
 
-        let mut mock_process_face = MockVendorAPICall::<
-            IncodeProcessFaceRequest,
-            IncodeResponse<ProcessFaceResponse>,
+        // Privacy Consent
+        let mut mock_privacy_consent = MockVendorAPICall::<
+            IncodeAddPrivacyConsentRequest,
+            IncodeResponse<AddConsentResponse>,
             idv::incode::error::Error,
         >::new();
-        mock_process_face
+        mock_privacy_consent
             .expect_make_request()
             .times(1)
-            .return_once(move |_| Ok(idv::tests::fixtures::incode::process_face_response()));
-        state.set_incode_process_face(Arc::new(mock_process_face));
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::add_consent_response()));
+        state.set_incode_add_privacy_consent(Arc::new(mock_privacy_consent));
+
+        // ML consent
+        let mut mock_ml_consent = MockVendorAPICall::<
+            IncodeAddMLConsentRequest,
+            IncodeResponse<AddConsentResponse>,
+            idv::incode::error::Error,
+        >::new();
+        mock_ml_consent
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::add_consent_response()));
+        state.set_incode_add_ml_consent(Arc::new(mock_ml_consent));
+
+        // Fetch Scores
+        let mut mock_fetch_scores = MockVendorAPICall::<
+            IncodeFetchScoresRequest,
+            IncodeResponse<FetchScoresResponse>,
+            idv::incode::error::Error,
+        >::new();
+        mock_fetch_scores
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::fetch_scores_response()));
+        state.set_incode_fetch_scores(Arc::new(mock_fetch_scores));
+        // Fetch OCR
+        let mut mock_fetch_ocr = MockVendorAPICall::<
+            IncodeFetchOCRRequest,
+            IncodeResponse<FetchOCRResponse>,
+            idv::incode::error::Error,
+        >::new();
+        mock_fetch_ocr
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::fetch_ocr_response(None)));
+        state.set_incode_fetch_ocr(Arc::new(mock_fetch_ocr));
+
+        let mut mock_get_ob_status = MockVendorAPICall::<
+            IncodeGetOnboardingStatusRequest,
+            IncodeResponse<GetOnboardingStatusResponse>,
+            idv::incode::error::Error,
+        >::new();
+        mock_get_ob_status
+            .expect_make_request()
+            .times(1)
+            .return_once(move |_| Ok(idv::tests::fixtures::incode::get_onboarding_status_response()));
+        state.set_incode_get_onboarding_status(Arc::new(mock_get_ob_status));
     }
 }
+
 
 // Mock s3 client returning an encrypted image. We have to do a lot of dancing around here
 // bc the enclave client needs to decrypt bytes encrypted in a certain format with a specific key

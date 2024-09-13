@@ -1,8 +1,9 @@
 use super::document_test_utils::mock_enclave_s3_client;
 use super::document_test_utils::mock_ff_client;
-use super::document_test_utils::mock_incode_request;
 use super::document_test_utils::mock_s3_put_object;
 use super::document_test_utils::DocumentUploadTestCase;
+use super::document_test_utils::IncodeMockOpts;
+use super::document_test_utils::IncodeMocker;
 use super::document_test_utils::UserKind;
 use super::test_helpers::FixtureData;
 use crate::decision::document::meta_headers::MetaHeaders;
@@ -224,7 +225,8 @@ async fn upload_and_process(
 ) -> DocumentResponse {
     // only make incode requests for live users
     if test_case.make_incode_calls() {
-        mock_incode_request(state, test_case.document_type, test_case.requires_selfie());
+        let mocker = IncodeMocker::new(test_case.document_type, test_case.requires_selfie());
+        mocker.mock(state, IncodeMockOpts::Full)
     }
 
     let mut sides = test_case.document_type.sides();
@@ -379,7 +381,7 @@ async fn assertions(
 }
 
 // Assert incode_verification_session is in the correct state
-async fn assert_ivs_in_state(
+pub async fn assert_ivs_in_state(
     state: &State,
     document_id: DocumentId,
     incode_session_state: IncodeVerificationSessionState,
