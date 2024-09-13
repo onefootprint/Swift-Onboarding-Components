@@ -13,12 +13,21 @@ import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
+const getSdkVersionQueryParam = (): string => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  return new URL(window.location.href).searchParams.get('sdkv') || '';
+};
+
 const appendLogContext = ({ meta }: GetD2PResponse) => {
   Logger.appendGlobalContext({
     fp_session_id: String(meta?.sessionId),
     l10n: JSON.stringify(meta?.l10n),
     opener: String(meta?.opener),
     redirectUrl: String(meta?.redirectUrl),
+    sdkVersion: getSdkVersionQueryParam(),
   });
 };
 

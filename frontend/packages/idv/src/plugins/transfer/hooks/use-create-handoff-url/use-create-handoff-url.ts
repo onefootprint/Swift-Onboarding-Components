@@ -3,6 +3,7 @@ import { HANDOFF_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { DocumentRequestKind } from '@onefootprint/types';
 import { useMemo } from 'react';
+import { Logger } from '../../../../utils/logger';
 
 import type { TransferRequirements } from '../../types';
 
@@ -40,11 +41,16 @@ const useCreateHandoffUrl = ({
     const params = new URLSearchParams();
     const fpSessionId = getSessionIdFromStorage();
     const randomSeed = Math.floor(Math.random() * 1000).toString();
+    const loggerGlobalContext = Logger.getGlobalContext();
+
     if (language !== 'en') {
       params.append('lng', language);
     }
     if (fpSessionId) {
       params.append('xfpsessionid', fpSessionId);
+    }
+    if (loggerGlobalContext?.sdkVersion) {
+      params.append('sdkv', String(loggerGlobalContext.sdkVersion));
     }
     params.append('r', randomSeed);
 

@@ -7,6 +7,12 @@ import {
   onboardingConfigFixture,
 } from './use-create-handoff-url.test.config';
 
+jest.mock('../../../../utils/logger', () => ({
+  Logger: {
+    getGlobalContext: () => ({ sdkVersion: 'test@1.0.0' }),
+  },
+}));
+
 describe('useCreateHandoffUrl', () => {
   it('should return undefined when authToken is not provided', () => {
     const { result } = customRenderHook(() => useCreateHandoffUrl({}));
@@ -40,6 +46,21 @@ describe('useCreateHandoffUrl', () => {
 
       expect(result.current.hash).toBe('#tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN');
       expect(result.current.searchParams.get('r')).toMatch(/^\d{1,3}$/);
+      expect(result.current.origin).toBe('https://handoff.onefootprint.com');
+    });
+
+    it('should return sdkVersion in the URL', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_123',
+          baseUrl: 'https://handoff.onefootprint.com',
+          onboardingConfig: onboardingConfigFixture,
+          missingRequirements: missingRequirementsFixture,
+        }),
+      );
+
+      expect(result.current.hash).toBe('#tok_123');
+      expect(result.current.searchParams.get('sdkv')).toBe('test@1.0.0');
       expect(result.current.origin).toBe('https://handoff.onefootprint.com');
     });
   });

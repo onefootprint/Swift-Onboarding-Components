@@ -95,6 +95,14 @@ const LoggerFactory = () => {
     }
   };
 
+  const getGlobalContext = (): ReturnType<typeof datadogLogs.getGlobalContext> | undefined => {
+    try {
+      return datadogLogs.getGlobalContext();
+    } catch (_e) {
+      return undefined;
+    }
+  };
+
   const startSessionReplay = () => {
     if (isSessionReplayOn) return;
 
@@ -150,6 +158,7 @@ const LoggerFactory = () => {
   return {
     appendGlobalContext,
     error,
+    getGlobalContext,
     info,
     init,
     setGlobalContext,
