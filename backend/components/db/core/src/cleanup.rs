@@ -47,6 +47,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::vault;
     use db_schema::schema::vault_data;
     use db_schema::schema::vault_dr_blob;
+    use db_schema::schema::vault_dr_manifest;
     use db_schema::schema::verification_request;
     use db_schema::schema::verification_result;
     use db_schema::schema::watchlist_check;
@@ -325,9 +326,20 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
         }
 
-        deleted_rows += diesel::delete(scoped_vault_version::table)
-            .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
-            .execute(conn.conn())?;
+        // Scoped Vault Versions
+        {
+            let svv_ids = scoped_vault_version::table
+                .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
+                .select(scoped_vault_version::id);
+
+            deleted_rows += diesel::delete(vault_dr_manifest::table)
+                .filter(vault_dr_manifest::scoped_vault_version_id.eq_any(svv_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(scoped_vault_version::table)
+                .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
+        }
 
         // delete scoped_users
         deleted_rows += diesel::delete(scoped_vault::table)
