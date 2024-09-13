@@ -9,7 +9,7 @@ type DisplayValueProps = {
 };
 
 const DisplayValue = ({ name, value }: DisplayValueProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.collected-data' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.collected-data' });
 
   if (typeof value === 'boolean') {
     return value ? <IcoCheckSmall24 aria-label={t('enabled')} /> : <IcoCloseSmall24 aria-label={t('disabled')} />;

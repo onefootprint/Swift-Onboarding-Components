@@ -22,21 +22,23 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
           {title}
         </Text>
       )}
-      {options && (
+      {options ? (
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
             const typedName = name as keyof Option;
             const typedValue = value as Option[keyof Option];
+            const label = getLabel(typedName);
+
             return (
-              <OptionItem key={name} role="row" aria-label={getLabel(typedName)}>
+              <OptionItem key={name} role="row" aria-label={label}>
                 <DisplayValue name={typedName} value={typedValue} />
                 <Label name={typedName} value={typedValue} />
               </OptionItem>
             );
           })}
         </OptionsContainer>
-      )}
+      ) : null}
       {subtitle && (
         <Text color="secondary" variant="body-2">
           {subtitle}

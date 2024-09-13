@@ -1,6 +1,12 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 
+export type SsnOption = {
+  active: boolean;
+  kind?: 'ssn9' | 'ssn4';
+  optional?: boolean;
+};
+
 export type Option = Partial<{
   name: boolean;
   dob: boolean;
@@ -11,11 +17,7 @@ export type Option = Partial<{
   countrySpecificIdDocKind: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
   phoneNumber: boolean;
   selfie: boolean;
-  ssn: {
-    active: boolean;
-    kind?: string;
-    optional?: boolean;
-  };
+  ssn: SsnOption;
   usTaxIdAcceptable?: boolean;
   usLegalStatus: boolean;
   countriesRestrictions: CountryRecord[];

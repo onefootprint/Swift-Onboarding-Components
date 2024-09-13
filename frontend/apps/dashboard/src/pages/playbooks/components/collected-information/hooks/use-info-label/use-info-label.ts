@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import type { Option } from '../../collected-information.types';
+import type { Option, SsnOption } from '../../collected-information.types';
 
 const useInfoLabel = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.collected-data' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'details.collected-data' });
   const map: Partial<Record<keyof Option, string>> = {
     name: t('name'),
     dob: t('dob'),
@@ -32,10 +32,18 @@ const useInfoLabel = () => {
     emailAddress: t('email-address'),
   };
 
+  const isSsnOption = (value: unknown): value is SsnOption => {
+    return typeof value === 'object' && value !== null && 'kind' in value;
+  };
+
   return (key: keyof Option, value?: Option[keyof Option]): string => {
-    if (value && typeof value === 'object' && 'kind' in value) {
-      return t(value.kind === 'ssn9' ? 'ssn-9' : 'ssn-4');
+    if (isSsnOption(value)) {
+      const { optional, kind } = value;
+      const kindText = kind === 'ssn4' ? t('ssn4') : t('ssn9');
+      const optionalText = optional ? ` ⋅ ${t('optional-label')}` : '';
+      return `${t('ssn')} (${kindText})${optionalText}`;
     }
+
     return map[key] || '';
   };
 };

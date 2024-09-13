@@ -48,11 +48,11 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
 
   return (
     <Stack gap={4} flexDirection="column">
-      <Text variant="label-3">{t('title')}</Text>
+      <Text variant="label-2">{t('title')}</Text>
       {variant === 'sectioned' && (
         <>
           <Divider variant="secondary" />
-          <Text variant="label-3">{t('docs-to-collect')}</Text>
+          <Text variant="label-2">{t('docs-to-collect')}</Text>
         </>
       )}
       <Stack paddingLeft={3} gap={3} flexDirection="column">
@@ -125,12 +125,12 @@ const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSe
   const { t } = useTranslation('playbooks', { keyPrefix: 'details.data-collection.additional-docs' });
   return (
     <Stack gap={2} alignItems="center">
-      <Text variant="body-3" color="secondary">
+      <Text variant="body-2" color="secondary">
         {label}
       </Text>
       {identifier || description || requiresHumanReview ? (
         <>
-          <Text variant="body-3" color="secondary">
+          <Text variant="body-2" color="secondary">
             ⋅
           </Text>
           <Popover
@@ -143,7 +143,7 @@ const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSe
               />
             }
           >
-            <Text variant="body-3" color="secondary">
+            <Text variant="body-2" color="secondary">
               {t('more-details')}
             </Text>
           </Popover>

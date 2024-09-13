@@ -12,7 +12,7 @@ const Section = ({ title, variant, children }: BorderedSectionProps) => {
     return (
       <Stack direction="column" gap={4} paddingBottom={7}>
         {!!title && (
-          <Text variant="label-3" color="primary">
+          <Text variant="label-2" color="primary">
             {title}
           </Text>
         )}
@@ -27,7 +27,7 @@ const Section = ({ title, variant, children }: BorderedSectionProps) => {
   return (
     <Stack direction="column" gap={5}>
       {!!title && (
-        <Text variant="label-3" color="primary">
+        <Text variant="label-2" color="primary">
           {title}
         </Text>
       )}
