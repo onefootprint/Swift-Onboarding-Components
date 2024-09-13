@@ -163,7 +163,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : (
     <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
-      <IconButton variant="secondary" aria-label={t('edit-business.label')} size="compact">
+      <IconButton variant="secondary" aria-label={t('edit-business.label')} size="compact" onClick={editControls.start}>
         <IcoPencil16 />
       </IconButton>
     </PermissionGate>
