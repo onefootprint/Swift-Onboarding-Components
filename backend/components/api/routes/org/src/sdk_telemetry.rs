@@ -1,3 +1,4 @@
+use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -19,7 +20,7 @@ struct LogBody {
 
 #[api_v2_operation(tags(SdkArgs, Hosted), description = "Log contents of the HTTP body. ")]
 #[post("/org/sdk_telemetry")]
-async fn post(request: web::Json<LogBody>) -> ApiResponse<api_wire_types::Empty> {
+async fn post(request: web::Json<LogBody>, root_span: RootSpan) -> ApiResponse<api_wire_types::Empty> {
     let fmt = |v: Option<String>| v.unwrap_or_default();
     let LogBody {
         tenant_domain,
@@ -32,6 +33,8 @@ async fn post(request: web::Json<LogBody>) -> ApiResponse<api_wire_types::Empty>
     } = request.into_inner();
     // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved
     // for Datadog RUM.
-    tracing::info!(fp_session_id=%fmt(session_id), tenant_domain=%fmt(tenant_domain), sdk_kind=%fmt(sdk_kind), sdk_name=%fmt(sdk_name), sdk_version=%fmt(sdk_version), log_level=%fmt(log_level), log_message=%fmt(log_message), "SDK telemetry");
+    // Normally this is added via a header, but here we read it from the body
+    root_span.record("fp_session_id", session_id);
+    tracing::info!(tenant_domain=%fmt(tenant_domain), sdk_kind=%fmt(sdk_kind), sdk_name=%fmt(sdk_name), sdk_version=%fmt(sdk_version), log_level=%fmt(log_level), log_message=%fmt(log_message), "SDK telemetry");
     Ok(api_wire_types::Empty)
 }
