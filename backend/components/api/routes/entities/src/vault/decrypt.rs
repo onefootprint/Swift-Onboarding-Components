@@ -339,15 +339,9 @@ pub(super) async fn post_inner(
                             let seqno = DataLifetime::get_seqno_at(conn, t)?;
                             Some(seqno)
                         }
-                        Some(VwVersion::ScopedVaultVersion(svv)) => {
-                            if svv == 0.into() {
-                                // A version number of 0 represents the state of the vault with no
-                                // DLs. Translate this into a seqno of 0, which is before all DLs.
-                                Some(DataLifetimeSeqno::from(0))
-                            } else {
-                                let svv = ScopedVaultVersion::get(conn, &scoped_user.id, svv)?;
-                                Some(svv.seqno)
-                            }
+                        Some(VwVersion::ScopedVaultVersion(svvn)) => {
+                            let seqno = ScopedVaultVersion::get_seqno(conn, &scoped_user.id, svvn)?;
+                            Some(seqno)
                         }
                     };
                     VaultWrapper::build_for_tenant_maybe_version(conn, &scoped_user.id, v_seqno)

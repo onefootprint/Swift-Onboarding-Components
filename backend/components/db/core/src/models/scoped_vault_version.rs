@@ -108,6 +108,25 @@ impl ScopedVaultVersion {
         Ok(result)
     }
 
+    #[tracing::instrument("ScopedVaultVersion::get_seqno", skip_all)]
+    pub fn get_seqno(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        version: ScopedVaultVersionNumber,
+    ) -> DbResult<DataLifetimeSeqno> {
+        if version == 0.into() {
+            // A version number of 0 represents the state of the vault with no
+            // DLs. Translate this into a seqno of 0, which is before all DLs.
+            Ok(DataLifetimeSeqno::from(0))
+        } else {
+            let svv: ScopedVaultVersion = scoped_vault_version::table
+                .filter(scoped_vault_version::scoped_vault_id.eq(sv_id))
+                .filter(scoped_vault_version::version.eq(version))
+                .get_result(conn)?;
+            Ok(svv.seqno)
+        }
+    }
+
     #[tracing::instrument("ScopedVaultVersion::latest_version_number", skip_all)]
     pub fn latest_version_number(
         conn: &mut PgConn,

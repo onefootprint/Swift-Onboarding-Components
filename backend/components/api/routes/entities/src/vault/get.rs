@@ -7,16 +7,21 @@ use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::web::Query;
+use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::VaultVersion;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use macros::route_alias;
 use newtypes::impl_map_apiv2_schema;
 use newtypes::impl_response_type;
 use newtypes::input::Csv;
 use newtypes::BusinessDataIdentifier;
 use newtypes::DataIdentifier;
+use newtypes::PreviewApi;
+use newtypes::ScopedVaultVersionNumber;
 use newtypes::UserDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -77,11 +82,16 @@ pub async fn get(
     state: web::Data<State>,
     path: FpIdPath,
     request: Query<UserFieldsParam>,
+    vault_version: VaultVersion,
     auth: Either<TenantSessionAuth, TenantApiKey>,
-) -> ApiResponse<GetUserVaultResponse> {
+) -> ApiResponse<WithVaultVersionHeader<GetUserVaultResponse>> {
     let UserFieldsParam { fields } = request.into_inner();
-    let result = get_inner(state, path, fields, auth).await?;
-    Ok(GetUserVaultResponse(result))
+    let (result, vault_version) = get_inner(state, path, fields, vault_version, auth).await?;
+
+    Ok(WithVaultVersionHeader::new(
+        GetUserVaultResponse(result),
+        vault_version,
+    ))
 }
 
 #[api_v2_operation(
@@ -93,31 +103,53 @@ pub async fn get_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Query<BusinessFieldsParam>,
+    vault_version: VaultVersion,
     auth: Either<TenantSessionAuth, TenantApiKey>,
-) -> ApiResponse<GetBusinessVaultResponse> {
+) -> ApiResponse<WithVaultVersionHeader<GetBusinessVaultResponse>> {
     let BusinessFieldsParam { fields } = request.into_inner();
-    let result = get_inner(state, path, fields, auth).await?;
-    Ok(GetBusinessVaultResponse(result))
+    let (result, vault_version) = get_inner(state, path, fields, vault_version, auth).await?;
+
+    Ok(WithVaultVersionHeader::new(
+        GetBusinessVaultResponse(result),
+        vault_version,
+    ))
 }
 
 async fn get_inner(
     state: web::Data<State>,
     path: FpIdPath,
     fields: Option<Csv<DataIdentifier>>,
+    vault_version: VaultVersion,
     auth: Either<TenantSessionAuth, TenantApiKey>,
-) -> ApiResponse<HashMap<DataIdentifier, bool>> {
+) -> ApiResponse<(HashMap<DataIdentifier, bool>, Option<ScopedVaultVersionNumber>)> {
     let fp_id = path.into_inner();
 
     let auth = auth.check_guard(TenantGuard::Read)?;
     let is_live = auth.is_live()?;
-    let tenant_id = auth.tenant().id.clone();
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
 
-    let uvw = state
+    let vault_version = if tenant.can_access_preview(&PreviewApi::VaultVersioning) {
+        vault_version.into_inner()
+    } else {
+        None
+    };
+
+    let (uvw, svvn) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            Ok(uvw)
+            let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+
+            let svvn = if let Some(svvn) = vault_version {
+                svvn
+            } else {
+                ScopedVaultVersion::latest_version_number(conn, &scoped_vault.id)?
+            };
+            let seqno = ScopedVaultVersion::get_seqno(conn, &scoped_vault.id, svvn)?;
+
+            let uvw: TenantVw = VaultWrapper::build_for_tenant_version(conn, &scoped_vault.id, seqno)?;
+
+            Ok((uvw, svvn))
         })
         .await?;
 
@@ -128,5 +160,11 @@ async fn get_inner(
         populated.clone()
     };
     let results = HashMap::from_iter(keys.into_iter().map(|di| (di.clone(), populated.contains(&di))));
-    Ok(results)
+
+    let vault_version = if tenant.can_access_preview(&PreviewApi::VaultVersioning) {
+        Some(svvn)
+    } else {
+        None
+    };
+    Ok((results, vault_version))
 }

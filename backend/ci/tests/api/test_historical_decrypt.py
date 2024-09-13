@@ -4,6 +4,7 @@ from tests.bifrost_client import BifrostClient
 from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
+    get_raw,
     post,
     post_raw,
     patch,
@@ -236,3 +237,36 @@ def test_versioned_decryption(sandbox_tenant, entity, di_1, di_2):
         "custom.abc": None,
         "custom.def": "5678",
     }
+
+    # Fetching the vault at the latest version yields the proper data/version.
+    resp = get_raw(f"{entity}/{fp_id}/vault", None, sandbox_tenant.s_sk)
+    version = resp.headers["x-fp-vault-version"]
+    assert version == "3"
+    fields = resp.json()
+    assert fields == {
+        di_1: True,
+        "custom.def": True,
+    }
+
+    # Fetching the vault at an older version yields the proper data/version.
+    resp = get_raw(
+        f"{entity}/{fp_id}/vault", None, sandbox_tenant.s_sk, VaultVersion(2)
+    )
+    version = resp.headers["x-fp-vault-version"]
+    assert version == "2"
+    fields = resp.json()
+    assert fields == {
+        di_1: True,
+        di_2: True,
+        "custom.abc": True,
+        "custom.def": True,
+    }
+
+    # Fetching the vault at version zero yields no data.
+    resp = get_raw(
+        f"{entity}/{fp_id}/vault", None, sandbox_tenant.s_sk, VaultVersion(0)
+    )
+    version = resp.headers["x-fp-vault-version"]
+    assert version == "0"
+    fields = resp.json()
+    assert fields == {}
