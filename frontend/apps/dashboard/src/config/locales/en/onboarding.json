@@ -119,6 +119,7 @@
   "in-progress": {
     "aria": "You may be here unintentionally.",
     "title": "Onboarding pending",
+    "aria": "You may be here unintentionally.",
     "description": "We noticed that you have an incomplete onboarding with <bold>{{tenantName}}</bold>. If you want to finalize your onboarding, or need support, please continue on their website or app instead.",
     "description-many": "We noticed that you have an incomplete onboarding with <bold>{{tenantNameFirst}}</bold> and <bold>{{tenantNameSecond}}</bold>. If you want to finalize your onboarding, or need support, please continue on their website or app instead.",
     "cta-single": "Go to {{tenantName}}",

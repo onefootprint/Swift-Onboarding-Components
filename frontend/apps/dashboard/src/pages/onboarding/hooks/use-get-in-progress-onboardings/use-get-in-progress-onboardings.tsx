@@ -8,16 +8,16 @@ type GetInProgressOnboardingProps = {
 };
 
 export const getInProgressOnboardings = async ({ authToken }: GetInProgressOnboardingProps) => {
-  const response = await request<InProgressOnboarding>({
+  const response = await request<InProgressOnboarding[]>({
     headers: {
       [DASHBOARD_AUTHORIZATION_HEADER]: authToken,
       [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(true),
     },
+    method: 'GET',
+    url: '/org/member/in_progress_onboardings',
     params: {
       isLive: true,
     },
-    method: 'GET',
-    url: '/org/member/in_progress_onboardings',
   });
 
   return response.data;

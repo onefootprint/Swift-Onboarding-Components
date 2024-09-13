@@ -1,6 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Organization, Role, UserUpdateResponse } from '@onefootprint/types';
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
+import { OnboardingStatus, RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const userFixture: UserUpdateResponse = {
   email: 'jane.doe@acme.com',
@@ -86,4 +86,32 @@ export const withInviteMember = () =>
     method: 'post',
     path: '/org/members',
     response: null,
+  });
+
+export const withNoInProgressOnboardings = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/member/in_progress_onboardings',
+    statusCode: 200,
+    response: {
+      data: [],
+    },
+  });
+
+export const withInProgressOnboarding = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/member/in_progress_onboardings',
+    statusCode: 200,
+    response: [
+      {
+        fpId: '1',
+        status: OnboardingStatus.incomplete,
+        tenant: {
+          name: 'Flexcar',
+          websiteUrl: 'https://flexcar.com',
+        },
+        timestamp: '2023-05-01T12:00:00Z',
+      },
+    ],
   });
