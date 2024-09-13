@@ -1,4 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import type { InProgressOnboarding } from '@onefootprint/types';
 import Takeover from './takeover';
 import {
   fourInProgressOnboardingsFixture,
@@ -12,25 +13,27 @@ describe('Takeover', () => {
     jest.clearAllMocks();
   });
 
-  describe('has one tenant', () => {
-    beforeEach(() => {
-      customRender(<Takeover inProgressOnboardings={oneInProgressOnboardingFixture} />);
-    });
+  const renderTakeover = (inProgressOnboardings: InProgressOnboarding[]) => {
+    return customRender(<Takeover inProgressOnboardings={inProgressOnboardings} onConfirm={jest.fn()} />);
+  };
 
+  describe('has one tenant', () => {
     it('button shows up properly and opens correct URL when clicked', async () => {
+      renderTakeover(oneInProgressOnboardingFixture);
       const mockWindowOpen = jest.fn();
       Object.defineProperty(window, 'open', {
         writable: true,
         value: mockWindowOpen,
       });
 
-      const button = screen.getByRole('button', { name: 'Go to Flexcar' });
+      const button = await screen.findByRole('button', { name: 'Go to Flexcar' });
       await userEvent.click(button);
       expect(mockWindowOpen).toHaveBeenCalledWith('https://flexcar.com', '_blank', 'noopener,noreferrer');
     });
 
-    it('description shows tenant name', () => {
-      const description = screen.getByLabelText('description');
+    it('description shows tenant name', async () => {
+      renderTakeover(oneInProgressOnboardingFixture);
+      const description = await screen.findByLabelText('description');
       const tenant1 = 'Flexcar';
       expect(description).toBeInTheDocument();
       expect(description).toHaveTextContent(tenant1);
@@ -38,19 +41,16 @@ describe('Takeover', () => {
   });
 
   describe('has two tenants', () => {
-    beforeEach(() => {
-      customRender(<Takeover inProgressOnboardings={twoInProgressOnboardingsFixture} />);
-    });
-
     it('shows two buttons and opens correct URLs when clicked', async () => {
+      renderTakeover(twoInProgressOnboardingsFixture);
       const mockWindowOpen = jest.fn();
       Object.defineProperty(window, 'open', {
         writable: true,
         value: mockWindowOpen,
       });
 
-      const button1 = screen.getByRole('button', { name: 'Go to Flexcar' });
-      const button2 = screen.getByRole('button', { name: 'Go to Composer' });
+      const button1 = await screen.findByRole('button', { name: 'Go to Flexcar' });
+      const button2 = await screen.findByRole('button', { name: 'Go to Composer' });
 
       await userEvent.click(button1);
       expect(mockWindowOpen).toHaveBeenCalledWith('https://flexcar.com', '_blank', 'noopener,noreferrer');
@@ -59,8 +59,9 @@ describe('Takeover', () => {
       expect(mockWindowOpen).toHaveBeenCalledWith('https://composer.com', '_blank', 'noopener,noreferrer');
     });
 
-    it('description shows both tenant names', () => {
-      const description = screen.getByLabelText('description');
+    it('description shows both tenant names', async () => {
+      renderTakeover(twoInProgressOnboardingsFixture);
+      const description = await screen.findByLabelText('description');
       const tenant1 = 'Flexcar';
       const tenant2 = 'Composer';
       expect(description).toBeInTheDocument();
@@ -70,20 +71,17 @@ describe('Takeover', () => {
   });
 
   describe('has three tenants', () => {
-    beforeEach(() => {
-      customRender(<Takeover inProgressOnboardings={threeInProgressOnboardingsFixture} />);
-    });
-
     it('shows three buttons and opens correct URLs when clicked', async () => {
+      renderTakeover(threeInProgressOnboardingsFixture);
       const mockWindowOpen = jest.fn();
       Object.defineProperty(window, 'open', {
         writable: true,
         value: mockWindowOpen,
       });
 
-      const button1 = screen.getByRole('button', { name: 'Go to Flexcar' });
-      const button2 = screen.getByRole('button', { name: 'Go to Composer' });
-      const button3 = screen.getByRole('button', { name: 'Go to Bloom' });
+      const button1 = await screen.findByRole('button', { name: 'Go to Flexcar' });
+      const button2 = await screen.findByRole('button', { name: 'Go to Composer' });
+      const button3 = await screen.findByRole('button', { name: 'Go to Bloom' });
 
       await userEvent.click(button1);
       expect(mockWindowOpen).toHaveBeenCalledWith('https://flexcar.com', '_blank', 'noopener,noreferrer');
@@ -95,8 +93,9 @@ describe('Takeover', () => {
       expect(mockWindowOpen).toHaveBeenCalledWith('https://bloom.com', '_blank', 'noopener,noreferrer');
     });
 
-    it('description shows all tenant names', () => {
-      const description = screen.getByLabelText('description');
+    it('description shows all tenant names', async () => {
+      renderTakeover(threeInProgressOnboardingsFixture);
+      const description = await screen.findByLabelText('description');
       const tenant1 = 'Flexcar';
       const tenant2 = 'Composer';
       const tenant3 = 'Bloom';
@@ -108,21 +107,18 @@ describe('Takeover', () => {
   });
 
   describe('has four tenants', () => {
-    beforeEach(() => {
-      customRender(<Takeover inProgressOnboardings={fourInProgressOnboardingsFixture} />);
-    });
-
     it('shows four buttons and opens correct URLs when clicked', async () => {
+      renderTakeover(fourInProgressOnboardingsFixture);
       const mockWindowOpen = jest.fn();
       Object.defineProperty(window, 'open', {
         writable: true,
         value: mockWindowOpen,
       });
 
-      const button1 = screen.getByRole('button', { name: 'Go to Flexcar' });
-      const button2 = screen.getByRole('button', { name: 'Go to Composer' });
-      const button3 = screen.getByRole('button', { name: 'Go to Bloom' });
-      const button4 = screen.getByRole('button', { name: 'Go to Findigs' });
+      const button1 = await screen.findByRole('button', { name: 'Go to Flexcar' });
+      const button2 = await screen.findByRole('button', { name: 'Go to Composer' });
+      const button3 = await screen.findByRole('button', { name: 'Go to Bloom' });
+      const button4 = await screen.findByRole('button', { name: 'Go to Findigs' });
 
       await userEvent.click(button1);
       expect(mockWindowOpen).toHaveBeenCalledWith('https://flexcar.com', '_blank', 'noopener,noreferrer');
@@ -137,8 +133,9 @@ describe('Takeover', () => {
       expect(mockWindowOpen).toHaveBeenCalledWith('https://findigs.com', '_blank', 'noopener,noreferrer');
     });
 
-    it('description shows all tenant names', () => {
-      const description = screen.getByLabelText('description');
+    it('description shows all tenant names', async () => {
+      renderTakeover(fourInProgressOnboardingsFixture);
+      const description = await screen.findByLabelText('description');
       const tenant1 = 'Flexcar';
       const tenant2 = 'Composer';
       const tenant3 = 'Bloom';

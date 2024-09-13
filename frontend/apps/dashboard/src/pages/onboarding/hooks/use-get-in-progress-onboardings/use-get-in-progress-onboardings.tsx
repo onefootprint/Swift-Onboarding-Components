@@ -13,6 +13,9 @@ export const getInProgressOnboardings = async ({ authToken }: GetInProgressOnboa
       [DASHBOARD_AUTHORIZATION_HEADER]: authToken,
       [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(true),
     },
+    params: {
+      isLive: true,
+    },
     method: 'GET',
     url: '/org/member/in_progress_onboardings',
   });

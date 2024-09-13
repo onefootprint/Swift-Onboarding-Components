@@ -9,9 +9,10 @@ import AreYouSure from './components/are-you-sure';
 
 type TakeoverProps = {
   inProgressOnboardings: InProgressOnboarding[];
+  onConfirm: () => void;
 };
 
-const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
+const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
   const { t } = useTranslation('onboarding', { keyPrefix: 'in-progress' });
   const isSingleTenant = inProgressOnboardings.length === 1;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -20,9 +21,8 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
     setIsConfirmOpen(false);
   };
 
-  // placeholder
-  const createBusinessAccount = () => {
-    console.log('createBusinessAccount');
+  const handleOpenConfirmDialog = () => {
+    setIsConfirmOpen(true);
   };
 
   const handleOpenWebsite = (url: string | undefined) => {
@@ -48,6 +48,7 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
           display="flex"
           flexDirection="column"
           gap={7}
+          aria-label={t('aria')}
         >
           <LogoFpCompact />
           <Stack flexDirection="column" gap={5}>
@@ -102,17 +103,16 @@ const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
                 ))}
               </Stack>
             )}
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <LinkButton>{t('cta-alternative')}</LinkButton>
-            </Box>
+            <Stack center>
+              <LinkButton onClick={handleOpenConfirmDialog}>{t('cta-alternative')}</LinkButton>
+            </Stack>
           </Stack>
         </Box>
       </Box>
       <AreYouSure
         isOpen={isConfirmOpen}
         onCancel={closeDialog}
-        // placeholder
-        onCreateBusinessAccount={createBusinessAccount}
+        onConfirm={onConfirm}
         inProgressOnboardings={inProgressOnboardings}
       />
     </Stack>
