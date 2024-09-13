@@ -4,8 +4,11 @@ import Takeover from './takeover';
 import {
   fourInProgressOnboardingsFixture,
   oneInProgressOnboardingFixture,
+  oneInProgressOnboardingNoLinkFixture,
   threeInProgressOnboardingsFixture,
   twoInProgressOnboardingsFixture,
+  twoInProgressOnboardingsNoLinksFixture,
+  twoInProgressOnboardingsOneLinkFixture,
 } from './takeover.test.config';
 
 describe('Takeover', () => {
@@ -145,6 +148,68 @@ describe('Takeover', () => {
       expect(description).toHaveTextContent(tenant2);
       expect(description).toHaveTextContent(tenant3);
       expect(description).toHaveTextContent(tenant4);
+    });
+  });
+  describe('has one tenant with no link', () => {
+    it('renders the correct description with tenant name', () => {
+      renderTakeover(oneInProgressOnboardingNoLinkFixture);
+      const description = screen.getByLabelText('description');
+      const tenant = 'Flexcar';
+      expect(description).toHaveTextContent(tenant);
+    });
+
+    it('does not render a button', () => {
+      renderTakeover(oneInProgressOnboardingNoLinkFixture);
+      const button = screen.queryByRole('button', { name: 'Go to Flexcar' });
+      expect(button).not.toBeInTheDocument();
+    });
+  });
+
+  describe('has two tenants with no links', () => {
+    it('renders the correct description with tenant names', () => {
+      renderTakeover(twoInProgressOnboardingsNoLinksFixture);
+      const description = screen.getByLabelText('description');
+      const tenant1 = 'Flexcar';
+      const tenant2 = 'Composer';
+      expect(description).toHaveTextContent(tenant1);
+      expect(description).toHaveTextContent(tenant2);
+    });
+
+    it('does not render any buttons', () => {
+      renderTakeover(twoInProgressOnboardingsNoLinksFixture);
+      const flexcarButton = screen.queryByRole('button', { name: 'Go to Flexcar' });
+      const composerButton = screen.queryByRole('button', { name: 'Go to Composer' });
+      expect(flexcarButton).not.toBeInTheDocument();
+      expect(composerButton).not.toBeInTheDocument();
+    });
+  });
+
+  describe('has two tenants with one link', () => {
+    it('renders the correct description with tenant names', () => {
+      renderTakeover(twoInProgressOnboardingsOneLinkFixture);
+      const description = screen.getByLabelText('description');
+      const tenant1 = 'Flexcar';
+      const tenant2 = 'Composer';
+      expect(description).toHaveTextContent(tenant1);
+      expect(description).toHaveTextContent(tenant2);
+    });
+
+    it('renders one button with correct text and opens correct URL when clicked', async () => {
+      renderTakeover(twoInProgressOnboardingsOneLinkFixture);
+      const mockWindowOpen = jest.fn();
+      Object.defineProperty(window, 'open', {
+        writable: true,
+        value: mockWindowOpen,
+      });
+
+      const flexcarButton = screen.getByRole('button', { name: 'Go to Flexcar' });
+      const composerButton = screen.queryByRole('button', { name: 'Go to Composer' });
+
+      expect(flexcarButton).toBeInTheDocument();
+      expect(composerButton).not.toBeInTheDocument();
+
+      await userEvent.click(flexcarButton);
+      expect(mockWindowOpen).toHaveBeenCalledWith('http://flexcar.com', '_blank', 'noopener,noreferrer');
     });
   });
 });

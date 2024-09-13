@@ -15,6 +15,7 @@ type TakeoverProps = {
 const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
   const { t } = useTranslation('onboarding', { keyPrefix: 'in-progress' });
   const isSingleTenant = inProgressOnboardings.length === 1;
+  const singleTenant = isSingleTenant ? inProgressOnboardings[0] : null;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const closeDialog = () => {
@@ -86,21 +87,25 @@ const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
                 </Text>
               )}
             </Stack>
-            {isSingleTenant ? (
-              <Button variant="primary" onClick={() => handleOpenWebsite(inProgressOnboardings[0].tenant.websiteUrl)}>
-                {t('cta-single', { tenantName: inProgressOnboardings[0].tenant.name })}
+            {isSingleTenant && singleTenant?.tenant.websiteUrl && (
+              <Button variant="primary" onClick={() => handleOpenWebsite(singleTenant.tenant.websiteUrl)}>
+                {t('cta-single', { tenantName: singleTenant.tenant.name })}
               </Button>
-            ) : (
+            )}
+
+            {!isSingleTenant && (
               <Stack flexDirection="column" gap={3}>
-                {inProgressOnboardings.map(onboarding => (
-                  <Button
-                    key={onboarding.fpId}
-                    variant="secondary"
-                    onClick={() => handleOpenWebsite(onboarding.tenant.websiteUrl)}
-                  >
-                    {t('cta-single', { tenantName: onboarding.tenant.name })}
-                  </Button>
-                ))}
+                {inProgressOnboardings.map(onboarding =>
+                  onboarding.tenant.websiteUrl ? (
+                    <Button
+                      key={onboarding.fpId}
+                      variant="secondary"
+                      onClick={() => handleOpenWebsite(onboarding.tenant.websiteUrl)}
+                    >
+                      {t('cta-single', { tenantName: onboarding.tenant.name })}
+                    </Button>
+                  ) : null,
+                )}
               </Stack>
             )}
             <Stack center>

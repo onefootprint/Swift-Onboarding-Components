@@ -15,6 +15,8 @@ export type AreYouSureProps = {
 const AreYouSure = ({ inProgressOnboardings, onConfirm, onCancel, isOpen }: AreYouSureProps) => {
   const { t } = useTranslation('onboarding', { keyPrefix: 'in-progress.are-you-sure' });
   const isSingleTenant = inProgressOnboardings.length === 1;
+  const multipleTenantsSomeWithURL =
+    !isSingleTenant && inProgressOnboardings.some(onboarding => onboarding.tenant.websiteUrl);
 
   return (
     <Dialog size="compact" title={t('title')} open={isOpen} onClose={onCancel} isConfirmation>
@@ -26,7 +28,13 @@ const AreYouSure = ({ inProgressOnboardings, onConfirm, onCancel, isOpen }: AreY
                 ns="onboarding"
                 i18nKey="in-progress.are-you-sure.description-single"
                 components={{
-                  link: <StyledLink href={inProgressOnboardings[0].tenant.websiteUrl}>{t('link-text')}</StyledLink>,
+                  link: inProgressOnboardings[0].tenant.websiteUrl ? (
+                    <StyledLink href={inProgressOnboardings[0].tenant.websiteUrl}>{t('link-text')}</StyledLink>
+                  ) : (
+                    <Text variant="label-3" tag="span">
+                      {inProgressOnboardings[0].tenant.name}
+                    </Text>
+                  ),
                   b: (
                     <Text variant="label-3" tag="span">
                       {inProgressOnboardings[0].tenant.name}
@@ -56,16 +64,18 @@ const AreYouSure = ({ inProgressOnboardings, onConfirm, onCancel, isOpen }: AreY
               />
             )}
           </Text>
-          {!isSingleTenant && (
+          {multipleTenantsSomeWithURL && (
             <Stack direction="column">
-              {inProgressOnboardings.map(onboarding => (
-                <Stack key={onboarding.tenant.name}>
-                  <LinkButton href={onboarding.tenant.websiteUrl}>
-                    {t('go-to-website', { tenant: onboarding.tenant.name })}
-                  </LinkButton>
-                  <IcoArrowTopRight24 color="accent" />
-                </Stack>
-              ))}
+              {inProgressOnboardings
+                .filter(onboarding => !!onboarding.tenant.websiteUrl)
+                .map(onboarding => (
+                  <Stack key={onboarding.tenant.name}>
+                    <LinkButton href={onboarding.tenant.websiteUrl}>
+                      {t('go-to-website', { tenant: onboarding.tenant.name })}
+                    </LinkButton>
+                    <IcoArrowTopRight24 color="accent" />
+                  </Stack>
+                ))}
             </Stack>
           )}
         </Stack>

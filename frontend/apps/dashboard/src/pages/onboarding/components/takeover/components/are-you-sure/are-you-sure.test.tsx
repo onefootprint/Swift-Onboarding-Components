@@ -3,8 +3,11 @@ import AreYouSure, { type AreYouSureProps } from './are-you-sure';
 import {
   fourInProgressOnboardingsFixture,
   oneInProgressOnboardingFixture,
+  oneInProgressOnboardingNoLinkFixture,
   threeInProgressOnboardingsFixture,
   twoInProgressOnboardingsFixture,
+  twoInProgressOnboardingsNoLinksFixture,
+  twoInProgressOnboardingsOneLinkFixture,
 } from './are-you-sure.test.config';
 
 describe('<AreYouSure />', () => {
@@ -136,6 +139,55 @@ describe('<AreYouSure />', () => {
 
       expect(findigsLink).toBeInTheDocument();
       expect(findigsLink).toHaveAttribute('href', 'https://findigs.com');
+    });
+  });
+
+  describe('single in-progress onboarding with no link', () => {
+    it('renders the correct description with tenant name', async () => {
+      renderAreYouSure({ inProgressOnboardings: oneInProgressOnboardingNoLinkFixture });
+      const description = await screen.findByLabelText('You may be here unintentionally.');
+      expect(description).toHaveTextContent('Flexcar');
+    });
+
+    it('does not render a link button', async () => {
+      renderAreYouSure({ inProgressOnboardings: oneInProgressOnboardingNoLinkFixture });
+      const linkButton = screen.queryByRole('link', { name: 'Go to Flexcar' });
+      expect(linkButton).not.toBeInTheDocument();
+    });
+  });
+
+  describe('two in-progress onboardings with no links', () => {
+    it('renders the correct description with tenant names', async () => {
+      renderAreYouSure({ inProgressOnboardings: twoInProgressOnboardingsNoLinksFixture });
+      const description = await screen.findByLabelText('You may be here unintentionally.');
+      expect(description).toHaveTextContent('Flexcar');
+      expect(description).toHaveTextContent('Composer');
+    });
+
+    it('does not render any link buttons', async () => {
+      renderAreYouSure({ inProgressOnboardings: twoInProgressOnboardingsNoLinksFixture });
+      const flexcarLink = screen.queryByRole('link', { name: 'Go to Flexcar' });
+      const composerLink = screen.queryByRole('link', { name: 'Go to Composer' });
+      expect(flexcarLink).not.toBeInTheDocument();
+      expect(composerLink).not.toBeInTheDocument();
+    });
+  });
+
+  describe('two in-progress onboardings with one link', () => {
+    it('renders the correct description with tenant names', async () => {
+      renderAreYouSure({ inProgressOnboardings: twoInProgressOnboardingsOneLinkFixture });
+      const description = await screen.findByLabelText('You may be here unintentionally.');
+      expect(description).toHaveTextContent('Flexcar');
+      expect(description).toHaveTextContent('Composer');
+    });
+
+    it('renders one link button with correct text and href', async () => {
+      renderAreYouSure({ inProgressOnboardings: twoInProgressOnboardingsOneLinkFixture });
+      const flexcarLink = await screen.findByRole('link', { name: 'Go to Flexcar' });
+      const composerLink = screen.queryByRole('link', { name: 'Go to Composer' });
+      expect(flexcarLink).toBeInTheDocument();
+      expect(flexcarLink).toHaveAttribute('href', 'http://flexcar.com');
+      expect(composerLink).not.toBeInTheDocument();
     });
   });
 });
