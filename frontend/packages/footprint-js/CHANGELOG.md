@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.15.1
+
+### Patch Changes
+
+- 2112b4b572: Remove retries and show error message when it fails
+
 ## 3.15.0
 
 ### Minor Changes
