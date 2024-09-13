@@ -16,7 +16,7 @@ use derive_more::Deref;
 #[derive(Deref)]
 pub struct TenantVw<Type = Any> {
     #[deref]
-    uvw: VaultWrapper<Type>,
+    pub(super) uvw: VaultWrapper<Type>,
     pub scoped_vault: ScopedVault,
     pub workflows: Vec<WorkflowAndConfig>,
 }

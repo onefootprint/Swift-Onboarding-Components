@@ -1,4 +1,4 @@
-use super::VaultWrapper;
+use super::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use derive_more::Deref;
 use newtypes::Locked;
@@ -40,6 +40,6 @@ pub use delete::DeleteDataResult;
 #[derive(Deref)]
 pub struct WriteableVw<Type> {
     #[deref]
-    uvw: Locked<VaultWrapper<Type>>,
+    uvw: Locked<TenantVw<Type>>,
     pub(crate) sv: Locked<ScopedVault>,
 }
