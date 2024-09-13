@@ -24,7 +24,7 @@ impl Deref for TestDbPool {
 
 static CREATE_TEST_DB_ONCE: std::sync::Once = std::sync::Once::new();
 static RUN_MIGRATIONS_ONCE: std::sync::Once = std::sync::Once::new();
-const TEST_DB_TEMPLATE_NAME: &str = "test_template_footprintdb2";
+const TEST_DB_TEMPLATE_NAME: &str = "test_template_footprintdb4";
 
 impl TestDbPool {
     fn base_db_url() -> String {
