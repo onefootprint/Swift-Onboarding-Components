@@ -22,7 +22,7 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
   const fpProvider = useFootprintProvider();
   const confirmationDialog = useConfirmationDialog();
   const { t } = useTranslation('common');
-  const isSandbox = !state.context.config?.isLive;
+  const isSandbox = state.context.config?.isLive === false;
 
   const handleClose = () => {
     if (!state.matches('identify') && !state.matches('passkeyProcessing')) {
