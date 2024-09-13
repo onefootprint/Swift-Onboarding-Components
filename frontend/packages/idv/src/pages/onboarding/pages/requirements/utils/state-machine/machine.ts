@@ -160,9 +160,21 @@ const createOnboardingRequirementsMachine = ({
         assignMissingRequirements: assign((ctx, event) => {
           const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
-            // If the highest priority requirement hasn't changed after a refetch, the user is
-            // stuck on a screen
-            logError(`User is stuck on ${ctx.lastHandledRequirement?.kind} requirement`);
+            const cleanedContext = {
+              ...ctx,
+              idvContext: {
+                ...ctx.idvContext,
+                authToken: undefined,
+                onboardingContext: {
+                  ...ctx.onboardingContext,
+                  bootstrapData: undefined,
+                },
+              },
+            };
+            logError('User is stuck on a requirement', {
+              context: cleanedContext,
+              event,
+            });
           }
           return {
             ...ctx,
