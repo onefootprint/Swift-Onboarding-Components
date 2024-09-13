@@ -50,13 +50,15 @@ const Actions = ({ member }: ActionsProps) => {
             <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
           </Dropdown.Trigger>
         </PermissionGate>
-        <Dropdown.Content align="end">
-          <Dropdown.Group>
-            <Dropdown.Item onSelect={handleRemove} variant="destructive">
-              {t('remove.cta')}
-            </Dropdown.Item>
-          </Dropdown.Group>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content align="end">
+            <Dropdown.Group>
+              <Dropdown.Item onSelect={handleRemove} variant="destructive">
+                {t('remove.cta')}
+              </Dropdown.Item>
+            </Dropdown.Group>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>
       <Box>
         <Dialog

@@ -60,23 +60,25 @@ const renderTr = (t: T, lang: Lang, handlers: Handlers, withConfirm: WithConfirm
             <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.latestVersion.name}`}>
               <IcoDotsHorizontal24 />
             </Dropdown.Trigger>
-            <Dropdown.Content align="end">
-              <Dropdown.Item
-                data-id={item.id}
-                onSelect={e => handlers.onEditClick(getDataId(e))}
-                onClick={stopPropagation}
-              >
-                {t('edit')}
-              </Dropdown.Item>
-              <Dropdown.Item
-                data-id={item.id}
-                onSelect={withConfirm(e => handlers.onDeleteClick(getDataId(e)))}
-                onClick={stopPropagation}
-                variant="destructive"
-              >
-                {t('delete')}
-              </Dropdown.Item>
-            </Dropdown.Content>
+            <Dropdown.Portal>
+              <Dropdown.Content align="end">
+                <Dropdown.Item
+                  data-id={item.id}
+                  onSelect={e => handlers.onEditClick(getDataId(e))}
+                  onClick={stopPropagation}
+                >
+                  {t('edit')}
+                </Dropdown.Item>
+                <Dropdown.Item
+                  data-id={item.id}
+                  onSelect={withConfirm(e => handlers.onDeleteClick(getDataId(e)))}
+                  onClick={stopPropagation}
+                  variant="destructive"
+                >
+                  {t('delete')}
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Portal>
           </Dropdown.Root>
         </Box>
       </>

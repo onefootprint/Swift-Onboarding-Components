@@ -21,17 +21,19 @@ const Domain = ({ domain, onRemove }: DomainProps) => {
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
-        <Dropdown.Content align="end">
-          <Dropdown.Item
-            onSelect={() => {
-              onRemove(domain);
-            }}
-            onClick={event => event.stopPropagation()}
-            variant="destructive"
-          >
-            {t('list.remove')}
-          </Dropdown.Item>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content align="end">
+            <Dropdown.Item
+              onSelect={() => {
+                onRemove(domain);
+              }}
+              onClick={event => event.stopPropagation()}
+              variant="destructive"
+            >
+              {t('list.remove')}
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>
     </Stack>
   );

@@ -4,6 +4,9 @@ import Content from './content';
 import Group from './group';
 import GroupTitle from './group-title';
 import Item from './item';
+import ItemIndicator from './item-indicator';
+import RadioGroup from './radio-group';
+import RadioItem from './radio-item';
 import SubContent from './sub/subcontent';
 import SubTrigger from './sub/subtrigger';
 import Trigger from './trigger';
@@ -24,6 +27,9 @@ const Dropdown = {
   GroupTitle,
   Divider: Separator,
   Separator: Separator,
+  RadioGroup: RadioGroup,
+  RadioItem: RadioItem,
+  RadioIndicator: ItemIndicator,
   Indicator: RadixDropdown.ItemIndicator,
   Item: Item,
   Sub: RadixDropdown.Sub,

@@ -15,14 +15,12 @@ const NUM_TENANTS_IN_DROPDOWN = 5;
 
 const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'components.private-layout.nav',
+    keyPrefix: 'components.private-layout.nav.tenants-list',
   });
   const [shouldShowAllTenants, setShouldShowAllTenants] = useState(false);
-  const [selectedTenant, setSelectedTenant] = useState(currTenantId);
   const displayList = shouldShowAllTenants ? tenants : tenants.slice(0, NUM_TENANTS_IN_DROPDOWN);
 
   const handleClick = (tenantId: string) => {
-    setSelectedTenant(tenantId);
     onSelect?.(tenantId);
   };
 
@@ -31,22 +29,19 @@ const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
   };
 
   return (
-    <>
-      <Dropdown.GroupTitle>{t('tenants-list.title')}</Dropdown.GroupTitle>
+    <Dropdown.RadioGroup value={currTenantId}>
+      <Dropdown.GroupTitle>{t('title')}</Dropdown.GroupTitle>
       {displayList.map(tenant => (
-        <TenantItem
-          key={tenant.id}
-          tenant={tenant}
-          onClick={() => handleClick(tenant.id)}
-          isSelected={tenant.id === selectedTenant}
-        />
+        <TenantItem key={tenant.id} tenant={tenant} onClick={() => handleClick(tenant.id)} aria-label={tenant.name}>
+          {tenant.name}
+        </TenantItem>
       ))}
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
         <LinkButton $paddingLeft={5} $paddingBottom={3} $paddingTop={3} onClick={handleToggleAll}>
-          {t(shouldShowAllTenants ? 'tenants-list.show-less' : 'tenants-list.show-all')}
+          {t(shouldShowAllTenants ? 'show-less' : 'show-all')}
         </LinkButton>
       )}
-    </>
+    </Dropdown.RadioGroup>
   );
 };
 

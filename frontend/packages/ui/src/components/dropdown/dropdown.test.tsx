@@ -16,10 +16,12 @@ describe('Dropdown Component', () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>Open Dropdown</Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.Item>Item 1</Dropdown.Item>
-          <Dropdown.Item>Item 2</Dropdown.Item>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content>
+            <Dropdown.Item>Item 1</Dropdown.Item>
+            <Dropdown.Item>Item 2</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>,
     );
 
@@ -32,10 +34,12 @@ describe('Dropdown Component', () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>Open Dropdown</Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.Item>Item 1</Dropdown.Item>
-          <Dropdown.Item>Item 2</Dropdown.Item>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content>
+            <Dropdown.Item>Item 1</Dropdown.Item>
+            <Dropdown.Item>Item 2</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>,
     );
 
@@ -50,9 +54,11 @@ describe('Dropdown Component', () => {
     render(
       <Dropdown.Root>
         <Dropdown.Trigger>Open Dropdown</Dropdown.Trigger>
-        <Dropdown.Content>
-          <Dropdown.Item onSelect={handleSelect}>Item 1</Dropdown.Item>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content>
+            <Dropdown.Item onSelect={handleSelect}>Item 1</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>,
     );
 

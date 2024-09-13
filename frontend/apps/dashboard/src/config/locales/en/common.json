@@ -578,6 +578,7 @@
           "title": "Tenants",
           "show-all": "Show all",
           "show-less": "Show less",
+          "log-in-to": "Log in to {{tenantName}}",
           "dialog": {
             "title": "All tenants",
             "cancel": "Cancel",

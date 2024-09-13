@@ -39,14 +39,16 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
-        <Dropdown.Content align="end">
-          <Dropdown.Item onSelect={handleToggleStatus} onClick={event => event.stopPropagation()}>
-            {proxyConfig.status === 'enabled' ? t('status.disable.cta') : t('status.enable.cta')}
-          </Dropdown.Item>
-          <Dropdown.Item onSelect={handleRemove} onClick={event => event.stopPropagation()} variant="destructive">
-            {t('remove.cta')}
-          </Dropdown.Item>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content align="end">
+            <Dropdown.Item onSelect={handleToggleStatus} onClick={event => event.stopPropagation()}>
+              {proxyConfig.status === 'enabled' ? t('status.disable.cta') : t('status.enable.cta')}
+            </Dropdown.Item>
+            <Dropdown.Item onSelect={handleRemove} onClick={event => event.stopPropagation()} variant="destructive">
+              {t('remove.cta')}
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>
       <Status proxyConfig={proxyConfig} ref={statusRef} />
       <Remove proxyConfig={proxyConfig} ref={removeRef} />

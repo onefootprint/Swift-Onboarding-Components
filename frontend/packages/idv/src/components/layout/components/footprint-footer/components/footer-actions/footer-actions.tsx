@@ -26,18 +26,20 @@ const FooterActions = ({ onWhatsThisClick, config }: FooterActionsProps) => {
       <Dropdown.Trigger>
         <IcoDotsHorizontal24 />
       </Dropdown.Trigger>
-      <Dropdown.Content align="end">
-        <Dropdown.Group>
-          <Dropdown.Item onClick={onWhatsThisClick} size="compact">
-            {t('whats-this')}
-          </Dropdown.Item>
-          <Dropdown.Item onClick={() => handleRedirect(`${FRONTPAGE_BASE_URL}/privacy-policy`)} size="compact">
-            {t('privacy')}
-          </Dropdown.Item>
-          <LanguagesSubmenu />
-          <SupportSubmenu config={config} />
-        </Dropdown.Group>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content align="end">
+          <Dropdown.Group>
+            <Dropdown.Item onClick={onWhatsThisClick} size="compact">
+              {t('whats-this')}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleRedirect(`${FRONTPAGE_BASE_URL}/privacy-policy`)} size="compact">
+              {t('privacy')}
+            </Dropdown.Item>
+            <LanguagesSubmenu />
+            <SupportSubmenu config={config} />
+          </Dropdown.Group>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };

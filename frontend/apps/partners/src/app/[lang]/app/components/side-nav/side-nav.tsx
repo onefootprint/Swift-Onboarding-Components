@@ -56,12 +56,14 @@ const SideNav = () => {
             <Dropdown.Trigger aria-label="aria-label">
               <IcoDotsHorizontal16 testID="nav-dropdown-button" />
             </Dropdown.Trigger>
-            <Dropdown.Content align="start" sideOffset={8}>
-              <Dropdown.Item onSelect={() => router.push('/auth/logout')}>
-                <IcoLogOut24 />
-                Log out
-              </Dropdown.Item>
-            </Dropdown.Content>
+            <Dropdown.Portal>
+              <Dropdown.Content align="start" sideOffset={8}>
+                <Dropdown.Item onSelect={() => router.push('/auth/logout')}>
+                  <IcoLogOut24 />
+                  Log out
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Portal>
           </Dropdown.Root>
         </Stack>
       </Stack>

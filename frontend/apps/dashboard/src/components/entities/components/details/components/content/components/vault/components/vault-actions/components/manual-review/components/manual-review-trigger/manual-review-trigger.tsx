@@ -24,32 +24,34 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewT
           {kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}
         </Button>
       </Dropdown.Trigger>
-      <Dropdown.Content align="end" sideOffset={12} $minWidth="220px">
-        <Dropdown.Group>
-          <Dropdown.Item
-            onClick={() => {
-              onSelect(ReviewStatus.pass);
-            }}
-          >
-            <div>
-              {status === EntityStatus.pass
-                ? t('dropdown.keep-as', { status: pass })
-                : t('dropdown.mark-as', { status: pass })}
-            </div>
-          </Dropdown.Item>
-          <Dropdown.Item
-            onClick={() => {
-              onSelect(ReviewStatus.fail);
-            }}
-          >
-            <div>
-              {status === EntityStatus.failed
-                ? t('dropdown.keep-as', { status: fail })
-                : t('dropdown.mark-as', { status: fail })}
-            </div>
-          </Dropdown.Item>
-        </Dropdown.Group>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content align="end" sideOffset={12} minWidth="220px">
+          <Dropdown.Group>
+            <Dropdown.Item
+              onClick={() => {
+                onSelect(ReviewStatus.pass);
+              }}
+            >
+              <div>
+                {status === EntityStatus.pass
+                  ? t('dropdown.keep-as', { status: pass })
+                  : t('dropdown.mark-as', { status: pass })}
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => {
+                onSelect(ReviewStatus.fail);
+              }}
+            >
+              <div>
+                {status === EntityStatus.failed
+                  ? t('dropdown.keep-as', { status: fail })
+                  : t('dropdown.mark-as', { status: fail })}
+              </div>
+            </Dropdown.Item>
+          </Dropdown.Group>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };

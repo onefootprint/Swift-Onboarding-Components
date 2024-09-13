@@ -32,11 +32,13 @@ const Actions = ({ tenant }: ActionsProps) => {
       <Dropdown.Trigger aria-label={'Actions'}>
         {isLoading ? <LoadingSpinner /> : <IcoDotsHorizontal24 />}
       </Dropdown.Trigger>
-      <Dropdown.Content align="end">
-        <Dropdown.Item onSelect={handleGenerateInvoice} onClick={event => event.stopPropagation()}>
-          Generate invoice
-        </Dropdown.Item>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content align="end">
+          <Dropdown.Item onSelect={handleGenerateInvoice} onClick={event => event.stopPropagation()}>
+            Generate invoice
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };

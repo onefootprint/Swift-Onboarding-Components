@@ -31,7 +31,7 @@ const LanguagesSubmenu = () => {
       <Dropdown.SubTrigger size="compact" onPointerDown={toggleSubmenu}>
         {`${t('languages')}...`}
       </Dropdown.SubTrigger>
-      <Dropdown.SubContent onPointerDownOutside={handlePointerDownOutside} $minWidth="120px">
+      <Dropdown.SubContent onPointerDownOutside={handlePointerDownOutside} minWidth="120px">
         <Dropdown.Group>
           {i18n.languages.map(language => (
             <Dropdown.Item

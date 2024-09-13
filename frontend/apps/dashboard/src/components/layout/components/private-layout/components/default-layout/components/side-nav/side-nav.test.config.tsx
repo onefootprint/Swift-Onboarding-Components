@@ -28,7 +28,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     domains: [],
     allowDomainAccess: false,
     isDomainAlreadyClaimed: null,
-    isAuthMethodSupported: false,
+    isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
     parent: null,

@@ -47,9 +47,11 @@ const Actions = ({ disabled }: ActionsProps) => {
       <Dropdown.Trigger variant="button" aria-label={t('delete')} disabled={disabled}>
         <IcoDotsHorizontal24 />
       </Dropdown.Trigger>
-      <Dropdown.Content align="end" sideOffset={8}>
-        <Dropdown.Item onSelect={launchDeleteConfirmation}>{t('delete')}</Dropdown.Item>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content align="end" sideOffset={8}>
+          <Dropdown.Item onSelect={launchDeleteConfirmation}>{t('delete')}</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };

@@ -17,9 +17,6 @@ import {
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
-const AUTH_METHOD_NOT_SUPPORTED_TEXT = (tenantName: string) =>
-  `${tenantName} has disabled the ability to log in using this auth method. Please retry using another method.`;
-
 describe('<SideNav />', () => {
   beforeEach(() => {
     mockRouter.setCurrentUrl('/');
@@ -50,7 +47,7 @@ describe('<SideNav />', () => {
         });
 
         await waitFor(() => {
-          const tenantItems = screen.queryAllByTestId('tenant-item');
+          const tenantItems = screen.queryAllByRole('menuitemradio');
           expect(tenantItems).toHaveLength(0);
         });
       });
@@ -70,45 +67,11 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 2).forEach(tenant => {
-            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+            expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
           });
 
-          const tenantItems = screen.getAllByTestId('tenant-item');
+          const tenantItems = screen.getAllByRole('menuitemradio');
           expect(tenantItems).toHaveLength(2);
-        });
-      });
-
-      it('should show a Tooltip if the tenant does not support the auth method', async () => {
-        renderSideNav();
-
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
-        await userEvent.click(navDropdownButton);
-
-        await waitFor(() => {
-          const authSupportedTenant = screen.getByRole('button', {
-            name: 'Acme',
-          });
-          expect(authSupportedTenant).toBeInTheDocument();
-        });
-        const authSupportedTenant = screen.getByRole('button', {
-          name: 'Acme',
-        });
-        await userEvent.hover(authSupportedTenant);
-        await waitFor(() => {
-          const tooltipText = screen.queryByText(AUTH_METHOD_NOT_SUPPORTED_TEXT('Acme'));
-          expect(tooltipText).not.toBeInTheDocument();
-        });
-
-        const authNotSupportedTenant = screen.getByRole('button', {
-          name: 'No Auth Tenant',
-        });
-        await waitFor(() => {
-          expect(authNotSupportedTenant).toBeInTheDocument();
-        });
-        await userEvent.hover(authNotSupportedTenant);
-        await waitFor(() => {
-          const tooltipText = screen.getAllByText(AUTH_METHOD_NOT_SUPPORTED_TEXT('No Auth Tenant'));
-          expect(tooltipText[0]).toBeInTheDocument();
         });
       });
 
@@ -122,9 +85,9 @@ describe('<SideNav />', () => {
 
         const tenant = getOrgAuthRoleFixture[2];
         await waitFor(() => {
-          expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+          expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
         });
-        const tenantButton = screen.getByRole('button', {
+        const tenantButton = screen.getByRole('menuitemradio', {
           name: tenant.name,
         });
         await userEvent.click(tenantButton);
@@ -144,9 +107,9 @@ describe('<SideNav />', () => {
 
         const tenant = getOrgAuthRoleFixture[2];
         await waitFor(() => {
-          expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+          expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
         });
-        const tenantButton = screen.getByRole('button', {
+        const tenantButton = screen.getByRole('menuitemradio', {
           name: tenant.name,
         });
         await userEvent.click(tenantButton);
@@ -169,10 +132,10 @@ describe('<SideNav />', () => {
         });
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 5).forEach(tenant => {
-            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+            expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
           });
 
-          const tenantItems = screen.getAllByTestId('tenant-item');
+          const tenantItems = screen.getAllByRole('menuitemradio');
           expect(tenantItems).toHaveLength(5);
         });
 
@@ -184,10 +147,10 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.forEach(tenant => {
-            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+            expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
           });
 
-          const tenantItems = screen.getAllByTestId('tenant-item');
+          const tenantItems = screen.getAllByRole('menuitemradio');
           expect(tenantItems).toHaveLength(7);
         });
 
@@ -200,10 +163,10 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 5).forEach(tenant => {
-            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
+            expect(screen.getByRole('menuitemradio', { name: tenant.name })).toBeInTheDocument();
           });
 
-          const tenantItems = screen.getAllByTestId('tenant-item');
+          const tenantItems = screen.getAllByRole('menuitemradio');
           expect(tenantItems).toHaveLength(5);
         });
         await waitFor(() => {

@@ -68,21 +68,23 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
           <ThemedLogoFpCompact color="primary" />
         </Trigger>
       </Dropdown.Trigger>
-      <Dropdown.Content
-        align="start"
-        sideOffset={-8}
-        onEscapeKeyDown={() => setShowOptions(false)}
-        onPointerDownOutside={() => setShowOptions(false)}
-      >
-        {assetsToCopy.map(asset => (
-          <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
-            <Stack align="center" justify="center" paddingBottom={1}>
-              <IcoDownload16 />
-            </Stack>
-            <Text variant="body-2"> {t(asset.label as ParseKeys<'common'>)} </Text>
-          </StyledItem>
-        ))}
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content
+          align="start"
+          sideOffset={-8}
+          onEscapeKeyDown={() => setShowOptions(false)}
+          onPointerDownOutside={() => setShowOptions(false)}
+        >
+          {assetsToCopy.map(asset => (
+            <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
+              <Stack align="center" justify="center" paddingBottom={1}>
+                <IcoDownload16 />
+              </Stack>
+              <Text variant="body-2"> {t(asset.label as ParseKeys<'common'>)} </Text>
+            </StyledItem>
+          ))}
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };

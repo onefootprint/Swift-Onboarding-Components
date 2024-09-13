@@ -42,16 +42,18 @@ const Row = ({ apiKey }: RowProps) => {
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
             </PermissionGate>
-            <Dropdown.Content align="end">
-              <Dropdown.Group>
-                <Dropdown.Item onSelect={reveal.toggle}>
-                  {apiKey.key ? t('manage.reveal.hide') : t('manage.reveal.show')}
-                </Dropdown.Item>
-                <Dropdown.Item onSelect={status.toggle}>
-                  {isEnabled ? t('manage.status.disable') : t('manage.status.enable')}
-                </Dropdown.Item>
-              </Dropdown.Group>
-            </Dropdown.Content>
+            <Dropdown.Portal>
+              <Dropdown.Content align="end">
+                <Dropdown.Group>
+                  <Dropdown.Item onSelect={reveal.toggle}>
+                    {apiKey.key ? t('manage.reveal.hide') : t('manage.reveal.show')}
+                  </Dropdown.Item>
+                  <Dropdown.Item onSelect={status.toggle}>
+                    {isEnabled ? t('manage.status.disable') : t('manage.status.enable')}
+                  </Dropdown.Item>
+                </Dropdown.Group>
+              </Dropdown.Content>
+            </Dropdown.Portal>
           </Dropdown.Root>
         </Stack>
       </td>

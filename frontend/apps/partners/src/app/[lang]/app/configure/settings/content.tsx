@@ -255,20 +255,22 @@ const renderTr = ({
               <Trigger aria-label="new label">
                 {member.role.name} <IcoChevronDown16 />
               </Trigger>
-              <Dropdown.Content align="end">
-                {roles
-                  .filter(r => r.label !== member.role.name)
-                  .map(r => (
-                    <Dropdown.Item
-                      data-id={r.value}
-                      key={r.value}
-                      onSelect={() => onRoleChange(member.id, r.value)}
-                      onClick={stopPropagation}
-                    >
-                      {r.label}
-                    </Dropdown.Item>
-                  ))}
-              </Dropdown.Content>
+              <Dropdown.Portal>
+                <Dropdown.Content align="end">
+                  {roles
+                    .filter(r => r.label !== member.role.name)
+                    .map(r => (
+                      <Dropdown.Item
+                        data-id={r.value}
+                        key={r.value}
+                        onSelect={() => onRoleChange(member.id, r.value)}
+                        onClick={stopPropagation}
+                      >
+                        {r.label}
+                      </Dropdown.Item>
+                    ))}
+                </Dropdown.Content>
+              </Dropdown.Portal>
             </Dropdown.Root>
           </Td>
         ) : (
@@ -282,15 +284,17 @@ const renderTr = ({
                 <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${member.email}`}>
                   <IcoDotsHorizontal24 />
                 </Dropdown.Trigger>
-                <Dropdown.Content align="end">
-                  <Dropdown.Item
-                    onSelect={withConfirm(() => onDeactivateClick(member.id))}
-                    onClick={stopPropagation}
-                    variant="destructive"
-                  >
-                    {t('deactivate')}
-                  </Dropdown.Item>
-                </Dropdown.Content>
+                <Dropdown.Portal>
+                  <Dropdown.Content align="end">
+                    <Dropdown.Item
+                      onSelect={withConfirm(() => onDeactivateClick(member.id))}
+                      onClick={stopPropagation}
+                      variant="destructive"
+                    >
+                      {t('deactivate')}
+                    </Dropdown.Item>
+                  </Dropdown.Content>
+                </Dropdown.Portal>
               </Dropdown.Root>
             </Box>
           </Td>

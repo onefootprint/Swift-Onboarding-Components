@@ -2,7 +2,6 @@ import { IcoChevronDown16 } from '@onefootprint/icons';
 import styled, { css } from 'styled-components';
 import Dropdown from '../../../dropdown';
 
-import { createFontStyles } from '../../../../utils';
 import type { ButtonVariant } from '../../split-button.types';
 
 export type Option = {
@@ -34,40 +33,19 @@ const DropdownOptions = ({
     <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={$width}>
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
-    <Dropdown.Content sideOffset={8} align="end" $minWidth="186px">
-      <Dropdown.Group>
-        {options.map(option => (
-          <Item key={option.value} onSelect={() => onOptionChange(option)}>
-            {option.label}
-          </Item>
-        ))}
-      </Dropdown.Group>
-    </Dropdown.Content>
+    <Dropdown.Portal>
+      <Dropdown.Content sideOffset={8} align="end" minWidth="186px">
+        <Dropdown.Group>
+          {options.map(option => (
+            <Dropdown.Item key={option.value} onSelect={() => onOptionChange(option)}>
+              {option.label}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Group>
+      </Dropdown.Content>
+    </Dropdown.Portal>
   </Dropdown.Root>
 );
-
-const Item = styled(Dropdown.Item)`
-  ${({ theme }) => {
-    const { dropdown } = theme.components;
-
-    return css`
-      width: 100%;
-      ${createFontStyles('body-3')}
-      background-color: ${dropdown.bg};
-      cursor: pointer;
-      padding: ${theme.spacing[2]} ${theme.spacing[5]};
-      border-radius: ${theme.borderRadius.sm};
-
-      &:hover {
-        background-color: ${dropdown.hover.bg};
-      }
-
-      &:focus {
-        outline: none;
-      }
-    `;
-  }}
-`;
 
 const Trigger = styled(Dropdown.Trigger)<{
   variant: ButtonVariant;

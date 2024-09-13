@@ -44,14 +44,16 @@ const Actions = ({ role }: ActionsProps) => {
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
-        <Dropdown.Content align="end">
-          <Dropdown.Group>
-            <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
-            <Dropdown.Item onSelect={handleRemove} variant="destructive">
-              {t('remove')}
-            </Dropdown.Item>
-          </Dropdown.Group>
-        </Dropdown.Content>
+        <Dropdown.Portal>
+          <Dropdown.Content align="end">
+            <Dropdown.Group>
+              <Dropdown.Item onSelect={handleEdit}>{t('edit')}</Dropdown.Item>
+              <Dropdown.Item onSelect={handleRemove} variant="destructive">
+                {t('remove')}
+              </Dropdown.Item>
+            </Dropdown.Group>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>
       <Remove role={role} ref={removeRef} />
       <Edit role={role} ref={editRef} />

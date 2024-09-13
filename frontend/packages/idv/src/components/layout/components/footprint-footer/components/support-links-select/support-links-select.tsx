@@ -74,15 +74,17 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
       <Dropdown.Trigger asChild>
         <StyledTrigger>{t('support.label')}</StyledTrigger>
       </Dropdown.Trigger>
-      <Dropdown.Content sideOffset={8} $minWidth="160px">
-        {supportLinks.map(({ label, contactLink, onSelect }) =>
-          label && contactLink ? (
-            <StyledItem key={label} size="tiny" onSelect={() => onSelect(contactLink)}>
-              {label}
-            </StyledItem>
-          ) : null,
-        )}
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content sideOffset={8} minWidth="160px">
+          {supportLinks.map(({ label, contactLink, onSelect }) =>
+            label && contactLink ? (
+              <StyledItem key={label} size="tiny" onSelect={() => onSelect(contactLink)}>
+                {label}
+              </StyledItem>
+            ) : null,
+          )}
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   ) : null;
 };

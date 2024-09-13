@@ -112,15 +112,17 @@ const renderTr = (t: T, lang: Lang, handlers: Handlers, withConfirm: WithConfirm
               <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.name}`}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
-              <Dropdown.Content align="end">
-                <Dropdown.Item
-                  data-id={item.id}
-                  onClick={stopPropagation}
-                  onSelect={e => handlers.onReSubmitClick(getDataId(e))}
-                >
-                  {t('doc.request-new-submission')}
-                </Dropdown.Item>
-              </Dropdown.Content>
+              <Dropdown.Portal>
+                <Dropdown.Content align="end">
+                  <Dropdown.Item
+                    data-id={item.id}
+                    onClick={stopPropagation}
+                    onSelect={e => handlers.onReSubmitClick(getDataId(e))}
+                  >
+                    {t('doc.request-new-submission')}
+                  </Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown.Portal>
             </Dropdown.Root>
           </Box>
         ) : (
@@ -129,65 +131,67 @@ const renderTr = (t: T, lang: Lang, handlers: Handlers, withConfirm: WithConfirm
               <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.name}`}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
-              <Dropdown.Content align="end">
-                {isAccepted(item.status) ? (
-                  <Dropdown.Item
-                    data-id={item.id}
-                    data-sub-id={item.activeSubmissionId}
-                    onClick={stopPropagation}
-                    onSelect={e => handlers.onViewClick(getDataId(e), getDataSubId(e))}
-                  >
-                    {t('view')}
-                  </Dropdown.Item>
-                ) : null}
-                {isWaitingForReview(item.status) ? (
-                  <Dropdown.Item
-                    data-id={item.id}
-                    data-sub-id={item.activeSubmissionId}
-                    onClick={stopPropagation}
-                    onSelect={e => handlers.onReviewClick(getDataId(e), getDataSubId(e))}
-                  >
-                    {t('review')}
-                  </Dropdown.Item>
-                ) : null}
-                {isAccepted(item.status) ? null : (
-                  <Dropdown.Item
-                    data-id={item.id}
-                    onClick={stopPropagation}
-                    onSelect={e => handlers.onAssignClick(getDataId(e))}
-                  >
-                    {t('assign')}
-                  </Dropdown.Item>
-                )}
-                {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
-                  <Dropdown.Item
-                    data-id={item.id}
-                    onClick={stopPropagation}
-                    onSelect={e => handlers.onEditClick(getDataId(e))}
-                  >
-                    {t('modify-request')}
-                  </Dropdown.Item>
-                )}
-                {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
-                  <Dropdown.Item
-                    data-id={item.activeRequestId}
-                    onClick={stopPropagation}
-                    onSelect={withConfirm(item.name, e => handlers.onDeleteClick(getDataId(e)))}
-                    variant="destructive"
-                  >
-                    {t('doc.cancel-submission')}
-                  </Dropdown.Item>
-                )}
-                {isAccepted(item.status) || isRejected(item.status) || isWaitingForReview(item.status) ? (
-                  <Dropdown.Item
-                    data-id={item.id}
-                    onClick={stopPropagation}
-                    onSelect={e => handlers.onReSubmitClick(getDataId(e))}
-                  >
-                    {t('doc.request-new-submission')}
-                  </Dropdown.Item>
-                ) : null}
-              </Dropdown.Content>
+              <Dropdown.Portal>
+                <Dropdown.Content align="end">
+                  {isAccepted(item.status) ? (
+                    <Dropdown.Item
+                      data-id={item.id}
+                      data-sub-id={item.activeSubmissionId}
+                      onClick={stopPropagation}
+                      onSelect={e => handlers.onViewClick(getDataId(e), getDataSubId(e))}
+                    >
+                      {t('view')}
+                    </Dropdown.Item>
+                  ) : null}
+                  {isWaitingForReview(item.status) ? (
+                    <Dropdown.Item
+                      data-id={item.id}
+                      data-sub-id={item.activeSubmissionId}
+                      onClick={stopPropagation}
+                      onSelect={e => handlers.onReviewClick(getDataId(e), getDataSubId(e))}
+                    >
+                      {t('review')}
+                    </Dropdown.Item>
+                  ) : null}
+                  {isAccepted(item.status) ? null : (
+                    <Dropdown.Item
+                      data-id={item.id}
+                      onClick={stopPropagation}
+                      onSelect={e => handlers.onAssignClick(getDataId(e))}
+                    >
+                      {t('assign')}
+                    </Dropdown.Item>
+                  )}
+                  {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
+                    <Dropdown.Item
+                      data-id={item.id}
+                      onClick={stopPropagation}
+                      onSelect={e => handlers.onEditClick(getDataId(e))}
+                    >
+                      {t('modify-request')}
+                    </Dropdown.Item>
+                  )}
+                  {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
+                    <Dropdown.Item
+                      data-id={item.activeRequestId}
+                      onClick={stopPropagation}
+                      onSelect={withConfirm(item.name, e => handlers.onDeleteClick(getDataId(e)))}
+                      variant="destructive"
+                    >
+                      {t('doc.cancel-submission')}
+                    </Dropdown.Item>
+                  )}
+                  {isAccepted(item.status) || isRejected(item.status) || isWaitingForReview(item.status) ? (
+                    <Dropdown.Item
+                      data-id={item.id}
+                      onClick={stopPropagation}
+                      onSelect={e => handlers.onReSubmitClick(getDataId(e))}
+                    >
+                      {t('doc.request-new-submission')}
+                    </Dropdown.Item>
+                  ) : null}
+                </Dropdown.Content>
+              </Dropdown.Portal>
             </Dropdown.Root>
           </Box>
         )}

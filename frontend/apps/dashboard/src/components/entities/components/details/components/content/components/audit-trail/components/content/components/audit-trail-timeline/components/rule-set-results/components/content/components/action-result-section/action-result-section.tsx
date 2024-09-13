@@ -50,24 +50,26 @@ const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) 
               <Text variant="body-3">{t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}</Text>
             </Stack>
           </Dropdown.Trigger>
-          <Dropdown.Content align="end" sideOffset={4} asChild>
-            <Dropdown.Group>
-              {Object.values(RuleResultGroup).map(group => {
-                const label = t(kebabCase(group) as ParseKeys<'common'>);
-                return (
-                  <Dropdown.Item
-                    key={group}
-                    role="option"
-                    aria-label={label}
-                    onClick={() => onChange(group)}
-                    checked={group === selectedResultGroup}
-                  >
-                    <Text variant="body-3">{label}</Text>
-                  </Dropdown.Item>
-                );
-              })}
-            </Dropdown.Group>
-          </Dropdown.Content>
+          <Dropdown.Portal>
+            <Dropdown.Content align="end" sideOffset={4} asChild>
+              <Dropdown.Group>
+                {Object.values(RuleResultGroup).map(group => {
+                  const label = t(kebabCase(group) as ParseKeys<'common'>);
+                  return (
+                    <Dropdown.Item
+                      key={group}
+                      role="option"
+                      aria-label={label}
+                      onClick={() => onChange(group)}
+                      checked={group === selectedResultGroup}
+                    >
+                      <Text variant="body-3">{label}</Text>
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Group>
+            </Dropdown.Content>
+          </Dropdown.Portal>
         </Dropdown.Root>
       </Stack>
       {actionSection === RuleActionSection.stepUp ? (

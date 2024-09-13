@@ -52,22 +52,24 @@ const IdDropdown = ({ entity }: IdDropdownProps) => {
           <ChevronContainer>
             <IcoChevronDown16 className="chevronIcon" />
           </ChevronContainer>
-          <Dropdown.Content sideOffset={4}>
-            <Dropdown.Group>
-              {ids.map(item => {
-                return (
-                  <Dropdown.Item height="56px" key={item.label} onClick={() => handleCopy(item)}>
-                    <Stack direction="column" gap={2}>
-                      <Text variant="caption-2" color="tertiary">
-                        {item.label}
-                      </Text>
-                      <Text variant="snippet-2">{item.value}</Text>
-                    </Stack>
-                  </Dropdown.Item>
-                );
-              })}
-            </Dropdown.Group>
-          </Dropdown.Content>
+          <Dropdown.Portal>
+            <Dropdown.Content sideOffset={4}>
+              <Dropdown.Group>
+                {ids.map(item => {
+                  return (
+                    <Dropdown.Item height="56px" key={item.label} onClick={() => handleCopy(item)}>
+                      <Stack direction="column" gap={2}>
+                        <Text variant="caption-2" color="tertiary">
+                          {item.label}
+                        </Text>
+                        <Text variant="snippet-2">{item.value}</Text>
+                      </Stack>
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Group>
+            </Dropdown.Content>
+          </Dropdown.Portal>
         </Dropdown.Root>
       )}
     </Container>

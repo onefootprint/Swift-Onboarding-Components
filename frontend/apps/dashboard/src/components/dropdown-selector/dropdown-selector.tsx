@@ -34,22 +34,24 @@ const DropdownSelector = <T,>({
       <Dropdown.Trigger aria-label={triggerAriaLabel} variant="chevron">
         {activeOption?.name || 'Select'}
       </Dropdown.Trigger>
-      <Dropdown.Content $width="320px">
-        <Dropdown.Group>
-          {options?.map(option => (
-            <Dropdown.Item
-              height="fit-content"
-              checked={value.id === option.id}
-              textValue={option.name}
-              key={option.id}
-              onSelect={() => handleSelect(option)}
-            >
-              {option.name}
-              {renderCustomData?.(option)}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Group>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content width="320px">
+          <Dropdown.Group>
+            {options?.map(option => (
+              <Dropdown.Item
+                height="fit-content"
+                checked={value.id === option.id}
+                textValue={option.name}
+                key={option.id}
+                onSelect={() => handleSelect(option)}
+              >
+                {option.name}
+                {renderCustomData?.(option)}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Group>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };
