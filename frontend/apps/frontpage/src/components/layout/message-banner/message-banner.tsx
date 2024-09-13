@@ -1,5 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { LinkButton, Stack, createFontStyles, media } from '@onefootprint/ui';
+import { Box, IconButton, LinkButton, Stack, createFontStyles, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 
@@ -48,9 +48,11 @@ const MessageBanner = ({ onClose, articleUrl, text, cta, showBanner }: MessageBa
               {cta}
             </LinkButton>
           </TextContainer>
-          <CloseButtonContainer onClick={onClose}>
-            <IcoCloseSmall16 />
-          </CloseButtonContainer>
+          <IconAligner>
+            <IconButton aria-label="Close" onClick={onClose}>
+              <IcoCloseSmall16 />
+            </IconButton>
+          </IconAligner>
         </Container>
       )}
     </AnimatePresence>
@@ -86,18 +88,13 @@ const Container = styled(motion(Stack))`
   `}
 `;
 
-const CloseButtonContainer = styled.button`
+const IconAligner = styled(Box)`
   ${({ theme }) => css`
-    all: unset;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: ${theme.spacing[7]};
-    width: ${theme.spacing[7]};
     position: absolute;
     right: ${theme.spacing[5]};
     top: 50%;
     transform: translateY(-50%);
+ 
   `}
 `;
 

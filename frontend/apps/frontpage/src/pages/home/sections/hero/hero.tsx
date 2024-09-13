@@ -81,10 +81,6 @@ const HeroContainer = styled(Container)`
     gap: ${theme.spacing[11]};
     padding: ${theme.spacing[9]} 0;
     align-items: center;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[11]} 0;
-    `}
   `}
 `;
 

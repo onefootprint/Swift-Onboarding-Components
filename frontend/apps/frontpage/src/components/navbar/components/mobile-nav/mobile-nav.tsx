@@ -136,29 +136,26 @@ const MobileNav = ({ entries, $isOnDarkSection }: MobileNavProps) => {
 const OuterContainer = styled(Box)<{ $isOpen: boolean }>`
   ${({ theme, $isOpen }) => css`
     position: fixed;
-    top: ${theme.spacing[3]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: calc(100vw - 2 * ${theme.spacing[3]});
-    border-radius: ${theme.borderRadius.lg};
+    width: 100vw;
     overflow: hidden;
     z-index: ${theme.zIndex.dialog};
-    background: rgba(${theme.backgroundColor.primary}, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: height 0.1s ease-out;
-    height: 'auto';
+    background-color: ${theme.backgroundColor.primary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    height: auto;
 
     ${
       $isOpen &&
       css`
-        height: calc(100dvh - 2 * ${theme.spacing[3]});
+        height: 100dvh;
         background: ${theme.backgroundColor.primary};
+        border-bottom: none;
       `
     }
 

@@ -70,36 +70,30 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
   );
 };
 
-const NavContainer = styled(Container)`
+const NavContainer = styled(Box)`
   ${({ theme }) => css`
     display: none; 
 
     ${media.greaterThan('lg')`
       display: flex;
       position: fixed;
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      border-radius: ${theme.borderRadius.lg};
-      top: ${theme.spacing[3]};
+      flex-direction: column;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
       z-index: ${theme.zIndex.sticky};
-      background: rgba(${theme.backgroundColor.primary}, 0.9);
-      backdrop-filter: blur(20px);
-      @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
-        background: rgba(${theme.backgroundColor.primary}, 0.9);
-        -webkit-backdrop-filter: blur(20px);
-        backdrop-filter: blur(20px);
-      }
+      background-color: ${theme.backgroundColor.primary};
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      width: 100%;
     `}
   `}
 `;
 
-const StyledContainer = styled(Box)`
+const StyledContainer = styled(Container)`
   ${({ theme }) => css`
       display: flex;
       flex-direction: row; 
       align-items: center;
-      padding: 0 ${theme.spacing[5]} 0 ${theme.spacing[6]};
       gap: ${theme.spacing[7]};
       justify-content: space-between;
       height: var(--desktop-header-height);
