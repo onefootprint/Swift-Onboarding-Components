@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "🚀 Initializing sourcemap upload for $SERVICE..."
+
 # Parse arguments
 SERVICE=""
 

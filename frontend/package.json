@@ -2,7 +2,10 @@
   "name": "footprint",
   "version": "0.0.0",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build:packages": "turbo run build --filter=./packages/*",
     "build:storybook": "turbo run build:storybook",
