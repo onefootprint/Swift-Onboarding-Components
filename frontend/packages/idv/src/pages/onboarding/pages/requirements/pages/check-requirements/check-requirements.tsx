@@ -10,17 +10,17 @@ const { logInfo, logError } = getLogger({ location: 'onboarding-check-requiremen
 
 const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
   logInfo(
-    `requirements status: ${response.allRequirements
+    `Requirements status: ${response.allRequirements
       .map(req => {
         if (req.kind === 'collect_data') {
-          return `${req.kind}:${req.isMet ? 1 : 0} missing:[${req.missingAttributes.join(',')}] populated:[${req.populatedAttributes.join(',')}]`;
+          return `${req.kind}:${req.isMet ? 'is met' : 'is not met'} missing:[${req.missingAttributes.join(',')}] populated:[${req.populatedAttributes.join(',')}]`;
         }
 
         if (req.kind === 'collect_document' && req.config.kind === 'identity') {
-          return `${req.kind}:${req.isMet ? 1 : 0} uploadSettings:${req.uploadSettings} collectConsent:${req.config.shouldCollectConsent ? 1 : 0} collectSelfie:${req.config.shouldCollectSelfie ? 1 : 0}`;
+          return `${req.kind}:${req.isMet ? 'is met' : 'is not met'} uploadSettings:${req.uploadSettings} collectConsent:${req.config.shouldCollectConsent ? 'is met' : 'is not met'} collectSelfie:${req.config.shouldCollectSelfie ? 'is met' : 'is not met'}`;
         }
 
-        return `${req.kind}:${req.isMet ? 1 : 0}`;
+        return `${req.kind}:${req.isMet ? 'is met' : 'is not met'}`;
       })
       .join(',')}`,
   );

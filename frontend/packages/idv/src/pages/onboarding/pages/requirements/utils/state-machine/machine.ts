@@ -160,20 +160,9 @@ const createOnboardingRequirementsMachine = ({
         assignMissingRequirements: assign((ctx, event) => {
           const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
-            const cleanedContext = {
-              ...ctx,
-              idvContext: {
-                ...ctx.idvContext,
-                authToken: undefined,
-                onboardingContext: {
-                  ...ctx.onboardingContext,
-                  bootstrapData: undefined,
-                },
-              },
-            };
             logError('User is stuck on a requirement', {
-              context: cleanedContext,
-              event,
+              lastRequirement: ctx.lastHandledRequirement,
+              nextRequirement: event.payload[0],
             });
           }
           return {

@@ -4,7 +4,7 @@ import { UserChallengeActionKind } from '@onefootprint/types';
 import type { PasskeyAttemptContext } from '@onefootprint/types/src/api/skip-liveness';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { BottomSheet, Box, Button, LinkButton, Stack, Text } from '@onefootprint/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -19,7 +19,7 @@ import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-regist
 
 const SUCCESS_TRANSITION_DELAY_MS = 2500;
 const { logError, logInfo, logTrack, logWarn } = getLogger({
-  location: 'liveness-register',
+  location: 'passkeys-register',
 });
 
 const Register = ({
@@ -37,8 +37,11 @@ const Register = ({
   } = state.context;
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
-
   const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<PasskeyAttemptContext[]>([]);
+
+  useEffect(() => {
+    logInfo('Passkeys registration started');
+  }, []);
 
   const handleOpenBottomSheet = () => {
     setShowBottomSheet(true);
@@ -96,10 +99,10 @@ const Register = ({
   };
 
   const handleSkip = () => {
-    trackAction('passkeys:skipped');
     if (skipLivenessMutation.isLoading) {
       return;
     }
+    trackAction('passkeys:skipped');
     logInfo('Skipping liveness after retrying registering passkeys');
     const context = {
       reason: SkipLivenessReason.failed,
@@ -111,10 +114,11 @@ const Register = ({
       { authToken, context },
       {
         onSuccess: () => {
+          logInfo('Registered passkeys with success');
           send({ type: 'skipped' });
         },
-        onError: (err: unknown) => {
-          logError(`Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(err)}`, err);
+        onError: (error: unknown) => {
+          logError(`Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(error)}`, error);
         },
       },
     );

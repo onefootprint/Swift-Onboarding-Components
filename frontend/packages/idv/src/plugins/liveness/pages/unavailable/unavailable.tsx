@@ -7,9 +7,10 @@ import styled from 'styled-components';
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../queries';
 import { checkIsSocialMediaBrowser } from '../../../../utils';
-import { trackAction } from '../../../../utils/logger';
-import { Logger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
+
+const { logError, logInfo, logWarn } = getLogger({ location: 'passkeys-unavailable' });
 
 const Unavailable = () => {
   const [state, send] = useLivenessMachine();
@@ -19,11 +20,16 @@ const Unavailable = () => {
   const skipLivenessMutation = useSkipLiveness();
 
   useEffect(() => {
+    logInfo('Passkeys unavailable started');
+  }, []);
+
+  useEffect(() => {
     if (!authToken) {
+      logWarn('Cannot continue as authToken is not defined');
       return;
     }
 
-    let reason;
+    let reason = SkipLivenessReason.unknown;
     if (!device?.hasSupportForWebauthn) {
       reason = SkipLivenessReason.unavailableOnDevice;
     } else if (isInIframe) {
@@ -32,9 +38,8 @@ const Unavailable = () => {
       } else {
         reason = SkipLivenessReason.unavailableInIframe;
       }
-    } else {
-      reason = SkipLivenessReason.unknown;
     }
+    logInfo(`Skipping passkeys: ${reason}`);
     trackAction('passkeys:unavailable', { reason });
 
     const context = {
@@ -47,18 +52,15 @@ const Unavailable = () => {
       { authToken, context },
       {
         onSuccess: () => {
-          send({
-            type: 'completed',
-          });
+          logInfo('Skipped passkeys with success');
+          send({ type: 'completed' });
         },
         onError: (error: unknown) => {
-          Logger.error(`Error while skipping liveness in liveness unavailable page: ${getErrorMessage(error)}`, {
-            location: 'liveness-unavailable',
-          });
+          logError(`Error while skipping passkeys: ${getErrorMessage(error)}`, error);
         },
       },
     );
-  }, []);
+  }, [authToken]);
 
   return (
     <Container>
