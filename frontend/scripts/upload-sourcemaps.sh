@@ -31,11 +31,10 @@ while getopts ":s:-:" opt; do
   esac
 done
 
-if [ -z "$SOURCE_MAPS_PUBLIC_STATIC_PATH" ]; then
-  echo 'SOURCE_MAPS_PUBLIC_STATIC_PATH is not set. Skipping datadog-ci sourcemaps upload.'
-  exit 0
+# Source the .env file from the calling directory
+if [ -f ".env.local" ]; then
+  . ./.env.local
 fi
-
 
 if [ -z "$SERVICE" ]; then
   echo "Service parameter is required."
@@ -47,5 +46,9 @@ if [ -z "$DATADOG_API_KEY" ]; then
   exit 0
 fi
 
-datadog-ci sourcemaps upload ./.next/static --disable-git --service=$SERVICE --release-version=${$SERVICE}-${VERCEL_GIT_COMMIT_SHA} --minified-path-prefix=$SOURCE_MAPS_PUBLIC_STATIC_PATH
+if [ -z "$VERCEL_GIT_COMMIT_SHA" ]; then
+  echo 'VERCEL_GIT_COMMIT_SHA is not set. Using "unknown" as fallback.'
+  VERCEL_GIT_COMMIT_SHA="unknown"
+fi
 
+datadog-ci sourcemaps upload .next/static --service="$SERVICE" --release-version="${SERVICE}-${VERCEL_GIT_COMMIT_SHA}" --minified-path-prefix=https://$SERVICE.onefootprint.com/_next/static
