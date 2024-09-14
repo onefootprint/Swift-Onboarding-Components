@@ -19,7 +19,7 @@ type RouterProps = {
 const Router = ({ actionKind, onCustomSkip, onDone }: RouterProps) => {
   const [state] = useLivenessMachine();
   const isDone = state.matches('completed');
-  useLogStateMachine('liveness', state);
+  useLogStateMachine('passkeys', state);
 
   useEffect(() => {
     logInfo('Passkeys router started');
