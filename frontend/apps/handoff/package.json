@@ -20,7 +20,7 @@
     "test:watch": "bun test --watch",
     "test": "bun test",
     "typecheck": "yarn tsc --noEmit",
-    "upload:sourcemaps": "DATADOG_API_KEY=$DATADOG_API_KEY sh ../../scripts/upload-sourcemaps.sh --service=handoff"
+    "upload:sourcemaps": "sh ../../scripts/upload-sourcemaps.sh --service=handoff"
   },
   "dependencies": {
     "@onefootprint/appearance": "*",
