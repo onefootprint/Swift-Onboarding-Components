@@ -160,10 +160,11 @@ const createOnboardingRequirementsMachine = ({
         assignMissingRequirements: assign((ctx, event) => {
           const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
-            logError('User is stuck on a requirement', {
+            const requirements = JSON.stringify({
               lastRequirement: ctx.lastHandledRequirement,
               nextRequirement: event.payload[0],
             });
+            logError(`User is stuck on a requirement: ${requirements}`);
           }
           return {
             ...ctx,
