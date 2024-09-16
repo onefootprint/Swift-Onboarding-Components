@@ -306,7 +306,7 @@ impl AuthenticatedIncodeClientAdapter {
         footprint_http_client: &FootprintVendorHttpClient,
         session_kind: IncodeVerificationSessionKind,
         incode_verification_session_id: IncodeVerificationSessionId,
-        wait_for_selfie: bool,
+        skip_wait_for_selfie: bool,
         // need to return json here since we deser to know if we poll
     ) -> Result<serde_json::Value, IncodeError> {
         let url = self.client_adapter.api_url("omni/get/onboarding/status")?;
@@ -324,8 +324,8 @@ impl AuthenticatedIncodeClientAdapter {
             // retry any error we get
             .map_err(|_| IncodeError::ResultsNotReady)?;
 
-        if !parsed_result.ready(&session_kind, wait_for_selfie) {
-            tracing::info!(status=%parsed_result.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, wait_for_selfie=wait_for_selfie, "incode GetOnboardingStatusResponse not ready");
+        if !parsed_result.ready(&session_kind, skip_wait_for_selfie) {
+            tracing::info!(status=%parsed_result.onboarding_status, session_kind=%session_kind, incode_verification_session_id=%incode_verification_session_id, skip_wait_for_selfie=skip_wait_for_selfie, "incode GetOnboardingStatusResponse not ready");
             return Err(IncodeError::ResultsNotReady);
         }
 

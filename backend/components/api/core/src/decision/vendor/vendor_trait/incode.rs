@@ -412,7 +412,7 @@ impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardin
                 self,
                 request.session_kind,
                 request.incode_verification_session_id,
-                request.wait_for_selfie,
+                request.skip_wait_for_selfie,
             )
             .await?;
 

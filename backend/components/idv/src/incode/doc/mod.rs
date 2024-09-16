@@ -27,7 +27,7 @@ pub struct IncodeGetOnboardingStatusRequest {
     pub credentials: IncodeCredentialsWithToken,
     pub session_kind: IncodeVerificationSessionKind,
     pub incode_verification_session_id: IncodeVerificationSessionId,
-    pub wait_for_selfie: bool,
+    pub skip_wait_for_selfie: bool,
 }
 
 pub struct IncodeProcessIdRequest {

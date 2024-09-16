@@ -160,10 +160,25 @@ impl IncodeFailureReason {
     pub fn selfie_processing_failed(&self) -> bool {
         matches!(self, Self::SelfieFaceNotFound | Self::SelfieTooDark)
     }
+
+    pub fn terminal_document_processing_failure(&self) -> bool {
+        matches!(self, Self::UnknownDocumentType | Self::WrongDocumentSide)
+    }
 }
 
 #[derive(
-    Debug, Display, Clone, Copy, Eq, PartialEq, AsExpression, FromSqlRow, EnumString, EnumIter, AsRefStr,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    EnumIter,
+    AsRefStr,
+    derive_more::IsVariant,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

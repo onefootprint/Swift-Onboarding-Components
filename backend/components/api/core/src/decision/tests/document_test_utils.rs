@@ -99,6 +99,9 @@ pub enum IncodeMockOpts {
     UploadBack {
         add_back_response: Option<IncodeResponse<AddSideResponse>>,
     },
+    UploadSelfie {
+        add_selfie_response: Option<IncodeResponse<AddSelfieResponse>>,
+    },
     Process,
 }
 
@@ -120,7 +123,7 @@ impl IncodeMocker {
                 self.mock_start(state);
                 self.mock_front(state, None);
                 self.mock_back(state, None);
-                self.mock_selfie(state);
+                self.mock_selfie(state, None);
                 self.mock_processing(state);
             }
             IncodeMockOpts::StopAfterFront { add_front_response } => {
@@ -132,6 +135,9 @@ impl IncodeMocker {
             }
             IncodeMockOpts::UploadBack { add_back_response } => {
                 self.mock_back(state, add_back_response);
+            }
+            IncodeMockOpts::UploadSelfie { add_selfie_response } => {
+                self.mock_selfie(state, add_selfie_response);
             }
             IncodeMockOpts::Process => self.mock_processing(state),
         }
@@ -183,7 +189,7 @@ impl IncodeMocker {
         }
     }
 
-    fn mock_selfie(&self, state: &mut State) {
+    fn mock_selfie(&self, state: &mut State, override_response: Option<IncodeResponse<AddSelfieResponse>>) {
         if self.require_selfie {
             let mut mock_add_selfie = MockVendorAPICall::<
                 IncodeAddSelfieRequest,
@@ -193,9 +199,15 @@ impl IncodeMocker {
             mock_add_selfie
                 .expect_make_request()
                 .times(1)
-                .return_once(move |_| Ok(idv::tests::fixtures::incode::add_selfie_response()));
+                .return_once(move |_| {
+                    Ok(override_response.unwrap_or(idv::tests::fixtures::incode::add_selfie_response()))
+                });
             state.set_incode_add_selfie(Arc::new(mock_add_selfie));
+        }
+    }
 
+    fn mock_processing(&self, state: &mut State) {
+        if self.require_selfie {
             let mut mock_process_face = MockVendorAPICall::<
                 IncodeProcessFaceRequest,
                 IncodeResponse<ProcessFaceResponse>,
@@ -207,9 +219,6 @@ impl IncodeMocker {
                 .return_once(move |_| Ok(idv::tests::fixtures::incode::process_face_response()));
             state.set_incode_process_face(Arc::new(mock_process_face));
         }
-    }
-
-    fn mock_processing(&self, state: &mut State) {
         // Process ID
         let mut mock_incode_process_id = MockVendorAPICall::<
             IncodeProcessIdRequest,
