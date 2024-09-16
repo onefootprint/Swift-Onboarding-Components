@@ -25,7 +25,7 @@ const ErrorComponent = ({ resetErrorBoundary }: ErrorProps) => {
               label: t('cta'),
               onClick: resetErrorBoundary,
             }}
-            renderHeader={() => <Image alt={t('image.alt')} height={212.62} src="/404.png" width={298} priority />}
+            renderHeader={() => <Image alt={t('image.alt')} height={212.62} src="/404.svg" width={298} priority />}
           />
         </Container>
       </ErrorContainer>
