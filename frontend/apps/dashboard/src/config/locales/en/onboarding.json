@@ -117,15 +117,20 @@
     "cta": "Go to dashboard"
   },
   "in-progress": {
+    "aria": "You may be here unintentionally.",
     "title": "Onboarding pending",
+    "aria": "You may be here unintentionally.",
     "description": "We noticed that you have an incomplete onboarding with <bold>{{tenantName}}</bold>. If you want to finalize your onboarding, or need support, please continue on their website or app instead.",
     "description-many": "We noticed that you have an incomplete onboarding with <bold>{{tenantNameFirst}}</bold> and <bold>{{tenantNameSecond}}</bold>. If you want to finalize your onboarding, or need support, please continue on their website or app instead.",
     "cta-single": "Go to {{tenantName}}",
     "cta-alternative": "No, create a Footprint business account",
     "are-you-sure": {
       "title": "Are you sure?",
+      "aria": "You may be here unintentionally.",
       "description-single": "If you're a business looking to enhance customer verification and streamline compliance, we'd love to show you how Footprint can help. If you need to complete your onboarding with <b/>, or need support, please <link/>",
+      "description-many": "If you're a business looking to enhance customer verification and streamline compliance, we'd love to show you how Footprint can help. If you need to complete your onboarding with <b1 />, or <b2 />, or need support, please go to their website or app instead.",
       "link-text": "go to their website or app instead.",
+      "go-to-website": "Go to {{tenant}}",
       "actions": {
         "cancel": "Cancel",
         "create-business-acc": "Create business account"
