@@ -137,7 +137,7 @@ jobs:
   # Add all jobs in this workflow to the `needs` here
   frontend-ci:
     runs-on: frontend_runner
-    needs: [files-changed, lint, typecheck, bun-unit-tests]
+    needs: [files-changed, lint, typecheck, test, bun-unit-tests]
     if: always()
     steps:
       - name: Success
