@@ -73,3 +73,4 @@ export * from './user-email-verify';
 export * from './user-update';
 export * from './users-update-annotation';
 export * from './users-vault';
+export * from './user-token';

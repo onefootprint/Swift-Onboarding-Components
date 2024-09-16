@@ -88,3 +88,14 @@ export class InlineOtpNotSupported extends Error {
     this.name = 'InlineOtpNotSupported';
   }
 }
+
+export enum AuthTokenStatus {
+  validWithSufficientScope = 'validWithSufficientScope',
+  validWithInsufficientScope = 'validWithInsufficientScope',
+  invalid = 'invalid',
+}
+
+export enum TenantAuthMethods {
+  authToken = 'authToken',
+  emailAndPhone = 'emailAndPhone',
+}

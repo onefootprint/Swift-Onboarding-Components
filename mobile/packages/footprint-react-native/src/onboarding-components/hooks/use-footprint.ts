@@ -71,7 +71,10 @@ const useFootprint = () => {
     handoff,
     launchIdentify: otp.launchIdentify,
     verifyChallenge: otp.verify,
-    createChallenge: otp.create,
+    createEmailPhoneBasedChallenge: otp.createEmailPhoneBasedChallenge,
+    createAuthTokenBasedChallenge: otp.createAuthTokenBasedChallenge,
+    isReadyForAuth: otp.isReadyForAuth,
+    requiresAuth: otp.requiresAuth,
   };
 };
 

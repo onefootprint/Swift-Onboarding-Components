@@ -1,4 +1,4 @@
-import type { PublicOnboardingConfig } from '@onefootprint/types';
+import type { ChallengeData, PublicOnboardingConfig } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
@@ -7,6 +7,7 @@ import { OverallOutcome, IdDocOutcome } from '../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 import usePropsUpdated from './hooks/use-props-updated';
 import isAlphanumeric from 'src/onboarding-components/utils/is-alphanumeric';
+import type { AuthTokenStatus } from 'src/types/footprint';
 
 export type ContextData = {
   appearance?: Appearance;
@@ -17,7 +18,12 @@ export type ContextData = {
   redirectUrl: string;
   sandboxId?: string;
   sandboxOutcome?: SandboxOutcome;
+
   vaultingToken?: string;
+  verifiedAuthToken?: string;
+  authTokenStatus?: AuthTokenStatus;
+  challengeData: ChallengeData | null;
+  didCallRequiresAuth: boolean;
 };
 
 export type ProviderProps = Pick<
@@ -27,12 +33,14 @@ export type ProviderProps = Pick<
   children?: React.ReactNode;
 };
 
-type UpdateContext = Dispatch<SetStateAction<ContextData>>;
+export type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 
 const Context = createContext<[ContextData, UpdateContext]>([
   {
     publicKey: '',
     redirectUrl: '',
+    didCallRequiresAuth: false,
+    challengeData: null,
   },
   () => undefined,
 ]);
@@ -55,6 +63,8 @@ const Provider = ({
     sandboxId,
     sandboxOutcome,
     redirectUrl,
+    challengeData: null,
+    didCallRequiresAuth: false,
   });
   usePropsUpdated({
     props: { appearance, authToken, locale, sandboxOutcome, publicKey, sandboxId, redirectUrl },
