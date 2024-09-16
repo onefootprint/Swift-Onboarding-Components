@@ -225,7 +225,11 @@ impl Tenant {
             }
         }
         if let Some(is_live) = is_live {
-            query = query.filter(tenant::sandbox_restricted.eq(!is_live));
+            query = query.filter(
+                tenant::sandbox_restricted
+                    .eq(!is_live)
+                    .and(tenant::is_demo_tenant.eq(false)),
+            );
         }
         let mut results: Vec<Self> = query.get_results(conn)?;
 
