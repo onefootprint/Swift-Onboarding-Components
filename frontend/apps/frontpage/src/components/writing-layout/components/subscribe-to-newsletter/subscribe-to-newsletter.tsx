@@ -48,7 +48,7 @@ const SubscribeToNewsletter = () => {
                 required: true,
               })}
             />
-            <Button type="submit" loading={subscribeUser.isLoading}>
+            <Button type="submit" loading={subscribeUser.isPending}>
               {t('form.cta')}
             </Button>
           </FieldsContainer>

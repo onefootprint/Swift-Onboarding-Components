@@ -21,6 +21,10 @@ const subscribeUser = async (payload: SubscribeUserRequest) => {
   return response.data;
 };
 
-const useSubscribeUser = () => useMutation(subscribeUser);
+const useSubscribeUser = () => {
+  return useMutation({
+    mutationFn: subscribeUser,
+  });
+};
 
 export default useSubscribeUser;

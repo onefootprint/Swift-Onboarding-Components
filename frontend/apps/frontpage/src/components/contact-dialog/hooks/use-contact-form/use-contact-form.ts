@@ -17,6 +17,10 @@ const contactFormRequest = async ({ url, data }: ContactFormRequest) => {
   return response.data;
 };
 
-const useContactForm = () => useMutation(contactFormRequest);
+const useContactForm = () => {
+  return useMutation({
+    mutationFn: contactFormRequest,
+  });
+};
 
 export default useContactForm;
