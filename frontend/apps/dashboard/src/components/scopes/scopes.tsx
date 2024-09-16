@@ -1,4 +1,5 @@
 import type { RoleScope } from '@onefootprint/types';
+import { Tag } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import DecryptOptions from 'src/components/roles/roles-table/components/row/components/decrypt-options';
@@ -20,7 +21,7 @@ const ScopesList = ({ scopes }: ScopesListProps) => {
   return (
     <>
       {basicScopes.map(scope => (
-        <span key={scope.kind}>{t(`scopes.${scope.kind}` as unknown as ParseKeys<'common'>) as unknown as string}</span>
+        <Tag key={scope.kind}>{t(`scopes.${scope.kind}` as unknown as ParseKeys<'common'>) as unknown as string}</Tag>
       ))}
       <DecryptOptions options={decryptOptions} />
       <VaultProxyOptions options={vaultProxyOptions} />

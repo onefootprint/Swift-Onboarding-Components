@@ -1,4 +1,4 @@
-import { Box, Dropdown, Stack, Text } from '@onefootprint/ui';
+import { Dropdown, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -17,13 +17,7 @@ export type DropdownSelectorProps<T> = {
   renderCustomData?: (option: Option<T>) => React.ReactNode;
 };
 
-const DropdownSelector = <T,>({
-  onValueChange,
-  triggerAriaLabel,
-  value,
-  options,
-  renderCustomData,
-}: DropdownSelectorProps<T>) => {
+const DropdownSelector = <T,>({ onValueChange, triggerAriaLabel, value, options }: DropdownSelectorProps<T>) => {
   const [activeOption, setActiveOption] = useState<Option<T> | null>(value);
   const handleSelect = (option: Option<T>) => {
     onValueChange(option.id);
@@ -36,7 +30,7 @@ const DropdownSelector = <T,>({
         {activeOption?.name || 'Select'}
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content width="320px">
+        <Dropdown.Content maxWidth="240px" align="center">
           <Dropdown.RadioGroup value={value.id}>
             {options?.map(option => (
               <Dropdown.RadioItem
@@ -46,11 +40,8 @@ const DropdownSelector = <T,>({
                 height="fit-content"
                 onSelect={() => handleSelect(option)}
               >
-                <Stack direction="column" gap={1} maxWidth="100%">
-                  <Box>
-                    <Name variant="body-3">{option.name}</Name>
-                  </Box>
-                  {renderCustomData?.(option)}
+                <Stack direction="column" gap={1} maxWidth="100%" paddingTop={2} paddingBottom={2}>
+                  <Name variant="body-3">{option.name}</Name>
                 </Stack>
               </Dropdown.RadioItem>
             ))}

@@ -69,7 +69,6 @@ const ChevronTriggerContainer = styled(RadixDropdown.Trigger)`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 100%;
     max-width: 100%;
 
     .chevronContainer {

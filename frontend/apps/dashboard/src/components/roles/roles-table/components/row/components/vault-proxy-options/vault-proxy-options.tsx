@@ -2,6 +2,7 @@ import type { ParseKeys } from 'i18next';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Tag } from '@onefootprint/ui';
 import type { VaultProxyOption } from '../../../../../hooks/use-vault-proxy-options';
 import { VaultProxyOptionKind } from '../../../../../hooks/use-vault-proxy-options';
 
@@ -12,7 +13,7 @@ export type VaultProxyOptionProps<T extends React.ElementType> = {
 
 const VaultProxyOptions = <T extends React.ElementType>({ options, as }: VaultProxyOptionProps<T>) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
-  const Component = as || 'span';
+  const Component = as || Tag;
   if (options.length === 1) {
     if (options[0] === VaultProxyOptionKind.all) {
       return <Component>{t('scopes.invoke_vault_proxy.all' as ParseKeys<'common'>) as unknown as string}</Component>;

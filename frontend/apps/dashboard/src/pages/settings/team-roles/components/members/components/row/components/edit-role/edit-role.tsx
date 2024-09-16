@@ -2,9 +2,9 @@ import type { Member } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import DropdownSelector from 'src/components/dropdown-selector';
 import useRoles from 'src/hooks/use-roles';
 
-import RoleDropdownSelector from 'src/components/role-dropdown-selector';
 import useUpdateMember from './hooks/use-update-member';
 
 export type EditRoleProps = {
@@ -47,7 +47,7 @@ const EditRole = ({ member }: EditRoleProps) => {
   };
 
   return (
-    <RoleDropdownSelector
+    <DropdownSelector
       options={options}
       triggerAriaLabel={t('aria-label', { email: member.email })}
       value={value}
