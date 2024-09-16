@@ -37,7 +37,9 @@ const useGetSandboxApiKey = () => {
     data: { authToken },
   } = useSession();
 
-  return useQuery(['sandboxApiKey', authToken], () => getSandboxApiKey(authToken || ''), {
+  return useQuery({
+    queryKey: ['sandboxApiKey', authToken],
+    queryFn: () => getSandboxApiKey(authToken || ''),
     enabled: !!authToken,
   });
 };

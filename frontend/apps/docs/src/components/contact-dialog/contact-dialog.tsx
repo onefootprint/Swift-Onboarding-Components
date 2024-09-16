@@ -43,14 +43,14 @@ const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
         label: t('send-button'),
         form: formId,
         type: 'submit',
-        loading: submitFormMutation.isLoading,
+        loading: submitFormMutation.isPending,
       }}
       secondaryButton={{
         label: t('cancel-button'),
         onClick: onClose,
         form: formId,
         type: 'reset',
-        disabled: submitFormMutation.isLoading,
+        disabled: submitFormMutation.isPending,
       }}
     >
       {submitFormMutation.isError && (

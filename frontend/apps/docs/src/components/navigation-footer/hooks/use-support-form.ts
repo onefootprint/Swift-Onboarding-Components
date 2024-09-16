@@ -27,6 +27,10 @@ const supportFormRequest = async ({ url, data }: SupportFormRequest) => {
   return response.data;
 };
 
-const useSupportForm = () => useMutation(supportFormRequest);
+const useSupportForm = () => {
+  return useMutation({
+    mutationFn: supportFormRequest,
+  });
+};
 
 export default useSupportForm;

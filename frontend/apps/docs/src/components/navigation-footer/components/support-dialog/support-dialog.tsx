@@ -62,14 +62,14 @@ const SupportDialog = ({ title, description, open, onClose }: SupportDialogProps
         label: t('form.send-button'),
         form: formId,
         type: 'submit',
-        loading: submitFormMutation.isLoading,
+        loading: submitFormMutation.isPending,
       }}
       secondaryButton={{
         label: t('form.cancel-button'),
         onClick: onClose,
         form: formId,
         type: 'reset',
-        disabled: submitFormMutation.isLoading,
+        disabled: submitFormMutation.isPending,
       }}
     >
       <Grid.Container tag="form" gap={7} id="support-dialog-id" onSubmit={handleSubmit(onSubmit)}>
