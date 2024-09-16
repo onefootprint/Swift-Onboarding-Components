@@ -209,16 +209,16 @@ config:
         cpuUnits: 4096
         memoryMB: 16384
         name: vault-dr
-      - args:
-          - vault-dr-worker
-          - --blob-batch-size=0
-          - --manifest-batch-size=1024
-          - --poll-period-ms=5000
-          - --record-task-concurrency=128
-          - --manifest-task-concurrency=128
-        cpuUnits: 4096
-        memoryMB: 16384
-        name: vault-dr-manifest-backfill
+      # - args:
+      #     - vault-dr-worker
+      #     - --blob-batch-size=0
+      #     - --manifest-batch-size=1024
+      #     - --poll-period-ms=5000
+      #     - --record-task-concurrency=128
+      #     - --manifest-task-concurrency=128
+      #   cpuUnits: 4096
+      #   memoryMB: 16384
+      #   name: vault-dr-manifest-backfill
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
