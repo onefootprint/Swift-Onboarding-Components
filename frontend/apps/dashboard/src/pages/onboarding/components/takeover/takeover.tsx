@@ -9,21 +9,20 @@ import AreYouSure from './components/are-you-sure';
 
 type TakeoverProps = {
   inProgressOnboardings: InProgressOnboarding[];
-  onConfirm: () => void;
 };
 
-const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
+const Takeover = ({ inProgressOnboardings }: TakeoverProps) => {
   const { t } = useTranslation('onboarding', { keyPrefix: 'in-progress' });
   const isSingleTenant = inProgressOnboardings.length === 1;
-  const singleTenant = isSingleTenant ? inProgressOnboardings[0] : null;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const closeDialog = () => {
     setIsConfirmOpen(false);
   };
 
-  const handleOpenConfirmDialog = () => {
-    setIsConfirmOpen(true);
+  // placeholder
+  const createBusinessAccount = () => {
+    console.log('createBusinessAccount');
   };
 
   const handleOpenWebsite = (url: string | undefined) => {
@@ -49,7 +48,6 @@ const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
           display="flex"
           flexDirection="column"
           gap={7}
-          aria-label={t('aria')}
         >
           <LogoFpCompact />
           <Stack flexDirection="column" gap={5}>
@@ -87,37 +85,34 @@ const Takeover = ({ inProgressOnboardings, onConfirm }: TakeoverProps) => {
                 </Text>
               )}
             </Stack>
-            {isSingleTenant && singleTenant?.tenant.websiteUrl && (
-              <Button variant="primary" onClick={() => handleOpenWebsite(singleTenant.tenant.websiteUrl)}>
-                {t('cta-single', { tenantName: singleTenant.tenant.name })}
+            {isSingleTenant ? (
+              <Button variant="primary" onClick={() => handleOpenWebsite(inProgressOnboardings[0].tenant.websiteUrl)}>
+                {t('cta-single', { tenantName: inProgressOnboardings[0].tenant.name })}
               </Button>
-            )}
-
-            {!isSingleTenant && (
+            ) : (
               <Stack flexDirection="column" gap={3}>
-                {inProgressOnboardings.map(onboarding =>
-                  onboarding.tenant.websiteUrl ? (
-                    <Button
-                      key={onboarding.fpId}
-                      variant="secondary"
-                      onClick={() => handleOpenWebsite(onboarding.tenant.websiteUrl)}
-                    >
-                      {t('cta-single', { tenantName: onboarding.tenant.name })}
-                    </Button>
-                  ) : null,
-                )}
+                {inProgressOnboardings.map(onboarding => (
+                  <Button
+                    key={onboarding.fpId}
+                    variant="secondary"
+                    onClick={() => handleOpenWebsite(onboarding.tenant.websiteUrl)}
+                  >
+                    {t('cta-single', { tenantName: onboarding.tenant.name })}
+                  </Button>
+                ))}
               </Stack>
             )}
-            <Stack center>
-              <LinkButton onClick={handleOpenConfirmDialog}>{t('cta-alternative')}</LinkButton>
-            </Stack>
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <LinkButton>{t('cta-alternative')}</LinkButton>
+            </Box>
           </Stack>
         </Box>
       </Box>
       <AreYouSure
         isOpen={isConfirmOpen}
         onCancel={closeDialog}
-        onConfirm={onConfirm}
+        // placeholder
+        onCreateBusinessAccount={createBusinessAccount}
         inProgressOnboardings={inProgressOnboardings}
       />
     </Stack>

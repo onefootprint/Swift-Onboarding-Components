@@ -1,1 +1,1 @@
-export { default, type AreYouSureProps } from './are-you-sure';
+export { default } from './are-you-sure';
