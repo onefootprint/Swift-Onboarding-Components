@@ -14,6 +14,7 @@ export type MachineContext = {
   idDocOutcome?: IdDocOutcome;
   isSocialMediaBrowser?: boolean;
   isInIframe: boolean;
+  isTransferFromDesktopToMobileDisabled?: boolean;
 };
 
 export type MachineEvents =

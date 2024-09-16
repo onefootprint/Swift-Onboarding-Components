@@ -20,8 +20,11 @@ const createTransferMachine = (initialContext: MachineContext) =>
         init: {
           always: [
             {
-              description: 'If not running on mobile or tablet',
-              cond: context => context.device.type !== 'mobile' && context.device.type !== 'tablet',
+              description: 'If not running on mobile or tablet, and can transfer from desktop to mobile',
+              cond: context =>
+                context.device.type !== 'mobile' &&
+                context.device.type !== 'tablet' &&
+                !context.isTransferFromDesktopToMobileDisabled,
               target: 'qrRegister',
             },
             {
@@ -29,6 +32,8 @@ const createTransferMachine = (initialContext: MachineContext) =>
               target: 'socialMediaBrowser',
             },
             {
+              description:
+                'We are on non-social media browser on mobile or desktop browser that has feature flag set to skip transfer to mobile',
               target: 'nonSocialMediaBrowser',
             },
           ],

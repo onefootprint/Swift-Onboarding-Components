@@ -20,7 +20,13 @@ const Router = ({ onDone }: RouterProps) => {
   const { config, idvContext, bootstrapData, overallOutcome, validationToken, idDocOutcome } = state.context;
   const { IdvTransferFromDesktopDisabled } = useFlags();
   const orgIds = new Set<string>(IdvTransferFromDesktopDisabled);
-  const isTransferOnDesktopDisabled = orgIds.has(config.orgId);
+
+  // Initially, the flag was created to completely skip transfer plugin
+  // However, since then, we added "open new tab" page to the transfer plugin
+  // which does passkey on desktop iframe
+  // So, we don't to completely skip the transfer plugin
+  // Instead we just want to skip the transfer from desktop to mobile
+  const isTransferFromDesktopToMobileDisabled = orgIds.has(config.orgId);
 
   const isDone = state.matches('complete');
   useEffect(() => {
@@ -41,7 +47,7 @@ const Router = ({ onDone }: RouterProps) => {
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}
-          isTransferOnDesktopDisabled={isTransferOnDesktopDisabled}
+          isTransferFromDesktopToMobileDisabled={isTransferFromDesktopToMobileDisabled}
         />
       )}
       {state.matches('validate') && <Validate />}

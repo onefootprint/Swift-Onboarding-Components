@@ -5,7 +5,12 @@ import type { TransferProps } from './types';
 
 const AppWithMachine = ({ idvContext, context, onDone }: TransferProps) => {
   const { device, authToken, isInIframe } = idvContext;
-  const { config, missingRequirements = { documents: [] }, idDocOutcome } = context;
+  const {
+    config,
+    missingRequirements = { documents: [] },
+    idDocOutcome,
+    isTransferFromDesktopToMobileDisabled,
+  } = context;
 
   return (
     <TransferMachineProvider
@@ -18,6 +23,7 @@ const AppWithMachine = ({ idvContext, context, onDone }: TransferProps) => {
         scopedAuthToken: '',
         isSocialMediaBrowser: checkIsSocialMediaBrowser(),
         isInIframe: !!isInIframe,
+        isTransferFromDesktopToMobileDisabled,
       }}
     >
       <Router onDone={onDone} />

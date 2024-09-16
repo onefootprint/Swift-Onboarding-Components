@@ -21,7 +21,7 @@ export type OnboardingRequirementsMachineArgs = {
   bootstrapData: UserData & BootstrapBusinessData;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
-  isTransferOnDesktopDisabled?: boolean;
+  isTransferFromDesktopToMobileDisabled?: boolean;
 };
 
 const { logError } = getLogger({ location: 'onboarding-requirements' });
@@ -32,7 +32,7 @@ const createOnboardingRequirementsMachine = ({
   idvContext,
   idDocOutcome,
   overallOutcome,
-  isTransferOnDesktopDisabled,
+  isTransferFromDesktopToMobileDisabled,
 }: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
@@ -56,7 +56,7 @@ const createOnboardingRequirementsMachine = ({
         },
         requirements: [],
         isRequirementRouterVisited: false,
-        isTransferOnDesktopDisabled,
+        isTransferFromDesktopToMobileDisabled,
       },
       on: {
         error: {

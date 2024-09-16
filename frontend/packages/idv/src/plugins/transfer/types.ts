@@ -16,6 +16,7 @@ export type TransferContext = {
   config: PublicOnboardingConfig;
   missingRequirements: TransferRequirements;
   idDocOutcome?: IdDocOutcome;
+  isTransferFromDesktopToMobileDisabled?: boolean;
 };
 
 export type TransferProps = {

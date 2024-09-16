@@ -47,9 +47,6 @@ const shouldRunTransfer = (ctx: MachineContext): boolean => {
   // If we're on desktop, we should still attempt to transfer
   if (!ctx.idvContext.isInIframe && isDeviceMobile(ctx)) return false;
 
-  // We've disabled transfer on desktop for certain tenants to reduce friction
-  if (ctx.isTransferOnDesktopDisabled && !isDeviceMobile(ctx)) return false;
-
   if (isNoPhoneFlow(ctx)) return false;
   // If the user has clicked on "Continue on mobile" button, we should allow them to continue with the transfer
   if (!ctx.continueOnMobile && ctx.isTransferVisited) return false;

@@ -38,8 +38,8 @@ export type MachineContext = {
   /** The last requirement whose respective machine was handled */
   lastHandledRequirement?: OnboardingRequirement;
 
-  /** We have a feature flag to disable transfers on desktops for some customers */
-  isTransferOnDesktopDisabled?: boolean;
+  /** We have a feature flag to disable transfers from desktops to mobile for some customers */
+  isTransferFromDesktopToMobileDisabled?: boolean;
 
   /** Record whether the user decided to proceed with capturing the docs on mobile (only applicable for the desktop flow) */
   continueOnMobile: boolean;

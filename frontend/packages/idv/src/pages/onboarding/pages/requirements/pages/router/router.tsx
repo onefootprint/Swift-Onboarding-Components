@@ -34,6 +34,7 @@ const Router = ({ onDone }: RouterProps) => {
     onboardingContext: { bootstrapData, config, idDocOutcome },
     isKycDataCollected,
     requirements,
+    isTransferFromDesktopToMobileDisabled,
   } = state.context;
   const { orgId } = config;
   const isDone = state.matches('success');
@@ -113,6 +114,7 @@ const Router = ({ onDone }: RouterProps) => {
             documents: idDocReqs,
           },
           idDocOutcome,
+          isTransferFromDesktopToMobileDisabled,
         }}
         onDone={handleRequirementCompleted}
       />
