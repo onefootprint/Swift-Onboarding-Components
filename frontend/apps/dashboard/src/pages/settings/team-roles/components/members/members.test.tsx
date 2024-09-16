@@ -307,17 +307,11 @@ describe('<Members />', () => {
           await userEvent.click(roleButton);
 
           await waitFor(() => {
-            const newRoleOption = screen.getByRole('menuitem', {
-              name: (_accessibleName: string, element: Element) =>
-                element.textContent?.includes(memberToEditRole.name) ?? false,
-            });
+            const newRoleOption = screen.getByText(memberToEditRole.name);
             expect(newRoleOption).toBeInTheDocument();
           });
 
-          const newRoleOption = screen.getByRole('menuitem', {
-            name: (_accessibleName: string, element: Element) =>
-              element.textContent?.includes(memberToEditRole.name) ?? false,
-          });
+          const newRoleOption = screen.getByText(memberToEditRole.name);
           await userEvent.click(newRoleOption);
 
           await waitFor(() => {
@@ -341,17 +335,11 @@ describe('<Members />', () => {
           await userEvent.click(roleButton);
 
           await waitFor(() => {
-            const newRoleOption = screen.getByRole('menuitem', {
-              name: (_accessibleName: string, element: Element) =>
-                element.textContent?.includes(memberToEditRole.name) ?? false,
-            });
+            const newRoleOption = screen.getByText(memberToEditRole.name);
             expect(newRoleOption).toBeInTheDocument();
           });
 
-          const newRoleOption = screen.getByRole('menuitem', {
-            name: (_accessibleName: string, element: Element) =>
-              element.textContent?.includes(memberToEditRole.name) ?? false,
-          });
+          const newRoleOption = screen.getByText(memberToEditRole.name);
           await userEvent.click(newRoleOption);
 
           await waitFor(() => {

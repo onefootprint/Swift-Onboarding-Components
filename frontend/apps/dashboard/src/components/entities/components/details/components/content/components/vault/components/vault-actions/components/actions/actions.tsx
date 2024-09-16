@@ -3,9 +3,9 @@ import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PermissionGate from 'src/components/permission-gate';
 
 import useTags from '@/entity/hooks/use-tags';
+import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
 import type { WithEntityProps } from '../../../../../../../with-entity';
@@ -87,63 +87,55 @@ const Actions = ({ entity }: WithEntityProps) => {
           </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Portal>
-          <Dropdown.Content align="end" sideOffset={8}>
+          <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
             <Dropdown.Group>
               <Dropdown.GroupTitle>{t('groups.user-management')}</Dropdown.GroupTitle>
-              <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
+              {hasPermission(RoleScopeKind.writeEntities) && (
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={editControls.start}>
                   {t('edit-user.label')}
                 </Dropdown.Item>
-              </PermissionGate>
-              <PermissionGate scopeKind={RoleScopeKind.labelAndTag} fallbackText={t('edit-tags.not-allowed')}>
+              )}
+              {hasLabelAndTagPermissions && (
                 <Dropdown.Item height="32px" onSelect={handleOpenEditTagsDialog}>
                   {tags?.length ? t('edit-tags.edit-label') : t('edit-tags.add-label')}
                 </Dropdown.Item>
-              </PermissionGate>
-              <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={newT('upload-doc.not-allowed')}>
+              )}
+              {hasPermission(RoleScopeKind.writeEntities) && (
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenUploadDocDialog}>
                   {newT('upload-doc.label')}
                 </Dropdown.Item>
-              </PermissionGate>
-              <PermissionGate
-                scopeKind={RoleScopeKind.manualReview}
-                fallbackText={t('view-historical-data.not-allowed')}
-              >
+              )}
+              {hasPermission(RoleScopeKind.manualReview) && (
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenHistoricalDataDialog}>
                   {t('view-historical-data.label')}
                 </Dropdown.Item>
-              </PermissionGate>
-              <PermissionGate scopeKind={RoleScopeKind.writeLists} fallbackText={t('add-to-list.not-allowed')}>
+              )}
+              {hasPermission(RoleScopeKind.writeLists) && (
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenAddToListDialog}>
                   {t('add-to-list.label')}
                 </Dropdown.Item>
-              </PermissionGate>
+              )}
               <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenSummarizeDialog}>
                 {t('summarize.label')}
               </Dropdown.Item>
             </Dropdown.Group>
             <Dropdown.Separator />
-            <Dropdown.Group>
-              <Dropdown.GroupTitle>{t('groups.user-requests')}</Dropdown.GroupTitle>
-              <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('request-more-info.not-allowed')}>
+            {hasPermission(RoleScopeKind.manualReview) && (
+              <Dropdown.Group>
+                <Dropdown.GroupTitle>{t('groups.user-requests')}</Dropdown.GroupTitle>
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenRequestMoreInfoDialog}>
                   {t('request-more-info.label')}
                 </Dropdown.Item>
-              </PermissionGate>
-              <PermissionGate
-                scopeKind={RoleScopeKind.manualReview}
-                fallbackText={t('update-auth-methods.not-allowed')}
-              >
                 <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenAuthMethodsDialog}>
                   {t('update-auth-methods.label')}
                 </Dropdown.Item>
-              </PermissionGate>
-            </Dropdown.Group>
+              </Dropdown.Group>
+            )}
             <Dropdown.Separator />
-            {user?.isFirmEmployee && (
+            {user?.isFirmEmployee && isOpenDatadogEnabled && (
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('groups.internal')}</Dropdown.GroupTitle>
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} disabled={!isOpenDatadogEnabled} onSelect={openDatadog}>
+                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={openDatadog}>
                   {t('open-datadog')}
                 </Dropdown.Item>
               </Dropdown.Group>

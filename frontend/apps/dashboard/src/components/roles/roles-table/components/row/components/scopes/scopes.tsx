@@ -26,8 +26,8 @@ const Scopes = ({ scopes }: ScopesProps) => {
         const label = t(`scopes.${scope.kind}` as ParseKeys<'common'>) as unknown as string;
         return <Tag key={scope.kind}>{label}</Tag>;
       })}
-      <DecryptOptions options={decryptOptions} as={Tag} />
-      <VaultProxyOptions options={vaultProxyOptions} as={Tag} />
+      <DecryptOptions options={decryptOptions} />
+      <VaultProxyOptions options={vaultProxyOptions} />
     </Tags>
   );
 };

@@ -1,6 +1,7 @@
-import { Dropdown } from '@onefootprint/ui';
+import { Box, Dropdown, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 export type Option<T> = {
   id: string;
@@ -36,24 +37,37 @@ const DropdownSelector = <T,>({
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content width="320px">
-          <Dropdown.Group>
+          <Dropdown.RadioGroup value={value.id}>
             {options?.map(option => (
-              <Dropdown.Item
-                height="fit-content"
-                checked={value.id === option.id}
+              <Dropdown.RadioItem
+                value={option.id}
                 textValue={option.name}
                 key={option.id}
+                height="fit-content"
                 onSelect={() => handleSelect(option)}
               >
-                {option.name}
-                {renderCustomData?.(option)}
-              </Dropdown.Item>
+                <Stack direction="column" gap={1} maxWidth="100%">
+                  <Box>
+                    <Name variant="body-3">{option.name}</Name>
+                  </Box>
+                  {renderCustomData?.(option)}
+                </Stack>
+              </Dropdown.RadioItem>
             ))}
-          </Dropdown.Group>
+          </Dropdown.RadioGroup>
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
   );
 };
+
+// cap role name at 2 lines
+const Name = styled(Text)`
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 export default DropdownSelector;

@@ -1,38 +1,21 @@
-import { styled } from 'styled-components';
-import { css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../../utils';
 import Box from '../../box';
+import type { BaseItemContainerProps } from '../dropdown.types';
 import { DROPDOWN_ITEM_SIZE } from '../dropdown.types';
 
-const BaseItemContainer = styled(Box)<{
-  variant?: 'default' | 'destructive';
-  size?: 'default' | 'compact' | 'tiny';
-  layout?: 'default' | 'radio-item';
-  $height?: string | 'fit-content';
-}>`
+const BaseItemContainer = styled(Box)<BaseItemContainerProps>`
   ${({ theme, variant = 'default', size = 'default', $height, layout = 'default' }) => {
     const getHeight = () => {
       if ($height === 'fit-content') return 'fit-content';
       if ($height) return $height;
-      return DROPDOWN_ITEM_SIZE[size || 'default'];
+      return DROPDOWN_ITEM_SIZE[size];
     };
 
     return css`
       ${createFontStyles('body-3')};
       position: relative;
       display: ${layout === 'radio-item' ? 'grid' : 'flex'};
-      ${
-        layout === 'radio-item'
-          ? css`
-          grid-template-columns: 1fr ${theme.spacing[4]};
-          grid-template-rows: 1fr;
-        `
-          : css`
-          flex-direction: row;
-         
-        `
-      }
-      gap: ${theme.spacing[3]};  
       align-items: center;
       width: 100%;
       height: ${getHeight()};
@@ -41,6 +24,21 @@ const BaseItemContainer = styled(Box)<{
       color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
       cursor: pointer;
       border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[1]});
+
+      ${
+        layout === 'radio-item' &&
+        css`
+        grid-template-columns: 1fr ${theme.spacing[4]};
+        grid-template-rows: 1fr;
+      `
+      }
+      ${
+        layout !== 'radio-item' &&
+        css`
+        flex-direction: row;
+      `
+      }
+      gap: ${theme.spacing[3]};
 
       a {
         color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};

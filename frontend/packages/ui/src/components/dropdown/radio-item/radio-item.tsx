@@ -5,10 +5,10 @@ import BaseItemContainer from '../base-item-container';
 import type { RadioItemProps } from '../dropdown.types';
 import RadioIndicator from '../item-indicator';
 
-const RadioItem = ({ value, children, onSelect }: RadioItemProps) => {
+const RadioItem = ({ value, children, height, onSelect }: RadioItemProps) => {
   return (
     <RadixDropdown.RadioItem value={value} onSelect={onSelect} asChild>
-      <BaseItemContainer layout="radio-item">
+      <BaseItemContainer layout="radio-item" $height={height}>
         <Content>{children}</Content>
         <IndicatorWrapper>
           <RadioIndicator />

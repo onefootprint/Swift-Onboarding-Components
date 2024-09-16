@@ -38,7 +38,7 @@ const Scopes = styled.span`
     color: ${theme.color.tertiary};
 
     span:not(:last-child)::after {
-      content: ';';
+      content: ',';
     }
   `}
 `;

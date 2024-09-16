@@ -1,4 +1,3 @@
-import type { Spacings } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import type {
   DropdownMenuContentProps,
@@ -22,7 +21,7 @@ export type ItemProps = DropdownMenuItemProps & {
   asLink?: boolean;
   size?: 'default' | 'compact' | 'tiny';
   variant?: 'default' | 'destructive';
-  height?: string;
+  height?: CSS.Property.Height;
   onSelect?: (event: Event) => void;
 };
 
@@ -30,11 +29,12 @@ export type TriggerProps = DropdownMenuTriggerProps & {
   hasChevron?: boolean;
   asButton?: boolean;
   variant?: 'default' | 'chevron' | 'icon' | 'button';
-  width?: Spacings;
-  height?: Spacings;
+  width?: CSS.Property.Width;
+  height?: CSS.Property.Width;
 };
 
 export type RadioItemProps = DropdownMenuRadioItemProps & {
+  height?: CSS.Property.Height;
   value: string;
   onSelect: (event: Event) => void;
 };
@@ -50,4 +50,11 @@ export type SubContentProps = DropdownMenuSubContentProps & {
   children: React.ReactNode;
   minWidth?: CSS.Property.Width;
   maxWidth?: CSS.Property.Width;
+};
+
+export type BaseItemContainerProps = {
+  $height?: CSS.Property.Height;
+  variant?: 'default' | 'destructive';
+  size?: 'default' | 'compact' | 'tiny';
+  layout?: 'default' | 'radio-item';
 };

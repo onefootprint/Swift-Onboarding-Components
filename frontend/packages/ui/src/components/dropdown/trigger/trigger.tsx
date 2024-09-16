@@ -1,8 +1,8 @@
-import styled, { css } from 'styled-components';
-
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
+import styled, { css } from 'styled-components';
 
+import Text from '../../text';
 import type { TriggerProps } from '../dropdown.types';
 
 const DropdownTrigger = ({ children, variant = 'default', ...props }: TriggerProps) => {
@@ -10,7 +10,9 @@ const DropdownTrigger = ({ children, variant = 'default', ...props }: TriggerPro
     case 'chevron':
       return (
         <ChevronTriggerContainer {...props}>
-          {children}
+          <Text variant="body-3" truncate>
+            {children}
+          </Text>
           <IcoChevronDown16 className="chevronContainer" />
         </ChevronTriggerContainer>
       );
@@ -21,14 +23,23 @@ const DropdownTrigger = ({ children, variant = 'default', ...props }: TriggerPro
   }
 };
 
+const baseTriggerStyles = css`
+  all: unset;
+  cursor: pointer;
+  position: relative;
+`;
+
+const disabledStyles = css`
+  cursor: initial;
+  opacity: 0.5;
+`;
+
 const IconTriggerContainer = styled(RadixDropdown.Trigger)`
   ${({ theme }) => css`
-    all: unset;
-    cursor: pointer;
+    ${baseTriggerStyles}
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
     color: ${theme.color.primary};
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
@@ -42,29 +53,32 @@ const IconTriggerContainer = styled(RadixDropdown.Trigger)`
     }
 
     &[data-disabled] {
-      cursor: initial;
-      opacity: 0.5;
+      ${disabledStyles}
     }
   `}
 `;
 
 const ChevronTriggerContainer = styled(RadixDropdown.Trigger)`
   ${({ theme }) => css`
-    all: unset;
-    position: relative;
-    cursor: pointer;
+    ${baseTriggerStyles}
     display: flex;
+    gap: ${theme.spacing[1]};
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    width: fit-content;
-    
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 100%;
+
     .chevronContainer {
       color: ${theme.color.primary};
       transition: transform 0.1s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     &:not([data-disabled])[data-state='closed']:hover {
@@ -84,16 +98,14 @@ const ChevronTriggerContainer = styled(RadixDropdown.Trigger)`
     }
 
     &[data-disabled] {
-      cursor: initial;
-      opacity: 0.5;
+      ${disabledStyles}
     }
   `}
 `;
 
 const DefaultTriggerContainer = styled(RadixDropdown.Trigger)`
   ${({ theme }) => css`
-    all: unset;
-    cursor: pointer;
+    ${baseTriggerStyles}
     color: ${theme.color.primary};
 
     &:not([data-disabled])[data-state='closed']:hover {
@@ -101,8 +113,7 @@ const DefaultTriggerContainer = styled(RadixDropdown.Trigger)`
     }
 
     &[data-disabled] {
-      cursor: initial;
-      opacity: 0.5;
+      ${disabledStyles}
     }
   `}
 `;

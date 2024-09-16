@@ -102,15 +102,11 @@ describe('<Row />', () => {
       await userEvent.click(triggerButton);
 
       await waitFor(() => {
-        const memberOption = screen.getByRole('menuitem', {
-          name: 'Member',
-        });
+        const memberOption = screen.getByText('Member');
         expect(memberOption).toBeInTheDocument();
       });
 
-      const memberOption = screen.getByRole('menuitem', {
-        name: 'Member',
-      });
+      const memberOption = screen.getByText('Member');
       const description = within(memberOption).getByText('Read-only');
       expect(description).toBeInTheDocument();
       await userEvent.click(memberOption);
