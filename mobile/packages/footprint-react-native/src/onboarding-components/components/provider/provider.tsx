@@ -1,9 +1,12 @@
-import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { type Appearance, OnboardingStep, type SandboxOutcome } from '../../../types';
+import type { Appearance, SandboxOutcome, SupportedLocale } from '../../../types';
+import { OverallOutcome, IdDocOutcome } from '../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
+import usePropsUpdated from './hooks/use-props-updated';
+import isAlphanumeric from 'src/onboarding-components/utils/is-alphanumeric';
 
 export type ContextData = {
   appearance?: Appearance;
@@ -11,19 +14,17 @@ export type ContextData = {
   locale?: SupportedLocale;
   onboardingConfig?: PublicOnboardingConfig;
   publicKey: string;
-  redirectUrl?: string;
+  redirectUrl: string;
   sandboxId?: string;
-  sandboxOutcome: SandboxOutcome;
-  step: OnboardingStep;
+  sandboxOutcome?: SandboxOutcome;
   vaultingToken?: string;
 };
 
 export type ProviderProps = Pick<
   ContextData,
-  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxId' | 'redirectUrl'
+  'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxId' | 'redirectUrl' | 'sandboxOutcome'
 > & {
   children?: React.ReactNode;
-  sandboxOutcome?: SandboxOutcome;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -31,8 +32,7 @@ type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 const Context = createContext<[ContextData, UpdateContext]>([
   {
     publicKey: '',
-    step: OnboardingStep.Auth,
-    sandboxOutcome: 'pass',
+    redirectUrl: '',
   },
   () => undefined,
 ]);
@@ -44,8 +44,8 @@ const Provider = ({
   locale = 'en-US',
   publicKey,
   sandboxId,
-  sandboxOutcome = 'pass',
-  redirectUrl,
+  sandboxOutcome,
+  redirectUrl = '',
 }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
@@ -55,9 +55,44 @@ const Provider = ({
     sandboxId,
     sandboxOutcome,
     redirectUrl,
-    step: authToken ? OnboardingStep.Onboard : OnboardingStep.Auth,
+  });
+  usePropsUpdated({
+    props: { appearance, authToken, locale, sandboxOutcome, publicKey, sandboxId, redirectUrl },
+    onUpdate: updatedProps => {
+      setContext(prev => ({ ...prev, ...updatedProps }));
+    },
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
+
+  const getSandboxProps = (response: PublicOnboardingConfig) => {
+    if (response.isLive && sandboxId) {
+      throw new Error('sandboxId is not allowed for live environments');
+    }
+    if (response.isLive && sandboxOutcome) {
+      throw new Error('sandboxOutcome is not allowed for live environments');
+    }
+    if (!response.requiresIdDoc && sandboxOutcome?.documentOutcome) {
+      throw new Error('documentOutcome is not allowed for no-document verification flow');
+    }
+
+    if (sandboxId && !isAlphanumeric(sandboxId)) {
+      throw new Error('sandboxId should only contain letters and numbers');
+    }
+
+    if (response.isLive) {
+      return { sandboxId, sandboxOutcome };
+    }
+
+    const overallOutcome = sandboxOutcome?.overallOutcome ?? OverallOutcome.success;
+    const documentOutcome = response.requiresIdDoc
+      ? sandboxOutcome?.documentOutcome ?? IdDocOutcome.success
+      : undefined;
+
+    return {
+      sandboxId: sandboxId ?? Math.random().toString(36).substring(2, 14),
+      sandboxOutcome: { overallOutcome, documentOutcome },
+    };
+  };
 
   const getOnboardingConfig = async (pKey?: string) => {
     if (!pKey) {
@@ -68,26 +103,17 @@ const Provider = ({
     try {
       response = await getOnboardingConfigReq(pKey);
     } catch (_e: unknown) {
-      throw new Error(`Failed to fetch onboarding config: ${_e}`);
+      throw new Error('Public key is invalid');
     }
 
-    let newSandboxId = sandboxId;
-    if (response.isLive && sandboxId) {
-      throw new Error('sandboxId is not allowed for live environments');
-    }
-    if (!response.isLive) {
-      if (sandboxId) {
-        const regex = /^[A-Za-z0-9]+$/;
-        if (!regex.test(sandboxId)) {
-          throw new Error('sandboxId should only contain letters and numbers');
-        }
-      }
-      if (!sandboxId) {
-        // create a random sandboxId with both letters and numbers of lenth 12
-        newSandboxId = Math.random().toString(36).substring(2, 14);
-      }
-    }
-    setContext(prev => ({ ...prev, onboardingConfig: response, sandboxId: newSandboxId }));
+    const { sandboxId, sandboxOutcome } = getSandboxProps(response);
+
+    setContext(prev => ({
+      ...prev,
+      onboardingConfig: response,
+      sandboxId,
+      sandboxOutcome,
+    }));
   };
 
   useEffect(() => {

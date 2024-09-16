@@ -61,7 +61,24 @@ export type Options = {
   showLogo?: boolean;
 };
 
-export type SandboxOutcome = 'fail' | 'pass' | 'manual_review' | 'use_rules_outcome';
+export enum OverallOutcome {
+  success = 'pass',
+  manualReview = 'manual_review',
+  fail = 'fail',
+  documentDecision = 'document_decision',
+  stepUp = 'step_up',
+  useRulesOutcome = 'use_rules_outcome',
+}
+
+export enum IdDocOutcome {
+  success = 'pass',
+  fail = 'fail',
+  real = 'real',
+}
+export type SandboxOutcome = {
+  overallOutcome?: OverallOutcome;
+  documentOutcome?: IdDocOutcome;
+};
 
 export class InlineOtpNotSupported extends Error {
   constructor(message: string) {

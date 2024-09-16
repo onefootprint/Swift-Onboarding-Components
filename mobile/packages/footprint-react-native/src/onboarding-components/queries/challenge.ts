@@ -112,12 +112,12 @@ const getValidationToken = async (options: { token: string }) => {
   return response;
 };
 
-const initOnboarding = async (options: { token: string; sandboxOutcome: SandboxOutcome }) => {
+const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/onboarding',
     method: 'POST',
     data: {
-      fixture_result: options.sandboxOutcome,
+      fixture_result: options.sandboxOutcome?.overallOutcome,
     },
     headers: {
       'X-Fp-Authorization': options.token,
@@ -142,7 +142,7 @@ const createVaultingToken = async ({ authToken }: { authToken: string }) => {
 
 export const verifyChallenge = async (
   payload: { challenge: string; challengeToken: string },
-  options: { token: string; sandboxOutcome: SandboxOutcome },
+  options: { token: string; sandboxOutcome?: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
   await getValidationToken({ token: response.authToken });

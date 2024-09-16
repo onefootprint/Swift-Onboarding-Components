@@ -55,7 +55,6 @@ const useOtp = () => {
           ...prev,
           authToken,
           vaultingToken,
-          step: OnboardingStep.Onboard,
         }));
         onAuthenticated?.();
       },
