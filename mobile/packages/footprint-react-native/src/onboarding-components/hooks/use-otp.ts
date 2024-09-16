@@ -27,7 +27,15 @@ const useOtp = () => {
       onCancel?: () => void;
     } = {},
   ) => {
-    const { appearance, publicKey, redirectUrl } = context;
+    if (context.authToken && (phoneNumber || email)) {
+      onError?.(
+        new Error(
+          'You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number',
+        ),
+      );
+      return;
+    }
+    const { appearance, publicKey, redirectUrl, sandboxId, sandboxOutcome } = context;
 
     if (!publicKey) {
       throw new Error('No publicKey found. Please make sure to set the publicKey first');
@@ -36,10 +44,20 @@ const useOtp = () => {
       throw new Error('No redirectUrl found. Please make sure to set the redirectUrl first');
     }
 
+    const verifyAuthVariantProps = context.authToken
+      ? {
+          authToken: context.authToken,
+        }
+      : {
+          publicKey: context.publicKey,
+        };
+
     const component = fp.init({
+      ...verifyAuthVariantProps,
       appearance,
-      publicKey,
       redirectUrl,
+      sandboxId,
+      sandboxOutcome,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,

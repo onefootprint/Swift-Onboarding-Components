@@ -6,7 +6,10 @@ const NUM_RETRIES = 3;
 
 type SendSdkArgsRequest = {
   kind: string;
-  data: Pick<VerifyProps, 'publicKey' | 'authToken' | 'bootstrapData' | 'options' | 'l10n'>;
+  data: Pick<
+    VerifyProps,
+    'publicKey' | 'authToken' | 'bootstrapData' | 'options' | 'l10n' | 'sandboxId' | 'sandboxOutcome'
+  >;
   is_components_sdk?: boolean;
 };
 
@@ -48,6 +51,8 @@ const sendSdkArgs = async (
           userData: data.bootstrapData,
           options: data.options,
           l10n: data.l10n,
+          fixtureResult: data.sandboxOutcome?.overallOutcome,
+          sandboxId: data.sandboxId,
         }),
         is_components_sdk: options?.isComponentSdk,
         should_relay_to_components: options?.shouldRelayToComponents,

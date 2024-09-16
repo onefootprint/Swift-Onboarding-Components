@@ -26,6 +26,8 @@ export type VerifyProps = BaseComponentProps & {
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
+  readonly sandboxId?: string;
+  readonly sandboxOutcome?: SandboxOutcome;
   readonly options?: Options;
 } & (WithAuthToken | WithPublicKey);
 

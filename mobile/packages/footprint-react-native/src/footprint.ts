@@ -38,6 +38,8 @@ const footprint = () => {
       bootstrapData: props.bootstrapData,
       options: props.options,
       l10n: props.l10n,
+      sandboxId: props.sandboxId,
+      sandboxOutcome: props.sandboxOutcome,
     });
     if (!token) {
       handleError(props, 'Unable to get SDK args token.');
