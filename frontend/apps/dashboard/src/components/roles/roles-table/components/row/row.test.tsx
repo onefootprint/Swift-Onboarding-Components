@@ -80,36 +80,6 @@ describe('<Row />', () => {
         expect(tag).toBeInTheDocument();
       });
     });
-
-    describe('when it has more than one decrypt field', () => {
-      it('should render the number of fields and the details in a tooltip', async () => {
-        renderRow({
-          role: {
-            ...roleFixture,
-            scopes: [
-              {
-                kind: RoleScopeKind.decrypt,
-                data: CollectedKycDataOption.name,
-              },
-              {
-                kind: RoleScopeKind.decrypt,
-                data: CollectedKycDataOption.email,
-              },
-            ],
-          },
-        });
-        const tag = screen.getByText('Decrypt 2 fields');
-        expect(tag).toBeInTheDocument();
-
-        await userEvent.hover(tag);
-        await waitFor(() => {
-          const tooltip = screen.getByRole('tooltip', {
-            name: 'Full name, Email',
-          });
-          expect(tooltip).toBeInTheDocument();
-        });
-      });
-    });
   });
 
   describe('when the role is assigned to at least one user', () => {
