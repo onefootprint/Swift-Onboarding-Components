@@ -16,8 +16,11 @@ export type CodeBlockProps = {
   language: string;
   showLineNumbers?: boolean;
   title?: string | React.ReactNode;
-  tooltipText?: string;
-  tooltipTextConfirmation?: string;
+  tooltip?: {
+    position?: 'top' | 'bottom' | 'left' | 'right';
+    text?: string;
+    textConfirmation?: string;
+  };
 };
 
 const CodeBlock = ({
@@ -28,8 +31,7 @@ const CodeBlock = ({
   language,
   showLineNumbers,
   title,
-  tooltipText,
-  tooltipTextConfirmation,
+  tooltip,
 }: CodeBlockProps) => {
   const { t } = useTranslation('ui');
   const theme = useTheme();
@@ -65,10 +67,10 @@ const CodeBlock = ({
             contentToCopy={children}
             size="compact"
             tooltip={{
-              position: 'top',
-              text: tooltipText ?? t('components.code-block.tooltip-text-default'),
+              position: tooltip?.position ?? 'top',
+              text: tooltip?.text ?? t('components.code-block.tooltip-text-default'),
               textConfirmation:
-                tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+                tooltip?.textConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
             }}
           />
         )}

@@ -1,26 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-
-import { createFontStyles } from '../../utils/mixins';
 import CopyButton from '../copy-button';
+import Text from '../text';
 
 export type CodeInlineProps = {
   ariaLabel?: string;
   children: string;
   disabled?: boolean;
-  tooltipText?: string;
-  tooltipTextConfirmation?: string;
   truncate?: boolean;
   isPrivate?: boolean;
   size?: 'default' | 'compact';
+  tooltip?: {
+    position?: 'top' | 'bottom' | 'left' | 'right';
+    text?: string;
+    textConfirmation?: string;
+  };
 };
 
 const CodeInline = ({
   ariaLabel,
   children,
   disabled,
-  tooltipText,
-  tooltipTextConfirmation,
+  tooltip,
   truncate,
   isPrivate,
   size = 'default',
@@ -29,7 +30,13 @@ const CodeInline = ({
 
   if (disabled) {
     return (
-      <CodeContent data-truncate={truncate} size={size} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
+      <CodeContent
+        variant={size === 'compact' ? 'snippet-3' : 'snippet-2'}
+        data-disabled={disabled}
+        truncate={truncate}
+        tag="code"
+        {...(isPrivate && { 'data-dd-privacy': 'mask' })}
+      >
         {children}
       </CodeContent>
     );
@@ -40,21 +47,26 @@ const CodeInline = ({
       contentToCopy={children}
       ariaLabel={ariaLabel ?? t('components.code-inline.aria-label-default')}
       tooltip={{
-        position: 'top',
-        text: tooltipText ?? t('components.code-inline.tooltip-text-default'),
-        textConfirmation: tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
+        position: tooltip?.position ?? 'top',
+        text: tooltip?.text ?? t('components.code-inline.tooltip-text-default'),
+        textConfirmation: tooltip?.textConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default'),
       }}
     >
-      <CodeContent data-truncate={truncate} size={size} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
+      <CodeContent
+        variant={size === 'compact' ? 'snippet-3' : 'snippet-2'}
+        data-disabled={disabled}
+        truncate={truncate}
+        tag="code"
+        {...(isPrivate && { 'data-dd-privacy': 'mask' })}
+      >
         {children}
       </CodeContent>
     </CopyButton>
   );
 };
 
-const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
-  ${({ theme, size }) => css`
-    ${size === 'compact' ? createFontStyles('snippet-3', 'code') : createFontStyles('snippet-2', 'code')};
+const CodeContent = styled(Text)`
+  ${({ theme }) => css`
     text-align: left;
     white-space: break-spaces;
     word-break: break-word;
@@ -62,17 +74,18 @@ const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
     display: inline-block;
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.sm};
-    color: ${size === 'compact' ? theme.color.secondary : theme.color.error};
+    color: ${theme.color.secondary};
     flex-flow: wrap;
-    height: ${size === 'compact' ? 'auto' : ''};
     padding: ${theme.spacing[1]} ${theme.spacing[2]};
 
-    &[data-truncate='true'] {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      word-break: unset;
+    &:not([data-disabled='true']) {
+      &:hover {
+        cursor: pointer;
+        color: ${theme.color.primary};
+        border-color: ${theme.borderColor.primary};
+      }
     }
+
   `}
 `;
 

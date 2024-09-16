@@ -27,21 +27,10 @@ export default {
       description: 'Prevent to break the line',
       required: false,
     },
-    tooltipText: {
-      control: {
-        type: 'text',
-      },
-      type: { name: 'string', required: false },
-      description: 'Tooltip text',
-      table: { defaultValue: { summary: 'Copy to clipboard' } },
-    },
-    tooltipTextConfirmation: {
-      control: {
-        type: 'text',
-      },
-      type: { name: 'string', required: false },
-      description: 'Toast title description',
-      table: { defaultValue: { summary: 'Copied to clipboard' } },
+    tooltip: {
+      control: 'object',
+      description: 'Tooltip configuration',
+      required: false,
     },
     size: {
       control: {
@@ -56,19 +45,11 @@ const Template: StoryFn<CodeInlineProps> = ({
   ariaLabel,
   children,
   disabled,
-  tooltipText,
-  tooltipTextConfirmation,
+  tooltip,
   truncate,
   size,
 }: CodeInlineProps) => (
-  <CodeInline
-    ariaLabel={ariaLabel}
-    disabled={disabled}
-    tooltipText={tooltipText}
-    tooltipTextConfirmation={tooltipTextConfirmation}
-    truncate={truncate}
-    size={size}
-  >
+  <CodeInline ariaLabel={ariaLabel} disabled={disabled} tooltip={tooltip} truncate={truncate} size={size}>
     {children}
   </CodeInline>
 );
@@ -78,8 +59,10 @@ Base.args = {
   ariaLabel: 'Copy',
   children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
   disabled: false,
-  tooltipText: 'Copy to clipboard',
-  tooltipTextConfirmation: 'Copied!',
+  tooltip: {
+    text: 'Copy to clipboard',
+    textConfirmation: 'Copied!',
+  },
   truncate: false,
   size: 'default',
 };

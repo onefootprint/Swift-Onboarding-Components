@@ -17,32 +17,30 @@ export default {
       description: 'Code to be displayed',
       required: true,
     },
-
     language: {
       control: 'text',
       description: 'Code language to display in header',
       required: true,
     },
-    tooltipText: {
-      control: {
-        type: 'text',
+    tooltip: {
+      control: 'object',
+      description: 'Tooltip configuration',
+      table: {
+        type: {
+          summary: '{ position?: "top" | "bottom" | "left" | "right", text?: string, textConfirmation?: string }',
+        },
+        defaultValue: { summary: '{ position: "top", text: "Copy to clipboard", textConfirmation: "Copied!" }' },
       },
-      type: { name: 'string', required: false },
-      description: 'Tooltip text',
-      table: { defaultValue: { summary: 'Copy to clipboard' } },
-    },
-    tooltipTextConfirmation: {
-      control: {
-        type: 'text',
-      },
-      type: { name: 'string', required: false },
-      description: 'Toast title description',
-      table: { defaultValue: { summary: 'Copied to clipboard' } },
     },
     title: {
       control: 'text',
-      description: 'Copy to clipboard',
-      required: true,
+      description: 'Title to display in the header',
+      required: false,
+    },
+    disableCopy: {
+      control: 'boolean',
+      description: 'Disable copy functionality',
+      required: false,
     },
   },
 } as Meta;
@@ -52,18 +50,10 @@ const Template: StoryFn<CodeBlockProps> = ({
   children,
   language,
   title,
-  tooltipText,
-  tooltipTextConfirmation,
+  tooltip,
   disableCopy,
 }: CodeBlockProps) => (
-  <CodeBlock
-    ariaLabel={ariaLabel}
-    language={language}
-    title={title}
-    tooltipText={tooltipText}
-    tooltipTextConfirmation={tooltipTextConfirmation}
-    disableCopy={disableCopy}
-  >
+  <CodeBlock ariaLabel={ariaLabel} language={language} title={title} tooltip={tooltip} disableCopy={disableCopy}>
     {children}
   </CodeBlock>
 );
@@ -80,8 +70,10 @@ Base.args = {
   } 
   `,
   language: 'javascript',
-  tooltipText: 'Copy to clipboard',
-  tooltipTextConfirmation: 'Copied!',
+  tooltip: {
+    text: 'Copy to clipboard',
+    textConfirmation: 'Copied!',
+  },
 };
 
 export const WithoutCopy = Template.bind({});
@@ -96,7 +88,9 @@ WithoutCopy.args = {
   } 
   `,
   language: 'javascript',
-  tooltipText: 'Copy to clipboard',
-  tooltipTextConfirmation: 'Copied!',
+  tooltip: {
+    text: 'Copy to clipboard',
+    textConfirmation: 'Copied!',
+  },
   disableCopy: true,
 };

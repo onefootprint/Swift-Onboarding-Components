@@ -14,18 +14,14 @@ describe('<CodeBlock />', () => {
     children = content,
     language = 'html',
     title,
-    tooltipText = 'Copy to clipboard',
-    tooltipTextConfirmation = 'Copied!',
+    tooltip = {
+      text: 'Copy to clipboard',
+      textConfirmation: 'Copied!',
+    },
   }: Partial<CodeBlockProps>) =>
     customRender(
       <ToastProvider>
-        <CodeBlock
-          ariaLabel={ariaLabel}
-          language={language}
-          title={title}
-          tooltipText={tooltipText}
-          tooltipTextConfirmation={tooltipTextConfirmation}
-        >
+        <CodeBlock ariaLabel={ariaLabel} language={language} title={title} tooltip={tooltip}>
           {children}
         </CodeBlock>
       </ToastProvider>,
@@ -46,7 +42,9 @@ describe('<CodeBlock />', () => {
   describe('when hovering the button', () => {
     it('should show a tooltip', async () => {
       renderCode({
-        tooltipText: 'Copy to clipboard',
+        tooltip: {
+          text: 'Copy to clipboard',
+        },
         ariaLabel: 'Copy to clipboard',
       });
       const copyButton = screen.getByRole('button', {
@@ -70,8 +68,10 @@ describe('<CodeBlock />', () => {
       const { writeTestMockFn } = createClipboardSpy();
       renderCode({
         children: content,
-        tooltipText: 'Copy to clipboard',
-        tooltipTextConfirmation: 'Copied!',
+        tooltip: {
+          text: 'Copy to clipboard',
+          textConfirmation: 'Copied!',
+        },
         ariaLabel: 'Copy to clipboard',
       });
       const copyButton = screen.getByRole('button', {

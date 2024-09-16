@@ -10,18 +10,16 @@ describe('<CodeInline />', () => {
   const renderCodeInline = ({
     ariaLabel = 'Copy to clipboard',
     children = 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-    tooltipText = 'Copy to clipboard',
-    tooltipTextConfirmation = 'Copied!',
+    tooltip = {
+      position: 'top',
+      text: 'Copy to clipboard',
+      textConfirmation: 'Copied!',
+    },
     disabled = false,
   }: Partial<CodeInlineProps>) =>
     customRender(
       <ToastProvider>
-        <CodeInline
-          ariaLabel={ariaLabel}
-          disabled={disabled}
-          tooltipText={tooltipText}
-          tooltipTextConfirmation={tooltipTextConfirmation}
-        >
+        <CodeInline ariaLabel={ariaLabel} disabled={disabled} tooltip={tooltip}>
           {children}
         </CodeInline>
       </ToastProvider>,
@@ -36,8 +34,9 @@ describe('<CodeInline />', () => {
     it('should show a tooltip', async () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-        tooltipText: 'Copy to clipboard',
-        tooltipTextConfirmation: 'Copied!',
+        tooltip: {
+          text: 'Copy to clipboard',
+        },
         ariaLabel: 'Copy to clipboard',
       });
       const code = screen.getByRole('button', { name: 'Copy to clipboard' });
@@ -59,8 +58,6 @@ describe('<CodeInline />', () => {
       const { writeTestMockFn } = createClipboardSpy();
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-        tooltipText: 'Copy to clipboard',
-        tooltipTextConfirmation: 'Copied!',
         ariaLabel: 'Copy to clipboard',
       });
       const code = screen.getByRole('button', { name: 'Copy to clipboard' });
@@ -82,7 +79,6 @@ describe('<CodeInline />', () => {
     it('should not show the button', async () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-        tooltipText: 'Copy to clipboard',
         ariaLabel: 'Copy to clipboard',
         disabled: true,
       });
@@ -93,7 +89,6 @@ describe('<CodeInline />', () => {
     it('should not show the tooltip', async () => {
       renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-        tooltipText: 'Copy to clipboard',
         ariaLabel: 'Copy to clipboard',
         disabled: true,
       });
