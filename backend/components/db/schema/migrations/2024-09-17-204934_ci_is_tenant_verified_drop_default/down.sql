@@ -1,0 +1,1 @@
+ALTER TABLE contact_info ALTER COLUMN is_tenant_verified SET DEFAULT 'f';

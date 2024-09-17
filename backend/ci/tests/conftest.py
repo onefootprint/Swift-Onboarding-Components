@@ -23,7 +23,6 @@ from tests.utils import (
     create_partner_tenant,
     create_ob_config,
     _gen_random_n_digit_number,
-    patch,
     clean_up_user,
 )
 

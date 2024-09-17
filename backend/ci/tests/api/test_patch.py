@@ -262,7 +262,7 @@ def test_delete_and_update(tenant):
     )
 
 
-def test_replace_verified_ci(sandbox_tenant):
+def test_replace_verified_ci(sandbox_tenant, investor_profile_ob_config):
     obc = sandbox_tenant.default_ob_config
     bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
@@ -307,3 +307,7 @@ def test_replace_verified_ci(sandbox_tenant):
     assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**00"
     phone = next(i for i in body["user"]["auth_methods"] if i["kind"] == "phone")
     assert phone["is_verified"]
+
+    # Then, onboard this user onto a new playbook. This will log in using their unverified phone number
+    bifrost = BifrostClient.inherit_user(investor_profile_ob_config, bifrost.sandbox_id)
+    bifrost.run()
