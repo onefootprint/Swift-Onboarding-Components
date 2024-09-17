@@ -13,7 +13,7 @@ use crate::utils::headers::IdempotencyId;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::headers::SandboxId as SandboxIdHeader;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::PatchDataResult;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -103,7 +103,6 @@ pub async fn create_non_portable_vault(
     tracing::info!(idempotency_id_provided=%idempotency_id.is_some(), external_id_provided=%external_id.is_some(), "Creating new vault");
 
     let actor = auth.actor();
-    let source = auth.dl_source();
     let (scoped_user, vault, new_version) = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
@@ -122,9 +121,8 @@ pub async fn create_non_portable_vault(
             let svv = if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
-                let sources = DataLifetimeSources::single(source);
                 let PatchDataResult { new_version, .. } =
-                    uvw.patch_data(conn, request, sources, Some(actor))?;
+                    uvw.patch_data(conn, request, DataRequestSource::TenantPatchVault(actor))?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 

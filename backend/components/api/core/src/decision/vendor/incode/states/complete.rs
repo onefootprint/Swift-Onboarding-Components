@@ -13,7 +13,7 @@ use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiCoreError;
 use crate::errors::AssertionError;
 use crate::utils::file_upload::mime_type_to_extension;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::NewDocument;
 use crate::utils::vault_wrapper::Person;
@@ -406,8 +406,7 @@ impl Complete {
         RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
 
         // Then add some extracted OCR data to the vault.
-        let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
-        let seqno = uvw.patch_data(conn, ocr_data, sources, None)?.seqno;
+        let seqno = uvw.patch_data(conn, ocr_data, DataRequestSource::Ocr)?.seqno;
 
         let (document_score, _) = score_response.document_score();
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence();

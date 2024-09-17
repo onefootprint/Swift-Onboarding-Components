@@ -26,6 +26,7 @@ use db::models::vault::Vault;
 use macros::route_alias;
 use newtypes::AuditEventDetail;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::DocumentDiKind;
 use newtypes::FpId;
@@ -80,7 +81,8 @@ pub async fn post(
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (fp_id, identifier) = path.into_inner();
-    post_upload_inner(&state, body, headers, auth, fp_id, identifier, insight).await
+    let source = DataLifetimeSource::Tenant;
+    post_upload_inner(&state, body, headers, auth, fp_id, identifier, insight, source).await
 }
 
 #[tracing::instrument(skip(state, auth, body))]
@@ -105,9 +107,20 @@ pub async fn post_client(
     let identifier = path.into_inner();
     let auth = auth.check_guard(CanVault::new(vec![identifier.clone()]))?;
     let fp_id = auth.fp_id.clone();
-    post_upload_inner(&state, body, headers, Box::new(auth), fp_id, identifier, insight).await
+    post_upload_inner(
+        &state,
+        body,
+        headers,
+        Box::new(auth),
+        fp_id,
+        identifier,
+        insight,
+        DataLifetimeSource::ClientTenant,
+    )
+    .await
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn post_upload_inner(
     state: &State,
     body: BodyBytes<TEN_MB>,
@@ -116,12 +129,12 @@ async fn post_upload_inner(
     fp_id: FpId,
     di: DataIdentifier,
     insight: InsightHeaders,
+    source: DataLifetimeSource,
 ) -> ApiResponse<api_wire_types::Empty> {
     let insight = CreateInsightEvent::from(insight);
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let principal: DbActor = auth.actor().into();
-    let source = auth.dl_source();
 
     // temporarily: block non custom/document objects
     match di {

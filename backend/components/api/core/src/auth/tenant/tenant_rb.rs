@@ -17,7 +17,6 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
 use paperclip::actix::Apiv2Security;
@@ -150,10 +149,6 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 
     fn actor(&self) -> AuthActor {
         AuthActor::from(self.tenant_user.id.clone())
-    }
-
-    fn dl_source(&self) -> DataLifetimeSource {
-        DataLifetimeSource::Tenant
     }
 }
 

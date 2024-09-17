@@ -2,7 +2,7 @@ use super::FingerprintedDataRequest;
 use super::ValidatedDataRequest;
 use crate::auth::tenant::AuthActor;
 use crate::utils::vault_wrapper::PrefillData;
-use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::FpResult;
 use api_errors::ValidationError;
@@ -23,31 +23,65 @@ use newtypes::DiValidationError;
 use newtypes::Error as NtError;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::NtResult;
-use newtypes::ScopedVaultId;
 use newtypes::VaultDataFormat;
 use newtypes::VaultKind;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, derive_more::IsVariant)]
 pub enum DataRequestSource {
-    CreateVault,
-    PatchVault,
-    UpdateContactInfo,
+    /// Creating a brand new user during a signup challenge. Some data can be bootstrapped while
+    /// others can be entered by the usr
+    SignupChallenge(DlSourceWithOverrides),
+    /// User-initiated write request. Can be either Components or Hosted
+    HostedPatchVault(DlSourceWithOverrides),
+    /// After verifying an OTP in `POST /hosted/identify/verify` or `POST
+    /// /hosted/user/challenge/verify`
+    OtpVerified,
+    /// Prefilling data either at ScopedVault creation time or onboarding time
+    Prefill,
+    /// Writing OCR data received from a vendor
+    Ocr,
+    /// Writing data received from a vendor
+    Vendor,
+    /// Tenant-initiated write request
+    TenantPatchVault(AuthActor),
+    /// Tenant-initiated write request
+    ClientTenant,
 }
 
-impl<Type> VaultWrapper<Type> {
+impl DataRequestSource {
+    pub fn actor(&self) -> Option<&AuthActor> {
+        match self {
+            Self::TenantPatchVault(actor) => Some(actor),
+            _ => None,
+        }
+    }
+
+    pub fn dl_source(&self, di: &DataIdentifier) -> DataLifetimeSource {
+        match self {
+            Self::SignupChallenge(s) => s.get(di),
+            Self::HostedPatchVault(s) => s.get(di),
+            Self::Ocr => DataLifetimeSource::Ocr,
+            Self::Vendor => DataLifetimeSource::Vendor,
+            Self::OtpVerified => DataLifetimeSource::LikelyHosted,
+            Self::Prefill => DataLifetimeSource::LikelyHosted,
+            Self::TenantPatchVault(_) => DataLifetimeSource::Tenant,
+            Self::ClientTenant => DataLifetimeSource::ClientTenant,
+        }
+    }
+}
+
+impl<Type> TenantVw<Type> {
     /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
     /// These invariants are also a function of the data in the vault at the time
     pub fn validate_request(
         &self,
         conn: &mut PgConn,
         request: FingerprintedDataRequest,
-        sources: DataLifetimeSources,
-        actor: Option<AuthActor>,
-        request_source: DataRequestSource,
+        request_source: &DataRequestSource,
     ) -> FpResult<ValidatedDataRequest> {
-        self.assert_update_allowed(conn, &request, &sources, request_source)?;
+        self.assert_update_allowed(conn, &request, request_source)?;
         // Transform the request into a Vec<NewVaultData>
         let FingerprintedDataRequest {
             data,
@@ -65,7 +99,7 @@ impl<Type> VaultWrapper<Type> {
                     VaultDataFormat::String
                 };
                 let vd = NewVaultData {
-                    source: sources.get(&kind),
+                    source: request_source.dl_source(&kind),
                     kind,
                     e_data,
                     p_data,
@@ -76,8 +110,7 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<FpResult<Vec<_>>>()?;
 
-        let for_replacing_ci = matches!(request_source, DataRequestSource::UpdateContactInfo);
-        let new_cdos = self.validate_adding_dis(conn, &data, None, actor, for_replacing_ci)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, request_source)?;
 
         let req = ValidatedDataRequest {
             data,
@@ -104,7 +137,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.sv.id), None, true)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, &DataRequestSource::Prefill)?;
         let request = ValidatedDataRequest {
             data,
             old_ci,
@@ -116,22 +149,24 @@ impl<Type> WriteableVw<Type> {
     }
 }
 
-impl<Type> VaultWrapper<Type> {
+impl<Type> TenantVw<Type> {
     fn validate_adding_dis(
         &self,
         conn: &mut PgConn,
         data: &[NewVaultData],
         // None if adding data not for prefill, Some with the sv_id if adding data for prefill
-        prefill_sv_id: Option<&ScopedVaultId>,
-        actor: Option<AuthActor>,
-        for_replacing_ci: bool,
+        request_source: &DataRequestSource,
     ) -> FpResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
+        let for_replacing_ci = matches!(
+            request_source,
+            DataRequestSource::OtpVerified | DataRequestSource::Prefill,
+        );
         let is_setting_verified_ci = dis.iter().any(|x| x.is_verified_ci());
-        if is_setting_verified_ci && actor.is_none() && !for_replacing_ci {
+        if is_setting_verified_ci && request_source.actor().is_none() && !for_replacing_ci {
             return ValidationError(
                 "Can only set verified CI in tenant-facing API or challenge verification flow",
             )
@@ -152,13 +187,13 @@ impl<Type> VaultWrapper<Type> {
             let update_has_di = dis.contains(&&di);
             // TODO should we disallow updating the email for any vault that is_verified?
             if ci.is_otp_verified && update_has_di {
-                if matches!(actor, Some(AuthActor::FirmEmployee(_))) {
+                if matches!(request_source.actor(), Some(AuthActor::FirmEmployee(_))) {
                     // Don't error, allow firm employees (who already have write permissions) to
                     // be able to replace CI
                     tracing::error!("Firm employee is updating verified ContactInfo! Note that this won't entirely work properly - the new ContactInfo is marked as unverified, which causes weird bugs. Please repair the vault manually");
-                } else if prefill_sv_id.is_none() {
+                } else if !request_source.is_prefill() {
                     validation_errors.insert(di, DiValidationError::CannotReplaceVerifiedContactInfo.into());
-                } else if prefill_sv_id.is_some_and(|sv_id| sv_id == &d.lifetime.scoped_vault_id) {
+                } else if self.scoped_vault.id == d.lifetime.scoped_vault_id {
                     // With our current prefill logic that only prefills for the first WF for a SV,
                     // we shouldn't ever get in a position where we're replacing CI.
                     // Except for a race condition
@@ -189,13 +224,13 @@ impl<Type> VaultWrapper<Type> {
             // tenant-view of the user is still built using portable data from other tenants
             // TODO rm this after backfill. Maybe switch to dropping partial CDOs for prefill data
             // if a full CDO already exists
-            if let Some(prefill_sv_id) = prefill_sv_id {
+            if request_source.is_prefill() {
                 let is_full_cdo_added_by_other_tenant = full_cdo
                     .data_identifiers()
                     .unwrap_or_default()
                     .into_iter()
                     .flat_map(|di| self.data(&di))
-                    .all(|d| &d.lifetime.scoped_vault_id != prefill_sv_id);
+                    .all(|d| d.lifetime.scoped_vault_id != self.scoped_vault.id);
                 if is_full_cdo_added_by_other_tenant {
                     // If the full CDO was added by another tenant and this is prefill data, temporarily allow
                     // it
@@ -247,11 +282,10 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         request: &FingerprintedDataRequest,
-        sources: &DataLifetimeSources,
-        request_source: DataRequestSource,
+        request_source: &DataRequestSource,
     ) -> FpResult<()> {
         assert_allowed_for_vault(request, self.vault.kind)?;
-        assert_allowed_for_sources(request, sources, request_source)?;
+        assert_allowed_for_sources(request, request_source)?;
 
         if self.vault.kind == VaultKind::Business {
             if let Some(sv_id) = self.sv_id.as_ref() {
@@ -296,13 +330,12 @@ fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind)
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
 fn assert_allowed_for_sources(
     request: &FingerprintedDataRequest,
-    sources: &DataLifetimeSources,
-    request_source: DataRequestSource,
+    request_source: &DataRequestSource,
 ) -> NtResult<()> {
     let is_allowed = move |di: &DataIdentifier| -> bool {
         // Restrict the components SDK from adding phone or email
-        let source = sources.get(di);
-        if !matches!(request_source, DataRequestSource::CreateVault) {
+        let source = request_source.dl_source(di);
+        if !matches!(request_source, DataRequestSource::SignupChallenge(_)) {
             #[allow(clippy::match_like_matches_macro)]
             match (source, di) {
                 // When a vault is being created, we support setting phone/email via the components SDK
@@ -339,29 +372,22 @@ fn assert_allowed_for_sources(
 }
 
 /// Helper struct to store which pieces of data have which DL sources.
-pub struct DataLifetimeSources {
-    default: DataLifetimeSource,
-    overrides: HashMap<DataIdentifier, DataLifetimeSource>,
+#[derive(Clone)]
+pub struct DlSourceWithOverrides {
+    pub default: DataLifetimeSource,
+    pub overrides: HashMap<DataIdentifier, DataLifetimeSource>,
 }
 
-impl DataLifetimeSources {
-    pub fn single(source: DataLifetimeSource) -> Self {
+impl From<DataLifetimeSource> for DlSourceWithOverrides {
+    fn from(value: DataLifetimeSource) -> Self {
         Self {
-            default: source,
+            default: value,
             overrides: HashMap::new(),
         }
     }
+}
 
-    pub fn overrides(
-        source: DataLifetimeSource,
-        overrides: HashMap<DataIdentifier, DataLifetimeSource>,
-    ) -> Self {
-        Self {
-            default: source,
-            overrides,
-        }
-    }
-
+impl DlSourceWithOverrides {
     fn get(&self, di: &DataIdentifier) -> DataLifetimeSource {
         self.overrides.get(di).copied().unwrap_or(self.default)
     }

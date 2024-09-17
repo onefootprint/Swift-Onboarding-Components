@@ -1,4 +1,3 @@
-use super::DataLifetimeSources;
 use super::DataRequestSource;
 use super::FingerprintedDataRequest;
 use super::WriteableVw;
@@ -13,7 +12,6 @@ use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::ContactInfoKind;
-use newtypes::DataLifetimeSource;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 
@@ -24,7 +22,6 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
-        source: DataLifetimeSource,
     ) -> FpResult<()> {
         // Validate only phone/email
         if request
@@ -34,9 +31,7 @@ impl<Type> WriteableVw<Type> {
         {
             return ValidationError("Can only replace_ci with phone or email").into();
         }
-        let sources = DataLifetimeSources::single(source);
-        let request =
-            self.validate_request(conn, request, sources, None, DataRequestSource::UpdateContactInfo)?;
+        let request = self.validate_request(conn, request, &DataRequestSource::OtpVerified)?;
         let result = self.internal_save_data(conn, request, None)?;
         for vd in result.new_vd {
             // Immediately portablize the verified contact info
@@ -56,7 +51,6 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
-        source: DataLifetimeSource,
         cik: ContactInfoKind,
     ) -> FpResult<IsFirstTimeVerifying> {
         // Validate only phone/email
@@ -71,9 +65,7 @@ impl<Type> WriteableVw<Type> {
         let ci = ContactInfo::get(conn, &dl.id)?;
         let is_first_time_verifying = on_otp_verified(conn, ci, &self.sv.id, &self.vault.id)?;
         if is_first_time_verifying {
-            let sources = DataLifetimeSources::single(source);
-            let request =
-                self.validate_request(conn, request, sources, None, DataRequestSource::UpdateContactInfo)?;
+            let request = self.validate_request(conn, request, &DataRequestSource::OtpVerified)?;
             let result = self.internal_save_data(conn, request, None)?;
             for vd in result.new_vd {
                 // Immediately portablize the verified contact info

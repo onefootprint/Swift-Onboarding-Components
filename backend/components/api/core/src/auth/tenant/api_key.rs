@@ -16,7 +16,6 @@ use db::models::tenant_role::TenantRole;
 use db::DbError;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::DataLifetimeSource;
 use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
@@ -131,10 +130,6 @@ impl TenantAuth for CheckedTenantApiKey {
 
     fn actor(&self) -> AuthActor {
         AuthActor::TenantApiKey(self.api_key.id.clone())
-    }
-
-    fn dl_source(&self) -> DataLifetimeSource {
-        DataLifetimeSource::Tenant
     }
 }
 

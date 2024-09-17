@@ -14,7 +14,7 @@ use crate::decision::{
 };
 use crate::enclave_client::EnclaveClient;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
@@ -44,7 +44,6 @@ use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::BillingEventKind;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
-use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentDiKind;
@@ -451,8 +450,7 @@ pub fn vault_curp_response(
     data: FingerprintedDataRequest,
 ) -> FpResult<DataLifetimeSeqno> {
     let vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-    let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
-    let result = vw.patch_data(conn, data, sources, None)?;
+    let result = vw.patch_data(conn, data, DataRequestSource::Ocr)?;
 
     Ok(result.seqno)
 }

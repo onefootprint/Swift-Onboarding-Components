@@ -1,4 +1,3 @@
-use super::DataLifetimeSources;
 use super::DataRequestSource;
 use super::FingerprintedDataRequest;
 use super::SavedData;
@@ -70,21 +69,20 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
-        sources: DataLifetimeSources,
-        actor: Option<AuthActor>,
+        request_source: DataRequestSource,
     ) -> FpResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
-        let r_source = DataRequestSource::PatchVault;
         let fields = request.data.keys().cloned().collect_vec();
-        let request = self.validate_request(conn, request, sources, actor.clone(), r_source)?;
-        let result = self.internal_save_data(conn, request, actor.clone())?;
+        let request = self.validate_request(conn, request, &request_source)?;
+        let result = self.internal_save_data(conn, request, request_source.actor().cloned())?;
         self.create_bos_if_needed(conn, kyced_bos)?;
 
         // create a webhook task for the vault update
         // currently we do this only for dashboard actors
         if matches!(
-            actor,
-            Some(AuthActor::FirmEmployee(_)) | Some(AuthActor::TenantUser(_))
+            request_source,
+            DataRequestSource::TenantPatchVault(AuthActor::FirmEmployee(_))
+                | DataRequestSource::TenantPatchVault(AuthActor::TenantUser(_))
         ) {
             let webhook_event = WebhookEvent::UserVaultUpdated(UserVaultUpdatedPayload {
                 fp_id: self.sv.fp_id.clone(),

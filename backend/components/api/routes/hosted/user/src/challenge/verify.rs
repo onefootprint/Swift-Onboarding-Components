@@ -31,7 +31,6 @@ use itertools::Itertools;
 use newtypes::ActionKind;
 use newtypes::AuthEventKind;
 use newtypes::ContactInfoKind;
-use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::InsightEventId;
 use newtypes::PiiString;
@@ -193,7 +192,7 @@ impl Action {
                         }
                     }
                 }
-                vw.replace_verified_ci(conn, data, DataLifetimeSource::LikelyHosted)?;
+                vw.replace_verified_ci(conn, data)?;
                 (kind, None)
             }
             Self::RegisterWebauthnCred(res) => {

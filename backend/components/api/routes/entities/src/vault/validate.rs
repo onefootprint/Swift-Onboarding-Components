@@ -9,7 +9,6 @@ use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanVault;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::DataLifetimeSources;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -45,8 +44,11 @@ pub async fn post(
     auth: TenantApiKey,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    let request = request.into_inner().into();
+    let actor = auth.actor();
+    let source = DataRequestSource::TenantPatchVault(actor);
 
-    let result = post_inner(&state, path.into_inner(), request.into_inner().into(), auth).await?;
+    let result = post_inner(&state, path.into_inner(), request, auth, source).await?;
     Ok(result)
 }
 
@@ -63,8 +65,11 @@ pub async fn post_business(
     auth: TenantApiKey,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    let request = request.into_inner().into();
+    let actor = auth.actor();
+    let source = DataRequestSource::TenantPatchVault(actor);
 
-    let result = post_inner(&state, path.into_inner(), request.into_inner().into(), auth).await?;
+    let result = post_inner(&state, path.into_inner(), request, auth, source).await?;
     Ok(result)
 }
 
@@ -88,8 +93,9 @@ pub async fn post_client(
     let request = request.into_inner();
     let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
+    let source = DataRequestSource::ClientTenant;
 
-    let result = post_inner(&state, fp_id, request.into(), Box::new(auth)).await?;
+    let result = post_inner(&state, fp_id, request.into(), Box::new(auth), source).await?;
     Ok(result)
 }
 
@@ -98,24 +104,21 @@ async fn post_inner(
     fp_id: FpId,
     request: RawDataRequest,
     auth: Box<dyn TenantAuth>,
+    source: DataRequestSource,
 ) -> ApiResponse<api_wire_types::Empty> {
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let actor = auth.actor();
 
     let PatchDataRequest { updates, .. } =
         PatchDataRequest::clean_and_validate(request, ValidateArgs::for_non_portable(is_live))?;
     // No fingerprints to check speculatively
     let updates = FingerprintedDataRequest::no_fingerprints_for_validation(updates);
-    let source = auth.dl_source();
     state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            let sources = DataLifetimeSources::single(source);
-
-            uvw.validate_request(conn, updates, sources, Some(actor), DataRequestSource::PatchVault)?;
+            uvw.validate_request(conn, updates, &source)?;
             Ok(())
         })
         .await?;

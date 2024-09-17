@@ -28,7 +28,6 @@ use crate::State;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
-use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantScope;
@@ -121,7 +120,6 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn is_live(&self) -> FpResult<bool>;
     fn actor(&self) -> AuthActor;
-    fn dl_source(&self) -> DataLifetimeSource;
 }
 
 pub trait PartnerTenantAuth {

@@ -19,7 +19,6 @@ use db::PgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::DataLifetimeSource;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
@@ -202,10 +201,6 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
 
     fn actor(&self) -> AuthActor {
         AuthActor::FirmEmployee(self.tenant_user.id.clone())
-    }
-
-    fn dl_source(&self) -> DataLifetimeSource {
-        DataLifetimeSource::Tenant
     }
 }
 

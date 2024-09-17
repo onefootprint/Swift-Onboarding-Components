@@ -1,4 +1,4 @@
-use super::DataLifetimeSources;
+use super::DataRequestSource;
 use super::FingerprintedDataRequest;
 use super::PrefillKind;
 use super::WriteableVw;
@@ -432,13 +432,8 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         .filter(|di| !matches!(di, DataIdentifier::Id(IDK::PhoneNumber)));
     let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
-    vw.mark_ci_as_verified(
-        conn,
-        data,
-        DataLifetimeSource::LikelyHosted,
-        ContactInfoKind::Phone,
-    )
-    .unwrap();
+    vw.mark_ci_as_verified(conn, data, ContactInfoKind::Phone)
+        .unwrap();
 
     TestData {
         su1: su1.into_inner(),
@@ -485,8 +480,8 @@ impl<Type> WriteableVw<Type> {
         } else {
             FingerprintedDataRequest::no_fingerprints_for_validation(request)
         };
-        let sources = DataLifetimeSources::single(DataLifetimeSource::LikelyHosted);
-        let new_ci = self.patch_data(conn, request, sources, None)?.new_ci;
+        let source = DataRequestSource::HostedPatchVault(DataLifetimeSource::LikelyHosted.into());
+        let new_ci = self.patch_data(conn, request, source)?.new_ci;
         Ok(new_ci)
     }
 }

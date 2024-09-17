@@ -17,7 +17,6 @@ use db::models::tenant::Tenant;
 use db::PgConn;
 use futures_util::Future;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSource;
 use newtypes::FpId;
 use newtypes::PiiString;
 use newtypes::TenantApiKeyId;
@@ -171,10 +170,6 @@ impl TenantAuth for SessionContext<ClientTenantData> {
 
     fn actor(&self) -> AuthActor {
         AuthActor::TenantApiKey(self.tenant_api_key_id.clone())
-    }
-
-    fn dl_source(&self) -> DataLifetimeSource {
-        DataLifetimeSource::ClientTenant
     }
 }
 

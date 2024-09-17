@@ -1,6 +1,6 @@
 use super::Any;
-use super::DataLifetimeSources;
 use super::DataRequestSource;
+use super::DlSourceWithOverrides;
 use super::FingerprintedDataRequest;
 use super::PatchDataResult;
 use super::Person;
@@ -125,8 +125,11 @@ impl VaultWrapper<Person> {
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number and/or email to the vault
-        let sources = DataLifetimeSources::overrides(DataLifetimeSource::LikelyHosted, sources);
-        let request = uvw.validate_request(conn, data, sources, None, DataRequestSource::CreateVault)?;
+        let sources = DlSourceWithOverrides {
+            default: DataLifetimeSource::LikelyHosted,
+            overrides: sources,
+        };
+        let request = uvw.validate_request(conn, data, &DataRequestSource::SignupChallenge(sources))?;
         let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
 
         Ok((uv, su, result))

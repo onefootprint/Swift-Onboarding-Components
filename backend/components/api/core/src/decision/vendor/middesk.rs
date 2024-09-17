@@ -13,7 +13,7 @@ use crate::decision::{
 use crate::enclave_client::EnclaveClient;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::VendorClient;
@@ -57,7 +57,6 @@ use newtypes::BillingEventKind;
 use newtypes::BusinessDataForRequest;
 use newtypes::BusinessDataKind;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DecisionIntentKind;
 use newtypes::EinOnly;
@@ -840,11 +839,8 @@ impl MiddeskResponseDerivedVaultData {
         // means we should deactivate the old DIs. We should handle this properly
         // with construct that knows when to clear vendor-written DIs like this
         if !self.data_request.is_empty() {
-            // Then add new vault data
-            let sources = DataLifetimeSources::single(DataLifetimeSource::Vendor);
-
             //TODO: we should probably store the resulting seqno somewhere on the vres?
-            let _ = uvw.patch_data(conn, self.data_request, sources, None)?;
+            let _ = uvw.patch_data(conn, self.data_request, DataRequestSource::Vendor)?;
         }
 
         Ok(())

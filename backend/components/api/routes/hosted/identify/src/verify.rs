@@ -40,7 +40,6 @@ use newtypes::AuthEventKind;
 use newtypes::BoId;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier as DI;
-use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
@@ -158,7 +157,7 @@ pub async fn post(
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
                         // TODO use vw.replace_verified_ci
-                        vw.mark_ci_as_verified(conn, data, DataLifetimeSource::LikelyHosted, cik)?
+                        vw.mark_ci_as_verified(conn, data, cik)?
                     } else {
                         false
                     };

@@ -16,7 +16,7 @@ use api_core::types::WithVaultVersionHeader;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::DataLifetimeSources;
+use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::DeleteDataResult;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::PatchDataResult;
@@ -65,7 +65,17 @@ pub async fn patch(
 
     let path = path.into_inner();
     let request = request.into_inner().into();
-    let result = patch_inner(&state, path, request, auth, insight, *ignore_luhn_validation).await?;
+    let source = DataRequestSource::TenantPatchVault(auth.actor());
+    let result = patch_inner(
+        &state,
+        path,
+        request,
+        auth,
+        insight,
+        *ignore_luhn_validation,
+        source,
+    )
+    .await?;
     Ok(result)
 }
 
@@ -86,7 +96,17 @@ pub async fn patch_business(
 
     let path = path.into_inner();
     let request = request.into_inner().into();
-    let result = patch_inner(&state, path, request, auth, insight, *ignore_luhn_validation).await?;
+    let source = DataRequestSource::TenantPatchVault(auth.actor());
+    let result = patch_inner(
+        &state,
+        path,
+        request,
+        auth,
+        insight,
+        *ignore_luhn_validation,
+        source,
+    )
+    .await?;
     Ok(result)
 }
 
@@ -111,8 +131,18 @@ pub async fn patch_client(
     let request = request.into_inner();
     let auth = auth.check_guard(CanVault::new(request.keys().cloned().collect()))?;
     let fp_id = auth.fp_id.clone();
+    let source = DataRequestSource::ClientTenant;
 
-    let result = patch_inner(&state, fp_id, request.into(), Box::new(auth), insight, false).await?;
+    let result = patch_inner(
+        &state,
+        fp_id,
+        request.into(),
+        Box::new(auth),
+        insight,
+        false,
+        source,
+    )
+    .await?;
     Ok(result)
 }
 
@@ -123,6 +153,7 @@ async fn patch_inner(
     auth: Box<dyn TenantAuth>,
     insight: InsightHeaders,
     ignore_luhn_validation: bool,
+    source: DataRequestSource,
 ) -> ApiResponse<WithVaultVersionHeader<api_wire_types::Empty>> {
     let insight = CreateInsightEvent::from(insight);
 
@@ -176,7 +207,6 @@ async fn patch_inner(
     let PatchDataRequest { updates, deletions } = PatchDataRequest::clean_and_validate(request, args)?;
     let updates = FingerprintedDataRequest::build(state, updates, &sv.id).await?;
 
-    let source = auth.dl_source();
     let actor = auth.actor();
     let new_version = state
         .db_pool
@@ -187,9 +217,7 @@ async fn patch_inner(
             // event with context on what was updated, deleted, and added
             let DeleteDataResult { deleted_dis, .. } = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
-            let sources = DataLifetimeSources::single(source);
-            let PatchDataResult { new_version: svv, .. } =
-                uvw.patch_data(conn, updates, sources, Some(actor.clone()))?;
+            let PatchDataResult { new_version: svv, .. } = uvw.patch_data(conn, updates, source)?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let principal: DbActor = actor.into();

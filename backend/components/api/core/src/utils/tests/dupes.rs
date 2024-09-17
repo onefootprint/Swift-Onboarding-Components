@@ -1,5 +1,5 @@
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -251,8 +251,8 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id).unwrap();
-            let sources = DataLifetimeSources::single(DataLifetimeSource::Tenant);
-            uvw.patch_data(conn, data_req, sources, None).unwrap();
+            let source = DataRequestSource::HostedPatchVault(DataLifetimeSource::LikelyHosted.into());
+            uvw.patch_data(conn, data_req, source).unwrap();
             Ok(())
         })
         .await

@@ -3,7 +3,7 @@ use super::IngressRule;
 use crate::auth::tenant::TenantAuth;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -149,7 +149,6 @@ pub async fn vault_pii(
         )
         .await?;
 
-        let source = auth.dl_source();
         let actor = auth.actor();
         state
             .db_pool
@@ -177,10 +176,10 @@ pub async fn vault_pii(
                 AuditEvent::create(conn, event)?;
 
                 // put our data
+                let data_source = DataRequestSource::TenantPatchVault(actor.clone());
                 if !data.is_empty() {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
-                    let sources = DataLifetimeSources::single(source);
-                    uvw.patch_data(conn, data, sources, Some(actor.clone()))?;
+                    uvw.patch_data(conn, data, data_source.clone())?;
                 }
 
                 // put our documents
@@ -199,9 +198,11 @@ pub async fn vault_pii(
                                          filename,
                                          mime_type,
                                      }| {
+                                        let di = kind.into();
+                                        let source = data_source.dl_source(&di);
                                         uvw.put_document_unsafe(
                                             conn,
-                                            kind.into(),
+                                            di,
                                             mime_type,
                                             filename,
                                             e_data_key,

@@ -7,8 +7,8 @@ use api_core::auth::user::UserAuthScope;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::utils::headers::BootstrapFieldsHeader;
 use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::DataLifetimeSources;
 use api_core::utils::vault_wrapper::DataRequestSource;
+use api_core::utils::vault_wrapper::DlSourceWithOverrides;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -62,8 +62,7 @@ pub async fn post_validate(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
-            let sources = DataLifetimeSources::single(source);
-            vw.validate_request(conn, updates, sources, None, DataRequestSource::PatchVault)?;
+            vw.validate_request(conn, updates, &DataRequestSource::HostedPatchVault(source.into()))?;
             Ok(())
         })
         .await?;
@@ -105,10 +104,13 @@ pub async fn patch(
                 .into_iter()
                 .map(|di| (di, DataLifetimeSource::LikelyBootstrap))
                 .collect();
-            let sources = DataLifetimeSources::overrides(source, overrides);
+            let sources = DlSourceWithOverrides {
+                default: source,
+                overrides,
+            };
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            uvw.patch_data(conn, updates, sources, None)?;
+            uvw.patch_data(conn, updates, DataRequestSource::HostedPatchVault(sources))?;
             Ok(())
         })
         .await?;

@@ -27,8 +27,8 @@ use self::fingerprints::Fingerprints;
 pub use fingerprinted::FingerprintedDataRequest;
 pub use prefill::PrefillData;
 pub use prefill::PrefillKind;
-pub use validation::DataLifetimeSources;
 pub use validation::DataRequestSource;
+pub use validation::DlSourceWithOverrides;
 
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest {

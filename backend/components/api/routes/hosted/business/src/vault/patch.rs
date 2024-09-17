@@ -6,7 +6,6 @@ use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::AuthError;
-use api_core::utils::vault_wrapper::DataLifetimeSources;
 use api_core::utils::vault_wrapper::DataRequestSource;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -47,8 +46,7 @@ pub async fn post_validate(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
-            let sources = DataLifetimeSources::single(source);
-            bvw.validate_request(conn, updates, sources, None, DataRequestSource::PatchVault)?;
+            bvw.validate_request(conn, updates, &DataRequestSource::HostedPatchVault(source.into()))?;
             Ok(())
         })
         .await?;
@@ -81,8 +79,7 @@ pub async fn patch(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            let sources = DataLifetimeSources::single(source);
-            bvw.patch_data(conn, updates, sources, None)?;
+            bvw.patch_data(conn, updates, DataRequestSource::HostedPatchVault(source.into()))?;
             Ok(())
         })
         .await?;
