@@ -59,20 +59,14 @@ function awsManagedRule(name: string, priority: number, sample: boolean) {
 }
 
 function rateLimitExceededAction() {
-  // For now, just count the requests that would be blocked to ensure we have
-  // our rate limits calibrated.
   return {
-    count: {}
+    block: {
+      customResponse: {
+        responseCode: 429,
+        customResponseBodyKey: RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY,
+      },
+    },
   };
-
-  // return {
-  //   block: {
-  //     customResponse: {
-  //       responseCode: 429,
-  //       customResponseBodyKey: RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY,
-  //     },
-  //   },
-  // };
 }
 
 // WAF rule to block requests from specific IP addresses, to respond to DOS
