@@ -39,6 +39,9 @@ const clientToken = async (payload: ClientTokenRequest) => {
   return response.data;
 };
 
-const useClientToken = () => useMutation(clientToken);
+const useClientToken = () =>
+  useMutation({
+    mutationFn: clientToken,
+  });
 
 export default useClientToken;
