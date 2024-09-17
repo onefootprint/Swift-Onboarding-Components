@@ -35,7 +35,7 @@ const RolesTable = ({ data, errorMessage, isLoading, kind }: RolesTableProps) =>
   ];
 
   const handleSearchChange = (search: string) => {
-    filters.push({ roles_search: search });
+    filters.push({ roles_search: search, roles_page: undefined });
   };
 
   return filters.isReady ? (

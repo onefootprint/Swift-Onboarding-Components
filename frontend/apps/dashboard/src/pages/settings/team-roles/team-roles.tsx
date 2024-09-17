@@ -17,23 +17,14 @@ enum TabName {
 }
 
 const TeamRoles = () => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.team-roles',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.team-roles' });
   const orgQuery = useOrg();
-  const [tab, setTab] = useQueryState<string>({
-    query: 'tab',
-    defaultValue: TabName.members,
-  });
+  const [tab, setTab] = useQueryState<TabName>({ query: 'tab', defaultValue: TabName.members });
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },
     { label: t('tabs.roles'), value: TabName.roles },
     ...(orgQuery.data?.domains.length ? [{ label: t('tabs.access'), value: TabName.domainAccess }] : []),
   ];
-
-  const handleTabChange = (value: string) => {
-    setTab(value as TabName);
-  };
 
   return (
     <>
@@ -46,7 +37,7 @@ const TeamRoles = () => {
           <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
             <div id="team-roles-actions" />
           </SectionHeader>
-          <Tabs options={tabs} onChange={handleTabChange} />
+          <Tabs options={tabs} onChange={setTab} />
           <Content>
             {tab === TabName.members && <Members />}
             {tab === TabName.roles && <Roles />}

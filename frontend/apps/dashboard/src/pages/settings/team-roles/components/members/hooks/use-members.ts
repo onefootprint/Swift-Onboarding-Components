@@ -25,20 +25,15 @@ const useMembers = () => {
   const { formatRelativeDate } = useIntl();
   const filters = useMembersFilters();
   const { requestParams } = filters;
+
   const membersQuery = useQuery(['org', 'members', requestParams], () => getMembers(authHeaders, requestParams), {
     enabled: filters.isReady,
     select: response => ({
       meta: response.meta,
-      data: response.data.map((member: Member) => ({
-        ...member,
-        rolebinding: {
-          lastLoginAt: member.rolebinding?.lastLoginAt
-            ? formatRelativeDate(new Date(member.rolebinding?.lastLoginAt))
-            : null,
-        },
-      })),
+      data: response.data.map(member => formatMember(member, formatRelativeDate)),
     }),
   });
+
   const pagination = usePagination({
     count: membersQuery.data?.meta.count,
     next: membersQuery.data?.meta.nextPage,
@@ -46,6 +41,7 @@ const useMembers = () => {
     page: filters.values.page,
     pageSize: 10,
   });
+
   const errorMessage = membersQuery.error ? getErrorMessage(membersQuery.error) : undefined;
 
   return {
@@ -54,5 +50,12 @@ const useMembers = () => {
     pagination,
   };
 };
+
+const formatMember = (member: Member, formatRelativeDate: (date: Date) => string) => ({
+  ...member,
+  rolebinding: {
+    lastLoginAt: member.rolebinding?.lastLoginAt ? formatRelativeDate(new Date(member.rolebinding.lastLoginAt)) : null,
+  },
+});
 
 export default useMembers;

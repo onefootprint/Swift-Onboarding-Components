@@ -25,7 +25,7 @@ const Filters = () => {
         },
       ]}
       onChange={(queryKey, queryValue) => {
-        filters.push({ [queryKey]: queryValue });
+        filters.push({ [queryKey]: queryValue, members_page: undefined });
       }}
       onClear={filters.clear}
     />

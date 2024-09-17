@@ -13,9 +13,7 @@ type MembersTableProps = {
 };
 
 const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.members',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.members' });
   const filters = useMembersFilters();
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '25%' },
@@ -26,7 +24,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
   ];
 
   const handleSearchChange = (search: string) => {
-    filters.push({ members_search: search });
+    filters.push({ members_search: search, members_page: undefined });
   };
 
   return filters.isReady ? (
