@@ -1,6 +1,7 @@
 import { IcoClose16 } from '@onefootprint/icons';
 import { Box, IconButton, LinkButton, Overlay, Stack, Text } from '@onefootprint/ui';
 import * as Dialog from '@radix-ui/react-dialog';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -18,23 +19,37 @@ const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) =>
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.uploads.doc-viewer',
   });
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleEscapeKeyDown = (event: KeyboardEvent) => {
+    event.preventDefault();
+    handleClose();
+  };
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
       <Stack>
         <Dialog.Trigger asChild>
           <Stack direction="column" gap={5}>
             {children || <PdfThumbnail src={src} />}
-            <LinkButton>{t('expand')}</LinkButton>
+            <LinkButton onClick={handleOpen}>{t('expand')}</LinkButton>
           </Stack>
         </Dialog.Trigger>
       </Stack>
       <Dialog.Portal>
         <Overlay />
-        <Container>
+        <Container onEscapeKeyDown={handleEscapeKeyDown} onPointerDownOutside={handleClose}>
           <Header>
             <Dialog.Close asChild>
-              <IconButton aria-label="close">
+              <IconButton aria-label="close" onClick={handleClose}>
                 <IcoClose16 />
               </IconButton>
             </Dialog.Close>
