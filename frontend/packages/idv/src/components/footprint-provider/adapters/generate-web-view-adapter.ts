@@ -1,5 +1,7 @@
-import { Logger } from '../../../utils/logger';
+import { getLogger } from '../../../utils/logger';
 import type { CompletePayload, SendResultCallback, WebViewAdapterReturn } from '../types';
+
+const { logError, logInfo, logTrack } = getLogger({ location: 'idv-webview' });
 
 const generateWebViewAdapter = (): WebViewAdapterReturn => {
   let sendResultCallback: SendResultCallback | undefined;
@@ -10,30 +12,41 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
 
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
-    return params.get('redirect_url');
+    const redirectUrl = params.get('redirect_url');
+
+    if (!redirectUrl) {
+      console.log('No redirect_url provided');
+      logError('No redirect_url provided');
+    }
+
+    return redirectUrl;
   };
 
   const setLocation = (data: Record<string, unknown> = {}) => {
-    Logger.info('Setting location from web view adapter');
     const params = new URLSearchParams();
-    Object.entries(data).forEach(([key, value]) => {
+    const dataEntries = Object.entries(data);
+    const paramKeys = dataEntries.map(([key, _value]) => key).join(',');
+
+    logTrack(`Redirecting with the following params keys: ${paramKeys}`);
+
+    dataEntries.forEach(([key, value]) => {
       params.set(key, value as string);
     });
     window.location.href = `${getRedirectUrl()}?${params.toString()}`;
   };
 
   const load = (): Promise<void> => {
-    Logger.info('Loading footprint from web view adapter');
+    logInfo('Loading footprint from web view adapter');
     return Promise.resolve();
   };
 
   const close = (): void => {
-    Logger.info('Closing footprint from web view adapter');
+    logInfo('Closing footprint from web view adapter');
     setLocation({ canceled: true });
   };
 
   const cancel = (): void => {
-    Logger.info('Canceling footprint from web view adapter');
+    logInfo('Canceling footprint from web view adapter');
     setLocation({ canceled: true });
   };
 
@@ -41,13 +54,13 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
 
   const setCompleteTimeout = (location: Record<string, string>, delay = 0) => {
     setTimeout(() => {
-      Logger.info('Closing footprint after complete timeout from web view adapter');
+      logInfo('Closing footprint after complete timeout from web view adapter');
       setLocation(location);
     }, delay);
   };
 
   const complete = ({ validationToken, delay = 0, authToken, deviceResponse }: CompletePayload): void => {
-    Logger.info('Completing footprint from web view adapter');
+    logInfo('Completing footprint from web view adapter');
     const location: Record<string, string> = {
       validation_token: validationToken,
     };
@@ -67,7 +80,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
   };
 
   const relayToComponents = (componentsVaultToken: string, authToken: string) => {
-    Logger.info('Completing auth footprint from web view adapter');
+    logInfo('Completing auth footprint from web view adapter');
     const location: Record<string, string> = {
       auth_token: authToken,
       components_vault_token: componentsVaultToken,
