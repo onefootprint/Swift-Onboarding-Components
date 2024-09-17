@@ -5,7 +5,6 @@ use crate::errors::AssertionError;
 use crate::errors::ValidationError;
 use crate::FpResult;
 use db::models::contact_info::ContactInfo;
-use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
@@ -86,7 +85,7 @@ pub fn on_otp_verified(
 ) -> FpResult<IsFirstTimeVerifying> {
     let is_first_time_verifying_ci = !ci.is_otp_verified;
     if is_first_time_verifying_ci {
-        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
+        ContactInfo::mark_otp_verified(conn, &ci.id)?;
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
     }

@@ -3,8 +3,6 @@ use crate::errors::challenge::ChallengeError;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::types::ApiResponse;
-use db::models::contact_info::ContactInfo;
-use db::models::contact_info::VerificationLevel;
 use newtypes::SessionAuthToken;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -34,16 +32,11 @@ pub async fn post(
     // Check the context in https://github.com/onefootprint/monorepo/pull/10698
     let session = AuthSession::get(&state, &request.data).await?;
 
-    let AuthSessionData::EmailVerify(data) = session.data else {
+    let AuthSessionData::EmailVerify(_) = session.data else {
         return Err(ChallengeError::EmailVerificationTokenInvalid.into());
     };
 
-    state
-        .db_pool
-        .db_query(move |conn| {
-            ContactInfo::mark_verified(conn, &data.email_id, VerificationLevel::NonOtpVerified)
-        })
-        .await?;
+    // TODO further deprecate this API
 
     Ok(api_wire_types::Empty)
 }

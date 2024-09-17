@@ -91,7 +91,6 @@ async fn test_prefill_data(state: &mut State) {
     );
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
     assert!(phone_ci.is_otp_verified);
-    assert!(phone_ci.is_verified);
 
     let prefill_data = vw
         .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
@@ -159,10 +158,8 @@ async fn test_prefill_data(state: &mut State) {
     // Check prefill contact info
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
     assert!(phone_ci.is_otp_verified);
-    assert!(phone_ci.is_verified);
     let email_ci = prefill_data.old_ci.get(&IDK::Email.into()).unwrap();
     assert!(!email_ci.is_otp_verified);
-    assert!(!email_ci.is_verified);
 
     // Write the prefill login methods
     let su2_id = data.su2.id.clone();

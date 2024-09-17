@@ -35,28 +35,6 @@ pub struct NewContactInfoArgs {
     pub lifetime_id: DataLifetimeId,
 }
 
-pub enum VerificationLevel {
-    OtpVerified,
-    NonOtpVerified,
-}
-
-#[derive(AsChangeset)]
-#[diesel(table_name = contact_info)]
-struct ContactInfoUpdate {
-    is_verified: Option<bool>,
-    is_otp_verified: Option<bool>,
-}
-
-impl From<VerificationLevel> for ContactInfoUpdate {
-    fn from(value: VerificationLevel) -> Self {
-        let is_otp_verified = matches!(value, VerificationLevel::OtpVerified).then(|| true);
-        ContactInfoUpdate {
-            is_verified: Some(true),
-            is_otp_verified,
-        }
-    }
-}
-
 impl ContactInfo {
     #[tracing::instrument("ContactInfo::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut PgConn, new_rows: Vec<NewContactInfoArgs>) -> DbResult<Vec<Self>> {
@@ -66,11 +44,11 @@ impl ContactInfo {
         Ok(results)
     }
 
-    #[tracing::instrument("ContactInfo::mark_verified", skip_all)]
-    pub fn mark_verified(conn: &mut PgConn, id: &ContactInfoId, level: VerificationLevel) -> DbResult<()> {
+    #[tracing::instrument("ContactInfo::mark_otp_verified", skip_all)]
+    pub fn mark_otp_verified(conn: &mut PgConn, id: &ContactInfoId) -> DbResult<()> {
         diesel::update(contact_info::table)
             .filter(contact_info::id.eq(id))
-            .set(ContactInfoUpdate::from(level))
+            .set(contact_info::is_otp_verified.eq(true))
             .execute(conn)?;
         Ok(())
     }

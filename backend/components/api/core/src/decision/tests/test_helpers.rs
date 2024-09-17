@@ -10,7 +10,6 @@ use crate::utils::{
 use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
-use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -238,7 +237,7 @@ pub fn create_user_and_populate_vault(
         .into_iter()
         .find(|(di, _)| di == &DataIdentifier::from(IdentityDataKind::PhoneNumber))
         .unwrap();
-    ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified).unwrap();
+    ContactInfo::mark_otp_verified(conn, &ci.id).unwrap();
 
     (uv.into_inner(), su)
 }
