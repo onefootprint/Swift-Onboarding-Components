@@ -94,8 +94,3 @@ export enum AuthTokenStatus {
   validWithInsufficientScope = 'validWithInsufficientScope',
   invalid = 'invalid',
 }
-
-export enum TenantAuthMethods {
-  authToken = 'authToken',
-  emailAndPhone = 'emailAndPhone',
-}
