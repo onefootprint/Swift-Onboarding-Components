@@ -2,6 +2,7 @@ from typing import NamedTuple
 import pytest
 from tests.identify_client import IdentifyClient
 from tests.utils import (
+    _gen_random_n_digit_number,
     get,
     patch,
     post,
@@ -14,6 +15,7 @@ class DualOnboardedUser(NamedTuple):
     fp_id: str
     foo_fp_id: str
     user: User
+    external_id: str
 
 
 @pytest.fixture(scope="module")
@@ -61,7 +63,13 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
     # foo_tenant's playbook collects less than sandbox_tenant's
     assert not get_scopes()
 
-    return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user)
+    # Set an external ID for the users to make it easier to search for them
+    external_id = _gen_random_n_digit_number(10)
+    data = dict(external_id=external_id)
+    patch(f"users/{fp_id}", data, sandbox_tenant.s_sk)
+    patch(f"users/{foo_fp_id}", data, foo_sandbox_tenant.s_sk)
+
+    return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user, external_id)
 
 
 def test_fp_id(dual_onboarded_user):
@@ -152,7 +160,7 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     phone_number = dual_onboarded_user.user.client.data["id.phone_number"]
     email = dual_onboarded_user.user.client.data["id.email"]
     for search_query in [phone_number, email]:
-        data = dict(search=search_query, pagination=dict(page_size=100))
+        data = dict(search=search_query, external_id=dual_onboarded_user.external_id)
         # Both tenants should be able to find the user based on the search query
 
         body = post("entities/search", data, *sandbox_tenant.db_auths)
@@ -160,6 +168,11 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
 
         body = post("entities/search", data, *foo_sandbox_tenant.db_auths)
         assert any(i["id"] == dual_onboarded_user.foo_fp_id for i in body["data"])
+
+    # Search query with bogus fingerprint doesn't return the user, even with external_id query
+    data = dict(search="asdfased", external_id=dual_onboarded_user.external_id)
+    body = post("entities/search", data, *sandbox_tenant.db_auths)
+    assert body["meta"]["count"] == 0
 
 
 def test_cant_see_speculative_fingerprints(
