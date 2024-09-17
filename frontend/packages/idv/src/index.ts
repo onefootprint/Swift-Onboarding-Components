@@ -52,9 +52,12 @@ export type { IdvCompletePayload, IdvProps } from './types';
 export type { BootstrapProps, DeviceResponseJsonPayload } from './utils';
 export {
   checkIsInIframe,
+  checkIsMobile,
   checkIsPhoneValid,
   checkIsSocialMediaBrowser,
+  createHandoffUrlAuth,
   createReceivedDeviceResponseJsonPayload,
+  default as media,
   DesignSystemProvider,
   FPCustomEvents,
   getAddressComponent,
@@ -64,7 +67,6 @@ export {
   getLogger,
   getRandomID,
   getSdkArgsToken,
-  trackAction,
   hasAuthMethodUnverifiedEmail,
   hasInvalidHashFragment,
   isAuth,
@@ -78,9 +80,8 @@ export {
   isStringValid,
   isUndefined,
   isValidTokenFormat,
-  createHandoffUrlAuth,
   Logger,
-  default as media,
   shouldChallengeEmail,
+  trackAction,
   withProvider,
 } from './utils';
