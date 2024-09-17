@@ -3,7 +3,7 @@
 import { getWindowUrl } from '@onefootprint/core';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { CustomChildAPI } from '@onefootprint/idv';
-import { AuthMethods, getLogger, getSdkArgsToken } from '@onefootprint/idv';
+import { AuthMethods, Logger, getLogger, getSdkArgsToken } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -101,11 +101,15 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
   useEffectOnceStrict(() => {
     fpProvider.load().then((data: VoidOr<CustomChildAPI>) => {
       isFpProvidedDone.current = true;
+      const sdkVersion = data?.model?.sdkVersion;
       const modelToken = data?.model?.authToken;
       const validToken = modelToken ? getSdkArgsToken(modelToken) : undefined;
       if (validToken) {
         logTrack('auth token received from provider');
         setAuthToken(validToken);
+      }
+      if (sdkVersion) {
+        Logger.appendGlobalContext({ sdkVersion: `footprint-js@${sdkVersion}` });
       }
     });
   });
