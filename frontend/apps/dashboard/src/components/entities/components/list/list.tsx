@@ -34,7 +34,7 @@ const List = ({ children, title, subtitle, kind, basePath, defaultFilters }: Lis
   };
 
   const handleSearchChange = (search: string) => {
-    filters.push({ search });
+    filters.push({ search, cursor: undefined });
   };
 
   return (

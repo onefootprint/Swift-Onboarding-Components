@@ -43,8 +43,10 @@ const DrawerFilter = () => {
   };
 
   const onSubmit = (formData: FormData) => {
-    const query = transformFormDataToQuery(formData);
-    filters.push(query);
+    filters.push({
+      ...transformFormDataToQuery(formData),
+      cursor: undefined,
+    });
     close();
   };
 

@@ -15,8 +15,12 @@ import useTenants from './hooks/use-tenants';
 
 const Tenants = () => {
   const { t } = useTranslation('internal');
+  const useAssumeTenantMutation = useAssumeTenant();
+  const { logIn } = useSession();
+  const router = useRouter();
   const filters = useFilters();
   const { data: response, isLoading, errorMessage, pagination } = useTenants();
+  const [drawerTenantId, setDrawerTenantId] = useState<string | undefined>(undefined);
   const columns = [
     { text: t('table.header.name'), width: '30%' },
     { text: t('table.header.id'), width: '25%' },
@@ -29,17 +33,11 @@ const Tenants = () => {
   const emptyState = errorMessage || t('table.empty-state') || '';
 
   const handleSearchChange = (search: string) => {
-    filters.push({ tenants_search: search });
+    filters.push({ tenants_search: search, tenants_page: undefined });
   };
   const handleLiveOnlyChange = (value: string) => {
-    filters.push({ tenants_live_only: value });
+    filters.push({ tenants_live_only: value, tenants_page: undefined });
   };
-
-  const useAssumeTenantMutation = useAssumeTenant();
-  const { logIn } = useSession();
-  const router = useRouter();
-
-  const [drawerTenantId, setDrawerTenantId] = useState<string | undefined>(undefined);
 
   const handleAssumeTenant = (tenant: Tenant) => {
     useAssumeTenantMutation.mutate(

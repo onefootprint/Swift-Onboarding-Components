@@ -46,7 +46,7 @@ const Filters = () => {
           groupId={isBusinesses ? 'all-businesses' : 'all-individuals'}
           value={isAll ? 'all' : undefined}
           onChange={() => {
-            filters.push({ state: undefined, verification: undefined });
+            filters.push({ state: undefined, verification: undefined, cursor: undefined });
           }}
         />
         <ToggleGroup
@@ -66,6 +66,7 @@ const Filters = () => {
             filters.push({
               state: newValue,
               verification: newVerification,
+              cursor: undefined,
             });
           }}
         />
@@ -85,6 +86,7 @@ const Filters = () => {
           ]}
           onChange={newValue => {
             filters.push({
+              cursor: undefined,
               verification: newValue,
               state: EntityStatusFilter.complete,
             });
