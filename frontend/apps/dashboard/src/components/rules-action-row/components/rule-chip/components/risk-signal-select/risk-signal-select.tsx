@@ -74,10 +74,10 @@ const RiskSignalSelect = ({ value, onChange }: RiskSignalSelectProps) => {
           style={style}
         >
           <ComboboxItem>
-            <Text variant="caption-1" truncate>
+            <Text variant="label-3" truncate>
               {option.label}
             </Text>
-            <Text variant="caption-4" color="tertiary">
+            <Text variant="body-3" color="tertiary">
               {option.description}
             </Text>
           </ComboboxItem>

@@ -179,33 +179,32 @@ const RulesActionRow = ({ isEditing, rule, onDelete, onEdit, onUndoDelete, onUnd
       </Stack>
       {isEditing && (
         <Stack justify="space-between" align="center">
-          <Stack gap={3} width="100%">
-            <ButtonContainer data-is-broadcast>
+          <Stack gap={3} width="100%" align="center">
+            <Button
+              variant="secondary"
+              size="compact"
+              prefixIcon={IcoBroadcast16}
+              disabled={isPendingDeletion || expressions.some(expression => !expression.field || !expression.value)}
+              onClick={handleAddRiskSignalExpression}
+            >
+              {t('add-risk-signal')}
+            </Button>
+
+            <Tooltip text={t('add-list-tooltip')} disabled={!!lists?.data.length}>
               <Button
                 variant="secondary"
-                prefixIcon={IcoBroadcast16}
-                disabled={isPendingDeletion || expressions.some(expression => !expression.field || !expression.value)}
-                onClick={handleAddRiskSignalExpression}
+                size="compact"
+                prefixIcon={IcoShuffle16}
+                disabled={
+                  !lists?.data.length ||
+                  isPendingDeletion ||
+                  expressions.some(expression => !expression.field || !expression.value)
+                }
+                onClick={handleAddListExpression}
               >
-                {t('add-risk-signal')}
+                {t('add-list')}
               </Button>
-            </ButtonContainer>
-            <ButtonContainer data-is-broadcast={false}>
-              <Tooltip text={t('add-list-tooltip')} disabled={!!lists?.data.length}>
-                <Button
-                  variant="secondary"
-                  prefixIcon={IcoShuffle16}
-                  disabled={
-                    !lists?.data.length ||
-                    isPendingDeletion ||
-                    expressions.some(expression => !expression.field || !expression.value)
-                  }
-                  onClick={handleAddListExpression}
-                >
-                  {t('add-list')}
-                </Button>
-              </Tooltip>
-            </ButtonContainer>
+            </Tooltip>
           </Stack>
           {(isPendingChange || isPendingDeletion) && (
             <Stack align="center" gap={2} width="fit-content">
@@ -243,26 +242,6 @@ const EmptyExpression = styled(Stack)`
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.full};
-  `}
-`;
-
-const ButtonContainer = styled.span`
-  ${({ theme }) => css`
-    button[disabled] svg path {
-      stroke: ${theme.color.quaternary};
-    }
-
-    &[data-is-broadcast='true'] {
-      button svg path {
-        stroke: none;
-      }
-    }
-
-    &[data-is-broadcast='false'] {
-      button[disabled] svg path {
-        fill: none !important;
-      }
-    }
   `}
 `;
 

@@ -7,7 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
 import partition from 'lodash/partition';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import { MAIN_PAGE_ID } from 'src/config/constants';
@@ -52,6 +52,20 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
     layoutElement?.classList.remove('editing');
     toggleDisableHeading(false);
   });
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isEditing) {
+        resetEdits();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isEditing]);
 
   const handleStartEdit = () => {
     setIsEditing(true);

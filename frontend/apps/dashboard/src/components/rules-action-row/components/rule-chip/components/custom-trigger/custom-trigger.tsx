@@ -39,8 +39,8 @@ const CustomTrigger: React.FC<CustomTriggerProps> = ({ isOpen, children, ariaLab
 
 const Trigger = styled(SelectPrimitive.Trigger)`
   ${({ theme, color }) => css`
-    ${createFontStyles('caption-1')};
-    padding: 0 ${theme.spacing[1]} 0 ${theme.spacing[2]};
+    ${createFontStyles('body-3')};
+    padding: 0 ${theme.spacing[2]} 0 ${theme.spacing[3]};
     color: ${theme.color[color as Color]};
     align-items: center;
     border-radius: ${theme.borderRadius.full};

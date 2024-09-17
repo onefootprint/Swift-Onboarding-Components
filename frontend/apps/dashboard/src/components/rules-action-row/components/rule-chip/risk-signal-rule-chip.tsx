@@ -53,7 +53,7 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
       <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
         <RiskSignalSelect value={ruleExpression.field} onChange={handleFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
-        <Text variant="caption-1" color="tertiary" paddingLeft={2}>
+        <Text variant="body-3" color="tertiary" paddingRight={3}>
           {t('risk-signal.value-placeholder')}
         </Text>
       </ExpressionContainer>
@@ -67,13 +67,13 @@ const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }
     </EditContainer>
   ) : (
     <ExpressionContainer role="group" aria-label={ruleExpression.field}>
-      <Text variant="caption-1" minWidth="fit-content">
+      <Text variant="body-3" minWidth="fit-content">
         {ruleExpression.field}
       </Text>
-      <Text variant="caption-1" minWidth="fit-content">
+      <Text variant="body-3" minWidth="fit-content">
         {t(`op.${ruleExpression.op}` as ParseKeys<'common'>)}
       </Text>
-      <Text variant="caption-1" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('risk-signal.value-placeholder')}
       </Text>
     </ExpressionContainer>
@@ -93,7 +93,7 @@ const ExpressionContainer = styled(Stack)`
 
     &[data-is-editing='true'] {
       gap: ${theme.spacing[1]};
-      padding-left: ${theme.spacing[3]};
+      padding: ${theme.spacing[1]};
     }
   `}
 `;

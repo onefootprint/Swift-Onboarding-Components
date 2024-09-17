@@ -93,7 +93,7 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
       <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
         <DISelect defaultDI={ruleExpression.field} listKind={selectedList?.kind} onChange={handleListFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
-        <Text variant="caption-1" color="tertiary" paddingLeft={2} paddingRight={2}>
+        <Text variant="body-3" color="tertiary">
           {t('list.in')}
         </Text>
         <ListSelect
@@ -113,13 +113,13 @@ const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onCh
     </EditContainer>
   ) : (
     <ExpressionContainer role="group" aria-label={ruleExpression.field}>
-      <Text variant="caption-1" minWidth="fit-content">
+      <Text variant="body-3" minWidth="fit-content">
         {ruleExpression.field}
       </Text>
-      <Text variant="caption-1" minWidth="fit-content">
+      <Text variant="body-3" minWidth="fit-content">
         {t(`op.${ruleExpression.op}` as ParseKeys<'common'>)}
       </Text>
-      <Text variant="caption-1" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t('list.in')}
       </Text>
       <Text variant="caption-1" minWidth="fit-content">
@@ -142,7 +142,7 @@ const ExpressionContainer = styled(Stack)`
 
     &[data-is-editing='true'] {
       gap: ${theme.spacing[1]};
-      padding-left: ${theme.spacing[3]};
+      padding: ${theme.spacing[1]};
     }
   `}
 `;
