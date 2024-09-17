@@ -1,4 +1,6 @@
 import SwiftUI
+import OpenAPIRuntime
+import OpenAPIURLSession
 
 @available(iOS 13.0, *)
 public class Footprint: NSObject {

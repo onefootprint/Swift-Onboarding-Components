@@ -1,11 +1,14 @@
 import SwiftUI
 import FootprintSwift
+import Inject
 
 struct ContentView: View {
+    @ObserveInjection var inject
     
     var body: some View {
-        VStack {
-            Button("Verify") {
+        NavigationStack {
+        VStack  {
+            Button("Verify with iFrame") {
                 let bootstrapData = FootprintBootstrapData(
                     email: "example@gmail.com",
                     phoneNumber: "+15555550100",
@@ -70,6 +73,10 @@ struct ContentView: View {
                 Footprint.initialize(with: config)
             }
         }
-        .padding()
+        .padding(50)        
+        NavigationLink("Verify with onboarding components", destination: OnboardingComponentsInitialView())
+            
+        }.enableInjection()
     }
+    
 }

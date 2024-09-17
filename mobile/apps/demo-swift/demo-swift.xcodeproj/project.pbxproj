@@ -12,6 +12,9 @@
 		565B65492B1E06EC0072925A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 565B65482B1E06EC0072925A /* Assets.xcassets */; };
 		565B654C2B1E06EC0072925A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 565B654B2B1E06EC0072925A /* Preview Assets.xcassets */; };
 		565B65542B1E06FB0072925A /* FootprintSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 565B65532B1E06FB0072925A /* FootprintSwift */; };
+		7C489DCB2C94B5C800339321 /* OnboardingComponentsInitialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C489DCA2C94B5C800339321 /* OnboardingComponentsInitialView.swift */; };
+		7C489DCE2C94BB2400339321 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 7C489DCD2C94BB2400339321 /* Inject */; };
+		7C489DD12C94CD5F00339321 /* CustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 7C489DD02C94CD5F00339321 /* CustomDump */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +23,7 @@
 		565B65462B1E06EB0072925A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		565B65482B1E06EC0072925A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		565B654B2B1E06EC0072925A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7C489DCA2C94B5C800339321 /* OnboardingComponentsInitialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingComponentsInitialView.swift; sourceTree = "<group>"; };
 		ECAD71DB2B79C0E00077AC52 /* demo-swiftRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "demo-swiftRelease.entitlements"; sourceTree = "<group>"; };
 		ECAD71DC2B79C0F20077AC52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ECAD71DD2B79C1160077AC52 /* demo-swiftDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "demo-swiftDebug.entitlements"; sourceTree = "<group>"; };
@@ -31,6 +35,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				565B65542B1E06FB0072925A /* FootprintSwift in Frameworks */,
+				7C489DD12C94CD5F00339321 /* CustomDump in Frameworks */,
+				7C489DCE2C94BB2400339321 /* Inject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +69,7 @@
 				565B65462B1E06EB0072925A /* ContentView.swift */,
 				565B65482B1E06EC0072925A /* Assets.xcassets */,
 				565B654A2B1E06EC0072925A /* Preview Content */,
+				7C489DCA2C94B5C800339321 /* OnboardingComponentsInitialView.swift */,
 			);
 			path = "demo-swift";
 			sourceTree = "<group>";
@@ -93,6 +100,8 @@
 			name = "demo-swift";
 			packageProductDependencies = (
 				565B65532B1E06FB0072925A /* FootprintSwift */,
+				7C489DCD2C94BB2400339321 /* Inject */,
+				7C489DD02C94CD5F00339321 /* CustomDump */,
 			);
 			productName = "demo-swift";
 			productReference = 565B65412B1E06EB0072925A /* demo-swift.app */;
@@ -124,6 +133,8 @@
 			mainGroup = 565B65382B1E06EB0072925A;
 			packageReferences = (
 				565B65522B1E06FB0072925A /* XCLocalSwiftPackageReference "../../packages/footprint-swift" */,
+				7C489DCC2C94BB2400339321 /* XCRemoteSwiftPackageReference "Inject" */,
+				7C489DCF2C94CD5F00339321 /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
 			);
 			productRefGroup = 565B65422B1E06EB0072925A /* Products */;
 			projectDirPath = "";
@@ -152,6 +163,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				565B65472B1E06EB0072925A /* ContentView.swift in Sources */,
+				7C489DCB2C94B5C800339321 /* OnboardingComponentsInitialView.swift in Sources */,
 				565B65452B1E06EB0072925A /* demo_swiftApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -301,6 +313,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-Xlinker",
+					"-interposable",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onefootprint.demo-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -332,6 +348,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.onefootprint.demo-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -370,10 +387,39 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		7C489DCC2C94BB2400339321 /* XCRemoteSwiftPackageReference "Inject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.2;
+			};
+		};
+		7C489DCF2C94CD5F00339321 /* XCRemoteSwiftPackageReference "swift-custom-dump" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-custom-dump";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		565B65532B1E06FB0072925A /* FootprintSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FootprintSwift;
+		};
+		7C489DCD2C94BB2400339321 /* Inject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C489DCC2C94BB2400339321 /* XCRemoteSwiftPackageReference "Inject" */;
+			productName = Inject;
+		};
+		7C489DD02C94CD5F00339321 /* CustomDump */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C489DCF2C94CD5F00339321 /* XCRemoteSwiftPackageReference "swift-custom-dump" */;
+			productName = CustomDump;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
