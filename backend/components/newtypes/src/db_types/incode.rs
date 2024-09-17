@@ -161,8 +161,11 @@ impl IncodeFailureReason {
         matches!(self, Self::SelfieFaceNotFound | Self::SelfieTooDark)
     }
 
-    pub fn terminal_document_processing_failure(&self) -> bool {
-        matches!(self, Self::UnknownDocumentType | Self::WrongDocumentSide)
+    pub fn selfie_document_processing_failed(&self) -> bool {
+        matches!(
+            self,
+            Self::UnknownDocumentType | Self::WrongDocumentSide | Self::FaceNotFound
+        )
     }
 }
 

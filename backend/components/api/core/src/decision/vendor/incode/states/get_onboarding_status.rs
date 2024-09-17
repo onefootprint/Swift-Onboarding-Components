@@ -50,7 +50,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
         let document_could_not_be_processed = front_upload
             .failure_reasons
             .iter()
-            .any(|r| r.terminal_document_processing_failure());
+            .any(|r| r.selfie_document_processing_failed());
 
         // Only wait for selfie if selfie AND doc were successfully processed
         let skip_wait_for_selfie = selfie_processing_failed || document_could_not_be_processed;
