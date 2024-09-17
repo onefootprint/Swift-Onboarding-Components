@@ -106,7 +106,7 @@ pub enum Error {
     #[error("This piece of data is already set and cannot be replaced.")]
     CannotReplaceData,
     #[error("Cannot replace verified contact information via API.")]
-    CannotReplaceVerifiedContactInfo,
+    CannotReplaceVerifiedCi,
     #[error("Expected string value, received JSON value.")]
     ExpectedStringFormat,
     #[error("Expected {0} value, received {1} value.")]

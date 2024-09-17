@@ -36,14 +36,6 @@ def no_phone_user(skip_phone_obc):
     )
     user = bifrost.run()
 
-    # Assert we can't replace the verified email
-    data = {"id.email": FIXTURE_EMAIL}
-    key = skip_phone_obc.tenant.sk.key
-    body = patch(f"entities/{user.fp_id}/vault", data, key, status_code=400)
-    assert (
-        body["context"]["id.email"]
-        == "Cannot replace verified contact information via API."
-    )
     return user
 
 

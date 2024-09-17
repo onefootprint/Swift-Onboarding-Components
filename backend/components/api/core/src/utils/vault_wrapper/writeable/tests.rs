@@ -63,7 +63,7 @@ async fn test_prefill_data(state: &mut State) {
         .unwrap();
     assert!(prefill_data.data.is_empty());
     assert!(prefill_data.fingerprints.is_empty());
-    assert!(prefill_data.old_ci.is_empty());
+    assert!(prefill_data.new_ci.is_empty());
 
     // If the user then tried to onboard onto tenant2, there should be almost no prefill data since
     // nothing is portablized - only the phone number because the phone is portablized after it's
@@ -89,7 +89,11 @@ async fn test_prefill_data(state: &mut State) {
             (IDK::PhoneNumber.into(), Some(FingerprintScope::Tenant)),
         ],
     );
-    let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
+    let phone_ci = prefill_data
+        .new_ci
+        .iter()
+        .find(|ci| ci.identifier == IDK::PhoneNumber.into())
+        .unwrap();
     assert!(phone_ci.is_otp_verified);
 
     let prefill_data = vw
@@ -156,9 +160,17 @@ async fn test_prefill_data(state: &mut State) {
     ];
     assert_have_same_elements(fingerprints, expected_fingerprints);
     // Check prefill contact info
-    let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
+    let phone_ci = prefill_data
+        .new_ci
+        .iter()
+        .find(|ci| ci.identifier == IDK::PhoneNumber.into())
+        .unwrap();
     assert!(phone_ci.is_otp_verified);
-    let email_ci = prefill_data.old_ci.get(&IDK::Email.into()).unwrap();
+    let email_ci = prefill_data
+        .new_ci
+        .iter()
+        .find(|ci| ci.identifier == IDK::Email.into())
+        .unwrap();
     assert!(!email_ci.is_otp_verified);
 
     // Write the prefill login methods

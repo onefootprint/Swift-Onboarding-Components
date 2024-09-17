@@ -11,11 +11,9 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::CollectedDataOption;
-use newtypes::ContactInfoPriority;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedVaultVersionNumber;
-use std::collections::HashMap;
 use std::collections::HashSet;
 
 mod fingerprinted;
@@ -36,7 +34,7 @@ pub struct ValidatedDataRequest {
     fingerprints: Fingerprints,
     /// On prefilled ValidatedDataRequests, includes the existing CI for any phone/email being
     /// prefilled
-    old_ci: HashMap<DataIdentifier, ContactInfo>,
+    new_ci: Vec<NewContactInfoArgs<DataIdentifier>>,
     /// The list of precomputed fingerprints for the data being saved. Not all fingerprints here
     /// will be saved to the database directly, some are only used to compute composite fingerprints
     new_cdos: HashSet<CollectedDataOption>,
@@ -63,7 +61,7 @@ impl ValidatedDataRequest {
             data,
             fingerprints,
             new_cdos,
-            old_ci,
+            new_ci,
             is_prefill: _,
         } = self;
 
@@ -109,15 +107,12 @@ impl ValidatedDataRequest {
             .iter()
             .filter(|vd| vd.kind.is_unverified_ci())
             .map(|vd| {
-                let old_ci = old_ci.get(&vd.kind);
+                let new_ci = new_ci.iter().find(|ci| ci.identifier == vd.kind);
                 NewContactInfoArgs {
                     // Inherit properties of old CI if we are prefilling this CI from portable data
-                    is_verified: old_ci.map(|ci| ci.is_verified).unwrap_or(false),
-                    is_otp_verified: old_ci.map(|ci| ci.is_otp_verified).unwrap_or(false),
-                    priority: old_ci
-                        .map(|ci| ci.priority)
-                        .unwrap_or(ContactInfoPriority::Primary),
-                    lifetime_id: vd.lifetime_id.clone(),
+                    is_otp_verified: new_ci.is_some_and(|ci| ci.is_otp_verified),
+                    is_tenant_verified: new_ci.is_some_and(|ci| ci.is_tenant_verified),
+                    identifier: vd.lifetime_id.clone(),
                 }
             })
             .collect_vec();

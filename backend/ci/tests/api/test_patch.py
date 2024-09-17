@@ -1,6 +1,10 @@
 import pytest
+from tests.bifrost_client import BifrostClient
 from tests.headers import IgnoreCardValidation
+from tests.types import ObConfiguration
 from tests.utils import post, patch, get
+from tests.constants import FIXTURE_PHONE_NUMBER2, FIXTURE_EMAIL, FIXTURE_PHONE_NUMBER
+from tests.headers import SandboxId, FpAuth
 
 
 def test_ssn_vaulting(tenant):
@@ -234,7 +238,9 @@ def test_delete_and_update(tenant):
 
     body = get("org/audit_events", dict(fp_id=fp_id), *tenant.db_auths)
     assert any(
-        i["name"] == "update_user_data" and set(i["detail"]["data"]["updated_fields"]) == {"id.first_name", "id.last_name"}
+        i["name"] == "update_user_data"
+        and set(i["detail"]["data"]["updated_fields"])
+        == {"id.first_name", "id.last_name"}
         for i in body["data"]
     )
 
@@ -245,10 +251,59 @@ def test_delete_and_update(tenant):
 
     body = get("org/audit_events", dict(fp_id=fp_id), *tenant.db_auths)
     assert any(
-        i["name"] == "update_user_data" and set(i["detail"]["data"]["updated_fields"]) == {"id.dob"}
+        i["name"] == "update_user_data"
+        and set(i["detail"]["data"]["updated_fields"]) == {"id.dob"}
         for i in body["data"]
     )
     assert any(
-        i["name"] == "delete_user_data" and set(i["detail"]["data"]["deleted_fields"]) == {"id.first_name"}
+        i["name"] == "delete_user_data"
+        and set(i["detail"]["data"]["deleted_fields"]) == {"id.first_name"}
         for i in body["data"]
     )
+
+
+def test_replace_verified_ci(sandbox_tenant):
+    obc = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.new_user(obc)
+    user = bifrost.run()
+
+    def identify(obc: ObConfiguration, **kwargs):
+        data = dict(scope="onboarding", **kwargs)
+        body = post("hosted/identify", data, obc.key, SandboxId(bifrost.sandbox_id))
+        if not body["user"]:
+            return None
+        token = FpAuth(body["user"]["token"])
+        body = get("hosted/user/private_info", None, token)
+        return body["fp_id"]
+
+    # Write a new phone number
+    data = {"id.phone_number": FIXTURE_PHONE_NUMBER2}
+    patch(f"users/{user.fp_id}/vault", data, sandbox_tenant.s_sk)
+
+    # Should be able to use the new phone number or old email to locate the user
+    assert identify(obc, phone_number=FIXTURE_PHONE_NUMBER) == None
+    assert identify(obc, phone_number=FIXTURE_PHONE_NUMBER2) == user.fp_id
+    assert (
+        identify(obc, phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL)
+        == user.fp_id
+    )
+    assert (
+        identify(obc, phone_number=FIXTURE_PHONE_NUMBER2, email=FIXTURE_EMAIL)
+        == user.fp_id
+    )
+
+    # Make sure the phone is still reported as verified since we copy the verification status
+    data = dict(scope="onboarding", phone_number=FIXTURE_PHONE_NUMBER2)
+    body = post("hosted/identify", data, obc.key, SandboxId(bifrost.sandbox_id))
+    assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**11"
+    phone = next(i for i in body["user"]["auth_methods"] if i["kind"] == "phone")
+    assert phone["is_verified"]
+
+    # And can patch it again and verification status is still maintained
+    data = {"id.phone_number": FIXTURE_PHONE_NUMBER}
+    patch(f"users/{user.fp_id}/vault", data, sandbox_tenant.s_sk)
+    data = dict(scope="onboarding", phone_number=FIXTURE_PHONE_NUMBER)
+    body = post("hosted/identify", data, obc.key, SandboxId(bifrost.sandbox_id))
+    assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**00"
+    phone = next(i for i in body["user"]["auth_methods"] if i["kind"] == "phone")
+    assert phone["is_verified"]

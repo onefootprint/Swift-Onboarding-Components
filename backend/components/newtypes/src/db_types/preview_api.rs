@@ -52,6 +52,8 @@ pub enum PreviewApi {
     ImplicitAuth,
     /// Vault DR requires white-glove onboarding for now.
     VaultDisasterRecovery,
+    /// Support setting `id.phone_number` and `id.email` when they are already verified
+    ManageVerifiedContactInfo,
 
     /// A catch-all variant here since we'll be scarily manually writing these values in a DB shell
     Other(String),

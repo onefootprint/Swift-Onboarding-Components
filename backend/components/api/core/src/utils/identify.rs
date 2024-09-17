@@ -65,7 +65,7 @@ pub fn get_user_auth_methods(
         .map(|(ci, dl)| -> FpResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
         .collect::<FpResult<Vec<_>>>()?;
 
-    let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
+    let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified());
     let mut allowed_unverified_methods = user_auth
         .iter()
         .flat_map(|ua| &ua.data.kba)
@@ -83,8 +83,8 @@ pub fn get_user_auth_methods(
         // TODO one day, don't allow logging in via data added via bootstrap?
         .map(|(cik, ci, _)| AuthMethod {
             kind: AuthMethodKind::from(*cik),
-            is_verified: ci.is_otp_verified,
-            can_initiate_challenge: ci.is_otp_verified,
+            is_verified: ci.is_otp_verified(),
+            can_initiate_challenge: ci.is_otp_verified(),
         })
         .chain((!passkeys.is_empty()).then_some(AuthMethod {
             kind: AuthMethodKind::Passkey,

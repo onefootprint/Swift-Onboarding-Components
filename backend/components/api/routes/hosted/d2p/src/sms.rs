@@ -58,7 +58,7 @@ pub async fn handler(
         .await?
         .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
 
-    if !ci.is_otp_verified {
+    if !ci.is_otp_verified() {
         // The d2p link we send out is authenticated as the user.
         // So, we want to make sure a tenant can't update the user's phone number/email
         // and then get an authenticated link. First, check that the phone number/email was

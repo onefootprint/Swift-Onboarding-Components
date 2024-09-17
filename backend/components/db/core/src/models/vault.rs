@@ -352,18 +352,15 @@ impl Vault {
         };
         let mut vaults: Vec<(Vault, FingerprintKind)> = query.get_results(conn)?;
 
-        // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
-        // non-portable vaults
         if let Some(tenant_id) = tenant_id {
+            // Also locate vaults made directly via API at a tenant and vaults that have
+            // new contact info written by this tenant.
             let mut query = DbFingerprint::q_fingerprints(sh_data, sandbox_id.is_none())
                 .inner_join(fingerprint_junction::table.inner_join(data_lifetime::table))
                 .inner_join(vault::table)
                 .inner_join(scoped_vault::table)
                 // Un-verified vaults owned by this tenant
                 .filter(fingerprint::tenant_id.eq(tenant_id))
-                .filter(data_lifetime::portablized_seqno.is_null())
-                .filter(vault::is_verified.eq(false))
-                .filter(vault::is_identifiable.eq(false))
                 .filter(vault::is_hidden.eq(false))
                 .select((vault::all_columns, fingerprint::kind));
             query = if let Some(sandbox_id) = sandbox_id.as_ref() {

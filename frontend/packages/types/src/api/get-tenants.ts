@@ -37,6 +37,7 @@ export enum TenantPreviewApi {
   LegacyListUsersBusinesses = 'legacy_list_users_businesses',
   ClientVaultingDocs = 'client_vaulting_docs',
   ListDuplicateUsers = 'list_duplicate_users',
+  ManageVerifiedContactInfo = 'manage_verified_contact_info',
 }
 
 export enum TenantBillingProfileProduct {

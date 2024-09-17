@@ -83,7 +83,7 @@ pub fn on_otp_verified(
     sv_id: &ScopedVaultId,
     v_id: &VaultId,
 ) -> FpResult<IsFirstTimeVerifying> {
-    let is_first_time_verifying_ci = !ci.is_otp_verified;
+    let is_first_time_verifying_ci = !ci.is_otp_verified();
     if is_first_time_verifying_ci {
         ContactInfo::mark_otp_verified(conn, &ci.id)?;
         let seqno = DataLifetime::get_next_seqno(conn)?;

@@ -8,7 +8,9 @@ use crate::FpResult;
 use api_errors::ValidationError;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
+use db::models::contact_info::NewContactInfoArgs;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::models::vault_data::NewVaultData;
 use db::PgConn;
 use itertools::Itertools;
@@ -23,12 +25,13 @@ use newtypes::DiValidationError;
 use newtypes::Error as NtError;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::NtResult;
+use newtypes::PreviewApi;
 use newtypes::VaultDataFormat;
 use newtypes::VaultKind;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-#[derive(Clone, derive_more::IsVariant)]
+#[derive(Debug, Clone, derive_more::IsVariant)]
 pub enum DataRequestSource {
     /// Creating a brand new user during a signup challenge. Some data can be bootstrapped while
     /// others can be entered by the usr
@@ -110,11 +113,12 @@ impl<Type> TenantVw<Type> {
             })
             .collect::<FpResult<Vec<_>>>()?;
 
-        let new_cdos = self.validate_adding_dis(conn, &data, request_source)?;
+        let new_cdos = self.validate_adding_dis(&data, request_source)?;
+        let new_ci = self.validate_contact_info(conn, &data, request_source)?;
 
         let req = ValidatedDataRequest {
             data,
-            old_ci: HashMap::new(),
+            new_ci,
             fingerprints,
             new_cdos,
             is_prefill: false,
@@ -126,21 +130,17 @@ impl<Type> TenantVw<Type> {
 impl<Type> WriteableVw<Type> {
     /// Given the source user-scoped vault and destination tenant-scoped vault, assembles the
     /// ValidatedDataRequest that will prefill portable data into the destination vault
-    pub fn validate_prefill_data_request(
-        &self,
-        conn: &mut PgConn,
-        prefill_data: PrefillData,
-    ) -> FpResult<ValidatedDataRequest> {
+    pub fn validate_prefill_data_request(&self, prefill_data: PrefillData) -> FpResult<ValidatedDataRequest> {
         let PrefillData {
             data,
             fingerprints,
-            old_ci,
+            new_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, &DataRequestSource::Prefill)?;
+        let new_cdos = self.validate_adding_dis(&data, &DataRequestSource::Prefill)?;
         let request = ValidatedDataRequest {
             data,
-            old_ci,
+            new_ci,
             new_cdos,
             fingerprints,
             is_prefill: true,
@@ -150,15 +150,86 @@ impl<Type> WriteableVw<Type> {
 }
 
 impl<Type> TenantVw<Type> {
-    fn validate_adding_dis(
+    /// Validates that the provided DataRequestSource source is allowed to write contact info,
+    /// considering the current contact infos' verification statuses.
+    /// Returns the new contact infos' verification statuses, if any.
+    fn validate_contact_info(
         &self,
         conn: &mut PgConn,
+        data: &[NewVaultData],
+        request_source: &DataRequestSource,
+    ) -> FpResult<Vec<NewContactInfoArgs<DataIdentifier>>> {
+        let updated_ci = data.iter().filter(|d| d.kind.is_unverified_ci()).collect_vec();
+        if updated_ci.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let can_update_verified_ci = match request_source {
+            // No validation for writing contact info at all - can always overwrite verified/unverified CI
+            DataRequestSource::SignupChallenge(_)
+            | DataRequestSource::OtpVerified
+            | DataRequestSource::Prefill => return Ok(vec![]),
+            // Can only write CI if it's currently unverified
+            DataRequestSource::Ocr | DataRequestSource::Vendor | DataRequestSource::HostedPatchVault(_) => {
+                false
+            }
+            // Can only write CI if the current tenant is allowed to
+            DataRequestSource::TenantPatchVault(_) | DataRequestSource::ClientTenant => {
+                let tenant = Tenant::get(conn, &self.scoped_vault.tenant_id)?;
+                tenant.can_access_preview(&PreviewApi::ManageVerifiedContactInfo)
+            }
+        };
+
+        let cis_to_replace = updated_ci
+            .iter()
+            .flat_map(|d| self.data(&d.kind))
+            .map(|d| -> FpResult<_> {
+                let ci = ContactInfo::get(conn, &d.lifetime.id)?;
+                Ok((d.lifetime.kind.clone(), ci))
+            })
+            .collect::<FpResult<Vec<_>>>()?;
+
+        let validation_errors = cis_to_replace
+            .iter()
+            .filter(|(_, ci)| ci.is_otp_verified() && !can_update_verified_ci)
+            .map(|(di, _)| (di.clone(), DiValidationError::CannotReplaceVerifiedCi.into()))
+            .collect::<HashMap<_, _>>();
+        if !validation_errors.is_empty() {
+            return Err(NtError::from(DataValidationError::FieldValidationError(validation_errors)).into());
+        }
+
+        // If the tenant is allowed to overwrite verified CI, the newly written CI should inherit the old
+        // CI's verification status so as to not cause a difference in login behavior.
+        // This is horribly implicit logic, but is probably the behavior that the tenant wants - vaulting a
+        // new piece of contact info should not drastically change the user's login experience.
+        // Alternatively, we could expose a vaulting API to specify `id.verified_phone_number` or
+        // `id.phone_number` explicitly.
+        let inherits_old_verification_status = matches!(
+            request_source,
+            DataRequestSource::TenantPatchVault(_) | DataRequestSource::ClientTenant
+        );
+        if !inherits_old_verification_status {
+            return Ok(vec![]);
+        }
+        let new_ci = cis_to_replace
+            .into_iter()
+            .map(|(di, old_ci)| NewContactInfoArgs {
+                is_otp_verified: false,
+                identifier: di,
+                is_tenant_verified: old_ci.is_otp_verified(),
+            })
+            .collect();
+        Ok(new_ci)
+    }
+
+    fn validate_adding_dis(
+        &self,
         data: &[NewVaultData],
         // None if adding data not for prefill, Some with the sv_id if adding data for prefill
         request_source: &DataRequestSource,
     ) -> FpResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
-        let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
+        let mut validation_errors = HashMap::<DataIdentifier, NtError>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
         let for_replacing_ci = matches!(
@@ -171,35 +242,6 @@ impl<Type> TenantVw<Type> {
                 "Can only set verified CI in tenant-facing API or challenge verification flow",
             )
             .into();
-        }
-
-        let irreplaceable_ci = if !for_replacing_ci {
-            vec![IDK::PhoneNumber.into(), IDK::Email.into()]
-        } else {
-            vec![]
-        };
-        for di in irreplaceable_ci {
-            let Some(d) = self.data(&di) else {
-                // If the DI doesn't exist yet, we're just adding the data, which is safe.
-                continue;
-            };
-            let ci = ContactInfo::get(conn, &d.lifetime.id)?;
-            let update_has_di = dis.contains(&&di);
-            // TODO should we disallow updating the email for any vault that is_verified?
-            if ci.is_otp_verified && update_has_di {
-                if matches!(request_source.actor(), Some(AuthActor::FirmEmployee(_))) {
-                    // Don't error, allow firm employees (who already have write permissions) to
-                    // be able to replace CI
-                    tracing::error!("Firm employee is updating verified ContactInfo! Note that this won't entirely work properly - the new ContactInfo is marked as unverified, which causes weird bugs. Please repair the vault manually");
-                } else if !request_source.is_prefill() {
-                    validation_errors.insert(di, DiValidationError::CannotReplaceVerifiedContactInfo.into());
-                } else if self.scoped_vault.id == d.lifetime.scoped_vault_id {
-                    // With our current prefill logic that only prefills for the first WF for a SV,
-                    // we shouldn't ever get in a position where we're replacing CI.
-                    // Except for a race condition
-                    tracing::error!("Unexpected: replacing CI with prefill data");
-                }
-            }
         }
 
         let irreplaceable_dis = vec![BDK::KycedBeneficialOwners.into()];
@@ -271,7 +313,7 @@ impl<Type> TenantVw<Type> {
 
         if !validation_errors.is_empty() {
             let validation_error = DataValidationError::FieldValidationError(validation_errors);
-            return Err(newtypes::Error::from(validation_error).into());
+            return Err(NtError::from(validation_error).into());
         }
 
         Ok(new_cdos)
@@ -298,9 +340,7 @@ impl<Type> TenantVw<Type> {
                     // via API
                     let err = newtypes::ValidationError("Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting").into();
                     let errs = HashMap::from_iter([(BDK::BeneficialOwners.into(), err)]);
-                    return Err(
-                        newtypes::Error::from(DataValidationError::FieldValidationError(errs)).into(),
-                    );
+                    return Err(NtError::from(DataValidationError::FieldValidationError(errs)).into());
                 }
             }
         }
@@ -372,7 +412,7 @@ fn assert_allowed_for_sources(
 }
 
 /// Helper struct to store which pieces of data have which DL sources.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DlSourceWithOverrides {
     pub default: DataLifetimeSource,
     pub overrides: HashMap<DataIdentifier, DataLifetimeSource>,

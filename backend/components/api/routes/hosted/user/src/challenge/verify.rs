@@ -186,7 +186,7 @@ impl Action {
                         // to add a phone number to the current tenant
                         let dis = data.keys().cloned().collect_vec();
                         let existing_ci = ContactInfo::list(conn, vault_id, dis)?;
-                        if existing_ci.iter().any(|ci| ci.is_otp_verified) {
+                        if existing_ci.iter().any(|ci| ci.is_otp_verified()) {
                             return ValidationError("Cannot add primary contact info when it already exists")
                                 .into();
                         }

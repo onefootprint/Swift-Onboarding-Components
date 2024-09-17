@@ -1,18 +1,17 @@
-use derive_more::Display;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use strum_macros::AsRefStr;
 use strum_macros::EnumString;
 
-/// The type of data attribute
 #[derive(
     Debug,
     Eq,
     PartialEq,
     Ord,
     PartialOrd,
-    Display,
+    // CAREFUL, this is the bad Display implemention. We should migrate away from using this
+    derive_more::Display,
     Hash,
     Clone,
     Copy,

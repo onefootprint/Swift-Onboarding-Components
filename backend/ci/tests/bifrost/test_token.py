@@ -186,14 +186,6 @@ def test_api_vault(sandbox_tenant, ob_config):
     auth_token = IdentifyClient.from_token(auth_token).step_up(
         assert_had_no_scopes=True
     )
-    # Ensure we can't edit the phone number once it's been verified
-    body = patch(
-        f"entities/{fp_id}/vault", initial_data, sandbox_tenant.sk.key, status_code=400
-    )
-    assert (
-        body["context"]["id.phone_number"]
-        == "Cannot replace verified contact information via API."
-    )
 
     # Run bifrost
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)

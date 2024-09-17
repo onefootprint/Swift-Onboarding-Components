@@ -282,6 +282,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         is_otp_verified -> Bool,
+        is_tenant_verified -> Bool,
     }
 }
 

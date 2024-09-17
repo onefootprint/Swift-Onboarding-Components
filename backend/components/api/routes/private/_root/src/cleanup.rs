@@ -77,7 +77,7 @@ async fn post(
                     .await?;
 
                 if let Some(phone) = phone {
-                    if !phone.1.is_otp_verified {
+                    if !phone.1.is_otp_verified() {
                         return Err(AssertionError(
                             "Cannot clean up via email if user has unverfiied phone number",
                         )

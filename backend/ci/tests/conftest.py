@@ -243,18 +243,6 @@ def sandbox_user(sandbox_tenant):
         "liveness",
         "process",
     ]
-
-    # Assert we can't replace the verified phone
-    data = {"id.phone_number": "+15555555555"}
-    body = patch(
-        f"entities/{user.fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
-    )
-    assert body["code"] == "T120"
-    assert (
-        body["context"]["id.phone_number"]
-        == "Cannot replace verified contact information via API."
-    )
-
     return user
 
 

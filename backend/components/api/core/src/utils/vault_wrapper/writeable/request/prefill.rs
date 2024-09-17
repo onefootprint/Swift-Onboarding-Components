@@ -8,6 +8,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
+use db::models::contact_info::NewContactInfoArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::NewVaultData;
@@ -18,7 +19,6 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::VaultKind;
-use std::collections::HashMap;
 use std::marker::PhantomData;
 
 /// Precomputed portable data from the user-scoped vault that we will use to prefill data for a new
@@ -30,7 +30,7 @@ use std::marker::PhantomData;
 pub struct PrefillData {
     pub data: Vec<NewVaultData>,
     pub(in super::super) fingerprints: Fingerprints,
-    pub(in super::super) old_ci: HashMap<DataIdentifier, ContactInfo>,
+    pub(in super::super) new_ci: Vec<NewContactInfoArgs<DataIdentifier>>,
     /// Prevent external construction
     phantom: PhantomData<()>,
 }
@@ -199,14 +199,16 @@ impl<Type> VaultWrapper<Type> {
             .filter(|di| di.is_unverified_ci())
             .filter_map(|di| self.get_lifetime(&di).map(|dl| (di, dl.id.clone())))
             .collect_vec();
-        let old_ci = state
+        let new_ci = state
             .db_pool
-            .db_query(|conn| -> FpResult<_> {
+            .db_query(|conn| -> Result<_, _> {
                 old_ci_dls
                     .into_iter()
-                    .map(|(di, dl_id)| -> FpResult<_> {
-                        let ci = ContactInfo::get(conn, &dl_id)?;
-                        Ok((di, ci))
+                    .map(|(di, dl_id)| ContactInfo::get(conn, &dl_id).map(|ci| (di, ci)))
+                    .map_ok(|(di, old_ci)| NewContactInfoArgs {
+                        is_otp_verified: old_ci.is_otp_verified,
+                        is_tenant_verified: old_ci.is_tenant_verified,
+                        identifier: di,
                     })
                     .collect()
             })
@@ -217,7 +219,7 @@ impl<Type> VaultWrapper<Type> {
         let result = PrefillData {
             data,
             fingerprints,
-            old_ci,
+            new_ci,
             phantom: PhantomData,
         };
         Ok(result)
@@ -232,7 +234,7 @@ impl<Type> WriteableVw<Type> {
         prefill_data: PrefillData,
         actor: Option<AuthActor>,
     ) -> FpResult<PatchDataResult> {
-        let request = self.validate_prefill_data_request(conn, prefill_data)?;
+        let request = self.validate_prefill_data_request(prefill_data)?;
         let result = self.internal_save_data(conn, request, actor)?;
         Ok(result)
     }

@@ -1,0 +1,1 @@
+ALTER TABLE contact_info DROP COLUMN is_tenant_verified;
