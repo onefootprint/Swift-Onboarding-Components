@@ -14,13 +14,13 @@ const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
   connect-src 'self' ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com maps.googleapis.com *.pusher.com wss://*.pusher.com ${DATADOG_SRC};
   default-src 'self' vitals.vercel-insights.com;
-  font-src 'self' fonts.googleapis.com fonts.gstatic.com;
+  font-src 'self' fonts.googleapis.com fonts.gstatic.com i.onefp.net;
   form-action 'self';
   frame-src 'self' vercel.live;
-  img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net maps.googleapis.com;
+  img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net maps.googleapis.com *.onefp.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: vercel.live vitals.vercel-insights.com maps.googleapis.com ${DATADOG_SRC};
-  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net i.onefp.net;
   worker-src 'self' blob:;
 `;
 
@@ -70,6 +70,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   env: {
     npm_package_name: process.env.npm_package_name,
+  },
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: '*.onefp.net' }],
   },
   transpilePackages: [
     '@onefootprint/design-tokens',
