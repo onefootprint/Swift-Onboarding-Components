@@ -13,6 +13,14 @@ use rand::Rng;
 /// Our dev .env files are generated/modeled after the pulumi definitions to mimic
 /// actual AWS server behavior
 pub struct Config {
+    /// The base URL of the API
+    /// i.e prod=https://api.onefootprint.com
+    /// dev=https://api.dev.onefootprint.com
+    /// preview=https://api-xyz.dev.onefootprint.com
+    /// local=http://localhost:8000
+    #[envconfig(from = "API_ORIGIN", default = "http://localhost:8000")]
+    pub api_origin: String,
+
     #[envconfig(nested = true)]
     pub service_config: ServiceEnvironmentConfig,
 
@@ -76,6 +84,8 @@ pub struct Config {
     pub twilio_acount_sid: String,
     #[envconfig(from = "TWILIO_API_KEY_SECRET")]
     pub twilio_api_key_secret: String,
+    #[envconfig(from = "TWILIO_AUTH_KEY_WEBHOOKS")]
+    pub twilio_auth_key_webhooks: String,
     #[envconfig(from = "TWILIO_PHONE_NUMBER")]
     pub twilio_phone_number: String,
     #[envconfig(from = "TWILIO_WHATSAPP_SENDER_SID")]
@@ -91,6 +101,8 @@ pub struct Config {
     pub twilio_acount_sid_backup: String,
     #[envconfig(from = "TWILIO_API_KEY_SECRET_BACKUP", default = "")]
     pub twilio_api_key_secret_backup: String,
+    #[envconfig(from = "TWILIO_AUTH_KEY_WEBHOOKS_BACKUP", default = "")]
+    pub twilio_auth_key_webhooks_backup: String,
     #[envconfig(from = "TWILIO_PHONE_NUMBER_BACKUP", default = "")]
     pub twilio_phone_number_backup: String,
     #[envconfig(from = "TWILIO_WHATSAPP_SENDER_SID_BACKUP", default = "")]
@@ -184,6 +196,10 @@ fn load_from_env<T: Envconfig>() -> Result<T> {
 impl Config {
     pub fn load_from_env() -> Result<Self> {
         load_from_env()
+    }
+
+    pub fn twilio_status_callback_url(&self) -> String {
+        format!("{}/webhooks/twilio_status_callback", self.api_origin)
     }
 }
 

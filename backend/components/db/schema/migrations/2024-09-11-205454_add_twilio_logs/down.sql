@@ -1,0 +1,1 @@
+DROP TABLE twilio_message_log;

@@ -12,6 +12,7 @@ use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
+use db::DbPool;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use feature_flag::JsonFlag;
@@ -23,6 +24,7 @@ use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::TenantId;
+use newtypes::VaultId;
 use std::fmt::Debug;
 use std::sync::Arc;
 use tokio::sync::oneshot;
@@ -153,6 +155,7 @@ impl SmsClient {
         message: SmsMessage,
         destination: PhoneNumber,
         t_id: Option<&TenantId>,
+        v_id: Option<&VaultId>,
     ) -> FpResult<()> {
         if !self
             .should_send_message(state, &message, &destination, t_id)
@@ -160,7 +163,8 @@ impl SmsClient {
         {
             return Ok(());
         }
-        self._send_message(message, destination, t_id, None).await?;
+        self._send_message(message, destination, t_id, v_id, &state.db_pool, None)
+            .await?;
         Ok(())
     }
 
@@ -171,6 +175,7 @@ impl SmsClient {
         message: SmsMessage,
         destination: PhoneNumber,
         t_id: Option<TenantId>,
+        v_id: Option<VaultId>,
         tx: Sender<FpError>,
     ) -> FpResult<()> {
         if !self
@@ -180,9 +185,13 @@ impl SmsClient {
             return Ok(());
         }
         let client = self.clone();
+        let db_pool = state.db_pool.clone();
+
         let fut = async move {
             let t_id = t_id.as_ref();
-            let res = client._send_message(message, destination, t_id, Some(tx)).await;
+            let res = client
+                ._send_message(message, destination, t_id, v_id.as_ref(), &db_pool, Some(tx))
+                .await;
             if let Err(err) = res {
                 tracing::error!(%err, "Couldn't send SMS asynchronously");
             }
@@ -198,6 +207,8 @@ impl SmsClient {
         message: SmsMessage,
         destination: PhoneNumber,
         t_id: Option<&TenantId>,
+        v_id: Option<&VaultId>,
+        db_pool: &DbPool,
         mut tx: Option<Sender<FpError>>,
     ) -> FpResult<()> {
         let e164 = destination.e164();
@@ -253,7 +264,10 @@ impl SmsClient {
 
             // Send the message using this vendor
             let vendor = vendor_kind.vendor();
-            let e = match vendor.send(self, &message, &destination.e164(), t_id).await {
+            let e = match vendor
+                .send(self, &message, &destination.e164(), t_id, v_id, db_pool)
+                .await
+            {
                 Ok(SmsSendStatus::Sent) => {
                     err = None;
                     break true;
@@ -305,6 +319,7 @@ pub async fn send_sms_challenge_non_blocking(
     tenant: Option<&Tenant>,
     destination: PhoneNumber,
     sandbox_id: Option<SandboxId>,
+    vault_id: Option<VaultId>,
 ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for twilio latency
@@ -331,7 +346,7 @@ pub async fn send_sms_challenge_non_blocking(
     let t_id = tenant.map(|t| t.id.clone());
     state
         .sms_client
-        .send_message_non_blocking(state, message, destination, t_id, tx)
+        .send_message_non_blocking(state, message, destination, t_id, vault_id, tx)
         .await?;
 
     let state = PhoneEmailChallengeState { h_code, contact_info };

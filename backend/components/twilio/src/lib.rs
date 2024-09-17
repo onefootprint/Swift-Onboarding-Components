@@ -1,5 +1,7 @@
 use crate::error::Error;
 use crate::response::message::Status;
+use hmac::Hmac;
+use hmac::Mac;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -14,6 +16,7 @@ use reqwest_tracing::TracingMiddleware;
 use response::decode_response;
 use response::lookup::LookupResponse;
 use response::message::Message;
+use sha1::Sha1;
 use std::time::Duration;
 
 pub mod error;
@@ -28,9 +31,11 @@ pub struct TwilioConfig {
     pub account_sid: String,
     pub api_key: String,
     pub api_secret: String,
+    pub auth_key_webhooks: String,
     pub from_number: String,
     pub whatsapp_sender_sid: String,
     pub whatsapp_otp_template_id: String,
+    pub status_callback_url: Option<String>,
 }
 
 impl TwilioConfig {
@@ -39,9 +44,11 @@ impl TwilioConfig {
             account_sid,
             api_key,
             api_secret,
+            auth_key_webhooks: _,
             from_number,
             whatsapp_sender_sid,
             whatsapp_otp_template_id,
+            status_callback_url: _,
         } = &self;
         if account_sid.is_empty()
             || api_key.is_empty()
@@ -71,6 +78,21 @@ impl TwilioConfig {
 pub struct Client {
     config: TwilioConfig,
     client: ClientWithMiddleware,
+}
+impl Client {
+    pub fn account_sid(&self) -> &str {
+        &self.config.account_sid
+    }
+
+    pub fn webhook_signature(&self, payload: &str) -> Result<String, Error> {
+        type HmacSha1 = Hmac<Sha1>;
+        let mut mac = HmacSha1::new_from_slice(self.config.auth_key_webhooks.as_bytes())
+            .map_err(|_| Error::InvalidWebhookAuthKey)?;
+        mac.update(payload.as_bytes());
+        let result = mac.finalize();
+        let code_bytes = result.into_bytes();
+        Ok(base64::encode(code_bytes))
+    }
 }
 
 impl std::fmt::Debug for Client {
@@ -149,6 +171,7 @@ impl Client {
             // We only need to use these fields for whatsapp
             content_sid: None,
             content_variables: None,
+            status_callback: self.config.status_callback_url.clone(),
         }
     }
 
@@ -172,6 +195,7 @@ impl Client {
             // body cannot be used in whatsapp messages, so we send the message using
             // content_sid and content_variables
             body: None,
+            status_callback: self.config.status_callback_url.clone(),
         };
         Ok(message)
     }

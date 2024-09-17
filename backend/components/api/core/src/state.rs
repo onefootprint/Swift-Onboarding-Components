@@ -210,6 +210,8 @@ impl State {
             from_number: config.twilio_phone_number.clone(),
             whatsapp_sender_sid: config.twilio_whatsapp_sender_sid.clone(),
             whatsapp_otp_template_id: config.twilio_whatsapp_otp_template_id.clone(),
+            status_callback_url: Some(config.twilio_status_callback_url()),
+            auth_key_webhooks: config.twilio_auth_key_webhooks.clone(),
         };
         let twilio_backup = TwilioConfig {
             account_sid: config.twilio_acount_sid_backup.clone(),
@@ -218,6 +220,8 @@ impl State {
             from_number: config.twilio_phone_number_backup.clone(),
             whatsapp_sender_sid: config.twilio_whatsapp_sender_sid_backup.clone(),
             whatsapp_otp_template_id: config.twilio_whatsapp_otp_template_id_backup.clone(),
+            status_callback_url: Some(config.twilio_status_callback_url()),
+            auth_key_webhooks: config.twilio_auth_key_webhooks_backup.clone(),
         };
         let twilio_client = SmsClient::new(
             twilio,

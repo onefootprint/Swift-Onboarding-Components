@@ -36,10 +36,10 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ""
       id2Base: id2.onefootprint.com
       id2Prefix: ""
       idOrigin: id.onefootprint.com
+      prefix: ""
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -182,6 +182,8 @@ config:
       phoneNumber: "+14152129648"
       whatsappOtpTemplateId: HX728369d784be2b98babfae0e399b8d1f
       whatsappSenderId: MGf4b90d6bc32195702ba16a4606f049bf
+      authKeyWebhooks:
+        secure: v1:gt8L7/PMbqD+jhTS:3nMrZw2YBq7z3GgGWgbWpVFra6DqWkVXKJGJC/9xJpKkFWMzE1DbvAu/TudfpWTa
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
@@ -191,6 +193,9 @@ config:
       phoneNumber: "+15105883668"
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
+      authKeyWebhooks:
+        secure: v1:CbIyz98KwI5EGHI4:ok6AkfSs6eN5dopxxb5dWNe9p7IzmKeXjCSzrqrJRSDDAMWxFiQ/SxNGo50Fo8VH
+
     workerTasks:
       - args:
           - execute-tasks

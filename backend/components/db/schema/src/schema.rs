@@ -1479,6 +1479,22 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    twilio_message_log (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        updated_at -> Nullable<Timestamptz>,
+        message_id -> Text,
+        account_sid -> Text,
+        tenant_id -> Nullable<Text>,
+        vault_id -> Nullable<Text>,
+        status -> Nullable<Text>,
+        error -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     user_consent (id) {
         id -> Text,
         timestamp -> Timestamptz,
@@ -1939,6 +1955,8 @@ diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
 diesel::joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
 diesel::joinable!(tenant_tag -> tenant (tenant_id));
 diesel::joinable!(tenant_vendor_control -> tenant (tenant_id));
+diesel::joinable!(twilio_message_log -> tenant (tenant_id));
+diesel::joinable!(twilio_message_log -> vault (vault_id));
 diesel::joinable!(user_consent -> insight_event (insight_event_id));
 diesel::joinable!(user_consent -> workflow (workflow_id));
 diesel::joinable!(user_timeline -> scoped_vault (scoped_vault_id));
@@ -2056,6 +2074,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     tenant_tag,
     tenant_user,
     tenant_vendor_control,
+    twilio_message_log,
     user_consent,
     user_timeline,
     vault,

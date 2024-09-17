@@ -87,7 +87,8 @@ pub async fn post(
             ))?;
             let e164 = phone_number.e164();
             let (rx, challenge_data) =
-                send_sms_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id).await?;
+                send_sms_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id, Some(uv.id))
+                    .await?;
 
             let challenge_data = RegisterChallengeData::Sms {
                 h_code: challenge_data.h_code,

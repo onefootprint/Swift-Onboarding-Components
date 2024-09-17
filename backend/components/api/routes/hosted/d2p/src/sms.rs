@@ -72,7 +72,7 @@ pub async fn handler(
     };
     state
         .sms_client
-        .send_message(&state, message, phone_number, t_id.as_ref())
+        .send_message(&state, message, phone_number, t_id.as_ref(), Some(&uvw.vault.id))
         .await?;
     let time_before_retry_s = state.sms_client.duration_between_challenges;
 

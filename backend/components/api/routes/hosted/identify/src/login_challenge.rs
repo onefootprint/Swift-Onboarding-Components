@@ -104,8 +104,14 @@ pub async fn post(
         ChallengeKind::Sms => {
             let phone_number = vw.get_decrypted_phone(&state).await?;
             let t = tenant.as_ref();
-            let (rx, challenge_state) =
-                send_sms_challenge_non_blocking(&state, t, phone_number.clone(), sandbox_id).await?;
+            let (rx, challenge_state) = send_sms_challenge_non_blocking(
+                &state,
+                t,
+                phone_number.clone(),
+                sandbox_id,
+                Some(vw.vault.id),
+            )
+            .await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)

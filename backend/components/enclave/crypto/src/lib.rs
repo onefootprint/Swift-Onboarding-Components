@@ -21,6 +21,8 @@ pub use self::clean_data::*;
 
 pub mod rsa_pksc1v15;
 
+pub use hmac;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Bad key")]

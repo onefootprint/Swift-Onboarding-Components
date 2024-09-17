@@ -46,6 +46,7 @@ export async function CreateWorkerTasks(
           // 10 minute DB statement timeout for worker.
           dbStatementTimeoutSec: 10 * 60,
         },
+        g.dnsConfig
       );
 
       const taskSlug = `${stackMetadata.shortStackName}-worker-${worker.name}`;

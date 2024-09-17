@@ -387,3 +387,4 @@ define_newtype_id!(
     "Identifier for a scoped_vault_version"
 );
 define_newtype_id!(VaultDrManifestId, String, "Identifier for a vault_dr_manifest");
+define_newtype_id!(TwilioMessageLogId, String, "Identifier for a twilio_message_log");

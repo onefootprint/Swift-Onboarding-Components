@@ -1,9 +1,12 @@
 use super::client::SmsClient;
 use crate::FpResult;
 use async_trait::async_trait;
+use db::models::twilio_message_log::NewTwilioMessageLog;
+use db::DbPool;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
 use newtypes::TenantId;
+use newtypes::VaultId;
 
 pub struct TwilioSms;
 
@@ -62,6 +65,8 @@ pub trait SmsVendor: Send + Sync {
         message: &SmsMessage,
         destination: &PiiString,
         t_id: Option<&TenantId>,
+        v_id: Option<&VaultId>,
+        db_pool: &DbPool,
     ) -> FpResult<SmsSendStatus>;
 }
 
@@ -74,10 +79,31 @@ impl SmsVendor for TwilioSms {
         message: &SmsMessage,
         destination: &PiiString,
         t_id: Option<&TenantId>,
+        v_id: Option<&VaultId>,
+        db_pool: &DbPool,
     ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_sms_message(message, destination, t_id);
-        twilio_client.send(message).await?;
+        let send_result = twilio_client.send(message).await.map(Box::new);
+
+        match &send_result {
+            Ok(msg)
+            | Err(twilio::error::Error::DeliveryFailed(msg))
+            | Err(twilio::error::Error::NotDeliveredAfterTimeout(msg)) => {
+                let log = NewTwilioMessageLog {
+                    message_id: msg.sid.clone(),
+                    account_sid: twilio_client.account_sid().to_string(),
+                    tenant_id: t_id.cloned(),
+                    vault_id: v_id.cloned(),
+                    status: msg.status.to_string().to_lowercase(),
+                    error: msg.error_code.map(|e| e.to_string()),
+                };
+                db_pool.db_query(move |conn| log.update_or_create(conn)).await?;
+            }
+            _ => (),
+        };
+
+        send_result?;
         Ok(SmsSendStatus::Sent)
     }
 }
@@ -90,7 +116,9 @@ impl SmsVendor for TwilioWhatsapp {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
-        _t_id: Option<&TenantId>,
+        t_id: Option<&TenantId>,
+        v_id: Option<&VaultId>,
+        db_pool: &DbPool,
     ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_whatsapp_message(message, destination)?;
@@ -107,7 +135,18 @@ impl SmsVendor for TwilioWhatsapp {
                 Ok(SmsSendStatus::Unsent)
             }
             Err(e) => Err(e.into()),
-            Ok(_) => Ok(SmsSendStatus::Sent),
+            Ok(message) => {
+                let log = NewTwilioMessageLog {
+                    message_id: message.sid,
+                    account_sid: twilio_client.account_sid().to_string(),
+                    tenant_id: t_id.cloned(),
+                    vault_id: v_id.cloned(),
+                    status: message.status.to_string().to_lowercase(),
+                    error: message.error_message,
+                };
+                db_pool.db_query(move |conn| log.update_or_create(conn)).await?;
+                Ok(SmsSendStatus::Sent)
+            }
         };
         tracing::info!(result=?result.as_ref().ok(), err=?result.as_ref().err(), "WhatsApp message status");
         result
@@ -123,6 +162,8 @@ impl SmsVendor for Pinpoint {
         message: &SmsMessage,
         destination: &PiiString,
         t_id: Option<&TenantId>,
+        _v_id: Option<&VaultId>,
+        _db_pool: &DbPool,
     ) -> FpResult<SmsSendStatus> {
         client
             .pinpoint_client

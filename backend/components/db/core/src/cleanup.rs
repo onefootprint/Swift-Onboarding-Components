@@ -42,6 +42,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     use db_schema::schema::scoped_vault_version;
     use db_schema::schema::socure_device_session;
     use db_schema::schema::stytch_fingerprint_event;
+    use db_schema::schema::twilio_message_log;
     use db_schema::schema::user_consent;
     use db_schema::schema::user_timeline;
     use db_schema::schema::vault;
@@ -326,6 +327,17 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .execute(conn.conn())?;
         }
 
+        // TwilioMessageLogs
+        {
+            deleted_rows += diesel::delete(twilio_message_log::table)
+                .filter(twilio_message_log::vault_id.eq_any(&v_ids))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(scoped_vault_version::table)
+                .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
+        }
+
         // Scoped Vault Versions
         {
             let svv_ids = scoped_vault_version::table
@@ -340,6 +352,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
                 .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
                 .execute(conn.conn())?;
         }
+
 
         // delete scoped_users
         deleted_rows += diesel::delete(scoped_vault::table)

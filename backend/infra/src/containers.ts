@@ -11,8 +11,9 @@ import * as s3 from './s3';
 import * as assets from './asset_cdn';
 import * as sg from './sg';
 
-import { GetStackMetadata, StackEnvironment } from './stack_metadata';
+import { GetStackMetadata, StackEnvironment, StackMetadata } from './stack_metadata';
 import { FPC_SERVICE_PORT } from './sg';
+import { DnsConfig } from './dns';
 
 const OTEL_PORT = 4317;
 const DD_OTEL_PORT = 4327;
@@ -47,6 +48,7 @@ export abstract class ServiceContainers {
     logGroupComponent: string,
     containerArgs: string[],
     knobs: Knobs,
+    dnsConfig: DnsConfig,
   ): Promise<ContainersOutput> {
     const otelCollectorContainerName = 'otelcollector';
     const datadogAgentContainerName = 'datadog-agent';
@@ -98,6 +100,7 @@ export abstract class ServiceContainers {
       datadogTags,
       containerArgs,
       knobs,
+      dnsConfig,
     );
 
     const definitions = pulumi
@@ -135,6 +138,7 @@ export abstract class ServiceContainers {
     datadogTags: Map<string, string>,
     containerArgs: string[],
     knobs: Knobs,
+    dnsConfig: DnsConfig,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
 
@@ -176,8 +180,10 @@ export abstract class ServiceContainers {
         secretsStore.workosSecretKey.arn,
         secretsStore.twilioApiKey.arn,
         secretsStore.twilioApiKeySecret.arn,
+        secretsStore.twilioAuthKeyWebhooks.arn,
         secretsStore.twilioApiKeyBackup.arn,
         secretsStore.twilioApiKeySecretBackup.arn,
+        secretsStore.twilioAuthKeyWebhooksBackup.arn,
         secretsStore.sendgridApiKey.arn,
         secretsStore.idologyUsername.arn,
         secretsStore.idologyPassword.arn,
@@ -238,8 +244,10 @@ export abstract class ServiceContainers {
           workosSecretKey,
           twilioApiKey,
           twilioApiKeySecret,
+          twilioAuthKeyWebhooks,
           twilioApiKeyBackup,
           twilioApiKeySecretBackup,
+          twilioAuthKeyWebhooksBackup,
           sendgridApiKey,
           idologyUsername,
           idologyPassword,
@@ -328,12 +336,20 @@ export abstract class ServiceContainers {
                 valueFrom: twilioApiKeySecret,
               },
               {
+                name: 'TWILIO_AUTH_KEY_WEBHOOKS',
+                valueFrom: twilioAuthKeyWebhooks,
+              },
+              {
                 name: 'TWILIO_API_KEY_BACKUP',
                 valueFrom: twilioApiKeyBackup,
               },
               {
                 name: 'TWILIO_API_KEY_SECRET_BACKUP',
                 valueFrom: twilioApiKeySecretBackup,
+              },
+              {
+                name: 'TWILIO_AUTH_KEY_WEBHOOKS_BACKUP',
+                valueFrom: twilioAuthKeyWebhooksBackup,
               },
               {
                 name: 'SENDGRID_API_KEY',
@@ -644,6 +660,10 @@ export abstract class ServiceContainers {
               {
                 name: 'DATABASE_STATEMENT_TIMEOUT_SEC',
                 value: `${knobs.dbStatementTimeoutSec}`,
+              },
+              {
+                name: 'API_ORIGIN',
+                value: `https://${dnsConfig.apiDomain}`,
               },
             ],
             // TODO: I've suggested some more tolerant values

@@ -125,7 +125,11 @@ async fn send_communication(
             content: msg.message_body,
         };
         let t_id = Some(&vw.scoped_vault.tenant_id);
-        state.sms_client.send_message(state, message, phone, t_id).await?;
+        let v_id = Some(&vw.vault.id);
+        state
+            .sms_client
+            .send_message(state, message, phone, t_id, v_id)
+            .await?;
         Some(ContactInfoKind::Phone)
     } else if let Some(email) = vw.decrypt_contact_info(state, ContactInfoKind::Email).await? {
         let msg = TokenEmailMessage::from(msg);

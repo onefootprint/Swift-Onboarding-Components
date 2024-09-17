@@ -17,14 +17,17 @@ pub enum Error {
     Api(ApiErrorResponse),
     #[error("{0}")]
     SerdeJson(#[from] serde_json::Error),
+    #[error("Invalid webhook auth key")]
+    InvalidWebhookAuthKey,
 }
 
 impl api_errors::FpErrorTrait for Error {
     fn status_code(&self) -> api_errors::StatusCode {
         match self {
-            Error::Request(_) | Error::ReqwestMiddleware(_) | Error::SerdeJson(_) => {
-                api_errors::StatusCode::INTERNAL_SERVER_ERROR
-            }
+            Error::InvalidWebhookAuthKey
+            | Error::Request(_)
+            | Error::ReqwestMiddleware(_)
+            | Error::SerdeJson(_) => api_errors::StatusCode::INTERNAL_SERVER_ERROR,
             Error::DeliveryFailed(_) | Error::NotDeliveredAfterTimeout(_) => {
                 api_errors::StatusCode::BAD_REQUEST
             }

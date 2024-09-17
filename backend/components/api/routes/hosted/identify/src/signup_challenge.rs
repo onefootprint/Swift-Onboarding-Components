@@ -143,8 +143,14 @@ pub async fn post(
                     "Phone number required to initiate sign up challenge",
                 ))?
                 .value;
-            let (rx, challenge_data) =
-                send_sms_challenge_non_blocking(&state, Some(ob_context.tenant()), phone, sandbox_id).await?;
+            let (rx, challenge_data) = send_sms_challenge_non_blocking(
+                &state,
+                Some(ob_context.tenant()),
+                phone,
+                sandbox_id,
+                Some(uv.id),
+            )
+            .await?;
             (rx, ChallengeData::Sms(challenge_data))
         }
         ChallengeKind::Email => {

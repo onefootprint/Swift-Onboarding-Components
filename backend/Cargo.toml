@@ -48,9 +48,9 @@ members = [
     "components/selfie_doc",
     "external_tools/ditto",
     "external_tools/hooky",
-    "internal_tools/ai_playground",
+    # "internal_tools/ai_playground",
     "external_tools/footprint-dr",
-    "internal_tools/scripts/avis",
+    # "internal_tools/scripts/avis",
 ]
 [workspace.dependencies]
 clap = { version = "4.4.18", features = ["derive", "env"] }
@@ -118,7 +118,11 @@ diesel_as_jsonb = "1.0.0"
 # https://github.com/bikeshedder/deadpool/issues/325
 #
 # Remove the patch once the next release of deadpool-diesel after 0.6.1 is out.
-deadpool-diesel = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118370e93aa5a3bdb6e8acfb2014f581a01d", package = "deadpool-diesel", features = ["serde", "postgres", "tracing"] }
+deadpool-diesel = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118370e93aa5a3bdb6e8acfb2014f581a01d", package = "deadpool-diesel", features = [
+    "serde",
+    "postgres",
+    "tracing",
+] }
 deadpool = { git = "https://github.com/bikeshedder/deadpool.git", rev = "cd3a118370e93aa5a3bdb6e8acfb2014f581a01d", package = "deadpool", features = [
     "managed",
 ], default-features = false }
@@ -257,6 +261,7 @@ rustls = { version = "0.20", default-features = false }
 rustls-pemfile = "1.0"
 schemars = "0.8.15"
 sec1 = "0.3.0"
+sha1 = "0.10.6"
 sha2 = "0.10.6"
 svix = "0.78.0"
 syn = "1.0.98"
@@ -277,7 +282,13 @@ zeroize = "1.6.0"
 rpassword = "7.3.1"
 keyring = "2.3.3"
 termcolor = "1.1.3"
-age = { version = "0.10.0", features = ["armor", "plugin", "async", "cli-common", "ssh"] }
+age = { version = "0.10.0", features = [
+    "armor",
+    "plugin",
+    "async",
+    "cli-common",
+    "ssh",
+] }
 age-core = "0.10.0"
 age-plugin = "0.5.0"
 bech32 = "0.9.0"

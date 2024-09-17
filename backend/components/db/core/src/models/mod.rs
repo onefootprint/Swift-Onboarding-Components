@@ -72,6 +72,7 @@ pub mod tenant_rolebinding;
 pub mod tenant_tag;
 pub mod tenant_user;
 pub mod tenant_vendor;
+pub mod twilio_message_log;
 pub mod user_consent;
 pub mod user_timeline;
 pub mod vault;

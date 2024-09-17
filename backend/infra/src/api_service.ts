@@ -77,6 +77,7 @@ export async function CreateApiService(
       // certainly never take more than 60s.
       dbStatementTimeoutSec: 60,
     },
+    g.dnsConfig,
   );
 
   // Setup our load balancer and CloudFront

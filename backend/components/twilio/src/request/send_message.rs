@@ -14,4 +14,6 @@ pub struct SendMessage {
     pub content_sid: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_variables: Option<String>,
+
+    pub status_callback: Option<String>,
 }

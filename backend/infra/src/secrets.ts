@@ -26,8 +26,10 @@ export interface StaticSecrets {
   workosSecretKey: aws.ssm.Parameter;
   twilioApiKey: aws.ssm.Parameter;
   twilioApiKeySecret: aws.ssm.Parameter;
+  twilioAuthKeyWebhooks: aws.ssm.Parameter;
   twilioApiKeyBackup: aws.ssm.Parameter;
   twilioApiKeySecretBackup: aws.ssm.Parameter;
+  twilioAuthKeyWebhooksBackup: aws.ssm.Parameter;
   sendgridApiKey: aws.ssm.Parameter;
   idologyUsername: aws.ssm.Parameter;
   idologyPassword: aws.ssm.Parameter;
@@ -117,6 +119,7 @@ interface Workos {
 interface Twilio {
   apiKey: string;
   apiKeySecret: string;
+  authKeyWebhooks: string;
 }
 
 interface Sendgrid {
@@ -336,6 +339,10 @@ export async function LoadSecrets(
       `twilioApiSecretKey-${stack}`,
       secretConstants.twilio.apiKeySecret,
     ),
+    twilioAuthKeyWebhooks: createSecretParameter(
+      `twilioAuthKeyWebhooks-${stack}`,
+      secretConstants.twilio.authKeyWebhooks,
+    ),
     twilioApiKeyBackup: createSecretParameter(
       `twilioApiKeyBackup-${stack}`,
       secretConstants.twilioBackup.apiKey,
@@ -343,6 +350,10 @@ export async function LoadSecrets(
     twilioApiKeySecretBackup: createSecretParameter(
       `twilioApiSecretKeyBackup-${stack}`,
       secretConstants.twilioBackup.apiKeySecret,
+    ),
+    twilioAuthKeyWebhooksBackup: createSecretParameter(
+      `twilioAuthKeyWebhooksBackup-${stack}`,
+      secretConstants.twilioBackup.authKeyWebhooks,
     ),
     sendgridApiKey: createSecretParameter(
       `sendgridApiKey-${stack}`,
