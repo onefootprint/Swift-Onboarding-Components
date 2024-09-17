@@ -28,7 +28,7 @@ import * as assets from './asset_cdn';
 import { DatabaseOutput } from './db';
 import { ConfigureAlerts } from './alerts';
 import * as datadog from './datadog';
-
+import * as ecrSetup from './ecr';
 /**
  * Convenient type to pass shared global resources
  */
@@ -157,6 +157,8 @@ export default async function main() {
     stackMetadata,
     assetCdn,
   };
+
+  ecrSetup.Setup();
 
   const service = await createCoreService(globalState);
 
