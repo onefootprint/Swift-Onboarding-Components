@@ -22,4 +22,3 @@ export const Fp = {
 export { default as useFootprint } from './hooks/use-footprint';
 
 export { default as AuthTokenStatus } from './types/auth-token-status';
-export { default as TenantAuthMethods } from './types/tenant-auth-methods';

@@ -4,37 +4,31 @@ import { useContext } from 'react';
 import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
 import AuthTokenStatus from '../types/auth-token-status';
-import TenantAuthMethods from '../types/tenant-auth-methods';
 import { unlockBody } from '../utils/dom-utils';
 import validateAuthToken from '../utils/validate-auth-token';
-
-type AuthRequirement = {
-  requiresAuth: boolean;
-  authMethod: null | TenantAuthMethods;
-};
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
   const isReadyForAuth = !!context.onboardingConfig;
   const { challengeData, didCallRequiresAuth } = context;
 
-  const authTokenStatusToRequirement = (status: AuthTokenStatus): AuthRequirement => {
+  const authTokenStatusToRequirement = (status: AuthTokenStatus): boolean => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
-      return { requiresAuth: false, authMethod: null };
+      return false;
     }
     if (status === AuthTokenStatus.validWithInsufficientScope) {
-      return { requiresAuth: true, authMethod: TenantAuthMethods.authToken };
+      return false;
     }
     throw new Error('Invalid auth token. Please use a valid auth token.');
   };
 
-  const requiresAuth = async (): Promise<AuthRequirement> => {
+  const requiresAuth = async (): Promise<boolean> => {
     const { authToken, authTokenStatus, vaultingToken, verifiedAuthToken } = context;
 
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken) {
       setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
-      return { requiresAuth: false, authMethod: null };
+      return false;
     }
 
     // If we have a verified auth token, we don't need to authenticate
@@ -46,7 +40,7 @@ const useOtp = () => {
         vaultingToken: vaultingTokenResponse.token,
         didCallRequiresAuth: true,
       }));
-      return { requiresAuth: false, authMethod: null };
+      return false;
     }
 
     if (authToken) {
@@ -73,7 +67,7 @@ const useOtp = () => {
 
     setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
 
-    return { requiresAuth: true, authMethod: TenantAuthMethods.emailAndPhone };
+    return true;
   };
 
   const launchIdentify = (
