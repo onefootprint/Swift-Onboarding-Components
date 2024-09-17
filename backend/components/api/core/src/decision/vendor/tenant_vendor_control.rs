@@ -7,9 +7,6 @@ use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use db::DbPool;
 use db::DbResult;
-use idv::experian::ExperianCrossCoreRequest;
-use idv::idology::pa::IdologyPaRequest;
-use idv::idology::IdologyExpectIDRequest;
 use newtypes::vendor_credentials::ExperianCredentialBuilder;
 use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::vendor_credentials::IdologyCredentials;
@@ -18,7 +15,6 @@ use newtypes::vendor_credentials::LexisCredentials;
 use newtypes::vendor_credentials::MiddeskCredentials;
 use newtypes::vendor_credentials::NeuroIdApiKeys;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
-use newtypes::IdvData;
 use newtypes::IncodeEnvironment;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -104,30 +100,6 @@ impl TenantVendorControl {
 
     pub fn neuro_api_key(&self) -> NeuroIdApiKeys {
         self.neuro_id_api_key.clone()
-    }
-
-    // Requests
-    pub fn build_idology_request(&self, idv_data: IdvData) -> IdologyExpectIDRequest {
-        IdologyExpectIDRequest {
-            idv_data,
-            credentials: self.idology_credentials(),
-            tenant_identifier: self.tenant_identifier(),
-        }
-    }
-
-    pub fn build_experian_request(&self, idv_data: IdvData) -> ExperianCrossCoreRequest {
-        ExperianCrossCoreRequest {
-            idv_data,
-            credentials: self.experian_credentials(),
-        }
-    }
-
-    pub fn build_idology_pa_request(&self, idv_data: IdvData) -> IdologyPaRequest {
-        IdologyPaRequest {
-            idv_data,
-            credentials: self.idology_credentials(),
-            tenant_identifier: self.tenant_identifier(),
-        }
     }
 }
 

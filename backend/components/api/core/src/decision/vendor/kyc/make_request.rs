@@ -119,7 +119,11 @@ pub async fn send_idv_request(
     let is_production = state.config.service_config.is_production();
     match vendor_api {
         WaterfallVendorAPI::Idology => {
-            let request = tvc.build_idology_request(idv_data);
+            let request = IdologyExpectIDRequest {
+                idv_data,
+                credentials: tvc.idology_credentials(),
+                tenant_identifier: tvc.tenant_identifier(),
+            };
             send_idology_idv_request(
                 request,
                 is_production,
@@ -130,7 +134,10 @@ pub async fn send_idv_request(
             .await
         }
         WaterfallVendorAPI::Experian => {
-            let request = tvc.build_experian_request(idv_data);
+            let request = ExperianCrossCoreRequest {
+                idv_data,
+                credentials: tvc.experian_credentials(),
+            };
             send_experian_idv_request(
                 request,
                 is_production,
@@ -340,8 +347,13 @@ mod tests {
             });
         }
         let tvc = TenantVendorControl::default();
+        let request = IdologyExpectIDRequest {
+            idv_data: IdvData::default(),
+            credentials: tvc.idology_credentials(),
+            tenant_identifier: tvc.tenant_identifier(),
+        };
         send_idology_idv_request(
-            tvc.build_idology_request(IdvData::default()),
+            request,
             is_production,
             ob_configuration_key,
             Arc::new(mock_api),

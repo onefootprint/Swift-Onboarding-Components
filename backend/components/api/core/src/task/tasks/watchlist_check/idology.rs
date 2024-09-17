@@ -15,6 +15,7 @@ use db::models::verification_result::VerificationResult;
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::idology::pa::IdologyPaAPIResponse;
+use idv::idology::pa::IdologyPaRequest;
 use idv::VendorResponse;
 use newtypes::DecisionIntentId;
 use newtypes::FootprintReasonCode;
@@ -75,11 +76,13 @@ async fn make_vendor_call(
     )
     .await?;
 
-    let res: Result<IdologyPaAPIResponse, idv::idology::error::Error> = state
-        .vendor_clients
-        .idology_pa
-        .make_request(tvc.build_idology_pa_request(idv_data))
-        .await;
+    let req = IdologyPaRequest {
+        idv_data,
+        credentials: tvc.idology_credentials(),
+        tenant_identifier: tvc.tenant_identifier(),
+    };
+    let res: Result<IdologyPaAPIResponse, idv::idology::error::Error> =
+        state.vendor_clients.idology_pa.make_request(req).await;
 
     let res = res
         .map(|r| {
