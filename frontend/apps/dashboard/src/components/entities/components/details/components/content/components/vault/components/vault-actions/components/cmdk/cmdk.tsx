@@ -20,17 +20,24 @@ import ActionList from './components/main-dialog/action-list/action-list';
 import Footer from './components/main-dialog/footer/footer';
 import SearchInput from './components/main-dialog/search-input';
 
+enum CmdKDialog {
+  reviewPass = 0,
+  reviewFail = 1,
+  editVault = 2,
+  requestMoreInfo = 3,
+  decrypt = 4,
+  decryptAll = 5,
+}
+
 const SHOW_TIMES_LIMIT = 5;
 
 const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [openDialog, setOpenDialog] = useState<CmdKDialog | null>(null);
   const { data: entityData } = useCurrentEntity();
-  const [dialogOpen, setDialogOpen] = useState(false);
   const decryptControls = useDecryptControls();
-  const [retrigerDialogOpen, setRetrigerDialogOpen] = useState(false);
-  const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
   const editControls = useEditControls();
   const { kind } = useEntityContext();
   const canDecrypt = !!entity.decryptableAttributes.length;
@@ -79,22 +86,20 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   });
 
-  const handleOpenDialog = (dialogStatus: ReviewStatus) => {
-    setReviewStatus(dialogStatus);
-    setDialogOpen(true);
-  };
-
   const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setReviewStatus(undefined);
+    setOpenDialog(null);
   };
 
-  const handleRetrigerDialogClose = () => {
-    setRetrigerDialogOpen(false);
+  const handleOpenPassDialog = () => {
+    setOpenDialog(CmdKDialog.reviewPass);
   };
 
-  const handleRetrigerDialogOpen = () => {
-    setRetrigerDialogOpen(true);
+  const handleOpenFailDialog = () => {
+    setOpenDialog(CmdKDialog.reviewFail);
+  };
+
+  const handleOpenRequestMoreInfoDialog = () => {
+    setOpenDialog(CmdKDialog.requestMoreInfo);
   };
 
   const actions = [
@@ -112,7 +117,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
                   status: t(`entity-statuses.${ReviewStatus.fail}`),
                 }),
           value: 'failed',
-          onSelect: () => handleOpenDialog(ReviewStatus.fail),
+          onSelect: handleOpenFailDialog,
           closeAfterSelect: true,
         },
         {
@@ -125,7 +130,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
                   status: t(`entity-statuses.${ReviewStatus.pass}`),
                 }),
           value: 'verified',
-          onSelect: () => handleOpenDialog(ReviewStatus.pass),
+          onSelect: handleOpenPassDialog,
           closeAfterSelect: true,
         },
       ],
@@ -143,7 +148,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label: t('components.cmdk.actions.request'),
           value: 'request',
-          onSelect: handleRetrigerDialogOpen,
+          onSelect: handleOpenRequestMoreInfoDialog,
           closeAfterSelect: true,
         },
       ],
@@ -177,9 +182,13 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         <ActionList actionsArray={actions} setOpen={setOpen} hasReview={shouldRenderManualReview} />
         <Footer />
       </DialogContainer>
-      <RequestMoreInfoDialog open={retrigerDialogOpen} onClose={handleRetrigerDialogClose} />
-      {dialogOpen && reviewStatus && (
-        <ManualReviewDialog status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />
+      {openDialog === CmdKDialog.requestMoreInfo && <RequestMoreInfoDialog open onClose={handleCloseDialog} />}
+      {(openDialog === CmdKDialog.reviewPass || openDialog === CmdKDialog.reviewFail) && (
+        <ManualReviewDialog
+          status={openDialog === CmdKDialog.reviewPass ? ReviewStatus.pass : ReviewStatus.fail}
+          open
+          onClose={handleCloseDialog}
+        />
       )}
       <Overlay isVisible={open} />
       <DiscoverFeatureChip isVisible={shouldShowDiscoverFeature} text={t('components.cmdk.discover')} />
