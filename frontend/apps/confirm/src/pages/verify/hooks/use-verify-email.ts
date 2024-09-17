@@ -11,6 +11,9 @@ const userDataRequest = async (payload: UserEmailVerifyRequest) => {
   return response.data;
 };
 
-const useVerifyEmail = () => useMutation(userDataRequest);
+const useVerifyEmail = () =>
+  useMutation({
+    mutationFn: userDataRequest,
+  });
 
 export default useVerifyEmail;

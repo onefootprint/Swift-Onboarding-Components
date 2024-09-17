@@ -28,7 +28,7 @@ const Verify = () => {
         <Box marginBottom={8}>
           <LogoFpDefault />
         </Box>
-        {verifyMutation.isLoading && <VerifyLoading />}
+        {verifyMutation.isPending && <VerifyLoading />}
         {verifyMutation.isSuccess && <VerifySuccess />}
         {(verifyMutation.isError || !challenge) && <VerifyError />}
       </Inner>
