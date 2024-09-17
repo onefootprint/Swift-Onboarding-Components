@@ -268,7 +268,7 @@ const Header = styled.header`
 const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    left: ${theme.spacing[5]};
+    left: ${theme.spacing[3]};
   `}
 `;
 

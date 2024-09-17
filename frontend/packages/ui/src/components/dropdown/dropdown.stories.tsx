@@ -1,4 +1,3 @@
-import { IcoDotsHorizontal16 } from '@onefootprint/icons';
 import type { Meta, StoryFn } from '@storybook/react';
 import Stack from '../stack';
 import Dropdown from './dropdown';
@@ -24,12 +23,6 @@ const Template: StoryFn<TriggerProps> = ({ children, ...args }) => (
   </Stack>
 );
 
-const DotsContainer = () => (
-  <Stack width="24px" height="24px" alignItems="center" justifyContent="center">
-    <IcoDotsHorizontal16 />
-  </Stack>
-);
-
 export const DefaultTrigger = Template.bind({});
 DefaultTrigger.args = {
   children: 'Default Trigger',
@@ -40,10 +33,4 @@ export const ChevronTrigger = Template.bind({});
 ChevronTrigger.args = {
   children: 'Chevron Trigger',
   variant: 'chevron',
-};
-
-export const IconTrigger = Template.bind({});
-IconTrigger.args = {
-  children: <DotsContainer />,
-  variant: 'icon',
 };

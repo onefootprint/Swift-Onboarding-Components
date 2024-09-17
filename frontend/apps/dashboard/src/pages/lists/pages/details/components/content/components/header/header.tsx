@@ -57,7 +57,7 @@ const Header = () => {
       </Stack>
       <Stack align="center" gap={3}>
         <PermissionGate fallbackText={t('cta-edit-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
-          <Button variant="secondary" onClick={launchEditDialog}>
+          <Button variant="secondary" onClick={launchEditDialog} size="compact">
             {t('edit')}
           </Button>
         </PermissionGate>

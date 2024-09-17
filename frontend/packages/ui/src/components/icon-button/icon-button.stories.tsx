@@ -19,9 +19,15 @@ export default {
     },
     variant: {
       control: 'select',
-      options: ['ghost', 'primary', 'secondary'],
+      options: ['ghost', 'outline'],
       description: 'Button variant',
       required: true,
+    },
+    size: {
+      control: 'select',
+      options: ['default', 'large', 'compact', 'tiny'],
+      description: 'Button size',
+      defaultValue: 'default',
     },
     onClick: {
       action: 'clicked',
@@ -42,11 +48,19 @@ const Template: StoryFn<IconButtonProps> = ({
   'aria-label': ariaLabel,
   children,
   variant,
+  size,
   onClick,
   disabled,
   testID,
 }: IconButtonProps) => (
-  <IconButton aria-label={ariaLabel} variant={variant} onClick={onClick} disabled={disabled} testID={testID}>
+  <IconButton
+    aria-label={ariaLabel}
+    variant={variant}
+    size={size}
+    onClick={onClick}
+    disabled={disabled}
+    testID={testID}
+  >
     {children}
   </IconButton>
 );
@@ -56,33 +70,27 @@ Ghost.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
   variant: 'ghost',
+  size: 'default',
   onClick: () => console.log('clicked'), // eslint-disable-line no-console
   testID: 'icon-button-test-id',
 };
 
-export const Primary = Template.bind({});
-Primary.args = {
+export const Outline = Template.bind({});
+Outline.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  variant: 'primary',
+  variant: 'outline',
+  size: 'default',
   onClick: () => console.log('clicked'), // eslint-disable-line no-console
   testID: 'icon-button-test-id',
 };
 
-export const Secondary = Template.bind({});
-Secondary.args = {
+export const OutlineDisabled = Template.bind({});
+OutlineDisabled.args = {
   'aria-label': 'Close',
   children: <IcoClose24 />,
-  variant: 'secondary',
-  onClick: () => console.log('clicked'), // eslint-disable-line no-console
-  testID: 'icon-button-test-id',
-};
-
-export const Disabled = Template.bind({});
-Disabled.args = {
-  'aria-label': 'Close',
-  children: <IcoClose24 />,
-  variant: 'primary',
+  variant: 'outline',
+  size: 'default',
   disabled: true,
   onClick: () => console.log('clicked'), // eslint-disable-line no-console
   testID: 'icon-button-test-id',

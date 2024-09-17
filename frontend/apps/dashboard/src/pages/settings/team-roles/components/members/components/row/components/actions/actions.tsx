@@ -1,6 +1,6 @@
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Dialog, Dropdown, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { Box, Dialog, Dropdown, IconButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -45,11 +45,15 @@ const Actions = ({ member }: ActionsProps) => {
   };
 
   return (
-    <Stack justify="flex-end">
+    <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
         <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
-          <Dropdown.Trigger aria-label={t('aria-label', { email })} variant="icon">
-            <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
+          <Dropdown.Trigger asChild>
+            <Box>
+              <IconButton aria-label={t('aria-label', { email })} size="tiny">
+                <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />
+              </IconButton>
+            </Box>
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Portal>

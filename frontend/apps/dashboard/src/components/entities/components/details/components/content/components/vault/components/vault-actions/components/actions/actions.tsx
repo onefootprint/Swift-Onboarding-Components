@@ -1,6 +1,6 @@
 import { IcoDotsHorizontal24, IcoPencil16 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
-import { Dropdown, IconButton } from '@onefootprint/ui';
+import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -89,10 +89,12 @@ const Actions = ({ entity }: WithEntityProps) => {
   return entity.kind === EntityKind.person ? (
     <>
       <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
-        <Dropdown.Trigger>
-          <IconButton variant="secondary" aria-label={t('cta')} size="compact">
-            <IcoDotsHorizontal24 />
-          </IconButton>
+        <Dropdown.Trigger asChild>
+          <Box>
+            <IconButton variant="outline" aria-label={t('cta')} size="compact">
+              <IcoDotsHorizontal24 />
+            </IconButton>
+          </Box>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
@@ -163,7 +165,7 @@ const Actions = ({ entity }: WithEntityProps) => {
     </>
   ) : (
     <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
-      <IconButton variant="secondary" aria-label={t('edit-business.label')} size="compact" onClick={editControls.start}>
+      <IconButton variant="outline" aria-label={t('edit-business.label')} size="compact" onClick={editControls.start}>
         <IcoPencil16 />
       </IconButton>
     </PermissionGate>

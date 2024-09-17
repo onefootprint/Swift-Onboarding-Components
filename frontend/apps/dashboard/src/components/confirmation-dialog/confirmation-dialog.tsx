@@ -17,6 +17,7 @@ const ConfirmationDialog = ({ children, isLoading, onClose, onConfirm, open, tit
   return (
     <Dialog
       size="compact"
+      isConfirmation
       open={open}
       onClose={onClose}
       title={title}

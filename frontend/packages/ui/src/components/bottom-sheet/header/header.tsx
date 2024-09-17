@@ -18,9 +18,11 @@ type HeaderProps = {
 const Header = ({ title, closeAriaLabel = 'Close', onClose }: HeaderProps) => (
   <Container $hasBorder={!!title} flexGrow={0}>
     <DialogPrimitive.Close asChild>
-      <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-        <IcoClose24 />
-      </IconButton>
+      <Box>
+        <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+          <IcoClose24 />
+        </IconButton>
+      </Box>
     </DialogPrimitive.Close>
     {title && (
       <Title>

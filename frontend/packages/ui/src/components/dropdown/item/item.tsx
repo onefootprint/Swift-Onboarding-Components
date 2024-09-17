@@ -17,11 +17,13 @@ const Item = ({
   size,
   variant,
   height,
+  onSelect,
   ...props
 }: ItemProps) => {
   const IconRight = asLink ? StyledIcoArrowTopRight16 : iconRight;
+
   return (
-    <RadixDropdown.Item {...props} asChild>
+    <RadixDropdown.Item {...props} onSelect={onSelect} asChild>
       <BaseItemContainer size={size} variant={variant} $height={height} layout="default">
         {IconLeft && <IconLeft color={variant === 'destructive' ? 'error' : undefined} />}
         <Stack direction="column" gap={1} flex={1} textDecoration="none">

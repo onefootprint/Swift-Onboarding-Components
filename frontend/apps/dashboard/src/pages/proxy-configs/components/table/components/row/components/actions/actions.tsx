@@ -1,7 +1,7 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ProxyConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Dropdown, Stack } from '@onefootprint/ui';
+import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -25,34 +25,34 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
   const removeRef = useRef<RemoveHandler>(null);
 
   const handleToggleStatus = () => {
-    if (dropdownOpen) {
-      setDropdownOpen(false);
-    }
+    setDropdownOpen(false);
     statusRef.current?.toggle();
   };
 
   const handleRemove = () => {
-    if (dropdownOpen) {
-      setDropdownOpen(false);
-    }
+    setDropdownOpen(false);
     removeRef.current?.remove();
   };
 
   return (
-    <Stack justify="flex-end">
+    <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <PermissionGate scopeKind={RoleScopeKind.manageVaultProxy} fallbackText={t('not-allowed')}>
-          <Dropdown.Trigger aria-label={t('aria-label', { name })}>
-            <IcoDotsHorizontal24 />
+          <Dropdown.Trigger asChild>
+            <Box>
+              <IconButton aria-label={t('aria-label', { name })} size="tiny">
+                <IcoDotsHorizontal24 />
+              </IconButton>
+            </Box>
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Portal>
           <Dropdown.Content align="end">
             <Dropdown.Group>
-              <Dropdown.Item onSelect={handleToggleStatus} onClick={event => event.stopPropagation()}>
+              <Dropdown.Item onSelect={handleToggleStatus}>
                 {proxyConfig.status === 'enabled' ? t('status.disable.cta') : t('status.enable.cta')}
               </Dropdown.Item>
-              <Dropdown.Item onSelect={handleRemove} onClick={event => event.stopPropagation()} variant="destructive">
+              <Dropdown.Item onSelect={handleRemove} variant="destructive">
                 {t('remove.cta')}
               </Dropdown.Item>
             </Dropdown.Group>

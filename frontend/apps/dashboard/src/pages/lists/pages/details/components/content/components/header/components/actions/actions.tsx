@@ -1,5 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { Dropdown, useConfirmationDialog } from '@onefootprint/ui';
+import { Dropdown, IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 
@@ -44,8 +44,10 @@ const Actions = ({ disabled }: ActionsProps) => {
 
   return (
     <Dropdown.Root>
-      <Dropdown.Trigger variant="button" aria-label={t('delete')} disabled={disabled}>
-        <IcoDotsHorizontal24 />
+      <Dropdown.Trigger aria-label={t('delete')} disabled={disabled}>
+        <IconButton aria-label={t('delete')} size="compact">
+          <IcoDotsHorizontal24 />
+        </IconButton>
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8}>

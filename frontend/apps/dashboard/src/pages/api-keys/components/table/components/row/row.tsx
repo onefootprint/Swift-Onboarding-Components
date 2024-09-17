@@ -1,7 +1,7 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Badge, Dropdown, Stack } from '@onefootprint/ui';
+import { Badge, Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';
@@ -38,8 +38,12 @@ const Row = ({ apiKey }: RowProps) => {
         <Stack justify="flex-end">
           <Dropdown.Root>
             <PermissionGate scopeKind={RoleScopeKind.apiKeys} fallbackText={t('manage.not-allowed')}>
-              <Dropdown.Trigger aria-label={t('manage.aria-label')} variant="icon">
-                <IcoDotsHorizontal24 />
+              <Dropdown.Trigger asChild>
+                <Box>
+                  <IconButton aria-label={t('manage.aria-label')} size="compact" variant="ghost">
+                    <IcoDotsHorizontal24 />
+                  </IconButton>
+                </Box>
               </Dropdown.Trigger>
             </PermissionGate>
             <Dropdown.Portal>

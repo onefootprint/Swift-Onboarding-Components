@@ -1,17 +1,23 @@
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-export type IconButtonSize = 'default' | 'large' | 'compact';
+export type IconButtonSize = 'default' | 'large' | 'compact' | 'tiny';
+
+export const iconButtonSizes: Record<IconButtonSize, string> = {
+  large: '40px',
+  default: '32px',
+  compact: '28px',
+  tiny: '24px',
+};
 
 export type IconButtonProps = {
   'aria-label': string;
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   testID?: string;
-  width?: string;
   size?: IconButtonSize;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'outline' | 'ghost';
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
@@ -26,74 +32,81 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       variant = 'ghost',
     }: IconButtonProps,
     ref,
-  ) => (
-    <Container
-      aria-label={ariaLabel}
-      data-testid={testID}
-      onClick={onClick}
-      ref={ref}
-      tabIndex={0}
-      type="button"
-      disabled={disabled}
-      size={size}
-      variant={variant}
-    >
-      {children}
-    </Container>
-  ),
+  ) => {
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      onClick?.(event);
+    };
+
+    return (
+      <Container
+        aria-label={ariaLabel}
+        data-testid={testID}
+        onClick={handleClick}
+        ref={ref}
+        tabIndex={0}
+        type="button"
+        disabled={disabled}
+        size={size}
+        variant={variant}
+      >
+        {children}
+      </Container>
+    );
+  },
 );
 
-const Container = styled.button<{ size: IconButtonSize; variant?: 'primary' | 'secondary' | 'ghost' }>`
+const Container = styled.button<{ size: IconButtonSize; variant?: 'outline' | 'ghost' }>`
   ${({ size, variant, theme }) => {
     const { button } = theme.components;
 
     const getVariantStyles = () => {
       const buttonSize = css`
-        height: ${button.size[size].height};
-        width: ${button.size[size].height};
+        height: ${iconButtonSizes[size]};
+        width: ${iconButtonSizes[size]};
       `;
 
-      if (variant === 'primary' || variant === 'secondary') {
+      if (variant === 'outline') {
         return css`
           ${buttonSize}
-          background-color: ${button.variant[variant].bg};
-          border: ${theme.borderWidth[1]} solid ${button.variant[variant].borderColor};
-          border-radius: ${theme.borderRadius.default};
-          box-shadow: ${button.variant[variant].boxShadow};
+          background-color: ${button.variant.secondary.bg};
+          border: ${theme.borderWidth[1]} solid ${button.variant.secondary.borderColor};
+          border-radius: ${size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
+          box-shadow: ${button.variant.secondary.boxShadow};
           svg {
             path {
-              fill: ${button.variant[variant].color};
+              fill: ${button.variant.secondary.color};
             }
           }
 
           &:disabled {
-            background-color: ${button.variant[variant].disabled.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[variant].disabled.borderColor};
-            box-shadow: ${button.variant[variant].disabled.boxShadow};
+            background-color: ${button.variant.secondary.disabled.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant.secondary.disabled.borderColor};
+            box-shadow: ${button.variant.secondary.disabled.boxShadow};
             svg {
               path {
-                fill: ${button.variant[variant].disabled.color};
+                fill: ${button.variant.secondary.disabled.color};
               }
             }
           }
 
           &:hover:enabled {
-            background-color: ${button.variant[variant].hover.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[variant].hover.borderColor};
-            box-shadow: ${button.variant[variant].hover.boxShadow};
+            background-color: ${button.variant.secondary.hover.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant.secondary.hover.borderColor};
+            box-shadow: ${button.variant.secondary.hover.boxShadow};
             svg {
               path {
-                fill: ${button.variant[variant].hover.color};
+                fill: ${button.variant.secondary.hover.color};
               }
             }
           }
 
           &:active:enabled { 
-            background-color: ${button.variant[variant].active.bg};
-            border: ${theme.borderWidth[1]} solid ${button.variant[variant].active.borderColor};
+            background-color: ${button.variant.secondary.active.bg};
+            border: ${theme.borderWidth[1]} solid ${button.variant.secondary.active.borderColor};
             svg {
               path {
-                fill: ${button.variant[variant].active.color};
+                fill: ${button.variant.secondary.active.color};
               }
             }
           }
@@ -104,7 +117,7 @@ const Container = styled.button<{ size: IconButtonSize; variant?: 'primary' | 's
         ${buttonSize}
         background: none;
         border: none;
-        border-radius: ${theme.borderRadius.default};
+        border-radius: ${size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
 
         &:disabled {
           cursor: initial;
@@ -127,9 +140,11 @@ const Container = styled.button<{ size: IconButtonSize; variant?: 'primary' | 's
       cursor: pointer;
       display: flex;
       justify-content: center;
+      box-sizing: border-box;
 
       ${getVariantStyles()}
     `;
   }}
 `;
+
 export default IconButton;

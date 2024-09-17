@@ -1,26 +1,23 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
+import type * as CSS from 'csstype';
 import styled, { css } from 'styled-components';
 
 import Text from '../../text';
 import type { TriggerProps } from '../dropdown.types';
 
-const DropdownTrigger = ({ children, variant = 'default', ...props }: TriggerProps) => {
-  switch (variant) {
-    case 'chevron':
-      return (
-        <ChevronTriggerContainer {...props}>
-          <Text variant="body-3" truncate>
-            {children}
-          </Text>
-          <IcoChevronDown16 className="chevronContainer" />
-        </ChevronTriggerContainer>
-      );
-    case 'icon':
-      return <IconTriggerContainer {...props}>{children}</IconTriggerContainer>;
-    default:
-      return <DefaultTriggerContainer {...props}>{children}</DefaultTriggerContainer>;
+const DropdownTrigger = ({ children, variant = 'default', maxWidth, ...props }: TriggerProps) => {
+  if (variant === 'chevron') {
+    return (
+      <ChevronTriggerContainer {...props}>
+        <Text variant="body-3" truncate>
+          {children}
+        </Text>
+        <IcoChevronDown16 className="chevronContainer" />
+      </ChevronTriggerContainer>
+    );
   }
+  return <DefaultTriggerContainer {...props}>{children}</DefaultTriggerContainer>;
 };
 
 const baseTriggerStyles = css`
@@ -34,32 +31,8 @@ const disabledStyles = css`
   opacity: 0.5;
 `;
 
-const IconTriggerContainer = styled(RadixDropdown.Trigger)`
-  ${({ theme }) => css`
-    ${baseTriggerStyles}
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: ${theme.color.primary};
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-    flex-shrink: 0;
-    width: ${theme.spacing[7]};
-    height: ${theme.spacing[7]};
-
-    &:not([data-disabled])[data-state='closed']:hover {
-      color: ${theme.color.secondary};
-      background-color: ${theme.backgroundColor.secondary};
-    }
-
-    &[data-disabled] {
-      ${disabledStyles}
-    }
-  `}
-`;
-
-const ChevronTriggerContainer = styled(RadixDropdown.Trigger)`
-  ${({ theme }) => css`
+const ChevronTriggerContainer = styled(RadixDropdown.Trigger)<{ maxWidth?: CSS.Property.Width }>`
+  ${({ theme, maxWidth }) => css`
     ${baseTriggerStyles}
     display: flex;
     gap: ${theme.spacing[1]};
@@ -69,7 +42,7 @@ const ChevronTriggerContainer = styled(RadixDropdown.Trigger)`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100%;
+    max-width: ${maxWidth};
 
     .chevronContainer {
       color: ${theme.color.primary};

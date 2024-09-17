@@ -1,8 +1,8 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind, RoleScopeKind } from '@onefootprint/types';
-import { Dropdown, Stack } from '@onefootprint/ui';
-import { useRef } from 'react';
+import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -21,6 +21,7 @@ type ActionsProps = {
 
 const Actions = ({ playbook }: ActionsProps) => {
   const { name, status, kind } = playbook;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.table.actions',
   });
@@ -31,27 +32,35 @@ const Actions = ({ playbook }: ActionsProps) => {
   const canShowLink = kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
 
   const handleToggleStatus = () => {
+    setDropdownOpen(false);
     statusRef.current?.toggle();
   };
 
   const launchEditName = () => {
+    setDropdownOpen(false);
     editNameRef.current?.launch();
   };
 
   const launchCopy = () => {
+    setDropdownOpen(false);
     copyRef.current?.launch();
   };
 
   const copyLinkToClipboard = () => {
+    setDropdownOpen(false);
     copyLinkRef.current?.launch();
   };
 
   return (
-    <Stack justify="flex-end">
-      <Dropdown.Root>
+    <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
+      <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
-          <Dropdown.Trigger aria-label={t('aria-label', { name })} variant="icon">
-            <IcoDotsHorizontal24 />
+          <Dropdown.Trigger asChild>
+            <Box>
+              <IconButton aria-label={t('aria-label', { name })} size="compact">
+                <IcoDotsHorizontal24 />
+              </IconButton>
+            </Box>
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Portal>

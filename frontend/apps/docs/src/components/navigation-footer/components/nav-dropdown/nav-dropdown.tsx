@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowTopRight16, IcoDotsHorizontal24, IcoLogOut16 } from '@onefootprint/icons';
-import { Box, Dropdown, Text } from '@onefootprint/ui';
+import { Box, Dropdown, IconButton, Text } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,8 +34,12 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
   return (
     <>
       <Dropdown.Root onOpenChange={setIsDropdownOpen} open={isDropdownOpen}>
-        <Dropdown.Trigger aria-label="Account" variant="icon">
-          <IcoDotsHorizontal24 testID="nav-dropdown-button" />
+        <Dropdown.Trigger asChild>
+          <Box>
+            <IconButton aria-label="Account" size="compact">
+              <IcoDotsHorizontal24 testID="nav-dropdown-button" />
+            </IconButton>
+          </Box>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content sideOffset={8} maxWidth="260px" align="start">

@@ -2,6 +2,7 @@ import { IcoClose16 } from '@onefootprint/icons';
 import { WhatsThisContent } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IconButton, Stack, createFontStyles } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import * as Popover from '@radix-ui/react-popover';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -20,9 +21,11 @@ const WhatsThisPopover = ({ config }: WhatsThisPopoverProps) => {
       <PopoverContent sideOffset={8}>
         <Stack direction="row" align="center" height="52px" justify="start" marginLeft={3}>
           <CloseBounds asChild>
-            <IconButton aria-label="close">
-              <IcoClose16 />
-            </IconButton>
+            <Box>
+              <IconButton aria-label="close">
+                <IcoClose16 />
+              </IconButton>
+            </Box>
           </CloseBounds>
         </Stack>
         <Stack paddingLeft={7} paddingRight={7} paddingBottom={7}>

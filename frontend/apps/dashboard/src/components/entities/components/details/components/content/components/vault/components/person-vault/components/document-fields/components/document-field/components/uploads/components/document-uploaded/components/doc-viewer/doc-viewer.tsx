@@ -49,9 +49,11 @@ const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) =>
         <Container onEscapeKeyDown={handleEscapeKeyDown} onPointerDownOutside={handleClose}>
           <Header>
             <Dialog.Close asChild>
-              <IconButton aria-label="close" onClick={handleClose}>
-                <IcoClose16 />
-              </IconButton>
+              <Box>
+                <IconButton aria-label="close" onClick={handleClose}>
+                  <IcoClose16 />
+                </IconButton>
+              </Box>
             </Dialog.Close>
             <Dialog.Title asChild>
               <Text variant="label-2">{documentName}</Text>
