@@ -3,6 +3,7 @@ use api_core::auth::Any;
 use api_core::errors::ValidationError;
 use api_core::ApiResponse;
 use newtypes::FpId;
+use newtypes::VaultId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
@@ -12,6 +13,7 @@ use paperclip::actix::{
 #[derive(serde::Serialize, Apiv2Schema, macros::JsonResponder)]
 pub struct PrivateUserInfo {
     fp_id: Option<FpId>,
+    vault_id: VaultId,
 }
 
 #[api_v2_operation(
@@ -32,6 +34,7 @@ pub async fn get(user_auth: UserAuthContext) -> ApiResponse<PrivateUserInfo> {
 
     let result = PrivateUserInfo {
         fp_id: user_auth.scoped_user().map(|sv| sv.fp_id.clone()),
+        vault_id: user_auth.user_vault_id.clone(),
     };
     Ok(result)
 }

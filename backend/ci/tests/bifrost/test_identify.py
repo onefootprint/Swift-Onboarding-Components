@@ -104,8 +104,8 @@ def vault2(sandbox_id, sandbox_tenant):
     bifrost = BifrostClient.new_user(
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
-    bifrost.data["id.first_name"] = "From Tenant A"
-    bifrost.run()
+    user = bifrost.run()
+    return get("hosted/user/private_info", None, user.client.auth_token)
 
 
 @pytest.fixture(scope="function")
@@ -150,8 +150,8 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     bifrost = BifrostClient.raw_auth(
         foo_sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
-    bifrost.data["id.first_name"] = "From Tenant B"
-    bifrost.run()
+    user = bifrost.run()
+    return get("hosted/user/private_info", None, user.client.auth_token)
 
 
 @pytest.fixture(scope="session")
@@ -185,23 +185,31 @@ def test_identify_priority(
     """
     vault1, vault2, vault3, vault4
     tests = [
-        (sandbox_tenant, sandbox_tenant.default_ob_config, "From Tenant A"),
-        (foo_sandbox_tenant, foo_sandbox_tenant.default_ob_config, "From Tenant B"),
+        (
+            sandbox_tenant,
+            sandbox_tenant.default_ob_config,
+            vault2["vault_id"],
+            vault2["fp_id"],
+        ),
+        (
+            foo_sandbox_tenant,
+            foo_sandbox_tenant.default_ob_config,
+            vault4["vault_id"],
+            vault4["fp_id"],
+        ),
         # This tenant doesn't have any fp_id with the contact info, so it should inherit the
         # one created by bifrost
-        (tenant, tenant_sandbox_obc, "From Tenant A"),
+        (tenant, tenant_sandbox_obc, vault2["vault_id"], None),
     ]
 
-    for i, (tenant, obc, expected_first_name) in enumerate(tests):
-        # Since the vault ID isn't public, the only way to really figure out which vault is selected
-        # by identify is to onboard it and check the PII
-        # Maybe it would be nice to expose via API to integration tests the underlying vault ID
+    for i, (tenant, obc, expected_vault_id, expected_fp_id) in enumerate(tests):
         # TODO test identifying on email
-        bifrost = BifrostClient.inherit_user(obc, sandbox_id)
-        fp_id = bifrost.run().fp_id
-        data = dict(fields=["id.first_name"], reason="flerp")
-        body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
-        assert body["id.first_name"] == expected_first_name, f"Incorrect user for {i}"
+        auth_token = IdentifyClient(obc, sandbox_id).inherit()
+        body = get("hosted/user/private_info", None, auth_token)
+        assert body["vault_id"] == expected_vault_id
+
+        if expected_fp_id:
+            assert body["fp_id"] == expected_fp_id
 
 
 def test_identify_with_non_portable_api_vault(
@@ -214,23 +222,20 @@ def test_identify_with_non_portable_api_vault(
     of inheriting the vault from another tenant. Otherwise this tenant would have two fp_ids
     for the same underlying user.
     """
+    vault2
 
     # Create the unverified user via API at this tenant
     sandbox_id_h = SandboxId(sandbox_id)
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
         "id.email": FIXTURE_EMAIL,
-        "id.first_name": "From Tenant C",
-        "id.last_name": "Penguin",
     }
-    post("users", vault_data, tenant.s_sk, sandbox_id_h)
+    body = post("users", vault_data, tenant.s_sk, sandbox_id_h)
+    fp_id_c = body["id"]
 
-    vault2
-    bifrost = BifrostClient.inherit_user(tenant_sandbox_obc, sandbox_id)
-    fp_id = bifrost.run().fp_id
-    data = dict(fields=["id.first_name"], reason="flerp")
-    body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
-    assert body["id.first_name"] == "From Tenant C"
+    auth_token = IdentifyClient(tenant_sandbox_obc, sandbox_id).inherit()
+    body = get("hosted/user/private_info", None, auth_token)
+    assert body["fp_id"] == fp_id_c
 
 
 def test_multi_identify(sandbox_user, sandbox_tenant):
