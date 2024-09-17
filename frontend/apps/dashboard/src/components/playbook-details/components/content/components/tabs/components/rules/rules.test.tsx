@@ -390,7 +390,7 @@ describe('<Rules />', () => {
         expect(saveButton).toBeInTheDocument();
         await userEvent.click(saveButton);
         await waitFor(() => {
-          expect(saveButton).toBeInTheDocument();
+          expect(saveButton).not.toBeInTheDocument();
         });
 
         // New rules are displayed

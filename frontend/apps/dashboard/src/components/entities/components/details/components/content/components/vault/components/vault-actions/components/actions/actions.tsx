@@ -45,42 +45,50 @@ const Actions = ({ entity }: WithEntityProps) => {
   const { hasPermission } = usePermissions();
   const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
   const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
   };
 
   const handleOpenRequestMoreInfoDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.requestMoreInfo);
   };
 
   const handleOpenAuthMethodsDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.auth);
   };
 
   const handleOpenAddToListDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.addToList);
   };
 
   const handleOpenSummarizeDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.summarize);
   };
 
   const handleOpenUploadDocDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.uploadDoc);
   };
 
   const handleOpenHistoricalDataDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.historicalData);
   };
 
   const handleOpenEditTagsDialog = () => {
+    setDropdownOpen(false);
     setOpenDialog(ActionDialog.editTags);
   };
 
   return entity.kind === EntityKind.person ? (
     <>
-      <Dropdown.Root>
+      <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
         <Dropdown.Trigger>
           <IconButton variant="secondary" aria-label={t('cta')} size="compact">
             <IcoDotsHorizontal24 />

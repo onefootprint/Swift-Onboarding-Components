@@ -25,6 +25,9 @@ const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) =
     <Dialog
       size="compact"
       title={t('pages.entity.decrypt.start')}
+      headerIcon={{ onClick: loading ? noop : onClose }}
+      onClose={loading ? noop : onClose}
+      open={open}
       primaryButton={{
         form: 'decrypt-reason-form',
         label: t('pages.entity.decrypt.decrypt'),
@@ -36,9 +39,6 @@ const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) =
         onClick: onClose,
         disabled: loading,
       }}
-      headerIcon={{ onClick: loading ? noop : onClose }}
-      onClose={loading ? noop : onClose}
-      open={open}
     >
       <ReasonForm onSubmit={handleSubmit} />
     </Dialog>

@@ -43,6 +43,8 @@ const FreeFormNoteEntryDialog = ({ open, onClose }: FreeFormNoteEntryDialogProps
     <Dialog
       size="compact"
       title={t('dialog.title')}
+      onClose={onClose}
+      open={open}
       primaryButton={{
         form: 'free-form-note-form',
         label: t('dialog.save'),
@@ -54,8 +56,6 @@ const FreeFormNoteEntryDialog = ({ open, onClose }: FreeFormNoteEntryDialogProps
         onClick: onClose,
         disabled: submitFreeFormMutation.isLoading,
       }}
-      onClose={onClose}
-      open={open}
     >
       <ManualNoteEntryForm
         formId="free-form-note-form"

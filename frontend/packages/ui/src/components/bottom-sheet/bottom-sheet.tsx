@@ -1,6 +1,8 @@
 'use client';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +64,9 @@ const BottomSheet = ({
     <DialogPrimitive.Root open={open} onOpenChange={onClose}>
       <DialogPrimitive.Portal container={portalRef.current || undefined}>
         <Content role="dialog" onPointerDownOutside={onClose}>
+          <DialogPrimitive.Title asChild>
+            <VisuallyHidden>{title}</VisuallyHidden>
+          </DialogPrimitive.Title>
           <Stack maxHeight={componentMaxHeight} direction="column">
             <Header
               closeAriaLabel={closeAriaLabel ?? t('components.bottom-sheet.close-aria-label-default')}

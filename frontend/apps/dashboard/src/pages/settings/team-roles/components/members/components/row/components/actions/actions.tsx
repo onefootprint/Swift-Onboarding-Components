@@ -19,10 +19,12 @@ const Actions = ({ member }: ActionsProps) => {
     keyPrefix: 'pages.members.table.actions',
   });
   const { email, firstName, lastName, id } = member;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const removeMemberMutation = useRemoveMember(email);
 
   const showConfirmation = () => {
+    setDropdownOpen(false);
     setOpen(true);
   };
 
@@ -44,7 +46,7 @@ const Actions = ({ member }: ActionsProps) => {
 
   return (
     <Stack justify="flex-end">
-      <Dropdown.Root>
+      <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
         <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <Dropdown.Trigger aria-label={t('aria-label', { email })} variant="icon">
             <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />

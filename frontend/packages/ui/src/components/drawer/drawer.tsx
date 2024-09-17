@@ -66,7 +66,12 @@ const Drawer = ({
   return (
     <DrawerPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <DrawerPrimitive.Portal>
-        <DrawerContainer onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} role="dialog">
+        <DrawerContainer
+          onEscapeKeyDown={onClose}
+          onPointerDownOutside={onClickOutside}
+          role="dialog"
+          aria-describedby={undefined}
+        >
           <DrawerSurface>
             <Header
               closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}

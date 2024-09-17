@@ -12,10 +12,12 @@ export type ManualReviewProps = {
 
 const ManualReview = ({ kind, status, disabled }: ManualReviewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
   const shouldShowDialog = dialogOpen && reviewStatus;
 
   const handleSelect = (dialogStatus: ReviewStatus) => {
+    setDropdownOpen(false);
     setReviewStatus(dialogStatus);
     setDialogOpen(true);
   };
@@ -27,7 +29,14 @@ const ManualReview = ({ kind, status, disabled }: ManualReviewProps) => {
 
   return (
     <>
-      <ManualReviewTrigger status={status} kind={kind} onSelect={handleSelect} disabled={disabled} />
+      <ManualReviewTrigger
+        status={status}
+        kind={kind}
+        onSelect={handleSelect}
+        disabled={disabled}
+        onOpenChange={setDropdownOpen}
+        open={dropdownOpen}
+      />
       {shouldShowDialog && <ManualReviewDialog status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />}
     </>
   );

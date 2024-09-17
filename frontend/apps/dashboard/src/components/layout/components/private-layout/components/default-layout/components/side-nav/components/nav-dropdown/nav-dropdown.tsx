@@ -25,7 +25,7 @@ export type NavDropdownProps = {
 
 const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdownProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.nav' });
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
   const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
@@ -37,14 +37,12 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
 
   const handleTenantChange = (tenantId: string) => {
     onAssumeTenant(tenantId);
-    setIsOpen(false);
+    setIsDropdownOpen(false);
   };
 
   const handleGlossaryOpen = () => {
-    setIsOpen(false);
-    setTimeout(() => {
-      setIsGlossaryOpen(true);
-    }, 50);
+    setIsDropdownOpen(false);
+    setIsGlossaryOpen(true);
   };
 
   const handleGlossaryClose = () => {
@@ -60,6 +58,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
   };
 
   const handleWhatsNewOpen = () => {
+    setIsDropdownOpen(false);
     setIsWhatsNewOpen(true);
   };
 
@@ -69,55 +68,53 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
 
   return (
     <>
-      <Dropdown.Root onOpenChange={setIsOpen} open={isOpen}>
+      <Dropdown.Root onOpenChange={setIsDropdownOpen} open={isDropdownOpen}>
         <Dropdown.Trigger aria-label="Account" variant="icon">
           <IcoDotsHorizontal24 testID="nav-dropdown-button" />
         </Dropdown.Trigger>
-        {isOpen && (
-          <Dropdown.Portal>
-            <Dropdown.Content sideOffset={8} maxWidth="260px" align="start">
-              <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
-              <Dropdown.Separator />
-              {tenants?.length > 1 ? (
-                <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
-              ) : null}
-              <Dropdown.Separator />
-              <Dropdown.Group>
-                <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
-                  <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
-                    {t('help-links.documentation')}
-                  </Link>
-                </Dropdown.Item>
-                <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
-                  <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
-                    {t('help-links.api-reference')}
-                  </Link>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <button type="button" onClick={handleGlossaryOpen}>
-                    {t('help-links.risk-signals-glossary')}
-                  </button>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <button type="button" onClick={handlePgpHelperOpen}>
-                    {t('help-links.pgp-helper-tool')}
-                  </button>
-                </Dropdown.Item>
-                <Dropdown.Item>
-                  <button type="button" onClick={handleWhatsNewOpen}>
-                    {t('whats-new.title')}
-                  </button>
-                </Dropdown.Item>
-              </Dropdown.Group>
-              <Dropdown.Separator />
-              <Dropdown.Group>
-                <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
-                  {t('log-out')}
-                </Dropdown.Item>
-              </Dropdown.Group>
-            </Dropdown.Content>
-          </Dropdown.Portal>
-        )}
+        <Dropdown.Portal>
+          <Dropdown.Content sideOffset={8} maxWidth="260px" align="start">
+            <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
+            <Dropdown.Separator />
+            {tenants?.length > 1 ? (
+              <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
+            ) : null}
+            <Dropdown.Separator />
+            <Dropdown.Group>
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
+                  {t('help-links.documentation')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
+                <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/api-reference`} target="_blank">
+                  {t('help-links.api-reference')}
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handleGlossaryOpen}>
+                  {t('help-links.risk-signals-glossary')}
+                </button>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handlePgpHelperOpen}>
+                  {t('help-links.pgp-helper-tool')}
+                </button>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <button type="button" onClick={handleWhatsNewOpen}>
+                  {t('whats-new.title')}
+                </button>
+              </Dropdown.Item>
+            </Dropdown.Group>
+            <Dropdown.Separator />
+            <Dropdown.Group>
+              <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
+                {t('log-out')}
+              </Dropdown.Item>
+            </Dropdown.Group>
+          </Dropdown.Content>
+        </Dropdown.Portal>
       </Dropdown.Root>
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
       <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />

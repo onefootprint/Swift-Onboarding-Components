@@ -17,9 +17,9 @@ describe('<Dialog />', () => {
     linkButton,
     size,
     testID,
-    open,
+    open = true,
     children = 'content',
-    isConfirmation,
+    isConfirmation = false,
   }: Partial<DialogProps>) =>
     customRender(
       // we need to ignore ts-lint given the constraints we have

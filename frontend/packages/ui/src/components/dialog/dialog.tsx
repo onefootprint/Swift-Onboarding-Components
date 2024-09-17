@@ -1,22 +1,16 @@
-'use client';
-
 import { IcoClose24 } from '@onefootprint/icons';
-import FocusTrap from 'focus-trap-react';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import type React from 'react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useElementSize, useLockedBody } from 'usehooks-ts';
 
-import { useEventListener, useOnClickOutside } from '../../hooks';
 import media from '../../utils/media';
 import Box from '../box';
 import Button from '../button';
-import Fade from '../fade';
 import IconButton from '../icon-button';
 import LinkButton from '../link-button';
 import Overlay from '../overlay';
-import Portal from '../portal';
 import ScrollArea from '../scroll-area';
 import Text from '../text';
 import type {
@@ -32,10 +26,10 @@ import type {
 } from './dialog.types';
 
 export type DialogProps = {
+  onClose: () => void;
+  open: boolean;
   children?: React.ReactNode;
   headerIcon?: DialogHeaderIcon;
-  onClose: () => void;
-  open?: boolean;
   size?: DialogSize;
   testID?: string;
   title: string;
@@ -75,119 +69,109 @@ const Dialog = ({
 }: DialogProps) => {
   const { t } = useTranslation('ui');
   const dialogRef = useRef<HTMLDivElement>(null);
-  useLockedBody(open);
-  const handleClickOutside = () => {
-    if (size !== 'full-screen') {
-      onClose();
-    }
-  };
-  useOnClickOutside(dialogRef, handleClickOutside);
-  useEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  });
 
-  const [footerRef, { height: footerHeight }] = useElementSize();
-
-  return open ? (
-    <Portal selector="#footprint-portal">
-      <FocusTrap>
-        <DialogContainer
-          role="dialog"
-          aria-label={title}
-          testID={testID}
-          isVisible={open}
-          from="center"
-          to="center"
-          size={size}
-          disableResponsiveness={disableResponsiveness}
-          onClick={(event: React.MouseEvent<HTMLDivElement>) => {
-            event.stopPropagation();
-          }}
-          isConfirmation={isConfirmation}
-          ref={dialogRef}
+  return (
+    <RadixDialog.Root open={open} onOpenChange={onClose}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay asChild>
+          <Overlay isVisible={open} />
+        </RadixDialog.Overlay>
+        <RadixDialog.Content
+          onPointerDownOutside={onClose}
+          onEscapeKeyDown={onClose}
+          forceMount
+          asChild
+          aria-describedby={undefined}
         >
-          <Header>
-            <CloseContainer>
-              <IconButton
-                aria-label={headerIconAriaLabel ?? t('components.dialog.header-icon.aria-label-default')}
-                onClick={onHeaderIconClick}
-              >
-                <HeaderIconComponent />
-              </IconButton>
-            </CloseContainer>
-            <Text variant="label-2">{title}</Text>
-
-            <HeaderButtonContainer>
-              {headerButton && (
-                <Button
-                  disabled={headerButton.disabled}
-                  form={headerButton.form}
-                  loading={headerButton.loading}
-                  loadingAriaLabel={headerButton.loadingAriaLabel}
-                  onClick={headerButton.onClick}
-                  type={headerButton.type}
-                  variant="primary"
-                >
-                  {headerButton.label}
-                </Button>
-              )}
-            </HeaderButtonContainer>
-          </Header>
-          <ScrollArea
-            paddingTop={7}
-            paddingBottom={5}
-            paddingLeft={7}
-            paddingRight={7}
-            maxHeight={`calc(100% - ${footerHeight}px)`}
+          <DialogContainer
+            aria-label={title}
+            data-testid={testID}
+            aria-describedby={undefined}
+            size={size}
+            $disableResponsiveness={disableResponsiveness}
+            $isConfirmation={isConfirmation}
+            ref={dialogRef}
           >
-            {children}
-          </ScrollArea>
-          {linkButton || primaryButton || secondaryButton ? (
-            <Footer ref={footerRef}>
-              <Box>
-                {linkButton && (
-                  <LinkButton onClick={linkButton.onClick} type={linkButton.type} form={linkButton.form}>
-                    {linkButton.label}
-                  </LinkButton>
-                )}
-              </Box>
-              <ButtonsContainer>
-                {secondaryButton && (
-                  <Button
-                    disabled={secondaryButton.disabled}
-                    form={secondaryButton.form}
-                    loading={secondaryButton.loading}
-                    loadingAriaLabel={secondaryButton.loadingAriaLabel}
-                    onClick={secondaryButton.onClick}
-                    type={secondaryButton.type}
-                    variant="secondary"
+            <Header>
+              <CloseContainer>
+                <RadixDialog.Close asChild>
+                  <IconButton
+                    aria-label={headerIconAriaLabel ?? t('components.dialog.header-icon.aria-label-default')}
+                    onClick={onHeaderIconClick}
                   >
-                    {secondaryButton.label}
-                  </Button>
-                )}
-                {primaryButton && (
+                    <HeaderIconComponent />
+                  </IconButton>
+                </RadixDialog.Close>
+              </CloseContainer>
+              <RadixDialog.Title asChild>
+                <Text variant="label-2">{title}</Text>
+              </RadixDialog.Title>
+              <HeaderButtonContainer>
+                {headerButton && (
                   <Button
-                    disabled={primaryButton.disabled}
-                    form={primaryButton.form}
-                    loading={primaryButton.loading}
-                    loadingAriaLabel={primaryButton.loadingAriaLabel}
-                    onClick={primaryButton.onClick}
-                    type={primaryButton.type}
+                    disabled={headerButton.disabled}
+                    form={headerButton.form}
+                    loading={headerButton.loading}
+                    loadingAriaLabel={headerButton.loadingAriaLabel}
+                    onClick={headerButton.onClick}
+                    type={headerButton.type}
                     variant="primary"
                   >
-                    {primaryButton.label}
+                    {headerButton.label}
                   </Button>
                 )}
-              </ButtonsContainer>
-            </Footer>
-          ) : null}
-        </DialogContainer>
-      </FocusTrap>
-      <Overlay isVisible={open} isConfirmation={isConfirmation} />
-    </Portal>
-  ) : null;
+              </HeaderButtonContainer>
+            </Header>
+            <ContentWrapper>
+              <ScrollArea paddingTop={7} paddingBottom={5} paddingLeft={7} paddingRight={7} maxHeight="100%">
+                {children}
+              </ScrollArea>
+            </ContentWrapper>
+            {linkButton || primaryButton || secondaryButton ? (
+              <Footer>
+                <Box>
+                  {linkButton && (
+                    <LinkButton onClick={linkButton.onClick} type={linkButton.type} form={linkButton.form}>
+                      {linkButton.label}
+                    </LinkButton>
+                  )}
+                </Box>
+                <ButtonsContainer>
+                  {secondaryButton && (
+                    <Button
+                      disabled={secondaryButton.disabled}
+                      form={secondaryButton.form}
+                      loading={secondaryButton.loading}
+                      loadingAriaLabel={secondaryButton.loadingAriaLabel}
+                      onClick={secondaryButton.onClick}
+                      type={secondaryButton.type}
+                      variant="secondary"
+                    >
+                      {secondaryButton.label}
+                    </Button>
+                  )}
+                  {primaryButton && (
+                    <Button
+                      disabled={primaryButton.disabled}
+                      form={primaryButton.form}
+                      loading={primaryButton.loading}
+                      loadingAriaLabel={primaryButton.loadingAriaLabel}
+                      onClick={primaryButton.onClick}
+                      type={primaryButton.type}
+                      variant="primary"
+                      autoFocus={isConfirmation}
+                    >
+                      {primaryButton.label}
+                    </Button>
+                  )}
+                </ButtonsContainer>
+              </Footer>
+            ) : null}
+          </DialogContainer>
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
+  );
 };
 
 const getSize = (size: DialogSize, isConfirmation: boolean) => {
@@ -225,39 +209,42 @@ const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize) => {
   return false;
 };
 
-const DialogContainer = styled(Fade)<{
+const DialogContainer = styled(Box)<{
   size: DialogSize;
-  disableResponsiveness: boolean;
-  isConfirmation: boolean;
-  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  $disableResponsiveness: boolean;
+  $isConfirmation: boolean;
 }>`
-  ${({ theme, disableResponsiveness, size, isConfirmation }) => css`
+  ${({ theme, $disableResponsiveness, size, $isConfirmation }) => css`
     background-color: ${theme.backgroundColor.primary};
     display: flex;
     flex-direction: column;
     isolation: isolate;
     justify-content: stretch;
     position: fixed;
-    z-index: ${isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
-    width: ${getSize(size, isConfirmation)};
+    z-index: ${$isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
+    width: ${getSize(size, $isConfirmation)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
     height: ${size === 'full-screen' ? '100vh' : 'inherit'};
     max-height: ${size !== 'full-screen' ? `calc(100vh - 2 * ${theme.spacing[9]})` : 'inherit'};
     border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
-    top: ${getDistanceFromTop(isConfirmation, size) || theme.spacing[9]};
+    top: ${getDistanceFromTop($isConfirmation, size) || theme.spacing[9]};
     box-shadow: ${theme.elevation[2]};
     left: 50%;
-    transform: ${isConfirmation ? 'translate(-50%, -50%)' : 'translate(-50%, 0%)'} !important;
-    z-index: ${isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
+    transform: ${$isConfirmation ? 'translate(-50%, -50%)' : 'translate(-50%, 0%)'};
+    z-index: ${$isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
 
     ${
-      !disableResponsiveness &&
+      !$disableResponsiveness &&
       media.lessThan('sm')`
         top: 0;
-        max-height: none;
-        width: 100vw;
+        left: 0;
+        right: 0;
+        max-height: 100dvh;
+        width: 100%;
+        max-width: 100%;
         height: 100vh;
         border-radius: 0;
+        transform: none;
     `
     };
   `}
@@ -290,6 +277,13 @@ const HeaderButtonContainer = styled.div`
     position: absolute;
     right: ${theme.spacing[5]};
   `}
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Footer = styled.footer`

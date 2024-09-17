@@ -68,7 +68,6 @@
     "@storybook/addon-actions": "^8.2.9",
     "@storybook/addon-essentials": "^8.2.9",
     "@storybook/addon-interactions": "^8.2.9",
-    "storybook-addon-pseudo-states": "^4.0.2",
     "@storybook/addon-links": "^8.2.9",
     "@storybook/blocks": "^8.2.9",
     "@storybook/nextjs": "^8.2.9",
@@ -97,6 +96,7 @@
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
     "storybook": "^8.2.9",
+    "storybook-addon-pseudo-states": "^4.0.2",
     "tsconfig": "*",
     "typescript": "^5.5.2",
     "webpack": "*"

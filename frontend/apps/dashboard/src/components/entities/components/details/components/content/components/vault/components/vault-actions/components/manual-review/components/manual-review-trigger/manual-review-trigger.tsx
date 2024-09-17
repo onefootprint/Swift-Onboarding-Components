@@ -8,9 +8,11 @@ type ManualReviewTriggerProps = {
   status: EntityStatus;
   onSelect: (reviewStatus: ReviewStatus) => void;
   disabled?: boolean;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 };
 
-const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewTriggerProps) => {
+const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, open }: ManualReviewTriggerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.manual-review',
   });
@@ -18,7 +20,7 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewT
   const fail = t(`status.${ReviewStatus.fail}` as ParseKeys<'common'>);
 
   return (
-    <Dropdown.Root>
+    <Dropdown.Root open={open} onOpenChange={onOpenChange}>
       <Dropdown.Trigger asChild disabled={disabled}>
         <Button size="compact">
           {kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}
