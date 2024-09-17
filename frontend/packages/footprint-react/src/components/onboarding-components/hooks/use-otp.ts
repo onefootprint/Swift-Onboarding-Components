@@ -235,6 +235,8 @@ const useOtp = () => {
       verifiedAuthToken: response.authToken,
       authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
+
+    return { validationToken: response.validationToken };
   };
 
   return {

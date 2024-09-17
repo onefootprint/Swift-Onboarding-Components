@@ -168,11 +168,12 @@ export const verifyChallenge = async (
   options: { token: string; sandboxOutcome?: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
-  await getValidationToken({ token: response.authToken });
+  const { validationToken } = await getValidationToken({ token: response.authToken });
   await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
   const vaultingToken = await createVaultingToken({ authToken: response.authToken });
   return {
     authToken: response.authToken,
     vaultingToken: vaultingToken.token,
+    validationToken,
   };
 };
