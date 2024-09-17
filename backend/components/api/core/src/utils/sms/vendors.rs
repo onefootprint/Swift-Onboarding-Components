@@ -90,15 +90,23 @@ impl SmsVendor for TwilioSms {
             Ok(msg)
             | Err(twilio::error::Error::DeliveryFailed(msg))
             | Err(twilio::error::Error::NotDeliveredAfterTimeout(msg)) => {
-                let log = NewTwilioMessageLog {
-                    message_id: msg.sid.clone(),
-                    account_sid: twilio_client.account_sid().to_string(),
-                    tenant_id: t_id.cloned(),
-                    vault_id: v_id.cloned(),
-                    status: msg.status.to_string().to_lowercase(),
-                    error: msg.error_code.map(|e| e.to_string()),
-                };
-                db_pool.db_query(move |conn| log.update_or_create(conn)).await?;
+                let msg = msg.clone();
+                let t_id = t_id.cloned();
+                let v_id = v_id.cloned();
+
+                db_pool
+                    .db_query(move |conn| {
+                        NewTwilioMessageLog::update_or_create(
+                            conn,
+                            msg.sid,
+                            msg.account_sid,
+                            t_id,
+                            v_id,
+                            msg.status.to_string().to_lowercase(),
+                            msg.error_code.map(|e| e.to_string()),
+                        )
+                    })
+                    .await?;
             }
             _ => (),
         };
@@ -135,16 +143,23 @@ impl SmsVendor for TwilioWhatsapp {
                 Ok(SmsSendStatus::Unsent)
             }
             Err(e) => Err(e.into()),
-            Ok(message) => {
-                let log = NewTwilioMessageLog {
-                    message_id: message.sid,
-                    account_sid: twilio_client.account_sid().to_string(),
-                    tenant_id: t_id.cloned(),
-                    vault_id: v_id.cloned(),
-                    status: message.status.to_string().to_lowercase(),
-                    error: message.error_message,
-                };
-                db_pool.db_query(move |conn| log.update_or_create(conn)).await?;
+            Ok(msg) => {
+                let t_id = t_id.cloned();
+                let v_id = v_id.cloned();
+
+                db_pool
+                    .db_query(move |conn| {
+                        NewTwilioMessageLog::update_or_create(
+                            conn,
+                            msg.sid,
+                            msg.account_sid,
+                            t_id,
+                            v_id,
+                            msg.status.to_string().to_lowercase(),
+                            msg.error_code.map(|e| e.to_string()),
+                        )
+                    })
+                    .await?;
                 Ok(SmsSendStatus::Sent)
             }
         };

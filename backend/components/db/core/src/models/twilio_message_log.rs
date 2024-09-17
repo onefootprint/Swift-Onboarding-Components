@@ -63,30 +63,49 @@ impl TwilioMessageLog {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = twilio_message_log)]
 pub struct NewTwilioMessageLog {
-    pub message_id: String,
-    pub account_sid: String,
-    pub tenant_id: Option<TenantId>,
-    pub vault_id: Option<VaultId>,
-    pub status: String,
-    pub error: Option<String>,
+    message_id: String,
+    account_sid: String,
+    tenant_id: Option<TenantId>,
+    vault_id: Option<VaultId>,
+    status: String,
+    error: Option<String>,
+    created_at: DateTime<Utc>,
 }
 
 impl NewTwilioMessageLog {
     /// Inserts a new Twilio message log into the database
     /// if one already exists -- it came from the webhook faster than we stored it
     /// so we just update it with relevent fields
-    #[tracing::instrument(name = "NewTwilioMessageLog::update_or_create", skip(self, conn))]
-    pub fn update_or_create(self, conn: &mut PgConn) -> DbResult<()> {
+    #[tracing::instrument(name = "NewTwilioMessageLog::update_or_create", skip(conn))]
+    pub fn update_or_create(
+        conn: &mut PgConn,
+        message_id: String,
+        account_sid: String,
+        tenant_id: Option<TenantId>,
+        vault_id: Option<VaultId>,
+        status: String,
+        error: Option<String>,
+    ) -> DbResult<()> {
         let created_at = Utc::now();
 
+        let log = NewTwilioMessageLog {
+            message_id,
+            account_sid,
+            tenant_id,
+            vault_id,
+            status,
+            error,
+            created_at,
+        };
+
         diesel::insert_into(twilio_message_log::table)
-            .values(&self)
+            .values(&log)
             .on_conflict(twilio_message_log::message_id)
             .do_update()
             .set((
-                twilio_message_log::created_at.eq(&created_at),
-                twilio_message_log::tenant_id.eq(&self.tenant_id),
-                twilio_message_log::vault_id.eq(&self.vault_id),
+                twilio_message_log::created_at.eq(&log.created_at),
+                twilio_message_log::tenant_id.eq(&log.tenant_id),
+                twilio_message_log::vault_id.eq(&log.vault_id),
             ))
             .execute(conn)?;
         Ok(())
