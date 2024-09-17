@@ -125,7 +125,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
 
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       expect(continueButton).toBeInTheDocument();
 
       await userEvent.click(continueButton);
@@ -179,10 +179,10 @@ describe('LegalStatus', () => {
       await userEvent.click(citizenRadio);
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -236,10 +236,10 @@ describe('LegalStatus', () => {
       await userEvent.click(permanentResidentRadio);
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -272,10 +272,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'United States of America');
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -306,10 +306,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -417,10 +417,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(newCitizenshipTrigger, 'Andorra');
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -487,10 +487,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(newCitizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -597,10 +597,10 @@ describe('LegalStatus', () => {
       await userEvent.click(deleteCitizenshipButtons[2]);
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
 
       await waitFor(() => {
@@ -659,7 +659,7 @@ describe('LegalStatus', () => {
       const visaRadio = screen.getByTestId('visa-radio');
       await userEvent.click(visaRadio);
 
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       expect(continueButton).toBeInTheDocument();
 
       await userEvent.click(continueButton);
@@ -711,10 +711,10 @@ describe('LegalStatus', () => {
       const before1900 = 1899;
       await userEvent.type(visaExpirationTextInput, `01/01/${before1900}`);
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
       await waitFor(() => {
         const visaExpirationError = screen.getByText('Visa expiration date is invalid');
@@ -771,10 +771,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(newCitizenshipTrigger, 'Andorra');
 
       await waitFor(() => {
-        const continueButton = screen.getByTestId('continue-button');
+        const continueButton = screen.getByTestId('kyc-legal-status-cta');
         expect(continueButton).toBeInTheDocument();
       });
-      const continueButton = screen.getByTestId('continue-button');
+      const continueButton = screen.getByTestId('kyc-legal-status-cta');
       await userEvent.click(continueButton);
       await waitFor(() => {
         const args: KycData = {

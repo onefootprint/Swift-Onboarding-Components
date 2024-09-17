@@ -123,7 +123,7 @@ const LegalStatus = ({ ctaLabel, hideHeader, onComplete, onCancel }: LegalStatus
             isLoading={mutation.isLoading}
             onCancel={onCancel}
             ctaLabel={ctaLabel}
-            submitButtonTestID="continue-button"
+            submitButtonTestID="kyc-legal-status-cta"
           />
         </Grid.Container>
       </FormProvider>
