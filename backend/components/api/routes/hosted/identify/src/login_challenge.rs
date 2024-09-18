@@ -79,20 +79,6 @@ pub async fn post(
     // If we need to create a challenge, extract the phone number for the user
     let sandbox_id = vw.vault.sandbox_id.clone();
 
-    let challenge_kind = match challenge_kind {
-        // Fall back to SMS if the user requested webauthn but doesn't have any creds
-        // TODO let's remove this weird fallback logic... I don't think anyone is ever using it
-        ChallengeKind::Passkey => {
-            if creds.is_empty() {
-                tracing::info!("Falling back to SMS");
-                ChallengeKind::Sms
-            } else {
-                tracing::info!("Not falling back to SMS");
-                ChallengeKind::Passkey
-            }
-        }
-        ck => ck,
-    };
     if !available_challenge_kinds.contains(&challenge_kind) {
         return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     }
