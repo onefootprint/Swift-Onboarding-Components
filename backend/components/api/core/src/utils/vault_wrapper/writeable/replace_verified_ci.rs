@@ -10,7 +10,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::ContactInfoKind;
+use newtypes::DataLifetimeId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 
@@ -50,18 +50,13 @@ impl<Type> WriteableVw<Type> {
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
-        cik: ContactInfoKind,
+        lifetime_id: &DataLifetimeId,
     ) -> FpResult<IsFirstTimeVerifying> {
         // Validate only phone/email
         if request.data.keys().any(|di| !di.is_verified_ci()) {
             return ValidationError("Can only mark_ci_as_verified with verified phone or email").into();
         }
-        // TODO the phone number used in this challenge could have drifted from id.phone_number.
-        // Clean up after we deprecate contact info
-        let dl = self
-            .get_lifetime(&cik.di())
-            .ok_or(AssertionError("No existing CI"))?;
-        let ci = ContactInfo::get(conn, &dl.id)?;
+        let ci = ContactInfo::get(conn, lifetime_id)?;
         let is_first_time_verifying = on_otp_verified(conn, ci, &self.sv.id, &self.vault.id)?;
         if is_first_time_verifying {
             let request = self.validate_request(conn, request, &DataRequestSource::OtpVerified)?;

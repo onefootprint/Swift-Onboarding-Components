@@ -1,6 +1,5 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
-use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::user::UserError;
 use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
@@ -25,7 +24,6 @@ use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::TenantId;
 use newtypes::VaultId;
-use std::fmt::Debug;
 use std::sync::Arc;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::Receiver;
@@ -34,22 +32,6 @@ use tracing::Instrument;
 use twilio::TwilioConfig;
 
 pub type SecondsBeforeRetry = Duration;
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct PhoneEmailChallengeState {
-    pub h_code: Vec<u8>,
-    pub contact_info: PiiString,
-}
-
-impl PhoneEmailChallengeState {
-    pub fn verify_response(&self, challenge_response: &str) -> FpResult<()> {
-        let PhoneEmailChallengeState { h_code, .. } = self;
-        if h_code != &sha256(challenge_response.as_bytes()).to_vec() {
-            return Err(ErrorWithCode::IncorrectPin.into());
-        };
-        Ok(())
-    }
-}
 
 #[derive(Clone)]
 pub struct SmsClient {
@@ -320,7 +302,7 @@ pub async fn send_sms_challenge_non_blocking(
     destination: PhoneNumber,
     sandbox_id: Option<SandboxId>,
     vault_id: Option<VaultId>,
-) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
+) -> FpResult<(Receiver<FpError>, Vec<u8>)> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for twilio latency
     if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -338,7 +320,6 @@ pub async fn send_sms_challenge_non_blocking(
     // Oneshot channel to send an error back from async message sending
     let (tx, rx) = oneshot::channel();
 
-    let contact_info = destination.e164();
     let message = SmsMessage::Otp {
         tenant_name: tenant.map(|t| t.name.clone()),
         code,
@@ -349,8 +330,7 @@ pub async fn send_sms_challenge_non_blocking(
         .send_message_non_blocking(state, message, destination, t_id, vault_id, tx)
         .await?;
 
-    let state = PhoneEmailChallengeState { h_code, contact_info };
-    Ok((rx, state))
+    Ok((rx, h_code))
 }
 
 pub struct BoSessionSmsInfo<'a> {

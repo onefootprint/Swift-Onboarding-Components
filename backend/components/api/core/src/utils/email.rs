@@ -1,6 +1,5 @@
 use super::challenge_rate_limit::RateLimit;
 use super::session::AuthSession;
-use super::sms::PhoneEmailChallengeState;
 use crate::auth::session::user::EmailVerifySession;
 use crate::auth::session::AuthSessionData;
 use crate::errors::user::UserError;
@@ -296,7 +295,7 @@ pub fn send_email_challenge_non_blocking(
     email: &Email,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
-) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState)> {
+) -> FpResult<(Receiver<FpError>, Vec<u8>)> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for sendrid latency
     if email.is_fixture() && sandbox_id.is_none() {
@@ -317,7 +316,6 @@ pub fn send_email_challenge_non_blocking(
 
     let state = state.clone();
     let email = email.email.clone();
-    let contact_info = email.clone();
     let fut = async move {
         let res = state
             .sendgrid_client
@@ -338,5 +336,5 @@ pub fn send_email_challenge_non_blocking(
     };
     tokio::spawn(fut.in_current_span());
 
-    Ok((rx, PhoneEmailChallengeState { h_code, contact_info }))
+    Ok((rx, h_code))
 }

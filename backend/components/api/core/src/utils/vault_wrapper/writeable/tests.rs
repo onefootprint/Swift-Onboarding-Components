@@ -19,7 +19,6 @@ use macros::test_state;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::fingerprint_salt::GlobalFingerprintKind;
 use newtypes::CollectedDataOption as CDO;
-use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
@@ -441,8 +440,8 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         .filter(|di| !matches!(di, DataIdentifier::Id(IDK::PhoneNumber)));
     let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
-    vw.mark_ci_as_verified(conn, data, ContactInfoKind::Phone)
-        .unwrap();
+    let lifetime = vw.get_lifetime(&IDK::PhoneNumber.into()).unwrap().clone();
+    vw.mark_ci_as_verified(conn, data, &lifetime.id).unwrap();
 
     TestData {
         su1: su1.into_inner(),

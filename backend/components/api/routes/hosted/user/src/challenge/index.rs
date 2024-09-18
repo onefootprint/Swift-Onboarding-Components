@@ -82,18 +82,15 @@ pub async fn post(
     let (rx, data, time_before_retry_s, biometric_challenge_json) = match kind {
         AuthMethodKind::Phone => {
             // Expect a phone number and initiate an SMS challenge
-            let phone_number = phone_number.ok_or(ValidationError(
+            let parsed_phone = phone_number.ok_or(ValidationError(
                 "Phone number required to initiate sign up challenge",
             ))?;
-            let e164 = phone_number.e164();
-            let (rx, challenge_data) =
-                send_sms_challenge_non_blocking(&state, tenant, phone_number, uv.sandbox_id, Some(uv.id))
+            let phone_number = parsed_phone.e164();
+            let (rx, h_code) =
+                send_sms_challenge_non_blocking(&state, tenant, parsed_phone, uv.sandbox_id, Some(uv.id))
                     .await?;
 
-            let challenge_data = RegisterChallengeData::Sms {
-                h_code: challenge_data.h_code,
-                phone_number: e164,
-            };
+            let challenge_data = RegisterChallengeData::Sms { h_code, phone_number };
             let time_between_challenges = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_between_challenges, None)
         }
@@ -103,12 +100,9 @@ pub async fn post(
             ))?;
             let tenant = tenant.ok_or(AssertionError("Need tenant to initiate email challenge for now"))?;
 
-            let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, tenant, uv.sandbox_id)?;
-            let challenge_data = RegisterChallengeData::Email {
-                h_code: challenge_data.h_code,
-                email: email.email,
-            };
+            let (rx, h_code) = send_email_challenge_non_blocking(&state, &email, tenant, uv.sandbox_id)?;
+            let email = email.email;
+            let challenge_data = RegisterChallengeData::Email { h_code, email };
             let time_between_challenges = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_between_challenges, None)
         }

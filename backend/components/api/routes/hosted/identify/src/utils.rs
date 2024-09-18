@@ -2,6 +2,7 @@ use crate::BiometricChallengeState;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::FpResult;
+use crate::PhoneEmailChallengeState;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ValidationError;
 use api_core::utils::challenge::Challenge;
@@ -42,20 +43,30 @@ pub(crate) async fn initiate_challenge(
             let challenge_data = ChallengeData::Passkey(challenge.state);
             (None, challenge_data, 0, Some(challenge.challenge_json))
         }
-        // TODO include lifetime_id
-        AuthMethodInfo::Phone { phone, .. } => {
-            let (rx, challenge_state) =
+        AuthMethodInfo::Phone { phone, lifetime_id } => {
+            let contact_info = phone.e164();
+            let (rx, h_code) =
                 send_sms_challenge_non_blocking(state, tenant, phone, sandbox_id, Some(vault.id)).await?;
-            let challenge_data = ChallengeData::Sms(challenge_state);
+            let data = PhoneEmailChallengeState {
+                h_code,
+                contact_info,
+                lifetime_id,
+            };
+            let challenge_data = ChallengeData::Sms(data);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)
         }
-        AuthMethodInfo::Email { email, .. } => {
+        AuthMethodInfo::Email { email, lifetime_id } => {
             let tenant = tenant.ok_or(ValidationError(
                 "Tenant not present when initiating an email challenge",
             ))?;
-            let (rx, challenge_data) = send_email_challenge_non_blocking(state, &email, tenant, sandbox_id)?;
-            let challenge_data = ChallengeData::Email(challenge_data);
+            let (rx, h_code) = send_email_challenge_non_blocking(state, &email, tenant, sandbox_id)?;
+            let data = PhoneEmailChallengeState {
+                h_code,
+                contact_info: email.email,
+                lifetime_id,
+            };
+            let challenge_data = ChallengeData::Email(data);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)
         }

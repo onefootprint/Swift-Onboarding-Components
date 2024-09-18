@@ -1,5 +1,6 @@
 use crate::ChallengeData;
 use crate::ChallengeState;
+use crate::PhoneEmailChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -40,11 +41,11 @@ use newtypes::AuthEventKind;
 use newtypes::BoId;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeId;
 use newtypes::DataRequest;
 use newtypes::IdentifyScope;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ObConfigurationKind;
-use newtypes::PiiString;
 use newtypes::ValidateArgs;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -104,11 +105,11 @@ pub async fn post(
     let verified_credential = match challenge_state.data {
         ChallengeData::Sms(s) => {
             s.verify_response(&c_response)?;
-            on_otp_verify(&state, &user_auth, s.contact_info, ContactInfoKind::Phone).await?
+            on_otp_verify(&state, &user_auth, s, ContactInfoKind::Phone).await?
         }
         ChallengeData::Email(s) => {
             s.verify_response(&c_response)?;
-            on_otp_verify(&state, &user_auth, s.contact_info, ContactInfoKind::Email).await?
+            on_otp_verify(&state, &user_auth, s, ContactInfoKind::Email).await?
         }
         ChallengeData::Passkey(s) => {
             let webauthn = WebauthnConfig::new(&state.config);
@@ -151,13 +152,13 @@ pub async fn post(
 
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
-                VerifiedCredential::Otp(cik, verified_data) => {
+                VerifiedCredential::Otp(verified_data, lifetime_id) => {
                     let added_auth_methods = if let Some((su, data)) = su.as_ref().zip(verified_data) {
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
                         // TODO use vw.replace_verified_ci
-                        vw.mark_ci_as_verified(conn, data, cik)?
+                        vw.mark_ci_as_verified(conn, data, &lifetime_id)?
                     } else {
                         false
                     };
@@ -302,12 +303,12 @@ fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId)
 async fn on_otp_verify(
     state: &State,
     user_auth: &CheckedUserAuthContext,
-    pii: PiiString,
+    s: PhoneEmailChallengeState,
     cik: ContactInfoKind,
 ) -> FpResult<VerifiedCredential> {
     let data = if let Some(obc) = user_auth.ob_config() {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
-        let data = HashMap::from_iter([(cik.verified_di(), pii)]);
+        let data = HashMap::from_iter([(cik.verified_di(), s.contact_info)]);
         // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.
         let data = DataRequest::clean_and_validate_str(data, args)?
             .filter(|di| !matches!(di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)));
@@ -316,10 +317,10 @@ async fn on_otp_verify(
     } else {
         None
     };
-    Ok(VerifiedCredential::Otp(cik, data))
+    Ok(VerifiedCredential::Otp(data, s.lifetime_id))
 }
 
 enum VerifiedCredential {
-    Otp(ContactInfoKind, Option<FingerprintedDataRequest>),
+    Otp(Option<FingerprintedDataRequest>, DataLifetimeId),
     Passkey(WebauthnAuthenticationResult),
 }

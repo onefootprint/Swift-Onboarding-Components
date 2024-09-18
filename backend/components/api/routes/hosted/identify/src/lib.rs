@@ -7,16 +7,18 @@ use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
 use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::identify::UserAuthMethodsContext;
-use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
+use crypto::sha256;
 use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
 use newtypes::AuthEventKind;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::PiiString;
 use newtypes::SandboxId;
 use paperclip::actix::web;
 use strum::EnumDiscriminants;
@@ -60,6 +62,24 @@ pub enum ChallengeData {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BiometricChallengeState {
     pub state: AuthenticationState,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PhoneEmailChallengeState {
+    pub h_code: Vec<u8>,
+    // Can we rm this?
+    pub contact_info: PiiString,
+    pub lifetime_id: DataLifetimeId,
+}
+
+impl PhoneEmailChallengeState {
+    pub fn verify_response(&self, challenge_response: &str) -> FpResult<()> {
+        let PhoneEmailChallengeState { h_code, .. } = self;
+        if h_code != &sha256(challenge_response.as_bytes()).to_vec() {
+            return Err(ErrorWithCode::IncorrectPin.into());
+        };
+        Ok(())
+    }
 }
 
 impl<'a> From<&'a ChallengeData> for AuthEventKind {
