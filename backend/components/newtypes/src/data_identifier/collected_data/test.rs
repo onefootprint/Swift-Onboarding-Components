@@ -6,7 +6,6 @@ use crate::DocumentDiKind as DK;
 use crate::IdentityDataKind as IDK;
 use crate::InvestorProfileKind as IPK;
 use crate::IsDataIdentifierDiscriminant;
-use crate::KvDataKey;
 use itertools::Itertools;
 use std::collections::HashSet;
 use strum::IntoEnumIterator;
@@ -104,21 +103,4 @@ fn test_discriminant(di: DI) {
 #[test_case(vec![DI::from(BDK::BeneficialOwners), DI::from(IDK::Zip), DI::from(IDK::Country)] => HashSet::from_iter([CDO::BusinessBeneficialOwners]))]
 fn test_parse_list_of_kinds(kinds: Vec<DI>) -> HashSet<CDO> {
     CDO::list_from(kinds)
-}
-
-#[test_case(vec![IDK::FirstName.into()], vec![IDK::FirstName.into()])]
-#[test_case(vec![IDK::Ssn4.into(), IDK::PhoneNumber.into(), IDK::Email.into(), KvDataKey::test_data("flerp".to_owned()).into()], vec![])]
-#[test_case(vec![IDK::FirstName.into(), IDK::Ssn4.into()], vec![IDK::FirstName.into()])]
-#[test_case(vec![IDK::LastName.into(), IDK::Ssn4.into()], vec![IDK::LastName.into()])]
-#[test_case(vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Ssn4.into()], vec![])]
-#[test_case(vec![IDK::AddressLine1.into(), IDK::FirstName.into(), IDK::LastName.into()], vec![IDK::AddressLine1.into()])]
-#[test_case(vec![IDK::AddressLine2.into(), IDK::FirstName.into(), IDK::LastName.into()], vec![IDK::AddressLine2.into()])]
-#[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into()], vec![IDK::AddressLine1.into(), IDK::AddressLine2.into()])]
-#[test_case(vec![IDK::AddressLine1.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into()], vec![])]
-#[test_case(vec![IDK::AddressLine1.into(), IDK::City.into(), IDK::State.into(), IDK::Zip.into(), IDK::Country.into(), IPK::Occupation.into()], vec![IPK::Occupation.into()])]
-#[test_case(vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::FirstName.into(), IDK::PhoneNumber.into(), IDK::Email.into(), IDK::Dob.into()], vec![IDK::AddressLine1.into(), IDK::AddressLine2.into(), IDK::City.into(), IDK::State.into(), IDK::FirstName.into()])]
-fn test_dangling_identifiers(dis: Vec<DI>, expected: Vec<DI>) {
-    let dangling: HashSet<_> = CDO::dangling_identifiers(dis).into_iter().collect();
-    let expected: HashSet<_> = expected.into_iter().collect();
-    assert_eq!(dangling, expected);
 }

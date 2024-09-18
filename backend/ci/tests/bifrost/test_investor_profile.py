@@ -67,26 +67,6 @@ def test_put_ip_info_invalid(incomplete_client, key, value, expected_error):
     assert expected_error in body["context"][key]
 
 
-def test_put_ip_info_incomplete_data(incomplete_client):
-    auth_token = incomplete_client.auth_token
-    data = {"investor_profile.occupation": "Penguin veterinarian"}
-    # Should not be able to provide single pieces of data without addl_headers
-    post("hosted/user/vault/validate", data, auth_token, status_code=400)
-
-    # But, when we provide this special header, should silence that error
-    addl_headers = {"x-fp-allow-extra-fields": "true"}
-    post("hosted/user/vault/validate", data, auth_token, addl_headers=addl_headers)
-
-    # The non-speculative endpoint should never accept this header
-    patch(
-        "hosted/user/vault",
-        data,
-        auth_token,
-        status_code=400,
-        addl_headers=addl_headers,
-    )
-
-
 def test_document_requirement(incomplete_client):
     auth_token = incomplete_client.auth_token
 

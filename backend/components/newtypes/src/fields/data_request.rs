@@ -1,10 +1,8 @@
 use crate::data_identifier::DiValidationError;
 use crate::CleanAndValidate;
-use crate::CollectedDataOption;
 use crate::DataIdentifier;
 use crate::DataValidationError;
 use crate::DeriveValues;
-use crate::Error;
 use crate::IdentityDataKind as IDK;
 use crate::NtResult;
 use crate::PiiJsonValue;
@@ -30,9 +28,6 @@ pub struct ValidateArgs {
     /// When true, performs some front-loaded validation that vendors normally perform in order to
     /// try to prevent vendors rejecting our request with a 400.
     pub for_bifrost: bool,
-    /// Don't raise errors for dangling keys.
-    /// Useful to allow speculatively validating data for a partial CDO
-    pub allow_dangling_keys: bool,
     /// Don't raise errors for card validation problems
     pub ignore_luhn_validation: bool,
     /// When true, validates as production data. When false, validates as sandbox data
@@ -44,7 +39,6 @@ impl ValidateArgs {
         Self {
             ignore_luhn_validation: false,
             for_bifrost: true,
-            allow_dangling_keys: false,
             is_live,
         }
     }
@@ -53,7 +47,6 @@ impl ValidateArgs {
         Self {
             ignore_luhn_validation: false,
             for_bifrost: false,
-            allow_dangling_keys: true,
             is_live,
         }
     }
@@ -65,7 +58,6 @@ impl ValidateArgs {
         Self {
             ignore_luhn_validation: false,
             for_bifrost: false,
-            allow_dangling_keys: false,
             is_live: true,
         }
     }
@@ -101,15 +93,6 @@ impl DataRequest {
             .collect();
         if !unallowed_entries.is_empty() {
             return Err(DataValidationError::FieldValidationError(unallowed_entries).into());
-        }
-
-        // Then, validate that there are no "dangling" extra keys in this request.
-        // For example, don't allow updating only AddressLine1 - need the whole address
-        let new_dis = map.keys().cloned().collect_vec();
-        let dangling_keys = CollectedDataOption::dangling_identifiers(new_dis);
-        if !args.allow_dangling_keys && !dangling_keys.is_empty() {
-            let err = Error::from(DataValidationError::ExtraFieldError(dangling_keys));
-            return Err(err);
         }
 
         // Remove any entries that will be overwritten with derived entries.

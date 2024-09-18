@@ -1,5 +1,4 @@
 use crate::types::ApiResponse;
-use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -42,7 +41,6 @@ pub async fn post_validate(
     state: web::Data<State>,
     request: Json<RawUserDataRequest>,
     user_wf_auth: UserWfAuthContext,
-    allow_extra_fields: AllowExtraFieldsHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
@@ -50,7 +48,6 @@ pub async fn post_validate(
     let opts = ValidateArgs {
         ignore_luhn_validation: false,
         for_bifrost: true,
-        allow_dangling_keys: *allow_extra_fields,
         is_live: user_auth.user().is_live,
     };
     let PatchDataRequest { updates, .. } = PatchDataRequest::clean_and_validate(request.into_inner(), opts)?;

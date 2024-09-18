@@ -45,11 +45,6 @@ def incomplete_bifrost(kyb_sandbox_ob_config, kyb_cdos):
             400,
         ),
         (
-            {"business.address_line1": "One Footprint Way"},
-            400,
-        ),
-        ({"business.zip": "12345"}, 400),
-        (
             {
                 "business.address_line1": "One Footprint Way",
                 "business.city": "Hayes Valley",

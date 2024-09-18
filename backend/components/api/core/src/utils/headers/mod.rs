@@ -6,9 +6,6 @@ pub use insight::*;
 mod telemetry;
 pub use telemetry::*;
 
-mod allow_extra_fields;
-pub use allow_extra_fields::*;
-
 mod idempotency_id;
 pub use idempotency_id::*;
 

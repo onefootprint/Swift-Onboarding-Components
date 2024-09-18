@@ -435,8 +435,7 @@ pub async fn pre_vault(
         DocumentDiKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
         response,
     )];
-    let mut validate_args = ValidateArgs::for_bifrost(is_live);
-    validate_args.allow_dangling_keys = true;
+    let validate_args = ValidateArgs::for_bifrost(is_live);
 
     let data = HashMap::from_iter(data.into_iter());
     let data = DataRequest::clean_and_validate(data, validate_args)?;

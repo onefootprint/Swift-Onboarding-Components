@@ -102,8 +102,7 @@ pub(super) async fn compute_ocr_data<'a>(
         dk,
         ..
     } = args;
-    let mut validate_args = ValidateArgs::for_bifrost(obc.is_live);
-    validate_args.allow_dangling_keys = true;
+    let validate_args = ValidateArgs::for_bifrost(obc.is_live);
 
     let barcode_read_successfully = rs
         .iter()

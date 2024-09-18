@@ -10,7 +10,6 @@ use crate::TenantScope;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
-use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
@@ -293,22 +292,6 @@ impl CollectedDataOption {
                     .map(|(cdo, _)| cdo)
             })
             .collect()
-    }
-
-    /// Given a list of DataIdentifiers, removes the DIs that are part of a coherent CDO. Returns
-    /// extra, "dangling" identifiers that are not part of any CDO.
-    /// For example, id.first_name is considered dangling when provided without id.last_name
-    pub fn dangling_identifiers(dis: Vec<DataIdentifier>) -> Vec<DataIdentifier> {
-        let cdos = CollectedDataOption::list_from(dis.clone());
-        let represented_identifiers: HashSet<_> = cdos
-            .into_iter()
-            .flat_map(|cdo| cdo.data_identifiers().unwrap_or_default())
-            .collect();
-        // Filter out the DIs that don't have a parent (like custom DIs) - these are never considered
-        // dangling
-        let keys: HashSet<_> = dis.into_iter().filter(|di| di.parent().is_some()).collect();
-        // Keys given minus represented keys
-        keys.difference(&represented_identifiers).cloned().collect_vec()
     }
 
     /// Maps the partial variant to a full variant of an option, if exists.

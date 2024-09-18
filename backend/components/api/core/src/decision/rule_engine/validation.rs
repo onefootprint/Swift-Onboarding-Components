@@ -101,7 +101,6 @@ pub fn validate_rule_expression(
                         PiiJsonValue::from_piistring(value.clone()),
                         ValidateArgs {
                             for_bifrost: false,
-                            allow_dangling_keys: true,
                             ignore_luhn_validation: true,
                             is_live,
                         },
