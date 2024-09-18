@@ -25,7 +25,7 @@ use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::contact_info::ContactInfo;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::webauthn_credential::WebauthnCredential;
+use db::models::passkey::Passkey;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::ActionKind;
@@ -33,10 +33,10 @@ use newtypes::AuthEventKind;
 use newtypes::ContactInfoKind;
 use newtypes::DataRequest;
 use newtypes::InsightEventId;
+use newtypes::PasskeyId;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::ValidateArgs;
-use newtypes::WebauthnCredentialId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -169,7 +169,7 @@ impl Action {
         action_kind: ActionKind,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
-    ) -> FpResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
+    ) -> FpResult<(AuthEventKind, Option<PasskeyId>)> {
         // TODO: eventually, let's make this a Vw util that is used to add login methods and use
         // this in identify/verify.
         // Then, send an email to the user's last verified CI any time their login methods change
@@ -198,10 +198,10 @@ impl Action {
             Self::RegisterWebauthnCred(res) => {
                 match action_kind {
                     ActionKind::Replace => {
-                        WebauthnCredential::deactivate(conn, sv_id)?;
+                        Passkey::deactivate(conn, sv_id)?;
                     }
                     ActionKind::AddPrimary => {
-                        let existing = WebauthnCredential::list(conn, sv_id)?;
+                        let existing = Passkey::list(conn, sv_id)?;
                         if !existing.is_empty() {
                             return ValidationError("Cannot add primary passkey when one already exists.")
                                 .into();

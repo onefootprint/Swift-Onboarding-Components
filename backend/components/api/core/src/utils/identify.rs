@@ -7,7 +7,7 @@ use crate::State;
 use api_errors::AssertionError;
 use api_errors::FpResult;
 use db::models::contact_info::ContactInfo;
-use db::models::webauthn_credential::WebauthnCredential;
+use db::models::passkey::Passkey;
 use itertools::Itertools;
 use newtypes::email::Email;
 use newtypes::AuthMethodKind;
@@ -35,7 +35,7 @@ pub struct AuthMethod {
 #[derive(Debug)]
 pub enum AuthMethodInfo {
     Passkey {
-        passkeys: Vec<WebauthnCredential>,
+        passkeys: Vec<Passkey>,
     },
     Phone {
         phone: PhoneNumber,
@@ -49,7 +49,7 @@ pub enum AuthMethodInfo {
 }
 
 impl AuthMethod {
-    pub fn passkeys(&self) -> &[WebauthnCredential] {
+    pub fn passkeys(&self) -> &[Passkey] {
         match &self.info {
             AuthMethodInfo::Passkey { passkeys } => passkeys,
             _ => &[],
@@ -82,7 +82,7 @@ impl AuthMethod {
 /// Determine what challenge kinds are available for the given user.
 /// We don't store any strong association of what constitutes a registered auth method in the
 /// database. So we have to assemble it from a combination of vault data, ContactInfo, and
-/// WebauthnCredentials. Eventually, we should create a table of registered AuthMethods in the
+/// Passkeys. Eventually, we should create a table of registered AuthMethods in the
 /// database.
 ///
 /// NOTE: this method needs to service two contexts: user-specific contexts (like my1fp or logging
@@ -98,8 +98,8 @@ pub async fn get_user_auth_methods(
         .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::from(&identifier))?;
             let passkeys = match identifier {
-                UserIdentifier::Vault(v_id) => WebauthnCredential::list(conn, &v_id)?,
-                UserIdentifier::ScopedVault(sv_id) => WebauthnCredential::list(conn, &sv_id)?,
+                UserIdentifier::Vault(v_id) => Passkey::list(conn, &v_id)?,
+                UserIdentifier::ScopedVault(sv_id) => Passkey::list(conn, &sv_id)?,
             };
             let cis = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
                 .into_iter()

@@ -13,9 +13,9 @@ use newtypes::AndroidAppLicense;
 use newtypes::AndroidAppRecognition;
 use newtypes::AndroidDeviceIntegrityLevel;
 use newtypes::GoogleDeviceAttestationId;
+use newtypes::PasskeyId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::WebauthnCredentialId;
 use serde::Serialize;
 
 #[derive(Debug, Serialize, Clone, Queryable)]
@@ -31,7 +31,7 @@ pub struct GoogleDeviceAttestation {
     pub package_name: String,
     pub app_version: Option<String>,
 
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
 
     // ids and metadata for matching devices
     pub widevine_id: Option<String>,
@@ -63,7 +63,7 @@ pub struct NewGoogleDeviceAttestation {
     pub package_name: String,
     pub app_version: Option<String>,
 
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
 
     // ids and metadata for matching devices
     pub widevine_id: Option<String>,

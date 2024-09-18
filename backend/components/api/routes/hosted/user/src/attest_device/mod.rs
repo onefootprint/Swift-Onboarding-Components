@@ -147,7 +147,7 @@ pub async fn post_attestation(
 
             // the attestation, in conjuction with a passkey registration, also helps us prove
             // liveness so if the device attests it registered a passkey, we can confirm liveness too!
-            if attestation.webauthn_credential_id().is_some() {
+            if attestation.passkey_id().is_some() {
                 let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
                 let liveness_event = NewLivenessEvent {
                     scoped_vault_id: sv_id.clone(),

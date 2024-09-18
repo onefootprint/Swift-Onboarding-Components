@@ -12,8 +12,8 @@ use crate::LabelId;
 use crate::LivenessEventId;
 use crate::ObConfigurationId;
 use crate::OnboardingDecisionId;
+use crate::PasskeyId;
 use crate::WatchlistCheckId;
-use crate::WebauthnCredentialId;
 use crate::WorkflowId;
 use crate::WorkflowRequestId;
 use diesel::sql_types::Text;
@@ -83,7 +83,7 @@ pub struct DataCollectedInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BiometricRegisteredInfo {
-    pub id: WebauthnCredentialId,
+    pub id: PasskeyId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

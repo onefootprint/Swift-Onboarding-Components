@@ -16,12 +16,12 @@ use idv::VendorResponse;
 use newtypes::DecisionIntentKind;
 use newtypes::LivenessIssuer;
 use newtypes::LivenessSource;
+use newtypes::PasskeyId;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
-use newtypes::WebauthnCredentialId;
 use newtypes::WorkflowId;
 
 #[derive(derive_more::From)]
@@ -46,7 +46,7 @@ impl AttestationResult {
         }
     }
 
-    pub fn webauthn_credential_id(&self) -> Option<&WebauthnCredentialId> {
+    pub fn passkey_id(&self) -> Option<&PasskeyId> {
         match self {
             Self::Apple(attestation) => attestation.webauthn_credential_id.as_ref(),
             Self::Google(attestation) => attestation.webauthn_credential_id.as_ref(),

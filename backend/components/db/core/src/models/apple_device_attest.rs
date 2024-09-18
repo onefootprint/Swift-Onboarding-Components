@@ -11,9 +11,9 @@ use diesel::Queryable;
 use diesel_as_jsonb::AsJsonb;
 use newtypes::AppleAttestationReceiptType;
 use newtypes::AppleDeviceAttestationId;
+use newtypes::PasskeyId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::WebauthnCredentialId;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -44,7 +44,7 @@ pub struct AppleDeviceAttestation {
     pub created_at: DateTime<Utc>,
     pub bundle_id: String,
 
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
 }
 
 /// This is a custom metadata object that comes from the device
@@ -80,7 +80,7 @@ pub struct NewAppleDeviceAttestation {
 
     pub bundle_id: String,
 
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
 }
 
 impl NewAppleDeviceAttestation {

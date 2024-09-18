@@ -4,11 +4,11 @@ use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
 use db::models::apple_device_attest::DeviceMetadata;
 use db::models::apple_device_attest::NewAppleDeviceAttestation;
+use db::models::passkey::Passkey;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::tenant_ios_app_meta::TenantIosAppFilters;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
-use db::models::webauthn_credential::WebauthnCredential;
 use db::DbResult;
 use newtypes::VaultId;
 
@@ -87,7 +87,7 @@ pub(super) async fn attest(
     let sv_id = sv.id.clone();
     let creds = state
         .db_pool
-        .db_query(move |conn| WebauthnCredential::list(conn, &sv_id))
+        .db_query(move |conn| Passkey::list(conn, &sv_id))
         .await?;
 
     let new_attestation = attest_inner(&sv.vault_id, &verifier, challenge, attestation, creds).await?;
@@ -101,7 +101,7 @@ pub(super) async fn attest_inner(
     verifier: &AppleAppAttestationVerifier,
     challenge: String,
     attestation: String,
-    webauthn_creds: Vec<WebauthnCredential>,
+    webauthn_creds: Vec<Passkey>,
 ) -> FpResult<NewAppleDeviceAttestation> {
     let payload: IosAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
     let attestation_data = base64::decode(payload.attestation_data)?;
@@ -139,7 +139,7 @@ pub(super) async fn attest_inner(
 
     Ok(NewAppleDeviceAttestation {
         vault_id: vault_id.clone(),
-        webauthn_credential_id: super::util::link_webauthn_credential(
+        webauthn_credential_id: super::util::link_passkey(
             webauthn_creds,
             attested_metadata.webauthn_device_response_json,
         )?,

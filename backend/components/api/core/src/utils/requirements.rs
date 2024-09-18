@@ -13,9 +13,9 @@ use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::liveness_event::LivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::passkey::Passkey;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
-use db::models::webauthn_credential::WebauthnCredential;
 use db::models::workflow::Workflow;
 use db::PgConn;
 use feature_flag::BoolFlag;
@@ -399,7 +399,7 @@ pub fn get_register_auth_method_requirements(
         .filter_ok(|(_, ci)| ci.is_otp_verified())
         .map_ok(|(cik, _)| AuthMethodKind::from(cik))
         .collect::<Result<Vec<_>, _>>()?;
-    let passkeys = WebauthnCredential::list(conn, &vw.scoped_vault.id)?;
+    let passkeys = Passkey::list(conn, &vw.scoped_vault.id)?;
     let verified_auth_methods = chain!(
         verified_cis,
         (!passkeys.is_empty()).then_some(AuthMethodKind::Passkey)
@@ -531,7 +531,7 @@ fn get_requirement_inner(
             if !obc.prompt_for_passkey {
                 return Ok(vec![]);
             }
-            let credentials = WebauthnCredential::list(conn, &wf.scoped_vault_id)?;
+            let credentials = Passkey::list(conn, &wf.scoped_vault_id)?;
 
             // Note: we should probably represent this another way, but for now we can determine if we
             // want to skip passkey reg by checking for this liveness event on the

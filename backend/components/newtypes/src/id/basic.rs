@@ -69,11 +69,7 @@ define_newtype_id!(
     String,
     "Public identifier for a an onboarding configuration"
 );
-define_newtype_id!(
-    WebauthnCredentialId,
-    String,
-    "Identifier for a webauthn credential"
-);
+define_newtype_id!(PasskeyId, String, "Identifier for a webauthn credential");
 define_newtype_id!(InsightEventId, String, "Identifier for an insight event");
 define_newtype_id!(
     VerificationRequestId,

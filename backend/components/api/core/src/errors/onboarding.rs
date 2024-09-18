@@ -13,8 +13,6 @@ use thiserror::Error;
 pub enum OnboardingError {
     #[error("Token invalid")]
     ValidateTokenInvalid,
-    #[error("Webauthn credential not set")]
-    WebauthnCredentialsNotSet,
     #[error("Sandbox users must be used in sandbox mode")]
     InvalidSandboxState,
     #[error("Onboarding does not exist")]

@@ -24,9 +24,9 @@ use newtypes::AuthMethodKind;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::IdentifyScope;
 use newtypes::InsightEventId;
+use newtypes::PasskeyId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::WebauthnCredentialId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -37,7 +37,7 @@ pub struct AuthEvent {
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub insight_event_id: Option<InsightEventId>,
     pub kind: AuthEventKind,
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
@@ -51,7 +51,7 @@ pub struct NewAuthEventRow {
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub insight_event_id: Option<InsightEventId>,
     pub kind: AuthEventKind,
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
     pub created_at: DateTime<Utc>,
     pub scope: IdentifyScope,
 }
@@ -62,7 +62,7 @@ pub struct NewAuthEventArgs {
     pub scoped_vault_id: Option<ScopedVaultId>,
     pub insight_event_id: Option<InsightEventId>,
     pub kind: AuthEventKind,
-    pub webauthn_credential_id: Option<WebauthnCredentialId>,
+    pub webauthn_credential_id: Option<PasskeyId>,
     pub created_at: DateTime<Utc>,
     pub scope: IdentifyScope,
 
@@ -252,7 +252,7 @@ impl AuthEvent {
                         })
                     },
                     _ => {
-                        tracing::error!(event_id=%event.id, "found unexpected combination of Kind and WebauthnCredential on AuthEvent");
+                        tracing::error!(event_id=%event.id, "found unexpected combination of Kind and Passkey on AuthEvent");
                         None
                     },
                 }

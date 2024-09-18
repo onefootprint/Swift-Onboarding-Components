@@ -3,7 +3,6 @@ use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::FpResult;
 use crate::PhoneEmailChallengeState;
-use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ValidationError;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
@@ -15,9 +14,9 @@ use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_core::State;
 use api_wire_types::IdentifyChallengeResponse;
 use api_wire_types::UserChallengeData;
+use db::models::passkey::Passkey;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
 use newtypes::SessionAuthToken;
 use webauthn_rs_core::proto::Base64UrlSafeData;
@@ -99,12 +98,9 @@ struct BiometricChallenge {
     challenge_json: String,
 }
 
-fn initiate_passkey_login_challenge(
-    state: &State,
-    creds: Vec<WebauthnCredential>,
-) -> FpResult<BiometricChallenge> {
+fn initiate_passkey_login_challenge(state: &State, creds: Vec<Passkey>) -> FpResult<BiometricChallenge> {
     if creds.is_empty() {
-        return Err(OnboardingError::WebauthnCredentialsNotSet.into());
+        return ValidationError("No passkey available for login challenge").into();
     }
 
     // convert these creds to webauthn rs type

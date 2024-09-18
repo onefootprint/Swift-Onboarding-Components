@@ -11,11 +11,11 @@ use chrono::Utc;
 use crypto::base64;
 use db::models::apple_device_attest::DeviceMetadata;
 use db::models::google_device_attest::NewGoogleDeviceAttestation;
+use db::models::passkey::Passkey;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::tenant_android_app_meta::TenantAndroidAppFilters;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
-use db::models::webauthn_credential::WebauthnCredential;
 use db::DbResult;
 use newtypes::AndroidAppLicense;
 use newtypes::AndroidAppRecognition;
@@ -109,7 +109,7 @@ pub(super) async fn attest(
     let sv_id = sv.id.clone();
     let creds = state
         .db_pool
-        .db_query(move |conn| WebauthnCredential::list(conn, &sv_id))
+        .db_query(move |conn| Passkey::list(conn, &sv_id))
         .await?;
 
     let new_attestation = attest_inner(&sv.vault_id, &verifier, challenge, attestation, creds).await?;
@@ -123,7 +123,7 @@ pub(super) async fn attest_inner(
     verifier: &GoogleAppAttestationVerifier,
     challenge: String,
     attestation: String,
-    webauthn_creds: Vec<WebauthnCredential>,
+    webauthn_creds: Vec<Passkey>,
 ) -> FpResult<NewGoogleDeviceAttestation> {
     let payload: AndroidAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
 
@@ -144,10 +144,8 @@ pub(super) async fn attest_inner(
 
     tracing::info!(verdict=?verdict, "verified attested android integrity verdict");
 
-    let webauthn_credential_id = super::util::link_webauthn_credential(
-        webauthn_creds,
-        attested_metadata.webauthn_device_response_json,
-    )?;
+    let passkey_id =
+        super::util::link_passkey(webauthn_creds, attested_metadata.webauthn_device_response_json)?;
 
     let license_verdict = verdict.account_details.app_licensing_verdict;
     let app_verdict = verdict.app_integrity.app_recognition_verdict;
@@ -170,7 +168,7 @@ pub(super) async fn attest_inner(
             model: attested_metadata.model,
             os: attested_metadata.os,
         },
-        webauthn_credential_id,
+        webauthn_credential_id: passkey_id,
         created_at: Utc::now(),
         raw_token: payload.attestation_data,
         raw_claims,

@@ -32,9 +32,9 @@ use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::passkey::Passkey;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::ActionKind;
 use newtypes::AuthEventKind;
@@ -142,7 +142,7 @@ pub async fn post(
                     let prefill_data =
                         prefill_data.ok_or(AssertionError("Missing prefill data for new SV"))?;
                     tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
-                    WebauthnCredential::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
+                    Passkey::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
                 }
                 Some(su)
             } else {
@@ -167,17 +167,17 @@ pub async fn post(
                 VerifiedCredential::Passkey(result) => {
                     let cred_id = &result.cred_id().0;
                     if result.backup_state() {
-                        WebauthnCredential::set_backup_state(conn, uv_id, cred_id)?;
+                        Passkey::set_backup_state(conn, uv_id, cred_id)?;
                     }
 
                     // Since the challenge generated for the client allows using one of multiple webauthn
-                    // credentials, find the exact WebauthnCredential id that was utilized
+                    // credentials, find the exact Passkey id that was utilized
                     let identifier = if let Some(su_id) = su.as_ref().map(|su| &su.id) {
                         su_id.into()
                     } else {
                         uv_id.into() // Only m1fp
                     };
-                    let credential = WebauthnCredential::get_by_credential_id(conn, identifier, cred_id)?;
+                    let credential = Passkey::get_by_credential_id(conn, identifier, cred_id)?;
                     (Some(credential.id), false)
                 }
             };

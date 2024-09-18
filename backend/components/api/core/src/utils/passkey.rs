@@ -5,9 +5,9 @@ use crate::FpResult;
 use api_errors::AssertionError;
 use api_errors::FpErrorCode;
 use db::models::liveness_event::NewLivenessEvent;
+use db::models::passkey::NewPasskey;
+use db::models::passkey::Passkey;
 use db::models::user_timeline::UserTimeline;
-use db::models::webauthn_credential::NewWebauthnCredential;
-use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::AttestationType;
 use newtypes::InsightEventId;
@@ -207,7 +207,7 @@ impl VerifyChallengeResult {
         conn: &mut TxnPgConn,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
-    ) -> FpResult<WebauthnCredential> {
+    ) -> FpResult<Passkey> {
         let vault_id = user_auth.user_vault_id();
         let Self {
             liveness_event_attributes,
@@ -239,7 +239,7 @@ impl VerifyChallengeResult {
 
         // Save the webauthn credential to the DB
         let public_key = crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?;
-        let credential = NewWebauthnCredential {
+        let credential = NewPasskey {
             scoped_vault_id: su_id,
             vault_id: vault_id.clone(),
             credential_id: cred.cred_id.0,
