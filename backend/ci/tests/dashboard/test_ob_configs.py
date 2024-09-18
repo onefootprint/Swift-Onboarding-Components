@@ -891,8 +891,8 @@ def test_skip_kyc(
                 "name",
             ],
             "kyb",
-            [{"kind": "kyb", "data": {"ein_only": False}}],
-            "Validation error: Must collect identity data if and only if collecting BOs",
+            [{"kind": "kyb", "data": {"ein_only": False}}, {"kind": "kyc", "data": {}}],
+            "Must skip KYC if not collecting BOs",
         ),
         (
             [
@@ -904,8 +904,8 @@ def test_skip_kyc(
                 "business_beneficial_owners",
             ],
             "kyb",
-            [{"kind": "kyb", "data": {"ein_only": False}}],
-            "Validation error: Must collect identity data if and only if collecting BOs",
+            [{"kind": "kyb", "data": {"ein_only": False}}, {"kind": "kyc", "data": {}}],
+            "Must skip KYC if not collecting KYC data",
         ),
         (
             [

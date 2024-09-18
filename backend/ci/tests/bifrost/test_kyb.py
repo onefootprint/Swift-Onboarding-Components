@@ -180,7 +180,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         must_collect_data = business_cdos
         skip_kyc = True
     elif beneficial_owners == "collect_without_kyc":
-        must_collect_data = business_cdos + user_cdos + ["business_beneficial_owners"]
+        must_collect_data = business_cdos + user_cdos
         skip_kyc = True
     elif beneficial_owners == "collect_with_single_kyc":
         must_collect_data = business_cdos + user_cdos + ["business_beneficial_owners"]
