@@ -1,6 +1,7 @@
 import {
   getIsoDate,
   isAddressLine,
+  isEinFormat,
   isEmail,
   isName,
   isPhoneNumber,
@@ -152,7 +153,7 @@ const validateBootstrapData = ({
     [BusinessDI.name]: isStringValid,
     [BusinessDI.phoneNumber]: (value: string) => isPhoneNumber(value),
     [BusinessDI.state]: (state: string, country?: string) => isStateValid(state, country),
-    [BusinessDI.tin]: () => true, // TODO: Add real validators for this field
+    [BusinessDI.tin]: value => isEinFormat(value),
     [BusinessDI.website]: value => isURL(value),
     [BusinessDI.zip]: isStringValid,
     [BootstrapOnlyBusinessPrimaryOwnerStake]: isNumber,
