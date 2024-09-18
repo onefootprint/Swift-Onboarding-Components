@@ -11,6 +11,9 @@ type FootprintProviderProps = {
 
 const NotImplemented = 'Function not implemented.';
 const FootprintContext = createContext<ProviderReturn>({
+  getAdapterKind() {
+    throw new Error(NotImplemented);
+  },
   getAdapterResponse(): CustomChildAPI | null {
     throw new Error(NotImplemented);
   },

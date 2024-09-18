@@ -1,4 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import type { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { CustomChildAPI } from '@onefootprint/idv';
 import { getLogger } from '@onefootprint/idv';
 import Postmate from '@onefootprint/postmate';
@@ -7,9 +8,7 @@ import type { IframeAdapterReturn } from '../types';
 import generateEventEmitter from '../utils';
 
 const { started } = FootprintPrivateEvent;
-const { logError, logTrack, logWarn } = getLogger({
-  location: 'auth-iframe',
-});
+const { logError, logTrack, logWarn } = getLogger({ location: 'auth-iframe' });
 
 const generateIframeAdapter = (): IframeAdapterReturn => {
   let isAdapterLoaded: boolean = false;
@@ -17,6 +16,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
   const eventEmitter = generateEventEmitter();
 
   return {
+    getAdapterKind: () => 'iframe',
     getAdapterResponse: () => postmateChildApiRef,
     getLoadingStatus: () => isAdapterLoaded,
     on: eventEmitter.on,
@@ -41,7 +41,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
         return null;
       }
     },
-    send: (name: string, data?: unknown): void => {
+    send: (name: `${FootprintPublicEvent}`, data?: unknown): void => {
       if (postmateChildApiRef) {
         postmateChildApiRef.emit(name, data);
         logTrack(`The ${name} event has been dispatched`);
