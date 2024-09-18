@@ -17,9 +17,10 @@ pub async fn create_validation_token(
     wf: Option<Workflow>,
 ) -> FpResult<SessionAuthToken> {
     let session_key = state.session_sealing_key.clone();
-    let sv_id = user_auth
+    let su_id = user_auth
         .scoped_user_id()
         .ok_or(AssertionError("No scoped user associated with auth session"))?;
+    let biz_wf_id = user_auth.business_workflow_id();
     let validation_token = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
@@ -37,17 +38,18 @@ pub async fn create_validation_token(
             if auth_events
                 .iter()
                 .filter_map(|ae| ae.scoped_vault_id.as_ref())
-                .any(|ae_sv_id| ae_sv_id != &sv_id)
+                .any(|ae_sv_id| ae_sv_id != &su_id)
             {
                 return Err(AssertionError("Auth event has different user").into());
             }
-            if wf.as_ref().is_some_and(|wf| wf.scoped_vault_id != sv_id) {
+            if wf.as_ref().is_some_and(|wf| wf.scoped_vault_id != su_id) {
                 return Err(AssertionError("Workflow has different user").into());
             }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                sv_id,
+                sv_id: su_id,
                 auth_event_ids: ae_ids,
                 wf_id: wf.map(|wf| wf.id),
+                biz_wf_id,
             });
             let (validation_token, _) =
                 AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;

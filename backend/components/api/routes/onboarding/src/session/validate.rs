@@ -6,6 +6,7 @@ use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -21,7 +22,6 @@ use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowIdentifier;
 use newtypes::AuthEventKind;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingStatus;
@@ -49,6 +49,7 @@ pub async fn post(
     let AuthSessionData::ValidateUserToken(ValidateUserToken {
         sv_id,
         wf_id,
+        biz_wf_id,
         auth_event_ids,
     }) = session
     else {
@@ -66,12 +67,8 @@ pub async fn post(
                 let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
                 let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if obc.kind == ObConfigurationKind::Kyb {
-                    let id = WorkflowIdentifier::BusinessOwner {
-                        owner_vault_id: &sv.vault_id,
-                        ob_config_id: &obc.id,
-                        is_business: (),
-                    };
-                    let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
+                    let biz_wf_id = biz_wf_id.ok_or(ValidationError("Missing business workflow"))?;
+                    let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf_id)?;
                     let biz_mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;
                     Some((biz_sv, biz_wf, biz_mrs, obc.clone()))
                 } else {

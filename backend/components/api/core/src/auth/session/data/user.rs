@@ -324,9 +324,10 @@ impl UserSession {
 /// Short-lived token that represents the completion of an onboarding
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
-    pub wf_id: Option<WorkflowId>,
-    pub auth_event_ids: Vec<AuthEventId>,
     pub sv_id: ScopedVaultId,
+    pub wf_id: Option<WorkflowId>,
+    pub biz_wf_id: Option<WorkflowId>,
+    pub auth_event_ids: Vec<AuthEventId>,
 }
 
 /// Longer-lived session that is sent out in emails to verify ownership

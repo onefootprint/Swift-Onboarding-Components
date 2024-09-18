@@ -130,13 +130,6 @@ pub enum WorkflowIdentifier<'a> {
     Id {
         id: &'a WorkflowId,
     },
-    /// Look up a business's workflow from any of its owners' vault IDs
-    BusinessOwner {
-        owner_vault_id: &'a VaultId,
-        ob_config_id: &'a ObConfigurationId,
-        /// To prevent the auto-derive from being misused to look up by su_id
-        is_business: (),
-    },
     ConfigId {
         vault_id: &'a VaultId,
         ob_config_id: &'a ObConfigurationId,
@@ -385,23 +378,10 @@ impl Workflow {
         conn: &mut PgConn,
         id: T,
     ) -> DbResult<(Self, ScopedVault)> {
-        use db_schema::schema::business_owner;
         use db_schema::schema::scoped_vault;
         let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
             WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
-            WorkflowIdentifier::BusinessOwner {
-                owner_vault_id,
-                ob_config_id,
-                ..
-            } => {
-                let business_vault_ids = business_owner::table
-                    .filter(business_owner::user_vault_id.eq(owner_vault_id))
-                    .select(business_owner::business_vault_id);
-                query = query
-                    .filter(scoped_vault::vault_id.eq_any(business_vault_ids))
-                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
-            }
             WorkflowIdentifier::ConfigId {
                 vault_id,
                 ob_config_id,

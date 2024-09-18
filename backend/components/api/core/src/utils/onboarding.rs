@@ -208,12 +208,14 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
         } => {
             // TODO don't always create a new business vault - once we have portable businesses,
             // we should display to the client an ability to select the business they want to use
-            let existing_businesses = BusinessOwner::list_businesses_for_playbook(conn, &uv.id, &obc.id)?;
-            if let Some(existing) = existing_businesses.into_iter().next() {
+            let existing_businesses = (!force_create).then_some(BusinessOwner::list_businesses_for_playbook(
+                conn, &uv.id, &obc.id,
+            )?);
+            if let Some(existing) = existing_businesses.into_iter().flatten().next() {
                 // If the user has already started onboarding their business onto this exact
-                // ob config, we should locate it.
+                // ob config AND the playbook doesn't support multiple onboardings, we should locate it.
                 // Note, this isn't quite portablizing the business since we only locate it
-                // when onboarding onto the exact same ob config
+                // when onboarding onto the exact same ob config.
                 return Ok(Some(existing.1 .1));
             }
             let args = NewVaultArgs {
