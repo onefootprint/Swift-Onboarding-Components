@@ -175,6 +175,7 @@ fn copy_playbook(
         business_documents_to_collect,
         required_auth_methods,
         prompt_for_passkey,
+        allow_reonboard,
 
         // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
         // field is added
@@ -221,5 +222,6 @@ fn copy_playbook(
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,
+        allow_reonboard,
     }
 }

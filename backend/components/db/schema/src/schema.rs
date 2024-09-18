@@ -777,6 +777,7 @@ diesel::table! {
         business_documents_to_collect -> Array<Nullable<Jsonb>>,
         required_auth_methods -> Nullable<Array<Nullable<Text>>>,
         prompt_for_passkey -> Bool,
+        allow_reonboard -> Bool,
     }
 }
 

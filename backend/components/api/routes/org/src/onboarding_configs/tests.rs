@@ -62,6 +62,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -99,6 +100,7 @@ fn test_is_no_phone_flow(
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -135,6 +137,7 @@ fn test_is_doc_first(
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -167,6 +170,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -204,6 +208,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
@@ -247,6 +252,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         ]),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfigurationArgsToValidate(args).validate_for_cip(kind).is_ok()
 }

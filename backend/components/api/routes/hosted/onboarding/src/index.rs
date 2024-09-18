@@ -100,7 +100,7 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, FpError> {
             // If this auth token was created via API or via the dashboard, the tenant is
             // specifically requesting that a new Workflow is created, even if one already exists
-            let force_create = user_auth.data.is_from_api();
+            let force_create = user_auth.data.is_from_api() || ob_config.allow_reonboard;
             let args = NewOnboardingArgs {
                 existing_wf_id: user_auth.workflow_id(),
                 wfr_id: user_auth.wfr_id.clone(),

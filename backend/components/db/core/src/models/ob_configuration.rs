@@ -104,6 +104,9 @@ pub struct ObConfiguration {
     /// When true, will prompt for passkey registration during onboarding requirements.
     /// Passkey registration will always be skippable.
     pub prompt_for_passkey: bool,
+    /// When true, allows users who have already onboarded onto this playbook to reonboard onto the
+    /// playbook in hosted bifrost.
+    pub allow_reonboard: bool,
 }
 
 impl ObConfiguration {
@@ -372,6 +375,7 @@ struct NewObConfiguration {
     verification_checks: Vec<VerificationCheck>,
     required_auth_methods: Option<Vec<AuthMethodKind>>,
     prompt_for_passkey: bool,
+    allow_reonboard: bool,
 }
 
 pub struct NewObConfigurationArgs {
@@ -398,6 +402,7 @@ pub struct NewObConfigurationArgs {
     pub verification_checks: VerificationChecks,
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
     pub prompt_for_passkey: bool,
+    pub allow_reonboard: bool,
 }
 
 
@@ -425,6 +430,7 @@ pub struct ObConfigurationUpdate {
     pub status: Option<ApiKeyStatus>,
     pub verification_checks: Option<Vec<VerificationCheck>>,
     pub prompt_for_passkey: Option<bool>,
+    pub allow_reonboard: Option<bool>,
 }
 
 #[derive(Debug, Clone)]
@@ -617,6 +623,7 @@ impl ObConfiguration {
             verification_checks,
             required_auth_methods,
             prompt_for_passkey,
+            allow_reonboard,
         } = args;
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -646,6 +653,7 @@ impl ObConfiguration {
             verification_checks: verification_checks.into_inner(),
             required_auth_methods,
             prompt_for_passkey,
+            allow_reonboard,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

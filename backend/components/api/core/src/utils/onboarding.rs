@@ -37,6 +37,7 @@ use newtypes::WorkflowId;
 use newtypes::WorkflowRequestId;
 use newtypes::WorkflowSource;
 
+#[derive(Debug)]
 pub enum NewBusinessWfArgs {
     /// There's no scoped business selected. Create a new business vault with the provided keypair,
     /// if no existing business vault exists for this playbook. Then create a workflow for this new
@@ -218,6 +219,7 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
                 // when onboarding onto the exact same ob config.
                 return Ok(Some(existing.1 .1));
             }
+            // Otherwise, make a new business vault and scoped vault owned by the currently authed user
             let args = NewVaultArgs {
                 public_key,
                 e_private_key,

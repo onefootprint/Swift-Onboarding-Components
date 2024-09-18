@@ -201,14 +201,14 @@ impl ScopedVault {
     #[tracing::instrument("ScopedVault::get_or_create_for_playbook", skip_all)]
     pub fn get_or_create_for_playbook(
         conn: &mut TxnPgConn,
-        uv: &Locked<Vault>,
+        vault: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<(Self, IsNew)> {
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
-            .filter(scoped_vault::vault_id.eq(&uv.id))
+            .filter(scoped_vault::vault_id.eq(&vault.id))
             .filter(scoped_vault::tenant_id.eq(&ob_config.tenant_id))
             .first(conn.conn())
             .optional()?;
@@ -220,7 +220,7 @@ impl ScopedVault {
             is_active: true,
             status: OnboardingStatus::None,
         };
-        let sv = Self::create_for_playbook(conn, uv, ob_config, args)?;
+        let sv = Self::create_for_playbook(conn, vault, ob_config, args)?;
         Ok((sv, true))
     }
 

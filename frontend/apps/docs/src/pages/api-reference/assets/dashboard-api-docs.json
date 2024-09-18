@@ -8002,6 +8002,28 @@
                 },
                 "security": []
             }
+        },
+        "/webhooks/twilio_status_callback": {
+            "post": {
+                "tags": [
+                    "Webhooks",
+                    "Private"
+                ],
+                "description": "Handler for Twilio Message webhook callback",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
         }
     },
     "components": {
@@ -8256,6 +8278,7 @@
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
+                                                "decrypt_all_except_pci_data",
                                                 "write_entities",
                                                 "label_and_tag",
                                                 "manage_compliance_doc_submission",
@@ -8343,6 +8366,7 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
+                                        "manage_verified_contact_info",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -8522,6 +8546,7 @@
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
+                                                "decrypt_all_except_pci_data",
                                                 "write_entities",
                                                 "label_and_tag",
                                                 "manage_compliance_doc_submission",
@@ -8734,6 +8759,7 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
+                                "decrypt_all_except_pci_data",
                                 "write_entities",
                                 "label_and_tag",
                                 "manage_compliance_doc_submission",
@@ -8771,6 +8797,7 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
+                                        "manage_verified_contact_info",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -9954,6 +9981,10 @@
                     "allow_international_residents": {
                         "type": "boolean"
                     },
+                    "allow_reonboard": {
+                        "description": "Allow the same user to onboard onto this playbook multiple times. It is generally not\n recommended to enable this setting. When this is enabled, you lose:\n - Protection against one user incurring many charges at your tenant\n - Ability for in-progress onboardings to continue where they left off\n When false, onboarding will no-op for repeat onboardings.",
+                        "type": "boolean"
+                    },
                     "allow_us_residents": {
                         "type": "boolean"
                     },
@@ -10455,6 +10486,7 @@
                 },
                 "required": [
                     "allow_international_residents",
+                    "allow_reonboard",
                     "business_documents_to_collect",
                     "can_access_data",
                     "documents_to_collect",
@@ -11004,6 +11036,7 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
+                                "decrypt_all_except_pci_data",
                                 "write_entities",
                                 "label_and_tag",
                                 "manage_compliance_doc_submission",
@@ -23107,6 +23140,7 @@
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
+                                                    "decrypt_all_except_pci_data",
                                                     "write_entities",
                                                     "label_and_tag",
                                                     "manage_compliance_doc_submission",
@@ -23236,6 +23270,7 @@
                                             "decrypt_document",
                                             "decrypt_document_and_selfie",
                                             "decrypt_all",
+                                            "decrypt_all_except_pci_data",
                                             "write_entities",
                                             "label_and_tag",
                                             "manage_compliance_doc_submission",
@@ -23371,6 +23406,7 @@
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
+                                                    "decrypt_all_except_pci_data",
                                                     "write_entities",
                                                     "label_and_tag",
                                                     "manage_compliance_doc_submission",
@@ -24151,6 +24187,7 @@
                                         "legacy_list_users_businesses",
                                         "implicit_auth",
                                         "vault_disaster_recovery",
+                                        "manage_verified_contact_info",
                                         "match_signals_list",
                                         "liveness_list",
                                         "auth_events_list",
@@ -24326,6 +24363,7 @@
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
+                                                "decrypt_all_except_pci_data",
                                                 "write_entities",
                                                 "label_and_tag",
                                                 "manage_compliance_doc_submission",
@@ -24503,6 +24541,7 @@
                                 "legacy_list_users_businesses",
                                 "implicit_auth",
                                 "vault_disaster_recovery",
+                                "manage_verified_contact_info",
                                 "match_signals_list",
                                 "liveness_list",
                                 "auth_events_list",
@@ -24678,6 +24717,7 @@
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
+                                        "decrypt_all_except_pci_data",
                                         "write_entities",
                                         "label_and_tag",
                                         "manage_compliance_doc_submission",
@@ -24774,6 +24814,7 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
+                                "decrypt_all_except_pci_data",
                                 "write_entities",
                                 "label_and_tag",
                                 "manage_compliance_doc_submission",
@@ -27118,6 +27159,7 @@
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
+                                        "decrypt_all_except_pci_data",
                                         "write_entities",
                                         "label_and_tag",
                                         "manage_compliance_doc_submission",
@@ -27349,6 +27391,9 @@
             "UpdateObConfigRequest": {
                 "type": "object",
                 "properties": {
+                    "allow_reonboard": {
+                        "type": "boolean"
+                    },
                     "name": {
                         "type": "string"
                     },
@@ -27499,6 +27544,7 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
+                                "decrypt_all_except_pci_data",
                                 "write_entities",
                                 "label_and_tag",
                                 "manage_compliance_doc_submission",

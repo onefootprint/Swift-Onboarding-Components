@@ -65,6 +65,13 @@ pub struct CreateOnboardingConfigurationRequest {
     #[serde(default)]
     pub required_auth_methods: Patch<Vec<AuthMethodKind>>,
     pub prompt_for_passkey: Option<bool>,
+    #[serde(default)]
+    /// Allow the same user to onboard onto this playbook multiple times. It is generally not
+    /// recommended to enable this setting. When this is enabled, you lose:
+    /// - Protection against one user incurring many charges at your tenant
+    /// - Ability for in-progress onboardings to continue where they left off
+    /// When false, onboarding will no-op for repeat onboardings.
+    pub allow_reonboard: bool,
 }
 
 #[api_v2_operation(
@@ -110,6 +117,7 @@ pub async fn post(
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,
+        allow_reonboard,
     } = pb_request;
 
 
@@ -173,6 +181,7 @@ pub async fn post(
         verification_checks,
         required_auth_methods,
         prompt_for_passkey,
+        allow_reonboard,
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;

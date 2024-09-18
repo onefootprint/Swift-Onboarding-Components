@@ -38,6 +38,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         verification_checks: VerificationChecks::default(),
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfiguration::create(conn, args).expect("Could not create ob config")
 }
@@ -146,6 +147,7 @@ pub fn create_with_opts(
         verification_checks,
         required_auth_methods: None,
         prompt_for_passkey: true,
+        allow_reonboard: false,
     };
     ObConfiguration::create(conn, args).expect("Could not create ob config")
 }

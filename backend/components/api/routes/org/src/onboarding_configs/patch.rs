@@ -25,6 +25,7 @@ struct UpdateObConfigRequest {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
     prompt_for_passkey: Option<bool>,
+    allow_reonboard: Option<bool>,
 }
 
 #[api_v2_operation(
@@ -46,6 +47,7 @@ async fn patch(
         name,
         status,
         prompt_for_passkey,
+        allow_reonboard,
     } = request.into_inner();
     let tenant_id = tenant.id.clone();
     let (obc, actor, rs) = state
@@ -55,6 +57,7 @@ async fn patch(
                 name,
                 status,
                 prompt_for_passkey,
+                allow_reonboard,
                 ..Default::default()
             };
             let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, update)?;
