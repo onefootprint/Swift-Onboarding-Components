@@ -40,11 +40,13 @@ pub mod middesk;
 pub mod neuro_id;
 pub mod requirements;
 pub mod samba;
+pub mod sentilink;
 pub mod socure;
 pub mod stytch;
 pub mod test_fixtures;
 pub mod tests;
 pub mod twilio;
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, serde::Serialize)]
 #[serde(untagged)]

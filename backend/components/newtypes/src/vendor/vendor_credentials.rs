@@ -100,7 +100,6 @@ impl ExperianCredentialBuilder {
         }
     }
 }
-#[allow(unused)]
 /// credentials for experian
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ExperianCredentials {
@@ -116,4 +115,11 @@ pub struct ExperianCredentials {
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct ComplyAdvantageCredentials {
     pub api_key: PiiString,
+}
+
+#[derive(Clone, Debug)]
+pub struct SentilinkCredentials {
+    pub base_url: PiiString,
+    pub auth_username: PiiString,
+    pub auth_password: PiiString,
 }
