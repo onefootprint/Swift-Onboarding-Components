@@ -15,6 +15,7 @@ export const createFontStyles = (variant: FontVariant, fontFamily: FontFamily = 
     font-weight: ${theme.typography[variant].fontWeight};
     font-size: ${theme.typography[variant].fontSize};
     line-height: ${theme.typography[variant].lineHeight};
+    letter-spacing: ${theme.typography[variant].letterSpacing};
   `}
 `;
 

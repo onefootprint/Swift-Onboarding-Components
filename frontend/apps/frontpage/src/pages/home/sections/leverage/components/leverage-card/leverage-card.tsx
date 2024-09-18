@@ -69,7 +69,7 @@ const LeverageCard = ({ variant, videoSrc, $inverted }: LeverageCardProps) => {
               <Text variant="heading-2" tag="h3">
                 {t(`${variant}.title` as unknown as ParseKeys<'common'>)}
               </Text>
-              <Text variant="display-5" color="secondary" tag="h4">
+              <Text variant="body-1" color="secondary" tag="h4">
                 {t(`${variant}.subtitle` as unknown as ParseKeys<'common'>)}
               </Text>
             </Stack>
@@ -116,7 +116,7 @@ const TextContainer = styled(Stack)`
     gap: ${theme.spacing[4]};
     padding: ${theme.spacing[9]} ${theme.spacing[5]};
     justify-content: center;
-    max-width: 500px;
+    max-width: 450px;
   `}
 `;
 

@@ -10,26 +10,31 @@ export const typography: Typographies = {
     fontWeight: 600,
     fontSize: '3.75rem', // 60px
     lineHeight: '4.75rem', // 76px
+    letterSpacing: '-0.015em',
   },
   'display-2': {
     fontWeight: 600,
     fontSize: '2.5rem', // 40px
     lineHeight: '3.25rem', // 52px
+    letterSpacing: '-0.015em',
   },
   'display-3': {
     fontWeight: 600,
     fontSize: '1.75rem', // 28px
     lineHeight: '2.25rem', // 36px
+    letterSpacing: '-0.015em',
   },
   'display-4': {
     fontWeight: 400,
     fontSize: '1.3125rem', // 21px
     lineHeight: '2rem', // 32px
+    letterSpacing: '-0.015em',
   },
   'display-5': {
     fontWeight: 400,
     fontSize: '1.1875rem', // 19px
     lineHeight: '1.875rem', // 30px
+    letterSpacing: '-0.015em',
   },
   'heading-1': {
     fontWeight: 550,
