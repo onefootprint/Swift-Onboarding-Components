@@ -1,9 +1,9 @@
-import type { ComponentsSdkProps } from '@onefootprint/footprint-js/src/types/components';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext } from 'react';
 
-import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { FormValues } from '../../../types';
 import { Context } from '../components/provider';
+import getRequirementsReq from '../queries/get-requirements';
 import save from '../queries/save';
 import { lockBody } from '../utils/dom-utils';
 import { formatBeforeSave } from '../utils/save-utils';
@@ -31,6 +31,13 @@ export const useFootprint = () => {
     });
   };
 
+  const getRequirements = () => {
+    if (!context.authToken) {
+      throw new Error('No authToken found. Please authenticate first');
+    }
+    return getRequirementsReq({ token: context.authToken });
+  };
+
   const createNewHandoff = ({
     onComplete,
     onError,
@@ -44,19 +51,18 @@ export const useFootprint = () => {
     onClose?: () => void;
     authToken: string;
   }) => {
-    const props: ComponentsSdkProps = {
-      authToken,
-      appearance: context.appearance,
-      sandboxOutcome: context.sandboxOutcome,
-      kind: FootprintComponentKind.Components,
-      onComplete,
-      onError,
-      onCancel,
-      onClose,
-    };
-
-    const fp = footprint.init(props);
-    fp.render();
+    footprint
+      .init({
+        authToken,
+        appearance: context.appearance,
+        sandboxOutcome: context.sandboxOutcome,
+        kind: FootprintComponentKind.Components,
+        onComplete,
+        onError,
+        onCancel,
+        onClose,
+      })
+      .render();
   };
 
   const handoff = ({
@@ -89,9 +95,10 @@ export const useFootprint = () => {
 
   return {
     data: {
-      ...context.onboardingConfig,
-      ...context.challengeData,
+      onboardingConfig: context.onboardingConfig,
+      challengeData: context.challengeData,
     },
+    getRequirements,
     handoff,
     save: vault,
     ...otp,

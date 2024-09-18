@@ -7,6 +7,7 @@ import {
 } from '@onefootprint/types';
 import { InlineOtpNotSupported } from '../../../types/request';
 import request from '../utils/request';
+import getRequirements from './get-requirements';
 
 type EmailAndPassword = { email?: string; phoneNumber?: string };
 
@@ -132,7 +133,7 @@ export const getValidationToken = async (options: { token: string }) => {
       'X-Fp-Authorization': options.token,
     },
   });
-  return response;
+  return response.validationToken;
 };
 
 export const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
@@ -168,12 +169,16 @@ export const verifyChallenge = async (
   options: { token: string; sandboxOutcome?: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
-  const { validationToken } = await getValidationToken({ token: response.authToken });
   await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
-  const vaultingToken = await createVaultingToken({ authToken: response.authToken });
+  const [validationToken, requirements, vaultingToken] = await Promise.all([
+    getValidationToken({ token: response.authToken }),
+    getRequirements({ token: response.authToken }),
+    createVaultingToken({ authToken: response.authToken }),
+  ]);
   return {
     authToken: response.authToken,
     vaultingToken: vaultingToken.token,
     validationToken,
+    requirements,
   };
 };

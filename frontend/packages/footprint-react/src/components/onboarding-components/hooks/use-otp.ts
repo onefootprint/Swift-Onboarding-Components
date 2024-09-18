@@ -219,7 +219,7 @@ const useOtp = () => {
     if (!challengeData) {
       throw new Error('No challengeData found. Please make sure that the publicKey is correct');
     }
-    const response = await verifyChallenge(
+    const { validationToken, requirements, vaultingToken, authToken } = await verifyChallenge(
       {
         challenge: payload.verificationCode,
         challengeToken: challengeData?.challengeToken,
@@ -231,12 +231,12 @@ const useOtp = () => {
     );
     setContext(prev => ({
       ...prev,
-      vaultingToken: response.vaultingToken,
-      verifiedAuthToken: response.authToken,
+      vaultingToken,
+      verifiedAuthToken: authToken,
       authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
 
-    return { validationToken: response.validationToken };
+    return { validationToken, requirements };
   };
 
   return {

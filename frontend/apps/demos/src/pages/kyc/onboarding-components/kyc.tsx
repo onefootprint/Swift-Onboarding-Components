@@ -17,6 +17,10 @@ const steps = [
     value: 'personal-data',
   },
   {
+    label: 'Address',
+    value: 'address',
+  },
+  {
     label: 'Confirmation',
     value: 'confirmation',
   },
@@ -29,6 +33,7 @@ const Demo = () => {
 
   const isIdentify = option.value === 'identify';
   const isPersonalData = option.value === 'personal-data';
+  const isAddress = option.value === 'address';
   const isSuccess = option.value === 'confirmation';
 
   return (
@@ -49,9 +54,16 @@ const Demo = () => {
               )}
               {isPersonalData && (
                 <PersonalData
+                  onDone={() => {
+                    setOption(steps[2]);
+                  }}
+                />
+              )}
+              {isAddress && (
+                <Address
                   onDone={(validationToken: string) => {
                     console.log(validationToken);
-                    setOption(steps[2]);
+                    setOption(steps[3]);
                   }}
                 />
               )}
@@ -68,14 +80,17 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const [busy, setBusy] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const handleSubmitData = async (formValues: FormValues) => {
+    const email = formValues['id.email'];
+    const phoneNumber = formValues['id.phone_number'];
+    if (!email || !phoneNumber) return null;
+
     try {
       setBusy(true);
-      await fp.createEmailPhoneBasedChallenge({
-        email: formValues['id.email'],
-        phoneNumber: formValues['id.phone_number'],
-      });
+      setPhoneNumber(phoneNumber);
+      await fp.createEmailPhoneBasedChallenge({ email, phoneNumber });
       setShowOtp(true);
     } catch (e) {
       console.log(e);
@@ -87,8 +102,8 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   const handleSubmitPin = async (verificationCode: string) => {
     try {
       setBusy(true);
-      const { validationToken } = await fp.verify({ verificationCode });
-      console.log({ validationToken });
+      const { validationToken, requirements } = await fp.verify({ verificationCode });
+      console.log({ validationToken, requirements });
       onDone();
     } catch (e) {
       console.log(e);
@@ -104,7 +119,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
           <Box marginBottom={7}>
             <Text variant="heading-3">Verify your phone number</Text>
             <Text variant="body-3" color="secondary">
-              Enter the 6-digit code sent to +1 (555) 555‑0100.
+              Enter the 6-digit code sent to {phoneNumber}.
             </Text>
           </Box>
           <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
@@ -146,7 +161,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-const PersonalData = ({ onDone }: { onDone: (validationToken: string) => void }) => {
+const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const [busy, setBusy] = useState(false);
 
@@ -154,7 +169,7 @@ const PersonalData = ({ onDone }: { onDone: (validationToken: string) => void })
     try {
       setBusy(true);
       await fp.save(formValues);
-      fp.handoff({ onComplete: onDone });
+      onDone();
     } catch (e) {
       console.log(e);
     } finally {
@@ -165,9 +180,9 @@ const PersonalData = ({ onDone }: { onDone: (validationToken: string) => void })
   return (
     <Layout>
       <Box marginBottom={7}>
-        <Text variant="heading-3">Basic information</Text>
+        <Text variant="heading-3">Personal information</Text>
         <Text variant="body-3" color="secondary">
-          Please provide some basic personal information
+          Please provide your personal details
         </Text>
       </Box>
       <Fp.Form onSubmit={handleSubmit}>
@@ -192,7 +207,47 @@ const PersonalData = ({ onDone }: { onDone: (validationToken: string) => void })
             <Fp.Input placeholder="MM/DD/YYYY" />
             <Fp.FieldErrors />
           </Fp.Field>
+          <Fp.Field name="id.ssn9">
+            <Fp.Label>SSN</Fp.Label>
+            <Fp.Input placeholder="XXX-XX-XXXX" />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
+          <Button type="submit" disabled={busy}>
+            {busy ? 'Loading...' : 'Continue'}
+          </Button>
+        </Stack>
+      </Fp.Form>
+    </Layout>
+  );
+};
+
+const Address = ({ onDone }: { onDone: (validationToken: string) => void }) => {
+  const fp = useFootprint();
+  const [busy, setBusy] = useState(false);
+
+  const handleSubmit = async (formValues: FormValues) => {
+    try {
+      setBusy(true);
+      await fp.save(formValues);
+      fp.handoff({ onComplete: onDone });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Layout>
+      <Box marginBottom={7}>
+        <Text variant="heading-3">Address information</Text>
+        <Text variant="body-3" color="secondary">
+          Please provide your address details
+        </Text>
+      </Box>
+      <Fp.Form onSubmit={handleSubmit}>
+        <Stack gap={5} direction="column">
           <Fp.Field name="id.country">
             <Fp.Input placeholder="US" defaultValue="US" type="hidden" />
           </Fp.Field>
@@ -219,12 +274,6 @@ const PersonalData = ({ onDone }: { onDone: (validationToken: string) => void })
           <Fp.Field name="id.zip">
             <Fp.Label>Zip</Fp.Label>
             <Fp.Input placeholder="11206" />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Fp.Field name="id.ssn9">
-            <Fp.Label>SSN</Fp.Label>
-            <Fp.Input placeholder="XXX-XX-XXXX" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
