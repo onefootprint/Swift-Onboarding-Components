@@ -16,7 +16,8 @@ pub struct TriggerKycRequest {
     pub fixture_result: Option<SimpleFixtureResult>,
     /// Run the user through KYC on the provided playbook even if they have already onboarded onto
     /// this playbook. Defaults to true.
-    pub force_reonboard: Option<bool>,
+    #[serde(alias = "force_reonboard")]
+    pub allow_reonboard: Option<bool>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
@@ -52,5 +53,6 @@ pub struct TriggerKybRequest {
     pub fixture_result: Option<SimpleFixtureResult>,
     /// Run the businesss through KYB on the provided playbook even if they have already onboarded
     /// onto this playbook. Defaults to true.
-    pub force_reonboard: Option<bool>,
+    #[serde(alias = "force_reonboard")]
+    pub allow_reonboard: Option<bool>,
 }

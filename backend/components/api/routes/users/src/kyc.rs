@@ -73,9 +73,9 @@ pub async fn post(
         onboarding_config_key,
         key,
         fixture_result,
-        force_reonboard,
+        allow_reonboard,
     } = request.into_inner();
-    let force_reonboard = force_reonboard.unwrap_or(true);
+    let allow_reonboard = allow_reonboard.unwrap_or(true);
     // For backwards compatibility
     match onboarding_config_key {
         Some(_) => root_span.record("meta", "with_legacy_onboarding_key"),
@@ -160,7 +160,7 @@ pub async fn post(
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
                 wfr_id: None,
-                force_create: force_reonboard,
+                force_create: allow_reonboard,
                 sv: &sv,
                 seqno,
                 obc: &obc,

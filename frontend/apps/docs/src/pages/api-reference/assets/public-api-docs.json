@@ -13462,6 +13462,10 @@
             "TriggerKybRequest": {
                 "type": "object",
                 "properties": {
+                    "allow_reonboard": {
+                        "description": "Run the businesss through KYB on the provided playbook even if they have already onboarded\n onto this playbook. Defaults to true.",
+                        "type": "boolean"
+                    },
                     "fixture_result": {
                         "example": null,
                         "description": "(only valid for sandbox businesses) choose the desired KYB outcome",
@@ -13471,10 +13475,6 @@
                             "pass",
                             "manual_review"
                         ]
-                    },
-                    "force_reonboard": {
-                        "description": "Run the businesss through KYB on the provided playbook even if they have already onboarded\n onto this playbook. Defaults to true.",
-                        "type": "boolean"
                     },
                     "key": {
                         "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB\n decision.",
@@ -13488,6 +13488,10 @@
             "TriggerKycRequest": {
                 "type": "object",
                 "properties": {
+                    "allow_reonboard": {
+                        "description": "Run the user through KYC on the provided playbook even if they have already onboarded onto\n this playbook. Defaults to true.",
+                        "type": "boolean"
+                    },
                     "fixture_result": {
                         "example": null,
                         "description": "(only valid for sandbox users) choose the desired KYC outcome.",
@@ -13497,10 +13501,6 @@
                             "pass",
                             "manual_review"
                         ]
-                    },
-                    "force_reonboard": {
-                        "description": "Run the user through KYC on the provided playbook even if they have already onboarded onto\n this playbook. Defaults to true.",
-                        "type": "boolean"
                     },
                     "key": {
                         "description": "The publishable key of the playbook onto which you would like this user to onboard. The\n playbook will specify required information and the rules by which to make a KYC decision.",
