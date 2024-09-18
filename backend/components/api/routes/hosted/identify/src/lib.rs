@@ -173,10 +173,7 @@ async fn get_identify_challenge_context(
         // new tenant
         UserIdentifier::Vault(existing_user_id)
     };
-    let ctx = state
-        .db_pool
-        .db_query(move |conn| get_user_auth_methods(conn, identifier, user_auth))
-        .await?;
+    let ctx = get_user_auth_methods(state, identifier, user_auth).await?;
     let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
     let ctx = IdentifyChallengeContext {
         ctx,

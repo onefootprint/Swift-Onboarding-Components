@@ -31,18 +31,15 @@ pub async fn get(
             _ => None,
         })
         .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
-    let ctx = state
-        .db_pool
-        .db_query(move |conn| get_user_auth_methods(conn, user_auth.user_identifier(), Some(user_auth)))
-        .await?;
+    let ctx = get_user_auth_methods(&state, user_auth.user_identifier(), Some(user_auth)).await?;
     let auth_methods = ctx
         .auth_methods
         .into_iter()
         .map(|m| {
             let can_update = limit_auth_methods.as_ref().is_none()
-                || limit_auth_methods.as_ref().is_some_and(|l| l.contains(&m.kind));
+                || limit_auth_methods.as_ref().is_some_and(|l| l.contains(&m.kind()));
             api_wire_types::AuthMethod {
-                kind: m.kind,
+                kind: m.kind(),
                 is_verified: m.is_verified,
                 can_update,
             }

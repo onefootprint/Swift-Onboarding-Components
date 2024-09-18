@@ -5,6 +5,7 @@ use serde::Serialize;
 #[derive(
     Debug,
     Clone,
+    Copy,
     Eq,
     PartialEq,
     Hash,

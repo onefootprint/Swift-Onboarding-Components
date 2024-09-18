@@ -4,30 +4,77 @@ use crate::auth::user::UserIdentifier;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
+use crate::State;
+use api_errors::AssertionError;
 use db::models::contact_info::ContactInfo;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::PgConn;
 use itertools::Itertools;
+use newtypes::email::Email;
 use newtypes::AuthMethodKind;
-use newtypes::ChallengeKind;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeId;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::PhoneNumber;
 
 pub struct UserAuthMethodsContext {
     pub vw: VaultWrapper<Person>,
-    pub webauthn_creds: Vec<WebauthnCredential>,
     pub auth_methods: Vec<AuthMethod>,
-    pub available_challenge_kinds: Vec<ChallengeKind>,
     pub is_vault_unverified: bool,
 }
 
 pub struct AuthMethod {
-    pub kind: AuthMethodKind,
+    pub info: AuthMethodInfo,
     /// When true, the auth method has been verified
     pub is_verified: bool,
     /// When true, this token can initiate a login challenge with this auth method
     pub can_initiate_challenge: bool,
+}
+
+pub enum AuthMethodInfo {
+    Passkey {
+        passkeys: Vec<WebauthnCredential>,
+    },
+    Phone {
+        phone: PhoneNumber,
+        // TODO use this to mark the CI as verified so we are explicit about verifying the CI that was used
+        lifetime_id: DataLifetimeId,
+    },
+    Email {
+        email: Email,
+        lifetime_id: DataLifetimeId,
+    },
+}
+
+impl AuthMethod {
+    pub fn passkeys(&self) -> &[WebauthnCredential] {
+        match &self.info {
+            AuthMethodInfo::Passkey { passkeys } => passkeys,
+            _ => &[],
+        }
+    }
+
+    pub fn phone(&self) -> Option<&PhoneNumber> {
+        match &self.info {
+            AuthMethodInfo::Phone { phone, .. } => Some(phone),
+            _ => None,
+        }
+    }
+
+    pub fn email(&self) -> Option<&Email> {
+        match &self.info {
+            AuthMethodInfo::Email { email, .. } => Some(email),
+            _ => None,
+        }
+    }
+
+    pub fn kind(&self) -> AuthMethodKind {
+        match &self.info {
+            AuthMethodInfo::Email { .. } => AuthMethodKind::Email,
+            AuthMethodInfo::Phone { .. } => AuthMethodKind::Phone,
+            AuthMethodInfo::Passkey { .. } => AuthMethodKind::Passkey,
+        }
+    }
 }
 
 /// Determine what challenge kinds are available for the given user.
@@ -39,33 +86,69 @@ pub struct AuthMethod {
 /// NOTE: this method needs to service two contexts: user-specific contexts (like my1fp or logging
 /// into an existing vault in order to onboard onto a new tenant) AND scoped-user-specific contexts.
 #[tracing::instrument(skip_all, fields(identifier))]
-pub fn get_user_auth_methods(
-    conn: &mut PgConn,
+pub async fn get_user_auth_methods(
+    state: &State,
     identifier: UserIdentifier,
     user_auth: Option<CheckedUserAuthContext>,
 ) -> FpResult<UserAuthMethodsContext> {
-    // TODO make this closer to the source of truth - challenges should be initiated from this returned
-    // list of what's available, and these should include the phone / email
-    let args = VwArgs::from(&identifier);
-    let uvw = VaultWrapper::build(conn, args)?;
-
-    let passkeys = match identifier {
-        UserIdentifier::Vault(v_id) => WebauthnCredential::list(conn, &v_id)?,
-        UserIdentifier::ScopedVault(sv_id) => WebauthnCredential::list(conn, &sv_id)?,
-    };
-
-    let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
-        .into_iter()
-        // TODO eventually only decrypt ci.verified_di()
-        .filter_map(|ci| uvw.get_lifetime(&ci.di()).map(|d| (ci, d.clone())))
-        .collect_vec();
-
-    let cis = ci
-        .into_iter()
-        .map(|(ci, dl)| -> FpResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
-        .collect::<FpResult<Vec<_>>>()?;
+    let (uvw, cis, passkeys) = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            let uvw = VaultWrapper::build(conn, VwArgs::from(&identifier))?;
+            let passkeys = match identifier {
+                UserIdentifier::Vault(v_id) => WebauthnCredential::list(conn, &v_id)?,
+                UserIdentifier::ScopedVault(sv_id) => WebauthnCredential::list(conn, &sv_id)?,
+            };
+            let cis = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
+                .into_iter()
+                // TODO eventually only decrypt ci.verified_di()
+                .filter_map(|cik| uvw.get_lifetime(&cik.di()).map(|dl| (cik, dl.id.clone())))
+                .map(|(cik, dl_id)| ContactInfo::get(conn, &dl_id).map(|ci| (cik, ci, dl_id)))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok((uvw, cis, passkeys))
+        })
+        .await?;
 
     let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified());
+
+    let mut auth_methods = vec![];
+    for (cik, ci, lifetime_id) in cis {
+        let info = match cik {
+            ContactInfoKind::Phone => {
+                let phone = uvw
+                    .decrypt_unchecked_parse(state, IDK::PhoneNumber)
+                    .await?
+                    .ok_or(AssertionError("Missing phone number"))?;
+                AuthMethodInfo::Phone { lifetime_id, phone }
+            }
+            ContactInfoKind::Email => {
+                let email = uvw
+                    .decrypt_unchecked_parse(state, IDK::Email)
+                    .await?
+                    .ok_or(AssertionError("Missing email"))?;
+                AuthMethodInfo::Email { lifetime_id, email }
+            }
+        };
+        auth_methods.push(AuthMethod {
+            is_verified: ci.is_otp_verified(),
+            info,
+            // Allow initiating challenges to unverified methods that are either permitted by
+            // KBA or because the vault is "not yet" portable
+            can_initiate_challenge: ci.is_otp_verified(),
+        })
+    }
+
+    if !passkeys.is_empty() {
+        auth_methods.push(AuthMethod {
+            is_verified: true,
+            can_initiate_challenge: true,
+            info: AuthMethodInfo::Passkey { passkeys },
+        })
+    }
+
+    // Allow initiating challenges to unverified methods that are either permitted by
+    // KBA or because the vault is "not yet" portable
+
     let mut allowed_unverified_methods = user_auth
         .iter()
         .flat_map(|ua| &ua.data.kba)
@@ -77,40 +160,13 @@ pub fn get_user_auth_methods(
         // even though they are unverified.
         allowed_unverified_methods.append(&mut vec![AuthMethodKind::Phone, AuthMethodKind::Email]);
     }
-
-    let auth_methods = cis
-        .iter()
-        // TODO one day, don't allow logging in via data added via bootstrap?
-        .map(|(cik, ci, _)| AuthMethod {
-            kind: AuthMethodKind::from(*cik),
-            is_verified: ci.is_otp_verified(),
-            can_initiate_challenge: ci.is_otp_verified(),
-        })
-        .chain((!passkeys.is_empty()).then_some(AuthMethod {
-            kind: AuthMethodKind::Passkey,
-            is_verified: true,
-            can_initiate_challenge: true,
-        }))
-        .map(|m| AuthMethod {
-            kind: m.kind,
-            is_verified: m.is_verified,
-            // Allow initiating challenges to unverified methods that are either permitted by
-            // KBA or because the vault is "not yet" portable
-            can_initiate_challenge: m.can_initiate_challenge || allowed_unverified_methods.contains(&m.kind),
-        })
-        .collect_vec();
-
-    let available_challenge_kinds = auth_methods
-        .iter()
-        .filter(|m| m.can_initiate_challenge)
-        .map(|m| m.kind.into())
-        .collect_vec();
+    auth_methods.iter_mut().for_each(|m| {
+        m.can_initiate_challenge = m.can_initiate_challenge || allowed_unverified_methods.contains(&m.kind())
+    });
 
     let ctx = UserAuthMethodsContext {
         vw: uvw,
-        webauthn_creds: passkeys,
         auth_methods,
-        available_challenge_kinds,
         is_vault_unverified,
     };
     Ok(ctx)

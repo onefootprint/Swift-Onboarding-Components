@@ -9,11 +9,11 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
+use api_core::utils::identify::AuthMethodInfo;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::sms::send_sms_challenge_non_blocking;
@@ -25,7 +25,6 @@ use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
 use newtypes::ChallengeKind;
-use newtypes::IdentityDataKind as IDK;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -69,49 +68,37 @@ pub async fn post(
         return Err(ErrorWithCode::LoginChallengeUserNotFound.into());
     };
     let IdentifyChallengeContext { ctx, tenant, .. } = ctx;
-    let UserAuthMethodsContext {
-        vw,
-        webauthn_creds: creds,
-        available_challenge_kinds,
-        ..
-    } = ctx;
+    let UserAuthMethodsContext { vw, auth_methods, .. } = ctx;
 
     // If we need to create a challenge, extract the phone number for the user
     let sandbox_id = vw.vault.sandbox_id.clone();
 
-    if !available_challenge_kinds.contains(&challenge_kind) {
+    let Some(auth_method) = auth_methods
+        .into_iter()
+        .filter(|am| am.can_initiate_challenge)
+        .find(|am| ChallengeKind::from(am.kind()) == challenge_kind)
+    else {
         return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
-    }
+    };
 
-    let (rx, challenge_data, time_before_retry_s, biometric_challenge_json) = match challenge_kind {
-        ChallengeKind::Passkey => {
-            let challenge = initiate_passkey_login_challenge(&state, creds).await?;
+    let (rx, challenge_data, time_before_retry_s, biometric_challenge_json) = match auth_method.info {
+        AuthMethodInfo::Passkey { passkeys } => {
+            let challenge = initiate_passkey_login_challenge(&state, passkeys).await?;
             let challenge_data = ChallengeData::Passkey(challenge.state);
             (None, challenge_data, 0, Some(challenge.challenge_json))
         }
-        ChallengeKind::Sms => {
-            let phone_number = vw
-                .decrypt_unchecked_parse(&state, IDK::PhoneNumber)
-                .await?
-                .ok_or(AssertionError("No phone number in vault"))?;
+        AuthMethodInfo::Phone { phone, .. } => {
             let t = tenant.as_ref();
             let (rx, challenge_state) =
-                send_sms_challenge_non_blocking(&state, t, phone_number, sandbox_id, Some(vw.vault.id))
-                    .await?;
+                send_sms_challenge_non_blocking(&state, t, phone, sandbox_id, Some(vw.vault.id)).await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)
         }
-        ChallengeKind::Email => {
-            let email = vw
-                .decrypt_unchecked_parse(&state, IDK::Email)
-                .await?
-                .ok_or(AssertionError("No phone number in vault"))?;
+        AuthMethodInfo::Email { email, .. } => {
             let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
-
             let (rx, challenge_data) =
                 send_email_challenge_non_blocking(&state, &email, &tenant, sandbox_id)?;
-
             let challenge_data = ChallengeData::Email(challenge_data);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)

@@ -92,7 +92,7 @@ def test_inherit_from_email(no_phone_user):
     post("hosted/onboarding", None, auth_token)
 
 
-def test_phone_user_cannot_inherit_from_email(sandbox_user):
+def test_phone_user_cannot_login_from_email(sandbox_user):
     email = sandbox_user.client.data["id.email"]
     sandbox_id = SandboxId(sandbox_user.client.sandbox_id)
 
@@ -102,7 +102,7 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
     assert "email" not in body["user"]["available_challenge_kinds"]
     token = FpAuth(body["user"]["token"])
 
-    # TODO: after adding is_otp_verified, confirm this still fails even if email is_verified
+    # Shouldn't be able to log in using the unverified email since we have a verified phone
     data = dict(email=email, preferred_challenge_kind="email", scope="onboarding")
     post("hosted/identify/login_challenge", data, token, status_code=400)
 

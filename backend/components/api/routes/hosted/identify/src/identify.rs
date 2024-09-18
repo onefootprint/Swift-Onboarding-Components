@@ -21,11 +21,7 @@ use api_wire_types::IdentifyResponse;
 use db::models::scoped_vault::ScopedVault;
 use itertools::chain;
 use itertools::Itertools;
-use newtypes::email::Email;
-use newtypes::DataIdentifier;
 use newtypes::IdentifyScope;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::PhoneNumber;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
@@ -35,7 +31,6 @@ use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
 };
-use std::str::FromStr;
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -94,10 +89,8 @@ pub async fn post(
         matching_fps,
     } = ctx;
     let UserAuthMethodsContext {
-        webauthn_creds,
-        available_challenge_kinds,
         is_vault_unverified,
-        auth_methods,
+        auth_methods: ams,
         vw,
     } = ctx;
 
@@ -109,35 +102,31 @@ pub async fn post(
         create_identified_token(&state, v_id, scope, sv, ob_context).await?
     };
 
-    let dis = vec![
-        DataIdentifier::Id(IDK::PhoneNumber),
-        DataIdentifier::Id(IDK::Email),
-    ];
-    let values = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
-    let phone = values.get_di(IDK::PhoneNumber).ok();
-    let scrubbed_phone = phone
-        .and_then(|p| PhoneNumber::parse(p).ok())
-        .map(|p| p.scrubbed());
+    let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
+    // When we are identifying a user via API-created auth token, provide the scrubbed phone and email
     let scrubbed_email = if is_from_api {
-        // When we are identifying a user via API-created auth token, provide the scrubbed phone and email
-        let email = values.get_di(IDK::Email).ok();
-        let scrubbed_email = email
-            .and_then(|p| Email::from_str(p.leak()).ok())
-            .map(|email| email.scrubbed());
-        scrubbed_email
+        ams.iter().find_map(|am| am.email()).map(|p| p.scrubbed())
     } else {
         None
     };
 
-    let auth_methods = auth_methods
+    let has_syncable_passkey = ams
+        .iter()
+        .flat_map(|am| am.passkeys())
+        .any(|cred| cred.backup_state);
+    let available_challenge_kinds = ams
+        .iter()
+        .filter(|m| m.can_initiate_challenge)
+        .map(|m| m.kind().into())
+        .collect_vec();
+    let auth_methods = ams
         .into_iter()
         .map(|m| api_wire_types::IdentifyAuthMethod {
-            kind: m.kind,
+            kind: m.kind(),
             is_verified: m.is_verified,
         })
         .collect();
 
-    let has_syncable_passkey = webauthn_creds.iter().any(|cred| cred.backup_state);
     let user = IdentifiedUser {
         token,
         token_scopes,
