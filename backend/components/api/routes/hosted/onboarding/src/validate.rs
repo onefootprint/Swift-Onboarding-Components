@@ -1,6 +1,5 @@
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
-use api_core::auth::user::UserIdentifier;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::IsGuardMet;
 use api_core::errors::onboarding::OnboardingError;
@@ -10,6 +9,8 @@ use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_register_auth_method_requirements;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
@@ -56,11 +57,12 @@ pub async fn post(
             .scoped_user_id()
             .ok_or(ValidationError("No scoped user associated with session"))?;
         let auth_events = user_auth.auth_events.clone();
-        let user_identifier = UserIdentifier::ScopedVault(sv_id);
         let reqs = state
             .db_pool
-            .db_query(move |conn| {
-                get_register_auth_method_requirements(conn, &obc, user_identifier, &auth_events)
+            .db_query(move |conn| -> FpResult<_> {
+                let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
+                let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &auth_events)?;
+                Ok(reqs)
             })
             .await?;
         let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();

@@ -1,10 +1,10 @@
 use crate::auth::user::UserAuthContext;
 use crate::State;
-use api_core::auth::user::UserIdentifier;
-use api_core::auth::Any;
 use api_core::errors::ValidationError;
 use api_core::utils::requirements::get_register_auth_method_requirements;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiResponse;
+use api_core::FpResult;
 use api_wire_types::hosted::onboarding_status::ApiOnboardingRequirement;
 use api_wire_types::hosted::onboarding_status::AuthRequirementsResponse;
 use itertools::Itertools;
@@ -23,7 +23,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> ApiResponse<AuthRequirementsResponse> {
-    let user_auth = user_auth.check_guard(Any)?;
+    let user_auth = user_auth.check_guard(api_core::auth::Any)?;
     let obc = user_auth
         .ob_config()
         .ok_or(ValidationError("No playbook associated with this session"))?
@@ -31,12 +31,13 @@ pub async fn get(
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(ValidationError("No scoped user associated with session"))?;
-    let user_identifier = UserIdentifier::ScopedVault(sv_id);
 
     let requirements = state
         .db_pool
-        .db_query(move |conn| {
-            get_register_auth_method_requirements(conn, &obc, user_identifier, &user_auth.auth_events)
+        .db_query(move |conn| -> FpResult<_> {
+            let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
+            let reqs = get_register_auth_method_requirements(conn, &obc, &vw, &user_auth.auth_events)?;
+            Ok(reqs)
         })
         .await?;
 

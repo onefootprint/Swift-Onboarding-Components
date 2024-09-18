@@ -18,7 +18,6 @@ use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
@@ -88,7 +87,7 @@ pub async fn post(
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sb.id, seqno))?;
+            let bvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &sb.id, seqno)?;
             Ok((bvw, sb, seqno))
         })
         .await?;

@@ -1,15 +1,14 @@
 use super::vault_wrapper::Any;
+use super::vault_wrapper::TenantVw;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::user::load_auth_events;
 use crate::auth::user::CheckUserWfAuthContext;
-use crate::auth::user::UserIdentifier;
-use crate::utils::identify::get_user_auth_methods;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
 use crate::State;
 use db::models::business_owner::BusinessOwner;
+use db::models::contact_info::ContactInfo;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::liveness_event::LivenessEvent;
@@ -24,11 +23,13 @@ use itertools::chain;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
 use newtypes::AuthEventKind;
+use newtypes::AuthMethodKind;
 use newtypes::AuthorizeFields;
 use newtypes::BusinessOwnerSource;
 use newtypes::CollectDocumentConfig;
 use newtypes::CollectedData;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::ContactInfoKind;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::Declaration;
 use newtypes::DocumentCdoInfo;
@@ -131,9 +132,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let (uvw, bvw_wf) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&su_id))?;
+            let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
             let bvw = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
-                let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb_id))?;
+                let bvw = VaultWrapper::<Any>::build_for_tenant(conn, &sb_id)?;
                 let (business_workflow, _) = Workflow::get_all(conn, &biz_wf_id)?;
                 Some((bvw, business_workflow))
             } else {
@@ -376,7 +377,7 @@ pub fn get_requirements_inner(
 pub fn get_register_auth_method_requirements(
     conn: &mut PgConn,
     obc: &ObConfiguration,
-    user_identifier: UserIdentifier,
+    vw: &TenantVw,
     auth_events: &[AssociatedAuthEvent],
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let auth_events = load_auth_events(conn, auth_events)?;
@@ -391,13 +392,20 @@ pub fn get_register_auth_method_requirements(
         return Ok(vec![]);
     }
 
-    let ctx = get_user_auth_methods(conn, user_identifier, None)?;
-    let verified_auth_methods = ctx
-        .auth_methods
+    let verified_cis = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
         .into_iter()
-        .filter(|am| am.is_verified)
-        .map(|am| am.kind)
-        .collect_vec();
+        .filter_map(|ci| vw.get_lifetime(&ci.di()).map(|d| (ci, d.clone())))
+        .map(|(cik, dl)| ContactInfo::get(conn, &dl.id).map(|ci| (cik, ci)))
+        .filter_ok(|(_, ci)| ci.is_otp_verified())
+        .map_ok(|(cik, _)| AuthMethodKind::from(cik))
+        .collect::<Result<Vec<_>, _>>()?;
+    let passkeys = WebauthnCredential::list(conn, &vw.scoped_vault.id)?;
+    let verified_auth_methods = chain!(
+        verified_cis,
+        (!passkeys.is_empty()).then_some(AuthMethodKind::Passkey)
+    )
+    .collect_vec();
+
     let required_auth_methods = obc.required_auth_methods.iter().flatten().copied();
     let requirements = required_auth_methods
         .filter(|amk| !verified_auth_methods.contains(amk))
@@ -409,7 +417,7 @@ pub fn get_register_auth_method_requirements(
 
 #[derive(Clone, Copy)]
 pub struct EntityInfo<'a> {
-    pub vw: &'a VaultWrapper<Any>,
+    pub vw: &'a TenantVw<Any>,
     pub wf: &'a Workflow,
     pub decrypted_values: &'a DecryptUncheckedResultForReqs,
     pub auth_events: &'a [AssociatedAuthEvent],
@@ -438,8 +446,7 @@ fn get_requirement_inner(
     } = opts;
     let req = match k {
         OnboardingRequirementKind::RegisterAuthMethod => {
-            let user_identifier = UserIdentifier::ScopedVault(wf.scoped_vault_id.clone());
-            get_register_auth_method_requirements(conn, obc, user_identifier, auth_events)?
+            get_register_auth_method_requirements(conn, obc, vw, auth_events)?
         }
         OnboardingRequirementKind::CollectData => {
             obc.must_collect(DID::Id)

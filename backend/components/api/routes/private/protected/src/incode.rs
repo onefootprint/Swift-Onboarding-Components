@@ -124,7 +124,7 @@ pub async fn rerun_machine(
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
             let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
-            let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id))?;
+            let uvw = VaultWrapper::build_for_tenant(conn, &su.id)?;
             let (obc, _) = ObConfiguration::get(conn, &dr.workflow_id)?;
             // TODO mark the latest DocumentUpload as not deactivated. Right now this needs to be done
             // manually
@@ -432,7 +432,7 @@ pub async fn adhoc_document_process(
                 .map_err(|_| DbError::PlaybookNotFound)?;
 
             let seqno = DataLifetime::get_current_seqno(conn)?;
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&wf.scoped_vault_id, seqno))?;
+            let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, seqno)?;
 
             Ok((wf, uvw, obc, seqno))
         })

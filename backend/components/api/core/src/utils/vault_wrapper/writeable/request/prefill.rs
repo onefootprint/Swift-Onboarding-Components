@@ -205,11 +205,7 @@ impl<Type> VaultWrapper<Type> {
                 old_ci_dls
                     .into_iter()
                     .map(|(di, dl_id)| ContactInfo::get(conn, &dl_id).map(|ci| (di, ci)))
-                    .map_ok(|(di, old_ci)| NewContactInfoArgs {
-                        is_otp_verified: old_ci.is_otp_verified,
-                        is_tenant_verified: old_ci.is_tenant_verified,
-                        identifier: di,
-                    })
+                    .map_ok(|(di, old_ci)| old_ci.replacement_ci(di))
                     .collect()
             })
             .await?;

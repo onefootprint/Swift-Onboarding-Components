@@ -26,8 +26,8 @@ pub struct ContactInfo {
     pub lifetime_id: DataLifetimeId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    /// Verified by entering an OTP sent to this contact info
-    pub is_otp_verified: bool,
+    /// Verified by entering an OTP sent to this contact info. Should not be read directly.
+    is_otp_verified: bool,
     /// Indicates whether the OTP verification status of this contact info was inherited from the
     /// _previous_ value of this contact info. For all intents and purposes, CI that
     /// `is_tenant_verified` behaves the same as CI that `is_otp_verified`. Only
@@ -110,5 +110,13 @@ impl ContactInfo {
     /// it was never verified with Footprint
     pub fn is_otp_verified(&self) -> bool {
         self.is_otp_verified || self.is_tenant_verified
+    }
+
+    pub fn replacement_ci<T>(self, identifier: T) -> NewContactInfoArgs<T> {
+        NewContactInfoArgs {
+            is_otp_verified: self.is_otp_verified,
+            is_tenant_verified: self.is_tenant_verified,
+            identifier,
+        }
     }
 }

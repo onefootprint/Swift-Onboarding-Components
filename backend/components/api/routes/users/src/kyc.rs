@@ -24,7 +24,6 @@ use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::SimpleFixtureResult;
@@ -101,7 +100,7 @@ pub async fn post(
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
+            let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &sv.id, seqno)?;
 
             let vault_version = ScopedVaultVersion::version_number_at_seqno(conn, &sv.id, seqno)?;
 
