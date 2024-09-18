@@ -6,6 +6,24 @@ import { StackEnvironment, StackMetadata } from './stack_metadata';
 
 export const RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY = 'RateLimitExceeded';
 
+
+function countAction() {
+    return {
+      count: {}
+    };
+}
+
+function rateLimitExceededAction() {
+  return {
+    block: {
+      customResponse: {
+        responseCode: 429,
+        customResponseBodyKey: RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY,
+      },
+    },
+  };
+}
+
 export const APP_CDN_WAF_RULES = [
     awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0, true),
     awsManagedRule('AWSManagedRulesCommonRuleSet', 1, false),
@@ -24,15 +42,31 @@ export const APP_CDN_WAF_RULES = [
     }),
     liveApiKeyRateLimitRule({
       name: 'LiveApiKeyRateLimitRule',
+      header: 'x-footprint-secret-key',
+      action: rateLimitExceededAction(),
       priority: 6,
+    }),
+    liveApiKeyRateLimitRule({
+      name: 'LiveApiKeyBasicAuthRateLimitRule',
+      header: 'authorization',
+      action: countAction(),
+      priority: 7,
     }),
     sandboxApiKeyRateLimitRule({
       name: 'SandboxApiKeyRateLimitRule',
-      priority: 7,
+      header: 'x-footprint-secret-key',
+      action: rateLimitExceededAction(),
+      priority: 8,
+    }),
+    sandboxApiKeyRateLimitRule({
+      name: 'SandboxApiKeyBasicAuthRateLimitRule',
+      header: 'authorization',
+      action: countAction(),
+      priority: 9,
     }),
     dashboardKeyRateLimitRule({
       name: 'DashboardKeyRateLimitRule',
-      priority: 8,
+      priority: 10,
     }),
 ];
 
@@ -54,17 +88,6 @@ function awsManagedRule(name: string, priority: number, sample: boolean) {
       metricName: name,
       cloudwatchMetricsEnabled: true,
       sampledRequestsEnabled: sample,
-    },
-  };
-}
-
-function rateLimitExceededAction() {
-  return {
-    block: {
-      customResponse: {
-        responseCode: 429,
-        customResponseBodyKey: RATE_LIMIT_EXCEEDED_RESPONSE_BODY_KEY,
-      },
     },
   };
 }
@@ -198,11 +221,11 @@ function sandboxApiIpRateLimitRule(args: {name: string, priority: number}) {
   };
 }
 
-function liveApiKeyRateLimitRule(args: {name: string, priority: number}) {
+function liveApiKeyRateLimitRule(args: {name: string, header: string, action: object, priority: number}) {
   return {
     name: args.name,
     priority: args.priority,
-    action: rateLimitExceededAction(),
+    action: args.action,
     statement: {
       rateBasedStatement: {
         limit: 10000,
@@ -211,7 +234,7 @@ function liveApiKeyRateLimitRule(args: {name: string, priority: number}) {
         customKeys: [
           {
             header: {
-              name: 'x-footprint-secret-key',
+              name: args.header,
               textTransformations: [
                 {
                   priority: 0,
@@ -232,7 +255,7 @@ function liveApiKeyRateLimitRule(args: {name: string, priority: number}) {
                 byteMatchStatement: {
                   fieldToMatch: {
                     singleHeader: {
-                      name: 'x-footprint-secret-key',
+                      name: args.header,
                     }
                   },
                   positionalConstraint: 'CONTAINS',
@@ -252,7 +275,7 @@ function liveApiKeyRateLimitRule(args: {name: string, priority: number}) {
                       byteMatchStatement: {
                         fieldToMatch: {
                           singleHeader: {
-                            name: 'x-footprint-secret-key',
+                            name: args.header,
                           }
                         },
                         positionalConstraint: 'CONTAINS',
@@ -282,11 +305,11 @@ function liveApiKeyRateLimitRule(args: {name: string, priority: number}) {
   };
 }
 
-function sandboxApiKeyRateLimitRule(args: {name: string, priority: number}) {
+function sandboxApiKeyRateLimitRule(args: {name: string, header: string, action: object, priority: number}) {
   return {
     name: args.name,
     priority: args.priority,
-    action: rateLimitExceededAction(),
+    action: args.action,
     statement: {
       rateBasedStatement: {
         limit: 1000,
@@ -295,7 +318,7 @@ function sandboxApiKeyRateLimitRule(args: {name: string, priority: number}) {
         customKeys: [
           {
             header: {
-              name: 'x-footprint-secret-key',
+              name: args.header,
               textTransformations: [
                 {
                   priority: 0,
@@ -313,7 +336,7 @@ function sandboxApiKeyRateLimitRule(args: {name: string, priority: number}) {
           byteMatchStatement: {
             fieldToMatch: {
               singleHeader: {
-                name: 'x-footprint-secret-key',
+                name: args.header,
               }
             },
             positionalConstraint: 'CONTAINS',
