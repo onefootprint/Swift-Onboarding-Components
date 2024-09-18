@@ -1,31 +1,25 @@
 use crate::identify::create_identified_token;
-use crate::ChallengeData;
-use crate::ChallengeState;
+use crate::utils::initiate_challenge;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
+use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::identify::UserAuthMethodsContext;
-use api_core::utils::sms::rx_background_error;
-use api_core::utils::sms::send_sms_challenge_non_blocking;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_wire_types::IdentifyChallengeResponse;
 use api_wire_types::IdentifyId;
 use api_wire_types::SignupChallengeData;
 use api_wire_types::SignupChallengeRequest;
-use api_wire_types::SignupChallengeResponse;
-use api_wire_types::UserChallengeData;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::email::Email;
@@ -56,7 +50,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     is_components_sdk: IsComponentsSdk,
     root_span: RootSpan,
-) -> ApiResponse<SignupChallengeResponse> {
+) -> ApiResponse<IdentifyChallengeResponse> {
     let SignupChallengeRequest {
         phone_number: phone,
         email,
@@ -132,64 +126,25 @@ pub async fn post(
             Ok((uv.into_inner(), sv, root_span))
         })
         .await?;
+    let ctx = get_user_auth_methods(&state, sv.id.clone().into(), None).await?;
     let (token, _) =
         create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
 
-    let (rx, challenge_data) = match challenge_kind {
-        ChallengeKind::Sms => {
-            // Expect a phone number and initiate an SMS challenge
-            let phone = phone
-                .ok_or(ValidationError(
-                    "Phone number required to initiate sign up challenge",
-                ))?
-                .value;
-            let (rx, challenge_data) = send_sms_challenge_non_blocking(
-                &state,
-                Some(ob_context.tenant()),
-                phone,
-                sandbox_id,
-                Some(uv.id),
-            )
-            .await?;
-            (rx, ChallengeData::Sms(challenge_data))
-        }
-        ChallengeKind::Email => {
-            // If obc is no-phone flow, only initiate email challenge
-            let email = email
-                .ok_or(ValidationError(
-                    "Email must be provided for no-phone signup challenges",
-                ))?
-                .value;
-            let (rx, challenge_data) =
-                send_email_challenge_non_blocking(&state, &email, ob_context.tenant(), sandbox_id)?;
-            (rx, ChallengeData::Email(challenge_data))
-        }
-        ChallengeKind::Passkey => {
-            return ValidationError("Passkey challenges not yet supported on signup").into();
-        }
+    let Some(auth_method) = ctx
+        .auth_methods
+        .into_iter()
+        .find(|am| ChallengeKind::from(am.kind()) == challenge_kind)
+    else {
+        return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     };
-
-    let err = rx_background_error(rx, 3).await.err();
+    let tenant = Some(ob_context.tenant());
+    let response = initiate_challenge(&state, auth_method, ctx.vw.vault, tenant, token).await?;
     // Since these errors return an HTTP 200, log something special on the root span if there's an error
-    match err {
+    match response.error {
         Some(_) => root_span.record("meta", "error"),
         None => root_span.record("meta", "no_error"),
     };
 
-    let data = ChallengeState { data: challenge_data };
-    let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
-    let challenge_data = UserChallengeData {
-        token,
-        challenge_kind,
-        challenge_token,
-        biometric_challenge_json: None,
-        time_before_retry_s: state.config.time_s_between_challenges,
-    };
-
-    let response = SignupChallengeResponse {
-        challenge_data,
-        error: err.map(|e| e.to_string()),
-    };
     Ok(response)
 }
 

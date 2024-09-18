@@ -19,7 +19,6 @@ use newtypes::AuthEventKind;
 use newtypes::DataIdentifier;
 use newtypes::SandboxId;
 use paperclip::actix::web;
-use paperclip::actix::Apiv2Schema;
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::AuthenticationState;
 
@@ -29,20 +28,9 @@ mod identify_lite;
 mod kba;
 pub mod login_challenge;
 pub mod signup_challenge;
+mod utils;
 mod validation_token;
 pub mod verify;
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub(crate) enum CreateChallengeRequest {
-    Email(#[allow(unused)] String),
-    PhoneNumber(#[allow(unused)] String),
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct BiometricChallengeState {
-    pub state: AuthenticationState,
-}
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -67,6 +55,11 @@ pub enum ChallengeData {
     #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
     Passkey(BiometricChallengeState),
     Email(PhoneEmailChallengeState),
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct BiometricChallengeState {
+    pub state: AuthenticationState,
 }
 
 impl<'a> From<&'a ChallengeData> for AuthEventKind {

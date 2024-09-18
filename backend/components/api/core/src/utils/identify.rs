@@ -3,9 +3,9 @@ use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserIdentifier;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::FpResult;
 use crate::State;
 use api_errors::AssertionError;
+use api_errors::FpResult;
 use db::models::contact_info::ContactInfo;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
@@ -23,14 +23,16 @@ pub struct UserAuthMethodsContext {
     pub is_vault_unverified: bool,
 }
 
+#[derive(Debug)]
 pub struct AuthMethod {
     pub info: AuthMethodInfo,
     /// When true, the auth method has been verified
     pub is_verified: bool,
     /// When true, this token can initiate a login challenge with this auth method
-    pub can_initiate_challenge: bool,
+    pub can_initiate_login_challenge: bool,
 }
 
+#[derive(Debug)]
 pub enum AuthMethodInfo {
     Passkey {
         passkeys: Vec<WebauthnCredential>,
@@ -134,14 +136,14 @@ pub async fn get_user_auth_methods(
             info,
             // Allow initiating challenges to unverified methods that are either permitted by
             // KBA or because the vault is "not yet" portable
-            can_initiate_challenge: ci.is_otp_verified(),
+            can_initiate_login_challenge: ci.is_otp_verified(),
         })
     }
 
     if !passkeys.is_empty() {
         auth_methods.push(AuthMethod {
             is_verified: true,
-            can_initiate_challenge: true,
+            can_initiate_login_challenge: true,
             info: AuthMethodInfo::Passkey { passkeys },
         })
     }
@@ -161,7 +163,8 @@ pub async fn get_user_auth_methods(
         allowed_unverified_methods.append(&mut vec![AuthMethodKind::Phone, AuthMethodKind::Email]);
     }
     auth_methods.iter_mut().for_each(|m| {
-        m.can_initiate_challenge = m.can_initiate_challenge || allowed_unverified_methods.contains(&m.kind())
+        m.can_initiate_login_challenge =
+            m.can_initiate_login_challenge || allowed_unverified_methods.contains(&m.kind())
     });
 
     let ctx = UserAuthMethodsContext {

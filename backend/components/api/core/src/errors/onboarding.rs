@@ -43,8 +43,6 @@ pub enum OnboardingError {
     MissingBoOnboarding,
     #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
     MissingBoOnboardingDecision(Csv<WorkflowId>),
-    #[error("Tenant not present when initiating an email challenge")]
-    NoTenantForEmailChallenge,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
     #[error("Unsupported document country. Supported document countries: {0}")]

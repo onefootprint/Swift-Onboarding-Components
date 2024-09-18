@@ -116,7 +116,7 @@ pub async fn post(
         .any(|cred| cred.backup_state);
     let available_challenge_kinds = ams
         .iter()
-        .filter(|m| m.can_initiate_challenge)
+        .filter(|m| m.can_initiate_login_challenge)
         .map(|m| m.kind().into())
         .collect_vec();
     let auth_methods = ams

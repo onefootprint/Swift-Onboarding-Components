@@ -97,12 +97,12 @@ pub struct LoginChallengeRequest {
 }
 
 #[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
-pub struct LoginChallengeResponse {
+pub struct IdentifyChallengeResponse {
     pub challenge_data: UserChallengeData,
     pub error: Option<String>,
 }
 
-#[derive(Apiv2Schema, serde::Deserialize, Clone)]
+#[derive(Debug, Apiv2Schema, serde::Deserialize, Clone)]
 pub struct SignupChallengeData<T> {
     pub value: T,
     #[serde(default)]
@@ -117,12 +117,6 @@ pub struct SignupChallengeRequest {
     #[openapi(required)]
     // TODO make required
     pub challenge_kind: Option<ChallengeKind>,
-}
-
-#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
-pub struct SignupChallengeResponse {
-    pub challenge_data: UserChallengeData,
-    pub error: Option<String>,
 }
 
 #[derive(Apiv2Schema, serde::Deserialize)]
