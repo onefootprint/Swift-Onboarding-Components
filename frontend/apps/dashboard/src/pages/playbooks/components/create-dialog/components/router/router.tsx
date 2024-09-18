@@ -60,13 +60,7 @@ const Router = ({ onCreate }: RouterProps) => {
 
   const createPlaybook = (
     context: MachineContext,
-    {
-      amlFormData: enhancedAml,
-      kybKind,
-      kycOptionForBeneficialOwners,
-      runKyb,
-      skipKyc: shouldSkipKyc,
-    }: VerificationChecksFormData,
+    { amlFormData: enhancedAml, kybKind, runKyb, skipKyc: shouldSkipKyc }: VerificationChecksFormData,
   ) => {
     const { playbook, nameForm, residencyForm } = context;
     if (!playbook || !nameForm || !enhancedAml) {
@@ -105,7 +99,6 @@ const Router = ({ onCreate }: RouterProps) => {
         },
       },
       skipKyc: shouldSkipKyc,
-      kycOptionForBeneficialOwners,
     });
 
     mutation.mutate(

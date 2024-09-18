@@ -14,16 +14,10 @@ import type {
   NameFormData,
   ResidencyFormData,
 } from '@/playbooks/utils/machine/types';
-import {
-  CountryRestriction,
-  KycOptionsForBeneficialOwners,
-  OnboardingTemplate,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import { CountryRestriction, OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
   kind: PlaybookKind;
-  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
   nameForm: NameFormData;
   playbook: DataToCollectFormData;
   residencyForm?: ResidencyFormData;
@@ -54,11 +48,10 @@ const processPlaybook = ({
   verificationChecks,
   template,
   skipKyc,
-  kycOptionForBeneficialOwners,
 }: ProcessPlaybookProps) => {
   const mustCollectData = [
     ...createPersonMustCollectDataPayload(playbook, kind),
-    ...createBusinessMustCollectDataPayload(playbook, kind, kycOptionForBeneficialOwners, skipKyc),
+    ...createBusinessMustCollectDataPayload(playbook, kind, skipKyc),
   ];
   const optionalData = [...createPersonOptionalDataPayload(playbook, kind)];
 
@@ -219,7 +212,6 @@ const createRequiredAuthMethodsPayload = (formData: DataToCollectFormData) => {
 const createBusinessMustCollectDataPayload = (
   formData: DataToCollectFormData,
   kind: PlaybookKind,
-  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners,
   skipKyc?: boolean,
 ) => {
   if (!isKyb(kind) || !formData.business) {
@@ -228,17 +220,8 @@ const createBusinessMustCollectDataPayload = (
   const { business } = formData;
   const mustCollectData: CollectedDataOption[] = [...requiredKybFields];
 
-  if (collectsBOInfo(formData)) {
-    if (skipKyc) {
-      mustCollectData.push(CollectedKybDataOption.beneficialOwners);
-    } else {
-      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.all) {
-        mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
-      }
-      if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary) {
-        mustCollectData.push(CollectedKybDataOption.beneficialOwners);
-      }
-    }
+  if (collectsBOInfo(formData) && !skipKyc) {
+    mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
   }
 
   if (business.basic.address) {

@@ -57,10 +57,6 @@ export const defaultResidencyFormDataAlpaca: ResidencyFormData = {
   allowInternationalResidents: false,
 };
 
-export enum KycOptionsForBeneficialOwners {
-  all = 'all',
-  primary = 'primary',
-}
 export const defaultResidencyFormDataApex: ResidencyFormData = {
   allowUsResidents: true,
   allowUsTerritories: true,
@@ -88,7 +84,6 @@ export const defaultResidencyFormDataCreditCard: ResidencyFormData = {
 export type VerificationChecksFormData = {
   amlFormData: AMLFormData;
   kybKind?: KybChecksKind;
-  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
   runKyb?: boolean;
   skipKyc?: boolean;
 };

@@ -1,10 +1,4 @@
-import {
-  type AMLFormData,
-  type Business,
-  type KybChecksKind,
-  KycOptionsForBeneficialOwners,
-  type VerificationChecksFormData,
-} from '@/playbooks/utils/machine/types';
+import type { AMLFormData, Business, KybChecksKind, VerificationChecksFormData } from '@/playbooks/utils/machine/types';
 import { Button, Stack } from '@onefootprint/ui';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -59,7 +53,6 @@ const VerificationChecks = ({
       // TODO: Migrate to runKyc
       skipKyc: !canRunKyc,
       amlFormData: defaultAmlValues,
-      kycOptionForBeneficialOwners: isKyb && canRunKyc ? KycOptionsForBeneficialOwners.primary : undefined,
     },
   });
   const { watch } = form;

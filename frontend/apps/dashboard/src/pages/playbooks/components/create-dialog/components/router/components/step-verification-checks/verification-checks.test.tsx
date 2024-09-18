@@ -108,7 +108,7 @@ describe('<VerificationChecks />', () => {
       expect(kycCheck).toBeChecked();
     });
 
-    it('should show the "KYC check" option as disabled anf falsy for KYB kind with collectBO false', () => {
+    it('should show the "KYC check" option as disabled and falsy for KYB kind with collectBO false', () => {
       renderAml({ isKyb: true });
 
       const kycCheck = screen.getByRole('switch', {
@@ -126,31 +126,6 @@ describe('<VerificationChecks />', () => {
       });
       expect(kycCheck).toBeEnabled();
       expect(kycCheck).toBeChecked();
-    });
-
-    it('can choose between primary or all owners when KYC check is enabled for KYB kind', async () => {
-      renderAml({ isKyb: true, collectBO: true });
-
-      const kycCheck = screen.getByRole('switch', {
-        name: 'Run KYC on beneficial owners',
-      });
-      expect(kycCheck).toBeEnabled();
-      expect(kycCheck).toBeChecked();
-
-      const primaryOwners = screen.getByRole('radio', {
-        name: "Only on business' primary owner",
-      });
-      expect(primaryOwners).toBeChecked();
-
-      const allOwners = screen.getByRole('radio', {
-        name: 'On all business owners',
-      });
-      expect(allOwners).not.toBeChecked();
-
-      await userEvent.click(allOwners);
-
-      expect(allOwners).toBeChecked();
-      expect(primaryOwners).not.toBeChecked();
     });
 
     describe('aml checks', () => {

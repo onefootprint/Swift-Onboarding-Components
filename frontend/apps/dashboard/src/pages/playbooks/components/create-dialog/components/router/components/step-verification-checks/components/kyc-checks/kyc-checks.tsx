@@ -1,11 +1,8 @@
-import { Divider, Radio, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
+import { Text, Toggle, Tooltip } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import {
-  KycOptionsForBeneficialOwners,
-  type VerificationChecksFormData,
-} from 'src/pages/playbooks/utils/machine/types';
+import type { VerificationChecksFormData } from 'src/pages/playbooks/utils/machine/types';
 import styled, { css } from 'styled-components';
 
 type KycChecksProps = {
@@ -16,10 +13,9 @@ type KycChecksProps = {
 
 const KycChecks = ({ isKyb, collectBO, requiresDoc }: KycChecksProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks.kyc-checks' });
-  const { watch, setValue, register } = useFormContext<VerificationChecksFormData>();
+  const { watch, setValue } = useFormContext<VerificationChecksFormData>();
   const shouldRunKyc = watch('skipKyc') !== true;
   const [isChecked, setIsChecked] = useState(shouldRunKyc);
-  const isKybWithBo = isKyb && collectBO;
   const toggleDisabled = (!isKyb && !requiresDoc) || (isKyb && !collectBO);
 
   useEffect(() => {
@@ -45,24 +41,6 @@ const KycChecks = ({ isKyb, collectBO, requiresDoc }: KycChecksProps) => {
           }}
         />
       </Tooltip>
-      {isKybWithBo && shouldRunKyc && (
-        <>
-          <Divider variant="secondary" />
-          <Stack direction="column" gap={3}>
-            <Radio
-              label={t('bo-options.only-primary-bo')}
-              hint={t('bo-options.only-primary-bo-hint')}
-              value={KycOptionsForBeneficialOwners.primary}
-              {...register('kycOptionForBeneficialOwners')}
-            />
-            <Radio
-              label={t('bo-options.all-bos')}
-              value={KycOptionsForBeneficialOwners.all}
-              {...register('kycOptionForBeneficialOwners')}
-            />
-          </Stack>
-        </>
-      )}
     </Container>
   );
 };
