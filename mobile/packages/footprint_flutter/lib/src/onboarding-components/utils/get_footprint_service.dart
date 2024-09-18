@@ -84,6 +84,7 @@ typedef HandoffHandler = void Function({
           authToken: authToken,
           sandboxId: fpContext.sandboxId,
           sandboxOutcome: fpContext.sandboxOutcome,
+          onboardingConfig: fpContext.onboardingConfig,
         );
         return authTokenStatusToResult(status);
       }
@@ -161,13 +162,18 @@ typedef HandoffHandler = void Function({
     final onboardingConfig = fpContext.onboardingConfig;
     final locale = fpContext.locale;
 
-    if (vaultToken == null) {
-      throw Exception('No auth token found. Please authenticate first.');
-    }
-
     if (onboardingConfig == null) {
       throw Exception(
           'No onboarding config found. Please make sure that the publicKey is correct.');
+    }
+
+    if (onboardingConfig.kind == OnboardingConfigKind.auth) {
+      throw Exception(
+          "Saving data is not allowed for auth playbooks. Please use a KYC or KYB playbook.");
+    }
+
+    if (vaultToken == null) {
+      throw Exception('No auth token found. Please authenticate first.');
     }
 
     if (onboardingConfig.kind != OnboardingConfigKind.kyc &&
@@ -194,6 +200,17 @@ typedef HandoffHandler = void Function({
     final redirectUrl = fpContext.redirectUrl;
     final sandboxId = fpContext.sandboxId;
     final sandboxOutcome = fpContext.sandboxOutcome;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
+
+    if (obConfigKind == null) {
+      onError?.call(Exception('Onboarding config kind not found.'));
+      return;
+    }
+
+    if (obConfigKind == OnboardingConfigKind.auth) {
+      onError?.call(Exception('Handoff is not allowed for auth playbooks.'));
+      return;
+    }
 
     if (authToken == null) {
       onError

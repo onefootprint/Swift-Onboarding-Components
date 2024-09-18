@@ -4,6 +4,7 @@ import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/models/internal/auth_method.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_response.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/inline_otp_not_supported_exception.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +15,7 @@ typedef OtpChallengeRequest = ({
   String? sandboxId,
   List<AuthMethodKind>? requiredAuthMethods,
   String? authToken,
+  IdentifyScope? scope,
 });
 
 typedef OtpIdentifyRequest = ({
@@ -22,6 +24,7 @@ typedef OtpIdentifyRequest = ({
   String obConfig,
   String? sandboxId,
   String? authToken,
+  IdentifyScope? scope,
 });
 
 Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
@@ -35,6 +38,7 @@ Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
   if (requestData.authToken != null) {
     headers['X-Fp-Authorization'] = requestData.authToken!;
   }
+  final scope = requestData.scope ?? IdentifyScope.onboarding;
 
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify'),
@@ -42,7 +46,7 @@ Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
     body: jsonEncode({
       'email': requestData.email,
       'phone_number': requestData.phoneNumber,
-      "scope": "onboarding",
+      "scope": scope.toString(),
     }),
   );
 
@@ -90,6 +94,7 @@ Future<ChallengeResponse> signupChallenge(
   if (requestData.sandboxId != null) {
     headers['X-Sandbox-Id'] = requestData.sandboxId!;
   }
+  final scope = requestData.scope ?? IdentifyScope.onboarding;
 
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify/signup_challenge'),
@@ -104,7 +109,7 @@ Future<ChallengeResponse> signupChallenge(
         "value": requestData.phoneNumber,
         "is_bootstrapped": false,
       },
-      "scope": "onboarding",
+      "scope": scope.toString(),
     }),
   );
 
@@ -124,6 +129,7 @@ Future<ChallengeResponse> createOtpChallenge(
     obConfig: requestData.obConfig,
     sandboxId: requestData.sandboxId,
     authToken: requestData.authToken,
+    scope: requestData.scope,
   ));
   if (identifyResponse.user?.authMethods != null) {
     final hasVerifiedSource =

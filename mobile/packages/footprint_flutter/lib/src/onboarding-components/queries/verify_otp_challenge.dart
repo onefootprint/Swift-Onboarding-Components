@@ -1,21 +1,31 @@
+import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/verification_response.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/validate_onboarding.dart';
 import 'package:http/http.dart' as http;
 
 typedef VerifyOtpChallengeRequest = ({
   String verificationCode,
   String challengeToken,
   String token,
-  OverallOutcome? overallOutcome
+  OverallOutcome? overallOutcome,
+  OnboardingConfigKind? onboardingConfigKind,
+  IdentifyScope? scope,
 });
 
-typedef VerifyOtpChallengeResponse = ({String authToken, String vaultingToken});
+typedef VerifyOtpChallengeResponse = ({
+  String authToken,
+  String? vaultingToken,
+  String validationToken
+});
 
 Future<VerificationResponse> verify(
     VerifyOtpChallengeRequest requestData) async {
+  final scope = requestData.scope ?? IdentifyScope.onboarding;
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify/verify'),
     headers: {
@@ -25,7 +35,7 @@ Future<VerificationResponse> verify(
     body: jsonEncode({
       'challenge_response': requestData.verificationCode,
       'challenge_token': requestData.challengeToken,
-      'scope': 'onboarding',
+      'scope': scope.toString(),
     }),
   );
 
@@ -96,11 +106,18 @@ Future<VerifyOtpChallengeResponse> verifyOtpChallenge(
     VerifyOtpChallengeRequest requestData) async {
   final response = await verify(requestData);
   final authToken = response.authToken;
-  await getValidationToken(authToken);
-  await initOnboarding(authToken, requestData.overallOutcome);
-  final vaultingToken = await createVaultingToken(authToken);
+  late String vTok;
+  String? vaultingToken;
+  if (requestData.onboardingConfigKind == OnboardingConfigKind.auth) {
+    vTok = (await validateOnboarding(authToken)).validationToken;
+  } else {
+    vTok = (await getValidationToken(authToken)).validationToken;
+    await initOnboarding(authToken, requestData.overallOutcome);
+    vaultingToken = (await createVaultingToken(authToken)).token;
+  }
   return (
     authToken: authToken,
-    vaultingToken: vaultingToken.token,
+    vaultingToken: vaultingToken,
+    validationToken: vTok,
   );
 }

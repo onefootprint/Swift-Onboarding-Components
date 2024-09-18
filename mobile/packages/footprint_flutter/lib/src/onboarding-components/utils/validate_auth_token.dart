@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/create_otp_challenge.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_identify_scope_from_ob_config_kind.dart';
 
 Future<AuthTokenStatus> validateAuthToken({
   required WidgetRef ref,
@@ -11,7 +14,25 @@ Future<AuthTokenStatus> validateAuthToken({
   required String authToken,
   required String? sandboxId,
   required SandboxOutcome? sandboxOutcome,
+  required OnboardingConfig? onboardingConfig,
 }) async {
+  OnboardingConfigKind? obConfigKind;
+
+  if (onboardingConfig == null) {
+    // Normally for other util functions, we would just throw an error if the onboardingConfig is null
+    // But this function is meant to be called in the beginning right after the first frame
+    // The context may not have the onboardingConfig yet
+    // So we need to fetch the onboardingConfig if it is null
+    final obConfig = await getOnboardingConfig(publicKey);
+    obConfigKind = obConfig.kind;
+  } else {
+    obConfigKind = onboardingConfig.kind;
+  }
+
+  if (obConfigKind == null) {
+    throw Exception('We could not determine the onboarding config kind');
+  }
+
   try {
     final identifyResponse = await identify((
       obConfig: publicKey,
@@ -19,6 +40,7 @@ Future<AuthTokenStatus> validateAuthToken({
       sandboxId: sandboxId,
       email: null,
       phoneNumber: null,
+      scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
     final tokenScopes = identifyResponse.user?.tokenScopes;
 

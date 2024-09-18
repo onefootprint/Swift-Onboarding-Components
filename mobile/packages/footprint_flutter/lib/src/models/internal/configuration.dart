@@ -36,7 +36,6 @@ class Configuration {
 
   @internal
   Map<String, dynamic> toJson() {
-    print("toJson in Configuration");
     var map = {
       'l10n': l10n?.toJson(),
       'options': options?.toJson(),

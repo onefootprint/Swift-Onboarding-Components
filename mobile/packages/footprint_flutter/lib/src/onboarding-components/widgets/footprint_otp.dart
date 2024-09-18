@@ -4,16 +4,19 @@ import 'package:footprint_flutter/src/models/internal/auth_method.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_kind.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/inline_otp_not_supported_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/create_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_identify_scope_from_ob_config_kind.dart';
 
 typedef BuildOtpProps = ({
   Future<ChallengeKind> Function(
       {required String email,
       required String phoneNumber}) createEmailPhoneBasedChallenge,
   Future<ChallengeKind> Function() createAuthTokenBasedChallenge,
-  Future<void> Function({required String verificationCode}) verifyOtpChallenge,
+  Future<String> Function(
+      {required String verificationCode}) verifyOtpChallenge,
 });
 
 class FootprintOtp extends ConsumerStatefulWidget {
@@ -33,6 +36,7 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final fpContext = ref.read(fpContextNotifierProvider);
     final sandboxId = fpContext.sandboxId;
     final obConfig = fpContext.onboardingConfig?.key;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
     final requiredAuthMethods = fpContext.onboardingConfig?.requiredAuthMethods;
     final authToken = fpContext.authToken;
 
@@ -58,9 +62,13 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
       throw Exception(
           "You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number");
     }
-    if (obConfig == null) {
+    if (obConfig == null || obConfigKind == null) {
       throw Exception(
           'Onboarding config not found. Please check your public key');
+    }
+    if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
+      throw InlineOtpNotSupportedException(
+          'Multiple auth methods are not supported');
     }
 
     final challengeResponse = await createOtpChallenge((
@@ -70,7 +78,8 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
       sandboxId: sandboxId,
       requiredAuthMethods: requiredAuthMethods,
       authToken:
-          null // authToken is not required here since we are using email/phone number
+          null, // authToken is not required here since we are using email/phone number
+      scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
     if (challengeResponse.challengeData == null) {
       throw Exception('Challenge data not found');
@@ -88,10 +97,11 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final fpContext = ref.read(fpContextNotifierProvider);
     final sandboxId = fpContext.sandboxId;
     final obConfig = fpContext.onboardingConfig?.key;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
     final requiredAuthMethods = fpContext.onboardingConfig?.requiredAuthMethods;
     final authToken = fpContext.authToken;
     final authTokenStatus = fpContext.authTokenStatus;
-    if (obConfig == null) {
+    if (obConfig == null || obConfigKind == null) {
       throw Exception(
           'Onboarding config not found. Please check your public key');
     }
@@ -106,13 +116,18 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     if (authTokenStatus == AuthTokenStatus.invalid) {
       throw Exception('Auth token is invalid. Please use a valid auth token');
     }
+    if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
+      throw InlineOtpNotSupportedException(
+          'Multiple auth methods are not supported');
+    }
     final challengeResponse = await createOtpChallenge((
       email: null,
       phoneNumber: null,
       obConfig: obConfig,
       sandboxId: sandboxId,
       requiredAuthMethods: requiredAuthMethods,
-      authToken: authToken
+      authToken: authToken,
+      scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
     if (challengeResponse.challengeData == null) {
       throw Exception('Challenge data not found');
@@ -126,24 +141,35 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     return challengeResponse.challengeData!.challengeKind;
   }
 
-  Future<void> verify({required String verificationCode}) async {
+  Future<String> verify({required String verificationCode}) async {
     final sandboxOutcome = ref.read(fpContextNotifierProvider).sandboxOutcome;
+    final obConfigKind =
+        ref.read(fpContextNotifierProvider).onboardingConfig?.kind;
+
+    if (obConfigKind == null) {
+      throw Exception('Onboarding config kind not found');
+    }
 
     if (_challengeData == null) {
       throw Exception('Challenge data not found');
     }
 
-    final (:authToken, :vaultingToken) = await verifyOtpChallenge((
+    final (:authToken, :vaultingToken, :validationToken) =
+        await verifyOtpChallenge((
       challengeToken: _challengeData!.challengeToken,
       verificationCode: verificationCode,
       token: _challengeData!.token,
-      overallOutcome: sandboxOutcome?.overallOutcome
+      overallOutcome: sandboxOutcome?.overallOutcome,
+      onboardingConfigKind: obConfigKind,
+      scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
 
     ref.read(fpContextNotifierProvider.notifier).update(
         verifiedAuthToken: authToken,
         vaultingToken: vaultingToken,
         authTokenStatus: AuthTokenStatus.validWithSufficientScope);
+
+    return validationToken;
   }
 
   @override
