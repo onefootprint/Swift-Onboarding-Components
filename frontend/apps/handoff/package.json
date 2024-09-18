@@ -40,7 +40,7 @@
     "i18next": "^23.7.16",
     "i18next-locales-sync": "^2.0.1",
     "launchdarkly-react-client-sdk": "^3.0.9",
-    "next": "^14.2.4",
+    "next": "^14.2.12",
     "react": "^18",
     "react-dom": "^18",
     "react-error-boundary": "4.0.11",

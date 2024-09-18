@@ -37,7 +37,7 @@
     "i18next-locales-sync": "^2.0.1",
     "lodash": "^4.17.21",
     "markdown-to-jsx": "^7.1.8",
-    "next": "^14.2.4",
+    "next": "^14.2.12",
     "next-themes": "^0.2.1",
     "react": "^18",
     "react-dom": "^18",
