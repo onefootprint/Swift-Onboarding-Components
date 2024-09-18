@@ -23,7 +23,7 @@ use itertools::Itertools;
 use newtypes::sms_message::SmsMessage;
 use newtypes::ContactInfoKind;
 use newtypes::DocumentRequestConfig;
-use newtypes::PhoneNumber;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
 use newtypes::WorkflowRequestConfig;
 use paperclip::actix::api_v2_operation;
@@ -118,9 +118,8 @@ async fn send_communication(
         link,
     };
 
-    let method = if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
+    let method = if let Some(phone) = vw.decrypt_unchecked_parse(state, IDK::PhoneNumber).await? {
         let msg = TokenSmsMessage::from(msg);
-        let phone = PhoneNumber::parse(phone.0)?;
         let message = SmsMessage::Freeform {
             content: msg.message_body,
         };
@@ -131,11 +130,11 @@ async fn send_communication(
             .send_message(state, message, phone, t_id, v_id)
             .await?;
         Some(ContactInfoKind::Phone)
-    } else if let Some(email) = vw.decrypt_contact_info(state, ContactInfoKind::Email).await? {
+    } else if let Some(email) = vw.decrypt_unchecked_parse(state, IDK::Email).await? {
         let msg = TokenEmailMessage::from(msg);
         state
             .sendgrid_client
-            .send_template(state, email.0, msg.template_id, msg.template_data)
+            .send_template(state, email, msg.template_id, msg.template_data)
             .await?;
         Some(ContactInfoKind::Email)
     } else {

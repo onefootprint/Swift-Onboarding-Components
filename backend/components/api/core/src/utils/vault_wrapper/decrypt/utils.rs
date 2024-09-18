@@ -2,13 +2,10 @@ use super::super::Business;
 use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::Any;
-use crate::ApiCoreError;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
 use db::models::business_owner::BusinessOwner;
-use db::models::contact_info::ContactInfo;
-use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::DbError;
 use itertools::Itertools;
@@ -16,7 +13,7 @@ use newtypes::email::Email;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::BusinessOwnerData;
 use newtypes::BusinessOwnerKind;
-use newtypes::ContactInfoKind;
+use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::KycedBusinessOwnerData;
@@ -27,52 +24,27 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 impl<Type> VaultWrapper<Type> {
-    pub async fn decrypt_contact_info(
-        &self,
-        state: &State,
-        kind: ContactInfoKind,
-    ) -> FpResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
-        // TODO eventually only decrypt verified?
-        if let Some(dl) = self.get_lifetime(&kind.di()) {
-            let dl_id = dl.id.clone();
-            let ci = state
-                .db_pool
-                .db_query(move |conn| ContactInfo::get(conn, &dl_id))
-                .await?;
+    pub async fn decrypt_unchecked_parse<T>(&self, state: &State, idk: IDK) -> FpResult<Option<T>>
+    where
+        T: FromStr,
+        FpError: From<<T as FromStr>::Err>,
+    {
+        let di = DataIdentifier::from(idk);
+        if !self.has_field(&di) {
+            return Ok(None);
+        };
 
-            let data = self
-                .decrypt_unchecked_single(&state.enclave_client, kind.di())
-                .await?
-                .ok_or(FpError::from(DbError::ObjectNotFound))?;
-            Ok(Some((data, ci, dl.clone())))
-        } else {
-            Ok(None)
-        }
-    }
-
-    pub async fn get_decrypted_phone(&self, state: &State) -> FpResult<PhoneNumber> {
-        let (data, _, _) = self
-            .decrypt_contact_info(state, ContactInfoKind::Phone)
+        let data = self
+            .decrypt_unchecked_single(&state.enclave_client, di)
             .await?
-            .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
-        PhoneNumber::parse(data).map_err(FpError::from)
-    }
-
-    pub async fn get_decrypted_email(&self, state: &State) -> FpResult<Email> {
-        let (data, _, _) = self
-            .decrypt_contact_info(state, ContactInfoKind::Email)
-            .await?
-            .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Email))?;
-        Email::from_str(data.leak()).map_err(FpError::from)
+            .ok_or(DbError::ObjectNotFound)?;
+        let data = data.parse_into()?;
+        Ok(Some(data))
     }
 
     pub async fn get_decrypted_country(&self, state: &State) -> FpResult<Option<Iso3166TwoDigitCountryCode>> {
-        let decrypted_values = self
-            .decrypt_unchecked(&state.enclave_client, &[IDK::Country.into()])
-            .await?;
-        Ok(decrypted_values
-            .get(&IDK::Country.into())
-            .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok()))
+        let result = self.decrypt_unchecked_parse(state, IDK::Country).await?;
+        Ok(result)
     }
 }
 

@@ -8,9 +8,10 @@ use api_core::errors::user::UserError;
 use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::Person;
 use api_core::ApiCoreError;
+use db::models::contact_info::ContactInfo;
 use newtypes::sms_message::SmsMessage;
 use newtypes::ContactInfoKind;
-use newtypes::PhoneNumber;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -43,20 +44,19 @@ pub async fn handler(
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
     let t_id = user_auth.tenant().map(|t| t.id.clone());
 
-    let uvw = state
+    let (uvw, ci) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);
             let uvw = VaultWrapper::<Person>::build(conn, args)?;
-            Ok(uvw)
+            let phone_dl = uvw
+                .get_lifetime(&IDK::PhoneNumber.into())
+                .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
+            let ci = ContactInfo::get(conn, &phone_dl.id)?;
+            Ok((uvw, ci))
         })
         .await?;
-
-    let (phone_number, ci, _) = uvw
-        .decrypt_contact_info(&state, ContactInfoKind::Phone)
-        .await?
-        .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
 
     if !ci.is_otp_verified() {
         // The d2p link we send out is authenticated as the user.
@@ -65,7 +65,10 @@ pub async fn handler(
         // verified by the user.
         return Err(UserError::ContactInfoKindNotVerified(ContactInfoKind::Phone).into());
     }
-    let phone_number = PhoneNumber::parse(phone_number)?;
+    let phone_number = uvw
+        .decrypt_unchecked_parse(&state, IDK::PhoneNumber)
+        .await?
+        .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
 
     let message = SmsMessage::D2p {
         url: request.url.clone(),

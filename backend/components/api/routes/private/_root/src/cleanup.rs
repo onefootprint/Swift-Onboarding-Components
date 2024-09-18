@@ -19,6 +19,7 @@ use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use newtypes::email::Email;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::PhoneNumber;
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -72,23 +73,11 @@ async fn post(
                     .db_pool
                     .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv_id))
                     .await?;
-                let phone = uvw
-                    .decrypt_contact_info(&state, newtypes::ContactInfoKind::Phone)
-                    .await?;
-
+                let phone = uvw.decrypt_unchecked_parse(&state, IDK::PhoneNumber).await?;
                 if let Some(phone) = phone {
-                    if !phone.1.is_otp_verified() {
-                        return Err(AssertionError(
-                            "Cannot clean up via email if user has unverfiied phone number",
-                        )
-                        .into());
-                    }
-
-                    ensure_phone_number_allowed(&state, &PhoneNumber::parse(phone.0)?)?;
-                    Some(uvw.vault.id)
-                } else {
-                    Some(uvw.vault.id)
+                    ensure_phone_number_allowed(&state, &phone)?;
                 }
+                Some(uvw.vault.id)
             } else {
                 None
             }

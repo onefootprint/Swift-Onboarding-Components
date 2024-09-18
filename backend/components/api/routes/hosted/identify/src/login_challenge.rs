@@ -9,6 +9,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
@@ -24,6 +25,7 @@ use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
 use newtypes::ChallengeKind;
+use newtypes::IdentityDataKind as IDK;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -102,22 +104,23 @@ pub async fn post(
             (None, challenge_data, 0, Some(challenge.challenge_json))
         }
         ChallengeKind::Sms => {
-            let phone_number = vw.get_decrypted_phone(&state).await?;
+            let phone_number = vw
+                .decrypt_unchecked_parse(&state, IDK::PhoneNumber)
+                .await?
+                .ok_or(AssertionError("No phone number in vault"))?;
             let t = tenant.as_ref();
-            let (rx, challenge_state) = send_sms_challenge_non_blocking(
-                &state,
-                t,
-                phone_number.clone(),
-                sandbox_id,
-                Some(vw.vault.id),
-            )
-            .await?;
+            let (rx, challenge_state) =
+                send_sms_challenge_non_blocking(&state, t, phone_number, sandbox_id, Some(vw.vault.id))
+                    .await?;
             let challenge_data = ChallengeData::Sms(challenge_state);
             let time_before_retry = state.config.time_s_between_challenges;
             (Some(rx), challenge_data, time_before_retry, None)
         }
         ChallengeKind::Email => {
-            let email = vw.get_decrypted_email(&state).await?;
+            let email = vw
+                .decrypt_unchecked_parse(&state, IDK::Email)
+                .await?
+                .ok_or(AssertionError("No phone number in vault"))?;
             let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
             let (rx, challenge_data) =
