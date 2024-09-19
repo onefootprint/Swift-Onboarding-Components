@@ -109,7 +109,7 @@ pub async fn delete(
     path: FpIdPathPlus<TagId>,
     auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Tags>>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let actor: DbActor = auth.actor().into();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
