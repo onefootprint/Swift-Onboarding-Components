@@ -59,9 +59,8 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
 
-    let meta = key.is_some().then_some("has_key").unwrap_or("no_key");
+    let meta = if key.is_some() { "has_key" } else { "no_key" };
     root_span.record("meta", meta);
-
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
