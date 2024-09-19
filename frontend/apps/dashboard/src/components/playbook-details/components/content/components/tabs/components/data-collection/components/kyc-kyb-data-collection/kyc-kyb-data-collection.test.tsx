@@ -1,17 +1,17 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
 import { DocumentRequestKind, OnboardingConfigKind } from '@onefootprint/types';
 
-import type { DataCollectionProps } from './data-collection';
-import DataCollection from './data-collection';
+import type { KycKybDataCollectionProps } from './kyc-kyb-data-collection';
+import KycKybDataCollection from './kyc-kyb-data-collection';
 import {
   onboardingConfigFixture,
   playbookFixtureWithBusinessAndKYCDocsFixture,
   playbookFixtureWithKYCForAllBusinessOwnersFixture,
-} from './data-collection.test.config';
+} from './kyc-kyb-data-collection.test.config';
 
-describe('<DataCollection />', () => {
-  const renderDataCollection = ({ playbook = onboardingConfigFixture }: Partial<DataCollectionProps>) =>
-    customRender(<DataCollection playbook={playbook} />);
+describe('<KycKybDataCollection />', () => {
+  const renderDataCollection = ({ playbook = onboardingConfigFixture }: Partial<KycKybDataCollectionProps>) =>
+    customRender(<KycKybDataCollection playbook={playbook} />);
 
   describe('when it has US territories enabled', () => {
     it('should show a note', () => {

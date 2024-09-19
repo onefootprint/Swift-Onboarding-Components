@@ -24,14 +24,18 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
   const { tab } = useGetQueryParam(tabsRouterSchema);
   const router = useRouter();
 
-  const options: OptionsProps = [
-    { value: 'data', label: t('tabs.data-collection') },
-    { value: 'verification-checks', label: t('tabs.verification-checks') },
-    { value: 'passkeys', label: t('tabs.passkeys') },
-    ...(playbook.kind !== OnboardingConfigKind.auth
-      ? ([{ value: 'rules', label: t('tabs.rules') }] as OptionsProps)
-      : []),
-  ];
+  const options: OptionsProps =
+    playbook.kind === OnboardingConfigKind.document
+      ? [
+          { value: 'data', label: t('tabs.data-collection') },
+          { value: 'rules', label: t('tabs.rules') },
+        ]
+      : [
+          { value: 'data', label: t('tabs.data-collection') },
+          { value: 'verification-checks', label: t('tabs.verification-checks') },
+          { value: 'passkeys', label: t('tabs.passkeys') },
+          { value: 'rules', label: t('tabs.rules') },
+        ];
 
   const handleChange = (tab: PlaybookTabs) => {
     router.replace({

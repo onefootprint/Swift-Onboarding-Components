@@ -11,14 +11,20 @@ describe('<Content />', () => {
   };
 
   describe('doc only playbook', () => {
-    it('renders single page instead of tablist', async () => {
+    it('renders Tabs with doc-only data collection tab open by default', async () => {
       renderContent(docPlaybookFixture);
 
       const governmentIssuedIdText = await screen.findByText('Government-issued ID');
       expect(governmentIssuedIdText).toBeInTheDocument();
 
-      const tablist = screen.queryByRole('tablist');
-      expect(tablist).not.toBeInTheDocument();
+      const tablist = screen.getByRole('tablist');
+      expect(tablist).toBeInTheDocument();
+
+      const dataCollectionTab = screen.getByRole('tab', { name: 'Data collection' });
+      expect(dataCollectionTab).toBeInTheDocument();
+
+      const rulesTab = screen.getByRole('tab', { name: 'Rules' });
+      expect(rulesTab).toBeInTheDocument();
     });
   });
 
@@ -28,6 +34,18 @@ describe('<Content />', () => {
 
       const tablist = screen.getByRole('tablist');
       expect(tablist).toBeInTheDocument();
+
+      const dataCollectionTab = screen.getByRole('tab', { name: 'Data collection' });
+      expect(dataCollectionTab).toBeInTheDocument();
+
+      const verificationChecksTab = screen.getByRole('tab', { name: 'Verification checks' });
+      expect(verificationChecksTab).toBeInTheDocument();
+
+      const passkeysTab = screen.getByRole('tab', { name: 'Passkeys' });
+      expect(passkeysTab).toBeInTheDocument();
+
+      const rulesTab = screen.getByRole('tab', { name: 'Rules' });
+      expect(rulesTab).toBeInTheDocument();
     });
   });
 
@@ -37,6 +55,18 @@ describe('<Content />', () => {
 
       const tablist = screen.getByRole('tablist');
       expect(tablist).toBeInTheDocument();
+
+      const dataCollectionTab = screen.getByRole('tab', { name: 'Data collection' });
+      expect(dataCollectionTab).toBeInTheDocument();
+
+      const verificationChecksTab = screen.getByRole('tab', { name: 'Verification checks' });
+      expect(verificationChecksTab).toBeInTheDocument();
+
+      const passkeysTab = screen.getByRole('tab', { name: 'Passkeys' });
+      expect(passkeysTab).toBeInTheDocument();
+
+      const rulesTab = screen.getByRole('tab', { name: 'Rules' });
+      expect(rulesTab).toBeInTheDocument();
     });
   });
 
