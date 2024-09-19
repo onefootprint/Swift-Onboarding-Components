@@ -21,10 +21,6 @@ const FieldsContainer = styled.div`
     display: flex;
     gap: ${theme.spacing[4]};
     flex-direction: column;
-
-    p {
-      max-width: 50%;
-    }
   `};
 `;
 

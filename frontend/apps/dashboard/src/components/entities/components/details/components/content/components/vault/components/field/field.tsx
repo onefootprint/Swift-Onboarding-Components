@@ -39,11 +39,7 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
     <Container role="row" aria-label={ariaLabel}>
       <Form.Field variant="horizontal">
         {field.showCheckbox ? (
-          <Tooltip
-            disabled={field.canDecrypt}
-            position="right"
-            text={field.isEmpty ? t('empty-not-allowed') : t('not-allowed')}
-          >
+          <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
             <Box>
               <Checkbox
                 checked={isChecked || undefined}
@@ -64,7 +60,9 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldTo
             )}
           </LabelContainer>
         )}
-        <FieldValue field={field} renderValue={renderValue} />
+        <ValueContainer>
+          <FieldValue field={field} renderValue={renderValue} />
+        </ValueContainer>
       </Form.Field>
     </Container>
   );
@@ -81,8 +79,12 @@ const LabelContainer = styled(Form.Label)`
     display: flex;
     gap: ${theme.spacing[2]};
     flex-direction: column;
-    max-width: 75%;
+    max-width: 50%;
   `};
+`;
+
+const ValueContainer = styled(Box)`
+  max-width: 50%;
 `;
 
 export default Field;
