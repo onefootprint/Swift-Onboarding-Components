@@ -1,5 +1,5 @@
-import { Stack, Text } from '@onefootprint/ui';
-import styled from 'styled-components';
+import { Container, Text, media } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 
 type HeadingProps = {
   title: string;
@@ -7,19 +7,28 @@ type HeadingProps = {
 };
 
 const Heading = ({ title, subtitle }: HeadingProps) => (
-  <Hero direction="column" align="center" justify="center" gap={3}>
-    <Text color="primary" variant="display-2" tag="h1" textAlign="center">
+  <StyledContainer>
+    <Text color="primary" variant="display-2" tag="h1" textAlign="center" maxWidth="600px">
       {title}
     </Text>
-    <Text color="secondary" variant="display-4" tag="p" textAlign="center">
+    <Text color="secondary" variant="display-4" tag="p" textAlign="center" maxWidth="600px">
       {subtitle}
     </Text>
-  </Hero>
+  </StyledContainer>
 );
 
-const Hero = styled(Stack)`
-  margin: auto;
-  max-width: 700px;
+const StyledContainer = styled(Container)`
+  ${({ theme }) => css`
+    padding-top: ${theme.spacing[9]};
+    padding-bottom: ${theme.spacing[9]};
+    gap: ${theme.spacing[5]};
+    align-items: center;
+
+    ${media.greaterThan('md')`
+      padding-top: ${theme.spacing[11]};
+      padding-bottom: ${theme.spacing[10]};
+    `}
+  `}
 `;
 
 export default Heading;

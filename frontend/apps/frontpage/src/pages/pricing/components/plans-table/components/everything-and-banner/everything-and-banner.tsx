@@ -3,7 +3,7 @@ import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { Plans } from '../../../../plans-table-types';
+import type { Plans } from '../../plans-table-types';
 
 type EverythingAndBannerProps = {
   plan: Plans;
@@ -14,7 +14,7 @@ const EverythingAndBanner = ({ plan }: EverythingAndBannerProps) => {
 
   return (
     <Container direction="column" gap={2}>
-      <Text variant="label-3" color="tertiary">
+      <Text variant="body-3" color="tertiary">
         {t(`plans.${plan}.everything-and` as ParseKeys<'common'>)}
       </Text>
     </Container>

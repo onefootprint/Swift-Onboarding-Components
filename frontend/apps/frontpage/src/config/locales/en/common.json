@@ -1532,6 +1532,26 @@
           "cta": "Get Enterprise plan"
         }
       },
+      "calculator": {
+        "title": "See how much extra revenue Footprint can generate for you",
+        "subtitle": "Footprint can boost your revenue significantly by streamlining user onboarding",
+        "monthly-onboards": {
+          "label": "Monthly Onboards",
+          "min": "1,000",
+          "max": "50,000"
+        },
+        "arpu": {
+          "label": "Monthly Revenue Per User",
+          "min": "$0",
+          "max": "$20"
+        },
+        "result": {
+          "label": "Extra revenue per year"
+        },
+        "callout": {
+          "label": "Assuming a 2.5% increase in conversion rate, based on conservative estimates from Footprint's customer data."
+        }
+      },
       "banner": {
         "title": "Not sure what plan you need?",
         "subtitle": "Reach out to us and we'll be happy to guide you through the available options.",

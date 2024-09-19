@@ -11,11 +11,11 @@ const FeatureCheck = ({ children, soon }: FeatureCheckProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
   return (
     <Stack direction="row" justify="space-between">
-      <Stack direction="row" gap={2} align="start" flexGrow={1}>
-        <Stack flex={0} height="20px" align="center" justify="center">
+      <Stack direction="row" gap={3} align="start" flexGrow={1}>
+        <Stack flex={0} height="1.5rem" align="center" justify="center">
           <IcoCheckSmall16 />
         </Stack>
-        <Text variant="label-2">{children}</Text>
+        <Text variant="body-2">{children}</Text>
       </Stack>
       {soon && <Badge variant="info">{t('soon')}</Badge>}
     </Stack>

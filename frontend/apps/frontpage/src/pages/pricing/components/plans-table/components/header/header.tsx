@@ -2,7 +2,7 @@ import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { HeaderProps } from '../../../../plans-table-types';
+import type { HeaderProps } from '../../plans-table-types';
 
 const Header = ({ title, price }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
@@ -44,7 +44,9 @@ const Header = ({ title, price }: HeaderProps) => {
       justify="center"
     >
       <Stack direction="column" gap={2}>
-        <Text variant="heading-3">{title}</Text>
+        <Text variant="heading-3" textAlign="center">
+          {title}
+        </Text>
         {renderPrice(price)}
       </Stack>
     </Container>
@@ -63,10 +65,10 @@ const Container = styled(Stack)`
       width: 100%;
       height: 1px;
       background: radial-gradient(
-        50% 50% at 20% 50%,
-        ${theme.borderColor.primary} 0%,
+        50% 50% at 50% 50%,
+        transparent 0%,
         ${theme.borderColor.primary} 50%,
-        ${theme.backgroundColor.primary} 100%
+        transparent 100%
       );
     }
   `}
