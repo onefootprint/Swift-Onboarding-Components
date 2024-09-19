@@ -8,7 +8,7 @@ import {
   uploadImage,
   verifyAppIframeClick,
   verifyPhoneNumber,
-} from './utils/commands';
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_CUSTOM_DOC || 'pb_test_U8RCDBPSmdBmXhyCXa7r5d';

@@ -5,7 +5,7 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
   waitForVerifyButton,
-} from './utils/commands';
+} from '../utils/commands';
 
 const key = process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 

@@ -7,7 +7,7 @@ import {
   selectOutcomeOptional,
   verifyAppIframeClick,
   verifyPhoneNumber,
-} from './utils/commands';
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_YIELDSTREET || 'pb_test_bH2tmxMPBCI8Gujjb90P3d';

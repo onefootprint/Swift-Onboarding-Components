@@ -36,6 +36,7 @@ ENV E2E_BIFROST_BASE_URL http://localhost:3000
 ENV E2E_COMPONENTS_BASE_URL http://localhost:3010
 ENV E2E_DEMOS_BASE_URL http://localhost:3002
 ENV E2E_HANDOFF_BASE_URL http://localhost:3005
+ENV E2E_HOSTED_BASE_URL http://localhost:3004
 ENV E2E_OB_ID_EMAIL $E2E_OB_ID_EMAIL
 ENV E2E_OB_ID_PHONE $E2E_OB_ID_PHONE
 ENV E2E_OB_ID_PHONE_EMAIL $E2E_OB_ID_PHONE_EMAIL
@@ -56,4 +57,4 @@ COPY --link ./packages/e2e /e2e
 
 RUN yarn install --pure-lockfile --link-duplicates
 
-CMD npx playwright test --workers=16 -g "#ci"
+CMD npx playwright test --workers=8 -g "#ci"

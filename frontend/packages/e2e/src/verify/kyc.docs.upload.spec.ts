@@ -9,7 +9,7 @@ import {
   uploadImage,
   verifyAppIframeClick,
   verifyPhoneNumber,
-} from './utils/commands';
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_DOC || 'ob_test_0DNRM31nSBCSqHLJQTeWi9';

@@ -55,7 +55,7 @@ export const uploadImage = async (
   cta: RegExp,
   fileName: string,
 ) => {
-  const filePath = path.join(__dirname, `../../upload/${fileName}`);
+  const filePath = path.join(__dirname, `../upload/${fileName}`);
   const fileChooserPromise = page.waitForEvent('filechooser');
   if (isMobile) {
     await frame.locator('button[radius="56"]').first().click();
@@ -98,7 +98,7 @@ export const verifyEmail = sixDigitChallenger.bind(null, 'Verify your email');
 export const verifyPhoneNumber = sixDigitChallenger.bind(null, 'Verify your phone number');
 
 export const fillNameAndDoB = async (
-  frame: FrameLocator,
+  frame: FrameLocator | Page,
   payload: { firstName: string; lastName: string; dob: string },
 ) => {
   await frame.getByLabel('First name').first().fill(payload.firstName);
@@ -120,7 +120,7 @@ export const fillBasicDataKYB = async (
 };
 
 export const fillAddress = async (
-  { frame, page }: { frame: FrameLocator; page: Page },
+  { frame, page }: { frame: FrameLocator | Page; page: Page },
   payload: { addressLine1: string; city: string; zipCode: string },
 ) => {
   await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
@@ -171,7 +171,7 @@ export const fillBeneficialOwners = async (
   await share1.fill('50');
 };
 
-export const fillSSN = async (frame: FrameLocator, payload: { ssn: string }) => {
+export const fillSSN = async (frame: FrameLocator | Page, payload: { ssn: string }) => {
   const field = frame.getByLabel('SSN').first();
   await field.waitFor(attachedState).then(() => field.fill(payload.ssn));
 };

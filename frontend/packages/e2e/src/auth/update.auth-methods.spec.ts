@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { verifyEmail } from '../verify/utils/commands';
+import { verifyEmail } from '../utils/commands';
 
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
 const uToken = process.env.E2E_UPDATE_UTOKEN || '';

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from './utils/commands';
+import { clickOnContinue, selectOutcomeOptional, verifyAppIframeClick, verifyPhoneNumber } from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs
@@ -73,7 +73,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYB obtok_ happy path #ci #debug', async ({ page, isMobile }) => {
+test('KYB obtok_ happy path #ci', async ({ page, isMobile }) => {
   test.slow(); // ~23.63s
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test

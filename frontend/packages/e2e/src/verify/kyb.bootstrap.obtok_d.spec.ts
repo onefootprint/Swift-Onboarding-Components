@@ -6,7 +6,7 @@ import {
   selectOutcomeOptional,
   verifyAppIframeClick,
   verifyPhoneNumber,
-} from './utils/commands';
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB_KYCED_BO || 'pb_test_eWuI7QxglTuuVclccyfAk4'; // KYC all BOs

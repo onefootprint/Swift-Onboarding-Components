@@ -6,7 +6,7 @@ import {
   selectOutcomeOptional,
   verifyAppIframeClick,
   verifyEmail,
-} from './utils/commands';
+} from '../utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const key = process.env.E2E_OB_KYC_NO_PHONE || 'ob_test_h9Qp2W3Trk1pfIoI7dTD5q';
