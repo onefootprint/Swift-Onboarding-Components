@@ -43,6 +43,10 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final hasEmail = email != null && email.isNotEmpty;
     final hasPhoneNumber = phoneNumber != null && phoneNumber.isNotEmpty;
 
+    if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
+      throw InlineOtpNotSupportedException(
+          'Multiple auth methods are not supported');
+    }
     if (!hasEmail && !hasPhoneNumber) {
       throw Exception('Email and/or phone number is required');
     }
