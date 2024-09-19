@@ -1,0 +1,1 @@
+DROP INDEX vault_dr_blob_config_id_data_lifetime_id;
