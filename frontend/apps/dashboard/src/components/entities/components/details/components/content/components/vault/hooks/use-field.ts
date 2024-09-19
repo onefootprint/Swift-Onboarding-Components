@@ -1,5 +1,5 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { BusinessDI, IdDI, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
+import { BusinessDI, IdDI, isVaultDataDecrypted, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
@@ -60,6 +60,7 @@ const useField = (entity: Entity) => {
       value,
       transforms,
       isDecrypted: isVaultDataDecrypted(value),
+      isEmpty: isVaultDataEmpty(value),
       canEdit: canEditField(di),
       showEditView,
     };
