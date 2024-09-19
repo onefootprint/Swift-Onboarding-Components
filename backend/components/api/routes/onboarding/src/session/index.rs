@@ -7,6 +7,7 @@ use api_core::auth::session::onboarding::OnboardingSession;
 use api_core::auth::session::sdk_args::UserDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
+use api_core::telemetry::RootSpan;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
@@ -23,6 +24,7 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
     /// Optionally, the playbook key that should be used for the onboarding.
+    #[openapi(required)]
     pub key: Option<ObConfigurationKey>,
     /// Optionally, any user or business bootstrap data that you would like to pass into the
     /// onboarding flow.
@@ -50,11 +52,16 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantApiKeyGated<preview_api::OnboardingSessionToken>,
     request: Json<CreateOnboardingSessionRequest>,
+    root_span: RootSpan,
 ) -> ApiResponse<CreateOnboardingSessionResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
+
+    let meta = key.is_some().then_some("has_key").unwrap_or("no_key");
+    root_span.record("meta", meta);
+
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
