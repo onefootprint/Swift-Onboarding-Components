@@ -12,7 +12,6 @@ use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
-use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::tenant::Tenant;
@@ -30,7 +29,7 @@ pub enum Request {
     Id(String),
 }
 
-#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder, Default)]
 pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
@@ -50,8 +49,10 @@ async fn post(
 
             // Use e164 with suffix to compute fingerprint
             let id = IdentifyId::PhoneNumber(phone_number);
-            let existing = state.find_vault(vec![id], sandbox_id.0, None).await?;
-            existing.map(|r| r.0.vault.id)
+            let Some(existing) = state.find_vault(vec![id], sandbox_id.0, None).await? else {
+                return Ok(CleanupResponse::default());
+            };
+            existing.0.vault.id
         }
         Request::Email(email) => {
             // only allow footprint emails to be cleanable
@@ -67,36 +68,35 @@ async fn post(
             // the phone number associated with the vault either:
             //  1) does not exist OR
             //  2) is one of our allowed-to-clean phone numbers.
-            if let Some(existing) = existing {
-                let uv_id = existing.0.vault.id;
-                let uvw = state
-                    .db_pool
-                    .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv_id))
-                    .await?;
-                let phone = uvw.decrypt_unchecked_parse(&state, IDK::PhoneNumber).await?;
-                if let Some(phone) = phone {
-                    ensure_phone_number_allowed(&state, &phone)?;
-                }
-                Some(uvw.vault.id)
-            } else {
-                None
-            }
+            let Some(existing) = existing else {
+                return Ok(CleanupResponse::default());
+            };
+            existing.0.vault.id
         }
         Request::Id(id) => {
             state
                 .db_pool
                 .db_query(move |conn| -> FpResult<_> {
                     let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
-                    let sv = ScopedVault::get(conn, id).optional()?;
-                    Ok(sv.map(|sv| sv.vault_id))
+                    let sv = ScopedVault::get(conn, id)?;
+                    Ok(sv.vault_id)
                 })
                 .await?
         }
     };
 
-    let Some(uv_id) = uv_id else {
-        return Ok(CleanupResponse { num_deleted_rows: 0 });
-    };
+    // Best-effort check that if the vault has a phone number that the phone belongs to an employee.
+    // This tries to prevent non-employees from deleting their vaults. But we also have protection
+    // against deleting data from non-test tenants below.
+    let uvid = uv_id.clone();
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uvid))
+        .await?;
+    let phone = uvw.decrypt_unchecked_parse(&state, IDK::PhoneNumber).await?;
+    if let Some(phone) = phone {
+        ensure_phone_number_allowed(&state, &phone)?;
+    }
 
     let is_production = state.config.service_config.is_production();
 
