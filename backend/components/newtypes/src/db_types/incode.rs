@@ -164,7 +164,10 @@ impl IncodeFailureReason {
     pub fn selfie_document_processing_failed(&self) -> bool {
         matches!(
             self,
-            Self::UnknownDocumentType | Self::WrongDocumentSide | Self::FaceNotFound
+            Self::UnknownDocumentType
+                | Self::WrongDocumentSide
+                | Self::FaceNotFound
+                | Self::UnableToAlignDocument
         )
     }
 }
