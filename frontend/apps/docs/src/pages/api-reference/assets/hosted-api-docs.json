@@ -452,7 +452,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/LoginChallengeResponse"
+                                    "$ref": "#/components/schemas/IdentifyChallengeResponse"
                                 }
                             }
                         }
@@ -508,7 +508,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SignupChallengeResponse"
+                                    "$ref": "#/components/schemas/IdentifyChallengeResponse"
                                 }
                             }
                         }
@@ -3494,6 +3494,51 @@
                     "validation_token"
                 ]
             },
+            "IdentifyChallengeResponse": {
+                "type": "object",
+                "properties": {
+                    "challenge_data": {
+                        "type": "object",
+                        "properties": {
+                            "biometric_challenge_json": {
+                                "type": "string"
+                            },
+                            "challenge_kind": {
+                                "type": "string",
+                                "enum": [
+                                    "sms",
+                                    "biometric",
+                                    "email"
+                                ]
+                            },
+                            "challenge_token": {
+                                "description": "Encrypted, base64-encoded challenge information",
+                                "type": "string"
+                            },
+                            "time_before_retry_s": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "token": {
+                                "description": "Auth token to pass to the verify call",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "challenge_kind",
+                            "challenge_token",
+                            "time_before_retry_s",
+                            "token"
+                        ]
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "challenge_data"
+                ]
+            },
             "IdentifyRequest": {
                 "type": "object",
                 "properties": {
@@ -3969,51 +4014,6 @@
                 },
                 "required": [
                     "challenge_kind"
-                ]
-            },
-            "LoginChallengeResponse": {
-                "type": "object",
-                "properties": {
-                    "challenge_data": {
-                        "type": "object",
-                        "properties": {
-                            "biometric_challenge_json": {
-                                "type": "string"
-                            },
-                            "challenge_kind": {
-                                "type": "string",
-                                "enum": [
-                                    "sms",
-                                    "biometric",
-                                    "email"
-                                ]
-                            },
-                            "challenge_token": {
-                                "description": "Encrypted, base64-encoded challenge information",
-                                "type": "string"
-                            },
-                            "time_before_retry_s": {
-                                "type": "integer",
-                                "format": "int64"
-                            },
-                            "token": {
-                                "description": "Auth token to pass to the verify call",
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "challenge_kind",
-                            "challenge_token",
-                            "time_before_retry_s",
-                            "token"
-                        ]
-                    },
-                    "error": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "challenge_data"
                 ]
             },
             "NeuroIdentityIdResponse": {
@@ -5597,51 +5597,6 @@
                 "required": [
                     "challenge_kind",
                     "scope"
-                ]
-            },
-            "SignupChallengeResponse": {
-                "type": "object",
-                "properties": {
-                    "challenge_data": {
-                        "type": "object",
-                        "properties": {
-                            "biometric_challenge_json": {
-                                "type": "string"
-                            },
-                            "challenge_kind": {
-                                "type": "string",
-                                "enum": [
-                                    "sms",
-                                    "biometric",
-                                    "email"
-                                ]
-                            },
-                            "challenge_token": {
-                                "description": "Encrypted, base64-encoded challenge information",
-                                "type": "string"
-                            },
-                            "time_before_retry_s": {
-                                "type": "integer",
-                                "format": "int64"
-                            },
-                            "token": {
-                                "description": "Auth token to pass to the verify call",
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "challenge_kind",
-                            "challenge_token",
-                            "time_before_retry_s",
-                            "token"
-                        ]
-                    },
-                    "error": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "challenge_data"
                 ]
             },
             "SkipPasskeyRegisterRequest": {

@@ -21,9 +21,10 @@ impl DataIdentifier {
                 DataIdentifierDiscriminant::Custom => {
                     vec![DataIdentifier::Custom(KvDataKey::from("*".to_string()))]
                 }
-                DataIdentifierDiscriminant::Id => {
-                    IdentityDataKind::iter().map(DataIdentifier::from).collect_vec()
-                }
+                DataIdentifierDiscriminant::Id => IdentityDataKind::iter()
+                    .map(DataIdentifier::from)
+                    .filter(|di| !di.is_verified_ci())
+                    .collect_vec(),
                 DataIdentifierDiscriminant::Business => {
                     BusinessDataKind::iter().map(DataIdentifier::from).collect_vec()
                 }

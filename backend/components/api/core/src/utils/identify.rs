@@ -39,7 +39,6 @@ pub enum AuthMethodInfo {
     },
     Phone {
         phone: PhoneNumber,
-        // TODO use this to mark the CI as verified so we are explicit about verifying the CI that was used
         lifetime_id: DataLifetimeId,
     },
     Email {
@@ -103,7 +102,6 @@ pub async fn get_user_auth_methods(
             };
             let cis = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
                 .into_iter()
-                // TODO eventually only decrypt ci.verified_di()
                 .filter_map(|cik| uvw.get_lifetime(&cik.di()).map(|dl| (cik, dl.id.clone())))
                 .map(|(cik, dl_id)| ContactInfo::get(conn, &dl_id).map(|ci| (cik, ci, dl_id)))
                 .collect::<Result<Vec<_>, _>>()?;

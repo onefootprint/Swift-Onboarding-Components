@@ -7,8 +7,8 @@ mod add_data;
 mod build;
 mod delete;
 mod portablize_data;
-mod replace_verified_ci;
 mod request;
+mod save_ci_after_otp;
 
 pub use request::*;
 

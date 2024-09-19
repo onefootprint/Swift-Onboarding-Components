@@ -597,5 +597,5 @@ def test_cannot_set_verified_ci(sandbox_tenant):
         body = patch("hosted/user/vault", data, bifrost.auth_token, status_code=400)
         assert (
             body["message"]
-            == "Can only set verified CI in tenant-facing API or challenge verification flow"
+            == "Can only set verified CI DIs in challenge verification flow"
         )

@@ -23,7 +23,6 @@ pub enum IdentityDataKind {
     Zip,
     Country,
     Email,
-    // TODO backfill these
     VerifiedEmail,
     PhoneNumber,
     VerifiedPhoneNumber,

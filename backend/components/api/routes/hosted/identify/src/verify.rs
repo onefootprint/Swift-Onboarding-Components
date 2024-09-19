@@ -31,6 +31,8 @@ use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
+use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::passkey::Passkey;
 use db::models::scoped_vault::ScopedVault;
@@ -157,8 +159,19 @@ pub async fn post(
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
-                        // TODO use vw.replace_verified_ci
-                        vw.mark_ci_as_verified(conn, data, &lifetime_id)?
+                        let ci = ContactInfo::get(conn, &lifetime_id)?;
+                        // Note, this arbitrarily doesn't allow portablizing data that was written by the
+                        // tenant, even after it's been OTP-verified by the user.
+                        // We need to better think through when to portablize login methods.
+                        let is_first_time_verifying = !ci.is_otp_verified();
+                        if is_first_time_verifying {
+                            // Save the `id.verified_xxx` data.
+                            let seqno = vw.save_ci_after_otp(conn, data)?;
+                            // Portablize and verify the existing piece of `id.xxx` contact info.
+                            DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+                            ContactInfo::mark_otp_verified(conn, &ci.id)?;
+                        }
+                        is_first_time_verifying
                     } else {
                         false
                     };

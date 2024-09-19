@@ -8,6 +8,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::test_helpers::assert_have_same_elements;
@@ -441,7 +442,10 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     let data = FingerprintedDataRequest::manual_fingerprints(data, vec![]);
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
     let lifetime = vw.get_lifetime(&IDK::PhoneNumber.into()).unwrap().clone();
-    vw.mark_ci_as_verified(conn, data, &lifetime.id).unwrap();
+    let ci = ContactInfo::get(conn, &lifetime.id).unwrap();
+    let seqno = vw.save_ci_after_otp(conn, data).unwrap();
+    DataLifetime::portablize(conn, &lifetime.id, seqno).unwrap();
+    ContactInfo::mark_otp_verified(conn, &ci.id).unwrap();
 
     TestData {
         su1: su1.into_inner(),

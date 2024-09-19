@@ -164,6 +164,14 @@ impl<Type> TenantVw<Type> {
             return Ok(vec![]);
         }
 
+        // `id.verified_phone_number` and `id.verified_email` are read-only for now and are only set by
+        // OTP verification code
+        let can_set_verified_ci_dis = matches!(request_source, DataRequestSource::OtpVerified);
+        let is_setting_verified_ci_dis = data.iter().any(|d| d.kind.is_verified_ci());
+        if is_setting_verified_ci_dis && !can_set_verified_ci_dis {
+            return ValidationError("Can only set verified CI DIs in challenge verification flow").into();
+        }
+
         let can_update_verified_ci = match request_source {
             // No validation for writing contact info at all - can always overwrite verified/unverified CI
             DataRequestSource::SignupChallenge(_)
@@ -231,18 +239,6 @@ impl<Type> TenantVw<Type> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, NtError>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
-
-        let for_replacing_ci = matches!(
-            request_source,
-            DataRequestSource::OtpVerified | DataRequestSource::Prefill,
-        );
-        let is_setting_verified_ci = dis.iter().any(|x| x.is_verified_ci());
-        if is_setting_verified_ci && request_source.actor().is_none() && !for_replacing_ci {
-            return ValidationError(
-                "Can only set verified CI in tenant-facing API or challenge verification flow",
-            )
-            .into();
-        }
 
         let irreplaceable_dis = vec![BDK::KycedBeneficialOwners.into()];
         for di in irreplaceable_dis {

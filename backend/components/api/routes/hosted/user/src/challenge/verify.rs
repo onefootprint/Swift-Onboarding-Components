@@ -192,7 +192,7 @@ impl Action {
                         }
                     }
                 }
-                vw.replace_verified_ci(conn, data)?;
+                vw.save_ci_after_otp(conn, data)?;
                 (kind, None)
             }
             Self::RegisterWebauthnCred(res) => {
