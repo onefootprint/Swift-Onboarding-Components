@@ -341,18 +341,20 @@ impl VaultDrWriter {
         dl: DataLifetime,
         e_record: EncryptedRecord,
     ) -> FpResult<NewVaultDrBlob> {
+        // To make blob S3 writes idempotent and blob keys 1:1 with each (VaultDrConfig,
+        // DataLifetime) pair, the blob key doesn't depend on the non-deterministic encrypted
+        // record content.
+        let key = blob_key(&self.bucket_path_namespace, &fp_id, &dl)?;
+
         let EncryptedRecord {
             e_record,
             wrapped_record_key,
             document_mime_type,
         } = e_record;
 
-
         let digest_bytes = crypto::sha256(&e_record);
         let checksum_b64_sha256 = base64::encode(digest_bytes);
         let content_length = e_record.len();
-
-        let key = blob_key(&self.bucket_path_namespace, &fp_id, &dl, &digest_bytes)?;
 
         let obj_metadata = document_mime_type.as_ref().map(|mime_type| {
             let mut metadata = HashMap::new();
@@ -769,12 +771,8 @@ fn fp_id_path(bucket_path_namespace: &str, fp_id: &FpId) -> FpResult<String> {
     Ok(path)
 }
 
-fn blob_key(
-    bucket_path_namespace: &str,
-    fp_id: &FpId,
-    dl: &DataLifetime,
-    blob_sha256_digest: &[u8],
-) -> FpResult<String> {
+// The determistic S3 blob key corresponding to a (VdrConfig, DataLifetime) pair.
+fn blob_key(bucket_path_namespace: &str, fp_id: &FpId, dl: &DataLifetime) -> FpResult<String> {
     let fp_id_path = fp_id_path(bucket_path_namespace, fp_id)?;
 
     let created_ts = dl.created_at.timestamp().to_string();
@@ -786,9 +784,15 @@ fn blob_key(
         .into();
     }
 
-    let digest_str = base64::encode_config(blob_sha256_digest, base64::URL_SAFE_NO_PAD);
+    // For a given VDR config, blobs correspond 1:1 to DLs, so we take the hash of the DL ID as an
+    // opaque, public, unique ID for the blob.
+    let h_dl_id = crypto::sha256(dl.id.as_bytes());
+    let public_unique_blob_id = base64::encode_config(h_dl_id, base64::URL_SAFE_NO_PAD);
 
-    let key = format!("{}/data/{}/{}-{}", fp_id_path, dl.kind, created_ts, digest_str,);
+    let key = format!(
+        "{}/data/{}/{}-{}",
+        fp_id_path, dl.kind, created_ts, public_unique_blob_id
+    );
     Ok(key)
 }
 
@@ -851,15 +855,10 @@ mod tests {
                 actor: None,
                 origin_id: None,
             },
-            &[
-                0xd8, 0xfb, 0xfe, 0x2e, 0x41, 0xb1, 0xe5, 0x76, 0xbb, 0xf3, 0xf3, 0x56, 0xbc, 0x98, 0xdd,
-                0x41, 0x68, 0x56, 0xe0, 0x6a, 0x38, 0xd9, 0xb5, 0xf1, 0x70, 0x3a, 0xac, 0xc4, 0xca, 0x53,
-                0x9e, 0x6b,
-            ],
         )
         .unwrap();
 
-        assert_eq!(&key, "footprint/vdr/a1b6cf025aaa4e5f926c2fa182755392/fp_id_Vu/fp_id_Vu5lEC3KeaAfVeedqtBjQ9/data/custom.my_custom_field/1672531200-2Pv-LkGx5Xa78_NWvJjdQWhW4Go42bXxcDqsxMpTnms");
+        assert_eq!(&key, "footprint/vdr/a1b6cf025aaa4e5f926c2fa182755392/fp_id_Vu/fp_id_Vu5lEC3KeaAfVeedqtBjQ9/data/custom.my_custom_field/1672531200-VJssGUtupV0AyqP0F_BWmHDqodj9DRL2eYIRMrfvCTI");
     }
 
     #[test]
