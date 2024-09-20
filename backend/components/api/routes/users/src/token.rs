@@ -59,6 +59,7 @@ pub async fn post(
         allow_reonboard,
     } = request.0.unwrap_or_default();
     let allow_reonboard = allow_reonboard.unwrap_or(true);
+    tracing::info!(has_fpbid=%fp_bid.is_some(), "Creating token with fp_bid");
 
     let kind = if let Some(kind) = kind {
         kind
