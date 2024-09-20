@@ -14,7 +14,6 @@ pub mod sdk_args;
 pub mod tenant;
 pub mod user;
 pub use guard::*;
-pub mod onboarding;
 pub mod protected_auth;
 
 #[derive(Debug, Error)]

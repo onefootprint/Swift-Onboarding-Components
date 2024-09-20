@@ -1,7 +1,7 @@
 from typing import NamedTuple, List
 
 from pyparsing import Any
-from tests.headers import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
+from tests.headers import PlaybookKey, TenantSecretAuth, DashboardAuth
 
 
 class SecretApiKey(NamedTuple):
@@ -20,7 +20,7 @@ class SecretApiKey(NamedTuple):
 
 
 class ObConfiguration(NamedTuple):
-    key: PublishableOnboardingKey
+    key: PlaybookKey
     tenant: Any  # Tenant
     id: str
     name: str
@@ -33,7 +33,7 @@ class ObConfiguration(NamedTuple):
 
     def from_response(resp, tenant):
         return ObConfiguration(
-            PublishableOnboardingKey(resp["key"]),
+            PlaybookKey(resp["key"]),
             tenant,
             resp["id"],
             resp["name"],

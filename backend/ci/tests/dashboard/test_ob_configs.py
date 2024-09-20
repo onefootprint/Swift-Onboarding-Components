@@ -11,7 +11,7 @@ from tests.utils import (
 from tests.dashboard.utils import update_rules
 from tests.headers import (
     IsLive,
-    PublishableOnboardingKey,
+    PlaybookKey,
     SecondaryDashboardAuth,
 )
 from tests.identify_client import IdentifyClient

@@ -14,7 +14,7 @@ class SdkArgs(BaseAuth):
     HEADER_NAME = "x-fp-sdk-args-token"
 
 
-class PublishableOnboardingKey(BaseAuth):
+class PlaybookKey(BaseAuth):
     HEADER_NAME = "X-Onboarding-Config-Key"
 
 
@@ -86,10 +86,6 @@ class BootstrappedFields(BaseAuth):
 
 class SessionId(BaseAuth):
     HEADER_NAME = "x-fp-session-id"
-
-
-class ObToken(BaseAuth):
-    HEADER_NAME = "x-fp-ob-token"
 
 
 class VaultVersion(BaseAuth):

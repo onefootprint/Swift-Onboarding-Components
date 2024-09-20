@@ -1,8 +1,6 @@
 use api_core::auth::ob_config::ObSessionAuth;
-use api_core::auth::onboarding::OnboardingSessionContext;
 use api_core::auth::session::onboarding::OnboardingSession;
 use api_core::auth::session::sdk_args::UserDataV1;
-use api_core::auth::Either;
 use api_core::types::ApiResponse;
 use newtypes::ObConfigurationKey;
 use paperclip::actix::api_v2_operation;
@@ -20,11 +18,8 @@ pub struct OnboardingSessionResponse {
     description = "Fetch information from an existing onboarding session token."
 )]
 #[get("/hosted/onboarding/session")]
-fn get(session: Either<OnboardingSessionContext, ObSessionAuth>) -> ApiResponse<OnboardingSessionResponse> {
-    let OnboardingSession { key, bootstrap_data } = match session {
-        Either::Left(session) => session.data.data,
-        Either::Right(session) => session.data.data,
-    };
+fn get(session: ObSessionAuth) -> ApiResponse<OnboardingSessionResponse> {
+    let OnboardingSession { key, bootstrap_data } = session.data.data;
     let result = OnboardingSessionResponse { key, bootstrap_data };
     Ok(result)
 }

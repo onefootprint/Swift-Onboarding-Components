@@ -1,5 +1,5 @@
 from tests.utils import get, post
-from tests.headers import ObToken
+from tests.headers import PlaybookKey
 from tests.constants import ID_DATA, BUSINESS_DATA
 
 
@@ -27,7 +27,7 @@ def test_onboarding_token(sandbox_tenant):
         assert token.startswith(
             "pbtok_"
         ), "Onboarding token MUST start with `pbtok_`. Our frontend SDK matches on this string EXPLICITLY. Do not change this prefix"
-        token = ObToken(token)
+        token = PlaybookKey(token)
         body = get("hosted/onboarding/session", None, token)
         assert body["key"] == data.get("key", None)
         assert body["bootstrap_data"] == data.get("bootstrap_data", {})
