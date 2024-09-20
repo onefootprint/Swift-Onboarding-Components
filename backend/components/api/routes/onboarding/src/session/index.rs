@@ -23,7 +23,6 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
     /// Optionally, the playbook key that should be used for the onboarding.
-    #[openapi(required)]
     pub key: ObConfigurationKey,
     /// Optionally, any user or business bootstrap data that you would like to pass into the
     /// onboarding flow.

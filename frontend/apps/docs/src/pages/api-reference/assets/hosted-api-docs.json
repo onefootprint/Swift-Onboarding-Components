@@ -340,6 +340,9 @@
                         "Onboarding Config Publishable Key": []
                     },
                     {
+                        "Onboarding Config Token": []
+                    },
+                    {
                         "Business Owner Token": []
                     },
                     {
@@ -416,6 +419,9 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
+                    },
+                    {
+                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -511,6 +517,9 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
+                    },
+                    {
+                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -617,6 +626,9 @@
                         "Onboarding Config Publishable Key": []
                     },
                     {
+                        "Onboarding Config Token": []
+                    },
+                    {
                         "Business Owner Token": []
                     }
                 ]
@@ -671,6 +683,9 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
+                    },
+                    {
+                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -988,6 +1003,9 @@
                 "security": [
                     {
                         "Onboarding token": []
+                    },
+                    {
+                        "Onboarding Config Token": []
                     }
                 ]
             }
@@ -2137,6 +2155,12 @@
                 "in": "header",
                 "name": "X-Onboarding-Config-Key",
                 "description": "Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard."
+            },
+            "Onboarding Config Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Onboarding-Config-Key",
+                "description": "Short-lived token representing a playbook."
             },
             "Onboarding token": {
                 "type": "apiKey",
@@ -4409,7 +4433,8 @@
                     }
                 },
                 "required": [
-                    "bootstrap_data"
+                    "bootstrap_data",
+                    "key"
                 ]
             },
             "OnboardingStatusResponse": {

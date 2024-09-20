@@ -23,6 +23,7 @@ pub struct ParsedOnboardingSession {
 }
 
 /// Auth extractor for a short-lived session that represents the onboarding
+/// TODO deprecate this in favor of `ObSessionAuth`
 pub type OnboardingSessionContext = SessionContext<ParsedOnboardingSession>;
 
 impl ExtractableAuthSession for ParsedOnboardingSession {
