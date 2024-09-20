@@ -3,14 +3,12 @@ import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import type { ProviderReturn } from '@onefootprint/idv';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import getSdkContext from '../../../../utils/sdk-context';
 
 type GetSdkArgsResponse = {
   args: { kind: string; data: FootprintVerifyDataProps };
-  obConfig?: PublicOnboardingConfig;
 };
 
 const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {

@@ -1,6 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -14,10 +13,7 @@ const noop = () => undefined;
 
 type Obj = Record<string, unknown>;
 
-const useProps = <T extends Obj>(
-  onSuccess?: (props?: T, config?: PublicOnboardingConfig) => void,
-  onError?: (error: unknown) => void,
-) => {
+const useProps = <T extends Obj>(onSuccess?: (props?: T) => void, onError?: (error: unknown) => void) => {
   // For legacy web SDKs that only pass args via postMessage
   // TODO: delete when all customers migrate to v3.8.0+
   const fpProvider = useFootprintProvider();
@@ -29,13 +25,13 @@ const useProps = <T extends Obj>(
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
   const timerId = useRef<ReturnType<typeof setTimeout>>();
 
-  const complete = (props: T, config?: PublicOnboardingConfig) => {
+  const complete = (props: T) => {
     // If already received props, ignore
     if (onSuccessCalled.current) {
       return;
     }
     onSuccessCalled.current = true;
-    onSuccess?.(props, config);
+    onSuccess?.(props);
   };
 
   useEffectOnce(() => {
@@ -60,7 +56,7 @@ const useProps = <T extends Obj>(
     // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)
     const sdkArgsData = sdkArgsQuery.isSuccess ? sdkArgsQuery.data : undefined;
     if (sdkArgsData) {
-      complete(sdkArgsData.args.data, sdkArgsData.obConfig);
+      complete(sdkArgsData.args.data);
       return noop;
     }
 

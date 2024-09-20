@@ -1,6 +1,5 @@
 import { isTokenFormat } from '@onefootprint/core';
 import request from '@onefootprint/request';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import type { ProviderReturn } from '../types';
@@ -8,7 +7,6 @@ import type { ProviderReturn } from '../types';
 type Obj = Record<string, unknown>;
 type GetSdkArgsResponse<T> = {
   args: { kind: string; data: T };
-  obConfig?: PublicOnboardingConfig;
 };
 
 const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
