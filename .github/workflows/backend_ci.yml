@@ -281,10 +281,12 @@ jobs:
           DITTO_URL: "https://ditto.footprint.dev"
           IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ci
+          FLAGS: ${{ github.ref == 'refs/heads/master' && '-v' || '' }}
+        # Run pytest with -v verbose flag when running CI on master
         run: |
           set -euxo pipefail
           docker compose --env-file /dev/null run --quiet-pull integration_tests \
-            pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
+            pytest -n 6 ${{ env.FLAGS }} ci/tests/ 2>&1 | tee integration_test_output.txt
 
       - name: Create results for PR
         id: test_results
