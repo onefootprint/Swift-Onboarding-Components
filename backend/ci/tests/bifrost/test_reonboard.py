@@ -1,4 +1,6 @@
-from tests.utils import get, patch
+from tests.identify_client import IdentifyClient
+from tests.headers import FpAuth
+from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 
@@ -85,5 +87,36 @@ def test_allow_reonboard_kyb(sandbox_tenant, must_collect_data):
     assert user1.fp_bid != user2.fp_bid, "Should make a new fp_bid when reonboarding"
 
     timeline = get(f"entities/{user1.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 2
+
+
+def test_allow_reonboard_user_token(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(sandbox_tenant, "obc", must_collect_data)
+    bifrost1 = BifrostClient.new_user(obc)
+    user = bifrost1.run()
+
+    def reonboard(allow_reonboard: bool):
+        data = dict(kind="onboard", key=obc.key.value, allow_reonboard=allow_reonboard)
+        body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
+        auth_token = FpAuth(body["token"])
+
+        auth_token = IdentifyClient.from_token(auth_token).step_up()
+        bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
+        bifrost2.run()
+        return bifrost2
+
+    # Create a token with allow_reonboard = False. Should not allow reonboarding
+    bifrost2 = reonboard(False)
+    assert [r["kind"] for r in bifrost2.handled_requirements] == []
+    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 1
+
+    # Create a token with allow_reonboard = False. Should allow reonboarding, even though the playbook doesn't
+    # have the option set
+    bifrost3 = reonboard(True)
+    assert [r["kind"] for r in bifrost3.handled_requirements] == ["process"]
+    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2

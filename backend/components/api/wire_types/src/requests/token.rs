@@ -68,6 +68,12 @@ pub struct CreateTokenRequest {
     #[serde(default)]
     pub use_third_party_auth: bool,
 
+    /// Only valid for sessions of kind `onboard`, `reonboard`, and `user`. Allow the user to
+    /// re-onboard onto this playbook even if they have already onboarded onto it. Defaults to
+    /// true.
+    #[openapi(example = "null")]
+    pub allow_reonboard: Option<bool>,
+
     /// Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be
     /// at least 1 minute, at most 1 day
     #[openapi(example = "60")]

@@ -58,13 +58,13 @@ pub async fn post(
 
             let args = CreateTokenArgs {
                 vw: &vw,
-                su,
                 fp_bid: None,
                 kind,
                 key,
                 scopes: vec![],
                 auth_events: vec![],
                 limit_auth_methods: None,
+                allow_reonboard: true,
             };
             let res = create_token(conn, &session_key, args, Duration::days(3))?;
 

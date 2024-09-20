@@ -1,17 +1,18 @@
 use crate::State;
-use api_core::auth::session::user::NewUserSessionArgs;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::auth::session::user::UserSession;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
-use api_core::utils::session::AuthSession;
+use api_core::utils::token::create_token;
+use api_core::utils::token::CreateTokenArgs;
+use api_core::utils::token::CreateTokenResult;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::EntityActionResponse;
+use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::models::ob_configuration::ObConfiguration;
@@ -97,23 +98,6 @@ pub(super) fn apply_trigger_request(
         note,
     };
     let wfr = WorkflowRequest::create(conn, wfr_args)?;
-    let context = NewUserSessionContext {
-        su_id: Some(sv.id.clone()),
-        obc_id: Some(obc.id.clone()),
-        wfr_id: Some(wfr.id.clone()),
-        ..Default::default()
-    };
-    // No scopes or auth factors - require the user to re-auth when using this token
-    let duration = Duration::days(3);
-    let args = NewUserSessionArgs {
-        user_vault_id: sv.vault_id.clone(),
-        purposes: vec![TokenCreationPurpose::ApiInherit],
-        context,
-        scopes: vec![],
-        auth_events: vec![],
-    };
-    let data = UserSession::make(args)?;
-    let (token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
     // Create a timeline event logging that the workflow was triggered
     let event = WorkflowTriggeredInfo {
         workflow_id: None,
@@ -122,6 +106,21 @@ pub(super) fn apply_trigger_request(
         actor,
     };
     UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
+
+    // Create an inherit token for the WFR
+    let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
+    let args = CreateTokenArgs {
+        vw: &vw,
+        fp_bid: None,
+        kind: TokenOperationKind::Inherit,
+        key: None,
+        // No scopes or auth factors - require the user to re-auth when using this token
+        scopes: vec![],
+        auth_events: vec![],
+        limit_auth_methods: None,
+        allow_reonboard: true,
+    };
+    let CreateTokenResult { token, session, .. } = create_token(conn, session_key, args, Duration::days(3))?;
 
     sv.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
 

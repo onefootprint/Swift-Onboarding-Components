@@ -31,13 +31,13 @@ use newtypes::VaultKind;
 
 pub struct CreateTokenArgs<'a> {
     pub vw: &'a TenantVw<Any>,
-    pub su: ScopedVault,
     pub fp_bid: Option<FpId>,
     pub kind: TokenOperationKind,
     pub key: Option<ObConfigurationKey>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
+    pub allow_reonboard: bool,
 }
 
 pub struct CreateTokenResult {
@@ -55,14 +55,15 @@ pub fn create_token(
 ) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
         vw,
-        su,
         fp_bid,
         kind,
         key,
         scopes,
         auth_events,
         limit_auth_methods,
+        allow_reonboard,
     } = args;
+    let su = &vw.scoped_vault;
 
     if su.kind != VaultKind::Person {
         return ValidationError("Cannot create a token for a non-person vault").into();
@@ -128,14 +129,15 @@ pub fn create_token(
     };
 
     let context = NewUserSessionContext {
-        su_id: Some(su.id),
+        su_id: Some(su.id.clone()),
         sb_id: sb.map(|sb| sb.id),
         obc_id,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
+        allow_reonboard: Some(allow_reonboard),
         ..Default::default()
     };
     let args = NewUserSessionArgs {
-        user_vault_id: su.vault_id,
+        user_vault_id: su.vault_id.clone(),
         purposes: vec![purpose],
         context,
         scopes,

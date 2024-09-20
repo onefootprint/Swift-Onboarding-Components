@@ -98,9 +98,18 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, FpError> {
-            // If this auth token was created via API or via the dashboard, the tenant is
-            // specifically requesting that a new Workflow is created, even if one already exists
-            let force_create = user_auth.data.is_from_api() || ob_config.allow_reonboard;
+            // TODO: allow_reonboard here technically allows creating multiple Workflows per auth token. This
+            // is harmless, but ideally we have idempotency protection here and only allow creating one
+            // onboarding for the purpose of associating with the auth session.
+
+            // If this auth token allows reonboarding OR the playbook is opted into always allow reonboarding,
+            // force create a new workflwo
+            let token_allows_reonboard =
+                // For sessions with a null `allow_reonboard` value, fall back to the old logic that would always
+                // allow reonboarding for tokens made via API.
+                // TODO: rm this logic
+                (user_auth.data.allow_reonboard).unwrap_or(user_auth.data.is_from_api());
+            let force_create = token_allows_reonboard || ob_config.allow_reonboard;
             let args = NewOnboardingArgs {
                 existing_wf_id: user_auth.workflow_id(),
                 wfr_id: user_auth.wfr_id.clone(),

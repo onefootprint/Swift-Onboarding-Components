@@ -53,6 +53,10 @@ pub struct UserSession {
     /// The list of DataIdentifiers whose knowledge has been proven during this session
     #[serde(default)]
     pub kba: Vec<DataIdentifier>,
+    /// When true, allows the user to make a Workflow for a playbook they've already started
+    /// onboarding onto
+    /// TODO make required
+    pub allow_reonboard: Option<bool>,
 }
 
 #[derive(Default)]
@@ -66,6 +70,7 @@ pub struct NewUserSessionContext {
     pub biz_wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
     pub kba: Vec<DataIdentifier>,
+    pub allow_reonboard: Option<bool>,
 }
 
 /// Enumerate all the possible places in which a user auth token can be created.
@@ -198,6 +203,7 @@ impl UserSession {
             biz_wf_id,
             wfr_id,
             kba,
+            allow_reonboard,
         } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
@@ -212,6 +218,7 @@ impl UserSession {
             scopes,
             auth_events,
             kba,
+            allow_reonboard: Some(allow_reonboard.unwrap_or(false)),
         });
         Ok(session)
     }
@@ -235,6 +242,7 @@ impl UserSession {
             biz_wf_id: new_ctx.biz_wf_id.or(old.biz_wf_id),
             wfr_id: new_ctx.wfr_id.or(old.wfr_id),
             kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
+            allow_reonboard: new_ctx.allow_reonboard.or(old.allow_reonboard),
         };
         let scopes = old.scopes.into_iter().chain(new_scopes).unique().collect();
         let auth_events = old.auth_events.into_iter().chain(new_auth_event).collect();
@@ -264,6 +272,7 @@ impl UserSession {
             biz_wf_id: old.biz_wf_id,
             wfr_id: old.wfr_id,
             kba: old.kba,
+            allow_reonboard: old.allow_reonboard,
         };
         if new_scopes.iter().any(|s| !old.scopes.contains(s)) {
             // The only use case of this today is to request a token with _fewer_ scopes.

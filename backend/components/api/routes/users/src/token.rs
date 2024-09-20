@@ -56,7 +56,9 @@ pub async fn post(
         use_implicit_auth,
         limit_auth_methods,
         ttl_min,
+        allow_reonboard,
     } = request.0.unwrap_or_default();
+    let allow_reonboard = allow_reonboard.unwrap_or(true);
 
     let kind = if let Some(kind) = kind {
         kind
@@ -173,22 +175,22 @@ pub async fn post(
             // will be granted no scopes and the user will be required to re-auth
             let scopes = allowed_user_scopes(kinds, RequestedTokenScope::Onboarding, false);
 
-            let args = CreateTokenArgs {
-                vw: &vw,
-                su,
-                kind,
-                key,
-                fp_bid,
-                scopes,
-                auth_events,
-                limit_auth_methods,
-            };
             let ttl_min = ttl_min.unwrap_or(60);
             const MAX_TTL: u32 = 60 * 24;
             if !(1..=MAX_TTL).contains(&ttl_min) {
                 return ValidationError("Token must have a TTL for at least one minute and at most one day")
                     .into();
             }
+            let args = CreateTokenArgs {
+                vw: &vw,
+                kind,
+                key,
+                fp_bid,
+                scopes,
+                auth_events,
+                limit_auth_methods,
+                allow_reonboard,
+            };
             let CreateTokenResult {
                 token,
                 session,
