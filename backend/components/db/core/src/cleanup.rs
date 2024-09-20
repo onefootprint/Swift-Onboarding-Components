@@ -328,15 +328,9 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         }
 
         // TwilioMessageLogs
-        {
-            deleted_rows += diesel::delete(twilio_message_log::table)
-                .filter(twilio_message_log::vault_id.eq_any(&v_ids))
-                .execute(conn.conn())?;
-
-            deleted_rows += diesel::delete(scoped_vault_version::table)
-                .filter(scoped_vault_version::scoped_vault_id.eq_any(su_ids.clone()))
-                .execute(conn.conn())?;
-        }
+        deleted_rows += diesel::delete(twilio_message_log::table)
+            .filter(twilio_message_log::vault_id.eq_any(&v_ids))
+            .execute(conn.conn())?;
 
         // Scoped Vault Versions
         {
