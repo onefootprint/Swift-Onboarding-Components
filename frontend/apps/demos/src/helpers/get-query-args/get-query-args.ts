@@ -12,6 +12,7 @@ const getQueryArgs = (router: NextRouter) => {
     bootstrap_data: rawBootstrapData,
     locale = 'en-US',
     ob_key: obKey,
+    publicKey,
     user_data: rawUserData,
   } = query;
   let bootstrapData = {};
@@ -31,7 +32,7 @@ const getQueryArgs = (router: NextRouter) => {
     authToken: getSdkArgsToken(asPath.split('#')[1]) ?? '',
     bootstrapData,
     locale,
-    publicKey: obKey,
+    publicKey: publicKey || obKey,
   };
 };
 

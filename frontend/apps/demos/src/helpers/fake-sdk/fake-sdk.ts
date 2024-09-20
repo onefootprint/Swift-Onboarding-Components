@@ -14,11 +14,10 @@ import { isUpdateLoginMethods } from '@onefootprint/footprint-js/src/utils/type-
 import { getSearchParams } from '@onefootprint/footprint-js/src/utils/url-utils';
 import Postmate from '@onefootprint/postmate';
 import once from 'lodash/once';
+import { API_BASE_URL } from 'src/config/constants';
 
 type ParentApi = Postmate.ParentAPI;
 
-const ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
-const baseUrl = ENV === 'production' ? 'https://api.onefootprint.com' : 'https://api.dev.onefootprint.com';
 const sdkVersion = 'dev';
 const getUniqueId = (): string => Math.random().toString(36).substring(2);
 
@@ -47,7 +46,7 @@ const sendSdkArgsRecursive = async (
   payload: Record<string, unknown>,
   retries: number,
 ): Promise<{ token: string; expires_at: string }> =>
-  fetch(`${baseUrl}/org/sdk_args`, {
+  fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
       'x-fp-client-version': `footprint-js ${sdkVersion} ${payload.kind}`.trim(),

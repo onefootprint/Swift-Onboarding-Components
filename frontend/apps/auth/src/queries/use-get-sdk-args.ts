@@ -1,6 +1,5 @@
 import { isTokenFormat } from '@onefootprint/core';
 import request from '@onefootprint/request';
-import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import type { ProviderReturn } from '../provider-footprint/types';
@@ -8,7 +7,6 @@ import type { ProviderReturn } from '../provider-footprint/types';
 type Obj = Record<string, unknown>;
 type GetSdkArgsResponse<T> = {
   args: { kind: string; data: T };
-  obConfig?: PublicOnboardingConfig;
 };
 
 const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
@@ -27,6 +25,7 @@ const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: Provider
     url: '/org/sdk_args',
     headers: optionalSdkVersion
       ? {
+          // TODO this version is kind of incorrect? this is coming from the auth app
           'x-fp-client-version': `footprint-js ${optionalSdkVersion} ${optionalSdkUrl}`.trim(),
           'x-fp-sdk-args-token': authToken,
         }
