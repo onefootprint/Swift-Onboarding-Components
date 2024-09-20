@@ -74,7 +74,7 @@ const Dialog = ({
     <RadixDialog.Root open={open} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay asChild>
-          <Overlay isVisible={open} />
+          <Overlay isVisible={open} isConfirmation={isConfirmation} />
         </RadixDialog.Overlay>
         <RadixDialog.Content
           onPointerDownOutside={onClose}
@@ -224,7 +224,7 @@ const DialogContainer = styled(Box)<{
     z-index: ${$isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
     width: ${getSize(size, $isConfirmation)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
-    height: ${size === 'full-screen' ? '100vh' : 'inherit'};
+    height: ${size === 'full-screen' ? '100vh' : 'auto'};
     max-height: ${size !== 'full-screen' ? `calc(100vh - 2 * ${theme.spacing[9]})` : 'inherit'};
     border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
     top: ${getDistanceFromTop($isConfirmation, size) || theme.spacing[9]};
