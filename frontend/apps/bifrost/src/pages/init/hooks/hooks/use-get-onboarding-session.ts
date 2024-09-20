@@ -11,7 +11,7 @@ const getOnboardingSession = async (authToken: string) => {
   const { data: response } = await request<GetOnboardingSessionResponse>({
     method: 'GET',
     url: '/hosted/onboarding/session',
-    headers: { 'x-fp-ob-token': authToken },
+    headers: { 'X-Onboarding-Config-Key': authToken },
   });
 
   return response;
