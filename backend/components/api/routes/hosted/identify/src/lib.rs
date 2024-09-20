@@ -126,11 +126,9 @@ async fn get_identify_challenge_context(
         root_span,
     } = args;
 
-    // Get the OBC from either user auth or obc auth
-    let obc = obc
-        .as_ref()
-        .map(|ob| ob.ob_config())
-        .or(user_auth.as_ref().and_then(|ua| ua.ob_config()))
+    // Get the OBC from either user auth or obc auth, preferring to extract from the auth token
+    let obc = (user_auth.as_ref().and_then(|ua| ua.ob_config()))
+        .or(obc.as_ref().map(|ob| ob.ob_config()))
         .cloned();
     let t_id = obc.as_ref().map(|obc| &obc.tenant_id);
     // Look up existing user vault by identifier
