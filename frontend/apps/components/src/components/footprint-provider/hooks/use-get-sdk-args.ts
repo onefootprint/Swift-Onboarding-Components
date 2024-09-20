@@ -1,4 +1,4 @@
-import { isValidTokenFormat } from '@onefootprint/idv';
+import { isTokenFormat } from '@onefootprint/core';
 import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
@@ -38,7 +38,7 @@ const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: Provider
 
 const useGetSdkArgs = <T extends Obj>(authToken: string, fpProvider: ProviderReturn) =>
   useQuery([authToken, 'get-sdk-args'], () => getSdkArgs<T>(authToken, fpProvider), {
-    enabled: isValidTokenFormat(authToken),
+    enabled: isTokenFormat(authToken),
   });
 
 export default useGetSdkArgs;

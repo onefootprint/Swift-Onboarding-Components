@@ -36,6 +36,5 @@ export {
 export {
   getSdkArgsToken,
   hasInvalidHashFragment,
-  isValidTokenFormat,
 } from './url-fragment';
 export { default as withProvider } from './with-provider';

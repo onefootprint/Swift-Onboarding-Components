@@ -1,9 +1,9 @@
+import { isTokenFormat } from '@onefootprint/core';
 import type { NextRouter } from 'next/router';
 
 export const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
-const isValidTokenFormat = (str: string): boolean => Boolean(str) && /tok_/.test(str);
 
-const getSdkArgsToken = (str: string): string => (isValidTokenFormat(str) ? str : '');
+const getSdkArgsToken = (str: string): string => (isTokenFormat(str) ? str : '');
 
 const getQueryArgs = (router: NextRouter) => {
   const { query, asPath } = router;

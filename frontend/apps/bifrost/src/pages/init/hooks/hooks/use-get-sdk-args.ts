@@ -1,6 +1,6 @@
+import { isTokenFormat } from '@onefootprint/core';
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import type { ProviderReturn } from '@onefootprint/idv';
-import { isValidTokenFormat } from '@onefootprint/idv';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
@@ -38,7 +38,7 @@ const useGetSdkArgs = (
   },
 ) =>
   useQuery([authToken, 'get-sdk-args'], () => getSdkArgs(authToken, fpProvider), {
-    enabled: isValidTokenFormat(authToken),
+    enabled: isTokenFormat(authToken),
     onSuccess: options?.onSuccess,
     onError: options?.onError,
   });

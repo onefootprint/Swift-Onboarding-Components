@@ -79,7 +79,6 @@ export {
   isString,
   isStringValid,
   isUndefined,
-  isValidTokenFormat,
   Logger,
   shouldChallengeEmail,
   trackAction,

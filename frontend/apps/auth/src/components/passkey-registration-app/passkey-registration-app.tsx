@@ -3,9 +3,8 @@
 import ModalLoading from '@/src/components/client-loading/modal-loading';
 import type { Variant } from '@/src/types';
 import { isEmbeddedInIframe } from '@/src/utils';
-import { getWindowUrl } from '@onefootprint/core';
+import { getWindowUrl, isTokenFormat } from '@onefootprint/core';
 import { getSessionIdFromQueryParam } from '@onefootprint/dev-tools';
-import { isValidTokenFormat } from '@onefootprint/idv';
 import type { DeviceInfo } from '@onefootprint/idv';
 import {
   Liveness,
@@ -76,7 +75,7 @@ const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.E
   useGetD2PStatus({
     enabled:
       !isDone &&
-      isValidTokenFormat(authToken) &&
+      isTokenFormat(authToken) &&
       d2dStatus.current !== D2PStatus.canceled &&
       d2dStatus.current !== D2PStatus.completed,
     authToken,
@@ -107,7 +106,7 @@ const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.E
   });
 
   useEffect(() => {
-    if (!isValidTokenFormat(authToken)) {
+    if (!isTokenFormat(authToken)) {
       logError('Invalid token format');
       setState('error');
       return;

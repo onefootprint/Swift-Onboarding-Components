@@ -1,9 +1,10 @@
+import { isTokenFormat } from '@onefootprint/core';
 import request from '@onefootprint/request';
 import type { UserAuthMethodsResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { isString, isValidTokenFormat } from '../../utils';
+import { isString } from '../../utils';
 
 const FIVE_MINUTES = 1000 * 60 * 5;
 
@@ -18,7 +19,7 @@ const requestFn = async (token: string) => {
 };
 
 const useUserAuthMethods = (token?: string) => {
-  const isTokenValid = isString(token) && isValidTokenFormat(token);
+  const isTokenValid = isString(token) && isTokenFormat(token);
 
   return useQuery({
     cacheTime: FIVE_MINUTES,

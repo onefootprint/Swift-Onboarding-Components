@@ -1,4 +1,5 @@
 export { default as getWindowUrl } from './dom-window/get-window-url';
+export { default as getTokenFromUrlHash } from './dom-window/get-token-from-url-hash';
 export {
   appendInlineContainer,
   appendInlineLoader,
@@ -27,5 +28,6 @@ export { default as isSandboxFixtureNumber } from './validations/is-sandbox-fixt
 export { default as isSsn4 } from './validations/is-ssn4';
 export { default as isSsn9, isSSN9Flexible } from './validations/is-ssn9';
 export { default as isTin } from './validations/is-tin';
+export { default as isTokenFormat } from './validations/is-token-format';
 export { default as isURL, isURLWithProtocol } from './validations/is-url';
 export { getIsoDate, isValidIsoDate } from './validations/date';
