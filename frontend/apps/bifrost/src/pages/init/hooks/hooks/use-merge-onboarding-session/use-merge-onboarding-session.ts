@@ -1,14 +1,14 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import useGetOnboardingSession, { type GetOnboardingSessionResponse } from '../use-get-onboarding-session';
 
-const OB_TOKEN_PREFIX = 'obtok_';
+const OB_TOKEN_PREFIXES = ['obtok_', 'pbtok_'];
 
 const useMergeOnboardingSession = () => {
   const getOnboardingSession = useGetOnboardingSession();
 
   /** Given the sdk arguments, merges with onboarding session arguments from the backend (if any). Returns the merged data. Throws an exception if we cannot fetch the onboarding session or cannot merge the data. */
   const mergeOnboardingSession = async (sdkArgsData: FootprintVerifyDataProps) => {
-    if (!sdkArgsData.authToken?.startsWith(OB_TOKEN_PREFIX)) {
+    if (!sdkArgsData.authToken || !OB_TOKEN_PREFIXES.some(prefix => sdkArgsData.authToken?.startsWith(prefix))) {
       return sdkArgsData;
     }
 
@@ -42,7 +42,7 @@ export const mergeData = (
 
   const mergedData: FootprintVerifyDataProps = {
     ...sdkArgsData,
-    // The authToken provided was an `obtok_` and shouldn't be passed on to the rest of bifrost
+    // The authToken provided was a `pbtok_` and shouldn't be passed on to the rest of bifrost
     authToken: undefined,
     bootstrapData: Object.keys(onboardingSessionData.bootstrapData || {}).length
       ? onboardingSessionData.bootstrapData

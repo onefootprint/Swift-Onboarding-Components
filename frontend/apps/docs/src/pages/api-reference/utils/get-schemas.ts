@@ -29,8 +29,8 @@ const getSchema = (schemaKey: string) => {
 // https://swagger.io/docs/specification/data-models/data-types/#string
 const DefaultFieldValues: Record<string, string> = {
   onboarding_config_key: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
-  key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
-  playbook_key: 'ob_live_fZvYlX3JpanlQ3MAwE45g0',
+  key: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
+  playbook_key: 'pb_live_fZvYlX3JpanlQ3MAwE45g0',
   fp_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',
   fp_bid: 'fp_bid_xIMR8HSsaGvKtiwosEsvV0',
   fp_user_id: 'fp_id_7p793EF07xKXHqAeg5VGPj',

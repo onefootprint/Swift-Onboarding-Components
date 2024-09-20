@@ -5373,8 +5373,8 @@
                         "format": "date-time"
                     },
                     "token": {
-                        "example": "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
-                        "description": "A short-lived onboarding session token that can be passed into the frontend SDK as an\n `authToken`. This token contains all information on the provided public key and/or bootstrap\n data provided.\n NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.",
+                        "example": "pbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH",
+                        "description": "A short-lived onboarding session token that can be passed into the frontend SDK as a\n `authToken`. This token contains all information on the provided public key and/or bootstrap\n data provided.\n NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.",
                         "type": "string"
                     }
                 },
@@ -12196,7 +12196,7 @@
                             "type": "object",
                             "properties": {
                                 "playbook_key": {
-                                    "example": "ob_live_fZvYlX3JpanlQ3MAwE45g0",
+                                    "example": "pb_live_fZvYlX3JpanlQ3MAwE45g0",
                                     "type": "string"
                                 },
                                 "status": {

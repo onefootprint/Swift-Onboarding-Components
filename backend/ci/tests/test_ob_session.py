@@ -26,8 +26,8 @@ def test_onboarding_token(sandbox_tenant):
         body = post("onboarding/session", data, sandbox_tenant.s_sk)
         token = body["token"]
         assert token.startswith(
-            "obtok_"
-        ), "Onboarding token MUST start with `obtok_`. Our frontend SDK matches on this string EXPLICITLY. Do not change this prefix"
+            "pbtok_"
+        ), "Onboarding token MUST start with `pbtok_`. Our frontend SDK matches on this string EXPLICITLY. Do not change this prefix"
         token = ObToken(token)
         body = get("hosted/onboarding/session", None, token)
         assert body["key"] == data.get("key", None)

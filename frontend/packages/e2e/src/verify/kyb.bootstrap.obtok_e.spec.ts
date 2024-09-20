@@ -62,7 +62,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   );
 
   expect(session).toHaveProperty('token');
-  expect(session.token.startsWith('obtok_')).toBeTruthy();
+  expect(session.token.startsWith('pbtok_')).toBeTruthy();
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
@@ -73,7 +73,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYB obtok_ happy path #ci', async ({ page, isMobile }) => {
+test('KYB pbtok_ happy path #ci', async ({ page, isMobile }) => {
   test.slow(); // ~23.63s
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test

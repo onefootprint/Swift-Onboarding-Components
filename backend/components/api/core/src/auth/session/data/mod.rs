@@ -72,7 +72,7 @@ impl AuthSessionData {
             // These two are very similar purpose and are basically interchangible.
             Self::TenantRb(_) => "db",
             Self::FirmEmployee(_) => "db",
-            Self::OnboardingSession(_) => "ob",
+            Self::OnboardingSession(_) => "pb",
         }
     }
 }

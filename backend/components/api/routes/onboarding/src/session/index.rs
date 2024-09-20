@@ -37,11 +37,11 @@ pub struct CreateOnboardingSessionRequest {
 
 #[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct CreateOnboardingSessionResponse {
-    /// A short-lived onboarding session token that can be passed into the frontend SDK as an
+    /// A short-lived onboarding session token that can be passed into the frontend SDK as a
     /// `authToken`. This token contains all information on the provided public key and/or bootstrap
     /// data provided.
     /// NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.
-    #[openapi(example = "botok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
+    #[openapi(example = "pbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub token: SessionAuthToken,
     pub expires_at: DateTime<Utc>,
 }

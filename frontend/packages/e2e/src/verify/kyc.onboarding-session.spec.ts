@@ -51,7 +51,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   console.log(session);
   expect(session).toHaveProperty('token');
-  expect(session.token.startsWith('obtok_')).toBeTruthy();
+  expect(session.token.startsWith('pbtok_')).toBeTruthy();
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
