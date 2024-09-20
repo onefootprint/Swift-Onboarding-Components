@@ -15,6 +15,7 @@ import InvalidConfig from './pages/invalid-config';
 import InvalidDomain from './pages/invalid-domain';
 import PasskeyAdd from './pages/passkey-add';
 import PasskeyProcessing from './pages/passkey-processing';
+import Success from './pages/success';
 import { useAuthIdentifyAppMachine } from './state';
 
 const { logTrack, logWarn } = getLogger({ location: 'auth-identify-router' });
@@ -30,7 +31,7 @@ const IdentifyRouter = () => {
     fpProvider.send(FootprintPublicEvent.closed);
   }, [fpProvider, isDone]);
 
-  if (isDone) return null;
+  if (isDone) return <Success />;
 
   if (state.matches('init')) {
     return <Init />;

@@ -37,7 +37,7 @@ const IdentifyAuthPage = () => {
   const mutOnboardingValidate = useOnboardingValidate();
   const fpProvider = useFootprintProvider();
 
-  const handleIdentifyCompletion = useCallback((args: DoneArgs, isPasskeyAlreadyRegistered: boolean) => {
+  const handleIdentifyCompletion = useCallback((args: DoneArgs, isDoneEarly: boolean) => {
     mutOnboardingValidate.mutate(
       { authToken: args.authToken },
       {
@@ -48,9 +48,9 @@ const IdentifyAuthPage = () => {
           fpProvider.send(FootprintPublicEvent.completed, validationToken);
           logTrack(`Onboarding validation: ${validationToken.slice(0, Math.floor(validationToken.length / 3))}...`);
 
-          if (isPasskeyAlreadyRegistered) {
+          if (isDoneEarly) {
             window.setTimeout(() => {
-              send({ type: 'identifyCompletedPasskeyAlreadyRegistered' });
+              send({ type: 'doneReceived' });
             }, IDENTIFY_COMPLETE_VISIBLE_TIME);
             return;
           }

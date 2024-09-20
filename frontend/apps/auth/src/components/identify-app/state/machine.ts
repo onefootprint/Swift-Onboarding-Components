@@ -20,6 +20,7 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         invalidAuthConfigReceived: { target: 'invalidAuthConfig' },
         invalidConfigReceived: { target: 'invalidConfig' },
         sdkUrlNotAllowedReceived: { target: 'sdkUrlNotAllowed' },
+        doneReceived: [{ target: 'done' }],
       },
       states: {
         init: {
@@ -34,7 +35,6 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         },
         identify: {
           on: {
-            identifyCompletedPasskeyAlreadyRegistered: [{ target: 'done' }],
             identifyCompleted: [
               {
                 cond: ctx => !!ctx.device?.hasSupportForWebauthn,

@@ -22,8 +22,8 @@ export type AuthIdentifyAppMachineContext = {
 export type AuthIdentifyAppMachineEvents =
   | { type: 'authPropsReceived'; payload: { props?: AuthDataPropsWithToken; config?: PublicOnboardingConfig } }
   | { type: 'deviceReceived'; payload: DeviceInfo }
+  | { type: 'doneReceived' }
   | { type: 'identifyCompleted'; payload: { authToken: string } }
-  | { type: 'identifyCompletedPasskeyAlreadyRegistered' }
   | { type: 'invalidAuthConfigReceived' }
   | { type: 'invalidConfigReceived' }
   | { type: 'notificationReceived'; payload: NotificationProps }
