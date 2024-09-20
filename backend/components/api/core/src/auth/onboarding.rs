@@ -46,5 +46,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         Ok(ParsedOnboardingSession { data })
     }
 
-    fn log_authed_principal(&self, _: tracing_actix_web::RootSpan) {}
+    fn log_authed_principal(&self, _: tracing_actix_web::RootSpan) {
+        // TODO
+    }
 }

@@ -340,9 +340,6 @@
                         "Onboarding Config Publishable Key": []
                     },
                     {
-                        "Onboarding Config Token": []
-                    },
-                    {
                         "Business Owner Token": []
                     },
                     {
@@ -419,9 +416,6 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -517,9 +511,6 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -626,9 +617,6 @@
                         "Onboarding Config Publishable Key": []
                     },
                     {
-                        "Onboarding Config Token": []
-                    },
-                    {
                         "Business Owner Token": []
                     }
                 ]
@@ -683,9 +671,6 @@
                 "security": [
                     {
                         "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
                     },
                     {
                         "Business Owner Token": []
@@ -2152,12 +2137,6 @@
                 "in": "header",
                 "name": "X-Onboarding-Config-Key",
                 "description": "Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard."
-            },
-            "Onboarding Config Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Onboarding-Session-Token",
-                "description": "Short-lived token representing an onboarding configuration."
             },
             "Onboarding token": {
                 "type": "apiKey",
