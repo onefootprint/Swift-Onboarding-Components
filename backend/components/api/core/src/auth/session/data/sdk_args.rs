@@ -4,7 +4,6 @@ use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
-use db::PgConn;
 use newtypes::DataIdentifier;
 use newtypes::DocumentFixtureResult;
 use newtypes::EncryptedVaultPrivateKey;
@@ -142,11 +141,6 @@ pub type ObConfigInfo = (
 pub trait ValidateSdkArgs {
     /// Validate the contents of the SdkArgs
     fn validate(&self) -> FpResult<()>;
-
-    /// If pertinent, the ob config identified by these SDK args
-    fn ob_config(&self, _conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
-        Ok(None)
-    }
 }
 
 impl ValidateSdkArgs for VerifyV1SdkArgs {
@@ -174,22 +168,6 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         tracing::info!(%show_completion_page, "SDK args completion page option");
         Ok(())
     }
-
-    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
-        let obc = if let Some(key) = self.public_key.as_ref() {
-            let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
-            let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
-                Some(Appearance::get(conn, appearance_id, &tenant.id)?)
-            } else {
-                None
-            };
-            let client_config = TenantClientConfig::get(conn, &tenant.id, obc.is_live)?;
-            Some((obc, tenant, client_config, appearance))
-        } else {
-            None
-        };
-        Ok(obc)
-    }
 }
 
 impl ValidateSdkArgs for AuthV1SdkArgs {
@@ -204,22 +182,6 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
             return Err(ValidationError("Public key must be provided").into());
         }
         Ok(())
-    }
-
-    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
-        let obc = if let Some(key) = self.public_key.as_ref() {
-            let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
-            let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
-                Some(Appearance::get(conn, appearance_id, &tenant.id)?)
-            } else {
-                None
-            };
-            let client_config = TenantClientConfig::get(conn, &tenant.id, obc.is_live)?;
-            Some((obc, tenant, client_config, appearance))
-        } else {
-            None
-        };
-        Ok(obc)
     }
 }
 
@@ -302,17 +264,6 @@ impl ValidateSdkArgs for SdkArgs {
             Self::RenderV1(args) => args.validate()?,
         }
         Ok(())
-    }
-
-    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
-        match self {
-            Self::VerifyV1(args) => args.ob_config(conn),
-            Self::VerifyResultV1(args) => args.ob_config(conn),
-            Self::FormV1(args) => args.ob_config(conn),
-            Self::AuthV1(args) => args.ob_config(conn),
-            Self::UpdateAuthMethodsV1(args) => args.ob_config(conn),
-            Self::RenderV1(args) => args.ob_config(conn),
-        }
     }
 }
 

@@ -1,16 +1,9 @@
-import pytest
-
 from tests.utils import get, post
 from tests.headers import SdkArgs
 
 
 def test_sdk_args_fail_validation():
     post("/org/sdk_args", {"kind": "verify_v1", "data": {}}, status_code=400)
-    post(
-        "/org/sdk_args",
-        {"kind": "verify_v1", "data": {"public_key": "pb_test123455"}},
-        status_code=404,
-    )
     post(
         "/org/sdk_args",
         {"kind": "form_v1", "data": {}},
@@ -20,11 +13,6 @@ def test_sdk_args_fail_validation():
         "/org/sdk_args",
         {"kind": "auth_v1", "data": {}},
         status_code=400,
-    )
-    post(
-        "/org/sdk_args",
-        {"kind": "auth_v1", "data": {"public_key": "pb_test123455"}},
-        status_code=404,
     )
     post(
         "/org/sdk_args",
@@ -236,8 +224,6 @@ def test_sdk_args_ob_config(sandbox_tenant):
         body = get("/org/sdk_args", None, token)
         assert body["args"]["kind"] == data["kind"]
         assert body["args"]["data"]["public_key"] == obc_key
-        assert body["ob_config"]["name"] == sandbox_tenant.default_ob_config.name
-        assert body["ob_config"]["key"] == obc_key
 
 
 def test_sdk_telemetry():

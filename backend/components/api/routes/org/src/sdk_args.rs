@@ -5,13 +5,11 @@ use api_core::auth::session::sdk_args::SdkArgsKind;
 use api_core::auth::session::sdk_args::ValidateSdkArgs;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
-use api_core::utils::db2api::DbToApi;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateSdkArgsTokenResponse;
-use api_wire_types::PublicOnboardingConfiguration;
 use chrono::Duration;
 use newtypes::PiiString;
 use paperclip::actix::api_v2_operation;
@@ -24,7 +22,6 @@ use paperclip::actix::Apiv2Response;
 #[serde(rename_all = "snake_case")]
 pub struct GetSdkArgsTokenResponse {
     pub args: SdkArgs,
-    pub ob_config: Option<api_wire_types::PublicOnboardingConfiguration>,
 }
 
 #[api_v2_operation(
@@ -50,12 +47,7 @@ async fn post(
         // the session in the database
         .db_query(move |conn| -> FpResult<_> {
             let duration = Duration::hours(1);
-            let err = data.validate();
-            let obc = data.ob_config(conn);
-            if let Ok(Some((obc, _, _, _))) = &obc {
-                root_span.record("tenant_id", obc.tenant_id.to_string());
-                root_span.record("is_live", obc.is_live.to_string());
-            }
+            let result = data.validate();
             let body = PiiString::new(serde_json::ser::to_string(&data)?);
             let e_data = public_key.seal_pii(&body)?;
             let data = SdkArgsData {
@@ -67,11 +59,8 @@ async fn post(
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             root_span.record("auth_token_hash", auth_token.id().to_string());
 
-            if let Some(err) = err.err().or(obc.err()) {
-                Err(err)
-            } else {
-                Ok((auth_token, session))
-            }
+            result?;
+            Ok((auth_token, session))
         })
         .await?;
 
@@ -84,11 +73,7 @@ async fn post(
     description = "Fetch information from an existing SDK args session."
 )]
 #[get("/org/sdk_args")]
-async fn get(
-    state: web::Data<State>,
-    session: SdkArgsContext,
-    root_span: RootSpan,
-) -> ApiResponse<GetSdkArgsTokenResponse> {
+async fn get(state: web::Data<State>, session: SdkArgsContext) -> ApiResponse<GetSdkArgsTokenResponse> {
     let SdkArgsData {
         e_private_key,
         e_data,
@@ -98,21 +83,6 @@ async fn get(
         .decrypt_to_piistring(&e_data, &e_private_key)
         .await?;
     let args: SdkArgs = serde_json::de::from_str(sdk_args_str.leak())?;
-    let (obc, args) = state
-        .db_pool
-        .db_query(move |conn| -> FpResult<_> {
-            let obc = args.ob_config(conn)?;
-            Ok((obc, args))
-        })
-        .await?;
-    if let Some((obc, _, _, _)) = obc.as_ref() {
-        root_span.record("tenant_id", obc.tenant_id.to_string());
-        root_span.record("is_live", obc.is_live.to_string());
-    }
-
-    let ob_config = obc.map(|(obc, t, tcc, a)| {
-        PublicOnboardingConfiguration::from_db((obc, t, tcc, a, state.ff_client.clone(), None))
-    });
-    let result = GetSdkArgsTokenResponse { args, ob_config };
+    let result = GetSdkArgsTokenResponse { args };
     Ok(result)
 }
