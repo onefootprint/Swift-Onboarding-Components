@@ -1,4 +1,0 @@
-enum FootprintAuthMethods {
-  authToken,
-  emailAndPhone,
-}

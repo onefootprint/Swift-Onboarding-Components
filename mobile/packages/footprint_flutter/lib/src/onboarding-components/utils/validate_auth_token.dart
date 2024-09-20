@@ -8,7 +8,12 @@ import 'package:footprint_flutter/src/onboarding-components/queries/get_onboardi
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_identify_scope_from_ob_config_kind.dart';
 
-Future<AuthTokenStatus> validateAuthToken({
+typedef ValidateAuthTokenResult = ({
+  AuthTokenStatus authTokenStatus,
+  String? validationToken,
+});
+
+Future<ValidateAuthTokenResult> validateAuthToken({
   required WidgetRef ref,
   required String publicKey,
   required String authToken,
@@ -58,18 +63,24 @@ Future<AuthTokenStatus> validateAuthToken({
             verifiedAuthToken: authToken,
             authTokenStatus: AuthTokenStatus.validWithSufficientScope,
           );
-      await getValidationToken(authToken);
+      final validationToken = await getValidationToken(authToken);
       await initOnboarding(authToken, sandboxOutcome?.overallOutcome);
       final vaultingToken = await createVaultingToken(authToken);
       ref
           .read(fpContextNotifierProvider.notifier)
           .updateVaultingToken(vaultingToken.token);
-      return AuthTokenStatus.validWithSufficientScope;
+      return (
+        authTokenStatus: AuthTokenStatus.validWithSufficientScope,
+        validationToken: validationToken.validationToken
+      );
     } else {
       ref
           .read(fpContextNotifierProvider.notifier)
           .updateAuthTokenStatus(AuthTokenStatus.validWithInsufficientScope);
-      return AuthTokenStatus.validWithInsufficientScope;
+      return (
+        authTokenStatus: AuthTokenStatus.validWithInsufficientScope,
+        validationToken: null
+      );
     }
   } catch (e) {
     ref

@@ -63,6 +63,10 @@ class FpContextNotifier extends Notifier<ProviderContext> {
     state = state.copyWith(authTokenStatus: authTokenStatus);
   }
 
+  void updateAuthValidationToken(String authValidationToken) {
+    state = state.copyWith(authValidationToken: authValidationToken);
+  }
+
   void update({
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
@@ -70,6 +74,7 @@ class FpContextNotifier extends Notifier<ProviderContext> {
     String? verifiedAuthToken,
     AuthTokenStatus? authTokenStatus,
     String? vaultingToken,
+    String? authValidationToken,
     String? publicKey,
     String? redirectUrl,
     String? sandboxId,
@@ -82,6 +87,7 @@ class FpContextNotifier extends Notifier<ProviderContext> {
       verifiedAuthToken: verifiedAuthToken,
       authTokenStatus: authTokenStatus,
       vaultingToken: vaultingToken,
+      authValidationToken: authValidationToken,
       publicKey: publicKey,
       redirectUrl: redirectUrl,
       sandboxId: sandboxId,

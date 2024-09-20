@@ -10,6 +10,8 @@ class ProviderContext {
   final String? verifiedAuthToken;
   final AuthTokenStatus? authTokenStatus;
   final String? vaultingToken;
+  final String?
+      authValidationToken; // This is the validation token generated from auth token, not from onboarding
   final FootprintAppearance? appearance;
   final FootprintSupportedLocale? locale;
   final OnboardingConfig? onboardingConfig;
@@ -24,6 +26,7 @@ class ProviderContext {
     this.verifiedAuthToken,
     this.authTokenStatus,
     this.vaultingToken,
+    this.authValidationToken,
     this.appearance,
     this.locale,
     this.onboardingConfig,
@@ -37,6 +40,7 @@ class ProviderContext {
     String? verifiedAuthToken,
     AuthTokenStatus? authTokenStatus,
     String? vaultingToken,
+    String? authValidationToken,
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
     OnboardingConfig? onboardingConfig,
@@ -50,6 +54,7 @@ class ProviderContext {
       verifiedAuthToken: verifiedAuthToken ?? this.verifiedAuthToken,
       authTokenStatus: authTokenStatus ?? this.authTokenStatus,
       vaultingToken: vaultingToken ?? this.vaultingToken,
+      authValidationToken: authValidationToken ?? this.authValidationToken,
       appearance: appearance ?? this.appearance,
       locale: locale ?? this.locale,
       onboardingConfig: onboardingConfig ?? this.onboardingConfig,

@@ -194,6 +194,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
             overallOutcome: OverallOutcome.fail,
           ),
           sandboxId: "3ruc9MwHfchgh2LRm9",
+          authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
           child: Container(
             alignment: Alignment.center,
             decoration: const BoxDecoration(
@@ -208,6 +209,8 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
                       handleAuthenticated: () {
                         handleComplete();
                       },
+                      useAuthToken:
+                          true, // True if an auth token was provided to the FootprintProvider
                     ),
                   if (currentStep == Steps.dataCollection)
                     DataCollection(
@@ -264,9 +267,13 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
   final void Function() handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -275,7 +282,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -283,10 +289,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
+        print(
+            "Requires Auth: ${response.requiresAuth}, Validation Token: ${response.validationToken}");
         if (response.requiresAuth == false) {
           widget.handleAuthenticated();
         } else {
@@ -315,7 +319,7 @@ class _IdentifyState extends State<Identify> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -324,9 +328,11 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (String validationToken) {
+                  print("Validation Token: $validationToken");
+                  widget.handleAuthenticated();
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
@@ -340,7 +346,10 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
+                otpUtils
+                    .verifyOtpChallenge(verificationCode: value)
+                    .then((validationToken) {
+                  print("Validation Token: $validationToken");
                   handleVerfied();
                 });
               },
@@ -406,7 +415,10 @@ class _IdentifyState extends State<Identify> {
                   footprintUtils(context).launchIdentify(
                     email: formData.email,
                     phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
+                    onAuthenticated: (String validationToken) {
+                      print("Validation Token: $validationToken");
+                      widget.handleAuthenticated();
+                    },
                   );
                 },
                 test: (err) => err is InlineOtpNotSupportedException,
@@ -421,7 +433,10 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
+              otpUtils
+                  .verifyOtpChallenge(verificationCode: value)
+                  .then((validationToken) {
+                print("Validation Token: $validationToken");
                 handleVerfied();
               });
             },

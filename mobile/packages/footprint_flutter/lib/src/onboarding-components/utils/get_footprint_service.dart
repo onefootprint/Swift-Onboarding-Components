@@ -9,7 +9,6 @@ import 'package:footprint_flutter/src/onboarding-components/models/footprint_con
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/footprint_auth_methods.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/save.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
@@ -20,13 +19,13 @@ import 'package:footprint_flutter/src/onboarding-components/utils/validate_auth_
 typedef IdentifyLauncher = void Function({
   String? email,
   String? phoneNumber,
-  void Function()? onAuthenticated,
+  void Function(String validationToken)? onAuthenticated,
   void Function(Object err)? onError,
   void Function()? onCancel,
 });
 typedef AuthMethodCheckerResult = ({
   bool requiresAuth,
-  FootprintAuthMethods? authMethod
+  String? validationToken,
 });
 typedef AuthMethodChecker = Future<AuthMethodCheckerResult> Function();
 typedef SaveHandler = Future<void> Function(FormData data);
@@ -44,12 +43,12 @@ typedef HandoffHandler = void Function({
 }) getFootprintService(BuildContext context, WidgetRef ref) {
   final fpWebview = Browser();
 
-  AuthMethodCheckerResult authTokenStatusToResult(AuthTokenStatus status) {
+  bool authTokenStatusToRequiresAuthResult(AuthTokenStatus status) {
     if (status == AuthTokenStatus.validWithSufficientScope) {
-      return (requiresAuth: false, authMethod: null);
+      return false;
     }
     if (status == AuthTokenStatus.validWithInsufficientScope) {
-      return (requiresAuth: true, authMethod: FootprintAuthMethods.authToken);
+      return true;
     }
     throw Exception('Invalid auth token. Please use a valid auth token.');
   }
@@ -60,10 +59,11 @@ typedef HandoffHandler = void Function({
     final verifiedAuthToken = fpContext.verifiedAuthToken;
     final authToken = fpContext.authToken;
     final authTokenStatus = fpContext.authTokenStatus;
+    final authValidationToken = fpContext.authValidationToken;
 
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken != null && vaultingToken.isNotEmpty) {
-      return (requiresAuth: false, authMethod: null);
+      return (requiresAuth: false, validationToken: authValidationToken);
     }
 
     // If we have a verified auth token, we don't need to authenticate
@@ -72,13 +72,13 @@ typedef HandoffHandler = void Function({
       ref
           .read(fpContextNotifierProvider.notifier)
           .updateVaultingToken(vaultingToken.token);
-      return (requiresAuth: false, authMethod: null);
+      return (requiresAuth: false, validationToken: authValidationToken);
     }
 
     // If we have an auth token, we need to check if it's valid
     if (authToken != null) {
       if (authTokenStatus == null) {
-        final status = await validateAuthToken(
+        final tokenValidationResult = await validateAuthToken(
           ref: ref,
           publicKey: fpContext.publicKey,
           authToken: authToken,
@@ -86,18 +86,28 @@ typedef HandoffHandler = void Function({
           sandboxOutcome: fpContext.sandboxOutcome,
           onboardingConfig: fpContext.onboardingConfig,
         );
-        return authTokenStatusToResult(status);
+        return (
+          requiresAuth: authTokenStatusToRequiresAuthResult(
+              tokenValidationResult.authTokenStatus),
+          validationToken: tokenValidationResult.validationToken,
+        );
       }
-      return authTokenStatusToResult(authTokenStatus);
+      return (
+        requiresAuth: authTokenStatusToRequiresAuthResult(authTokenStatus),
+        validationToken: authValidationToken,
+      );
     }
 
-    return (requiresAuth: true, authMethod: FootprintAuthMethods.emailAndPhone);
+    return (
+      requiresAuth: true,
+      validationToken: authValidationToken
+    ); // Validation token should be null here
   }
 
   void launchIdentify({
     String? email,
     String? phoneNumber,
-    void Function()? onAuthenticated,
+    void Function(String validationToken)? onAuthenticated,
     void Function(Object err)? onError,
     void Function()? onCancel,
   }) {
@@ -138,13 +148,18 @@ typedef HandoffHandler = void Function({
         authToken: authToken,
         onAuthComplete: (
             {required String authToken, required String vaultingToken}) {
-          onAuthenticated?.call();
           ref
               .read(fpContextNotifierProvider.notifier)
               .updateVerifiedAuthToken(authToken);
           ref
               .read(fpContextNotifierProvider.notifier)
+              .updateAuthTokenStatus(AuthTokenStatus.validWithSufficientScope);
+          ref
+              .read(fpContextNotifierProvider.notifier)
               .updateVaultingToken(vaultingToken);
+          getValidationToken(authToken).then((validationToken) {
+            onAuthenticated?.call(validationToken.validationToken);
+          });
         },
         onError: (err) {
           onError?.call(err);
