@@ -9,7 +9,9 @@
   "types": "./dist/footprint-react-native.d.ts",
   "sideEffects": false,
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@onefootprint/types": "*",
     "@types/react": "^18.2.8",
+    "@types/validator": "^13.12.2",
     "react": "^18.2.0",
     "react-native": "0.74.3",
     "tsconfig": "*",
