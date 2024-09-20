@@ -9,7 +9,7 @@ use paperclip::actix::Apiv2Response;
 
 #[derive(serde::Serialize, Debug, Apiv2Response, macros::JsonResponder)]
 pub struct OnboardingSessionResponse {
-    pub key: Option<ObConfigurationKey>,
+    pub key: ObConfigurationKey,
     pub bootstrap_data: UserDataV1,
 }
 

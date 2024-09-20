@@ -7,7 +7,6 @@ use api_core::auth::session::onboarding::OnboardingSession;
 use api_core::auth::session::sdk_args::UserDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
-use api_core::telemetry::RootSpan;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
@@ -25,7 +24,7 @@ use paperclip::actix::Apiv2Schema;
 pub struct CreateOnboardingSessionRequest {
     /// Optionally, the playbook key that should be used for the onboarding.
     #[openapi(required)]
-    pub key: Option<ObConfigurationKey>,
+    pub key: ObConfigurationKey,
     /// Optionally, any user or business bootstrap data that you would like to pass into the
     /// onboarding flow.
     /// For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).
@@ -52,24 +51,18 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantApiKeyGated<preview_api::OnboardingSessionToken>,
     request: Json<CreateOnboardingSessionRequest>,
-    root_span: RootSpan,
 ) -> ApiResponse<CreateOnboardingSessionResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
 
-    let meta = if key.is_some() { "has_key" } else { "no_key" };
-    root_span.record("meta", meta);
-
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            if let Some(key) = key.clone() {
-                // Check ownership of Playbook
-                ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
-            }
+            // Check ownership of Playbook
+            ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
             let data = OnboardingSession { key, bootstrap_data };
             let expires_in = chrono::Duration::hours(1);
             let session = AuthSession::create_sync(conn, &sealing_key, data, expires_in)?;

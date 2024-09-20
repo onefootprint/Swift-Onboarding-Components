@@ -6,7 +6,6 @@ from tests.constants import ID_DATA, BUSINESS_DATA
 def test_onboarding_token(sandbox_tenant):
     TESTS = [
         dict(key=sandbox_tenant.default_ob_config.key.value),
-        dict(bootstrap_data={**ID_DATA, **BUSINESS_DATA}),
         dict(
             key=sandbox_tenant.default_ob_config.key.value,
             bootstrap_data={**ID_DATA, **BUSINESS_DATA},
@@ -36,6 +35,11 @@ def test_onboarding_token(sandbox_tenant):
 
 def test_onboarding_token_errors(sandbox_tenant, foo_sandbox_tenant):
     TESTS = [
+        (
+            dict(bootstrap_data={}),
+            400,
+            "Json deserialize error: missing field `key` at line 1 column 22",
+        ),
         (
             dict(key=foo_sandbox_tenant.default_ob_config.key.value),
             404,

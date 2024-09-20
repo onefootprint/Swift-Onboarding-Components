@@ -14,7 +14,7 @@ pub struct DeprecatedOnboardingSession {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct OnboardingSession {
-    pub key: Option<ObConfigurationKey>,
+    pub key: ObConfigurationKey,
     pub bootstrap_data: UserDataV1,
 }
 
