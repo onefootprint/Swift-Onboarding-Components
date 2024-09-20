@@ -1,4 +1,4 @@
-import { LinkButton, Text } from '@onefootprint/ui';
+import { LinkButton, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 
 type InlineActionProps = {
@@ -23,8 +23,10 @@ const InlineAction = ({ className, isDisabled, label, labelCta, onClick }: Inlin
   };
 
   return (
-    <Text tag="span" className={className} color="tertiary" isPrivate variant="label-3">
-      {label}&nbsp;
+    <Stack direction="row" gap={1} align="center" justify="center" width="100%" flexWrap="wrap">
+      <Text tag="span" whiteSpace="nowrap" className={className} color="tertiary" isPrivate variant="label-3">
+        {label}&nbsp;
+      </Text>
       <LinkButton
         disabled={isDisabled}
         variant="label-3"
@@ -33,7 +35,7 @@ const InlineAction = ({ className, isDisabled, label, labelCta, onClick }: Inlin
       >
         {labelCta}
       </LinkButton>
-    </Text>
+    </Stack>
   );
 };
 
