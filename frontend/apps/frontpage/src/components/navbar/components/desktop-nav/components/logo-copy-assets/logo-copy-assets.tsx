@@ -9,46 +9,27 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 const assetsToCopy = [
-  {
-    label: 'isotype',
-    imgSrc: '/footprint-logos/isotype.svg',
-  },
-  {
-    label: 'logo',
-    imgSrc: '/footprint-logos/logo.svg',
-  },
+  { label: 'isotype', imgSrc: '/footprint-logos/isotype.svg' },
+  { label: 'logo', imgSrc: '/footprint-logos/logo.svg' },
 ];
 
-type LogoCopyAssetsProps = {
-  href?: string;
-};
-
-const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'components.navbar.save-assets',
-  });
+const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }) => {
+  const { t } = useTranslation('common', { keyPrefix: 'components.navbar.save-assets' });
   const router = useRouter();
   const [showOptions, setShowOptions] = useState(false);
 
-  const handleButtonClick = () => {
-    router.push(href);
-  };
+  const handleClick = () => router.push(href);
 
-  const handleButtonContextMenu = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleContextMenu = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShowOptions(true);
   };
 
-  const getImgSrc = (label: string) => {
-    const element = assetsToCopy.find(asset => asset.label === label);
-    return element?.imgSrc;
-  };
-
   const downloadFile = (label: string) => {
-    const imgSrc = getImgSrc(label);
-    const link = document.createElement('a');
-    if (imgSrc) {
-      link.href = imgSrc;
+    const asset = assetsToCopy.find(a => a.label === label);
+    if (asset) {
+      const link = document.createElement('a');
+      link.href = asset.imgSrc;
       link.download = `${label}.svg`;
       document.body.appendChild(link);
       link.click();
@@ -64,7 +45,7 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
   return (
     <Dropdown.Root open={showOptions}>
       <Dropdown.Trigger aria-label={t('aria-label')} asChild>
-        <Trigger onClick={handleButtonClick} onContextMenu={handleButtonContextMenu}>
+        <Trigger onClick={handleClick} onContextMenu={handleContextMenu}>
           <ThemedLogoFpCompact color="primary" />
         </Trigger>
       </Dropdown.Trigger>
@@ -75,14 +56,18 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
           onEscapeKeyDown={() => setShowOptions(false)}
           onPointerDownOutside={() => setShowOptions(false)}
         >
-          {assetsToCopy.map(asset => (
-            <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
-              <Stack align="center" justify="center" paddingBottom={1}>
-                <IcoDownload16 />
-              </Stack>
-              <Text variant="body-2"> {t(asset.label as ParseKeys<'common'>)} </Text>
-            </StyledItem>
-          ))}
+          <Dropdown.Group>
+            {assetsToCopy.map(({ label }) => (
+              <Dropdown.Item key={label} onClick={handleSave(label)}>
+                <Stack direction="row" align="center" justify="flex-start" gap={3}>
+                  <Stack align="center" justify="center" paddingBottom={1}>
+                    <IcoDownload16 />
+                  </Stack>
+                  <Text variant="body-2">{t(label as ParseKeys<'common'>)}</Text>
+                </Stack>
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -102,15 +87,6 @@ const Trigger = styled.button`
     &&:hover {
       background-color: ${theme.backgroundColor.transparent};
     }
-  `}
-`;
-
-const StyledItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: ${theme.spacing[3]};
   `}
 `;
 
