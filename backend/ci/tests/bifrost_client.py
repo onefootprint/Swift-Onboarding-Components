@@ -1,5 +1,6 @@
 import json
 from typing import NamedTuple, Optional
+from tests.headers import FpAuth
 from tests.types import Tenant
 from tests.constants import (
     TEST_URL,
@@ -360,7 +361,9 @@ class BifrostClient:
         body = post("hosted/user/challenge", data, self.auth_token)
         chal_token = body["challenge_token"]
         data = dict(challenge_token=chal_token, challenge_response="000000")
-        post("hosted/user/challenge/verify", data, self.auth_token)
+        body = post("hosted/user/challenge/verify", data, self.auth_token)
+        # Replace the client's auth token with the new one issued from completing the challenge
+        self.auth_token = FpAuth(body["auth_token"])
 
     def handle_liveness(self):
         """Register the passkey credential"""
@@ -373,7 +376,9 @@ class BifrostClient:
         data = dict(
             challenge_token=chal_token, challenge_response=json.dumps(attestation)
         )
-        post("hosted/user/challenge/verify", data, self.auth_token)
+        body = post("hosted/user/challenge/verify", data, self.auth_token)
+        # Replace the client's auth token with the new one issued from completing the challenge
+        self.auth_token = FpAuth(body["auth_token"])
 
     def handle_authorize(self, **kwargs):
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
@@ -400,11 +405,13 @@ class BifrostClient:
         assert body["user"]["playbook_key"] == self.ob_config.key.value
         # Check user_auth
         assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
-        assert all(
-            e["kind"] in {"sms", "email", "passkey"}
-            for e in body["user_auth"]["auth_events"]
-        )
-        assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
+        auth_events = body["user_auth"]["auth_events"]
+        assert all(e["kind"] in {"sms", "email", "passkey"} for e in auth_events)
+        assert all(e["timestamp"] for e in auth_events)
+
+        # Check passkey auth events
+        if any(r["kind"] == "liveness" for r in self.handled_requirements):
+            assert any(ae["kind"] == "passkey" for ae in auth_events)
 
         if body.get("business", None):
             assert body["business"]["playbook_key"] == self.ob_config.key.value

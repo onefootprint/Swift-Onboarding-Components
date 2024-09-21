@@ -3,6 +3,7 @@ use newtypes::ActionKind;
 use newtypes::AuthMethodKind;
 use newtypes::ChallengeToken;
 use newtypes::PhoneNumber;
+use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
 
@@ -12,6 +13,12 @@ pub struct UserChallengeVerifyRequest {
     pub challenge_token: ChallengeToken,
     /// The response to the challenge. Either SMS/email PIN code or passkey response
     pub challenge_response: String,
+}
+
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
+pub struct UserChallengeVerifyResponse {
+    /// The new token issued after completing the challenge
+    pub auth_token: SessionAuthToken,
 }
 
 #[derive(Apiv2Schema, serde::Deserialize)]

@@ -90,6 +90,8 @@ pub enum TokenCreationPurpose {
     Kba,
     /// This token was created after adding a workflow
     AddWorkflow,
+    /// New login method created in POST /hosted/user/challenge/verify
+    RegisterAuthMethod,
     /// This token was created to onboard a secondary BO in a multi-KYC playbook
     SecondaryBo,
     ApiOnboard,
@@ -133,6 +135,7 @@ impl TokenCreationPurpose {
             | Self::BifrostComponentsSdk
             | Self::Handoff
             | Self::AddWorkflow
+            | Self::RegisterAuthMethod
             | Self::SecondaryBo
             | Self::Kba => false,
         }

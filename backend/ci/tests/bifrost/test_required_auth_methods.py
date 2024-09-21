@@ -68,3 +68,9 @@ def test_kyc_playbook(sandbox_tenant, required_auth_methods, must_collect_data):
     # handled in bifrost
     expected_remaining_required_auth_methods = set(required_auth_methods[1:])
     assert registered_auth_methods == expected_remaining_required_auth_methods
+    ae_kinds = [
+        i["kind"] for i in bifrost.validate_response["user_auth"]["auth_events"]
+    ]
+    expected_aes = [i.replace("phone", "sms") for i in required_auth_methods]
+    expected_aes.append("passkey")
+    assert set(ae_kinds) == set(expected_aes)

@@ -1,6 +1,8 @@
 use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
+use api_core::auth::session::user::AssociatedAuthEvent;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
@@ -55,7 +57,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
-) -> ApiResponse<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::UserChallengeVerifyResponse> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let sv_id = user_auth
@@ -102,7 +104,8 @@ pub async fn post(
     };
 
     // Perform the action - register the email/phone/passkey
-    state
+    let session_key = state.session_sealing_key.clone();
+    let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
@@ -126,13 +129,19 @@ pub async fn post(
                 scope: existing_auth_event.scope,
                 new_auth_method_action: Some(action_kind),
             };
-            AuthEvent::save(args, conn)?;
+            let ae = AuthEvent::save(args, conn)?;
 
-            Ok(())
+            // TODO: maybe one day we want to save whether the auth event is a login or registration event
+            let ae = AssociatedAuthEvent::explicit(ae.id);
+            let purpose = TokenCreationPurpose::RegisterAuthMethod;
+            let session = user_auth.update(Default::default(), vec![], purpose, Some(ae))?;
+            let (auth_token, _) = user_auth.create_derived(conn, &session_key, session, None)?;
+
+            Ok(auth_token)
         })
         .await?;
 
-    Ok(api_wire_types::Empty)
+    Ok(api_wire_types::UserChallengeVerifyResponse { auth_token })
 }
 
 enum Action {

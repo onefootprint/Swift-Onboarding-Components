@@ -1002,9 +1002,6 @@
                 },
                 "security": [
                     {
-                        "Onboarding token": []
-                    },
-                    {
                         "Onboarding Config Token": []
                     }
                 ]
@@ -1389,7 +1386,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Empty"
+                                    "$ref": "#/components/schemas/UserChallengeVerifyResponse"
                                 }
                             }
                         }
@@ -2161,12 +2158,6 @@
                 "in": "header",
                 "name": "X-Onboarding-Config-Key",
                 "description": "Short-lived token representing a playbook."
-            },
-            "Onboarding token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "X-Fp-Ob-Token",
-                "description": "Short-lived token representing onboarding arguments."
             },
             "SDK Args Token": {
                 "type": "apiKey",
@@ -5360,6 +5351,18 @@
                 "required": [
                     "challenge_response",
                     "challenge_token"
+                ]
+            },
+            "UserChallengeVerifyResponse": {
+                "type": "object",
+                "properties": {
+                    "auth_token": {
+                        "description": "The new token issued after completing the challenge",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "auth_token"
                 ]
             },
             "UserDecryptRequest": {
