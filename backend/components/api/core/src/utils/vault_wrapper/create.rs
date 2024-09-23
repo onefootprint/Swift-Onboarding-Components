@@ -130,7 +130,7 @@ impl VaultWrapper<Person> {
             overrides: sources,
         };
         let request = uvw.validate_request(conn, data, &DataRequestSource::SignupChallenge(sources))?;
-        let result = WriteableVw::<Any>::internal_save_data(&uvw, conn, request, None)?;
+        let result = WriteableVw::<Any>::internal_save_data(uvw, conn, request, None)?;
 
         Ok((uv, su, result))
     }

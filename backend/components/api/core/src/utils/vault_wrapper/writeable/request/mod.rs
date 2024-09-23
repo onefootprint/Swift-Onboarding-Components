@@ -54,7 +54,7 @@ impl ValidatedDataRequest {
     pub(super) fn save<Type>(
         self,
         conn: &mut TxnPgConn,
-        vw: &WriteableVw<Type>,
+        vw: WriteableVw<Type>,
         actor: Option<AuthActor>,
     ) -> FpResult<SavedData> {
         let Self {
@@ -76,6 +76,7 @@ impl ValidatedDataRequest {
                 new_version: latest_version,
             });
         }
+        let fingerprints = fingerprints.validate(&vw)?;
 
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Saving DIs");
         let v_id = &vw.vault.id;
@@ -100,7 +101,7 @@ impl ValidatedDataRequest {
         let (vd, svv) = VaultData::bulk_create(conn, v_id, &vw.sv, data, seqno, actor)?;
 
         // Save fingerprints
-        fingerprints.save(conn, vw, &vd)?;
+        fingerprints.save(conn, &vw.sv, &vd)?;
 
         // Add contact info for the new CIs added
         let new_contact_info = vd

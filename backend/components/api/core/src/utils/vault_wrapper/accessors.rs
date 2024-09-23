@@ -39,7 +39,7 @@ impl<Type> VaultWrapper<Type> {
         self.data(di).map(|d| d.data())
     }
 
-    /// Returns the visible liftime for the given DI, if exists
+    /// Returns the visible lifetime for the given DI, if exists
     pub fn get_lifetime(&self, di: &DataIdentifier) -> Option<&DataLifetime> {
         self.data(di).map(|d| &d.lifetime)
     }

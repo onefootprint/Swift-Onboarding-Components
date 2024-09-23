@@ -29,6 +29,7 @@ use newtypes::DataCollectedInfo;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
+use newtypes::FireWebhookArgs;
 use newtypes::KycedBusinessOwnerData;
 use newtypes::PiiString;
 use newtypes::S3Url;
@@ -71,11 +72,17 @@ impl<Type> WriteableVw<Type> {
         request: FingerprintedDataRequest,
         request_source: DataRequestSource,
     ) -> FpResult<PatchDataResult> {
+        let vault_id = self.vault().id.clone();
+        let tenant_id = self.sv.tenant_id.clone();
+        let scoped_vault_id = self.sv.id.clone();
+        let fp_id = self.sv.fp_id.clone();
+        let is_live = self.sv.is_live;
+
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let fields = request.data.keys().cloned().collect_vec();
         let request = self.validate_request(conn, request, &request_source)?;
         let result = self.internal_save_data(conn, request, request_source.actor().cloned())?;
-        self.create_bos_if_needed(conn, kyced_bos)?;
+        Self::create_bos_if_needed(conn, vault_id, kyced_bos)?;
 
         // create a webhook task for the vault update
         // currently we do this only for dashboard actors
@@ -85,13 +92,20 @@ impl<Type> WriteableVw<Type> {
                 | DataRequestSource::TenantPatchVault(AuthActor::TenantUser(_))
         ) {
             let webhook_event = WebhookEvent::UserVaultUpdated(UserVaultUpdatedPayload {
-                fp_id: self.sv.fp_id.clone(),
+                fp_id,
                 timestamp: Utc::now(),
-                is_live: self.sv.is_live,
+                is_live,
                 source: UserVaultUpdateSource::Dashboard,
                 fields,
             });
-            let task_data = self.sv.webhook_event(webhook_event);
+
+            // Temporarily constructing manually.
+            let task_data = FireWebhookArgs {
+                scoped_vault_id,
+                tenant_id,
+                is_live,
+                webhook_event,
+            };
             Task::create(conn, Utc::now(), task_data)?;
         }
 
@@ -100,13 +114,18 @@ impl<Type> WriteableVw<Type> {
     }
 
     pub(in crate::utils::vault_wrapper) fn internal_save_data(
-        &self,
+        self, // Updating data invalidates the WriteableVw.
         conn: &mut TxnPgConn,
         request: ValidatedDataRequest,
         actor: Option<AuthActor>,
     ) -> FpResult<PatchDataResult> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
+
+        let is_billable_for_vault_storage = self.sv.is_billable_for_vault_storage;
+        let vault_id = self.sv.vault_id.clone();
+        let sv_id = self.sv.id.clone();
+
         let SavedData {
             vd,
             ci,
@@ -114,19 +133,19 @@ impl<Type> WriteableVw<Type> {
             new_version,
         } = request.save(conn, self, actor.clone())?;
 
-        if keys.iter().any(|di| !di.is_vault_storage_free()) && !self.sv.is_billable_for_vault_storage {
+        if keys.iter().any(|di| !di.is_vault_storage_free()) && !is_billable_for_vault_storage {
             // If we just added the first billable DI, set the vault as billable
             let update = ScopedVaultUpdate {
                 is_billable_for_vault_storage: Some(true),
                 ..Default::default()
             };
-            ScopedVault::update(conn, &self.sv.id, update)?;
+            ScopedVault::update(conn, &sv_id, update)?;
         }
 
         // Add timeline event for all the newly added data.
         // NOTE: this must happen after saving data for the seqno to be correct on the timeline event.
         // TODO let's make this accept the seqno as an argument
-        self.add_timeline_event(conn, keys, actor, is_prefill)?;
+        Self::add_timeline_event(conn, vault_id, sv_id, keys, actor, is_prefill)?;
 
         // Zip new CIs with their DI
         let new_ci = ci
@@ -149,7 +168,11 @@ impl<Type> WriteableVw<Type> {
     /// We have book-keeping for business owners that are KYCed outside of the vault. When BOs are
     /// added to the vault, also create those secondary records in the DB.
     #[tracing::instrument("WriteableVw::create_bos_if_needed", skip_all)]
-    fn create_bos_if_needed(&self, conn: &mut TxnPgConn, kyced_bos: Option<PiiString>) -> FpResult<()> {
+    fn create_bos_if_needed(
+        conn: &mut TxnPgConn,
+        vault_id: VaultId,
+        kyced_bos: Option<PiiString>,
+    ) -> FpResult<()> {
         let Some(kyced_bos) = kyced_bos else {
             return Ok(());
         };
@@ -158,15 +181,16 @@ impl<Type> WriteableVw<Type> {
         let kyced_bos: Vec<KycedBusinessOwnerData> = serde_json::de::from_str(kyced_bos.leak())?;
         // Skip the first BO since it is the primary
         let bo_ids = kyced_bos.into_iter().skip(1).map(|bo| bo.link_id).collect_vec();
-        BusinessOwner::bulk_create_secondary(conn, bo_ids, self.vault().id.clone())?;
+        BusinessOwner::bulk_create_secondary(conn, bo_ids, vault_id)?;
 
         Ok(())
     }
 
     #[tracing::instrument("WriteableVw::add_timeline_event", skip_all)]
     fn add_timeline_event(
-        &self,
         conn: &mut TxnPgConn,
+        vault_id: VaultId,
+        sv_id: ScopedVaultId,
         keys: Vec<DataIdentifier>,
         actor: Option<AuthActor>,
         is_prefill: bool,
@@ -181,7 +205,7 @@ impl<Type> WriteableVw<Type> {
                 actor: actor.map(|a| a.into()),
                 is_prefill,
             };
-            UserTimeline::create(conn, info, self.vault.id.clone(), self.sv.id.clone())?;
+            UserTimeline::create(conn, info, vault_id, sv_id.clone())?;
         }
         Ok(())
     }
@@ -266,7 +290,7 @@ impl WriteableVw<Person> {
             .collect::<db::DbResult<Vec<_>>>()?;
 
         if make_timeline_event {
-            self.add_timeline_event(conn, kinds, actor, false)?;
+            Self::add_timeline_event(conn, vault_id, self.sv.id.clone(), kinds, actor, false)?;
         }
 
         Ok((docs, seqno))

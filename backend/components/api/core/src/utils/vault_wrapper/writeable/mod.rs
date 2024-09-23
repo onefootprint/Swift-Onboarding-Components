@@ -41,5 +41,5 @@ pub use delete::DeleteDataResult;
 pub struct WriteableVw<Type> {
     #[deref]
     uvw: Locked<TenantVw<Type>>,
-    pub(crate) sv: Locked<ScopedVault>,
+    pub sv: Locked<ScopedVault>,
 }

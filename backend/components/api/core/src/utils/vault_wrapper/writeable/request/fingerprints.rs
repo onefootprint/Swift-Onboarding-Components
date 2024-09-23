@@ -5,6 +5,7 @@ use crate::FpResult;
 use db::models::fingerprint::Fingerprint as DbFingerprint;
 use db::models::fingerprint::FingerprintDataValue;
 use db::models::fingerprint::NewFingerprintArgs;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::chain;
@@ -12,10 +13,12 @@ use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::CompositeFingerprint;
 use newtypes::CompositeFingerprintKind;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::Fingerprint;
 use newtypes::FingerprintKind;
 use newtypes::FingerprintScope;
+use newtypes::Locked;
 use newtypes::MissingFingerprint;
 use std::collections::HashMap;
 
@@ -26,13 +29,20 @@ pub(in super::super) struct Fingerprints {
     salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
 }
 
+pub(in super::super) struct ValidatedFingerprints {
+    fingerprints: Fingerprints,
+
+    // Stored here since the VaultWrapper is invalidated after updating data.
+    dis_before_vw_update: Vec<DataIdentifier>,
+}
+
 impl Fingerprints {
-    pub fn new(fps: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
+    pub(super) fn new(fps: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
         let salt_to_dl_id = HashMap::new();
         Self { fps, salt_to_dl_id }
     }
 
-    pub fn extend(
+    pub(super) fn extend(
         &mut self,
         fps: Vec<(FingerprintSalt, Fingerprint)>,
         salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
@@ -41,13 +51,40 @@ impl Fingerprints {
         self.salt_to_dl_id.extend(salt_to_dl_id);
     }
 
-    pub fn save<Type>(
+    pub(super) fn validate<Type>(self, vw: &WriteableVw<Type>) -> FpResult<ValidatedFingerprints> {
+        // We are susceptible to a race condition... Our transient fingerprints may be stale if the
+        // vault data changed since we computed them. This may happen since we cannot lock the
+        // vault while computing transient fingerprints.
+        // If the transient fingeprints are stale, we've made the arbitrary decision to error.
+        for (salt, dl_id) in self.salt_to_dl_id.iter() {
+            let new_dl_id = vw.get_lifetime(&salt.di()).map(|dl| &dl.id);
+            if new_dl_id != Some(dl_id) {
+                tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale transient fingerprint");
+                return ValidationError(
+                    "Operation aborted due to a concurrent update on this user. Please retry this request",
+                )
+                .into();
+            }
+        }
+
+        Ok(ValidatedFingerprints {
+            fingerprints: self,
+            dis_before_vw_update: vw.populated_dis(),
+        })
+    }
+}
+impl ValidatedFingerprints {
+    pub(super) fn save(
         self,
         conn: &mut TxnPgConn,
-        vw: &WriteableVw<Type>,
+        sv: &Locked<ScopedVault>,
         new_vd: &[VaultData],
     ) -> FpResult<()> {
-        let Self { fps, salt_to_dl_id } = self;
+        let Self {
+            fingerprints: Fingerprints { fps, salt_to_dl_id },
+            dis_before_vw_update,
+        } = self;
+
         struct FingerprintData<'a> {
             kind: FingerprintKind,
             data: FingerprintDataValue,
@@ -102,9 +139,9 @@ impl Fingerprints {
         let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
         let vd_kinds = new_vd.keys().cloned().collect_vec();
 
-        let composite_fingerprints = CompositeFingerprint::list(&vw.sv.tenant_id, &vd_kinds)
+        let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id, &vd_kinds)
             .into_iter()
-            .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
+            .filter(|cfp| cfp.should_generate(&dis_before_vw_update, &vd_kinds))
             .map(|cfp| -> FpResult<_> {
                 // For each Composite FPK that has any DI represented in this data update, generate
                 // the new composite fingerprint out of the pre-computed transient fingerprints
@@ -146,20 +183,6 @@ impl Fingerprints {
             .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .flatten();
-        // We are susceptible to a race condition... Our transient fingerprints may be stale if the
-        // vault data changed since we computed them. This may happen since we cannot lock the
-        // vault while computing transient fingerprints.
-        // If the transient fingeprints are stale, we've made the arbitrary decision to error.
-        for (salt, dl_id) in salt_to_dl_id.iter() {
-            let new_dl_id = vw.get_lifetime(&salt.di()).map(|dl| &dl.id);
-            if new_dl_id != Some(dl_id) {
-                tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale transient fingerprint");
-                return ValidationError(
-                    "Operation aborted due to a concurrent update on this user. Please retry this request",
-                )
-                .into();
-            }
-        }
 
         //
         // Save fingerprints to the database
@@ -180,10 +203,10 @@ impl Fingerprints {
                     scope,
                     version: newtypes::FingerprintVersion::current(),
                     // Denormalized fields
-                    scoped_vault_id: &vw.sv.id,
-                    vault_id: &vw.sv.vault_id,
-                    tenant_id: &vw.sv.tenant_id,
-                    is_live: vw.sv.is_live,
+                    scoped_vault_id: &sv.id,
+                    vault_id: &sv.vault_id,
+                    tenant_id: &sv.tenant_id,
+                    is_live: sv.is_live,
                 }
             })
             .collect();

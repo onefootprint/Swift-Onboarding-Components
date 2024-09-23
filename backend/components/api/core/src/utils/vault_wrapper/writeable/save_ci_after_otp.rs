@@ -19,6 +19,9 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
     ) -> FpResult<DataLifetimeSeqno> {
+        let vault_id = self.vault.id.clone();
+        let sv_id = self.sv.id.clone();
+
         // Validate only phone/email
         if request
             .data
@@ -40,12 +43,12 @@ impl<Type> WriteableVw<Type> {
         }
 
         // Mark the vault as verified now that we have an OTPed contact info
-        Vault::mark_verified(conn, &self.vault.id)?;
+        Vault::mark_verified(conn, &vault_id)?;
         let update = ScopedVaultUpdate {
             is_active: Some(true),
             ..ScopedVaultUpdate::default()
         };
-        ScopedVault::update(conn, &self.sv.id, update)?;
+        ScopedVault::update(conn, &sv_id, update)?;
 
         Ok(result.seqno)
     }
