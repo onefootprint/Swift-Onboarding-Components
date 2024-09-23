@@ -51,7 +51,7 @@ impl<Type> WriteableVw<Type> {
             .map(|(di, d)| (di, d.lifetime.id.clone()))
             .unzip();
 
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn, &self.sv)?;
         let (_, svv) = DataLifetime::bulk_deactivate(conn, &self.sv, dls, seqno)?;
 
         Ok(DeleteDataResult {
@@ -104,7 +104,7 @@ mod tests {
                         source: DataLifetimeSource::LikelyHosted,
                     },
                 ];
-                let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+                let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
                 VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
                 sv
             })

@@ -70,7 +70,7 @@ impl WriteableVw<Person> {
         // the data has been changed via API in between sending VReqs and now.
         let Self { uvw, sv } = self;
         // Use the same seqno to deactivate old data and portablize new data
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn, &sv)?;
 
         if !uvw.vault.is_portable {
             Vault::mark_portable(conn, &uvw.vault.id)?;

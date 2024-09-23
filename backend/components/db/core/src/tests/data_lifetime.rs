@@ -87,13 +87,14 @@ impl TestData {
         let sv3 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id);
 
         // Timeline of seqnos
-        let seqno0 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno1 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno2 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno3 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno4 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno5 = DataLifetime::get_next_seqno(conn).unwrap();
-        let seqno6 = DataLifetime::get_next_seqno(conn).unwrap();
+        let seqno0 = DataLifetime::get_current_seqno(conn).unwrap();
+        // FIXME: SVs don't correspond with the right seqnos.
+        let seqno1 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let seqno2 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let seqno3 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let seqno4 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let seqno5 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let seqno6 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
 
         // Place some DataLifetimes at various points along the timeline
         let dl1 =

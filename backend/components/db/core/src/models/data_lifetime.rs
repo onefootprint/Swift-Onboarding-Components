@@ -1,4 +1,5 @@
 use super::fingerprint::Fingerprint;
+use super::ob_configuration::ObConfiguration;
 use super::scoped_vault::ScopedVault;
 use super::scoped_vault_version::ScopedVaultVersion;
 use crate::nextval;
@@ -135,6 +136,15 @@ struct PgSequence {
     last_value: DataLifetimeSeqno,
 }
 
+/// Binds an advanced seqno to a ScopedVault to ensure that the seqno is only used within the
+/// context of a single ScopedVault. See the notes on `DataLifetime::get_next_seqno` for more
+/// information.
+#[derive(Debug, Clone, Copy)]
+pub struct NextScopedVaultSeqno<'a> {
+    pub sv: &'a Locked<ScopedVault>,
+    pub seqno: DataLifetimeSeqno,
+}
+
 impl DataLifetime {
     /// Gets the next sequence number for the lifetime table. Should be used when creating new data.
     ///
@@ -146,8 +156,34 @@ impl DataLifetime {
     /// Uniquely, writes made to a sequence are never undone, even if the transaction that made the
     /// write ends up rolling back. Because of this, multiple concurrently running transactions can
     /// fetch the next value from a sequence without creating an observable throughput bottleneck.
+    ///
+    /// Corollary 1: Advancing a seqno is observable from all transactions, despite read committed
+    /// isolation.
+    ///
+    /// Corollary 2: Seqnos can only be interpreted as an ordering of events within some scope of
+    /// resources S if DataLifetime::get_next_seqno is called while holding a lock on the entire
+    /// scope S.
+    ///
+    /// In practice, this means that seqnos are only a meaningful ordering of events within a
+    /// single scoped vault. Therefore, for safety, we requires a Locked<ScopedVault> as an
+    /// argument.
     #[tracing::instrument("DataLifetime::get_next_seqno", skip_all)]
-    pub fn get_next_seqno(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
+    pub fn get_next_seqno(conn: &mut PgConn, _safety: &Locked<ScopedVault>) -> DbResult<DataLifetimeSeqno> {
+        let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
+        Ok(result)
+    }
+
+    /// Temporary function while we clean up unsafe usage of seqnos.
+    pub fn get_next_seqno_no_ordering_guarantee(conn: &mut PgConn) -> DbResult<DataLifetimeSeqno> {
+        let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
+        Ok(result)
+    }
+
+    /// TODO: Create a dedicated sequence for the ObConfiguration usage of seqnos.
+    pub fn get_next_obc_seqno(
+        conn: &mut PgConn,
+        _safety: &Locked<ObConfiguration>,
+    ) -> DbResult<DataLifetimeSeqno> {
         let result = diesel::select(nextval("data_lifetime_seqno")).get_result(conn)?;
         Ok(result)
     }

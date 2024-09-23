@@ -68,7 +68,7 @@ impl RuleSetVersion {
         expected_rule_set_version: Option<i32>,
         actor: DbActor,
     ) -> DbResult<(Self, DataLifetimeSeqno, DateTime<Utc>)> {
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_obc_seqno(conn, obc)?;
         let now = Utc::now();
 
         let current: Option<RuleSetVersion> = diesel::update(rule_set::table)

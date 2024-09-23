@@ -66,7 +66,7 @@ fn save_req_and_result(
     is_error: bool,
 ) -> Vec<RequestAndMaybeResult> {
     // Increment seqno for each set of requests
-    DataLifetime::get_next_seqno(conn).unwrap();
+    DataLifetime::get_next_seqno_no_ordering_guarantee(conn).unwrap();
 
     let verification_requests =
         VerificationRequest::bulk_create(conn.conn(), su_id, vendor_apis, &di_id, None).unwrap();

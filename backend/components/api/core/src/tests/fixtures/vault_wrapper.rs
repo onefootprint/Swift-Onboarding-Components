@@ -75,7 +75,7 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             source: DataLifetimeSource::LikelyHosted,
         },
     ];
-    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
     VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
 
     (

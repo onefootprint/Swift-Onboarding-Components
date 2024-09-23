@@ -92,7 +92,7 @@ impl ValidatedDataRequest {
             .chain(overwrite_kinds)
             .unique()
             .collect();
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn, &vw.sv)?;
         DataLifetime::bulk_deactivate_kinds(conn, &vw.sv, kinds_to_deactivate, seqno)?;
 
         // Create the new VDs

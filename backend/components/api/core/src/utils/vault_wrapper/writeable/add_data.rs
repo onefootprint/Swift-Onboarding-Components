@@ -234,7 +234,7 @@ impl WriteableVw<Person> {
     ) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
 
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn, &self.sv)?;
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, &self.sv, kinds.clone(), seqno)?;
 

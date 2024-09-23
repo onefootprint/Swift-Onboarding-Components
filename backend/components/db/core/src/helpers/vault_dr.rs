@@ -285,7 +285,7 @@ mod tests {
         let batch_size: usize = 5;
         let mut dls = vec![];
         for _ in 0..=5 {
-            let seqno1 = DataLifetime::get_next_seqno(conn).unwrap();
+            let seqno1 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
             DataLifetime::bulk_deactivate_kinds(
                 conn,
                 &sv1,
@@ -297,7 +297,7 @@ mod tests {
                 fixtures::data_lifetime::build(conn, &v1_id, &sv1, seqno1, None, None, IdentityDataKind::Dob);
             dls.push(dl);
 
-            let seqno2 = DataLifetime::get_next_seqno(conn).unwrap();
+            let seqno2 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
             DataLifetime::bulk_deactivate_kinds(
                 conn,
                 &sv1,
@@ -341,7 +341,7 @@ mod tests {
         assert_eq!(dls[batch_size - 1].created_seqno, dls[batch_size].created_seqno);
 
         // Deactivate the last DL.
-        let deactivate_seqno = DataLifetime::get_next_seqno(conn).unwrap();
+        let deactivate_seqno = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
         DataLifetime::bulk_deactivate_kinds(
             conn,
             &sv1,

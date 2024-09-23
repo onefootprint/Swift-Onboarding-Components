@@ -83,7 +83,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             source: DataLifetimeSource::LikelyHosted,
         },
     ];
-    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
     let (vds, svv) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
 
     assert_eq!(svv, ScopedVaultVersionNumber::from(1));
@@ -221,7 +221,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     for (sv_id, portablize, data) in data {
         let sv = ScopedVault::lock(conn, sv_id).unwrap();
 
-        let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+        let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_kinds(conn, &sv, kinds, seqno).unwrap();
         let (vds, _) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
@@ -300,7 +300,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             source: DataLifetimeSource::LikelyHosted,
         },
     ];
-    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
     VaultData::bulk_create(conn, &bv.id, &sv, data, seqno, None).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();

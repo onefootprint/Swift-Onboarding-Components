@@ -25,7 +25,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     Vault::mark_verified(conn, &uv.id).unwrap();
     let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
-    let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
 
     let fingerprint = Fingerprint(vec![10]);
     let lifetime = fixtures::data_lifetime::build(

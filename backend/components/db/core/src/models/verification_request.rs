@@ -126,7 +126,7 @@ impl VerificationRequest {
         decision_intent_id: &DecisionIntentId,
         identity_document_id: Option<&DocumentId>,
     ) -> Result<Vec<Self>, crate::DbError> {
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno_no_ordering_guarantee(conn)?;
         let requests: Vec<_> = vendor_apis
             .into_iter()
             .map(|vendor_api| NewVerificationRequestRow {
@@ -305,7 +305,7 @@ impl VerificationRequest {
         identity_document_id: DocumentId,
         decision_intent_id: &DecisionIntentId,
     ) -> DbResult<Self> {
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno_no_ordering_guarantee(conn)?;
         let new_row = NewVerificationRequestRow {
             vendor_api,
             vendor: Vendor::from(vendor_api),

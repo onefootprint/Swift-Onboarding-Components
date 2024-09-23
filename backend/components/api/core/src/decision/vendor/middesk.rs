@@ -830,7 +830,7 @@ impl MiddeskResponseDerivedVaultData {
 
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
 
-        let seqno = DataLifetime::get_next_seqno(conn)?;
+        let seqno = DataLifetime::get_next_seqno(conn, &uvw.sv)?;
 
         // Clear all derived data kinds
         DataLifetime::bulk_deactivate_kinds(conn, &uvw.sv, dis, seqno)?;
