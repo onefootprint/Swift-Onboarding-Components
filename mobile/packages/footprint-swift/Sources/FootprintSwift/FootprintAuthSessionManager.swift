@@ -131,11 +131,10 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
     
     // Presentation context provider for the web authentication session
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return DispatchQueue.main.sync {
-            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                fatalError("@onefootprint/footprint-swift: no key window available.")
-            }
-            return window
-        }
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                     let window = scene.windows.first else {
+                   fatalError("@onefootprint/footprint-swift: no window available.")
+               }
+               return window
     }
 }
