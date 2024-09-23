@@ -31,7 +31,7 @@ const steps = [
   },
 ];
 
-const publicKeyEnv = 'pb_test_2i5Sl82d7NQOnToRYrD2dx';
+const publicKeyEnv = process.env.NEXT_PUBLIC_KYC_KEY || 'pb_test_2i5Sl82d7NQOnToRYrD2dx';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
@@ -52,13 +52,7 @@ const Demo = () => {
   return (
     <>
       <GlobalStyles />
-      <Fp.Provider
-        publicKey={publicKeyEnv}
-        sandboxId="9876523243212209"
-        // sandboxOutcome={{
-        //   overallOutcome: 'step_up',
-        // }}
-      >
+      <Fp.Provider publicKey={publicKeyEnv}>
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>
