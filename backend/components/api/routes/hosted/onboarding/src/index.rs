@@ -104,12 +104,7 @@ pub async fn post(
 
             // If this auth token allows reonboarding OR the playbook is opted into always allow reonboarding,
             // force create a new workflwo
-            let token_allows_reonboard =
-                // For sessions with a null `allow_reonboard` value, fall back to the old logic that would always
-                // allow reonboarding for tokens made via API.
-                // TODO: rm this logic
-                (user_auth.data.allow_reonboard).unwrap_or(user_auth.data.is_from_api());
-            let force_create = token_allows_reonboard || ob_config.allow_reonboard;
+            let force_create = user_auth.data.allow_reonboard || ob_config.allow_reonboard;
             let args = NewOnboardingArgs {
                 existing_wf_id: user_auth.workflow_id(),
                 wfr_id: user_auth.wfr_id.clone(),
