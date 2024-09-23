@@ -24,9 +24,9 @@ const useInviteMembers = () => {
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation({
-    mutationKey: ['inviteMember'],
-    mutationFn: (payload: CreateMembersRequest) => inviteMemberRequest(session.authHeaders, payload),
+  const mutation = useMutation({
+    mutationFn: (payload: CreateMembersRequest[]) =>
+      Promise.all(payload.map(invitation => inviteMemberRequest(session.authHeaders, invitation))),
   });
 
   const mutate = async (
@@ -36,29 +36,32 @@ const useInviteMembers = () => {
       onError?: (error: unknown) => void;
     },
   ) => {
-    const promises = invitations.map(invitation => mutateAsync(invitation));
-    Promise.all(promises)
-      .then(() => {
+    mutation.mutate(invitations, {
+      onSuccess: () => {
         toast.show({
           title: t('notification.success.title', { count: invitations.length }),
           description: t('notification.success.description', {
             count: invitations.length,
           }),
         });
-        queryClient.invalidateQueries(['org', 'members']);
+        queryClient.invalidateQueries({ queryKey: ['org', 'members'] });
         options?.onSuccess?.();
-      })
-      .catch(error => {
+      },
+      onError: error => {
         toast.show({
           description: getErrorMessage(error),
           title: t('notification.error.title', { count: invitations.length }),
           variant: 'error',
         });
         options?.onError?.(error);
-      });
+      },
+    });
   };
 
-  return { mutate, isLoading };
+  return {
+    mutate,
+    isPending: mutation.isPending,
+  };
 };
 
 export default useInviteMembers;

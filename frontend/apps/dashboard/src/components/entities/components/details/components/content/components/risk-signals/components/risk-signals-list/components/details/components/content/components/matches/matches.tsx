@@ -40,7 +40,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
     <MatchesSection data-is-decrypted={!!aml}>
       {!aml && (
         <>
-          <ProtectedDetails onClick={handleDecrypt} isLoading={decryptMutation.isLoading} />
+          <ProtectedDetails onClick={handleDecrypt} isLoading={decryptMutation.isPending} />
           <HitsShimmer />
         </>
       )}

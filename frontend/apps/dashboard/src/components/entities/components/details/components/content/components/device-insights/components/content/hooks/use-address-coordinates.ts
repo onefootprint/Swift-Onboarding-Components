@@ -1,5 +1,4 @@
 import type { Entity } from '@onefootprint/types';
-import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import AddressType from '../components/address-card/types';
@@ -25,7 +24,12 @@ export const getCoordinatesFromAddress = async (address: string): Promise<Coordi
   }
 };
 
-const getAddressCoordinates = async (queryClient: QueryClient, entity: Entity, type: AddressType, address: string) => {
+const getAddressCoordinates = async (
+  queryClient: ReturnType<typeof useQueryClient>,
+  entity: Entity,
+  type: AddressType,
+  address: string,
+) => {
   const getFromCache = () => queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
 
   const createInitialData = async (): Promise<Coordinates> => {
@@ -43,12 +47,11 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   const queryClient = useQueryClient();
   const { getAddressFieldsProps } = useAddressFieldsProps(entity);
   const update = (newData: Coordinates) => {
-    const prevData = queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
-    queryClient.setQueryData(['device-insights', entity.id, type], {
+    queryClient.setQueryData(['device-insights', entity.id, type], (prevData: Coordinates | undefined) => ({
       ...prevData,
       lat: newData.lat,
       lng: newData.lng,
-    });
+    }));
   };
 
   const addressProps = getAddressFieldsProps(type);
@@ -65,13 +68,11 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   const addressTypeRequired = entity.kind === 'business' ? AddressType.business : AddressType.residential;
   const enabled = !!entity && type === addressTypeRequired && hasCompleteAddress && !!completeAddress;
 
-  const query = useQuery<Coordinates>(
-    ['device-insights', entity.id, type],
-    () => getAddressCoordinates(queryClient, entity, type, completeAddress),
-    {
-      enabled,
-    },
-  );
+  const query = useQuery({
+    queryKey: ['device-insights', entity.id, type],
+    queryFn: () => getAddressCoordinates(queryClient, entity, type, completeAddress),
+    enabled,
+  });
 
   return {
     ...query,

@@ -64,7 +64,7 @@ const BacktestingDialog = ({ open, playbookId, ruleEdits, isSaveLoading, onSave,
       }}
     >
       {data && <Content data={data} dateRange={dateRange} onFilter={handleBacktest} />}
-      {backtestMutation.isLoading && <Loading />}
+      {backtestMutation.isPending && <Loading />}
       {!!error && <ErrorComponent error={error} />}
     </Dialog>
   );

@@ -35,13 +35,13 @@ const Dialog = ({ onClose, open }: DialogProps) => {
       primaryButton={{
         form: 'members-invite-form',
         label: 'Invite',
-        loading: inviteMembersMutation.isLoading,
+        loading: inviteMembersMutation.isPending,
         disabled: rolesQuery.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: 'Cancel',
-        disabled: inviteMembersMutation.isLoading,
+        disabled: inviteMembersMutation.isPending,
         onClick: onClose,
       }}
     >

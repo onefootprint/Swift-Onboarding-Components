@@ -97,7 +97,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
   );
   return {
     component,
-    isLoading: createSandboxTenantMutation.isLoading,
+    isLoading: createSandboxTenantMutation.isPending,
   };
 };
 

@@ -148,7 +148,7 @@ const Content = ({ organization }: ContentProps) => {
           </Stack>
         </Stack>
         <div>
-          <Button type="submit" loading={updateOrgMutation.isLoading} disabled={!canEdit}>
+          <Button type="submit" loading={updateOrgMutation.isPending} disabled={!canEdit}>
             {t('save-changes')}
           </Button>
         </div>

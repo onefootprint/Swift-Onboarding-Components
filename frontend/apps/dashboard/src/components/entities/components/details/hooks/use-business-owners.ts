@@ -16,8 +16,9 @@ const getBusinessOwners = async (authHeaders: AuthHeaders, { id }: GetBusinessOw
 
 const useBusinessOwners = (id: string) => {
   const { authHeaders } = useSession();
-
-  return useQuery(['business', id, 'owners'], () => getBusinessOwners(authHeaders, { id }), {
+  return useQuery({
+    queryKey: ['business', id, 'owners'],
+    queryFn: () => getBusinessOwners(authHeaders, { id }),
     enabled: !!id,
   });
 };

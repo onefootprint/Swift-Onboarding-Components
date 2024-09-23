@@ -43,16 +43,14 @@ const useAddressCoordinates = (address: BusinessAddress) => {
   const enabled = (!!address.latitude && !!address.longitude) || addressFields.every(field => !!field);
   const completeAddress = addressFields.join(', ');
 
-  const query = useQuery<Coordinates>(
-    ['business-insights', address.id],
-    () =>
+  const query = useQuery({
+    queryKey: ['business-insights', address.id],
+    queryFn: () =>
       !!address.latitude && !!address.longitude
         ? { latitude: address.latitude, longitude: address.longitude }
         : getAddressCoordinates(queryClient, address.id, completeAddress),
-    {
-      enabled,
-    },
-  );
+    enabled,
+  });
 
   return {
     ...query,

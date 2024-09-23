@@ -17,8 +17,10 @@ const getOrgTags = async (authHeaders: AuthHeaders, kind: EntityKind) => {
 const useOrgTags = (kind: EntityKind) => {
   const { authHeaders } = useSession();
 
-  const tagsQuery = useQuery(['org', 'tags', authHeaders], () => getOrgTags(authHeaders, kind), {
-    select: tags => {
+  const tagsQuery = useQuery({
+    queryKey: ['org', 'tags', authHeaders],
+    queryFn: () => getOrgTags(authHeaders, kind),
+    select: (tags: GetOrgTagsResponse) => {
       const formattedTags = {} as Record<EntityKind, OrgTag[]>;
       Object.values(EntityKind).forEach(kind => {
         formattedTags[kind] = [];
@@ -33,12 +35,11 @@ const useOrgTags = (kind: EntityKind) => {
       return formattedTags;
     },
   });
-  const { error, data } = tagsQuery;
 
   return {
     ...tagsQuery,
-    error: error ?? undefined,
-    response: data,
+    error: tagsQuery.error ?? undefined,
+    response: tagsQuery.data,
   };
 };
 

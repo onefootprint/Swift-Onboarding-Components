@@ -20,14 +20,12 @@ const useRiskSignalAmlHits = () => {
   const entityId = useEntityId();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    (riskSignalId: string) => decryptRiskSignalAmlHits({ authHeaders, entityId, riskSignalId }),
-    {
-      onSuccess: (response, riskSignalId: string) => {
-        queryClient.setQueryData(['entity', entityId, 'risk-signals', riskSignalId, 'aml-hits'], response);
-      },
+  const mutation = useMutation({
+    mutationFn: (riskSignalId: string) => decryptRiskSignalAmlHits({ authHeaders, entityId, riskSignalId }),
+    onSuccess: (response, riskSignalId) => {
+      queryClient.setQueryData(['entity', entityId, 'risk-signals', riskSignalId, 'aml-hits'], response);
     },
-  );
+  });
 
   return mutation;
 };

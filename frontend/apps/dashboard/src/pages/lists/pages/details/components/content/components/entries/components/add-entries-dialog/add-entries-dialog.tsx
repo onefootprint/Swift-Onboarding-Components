@@ -82,12 +82,12 @@ const AddEntriesDialog = ({ open, onClose, onAdd }: AddEntriesDialogProps) => {
       primaryButton={{
         form: 'add-entries-form',
         label: t('cta.save.label'),
-        loading: addEntriesMutation.isLoading,
+        loading: addEntriesMutation.isPending,
         loadingAriaLabel: t('cta.save.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: addEntriesMutation.isLoading,
+        disabled: addEntriesMutation.isPending,
         label: t('cta.cancel'),
         onClick: handleCancel,
       }}

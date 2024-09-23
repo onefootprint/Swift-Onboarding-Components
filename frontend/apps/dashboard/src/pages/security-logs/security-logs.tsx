@@ -18,8 +18,8 @@ const SecurityLogs = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.security-logs' });
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
-  const accessEvents =
-    (getAccessEvents.data?.pages || []).reduce((allPages, page) => [...allPages, ...page.data], [] as AccessEvent[]) ||
+  const accessEvents: AccessEvent[] =
+    getAccessEvents.data?.pages.reduce<AccessEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
   const items = accessEvents.map(item => ({
@@ -48,7 +48,7 @@ const SecurityLogs = () => {
     return () => {
       mainContainer?.removeEventListener('scroll', handleScroll);
     };
-  });
+  }, []);
 
   return (
     <>

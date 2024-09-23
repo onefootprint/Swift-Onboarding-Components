@@ -21,16 +21,17 @@ const useAddEntries = (listId: string = '') => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation((data: AddListEntriesRequest) => addEntries(authHeaders, data), {
-    onError: e => {
-      showErrorToast(e);
+  return useMutation({
+    mutationFn: (data: AddListEntriesRequest) => addEntries(authHeaders, data),
+    onError: (error: Error) => {
+      showErrorToast(error);
       // Clear out all the results in case the request did create the list
-      queryClient.invalidateQueries(['list-entries', listId, authHeaders]);
+      queryClient.invalidateQueries({ queryKey: ['list-entries', listId, authHeaders] });
     },
-    onSuccess: response => {
+    onSuccess: (response: AddListEntriesResponse) => {
       // Insert the newly created list into the top of the returned entries list. This nicely
       // helps to show the most recent value as soon as it is created
-      queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
+      queryClient.invalidateQueries({ queryKey: ['list-timeline', listId, authHeaders] });
       queryClient.setQueryData(['list-entries', listId, authHeaders], (prevList?: ListEntry[]) =>
         (response || []).concat(prevList || []),
       );

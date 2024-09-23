@@ -26,7 +26,7 @@ const useSubmitFreeFormNote = () => {
   return useMutation({
     mutationFn: (data: SubmitFreeFormNoteRequest) => submitFreeFormNote(authHeaders, data),
     onSuccess: () => {
-      queryClient.refetchQueries();
+      queryClient.refetchQueries({ queryKey: ['entity'] });
     },
   });
 };

@@ -28,7 +28,7 @@ const useUpdateOrgLogo = () => {
     mutationFn: (payload: FormData) => updateOrgLogoRequest(session.authHeaders, payload),
     onError: showErrorToast,
     onSuccess: (response: UpdateOrgResponse) => {
-      queryClient.invalidateQueries(['org']);
+      queryClient.invalidateQueries({ queryKey: ['org'] });
       queryClient.setQueryData(['org'], response);
       session.setOrg({
         name: response.name,

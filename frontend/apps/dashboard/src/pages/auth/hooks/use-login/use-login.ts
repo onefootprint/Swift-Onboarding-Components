@@ -21,7 +21,8 @@ const useLogin = () => {
   const router = useRouter();
   const toast = useToast();
 
-  return useMutation(login, {
+  return useMutation({
+    mutationFn: login,
     onError(e: RequestError): void {
       let description;
       if (e.response?.status === 401) {

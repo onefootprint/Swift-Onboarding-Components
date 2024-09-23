@@ -1,6 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
-import type { PaginatedRequestResponse, RequestError } from '@onefootprint/request';
-import request from '@onefootprint/request';
+import type { PaginatedRequestResponse } from '@onefootprint/request';
+import request, { type RequestError } from '@onefootprint/request';
 import type { ApiKey } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import take from 'lodash/take';
@@ -25,8 +25,10 @@ const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
 const useApiKeys = () => {
   const { formatDateWithTime } = useIntl();
   const { authHeaders } = useSession();
-  return useQuery<GetApiKeysResponse, RequestError>(['api-keys', authHeaders], () => getApiKeys({ authHeaders }), {
-    select: response =>
+  return useQuery<GetApiKeysResponse, RequestError>({
+    queryKey: ['api-keys', authHeaders],
+    queryFn: () => getApiKeys({ authHeaders }),
+    select: (response: GetApiKeysResponse) =>
       take(response, 10).map((apiKey: ApiKey) => ({
         ...apiKey,
         createdAt: formatDateWithTime(new Date(apiKey.createdAt)),

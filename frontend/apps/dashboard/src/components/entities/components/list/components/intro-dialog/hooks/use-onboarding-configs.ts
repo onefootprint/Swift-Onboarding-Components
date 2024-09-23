@@ -17,7 +17,10 @@ const getOnboardingConfigs = async (authHeaders: AuthHeaders) => {
 
 const useOnboardingConfigs = () => {
   const { authHeaders } = useSession();
-  return useQuery(['entities', 'onboarding-configurations', authHeaders], () => getOnboardingConfigs(authHeaders));
+  return useQuery({
+    queryKey: ['entities', 'onboarding-configurations', authHeaders],
+    queryFn: () => getOnboardingConfigs(authHeaders),
+  });
 };
 
 export default useOnboardingConfigs;

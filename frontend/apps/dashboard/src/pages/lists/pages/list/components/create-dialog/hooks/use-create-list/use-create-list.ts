@@ -20,14 +20,15 @@ const useCreateList = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation((data: CreateListRequest) => createList(authHeaders, data), {
-    onError: e => {
-      showErrorToast(e);
+  return useMutation({
+    mutationFn: (data: CreateListRequest) => createList(authHeaders, data),
+    onError: (error: Error) => {
+      showErrorToast(error);
       // Clear out all the results in case the request did create the list
-      queryClient.invalidateQueries(['lists', authHeaders]);
+      queryClient.invalidateQueries({ queryKey: ['lists', authHeaders] });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['lists', authHeaders]);
+      queryClient.invalidateQueries({ queryKey: ['lists', authHeaders] });
     },
   });
 };

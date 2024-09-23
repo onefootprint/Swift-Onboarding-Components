@@ -19,7 +19,9 @@ const useEntity = (id: string) => {
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, authHeaders], () => getEntity(authHeaders, { id }), {
+  return useQuery({
+    queryKey: ['entity', id, authHeaders],
+    queryFn: () => getEntity(authHeaders, { id }),
     enabled: isReady && !!id,
   });
 };

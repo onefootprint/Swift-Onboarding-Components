@@ -22,11 +22,12 @@ const useEntityRiskSignals = (id: string, seqno?: string | undefined) => {
   const filters = useRiskSignalsFilters();
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['entity', id, 'risk-signals', filters.requestParams, seqno, authHeaders],
-    () => getRiskSignals({ ...filters.requestParams, seqno, id }, authHeaders),
-    { enabled: !!id, keepPreviousData: true },
-  );
+  return useQuery({
+    queryKey: ['entity', id, 'risk-signals', filters.requestParams, seqno, authHeaders],
+    queryFn: () => getRiskSignals({ ...filters.requestParams, seqno, id }, authHeaders),
+    enabled: !!id,
+    placeholderData: prev => prev,
+  });
 };
 
 export default useEntityRiskSignals;

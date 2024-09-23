@@ -15,27 +15,25 @@ const updateApiKey = async (authHeaders: AuthHeaders, params: OrgApiKeyUpdateReq
   });
   return response.data;
 };
-
 const useUpdateRoleId = () => {
   const queryClient = useQueryClient();
   const { authHeaders } = useSession();
 
-  const mutation = useMutation((data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data), {
-    onMutate: async updatedApiKey => {
-      await queryClient.cancelQueries(['api-keys', authHeaders]);
-      const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData(['api-keys', authHeaders]);
-      queryClient.setQueryData(['api-keys', authHeaders], () => {
-        const apiKeys = previousApiKeys?.map(_apiKey => {
-          if (_apiKey.id === updatedApiKey.id) {
-            return updatedApiKey;
-          }
-          return _apiKey;
-        });
-        return apiKeys;
+  const mutation = useMutation({
+    mutationFn: (data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data),
+    onMutate: async (updatedApiKey: OrgApiKeyUpdateRequest) => {
+      await queryClient.cancelQueries({ queryKey: ['api-keys', authHeaders] });
+      const previousApiKeys = queryClient.getQueryData<ApiKey[]>(['api-keys', authHeaders]);
+      queryClient.setQueryData<ApiKey[] | undefined>(['api-keys', authHeaders], oldData => {
+        return oldData?.map(_apiKey => (_apiKey.id === updatedApiKey.id ? { ..._apiKey, ...updatedApiKey } : _apiKey));
       });
       return { previousApiKeys };
     },
-    onError: (_err, _updatedApiKey, context) => {
+    onError: (
+      _err: Error,
+      _updatedApiKey: OrgApiKeyUpdateRequest,
+      context: { previousApiKeys?: ApiKey[] } | undefined,
+    ) => {
       if (context?.previousApiKeys) {
         queryClient.setQueryData(['api-keys', authHeaders], context.previousApiKeys);
       }

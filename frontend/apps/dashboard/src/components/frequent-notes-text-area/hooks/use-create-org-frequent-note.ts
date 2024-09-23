@@ -21,9 +21,12 @@ const useCreateOrgFrequentNote = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation((req: CreateOrgFrequentNoteRequest) => createOrgFrequentNote(req, authHeaders), {
+  return useMutation({
+    mutationFn: (req: CreateOrgFrequentNoteRequest) => createOrgFrequentNote(req, authHeaders),
     onSuccess: (resp: CreateOrgFrequentNoteResponse) => {
-      queryClient.invalidateQueries(getOrgFrequentNotesQueryKey(resp.kind, authHeaders));
+      queryClient.invalidateQueries({
+        queryKey: getOrgFrequentNotesQueryKey(resp.kind, authHeaders),
+      });
     },
   });
 };

@@ -27,14 +27,12 @@ const useHistoricalEntityData = (
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['entity', id, 'data', 'seqno', seqno, authHeaders],
-    () => getHistoricalEntityData(authHeaders, { id, seqno }),
-    {
-      enabled: isReady && !!id && !!seqno,
-      ...callbacks,
-    },
-  );
+  return useQuery({
+    queryKey: ['entity', id, 'data', 'seqno', seqno, authHeaders],
+    queryFn: () => getHistoricalEntityData(authHeaders, { id, seqno }),
+    enabled: isReady && !!id && !!seqno,
+    ...callbacks,
+  });
 };
 
 export default useHistoricalEntityData;

@@ -20,9 +20,12 @@ const useAddTag = () => {
   const queryClient = useQueryClient();
   const entityId = useEntityId();
 
-  return useMutation(({ id, text }: AddTagRequest) => addTag({ id, text }, authHeaders), {
+  return useMutation({
+    mutationFn: ({ id, text }: AddTagRequest) => addTag({ id, text }, authHeaders),
     onSuccess: () => {
-      queryClient.invalidateQueries(['entities', entityId, 'tags', authHeaders]);
+      queryClient.invalidateQueries({
+        queryKey: ['entities', entityId, 'tags', authHeaders],
+      });
     },
   });
 };

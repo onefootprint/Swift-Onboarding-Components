@@ -11,7 +11,7 @@ const useOrgSession = () => {
 
   const toggle = async () => {
     await setIsLive(!isLive);
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: ['org'] });
   };
 
   const sandbox = {

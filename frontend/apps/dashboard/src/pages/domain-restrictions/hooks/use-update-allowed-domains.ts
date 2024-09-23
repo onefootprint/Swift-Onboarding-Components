@@ -24,7 +24,7 @@ const useUpdateAllowedDomains = () => {
   return useMutation({
     mutationFn: (data: UpdateClientSecurityConfigRequest) => updateDomains(authHeaders, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['allowed-domains']);
+      queryClient.invalidateQueries({ queryKey: ['allowed-domains'] });
     },
     onError: err => showError(err),
   });

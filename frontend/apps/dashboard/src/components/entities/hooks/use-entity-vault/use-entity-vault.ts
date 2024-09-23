@@ -99,11 +99,11 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     });
   };
 
-  const query = useQuery<VaultType>(
-    ['entity', entityId, 'vault'],
-    () => getVaultOrCreate(queryClient, entity as Entity),
-    { enabled: !!entityId && !!entity },
-  );
+  const query = useQuery<VaultType>({
+    queryKey: ['entity', entityId, 'vault'],
+    queryFn: () => getVaultOrCreate(queryClient, entity as Entity),
+    enabled: !!entityId && !!entity,
+  });
 
   return { ...query, update, updateForHistorical };
 };

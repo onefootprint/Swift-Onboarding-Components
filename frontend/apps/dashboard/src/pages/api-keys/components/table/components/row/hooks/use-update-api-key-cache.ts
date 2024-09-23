@@ -7,12 +7,18 @@ const useUpdateApiKeyCache = () => {
   const { authHeaders } = useSession();
 
   return (apiKey: ApiKey) => {
-    queryClient.setQueryData(['api-keys', authHeaders], (prevApiKeys?: ApiKey[]) => {
-      if (prevApiKeys) {
-        return prevApiKeys.map(prevApiKey => (prevApiKey.id === apiKey.id ? apiKey : prevApiKey));
-      }
-      return [apiKey];
-    });
+    queryClient.setQueriesData(
+      {
+        queryKey: ['api-keys', authHeaders],
+      },
+      (prevApiKeys?: ApiKey[]) => {
+        if (prevApiKeys) {
+          return prevApiKeys.map(prevApiKey => (prevApiKey.id === apiKey.id ? apiKey : prevApiKey));
+        }
+        return [apiKey];
+      },
+      {},
+    );
   };
 };
 

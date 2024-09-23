@@ -27,18 +27,17 @@ const useEntities = (kind: EntityKind, defaultFilters?: Record<string, unknown>)
   const filters = useFilters();
   const { requestParams } = filters;
 
-  const query = useQuery(
-    ['entities', kind, requestParams, authHeaders, defaultFilters, isLive],
-    () =>
+  const query = useQuery({
+    queryKey: ['entities', kind, requestParams, authHeaders, defaultFilters, isLive],
+    queryFn: () =>
       getEntities(authHeaders, {
         ...requestParams,
         ...defaultFilters,
         kind,
       }),
-    {
-      enabled: filters.isReady,
-    },
-  );
+    enabled: filters.isReady,
+  });
+
   const pagination = useCursorPagination({
     count: query.data?.meta.count,
     next: query.data?.meta.next,

@@ -26,7 +26,9 @@ const useMembers = () => {
   const filters = useMembersFilters();
   const { requestParams } = filters;
 
-  const membersQuery = useQuery(['org', 'members', requestParams], () => getMembers(authHeaders, requestParams), {
+  const membersQuery = useQuery({
+    queryKey: ['org', 'members', requestParams],
+    queryFn: () => getMembers(authHeaders, requestParams),
     enabled: filters.isReady,
     select: response => ({
       meta: response.meta,

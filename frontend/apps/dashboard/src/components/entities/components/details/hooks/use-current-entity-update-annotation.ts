@@ -27,17 +27,14 @@ const useCurrentEntityUpdateAnnotation = () => {
   const showErrorToast = useRequestErrorToast();
   const id = useEntityId();
 
-  return useMutation(
-    (updateAnnotationRequest: UpdateAnnotationRequest) => updateAnnotation(authHeaders, updateAnnotationRequest, id),
-    {
-      onSuccess: () => {
-        queryClient.refetchQueries();
-      },
-      onError: (error: unknown) => {
-        showErrorToast(error);
-      },
+  return useMutation({
+    mutationFn: (updateAnnotationRequest: UpdateAnnotationRequest) =>
+      updateAnnotation(authHeaders, updateAnnotationRequest, id),
+    onSuccess: () => {
+      queryClient.refetchQueries();
     },
-  );
+    onError: showErrorToast,
+  });
 };
 
 export default useCurrentEntityUpdateAnnotation;

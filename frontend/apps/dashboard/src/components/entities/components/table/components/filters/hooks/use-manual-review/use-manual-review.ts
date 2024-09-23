@@ -24,9 +24,9 @@ const useManualReview = (entityKind: EntityKind) => {
   const filters = useFilters();
   const { requestParams } = filters;
 
-  return useQuery(
-    ['entities', entityKind, 'manual-review', requestParams, authHeaders, isLive],
-    () =>
+  return useQuery({
+    queryKey: ['entities', entityKind, 'manual-review', requestParams, authHeaders, isLive],
+    queryFn: () =>
       getManualReview(
         {
           kind: entityKind,
@@ -34,10 +34,8 @@ const useManualReview = (entityKind: EntityKind) => {
         },
         authHeaders,
       ),
-    {
-      refetchInterval: USE_MANUAL_REVIEW_FETCH_INTERVAL,
-    },
-  );
+    refetchInterval: USE_MANUAL_REVIEW_FETCH_INTERVAL,
+  });
 };
 
 export default useManualReview;

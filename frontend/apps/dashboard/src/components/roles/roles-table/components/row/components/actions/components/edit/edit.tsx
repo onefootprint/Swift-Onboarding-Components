@@ -67,11 +67,11 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
       primaryButton={{
         form: 'roles-form',
         label: allT('save'),
-        loading: editRoleMutation.isLoading,
+        loading: editRoleMutation.isPending,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: editRoleMutation.isLoading,
+        disabled: editRoleMutation.isPending,
         label: allT('cancel'),
         onClick: handleClose,
       }}

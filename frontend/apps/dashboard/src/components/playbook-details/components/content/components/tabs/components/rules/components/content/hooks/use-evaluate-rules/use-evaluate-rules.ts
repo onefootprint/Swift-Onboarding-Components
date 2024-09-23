@@ -17,9 +17,9 @@ const evaluateRules = async ({ playbookId, fields }: EvaluateRulesRequest, authH
 const useEvaluateRules = () => {
   const { authHeaders } = useSession();
 
-  return useMutation(({ playbookId, fields }: EvaluateRulesRequest) =>
-    evaluateRules({ playbookId, fields }, authHeaders),
-  );
+  return useMutation({
+    mutationFn: ({ playbookId, fields }: EvaluateRulesRequest) => evaluateRules({ playbookId, fields }, authHeaders),
+  });
 };
 
 export default useEvaluateRules;

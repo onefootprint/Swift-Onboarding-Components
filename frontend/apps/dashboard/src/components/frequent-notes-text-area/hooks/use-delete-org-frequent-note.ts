@@ -18,9 +18,10 @@ const useDeleteOrgFrequentNote = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation((id: string) => deleteOrgFrequentNote(id, authHeaders), {
+  return useMutation({
+    mutationFn: (id: string) => deleteOrgFrequentNote(id, authHeaders),
     onSuccess: () => {
-      queryClient.invalidateQueries(getOrgFrequentNotesQueryKey());
+      queryClient.invalidateQueries({ queryKey: getOrgFrequentNotesQueryKey() });
     },
   });
 };

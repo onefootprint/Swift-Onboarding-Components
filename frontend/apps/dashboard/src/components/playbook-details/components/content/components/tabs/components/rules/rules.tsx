@@ -12,7 +12,7 @@ export type RulesProps = {
 };
 
 const Rules = ({ playbook, toggleDisableHeading }: RulesProps) => {
-  const { response, isLoading, error } = useRules(playbook.id);
+  const { data: response, isLoading, error } = useRules(playbook.id);
   const isFirmEmployee = !!useSession().data.user?.isFirmEmployee;
 
   return (

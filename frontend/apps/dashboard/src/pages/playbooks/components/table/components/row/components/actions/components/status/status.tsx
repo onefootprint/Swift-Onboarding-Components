@@ -65,7 +65,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
 
   return (
     <ConfirmationDialog
-      isLoading={mutation.isLoading}
+      isLoading={mutation.isPending}
       onClose={hideConfirmation}
       onConfirm={disable}
       open={open}

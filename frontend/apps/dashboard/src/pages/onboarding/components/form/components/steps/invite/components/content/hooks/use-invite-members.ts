@@ -18,7 +18,7 @@ const inviteMember = async (authHeaders: AuthHeaders, payload: CreateMembersRequ
 };
 
 const useInviteMembers = () => {
-  const isMutating = useIsMutating(['inviteMember']);
+  const isMutating = useIsMutating({ mutationKey: ['inviteMember'] });
   const { t } = useTranslation('onboarding', {
     keyPrefix: 'invite',
   });

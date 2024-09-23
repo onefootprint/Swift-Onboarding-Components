@@ -19,10 +19,11 @@ const useDeleteList = (listId: string) => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation(() => deleteList(listId, authHeaders), {
+  return useMutation({
+    mutationFn: () => deleteList(listId, authHeaders),
     onError: showErrorToast,
     onSuccess: () => {
-      queryClient.invalidateQueries(['lists', authHeaders]);
+      queryClient.invalidateQueries({ queryKey: ['lists', authHeaders] });
     },
   });
 };

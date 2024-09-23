@@ -12,7 +12,7 @@ const useRedirect = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: ['org'] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

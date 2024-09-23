@@ -50,7 +50,7 @@ const EmailForm = () => {
           />
           <Form.Errors>{errors?.email?.message}</Form.Errors>
         </Form.Field>
-        <Button fullWidth loading={mutateLoginEmail.isLoading} size="large" type="submit">
+        <Button fullWidth loading={mutateLoginEmail.isPending} size="large" type="submit">
           {t('cta')}
         </Button>
       </Stack>
