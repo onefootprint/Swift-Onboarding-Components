@@ -1,7 +1,19 @@
 import request from '../utils/request';
 
-const process = async (options: { token: string }) => {
-  const response = await request<{}>({
+type ProcessResponse = {
+  allRequirements: Array<{
+    isMet: boolean;
+    kind: string;
+    // @ts-ignore
+    [key: string]: unknown;
+  }>;
+  ob_configuration: {
+    [key: string]: unknown;
+  };
+};
+
+const process = async (options: { token: string }): Promise<ProcessResponse> => {
+  const response = await request<ProcessResponse>({
     method: 'POST',
     url: '/hosted/onboarding/process',
     headers: {

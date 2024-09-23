@@ -1,12 +1,14 @@
-import type { FootprintComponent, SandboxOutcome } from '@onefootprint/footprint-js';
-import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import type React from 'react';
 import { createContext, useEffect, useMemo, useState } from 'react';
 
 import { isAlphanumeric } from '@onefootprint/core';
+import type { FootprintComponent, SandboxOutcome } from '@onefootprint/footprint-js';
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { PublicOnboardingConfig, SupportedLocale } from '@onefootprint/types';
 import type { ChallengeData } from '@onefootprint/types';
+
+import type { FormValues } from '../../../../types';
 import getOnboardingConfigReq from '../../queries/get-onboarding-config';
 import type AuthTokenStatus from '../../types/auth-token-status';
 import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
@@ -14,36 +16,34 @@ import usePropsUpdated from './hooks/use-props-updated/use-props-updated';
 export type ContextData = {
   appearance?: FootprintAppearance;
   authToken?: string;
-  fpInstance: FootprintComponent | null;
+  fpInstance?: FootprintComponent;
   handoffCallbacks?: {
     onCancel?: () => void;
     onClose?: () => void;
     onComplete?: (validationToken: string) => void;
     onError?: (error: unknown) => void;
   };
-  onboardingConfig: PublicOnboardingConfig | null;
+  onboardingConfig?: PublicOnboardingConfig;
   sandboxOutcome?: SandboxOutcome;
   sandboxId?: string;
   publicKey: string;
   locale?: SupportedLocale;
 
+  authTokenStatus?: AuthTokenStatus;
+  challengeData?: ChallengeData;
+  didCallRequiresAuth: boolean;
+  vaultData?: FormValues;
   vaultingToken?: string;
   verifiedAuthToken?: string;
-  authTokenStatus?: AuthTokenStatus;
-  challengeData: ChallengeData | null;
-  didCallRequiresAuth: boolean;
 };
 
 export type UpdateContext = Dispatch<SetStateAction<ContextData>>;
 
 const Context = createContext<[ContextData, UpdateContext]>([
   {
-    fpInstance: null,
-    onboardingConfig: null,
-    publicKey: '',
-    locale: 'en-US',
-    challengeData: null,
     didCallRequiresAuth: false,
+    locale: 'en-US',
+    publicKey: '',
   },
   () => undefined,
 ]);
@@ -69,8 +69,6 @@ const Provider = ({
     appearance,
     authToken,
     locale,
-    fpInstance: null,
-    onboardingConfig: null,
     sandboxOutcome,
     sandboxId,
     publicKey,
@@ -81,7 +79,6 @@ const Provider = ({
       onError: undefined,
       onClose: undefined,
     },
-    challengeData: null,
     didCallRequiresAuth: false,
   });
 
@@ -129,16 +126,8 @@ const Provider = ({
     if (!pKey) {
       throw new Error('No publicKey found');
     }
-    let response;
-
-    try {
-      response = await getOnboardingConfigReq(pKey);
-    } catch (_e: unknown) {
-      throw new Error('Public key is invalid');
-    }
-
+    const response = await getOnboardingConfigReq(pKey);
     const { sandboxId, sandboxOutcome } = getSandboxProps(response);
-
     setContext(prev => ({
       ...prev,
       onboardingConfig: response,

@@ -3,7 +3,8 @@ import { AuthMethodKind } from '@onefootprint/types';
 import { useContext } from 'react';
 import { Context } from '../components/provider';
 import { createChallenge, createVaultingToken, getValidationToken, verifyChallenge } from '../queries/challenge';
-import getRequirements from '../queries/get-requirements';
+import decryptUserVaultReq from '../queries/decrypt-user-vault';
+import getOnboardingStatus from '../queries/get-onboarding-status';
 import AuthTokenStatus from '../types/auth-token-status';
 import { unlockBody } from '../utils/dom-utils';
 import validateAuthToken from '../utils/validate-auth-token';
@@ -230,22 +231,26 @@ const useOtp = () => {
         sandboxOutcome,
       },
     );
-    const { validationToken, requirements } = await getDataAfterVerify(authToken);
     setContext(prev => ({
       ...prev,
       vaultingToken,
       verifiedAuthToken: authToken,
       authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
-    return { validationToken, requirements };
+    return getDataAfterVerify(authToken);
   };
 
   const getDataAfterVerify = async (authToken: string) => {
-    const [{ validationToken }, requirements] = await Promise.all([
+    const [{ validationToken }, { requirements, fields }] = await Promise.all([
       getValidationToken({ authToken }),
-      getRequirements({ authToken }),
+      getOnboardingStatus({ authToken }),
     ]);
-    return { validationToken, requirements };
+    const vaultData = await decryptUserVaultReq({
+      authToken,
+      fields: [...fields.collected, ...fields.missing, ...fields.optional],
+    });
+    setContext(prev => ({ ...prev, vaultData }));
+    return { validationToken, requirements, vaultData, fields };
   };
 
   return {

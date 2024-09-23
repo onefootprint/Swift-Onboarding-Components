@@ -1,5 +1,9 @@
 import type { SupportedLocale } from '@onefootprint/types';
+import { useContext } from 'react';
+import type { FormValues } from '../../../types';
+import { Context } from '../components/provider';
 
+// TODO: Use these functions from the core package
 const isString = (x: unknown): x is string => typeof x === 'string';
 
 /**
@@ -45,3 +49,42 @@ export const fromUSDateToISO8601Format = (date?: string | string[]): string | un
   const [month, day, year] = date.trim().split('/');
   return !day || !month || !year ? undefined : `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 };
+
+const useFormTransforms = () => {
+  const [context] = useContext(Context);
+  const locale = context.locale || 'en-US';
+
+  const input = (values?: FormValues) => {
+    const transformedValues = { ...values };
+
+    if ('id.dob' in transformedValues) {
+      const dobValue = transformedValues['id.dob'];
+      const isISO8601 = isString(dobValue) && /^\d{4}-\d{2}-\d{2}$/.test(dobValue);
+      if (isISO8601) {
+        const [year, month, day] = dobValue.split('-');
+        if (locale === 'en-US') {
+          transformedValues['id.dob'] = `${month}/${day}/${year}`;
+        } else {
+          transformedValues['id.dob'] = `${day}/${month}/${year}`;
+        }
+      }
+    }
+
+    return transformedValues;
+  };
+
+  const output = (values?: FormValues) => {
+    const transformedValues = { ...values };
+
+    if (typeof transformedValues['id.dob'] === 'string') {
+      const usDobString = strInputToUSDate(locale, transformedValues['id.dob']);
+      transformedValues['id.dob'] = fromUSDateToISO8601Format(usDobString);
+    }
+
+    return transformedValues;
+  };
+
+  return { input, output };
+};
+
+export default useFormTransforms;

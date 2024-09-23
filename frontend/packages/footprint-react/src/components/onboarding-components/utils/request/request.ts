@@ -53,7 +53,7 @@ async function request<T>(options: Options): Promise<T> {
   }
 
   const jsonResponse = await response.json();
-  return keysToCamelCase(jsonResponse);
+  return keysToCamelCase(jsonResponse, disableCaseConverter);
 }
 
 export default request;

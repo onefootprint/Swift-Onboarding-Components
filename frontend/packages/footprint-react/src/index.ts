@@ -7,7 +7,7 @@ export { default as FootprintRender } from './components/footprint-render';
 
 export * from './components/onboarding-components';
 
-export type { FormValues, BootstrapData } from './types';
+export type { FormValues } from './types';
 export { ApiError, InlineOtpNotSupported, InlineProcessError, type ApiErrorDetails } from './types';
 export type { UserDataError } from './types';
 

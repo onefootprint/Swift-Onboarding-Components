@@ -39,13 +39,13 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "@onefootprint/types": "*",
     "classnames": "^2.5.1",
     "cleave.js": "https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9",
     "csstype": "^3.1.2",
     "i18next": "^23.10.1",
     "lodash": "^4.17.21",
-    "react-hook-form": "^7.52.2",
-    "react-i18next": "^14.1.0"
+    "react-hook-form": "^7.52.2"
   },
   "peerDependencies": {
     "@onefootprint/footprint-js": ">=3.15.0",

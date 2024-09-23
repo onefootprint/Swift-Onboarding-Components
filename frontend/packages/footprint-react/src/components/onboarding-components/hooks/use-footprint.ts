@@ -5,12 +5,11 @@ import type { FormValues } from '../../../types';
 import { InlineProcessError } from '../../../types/request';
 import { Context } from '../components/provider';
 import { getValidationToken } from '../queries/challenge';
-import decryptUserVaultReq from '../queries/decrypt-user-vault';
-import getRequirementsReq from '../queries/get-requirements';
+import getRequirementsReq from '../queries/get-onboarding-status';
 import processReq from '../queries/process';
 import vaultReq from '../queries/vault';
 import { lockBody } from '../utils/dom-utils';
-import { formatBeforeSave } from '../utils/save-utils';
+import transformBeforeVault from '../utils/transform-before-vault';
 import useOtp from './use-otp';
 
 export const useFootprint = () => {
@@ -18,8 +17,8 @@ export const useFootprint = () => {
   const otp = useOtp();
 
   const vault = async (formValues: FormValues) => {
-    const { vaultingToken, onboardingConfig } = context;
-    if (!vaultingToken) {
+    const { verifiedAuthToken, onboardingConfig } = context;
+    if (!verifiedAuthToken) {
       throw new Error('No authToken found. Please authenticate first');
     }
     if (!onboardingConfig) {
@@ -28,18 +27,16 @@ export const useFootprint = () => {
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
       throw new Error('Onboarding components only support kyc and kyb kind');
     }
-    await vaultReq({
-      data: formatBeforeSave(formValues, context.locale ?? 'en-US'),
-      bootstrapDis: [],
-      authToken: vaultingToken,
-    });
-  };
+    const data = transformBeforeVault(formValues, { vaultValues: context.vaultData }) as FormValues;
+    await vaultReq({ data, bootstrapDis: [], authToken: verifiedAuthToken });
 
-  const decryptUserData = (fields: keyof FormValues) => {
-    if (!context.verifiedAuthToken) {
-      throw new Error('No authToken found. Please authenticate first');
-    }
-    return decryptUserVaultReq({ authToken: context.verifiedAuthToken, fields });
+    setContext({
+      ...context,
+      vaultData: {
+        ...context.vaultData,
+        ...data,
+      },
+    });
   };
 
   const getRequirements = () => {
@@ -58,10 +55,16 @@ export const useFootprint = () => {
     } catch (error: unknown) {
       throw new InlineProcessError((error as Error).message || 'Something happened');
     }
-    const [requirements, { validationToken }] = await Promise.all([
+    const [{ requirements }, { validationToken }] = await Promise.all([
       getRequirementsReq({ authToken: context.verifiedAuthToken }),
       getValidationToken({ authToken: context.verifiedAuthToken }),
     ]);
+
+    requirements.all.forEach(req => {
+      if (!req.isMet) {
+        throw new InlineProcessError('Something happened');
+      }
+    });
 
     return { validationToken, requirements };
   };
@@ -122,7 +125,6 @@ export const useFootprint = () => {
   };
 
   return {
-    decryptUserData,
     getRequirements,
     handoff,
     process,
@@ -131,6 +133,7 @@ export const useFootprint = () => {
     data: {
       onboardingConfig: context.onboardingConfig,
       challengeData: context.challengeData,
+      vaultData: context.vaultData,
     },
   };
 };

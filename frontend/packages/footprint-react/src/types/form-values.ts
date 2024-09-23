@@ -97,6 +97,4 @@ type BusinessProps = {
   [key: `business.kyced_beneficial_owners[${number}].ownership_stake`]: number;
 };
 
-export type BootstrapData = Partial<IDProps> & Partial<BusinessProps> & Partial<InvestorProps> & Partial<CustomProps>;
-
-export type FormValues = BootstrapData;
+export type FormValues = Partial<IDProps> & Partial<BusinessProps> & Partial<InvestorProps> & Partial<CustomProps>;
