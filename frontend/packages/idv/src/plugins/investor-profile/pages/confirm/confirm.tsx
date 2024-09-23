@@ -32,7 +32,7 @@ const Confirm = () => {
 
   const { mutation: mutSyncData, syncData } = useSyncData();
   const uploadFileMutation = useUploadFile();
-  const isLoading = mutSyncData.isLoading || uploadFileMutation.isLoading;
+  const isLoading = mutSyncData.isPending || uploadFileMutation.isPending;
 
   const valueAnnualIncome = data?.[InvestorProfileDI.annualIncome];
   const valueNetWorth = data?.[InvestorProfileDI.netWorth];
@@ -51,7 +51,7 @@ const Confirm = () => {
           return;
         }
 
-        if (uploadFileMutation.isLoading) return;
+        if (uploadFileMutation.isPending) return;
         uploadFileMutation.mutate(
           {
             file: declarationFiles[0],
@@ -95,7 +95,7 @@ const Confirm = () => {
             {isAnnualIncomeOpen ? (
               <Income
                 onSuccess={() => setIsAnnualIncomeOpen(false)}
-                renderFooter={loading => (
+                renderFooter={(loading: boolean) => (
                   <Stack direction="row" justifyContent="end" gap={3}>
                     <Button
                       type="button"
@@ -135,7 +135,7 @@ const Confirm = () => {
             {isNetWorthOpen ? (
               <NetWorth
                 onSuccess={() => setIsNetWorthOpen(false)}
-                renderFooter={loading => (
+                renderFooter={(loading: boolean) => (
                   <Stack direction="row" justifyContent="end" gap={3}>
                     <Button type="button" variant="secondary" onClick={() => setIsNetWorthOpen(!isNetWorthOpen)}>
                       {t('cancel')}
@@ -171,7 +171,7 @@ const Confirm = () => {
             {isFundingSourcesOpen ? (
               <FundingSources
                 onSuccess={() => setIsFundingSourcesOpen(false)}
-                renderFooter={loading => (
+                renderFooter={(loading: boolean) => (
                   <Stack direction="row" justifyContent="end" gap={3}>
                     <Button
                       type="button"
@@ -221,7 +221,7 @@ const Confirm = () => {
             {isInvestmentGoalsOpen ? (
               <InvestmentGoals
                 onSuccess={() => setIsInvestmentGoals(false)}
-                renderFooter={loading => (
+                renderFooter={(loading: boolean) => (
                   <Stack direction="row" justifyContent="end" gap={3}>
                     <Button
                       type="button"
@@ -271,7 +271,7 @@ const Confirm = () => {
             {isRiskToleranceOpen ? (
               <RiskTolerance
                 onSuccess={() => setIsRiskToleranceOpen(false)}
-                renderFooter={loading => (
+                renderFooter={(loading: boolean) => (
                   <Stack direction="row" justifyContent="end" gap={3}>
                     <Button
                       type="button"

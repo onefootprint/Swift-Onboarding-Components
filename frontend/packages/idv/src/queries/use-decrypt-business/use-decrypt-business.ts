@@ -21,7 +21,9 @@ const decryptBusiness = async ({ fields, authToken }: DecryptUserRequest, format
 
 const useDecryptBusiness = () => {
   const { formatUtcDate } = useIntl();
-  return useMutation((data: DecryptUserRequest) => decryptBusiness(data, formatUtcDate));
+  return useMutation({
+    mutationFn: (data: DecryptUserRequest) => decryptBusiness(data, formatUtcDate),
+  });
 };
 
 export default useDecryptBusiness;

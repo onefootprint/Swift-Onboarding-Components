@@ -98,11 +98,6 @@ describe('<Idv />', () => {
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
-    logger: {
-      log: () => undefined,
-      warn: () => undefined,
-      error: () => undefined,
-    },
     defaultOptions: {
       queries: {
         retry: false,

@@ -15,6 +15,10 @@ const identifyValidateRequest = async (payload: IdentifyValidateRequest) => {
   return response.data;
 };
 
-const useIdentifyValidate = () => useMutation(identifyValidateRequest);
+const useIdentifyValidate = () => {
+  return useMutation({
+    mutationFn: identifyValidateRequest,
+  });
+};
 
 export default useIdentifyValidate;

@@ -30,6 +30,10 @@ const submitDoc = async (payload: SubmitDocRequest) => {
   return response.data;
 };
 
-const useSubmitDoc = () => useMutation(submitDoc);
+const useSubmitDoc = () => {
+  return useMutation({
+    mutationFn: submitDoc,
+  });
+};
 
 export default useSubmitDoc;

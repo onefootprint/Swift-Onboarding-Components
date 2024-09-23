@@ -19,7 +19,7 @@ const Process = ({ onDone }: ProcessProps) => {
   const processMutation = useOnboardingProcess();
 
   useEffectOnce(() => {
-    if (!authToken || processMutation.isLoading) {
+    if (!authToken || processMutation.isPending) {
       return;
     }
     processMutation.mutate(

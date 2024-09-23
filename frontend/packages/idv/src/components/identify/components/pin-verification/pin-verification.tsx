@@ -62,9 +62,9 @@ const PinVerification = ({
   const challengeData: ChallengeData | undefined =
     data || mutLoginChallenge.data?.challengeData || mutSignupChallenge.data?.challengeData;
 
-  const isLoading = mutLoginChallenge.isLoading || mutSignupChallenge.isLoading;
+  const isLoading = mutLoginChallenge.isPending || mutSignupChallenge.isPending;
   const isPending = isLoading || !challengeData;
-  const isVerifying = mutIdentifyVerify.isLoading;
+  const isVerifying = mutIdentifyVerify.isPending;
 
   const verifyPin = (pin: string) => {
     if (!challengeData) {
@@ -72,7 +72,7 @@ const PinVerification = ({
       return;
     }
 
-    if (mutIdentifyVerify.isLoading) {
+    if (mutIdentifyVerify.isPending) {
       return;
     }
 
@@ -112,7 +112,7 @@ const PinVerification = ({
       logError('Cannot initiate signup challenge challenge without obConfigAuth');
       return;
     }
-    if (mutSignupChallenge.isLoading) {
+    if (mutSignupChallenge.isPending) {
       return;
     }
 
@@ -140,7 +140,7 @@ const PinVerification = ({
   };
 
   const initiatePhoneOrEmailLoginChallenge = (authToken: string) => {
-    if (mutLoginChallenge.isLoading) {
+    if (mutLoginChallenge.isPending) {
       return;
     }
 

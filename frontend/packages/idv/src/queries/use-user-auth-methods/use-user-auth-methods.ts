@@ -22,7 +22,7 @@ const useUserAuthMethods = (token?: string) => {
   const isTokenValid = isString(token) && isTokenFormat(token);
 
   return useQuery({
-    cacheTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES,
     enabled: isTokenValid,
     queryFn: () => (isTokenValid ? requestFn(token) : undefined),
     queryKey: [token, 'get-user-auth-methods'],

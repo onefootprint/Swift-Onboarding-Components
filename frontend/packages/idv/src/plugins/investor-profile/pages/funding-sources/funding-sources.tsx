@@ -46,9 +46,9 @@ const FundingSources = ({ onSuccess, renderFooter }: FundingSourcesProps) => {
       defaultValues={{ [fundingSources]: data?.[fundingSources] }}
       footer={
         renderFooter ? (
-          renderFooter(mutation.isLoading)
+          renderFooter(mutation.isPending)
         ) : (
-          <ContinueButton isLoading={mutation.isLoading} trackActionName="investor-profile:funding-sources-continue" />
+          <ContinueButton isLoading={mutation.isPending} trackActionName="investor-profile:funding-sources-continue" />
         )
       }
       onSubmit={handleSubmit}

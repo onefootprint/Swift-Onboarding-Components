@@ -55,9 +55,9 @@ const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
       countries={options}
       defaultPhone={phoneNumber?.value}
       Header={Header}
-      isLoading={mutIdentifyKba.isLoading}
+      isLoading={mutIdentifyKba.isPending}
       l10n={l10n}
-      onSubmit={mutIdentifyKba.isLoading ? noop : handleSubmit}
+      onSubmit={mutIdentifyKba.isPending ? noop : handleSubmit}
       phoneValidator={handlePhoneValidation}
       texts={{
         headerTitle: t('confirm-phone-number'),

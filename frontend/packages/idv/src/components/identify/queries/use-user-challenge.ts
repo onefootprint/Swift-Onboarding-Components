@@ -86,7 +86,7 @@ const useUserChallenge = () => {
       const queryKey = getQueryKey(payload);
       queryClient.setQueryData(queryKey, data);
     },
-    cacheTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES,
   });
 };
 

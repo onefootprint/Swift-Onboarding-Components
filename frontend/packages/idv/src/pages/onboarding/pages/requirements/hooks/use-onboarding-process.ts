@@ -15,6 +15,10 @@ const onboardingProcess = async (payload: OnboardingProcessRequest) => {
   return response.data;
 };
 
-const useOnboardingProcess = () => useMutation(onboardingProcess);
+const useOnboardingProcess = () => {
+  return useMutation({
+    mutationFn: onboardingProcess,
+  });
+};
 
 export default useOnboardingProcess;

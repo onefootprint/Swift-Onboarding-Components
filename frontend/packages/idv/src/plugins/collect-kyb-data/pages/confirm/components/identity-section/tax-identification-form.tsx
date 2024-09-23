@@ -100,7 +100,7 @@ const TaxIdentificationForm = ({ ctaLabel, onCancel, onComplete }: TaxIdentifica
       </Stack>
       <EditableFormButtonContainer
         onCancel={onCancel}
-        isLoading={mutation.isLoading}
+        isLoading={mutation.isPending}
         ctaLabel={ctaLabel}
         submitButtonTestID="kyb-basic"
       />

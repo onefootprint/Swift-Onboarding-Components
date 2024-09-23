@@ -53,7 +53,7 @@ const IdentitySection = () => {
       send({ type: 'stepUpAuthTokenCompleted', payload: newAuthToken });
       sendCustomEvent(FPCustomEvents.stepUpCompleted, { authToken: newAuthToken });
 
-      if (mutDecryptBusiness.isLoading || isTinNotScrubbed) return;
+      if (mutDecryptBusiness.isPending || isTinNotScrubbed) return;
       mutDecryptBusiness.mutate(
         { authToken: newAuthToken, fields: [BusinessDI.tin] },
         {

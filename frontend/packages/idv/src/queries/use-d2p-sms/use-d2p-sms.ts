@@ -17,6 +17,10 @@ const d2pSms = async (payload: D2PSmsRequest) => {
   return response.data;
 };
 
-const useD2PSms = () => useMutation(d2pSms);
+const useD2PSms = () => {
+  return useMutation({
+    mutationFn: d2pSms,
+  });
+};
 
 export default useD2PSms;

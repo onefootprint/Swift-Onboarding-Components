@@ -16,6 +16,9 @@ const createTokenRequest = async (payload: CreateUserTokenRequest) => {
   return response.data;
 };
 
-const useCreateToken = () => useMutation(createTokenRequest);
+const useCreateToken = () =>
+  useMutation({
+    mutationFn: createTokenRequest,
+  });
 
 export default useCreateToken;

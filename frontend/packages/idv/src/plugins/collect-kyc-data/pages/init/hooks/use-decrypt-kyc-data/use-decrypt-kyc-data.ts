@@ -66,7 +66,7 @@ const useDecryptKycData = ({ authToken, populatedCdos, onSuccess, onError }: Use
       return;
     }
 
-    if (decryptUserMutation.isLoading) {
+    if (decryptUserMutation.isPending) {
       return;
     }
 

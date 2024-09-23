@@ -35,7 +35,7 @@ const useSyncData = () => {
       return;
     }
 
-    if (businessDataMutation.isLoading) {
+    if (businessDataMutation.isPending) {
       return;
     }
 

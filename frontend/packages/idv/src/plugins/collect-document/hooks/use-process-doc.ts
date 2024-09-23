@@ -16,6 +16,10 @@ const processDoc = async (payload: ProcessDocRequest) => {
   return response.data;
 };
 
-const useProcessDoc = () => useMutation(processDoc);
+const useProcessDoc = () => {
+  return useMutation({
+    mutationFn: processDoc,
+  });
+};
 
 export default useProcessDoc;

@@ -66,10 +66,10 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
       defaultPhone={phoneNumber?.value}
       email={email?.value}
       Header={Header}
-      isLoading={mutIdentify.isLoading}
+      isLoading={mutIdentify.isPending}
       l10n={l10n}
       onChangeEmailClick={handleChangeEmail}
-      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
+      onSubmit={mutIdentify.isPending ? noop : handleSubmit}
       phoneValidator={handlePhoneValidation}
       texts={{
         headerTitle: t('phone-step.title'),

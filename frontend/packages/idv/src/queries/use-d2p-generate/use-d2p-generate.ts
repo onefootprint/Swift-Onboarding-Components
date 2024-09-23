@@ -19,6 +19,10 @@ const d2pGenerate = async (payload: D2PGenerateRequest) => {
   return response.data;
 };
 
-const useD2PGenerate = () => useMutation(d2pGenerate);
+const useD2PGenerate = () => {
+  return useMutation({
+    mutationFn: d2pGenerate,
+  });
+};
 
 export default useD2PGenerate;

@@ -40,7 +40,7 @@ const useLoginChallenge = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ isResend, ...payload }: Payload) => {
+    mutationFn: async ({ isResend, ...payload }: Payload) => {
       const queryKey = getQueryKeyForPayload(payload);
       const queryState = queryClient.getQueryState<LoginChallengeResponse>(queryKey);
       if (!queryState) {
@@ -69,7 +69,7 @@ const useLoginChallenge = () => {
       const queryKey = getQueryKeyForPayload(payload);
       queryClient.setQueryData(queryKey, data);
     },
-    cacheTime: FIVE_MINUTES,
+    gcTime: FIVE_MINUTES,
   });
 };
 

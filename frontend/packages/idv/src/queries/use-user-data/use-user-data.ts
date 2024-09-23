@@ -60,6 +60,10 @@ const userDataRequest = async (payload: UserDataRequest) => {
   return response.data;
 };
 
-const useUserData = () => useMutation(userDataRequest);
+const useUserData = () => {
+  return useMutation({
+    mutationFn: userDataRequest,
+  });
+};
 
 export default useUserData;

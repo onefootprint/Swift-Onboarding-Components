@@ -55,7 +55,7 @@ const DesktopConsent = () => {
 
   const submitConsent = () => {
     const consentInfo = consentRef.current?.getConsentInfo();
-    if (!authToken || consentMutation.isLoading || !consentInfo) {
+    if (!authToken || consentMutation.isPending || !consentInfo) {
       if (!authToken) {
         logError("Could not submit consent - auth token doesn't exist");
       }
@@ -99,7 +99,7 @@ const DesktopConsent = () => {
         <Button
           fullWidth
           onClick={submitConsent}
-          loading={consentMutation.isLoading}
+          loading={consentMutation.isPending}
           disabled={!fullyScrolled}
           testID="consent-button"
           size="large"

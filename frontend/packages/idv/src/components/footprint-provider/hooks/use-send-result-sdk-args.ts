@@ -24,6 +24,9 @@ const sendResultSdkArgs = async (payload: SendResultSdkArgsRequest) => {
   return response?.token;
 };
 
-const useSendResultSdkArgs = () => useMutation(sendResultSdkArgs);
+const useSendResultSdkArgs = () =>
+  useMutation({
+    mutationFn: sendResultSdkArgs,
+  });
 
 export default useSendResultSdkArgs;

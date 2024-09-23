@@ -82,7 +82,7 @@ const Confirm = () => {
       cta={t('summary.cta')}
       onClickPrev={() => send({ type: 'navigatedToPrevPage' })}
       onClickConfirm={handleConfirm}
-      isLoading={syncDataMutation.isLoading}
+      isLoading={syncDataMutation.isPending}
       headerVariant={headerVariant}
     >
       <BasicInfoSection verifiedMethods={verifiedMethods} />

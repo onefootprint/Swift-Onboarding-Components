@@ -34,7 +34,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
   });
 
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
-  const isWaiting = isRunningWebauthn || mutIdentifyVerify.isLoading;
+  const isWaiting = isRunningWebauthn || mutIdentifyVerify.isPending;
 
   const initiatePasskeyChallenge = () => {
     if (!user?.token) {
@@ -42,7 +42,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       return;
     }
 
-    if (mutLoginChallenge.isLoading) {
+    if (mutLoginChallenge.isPending) {
       return;
     }
 
@@ -90,7 +90,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       return;
     }
 
-    if (mutIdentifyVerify.isLoading) {
+    if (mutIdentifyVerify.isPending) {
       return;
     }
 

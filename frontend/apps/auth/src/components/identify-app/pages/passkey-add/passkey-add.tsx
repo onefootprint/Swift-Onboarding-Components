@@ -37,7 +37,7 @@ const PasskeyAdd = ({ authToken, device, onError, onNewTabOpened, onScopedAuthTo
     },
   });
 
-  const isLoading = mutation.isLoading || !urlStr || !scopedAuthToken;
+  const isLoading = mutation.isPending || !urlStr || !scopedAuthToken;
 
   const handleAddPassKeyClick = () => {
     if (!urlStr) return;

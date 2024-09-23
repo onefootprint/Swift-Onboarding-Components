@@ -19,7 +19,7 @@ const Declarations = ({ onSuccess, renderFooter }: DeclarationsProps) => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data, declarationFiles } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
-  const isLoading = syncDataMutation.isLoading;
+  const isLoading = syncDataMutation.isPending;
 
   const handleSubmit = (declarationData: DeclarationData, files?: File[]) => {
     syncData({

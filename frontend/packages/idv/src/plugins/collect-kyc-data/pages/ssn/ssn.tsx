@@ -183,7 +183,7 @@ const SsnOrTaxId = ({ hideDisclaimer, hideHeader, onCancel, onComplete }: SsnOrT
               ) : null}
             </Stack>
             <EditableFormButtonContainer
-              isLoading={mutation.isLoading}
+              isLoading={mutation.isPending}
               onCancel={onCancel}
               submitButtonTestID="ssn-save-edit-button"
             />

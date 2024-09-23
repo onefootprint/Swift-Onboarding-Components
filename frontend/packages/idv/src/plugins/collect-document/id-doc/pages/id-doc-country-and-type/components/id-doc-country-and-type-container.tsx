@@ -45,7 +45,7 @@ const IdDocCountryAndTypeContainer = ({
   });
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
-  const { isLoading: isDocTypeSubmissionLoading } = submitDocTypeMutation;
+  const { isPending: isDocTypeSubmissionLoading } = submitDocTypeMutation;
   const [consentVisible, setConsentVisible] = useState(false);
   const l10n = useL10nContext();
   const { idDoc: defaultCountryDoc, sandboxOutcome, isConsentMissing, authToken, device, requirement } = state.context;
@@ -81,7 +81,7 @@ const IdDocCountryAndTypeContainer = ({
   const handleSubmit = async () => {
     const selectedCountry = getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
     const hasWebcam = await detectWebcam();
-    if (submitDocTypeMutation.isLoading) {
+    if (submitDocTypeMutation.isPending) {
       return;
     }
 

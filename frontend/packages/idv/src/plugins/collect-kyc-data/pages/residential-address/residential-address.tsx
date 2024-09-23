@@ -120,7 +120,7 @@ const ResidentialAddress = ({
             <StateField />
           </Stack>
           <EditableFormButtonContainer
-            isLoading={mutation.isLoading}
+            isLoading={mutation.isPending}
             onCancel={onCancel}
             ctaLabel={ctaLabel}
             submitButtonTestID="kyc-res-address"

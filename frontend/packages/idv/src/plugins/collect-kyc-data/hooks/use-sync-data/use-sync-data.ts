@@ -48,7 +48,7 @@ const useSyncData = () => {
       logError('Found empty auth token while syncing kyc data fields.');
       return;
     }
-    if (userDataMutation.isLoading) {
+    if (userDataMutation.isPending) {
       return;
     }
 

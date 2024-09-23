@@ -3,6 +3,7 @@ import request from '@onefootprint/request';
 import type { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 type GetD2PStatusPollArgs = {
   enabled?: boolean;
@@ -33,12 +34,25 @@ const useGetD2PStatus = ({
   enabled = true,
   refetchInterval = D2P_STATUS_FETCH_INTERVAL,
   options = {},
-}: GetD2PStatusPollArgs) =>
-  useQuery([authToken, enabled, 'get-d2p-status'], () => getD2PStatus({ scopedAuthToken: authToken ?? '' }), {
+}: GetD2PStatusPollArgs) => {
+  const query = useQuery({
+    queryKey: ['get-d2p-status', authToken, enabled],
+    queryFn: () => getD2PStatus({ scopedAuthToken: authToken ?? '' }),
     enabled: !!authToken && !!enabled,
     refetchInterval,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
   });
+
+  useEffect(() => {
+    if (query.data) {
+      options.onSuccess?.(query.data);
+    }
+    if (query.isError) {
+      options.onError?.(query.error as RequestError);
+    }
+    // no onSuccess or onError because likely to trigger infinite re-render/loop
+  }, [query.isSuccess, query.isError, query.error, query.data]);
+
+  return query;
+};
 
 export default useGetD2PStatus;

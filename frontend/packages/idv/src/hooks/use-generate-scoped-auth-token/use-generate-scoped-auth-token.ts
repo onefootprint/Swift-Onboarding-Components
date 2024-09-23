@@ -35,7 +35,7 @@ const useGenerateScopedAuthToken = ({
     const isMobile = device.type === 'mobile' || device.type === 'tablet';
     const redirectUrl = isMobile ? window.location.href : undefined;
 
-    if (!authToken || d2pGenerateMutation.isLoading) {
+    if (!authToken || d2pGenerateMutation.isPending) {
       return;
     }
     d2pGenerateMutation.mutate(
@@ -64,13 +64,14 @@ const useGenerateScopedAuthToken = ({
   };
 
   useEffect(() => {
-    if (d2pGenerateMutation.isLoading || d2pGenerateMutation.isSuccess) {
+    if (d2pGenerateMutation.isPending || d2pGenerateMutation.isSuccess) {
       return;
     }
 
     generateScopedAuthToken();
+    // no onSuccess because likely to trigger infinite re-render/loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, styleParams, sessionId, d2pGenerateMutation.isLoading, d2pGenerateMutation.isSuccess, onSuccess]);
+  }, [authToken, styleParams, sessionId, d2pGenerateMutation.isPending, d2pGenerateMutation.isSuccess]);
 
   return { mutation: d2pGenerateMutation, generateScopedAuthToken };
 };

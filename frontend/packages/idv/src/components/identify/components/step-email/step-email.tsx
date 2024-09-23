@@ -55,8 +55,8 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
       defaultEmail={email?.value}
       Footer={<LegalFooter />}
       Header={Header}
-      isLoading={mutIdentify.isLoading}
-      onSubmit={mutIdentify.isLoading ? noop : handleSubmit}
+      isLoading={mutIdentify.isPending}
+      onSubmit={mutIdentify.isPending ? noop : handleSubmit}
       texts={{
         header: {
           title: t('email-step.title'),

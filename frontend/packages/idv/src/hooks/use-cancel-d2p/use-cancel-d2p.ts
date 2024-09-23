@@ -16,7 +16,7 @@ const useCancelD2P = ({
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   return () => {
-    if (!authToken || updateD2PStatusMutation.isLoading) {
+    if (!authToken || updateD2PStatusMutation.isPending) {
       return;
     }
 

@@ -20,6 +20,9 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
   return response.data;
 };
 
-const useBusinessData = () => useMutation(businessDataRequest);
+const useBusinessData = () =>
+  useMutation({
+    mutationFn: businessDataRequest,
+  });
 
 export default useBusinessData;

@@ -47,7 +47,7 @@ const QRRegister = () => {
     },
   });
 
-  const isLoading = mutation.isLoading || !url || !scopedAuthToken;
+  const isLoading = mutation.isPending || !url || !scopedAuthToken;
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
   useGetD2PStatus({

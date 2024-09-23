@@ -22,6 +22,10 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
   return response.data;
 };
 
-const useOnboarding = () => useMutation(onboardingRequest);
+const useOnboarding = () => {
+  return useMutation({
+    mutationFn: onboardingRequest,
+  });
+};
 
 export default useOnboarding;

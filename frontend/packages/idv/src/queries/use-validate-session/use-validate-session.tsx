@@ -3,6 +3,7 @@ import request from '@onefootprint/request';
 import type { ValidateSessionRequest } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 const validateSession = async (payload: ValidateSessionRequest) => {
   const { data: response } = await request<string>({
@@ -18,16 +19,29 @@ const validateSession = async (payload: ValidateSessionRequest) => {
 const useValidateSession = (
   payload: ValidateSessionRequest,
   options: {
-    onSuccess: (response: string) => void;
+    onSuccess?: (response: string) => void;
     onError?: (error: RequestError) => void;
-  },
-) =>
-  useQuery(['validate'], () => validateSession(payload), {
+  } = {},
+) => {
+  const query = useQuery({
+    queryKey: ['validate', payload.authToken],
+    queryFn: () => validateSession(payload),
     refetchInterval: 60000,
     refetchIntervalInBackground: true,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
     enabled: !!payload.authToken,
   });
+
+  useEffect(() => {
+    if (query.isSuccess && options.onSuccess) {
+      options.onSuccess(query.data);
+    }
+    if (query.isError && options.onError) {
+      options.onError(query.error as RequestError);
+    }
+    // no onSuccess or onError because likely to trigger infinite re-render/loop
+  }, [query.isSuccess, query.isError, query.data, query.error]);
+
+  return query;
+};
 
 export default useValidateSession;

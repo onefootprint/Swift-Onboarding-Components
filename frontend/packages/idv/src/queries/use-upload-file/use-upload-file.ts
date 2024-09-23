@@ -21,6 +21,10 @@ const uploadFileRequest = async (payload: UploadFileRequest) => {
   return response.data;
 };
 
-const useUploadFile = () => useMutation(uploadFileRequest);
+const useUploadFile = () => {
+  return useMutation({
+    mutationFn: uploadFileRequest,
+  });
+};
 
 export default useUploadFile;

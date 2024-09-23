@@ -18,6 +18,10 @@ const onboardingValidateRequest = async (payload: OnboardingValidateRequest) => 
   return response.data;
 };
 
-const useOnboardingValidate = () => useMutation(onboardingValidateRequest);
+const useOnboardingValidate = () => {
+  return useMutation({
+    mutationFn: onboardingValidateRequest,
+  });
+};
 
 export default useOnboardingValidate;

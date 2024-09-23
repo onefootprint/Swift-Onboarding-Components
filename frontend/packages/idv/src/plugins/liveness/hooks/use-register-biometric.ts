@@ -44,42 +44,42 @@ const useBiometricInit = () => {
   const userChallengeMut = useUserChallenge();
   const userChallengeVerifyMut = useUserChallengeVerify();
 
-  const biometricInit = async ({ authToken, actionKind }: BiometricRegisterRequest) => {
-    const { challengeToken, biometricChallengeJson } = await userChallengeMut.mutateAsync({
-      authToken,
-      kind: AuthMethodKind.passkey,
-      actionKind,
-    });
+  return useMutation({
+    mutationFn: async ({ authToken, actionKind }: BiometricRegisterRequest) => {
+      const { challengeToken, biometricChallengeJson } = await userChallengeMut.mutateAsync({
+        authToken,
+        kind: AuthMethodKind.passkey,
+        actionKind,
+      });
 
-    if (!biometricChallengeJson) {
-      throw new Error('No biometric challenge JSON when registering passkey');
-    }
+      if (!biometricChallengeJson) {
+        throw new Error('No biometric challenge JSON when registering passkey');
+      }
 
-    const startPasskeyRegister = new Date();
-    let challengeResponse;
-    try {
-      challengeResponse = await registerPasskeyOnDevice(biometricChallengeJson);
-    } catch (error) {
-      const endPasskeyRegister = new Date();
-      const elapsedTimeInOsPromptMs = endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
-      const e: RegisterPasskeyError = {
-        kind: 'registerPasskeyError',
-        elapsedTimeInOsPromptMs,
-        error,
-      };
-      return Promise.reject(e);
-    }
+      const startPasskeyRegister = new Date();
+      let challengeResponse;
+      try {
+        challengeResponse = await registerPasskeyOnDevice(biometricChallengeJson);
+      } catch (error) {
+        const endPasskeyRegister = new Date();
+        const elapsedTimeInOsPromptMs = endPasskeyRegister.getTime() - startPasskeyRegister.getTime();
+        const e: RegisterPasskeyError = {
+          kind: 'registerPasskeyError',
+          elapsedTimeInOsPromptMs,
+          error,
+        };
+        return Promise.reject(e);
+      }
 
-    const response = await userChallengeVerifyMut.mutateAsync({
-      authToken,
-      challengeToken,
-      challengeResponse,
-    });
+      const response = await userChallengeVerifyMut.mutateAsync({
+        authToken,
+        challengeToken,
+        challengeResponse,
+      });
 
-    return { response, deviceResponseJson: challengeResponse };
-  };
-
-  return useMutation(biometricInit);
+      return { response, deviceResponseJson: challengeResponse };
+    },
+  });
 };
 
 export default useBiometricInit;

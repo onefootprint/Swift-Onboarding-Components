@@ -16,7 +16,7 @@ const Confirm = () => {
   const [state, send] = useCollectKybDataMachine();
   const { data, idvContext, dataCollectionScreensToShow } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { isLoading } = mutation;
+  const { isPending } = mutation;
   const shouldShowCloseButton = dataCollectionScreensToShow.length === 1;
 
   const handleConfirm = () => {
@@ -37,7 +37,7 @@ const Confirm = () => {
       cta={t('cta')}
       onClickPrev={() => send({ type: 'navigatedToPrevPage' })}
       onClickConfirm={handleConfirm}
-      isLoading={isLoading}
+      isLoading={isPending}
       headerVariant={shouldShowCloseButton ? 'close' : 'back'}
     >
       <BasicDataSection />

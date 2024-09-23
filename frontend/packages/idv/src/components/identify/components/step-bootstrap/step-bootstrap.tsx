@@ -19,7 +19,7 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
 
   const processBootstrapData = async () => {
-    if (mutIdentify.isLoading || mutIdentify.isSuccess || mutIdentify.isError) {
+    if (mutIdentify.isPending || mutIdentify.isSuccess || mutIdentify.isError) {
       return;
     }
 

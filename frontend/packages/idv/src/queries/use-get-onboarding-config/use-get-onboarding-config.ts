@@ -3,6 +3,7 @@ import request from '@onefootprint/request';
 import type { GetOnboardingConfigRequest, GetPublicOnboardingConfigResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const { obConfigAuth, authToken } = payload;
@@ -26,12 +27,24 @@ const useGetOnboardingConfig = (
 ) => {
   const { obConfigAuth, authToken } = payload;
 
-  return useQuery(['get-onboarding-config', obConfigAuth, authToken], () => getOnboardingConfig(payload), {
+  const query = useQuery({
+    queryKey: ['get-onboarding-config', obConfigAuth, authToken],
+    queryFn: () => getOnboardingConfig(payload),
     enabled: !!obConfigAuth || !!authToken,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
     retry: 2,
   });
+
+  useEffect(() => {
+    if (query.isSuccess && options.onSuccess) {
+      options.onSuccess(query.data);
+    }
+    if (query.isError && options.onError) {
+      options.onError(query.error as RequestError);
+    }
+    // no onSuccess or onError because likely to trigger infinite re-render/loop
+  }, [query.isSuccess, query.isError, query.data, query.error]);
+
+  return query;
 };
 
 export default useGetOnboardingConfig;

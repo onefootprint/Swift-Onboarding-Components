@@ -78,7 +78,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const qryUserAuthMethods = useUserAuthMethods(verifyToken);
   const mutDecryptUser = useDecryptUser();
   const toast = useToast();
-  const isLoading = qryUserAuthMethods.isLoading || mutDecryptUser.isLoading;
+  const isLoading = qryUserAuthMethods.isPending || mutDecryptUser.isPending;
 
   const methodsMap = useMemo(() => {
     const methods = qryUserAuthMethods.data;

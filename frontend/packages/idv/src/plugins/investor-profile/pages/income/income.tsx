@@ -41,9 +41,9 @@ const Income = ({ onSuccess, renderFooter }: IncomeProps) => {
       defaultValues={{ [annualIncome]: data?.[annualIncome] || InvestorProfileAnnualIncome.le25k }}
       footer={
         renderFooter ? (
-          renderFooter(mutation.isLoading)
+          renderFooter(mutation.isPending)
         ) : (
-          <ContinueButton isLoading={mutation.isLoading} trackActionName="investor-profile:income-continue" />
+          <ContinueButton isLoading={mutation.isPending} trackActionName="investor-profile:income-continue" />
         )
       }
       onSubmit={handleSubmit}

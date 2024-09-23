@@ -24,6 +24,10 @@ const submitDocType = async (payload: SubmitDocTypeRequest) => {
   return response.data;
 };
 
-const useSubmitDocType = () => useMutation(submitDocType);
+const useSubmitDocType = () => {
+  return useMutation({
+    mutationFn: submitDocType,
+  });
+};
 
 export default useSubmitDocType;

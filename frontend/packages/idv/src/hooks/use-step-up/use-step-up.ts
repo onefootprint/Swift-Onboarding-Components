@@ -52,9 +52,9 @@ const useStepUp = ({ authToken, device, onSuccess, onError }: UseStepUpArgs) => 
   const isLoading =
     isRunningWebauthn ||
     userTokenQuery.isLoading ||
-    identifyMutation.isLoading ||
-    loginChallengeMutation.isLoading ||
-    identifyVerifyMutation.isLoading;
+    identifyMutation.isPending ||
+    loginChallengeMutation.isPending ||
+    identifyVerifyMutation.isPending;
 
   const needsStepUp = isStepUpNeeded(userTokenQuery.data);
   const canStepUp = isStepUpPossible(device, identifyMutation.data);
@@ -100,7 +100,7 @@ const useStepUp = ({ authToken, device, onSuccess, onError }: UseStepUpArgs) => 
       return;
     }
 
-    if (identifyVerifyMutation.isLoading) {
+    if (identifyVerifyMutation.isPending) {
       return;
     }
 
@@ -137,7 +137,7 @@ const useStepUp = ({ authToken, device, onSuccess, onError }: UseStepUpArgs) => 
       return;
     }
 
-    if (loginChallengeMutation.isLoading) {
+    if (loginChallengeMutation.isPending) {
       return;
     }
 

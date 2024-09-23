@@ -24,7 +24,7 @@ const SmsButtonWithCountdown = ({ url, authToken }: SmsButtonWithCountdownProps)
   });
   const toast = useToast();
   const d2pSmsMutation = useD2PSms();
-  const { isLoading } = d2pSmsMutation;
+  const { isPending } = d2pSmsMutation;
   const [isDisabled, setIsDisabled] = useState(true);
   const sendCount = useRef(0);
   const isResend = sendCount.current > 1;
@@ -60,7 +60,7 @@ const SmsButtonWithCountdown = ({ url, authToken }: SmsButtonWithCountdownProps)
   }, [url, authToken]);
 
   const handleResend = () => {
-    if (isLoading || !authToken || !url) {
+    if (isPending || !authToken || !url) {
       return;
     }
     sendCount.current += 1;
@@ -85,7 +85,7 @@ const SmsButtonWithCountdown = ({ url, authToken }: SmsButtonWithCountdownProps)
         variant="secondary"
         fullWidth
         disabled={isDisabled}
-        loading={isResend && isLoading}
+        loading={isResend && isPending}
         onClick={isDisabled ? undefined : handleResend}
         size="large"
         data-dd-action-name="transfer:resend-sms"

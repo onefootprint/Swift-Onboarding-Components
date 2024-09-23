@@ -16,6 +16,10 @@ const skipLiveness = async (payload: SkipLivenessRequest) => {
   return response.data;
 };
 
-const useSkipLiveness = () => useMutation(skipLiveness);
+const useSkipLiveness = () => {
+  return useMutation({
+    mutationFn: skipLiveness,
+  });
+};
 
 export default useSkipLiveness;

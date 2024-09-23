@@ -120,7 +120,7 @@ const LegalStatus = ({ ctaLabel, hideHeader, onComplete, onCancel }: LegalStatus
           {selectedOption && selectedOption !== UsLegalStatus.citizen && <CitizenshipFields />}
           {selectedOption === UsLegalStatus.visa && <VisaFields />}
           <EditableFormButtonContainer
-            isLoading={mutation.isLoading}
+            isLoading={mutation.isPending}
             onCancel={onCancel}
             ctaLabel={ctaLabel}
             submitButtonTestID="kyc-legal-status-cta"

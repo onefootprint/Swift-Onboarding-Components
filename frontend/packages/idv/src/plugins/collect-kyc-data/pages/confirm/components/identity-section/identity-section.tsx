@@ -118,7 +118,7 @@ const IdentitySection = () => {
 
     // If the user has already decrypted their SSN, we don't need to do it again
     if (!taxIdObj?.scrubbed) return;
-    if (mutDecryptUser.isLoading) return;
+    if (mutDecryptUser.isPending) return;
 
     mutDecryptUser.mutate(
       { authToken: stepUpAuthToken, fields: getTaxIdFields(taxIdKind) },

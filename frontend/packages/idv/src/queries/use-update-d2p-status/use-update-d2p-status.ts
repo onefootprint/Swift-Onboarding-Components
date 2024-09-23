@@ -15,6 +15,10 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
   return response.data;
 };
 
-const useUpdateD2PStatus = () => useMutation(updateD2PStatus);
+const useUpdateD2PStatus = () => {
+  return useMutation({
+    mutationFn: updateD2PStatus,
+  });
+};
 
 export default useUpdateD2PStatus;

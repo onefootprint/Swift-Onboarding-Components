@@ -18,6 +18,10 @@ const consentRequest = async ({ consentLanguageText, mlConsent, authToken }: Con
   return response.data;
 };
 
-const useConsent = () => useMutation(consentRequest);
+const useConsent = () => {
+  return useMutation({
+    mutationFn: consentRequest,
+  });
+};
 
 export default useConsent;

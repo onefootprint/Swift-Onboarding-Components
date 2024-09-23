@@ -14,6 +14,10 @@ const onboardingAuthorize = async (payload: OnboardingAuthorizeRequest) => {
   return response.data;
 };
 
-const useOnboardingAuthorize = () => useMutation(onboardingAuthorize);
+const useOnboardingAuthorize = () => {
+  return useMutation({
+    mutationFn: onboardingAuthorize,
+  });
+};
 
 export default useOnboardingAuthorize;

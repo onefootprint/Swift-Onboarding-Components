@@ -63,7 +63,7 @@ const BusinessAddress = ({ ctaLabel, onComplete, onCancel, hideHeader }: Busines
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         onCancel={onCancel}
-        isLoading={mutation.isLoading}
+        isLoading={mutation.isPending}
         ctaLabel={ctaLabel}
       />
     </Stack>

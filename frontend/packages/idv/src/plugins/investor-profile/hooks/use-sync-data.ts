@@ -31,7 +31,7 @@ const useSyncData = () => {
       return;
     }
 
-    if (investorProfileDataMutation.isLoading) {
+    if (investorProfileDataMutation.isPending) {
       return;
     }
 

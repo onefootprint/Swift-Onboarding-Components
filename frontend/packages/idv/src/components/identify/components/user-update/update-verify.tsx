@@ -54,7 +54,7 @@ const UpdateVerify = ({
   const mutUserChallenge = useUserChallenge();
   const mutUserChallengeVerify = useUserChallengeVerify();
   const [challengeData, setChallengeData] = useState<UserChallengeResponse | undefined>(undefined);
-  const isChallengePending = mutUserChallenge.isLoading || !challengeData;
+  const isChallengePending = mutUserChallenge.isPending || !challengeData;
 
   const handleRequestReplace = (payload: UserChallengeBody) => {
     if (!payload.kind) {
@@ -138,10 +138,10 @@ const UpdateVerify = ({
       <PinForm
         hasError={mutUserChallengeVerify.isError}
         isPending={isChallengePending}
-        isResendLoading={mutUserChallenge.isLoading}
+        isResendLoading={mutUserChallenge.isPending}
         isSuccess={mutUserChallengeVerify.isSuccess}
-        isVerifying={mutUserChallengeVerify.isLoading}
-        onComplete={mutUserChallengeVerify.isLoading ? noop : handleOnPinInputCompletion}
+        isVerifying={mutUserChallengeVerify.isPending}
+        onComplete={mutUserChallengeVerify.isPending ? noop : handleOnPinInputCompletion}
         onResend={handleOnResendClick}
         resendDisabledUntil={challengeData?.retryDisabledUntil}
         texts={{

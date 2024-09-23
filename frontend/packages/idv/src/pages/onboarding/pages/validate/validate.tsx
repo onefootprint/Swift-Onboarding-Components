@@ -17,7 +17,7 @@ const Validate = () => {
   const { isError } = onboardingValidateMutation;
 
   useEffectOnce(() => {
-    if (onboardingValidateMutation.isLoading) {
+    if (onboardingValidateMutation.isPending) {
       return;
     }
 

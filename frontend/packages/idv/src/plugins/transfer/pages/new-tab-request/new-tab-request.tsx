@@ -75,7 +75,7 @@ const NewTabRequest = () => {
       <Button
         onClick={handleClick}
         fullWidth
-        disabled={mutation.isLoading || !scopedAuthToken}
+        disabled={mutation.isPending || !scopedAuthToken}
         data-dd-action-name="transfer-tab:cta"
         size="large"
       >

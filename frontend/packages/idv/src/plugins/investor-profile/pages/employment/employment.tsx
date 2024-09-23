@@ -31,7 +31,7 @@ const Employment = () => {
 
   return (
     <EmploymentForm
-      isLoading={mutation.isLoading}
+      isLoading={mutation.isPending}
       onSubmit={handleSubmit}
       defaultValues={{
         [InvestorProfileDI.employmentStatus]: data?.[InvestorProfileDI.employmentStatus],

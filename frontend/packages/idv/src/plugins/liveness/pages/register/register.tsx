@@ -52,7 +52,7 @@ const Register = ({
   };
 
   const handleRegister = () => {
-    if (biometricInitMutation.isLoading) {
+    if (biometricInitMutation.isPending) {
       return;
     }
 
@@ -99,7 +99,7 @@ const Register = ({
   };
 
   const handleSkip = () => {
-    if (skipLivenessMutation.isLoading) {
+    if (skipLivenessMutation.isPending) {
       return;
     }
     trackAction('passkeys:skipped');
@@ -159,8 +159,8 @@ const Register = ({
           {biometricInitMutation.isSuccess && <LivenessSuccess />}
           {primaryButtonText && (
             <Button
-              loading={biometricInitMutation.isLoading}
-              disabled={biometricInitMutation.isLoading || skipLivenessMutation.isLoading}
+              loading={biometricInitMutation.isPending}
+              disabled={biometricInitMutation.isPending || skipLivenessMutation.isPending}
               onClick={handleRegister}
               fullWidth
               size="large"
@@ -170,8 +170,8 @@ const Register = ({
           )}
           {secondaryButtonText && (
             <Button
-              loading={skipLivenessMutation.isLoading}
-              disabled={biometricInitMutation.isLoading || skipLivenessMutation.isLoading}
+              loading={skipLivenessMutation.isPending}
+              disabled={biometricInitMutation.isPending || skipLivenessMutation.isPending}
               onClick={typeof onCustomSkip === 'function' ? handleCustomSkip : handleSkip}
               fullWidth
               size="large"

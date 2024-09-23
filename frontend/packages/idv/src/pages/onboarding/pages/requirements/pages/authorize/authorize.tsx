@@ -39,7 +39,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const processRequirement = getRequirement(requirements, OnboardingRequirementKind.process);
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const processMutation = useOnboardingProcess();
-  const isLoading = onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
+  const isLoading = onboardingAuthorizeMutation.isPending || processMutation.isPending;
   const toast = useToast();
 
   if (!authorizeRequirement) {
@@ -64,7 +64,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       return;
     }
 
-    if (processMutation.isLoading) {
+    if (processMutation.isPending) {
       return;
     }
 
@@ -81,7 +81,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   };
 
   const handleClick = () => {
-    if (onboardingAuthorizeMutation.isLoading) {
+    if (onboardingAuthorizeMutation.isPending) {
       return;
     }
 

@@ -44,9 +44,9 @@ const InvestmentGoals = ({ onSuccess, renderFooter }: InvestmentGoalsProps) => {
       defaultValues={{ [investmentGoals]: data?.[investmentGoals] }}
       footer={
         renderFooter ? (
-          renderFooter(mutation.isLoading)
+          renderFooter(mutation.isPending)
         ) : (
-          <ContinueButton isLoading={mutation.isLoading} trackActionName="investor-profile:investment-goals-continue" />
+          <ContinueButton isLoading={mutation.isPending} trackActionName="investor-profile:investment-goals-continue" />
         )
       }
       onSubmit={handleSubmit}

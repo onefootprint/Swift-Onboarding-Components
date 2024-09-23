@@ -45,7 +45,7 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
 
     const { consentLanguageText, mlConsent } = consentInfo;
 
-    if (consentMutation.isLoading) {
+    if (consentMutation.isPending) {
       return;
     }
 
@@ -68,7 +68,7 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       open={open}
       onClose={handleClose}
       onComplete={handleConsent}
-      isLoading={consentMutation.isLoading}
+      isLoading={consentMutation.isPending}
       testID="mobile-consent"
     >
       <ImageConsent ref={consentRef} />

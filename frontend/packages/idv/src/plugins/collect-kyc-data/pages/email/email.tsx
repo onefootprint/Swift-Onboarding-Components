@@ -108,7 +108,7 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
         </Stack>
         <EditableFormButtonContainer
           onCancel={onCancel}
-          isLoading={mutation.isLoading}
+          isLoading={mutation.isPending}
           ctaLabel={ctaLabel}
           submitButtonTestID="kyc-email"
         />
