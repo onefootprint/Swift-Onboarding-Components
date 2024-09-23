@@ -38,7 +38,7 @@ const useGetSdkArgs = <T extends Obj>(authToken: string, fpProvider: ProviderRet
   useQuery({
     queryKey: [authToken, 'get-sdk-args'],
     queryFn: () => getSdkArgs<T>(authToken, fpProvider),
-    enabled: isValidTokenFormat(authToken),
+    enabled: isTokenFormat(authToken),
   });
 
 export default useGetSdkArgs;

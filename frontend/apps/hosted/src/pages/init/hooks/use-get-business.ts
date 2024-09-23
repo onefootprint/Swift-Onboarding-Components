@@ -2,6 +2,7 @@ import request from '@onefootprint/request';
 import type { BusinessRequest, BusinessResponse } from '@onefootprint/types';
 import { KYB_BO_SESSION_AUTHORIZATION_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 const getBusinessRequest = async ({ obConfigAuth }: BusinessRequest) => {
   const { data } = await request<BusinessResponse>({
@@ -12,7 +13,6 @@ const getBusinessRequest = async ({ obConfigAuth }: BusinessRequest) => {
 
   return data;
 };
-
 const useGetBusiness = (
   payload: BusinessRequest,
   options: {
@@ -20,11 +20,21 @@ const useGetBusiness = (
     onError?: (error: unknown) => void;
   } = {},
 ) => {
-  useQuery(['get-business', payload], () => getBusinessRequest(payload), {
+  const query = useQuery({
+    queryKey: ['get-business', payload],
+    queryFn: () => getBusinessRequest(payload),
     enabled: !!payload?.obConfigAuth && KYB_BO_SESSION_AUTHORIZATION_HEADER in payload.obConfigAuth,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
   });
+
+  useEffect(() => {
+    if (query.isSuccess) {
+      options.onSuccess?.(query.data);
+    }
+    if (query.isError) {
+      options.onError?.(query.error);
+    }
+  }, [query.isSuccess, query.isError, query.error]);
+  return query;
 };
 
 export default useGetBusiness;
