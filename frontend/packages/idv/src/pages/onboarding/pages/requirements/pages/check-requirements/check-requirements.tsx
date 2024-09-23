@@ -1,8 +1,9 @@
 import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
+import { useEffect } from 'react';
 
 import { useGetOnboardingStatus } from '../../../../../../queries';
-import { getLogger } from '../../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import filterRequirementsToShow from './utils/filter-requirements-to-show';
 
@@ -36,10 +37,17 @@ const CheckRequirements = () => {
     isRequirementRouterVisited,
   } = state.context;
 
+  useEffect(() => {
+    logInfo('Check requirements started');
+    trackAction('checkRequirements:started');
+  }, []);
+
   useGetOnboardingStatus({
     authToken,
     options: {
       onSuccess: (response: OnboardingStatusResponse) => {
+        trackAction('checkRequirements:completed');
+        logInfo('Onboarding status request completed');
         logOnboardingStatusResponse(response);
 
         const context = {
@@ -51,6 +59,8 @@ const CheckRequirements = () => {
           isTransfer: !!isTransfer,
         };
         const payload = filterRequirementsToShow(context, response);
+        logInfo(`Requirements status before filter: ${JSON.stringify(response)}`);
+        logInfo(`Requirements status filtered: ${JSON.stringify(payload)}`);
         send({ type: 'onboardingRequirementsReceived', payload });
       },
       onError: (err: unknown) => {
