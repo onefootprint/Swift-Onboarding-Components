@@ -520,7 +520,10 @@ describe('<Idv />', () => {
       // Skips identify, goes straight to waitForComponentsSdk
       await waitFor(() => {
         // Make sure the downscoped token is relayed back, not the token with full scopes
-        expect(componentsSdkContext.relayToComponents).toHaveBeenCalledWith('downscoped_token_xxxx', 'token');
+        expect(componentsSdkContext.relayToComponents).toHaveBeenCalledWith({
+          authToken: 'token',
+          vaultingToken: 'downscoped_token_xxxx',
+        });
       });
       expect(componentsSdkContext.relayToComponents).toHaveBeenCalledTimes(1);
 

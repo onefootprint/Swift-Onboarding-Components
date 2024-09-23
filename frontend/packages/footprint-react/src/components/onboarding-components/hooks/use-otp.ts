@@ -2,15 +2,28 @@ import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { AuthMethodKind } from '@onefootprint/types';
 import { useContext } from 'react';
 import { Context } from '../components/provider';
-import { createChallenge, createVaultingToken, verifyChallenge } from '../queries/challenge';
+import { createChallenge, createVaultingToken, getValidationToken, verifyChallenge } from '../queries/challenge';
+import getRequirements from '../queries/get-requirements';
 import AuthTokenStatus from '../types/auth-token-status';
 import { unlockBody } from '../utils/dom-utils';
 import validateAuthToken from '../utils/validate-auth-token';
 
 const useOtp = () => {
   const [context, setContext] = useContext(Context);
-  const isReadyForAuth = !!context.onboardingConfig;
-  const { challengeData, didCallRequiresAuth } = context;
+  const {
+    appearance,
+    authToken,
+    authTokenStatus,
+    challengeData,
+    didCallRequiresAuth,
+    onboardingConfig,
+    publicKey,
+    sandboxId,
+    sandboxOutcome,
+    vaultingToken,
+    verifiedAuthToken,
+  } = context;
+  const isReadyForAuth = !!onboardingConfig;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): boolean => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
@@ -23,8 +36,6 @@ const useOtp = () => {
   };
 
   const requiresAuth = async (): Promise<boolean> => {
-    const { authToken, authTokenStatus, vaultingToken, verifiedAuthToken } = context;
-
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken) {
       setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
@@ -50,23 +61,19 @@ const useOtp = () => {
       // which will only happen once the first time we call the function
       if (!authTokenStatus) {
         const status = await validateAuthToken({
-          publicKey: context.publicKey,
           authToken,
-          sandboxId: context.sandboxId,
-          sandboxOutcome: context.sandboxOutcome,
+          publicKey,
+          sandboxId,
+          sandboxOutcome,
           setContext,
         });
         setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
-
         return authTokenStatusToRequirement(status);
       }
       setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
-
       return authTokenStatusToRequirement(authTokenStatus);
     }
-
     setContext(prev => ({ ...prev, didCallRequiresAuth: true }));
-
     return true;
   };
 
@@ -76,11 +83,11 @@ const useOtp = () => {
       onAuthenticated,
       onError,
     }: {
-      onAuthenticated?: () => void;
+      onAuthenticated?: (response: Awaited<ReturnType<typeof getDataAfterVerify>>) => void;
       onError?: (error: unknown) => void;
     } = {},
   ) => {
-    if (context.authToken && (phoneNumber || email)) {
+    if (authToken && (phoneNumber || email)) {
       onError?.(
         new Error(
           'You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number',
@@ -89,24 +96,18 @@ const useOtp = () => {
       return;
     }
 
-    const verifyAuthVariantProps = context.authToken
-      ? {
-          authToken: context.authToken,
-        }
-      : {
-          publicKey: context.publicKey,
-        };
-
+    const verifyAuthVariantProps = authToken ? { authToken } : { publicKey };
     const fp = footprint.init({
       ...verifyAuthVariantProps,
-      sandboxId: context.sandboxId,
-      sandboxOutcome: context.sandboxOutcome,
-      appearance: context.appearance,
+      sandboxId,
+      sandboxOutcome,
+      appearance,
       bootstrapData: {
         'id.phone_number': phoneNumber,
         'id.email': email,
       },
       kind: FootprintComponentKind.Components,
+      shouldRelayToComponents: true,
       onComplete: (validationToken: string) => {
         setContext(prev => {
           prev.handoffCallbacks?.onComplete?.(validationToken);
@@ -132,14 +133,11 @@ const useOtp = () => {
           return prev;
         });
       },
-      shouldRelayToComponents: true,
-      onRelayToComponents: (authToken: string) => {
+      onRelayToComponents: async ({ authToken, vaultingToken }: { vaultingToken: string; authToken: string }) => {
         unlockBody();
-        // This part might be a little confusing, but we need to set the vaultingToken here
-        // Technically, the the authToken we recieve here has a lower scope and can only be used for vaulting
-        // The token is created by a API request to "/hosted/user/tokens" using the original authToken
-        setContext(prev => ({ ...prev, vaultingToken: authToken }));
-        onAuthenticated?.();
+        setContext(prev => ({ ...prev, authToken, vaultingToken }));
+        const result = await getDataAfterVerify(authToken);
+        onAuthenticated?.(result);
       },
     });
 
@@ -219,23 +217,34 @@ const useOtp = () => {
     if (!challengeData) {
       throw new Error('No challengeData found. Please make sure that the publicKey is correct');
     }
-    const { validationToken, requirements, vaultingToken, authToken } = await verifyChallenge(
+    if (!onboardingConfig) {
+      throw new Error('Onboarding config not found. Please check your public key');
+    }
+    const { vaultingToken, authToken } = await verifyChallenge(
       {
         challenge: payload.verificationCode,
         challengeToken: challengeData?.challengeToken,
       },
       {
         token: challengeData.token,
-        sandboxOutcome: context.sandboxOutcome,
+        sandboxOutcome,
       },
     );
+    const { validationToken, requirements } = await getDataAfterVerify(authToken);
     setContext(prev => ({
       ...prev,
       vaultingToken,
       verifiedAuthToken: authToken,
       authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     }));
+    return { validationToken, requirements };
+  };
 
+  const getDataAfterVerify = async (authToken: string) => {
+    const [{ validationToken }, requirements] = await Promise.all([
+      getValidationToken({ authToken }),
+      getRequirements({ authToken }),
+    ]);
     return { validationToken, requirements };
   };
 

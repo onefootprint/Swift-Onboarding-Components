@@ -72,8 +72,8 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
   };
 
   return {
-    auth: (token: string) => sendEvent(auth, token),
-    relayToComponents: (token: string) => sendEvent(relayToComponents, token),
+    auth: (validationToken: string) => sendEvent(auth, validationToken),
+    relayToComponents: (tokens: { authToken: string; vaultingToken: string }) => sendEvent(relayToComponents, tokens),
     cancel: () => sendEvent(canceled),
     close: () => sendEvent(closed),
     complete,

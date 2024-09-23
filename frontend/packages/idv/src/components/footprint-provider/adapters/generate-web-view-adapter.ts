@@ -79,11 +79,11 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
     }
   };
 
-  const relayToComponents = (componentsVaultToken: string, authToken: string) => {
+  const relayToComponents = (response: { authToken: string; vaultingToken: string }) => {
     logInfo('Completing auth footprint from web view adapter');
     const location: Record<string, string> = {
-      auth_token: authToken,
-      components_vault_token: componentsVaultToken,
+      auth_token: response.authToken,
+      components_vault_token: response.vaultingToken,
     };
     setLocation(location);
   };

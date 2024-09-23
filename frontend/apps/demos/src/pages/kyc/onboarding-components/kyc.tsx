@@ -102,8 +102,8 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   const handleSubmitPin = async (verificationCode: string) => {
     try {
       setBusy(true);
-      const { validationToken, requirements } = await fp.verify({ verificationCode });
-      console.log({ validationToken, requirements });
+      const res = await fp.verify({ verificationCode });
+      console.log(res);
       onDone();
     } catch (e) {
       console.log(e);

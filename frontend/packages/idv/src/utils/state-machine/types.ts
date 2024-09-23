@@ -12,7 +12,7 @@ export enum ComponentsSdkTypes {
 
 export type ComponentsSdkContext = {
   onRelayFromComponents: (cb: () => void) => () => void;
-  relayToComponents: (componentsVaultToken: string, authToken: string) => void;
+  relayToComponents: (response: { authToken: string; vaultingToken: string }) => void;
   componentsSdkType: ComponentsSdkTypes;
   skipRelayToComponents?: boolean;
 };
