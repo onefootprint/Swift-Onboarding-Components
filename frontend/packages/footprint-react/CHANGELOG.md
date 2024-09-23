@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 7.5.0
+
+### Minor Changes
+
+- 04daf567e5: Add get requirements
+
+### Patch Changes
+
+- Updated dependencies [85ef45ebcd]
+  - @onefootprint/footprint-js@3.15.2
+
 ## 7.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.15.2
+
+### Patch Changes
+
+- 85ef45ebcd: Fix types
+
 ## 3.15.1
 
 ### Patch Changes
