@@ -1,4 +1,3 @@
-import request from '@onefootprint/request';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { PUBLIC_ROUTES } from 'src/config/constants';
@@ -17,7 +16,7 @@ const usePermissionsByRoute = (options: {
     }) => void;
   };
 }) => {
-  const { isLoggedIn, data, authHeaders } = useSession();
+  const { isLoggedIn, data } = useSession();
   const router = useRouter();
   const { pathname } = router;
   const { publicRoute, privateRoute } = options;
@@ -45,19 +44,7 @@ const usePermissionsByRoute = (options: {
           privateRoute.onSuccess();
         }
         if (!requiresOnboarding && pathname !== '/onboarding') {
-          const fetchOrgData = async () => {
-            try {
-              await request({
-                method: 'GET',
-                url: '/org',
-                headers: authHeaders,
-              });
-              privateRoute.onSuccess();
-            } catch (_) {
-              privateRoute.onError({ isLoggedIn: false, requiresOnboarding: false });
-            }
-          };
-          fetchOrgData();
+          privateRoute.onSuccess();
         }
       } else {
         privateRoute.onError({ isLoggedIn: false, requiresOnboarding: false });

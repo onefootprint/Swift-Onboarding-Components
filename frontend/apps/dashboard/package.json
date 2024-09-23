@@ -15,6 +15,7 @@
     "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3001",
+    "test:ci": "NODE_OPTIONS=--max-old-space-size=9216 jest --ci --bail --runInBand",
     "test:watch": "NODE_OPTIONS=--max-old-space-size=9216 NODE_OPTIONS=--max-old-space-size=9216 jest --watch",
     "test": "jest",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --noEmit"
