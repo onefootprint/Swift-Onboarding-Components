@@ -14,9 +14,8 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'identifyCompleted';
-    assignDevice: 'deviceReceived';
+    assignInitProps: 'initPropsReceived';
     assignPasskeyRegistrationWindow: 'passkeyRegistrationTabOpened';
-    assignProps: 'authPropsReceived';
     assignScopedAuthToken: 'scopedAuthTokenReceived';
   };
   eventsCausingDelays: {};

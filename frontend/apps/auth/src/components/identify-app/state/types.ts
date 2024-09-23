@@ -20,8 +20,14 @@ export type AuthIdentifyAppMachineContext = {
 };
 
 export type AuthIdentifyAppMachineEvents =
-  | { type: 'authPropsReceived'; payload: { props?: AuthDataPropsWithToken; config?: PublicOnboardingConfig } }
-  | { type: 'deviceReceived'; payload: DeviceInfo }
+  | {
+      type: 'initPropsReceived';
+      payload: {
+        config: PublicOnboardingConfig;
+        device: DeviceInfo;
+        props: AuthDataPropsWithToken;
+      };
+    }
   | { type: 'doneReceived' }
   | { type: 'identifyCompleted'; payload: { authToken: string } }
   | { type: 'invalidAuthConfigReceived' }

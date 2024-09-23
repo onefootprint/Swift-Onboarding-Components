@@ -15,7 +15,6 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
       initial: 'init',
       context: {},
       on: {
-        deviceReceived: { actions: ['assignDevice'] },
         scopedAuthTokenReceived: { actions: ['assignScopedAuthToken'] },
         invalidAuthConfigReceived: { target: 'invalidAuthConfig' },
         invalidConfigReceived: { target: 'invalidConfig' },
@@ -25,10 +24,10 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
       states: {
         init: {
           on: {
-            authPropsReceived: [
+            initPropsReceived: [
               {
                 target: 'identify',
-                actions: ['assignProps'],
+                actions: ['assignInitProps'],
               },
             ],
           },
@@ -74,16 +73,11 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
     },
     {
       actions: {
-        assignProps: assign((ctx, { payload }) => {
+        assignInitProps: assign((ctx, { payload }) => {
           if (!payload) return ctx;
-
           ctx.config = payload.config ? { ...payload.config } : ctx.config;
+          ctx.device = payload.device ? { ...payload.device } : ctx.device;
           ctx.props = payload.props ? { ...payload.props } : ctx.props;
-          return ctx;
-        }),
-        assignDevice: assign((ctx, { payload }) => {
-          if (!payload) return ctx;
-          ctx.device = { ...payload };
           return ctx;
         }),
         assignAuthToken: assign((ctx, { payload }) => {

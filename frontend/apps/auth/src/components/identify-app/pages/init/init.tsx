@@ -3,6 +3,7 @@
 import useGetOnboardingConfig from '@/src/queries/use-get-onboarding-config';
 import { isSdkUrlAllowed } from '@/src/utils';
 import type { FootprintAuthDataProps } from '@onefootprint/footprint-js';
+import type { DeviceInfo } from '@onefootprint/idv';
 import { getLogger, isAuth, useDeviceInfo } from '@onefootprint/idv';
 import Loading from '@onefootprint/idv/src/components/identify/components/loading';
 import { useEffect, useState } from 'react';
@@ -12,39 +13,42 @@ import { useAuthIdentifyAppMachine } from '../../state';
 
 type AuthDataPropsWithToken = FootprintAuthDataProps & { authToken?: string };
 
-const { logError, logInfo } = getLogger({ location: 'identify-app-layout' });
+const { logError, logInfo, logWarn } = getLogger({ location: 'identify-app-layout' });
 
 const Init = (): JSX.Element | null => {
   const fpProvider = useFootprintProvider();
   const [_state, send] = useAuthIdentifyAppMachine();
+  const [device, setDevice] = useState<DeviceInfo | undefined>(undefined);
   const [authProps, setAuthProps] = useState<AuthDataPropsWithToken | undefined>(undefined);
-
-  useDeviceInfo(
-    device => {
-      send({ type: 'deviceReceived', payload: device });
-      logInfo(`Webauthn support:${device.hasSupportForWebauthn}`, device);
-    },
-    /** Device is not crucial for authentication flow */
-    error => logError('Unable to collect device info', error),
-  );
+  const onboardingConfig = useGetOnboardingConfig(authProps?.publicKey || '');
 
   useProps<AuthDataPropsWithToken>(setAuthProps, (error: unknown) => {
     logError('Error fetching auth sdk args', error);
     send({ type: 'invalidConfigReceived' });
   });
 
-  const onboardingConfig = useGetOnboardingConfig(authProps?.publicKey || '');
+  useDeviceInfo(
+    deviceInfo => {
+      logInfo(`Webauthn support:${deviceInfo.hasSupportForWebauthn}`, device);
+      setDevice(deviceInfo);
+    },
+    error => {
+      logWarn('Unable to collect device info', error);
+      setDevice({} as DeviceInfo);
+    },
+  );
 
   useEffect(() => {
-    if (!authProps || onboardingConfig.isLoading || !onboardingConfig.data) {
+    if (!device || !authProps || onboardingConfig.isLoading || !onboardingConfig.data) {
       return;
     }
 
     send({
-      type: 'authPropsReceived',
+      type: 'initPropsReceived',
       payload: {
-        props: authProps,
         config: onboardingConfig.data,
+        device: device,
+        props: authProps,
       },
     });
 
