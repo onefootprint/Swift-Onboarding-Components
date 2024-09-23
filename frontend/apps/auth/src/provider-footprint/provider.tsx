@@ -20,6 +20,9 @@ const FootprintContext = createContext<ProviderReturn>({
   getLoadingStatus(): boolean {
     throw new Error(NotImplemented);
   },
+  getRedirectUrl(): string | null {
+    throw new Error(NotImplemented);
+  },
   load(): Promise<CustomChildAPI | null> {
     throw new Error(NotImplemented);
   },

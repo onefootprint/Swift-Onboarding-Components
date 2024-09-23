@@ -6,6 +6,7 @@ const generateEmptyAdapter = (): EmptyAdapterReturn => {
     getAdapterKind: () => 'empty',
     getAdapterResponse: () => null,
     getLoadingStatus: () => false,
+    getRedirectUrl: () => null,
     load: () => Promise.resolve(),
     on: () => () => undefined,
     send: (_event: `${FootprintPublicEvent}`, _data?: unknown) => undefined,

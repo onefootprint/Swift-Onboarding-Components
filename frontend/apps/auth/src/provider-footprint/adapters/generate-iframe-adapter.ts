@@ -19,6 +19,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
     getAdapterKind: () => 'iframe',
     getAdapterResponse: () => postmateChildApiRef,
     getLoadingStatus: () => isAdapterLoaded,
+    getRedirectUrl: () => null,
     on: eventEmitter.on,
     load: async (): Promise<CustomChildAPI | null> => {
       if (isAdapterLoaded) {

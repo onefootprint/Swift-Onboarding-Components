@@ -88,8 +88,11 @@ const IdentifyAuthPage = () => {
       }
       onDone={args => {
         const isPasskeyAlreadyRegistered = args.availableChallengeKinds?.includes(ChallengeKind.biometric);
-        setScreen(isPasskeyAlreadyRegistered ? 'completed' : 'prePasskey');
-        handleIdentifyCompletion(args, !!isPasskeyAlreadyRegistered);
+        const isWebViewAdapter = fpProvider.getAdapterKind() === 'webview';
+        const isDoneEarly = isPasskeyAlreadyRegistered || isWebViewAdapter;
+
+        setScreen(isDoneEarly ? 'completed' : 'prePasskey');
+        handleIdentifyCompletion(args, !!isDoneEarly);
       }}
     />
   );

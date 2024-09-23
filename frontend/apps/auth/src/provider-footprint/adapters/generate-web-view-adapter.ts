@@ -8,35 +8,42 @@ const { logError, logTrack } = getLogger({ location: 'auth-webview' });
 
 const generateWebViewAdapter = (): WebViewAdapterReturn => {
   let isAdapterLoaded = false;
+  let isLocationAlreadySet = false;
+
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
-    const redirectUrl = params.get('redirect_url');
+    return params.get('redirect_url');
+  };
+
+  const setLocation = (data: Record<string, string | boolean> = {}) => {
+    if (isLocationAlreadySet) {
+      return;
+    }
+
+    const params = new URLSearchParams();
+    const dataEntries = Object.entries(data);
+    const paramKeys = dataEntries.map(([key]) => key).join(',');
+    const redirectUrl: string | null = getRedirectUrl();
 
     if (!redirectUrl) {
       console.error('No redirect_url provided');
       logError('No redirect_url provided');
     }
 
-    return redirectUrl;
-  };
-
-  const setLocation = (data: Record<string, string | boolean> = {}) => {
-    const params = new URLSearchParams();
-    const dataEntries = Object.entries(data);
-    const paramKeys = dataEntries.map(([key]) => key).join(',');
-
     logTrack(`Redirecting with the following params keys: ${paramKeys}`);
 
     dataEntries.forEach(([key, value]) => {
       params.set(key, String(value));
     });
-    window.location.href = `${getRedirectUrl()}?${params.toString()}`;
+    isLocationAlreadySet = true;
+    window.location.href = `${redirectUrl}?${params.toString()}`;
   };
 
   return {
     getAdapterKind: () => 'webview',
     getAdapterResponse: () => null,
     getLoadingStatus: () => isAdapterLoaded,
+    getRedirectUrl,
     load: () => {
       logTrack('Loaded the webview adapter');
       return Promise.resolve().then(() => {
