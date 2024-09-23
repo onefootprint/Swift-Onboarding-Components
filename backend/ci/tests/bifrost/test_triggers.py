@@ -1,10 +1,10 @@
 import pytest
-from tests.headers import FpAuth
-from tests.utils import _gen_random_ssn, create_ob_config, post
-from tests.utils import get, patch
-from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL, ID_DATA
+from tests.headers import FpAuth
+from tests.identify_client import IdentifyClient
+from tests.utils import _gen_random_ssn, create_ob_config, post
+from tests.utils import get, patch
 
 
 def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
@@ -287,6 +287,67 @@ def test_collect_document(document_configs, sandbox_tenant, expected_docs):
     body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
     assert body["status"] == status, "Status shouldn't have changed from doc"
     # All adhoc document triggers should put the user into manual review since there are no rules to execute
+    assert body["requires_manual_review"]
+    assert body["manual_review_kinds"] == ["document_needs_review"]
+
+
+def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
+    document_configs = [
+        dict(
+            kind="custom",
+            data=dict(
+                name="My special business doc",
+                identifier="document.custom.my_special_business_doc",
+            ),
+        )
+    ]
+
+    expected_docs = ["custom"]
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    sandbox_user = bifrost.run()
+
+    status = bifrost.validate_response["user"]["status"]
+    fp_id = sandbox_user.fp_id
+    fp_bid = sandbox_user.fp_bid
+
+    # Trigger recollect document
+    trigger = dict(
+        kind="document",
+        data=dict(
+            configs=[],
+            fp_bid=fp_bid,
+            business_configs=document_configs,
+        ),
+    )
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
+
+    # re-run Bifrost with the token from the link we sent to user
+    def pre_run(bifrost):
+        # Check that requirements are what we expect
+        requirements = bifrost.get_status()["all_requirements"]
+        assert any(i["kind"] == "collect_document" for i in requirements)
+        assert set(
+            i["config"]["kind"] for i in requirements if i["kind"] == "collect_document"
+        ) == set(i["kind"] for i in document_configs)
+        assert all(
+            not i["is_met"] for i in requirements if i["kind"] == "collect_document"
+        )
+
+    complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
+
+    # Test tenant-facing API
+    body = get(f"users/{fp_bid}/documents", None, sandbox_tenant.sk.key)
+    assert set(i["document_type"] for i in body) == set(expected_docs)
+
+    # And dashboard-facing API
+    body = get(f"entities/{fp_bid}/documents", None, *sandbox_tenant.db_auths)
+    assert set(i["kind"] for i in body) == set(expected_docs)
+    assert all(i["review_status"] == "pending_human_review" for i in body)
+
+    body = get(f"entities/{fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == status, "Status shouldn't have changed from doc"
+
+    # All adhoc document triggers should put the business into manual review since there are no rules to execute
     assert body["requires_manual_review"]
     assert body["manual_review_kinds"] == ["document_needs_review"]
 

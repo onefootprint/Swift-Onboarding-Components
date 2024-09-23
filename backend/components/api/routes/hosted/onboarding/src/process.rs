@@ -87,7 +87,6 @@ pub async fn post(
     };
 
     let seqno = state.db_pool.db_query(DataLifetime::get_current_seqno).await?;
-
     let ww = WorkflowWrapper::init(&state, wf.clone(), seqno).await?;
     // Since actions are typed right now, infer which action needs to be sent to the workflow
     // in order to make it proceed
@@ -126,7 +125,6 @@ pub async fn post(
     }
 
     run_kyb_if_needed(&state, user_auth, fixture_result, seqno).await?;
-
     Ok(api_wire_types::Empty)
 }
 
@@ -163,7 +161,8 @@ async fn run_kyb_if_needed(
                 .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, r))
                 .await?;
         }
-        api_core::utils::kyb_utils::run_kyb(state, &tenant, biz_wf, seqno).await?;
+
+        api_core::utils::kyb_utils::progress_business_workflow(state, &tenant, biz_wf, seqno).await?;
     }
     Ok(())
 }

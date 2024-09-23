@@ -299,6 +299,8 @@ async fn collect_ad_hoc_document(
                     configs: vec![DocumentRequestConfig::Identity {
                         collect_selfie: false,
                     }],
+                    fp_bid: None,
+                    business_configs: vec![],
                 }
                 .into(),
                 fixture_result,

@@ -1,4 +1,5 @@
 use crate::DocumentRequestConfig;
+use crate::FpId;
 use crate::ObConfigurationId;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -19,5 +20,10 @@ pub enum WorkflowRequestConfig {
     /// This allows editing data, re-verifies data, and then re-triggers decision engine
     Onboard { playbook_id: ObConfigurationId },
     /// Upload a new document and re-run the decision engine
-    Document { configs: Vec<DocumentRequestConfig> },
+    Document {
+        configs: Vec<DocumentRequestConfig>,
+        fp_bid: Option<FpId>,
+        #[serde(default)]
+        business_configs: Vec<DocumentRequestConfig>,
+    },
 }

@@ -185,7 +185,8 @@ pub async fn post(
         })
         .await?;
 
-    api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone(), seqno).await?;
+    api_core::utils::kyb_utils::progress_business_workflow(&state, auth.tenant(), biz_wf.clone(), seqno)
+        .await?;
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     let (wf, sv, mrs) = state

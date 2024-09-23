@@ -19,6 +19,7 @@ use api_wire_types::CreateEntityTokenResponse;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::sms_message::SmsMessage;
 use newtypes::ContactInfoKind;
@@ -45,6 +46,7 @@ pub async fn post(
 ) -> ApiResponse<CreateEntityTokenResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let CreateEntityTokenRequest { kind, key, send_link } = request.into_inner();
+
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -67,7 +69,6 @@ pub async fn post(
                 allow_reonboard: true,
             };
             let res = create_token(conn, &session_key, args, Duration::days(3))?;
-
             Ok((res, vw))
         })
         .await?;
@@ -105,7 +106,14 @@ async fn send_communication(
         let kind = match config {
             WorkflowRequestConfig::RedoKyc => TriggerMessageKind::RedoKyc,
             WorkflowRequestConfig::Onboard { .. } => TriggerMessageKind::Onboard,
-            WorkflowRequestConfig::Document { configs } => TriggerMessageKind::Document { configs },
+            WorkflowRequestConfig::Document {
+                configs,
+                business_configs,
+                ..
+            } => TriggerMessageKind::Document {
+                configs,
+                business_configs,
+            },
         };
         (kind, note)
     } else {
@@ -154,10 +162,13 @@ enum TriggerMessageKind {
     Auth,
     RedoKyc,
     Onboard,
-    Document { configs: Vec<DocumentRequestConfig> },
+    Document {
+        configs: Vec<DocumentRequestConfig>,
+        business_configs: Vec<DocumentRequestConfig>,
+    },
 }
 
-fn message_for_documents(configs: &[DocumentRequestConfig], org_name: &str) -> String {
+fn message_for_documents(configs: Vec<&DocumentRequestConfig>, org_name: &str) -> String {
     match configs.first() {
         Some(config) if configs.len() == 1 => {
             let doc_type = match config {
@@ -166,16 +177,10 @@ fn message_for_documents(configs: &[DocumentRequestConfig], org_name: &str) -> S
                 DocumentRequestConfig::ProofOfSsn { .. } => "provide proof of your SSN.",
                 DocumentRequestConfig::Custom { .. } => "upload a document.",
             };
-            format!(
-                "In order to verify your identity, {} has requested you {}",
-                org_name, doc_type,
-            )
+            format!("{} has requested you {}", org_name, doc_type,)
         }
         _ => {
-            format!(
-                "In order to verify your identity, {} has requested you upload additional documentation.",
-                org_name,
-            )
+            format!("{} has requested you upload additional documentation.", org_name,)
         }
     }
 }
@@ -195,7 +200,13 @@ impl TriggerMessageKind {
             Self::Onboard => {
                 format!("{} has requested you to verify your identity.", org_name)
             }
-            Self::Document { configs } => message_for_documents(configs, org_name),
+            Self::Document {
+                configs,
+                business_configs,
+            } => {
+                let docs_to_collect = chain!(configs, business_configs).collect_vec();
+                message_for_documents(docs_to_collect, org_name)
+            }
         }
     }
 
@@ -216,9 +227,10 @@ impl TriggerMessageKind {
                 format!("{} has requested you to verify your identity", org_name),
                 "Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity.".into()
             ),
-            Self::Document { configs } => {
-                let body = message_for_documents(configs, org_name);
-                ("Verify your identity".into(), body)
+            Self::Document { configs, business_configs } => {
+                let docs_to_collect = chain!(configs, business_configs).collect_vec();
+                let body = message_for_documents(docs_to_collect, org_name);
+                (format!("{} has requested you upload a document", org_name), body)
             }
         }
     }

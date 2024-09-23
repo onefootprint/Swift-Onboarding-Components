@@ -235,8 +235,14 @@ impl Workflow {
                     // This is_redo flag can be deprecated - redo flows are treated no differently
                     KycConfig { is_redo: false }.into()
                 }
-                WorkflowRequestConfig::Document { configs } => DocumentConfig {
+                WorkflowRequestConfig::Document {
+                    configs,
+                    business_configs,
+                    fp_bid,
+                } => DocumentConfig {
                     configs: configs.clone(),
+                    fp_bid: fp_bid.clone(),
+                    business_configs: business_configs.clone(),
                 }
                 .into(),
             }

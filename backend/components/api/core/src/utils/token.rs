@@ -28,6 +28,7 @@ use newtypes::ObConfigurationKey;
 use newtypes::SessionAuthToken;
 use newtypes::UserAuthScope;
 use newtypes::VaultKind;
+use newtypes::WorkflowRequestConfig;
 
 pub struct CreateTokenArgs<'a> {
     pub vw: &'a TenantVw<Any>,
@@ -55,7 +56,7 @@ pub fn create_token(
 ) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
         vw,
-        fp_bid,
+        mut fp_bid,
         kind,
         key,
         scopes,
@@ -73,19 +74,6 @@ pub fn create_token(
         return ValidationError("Cannot create a token for a vault with no contact info. Must have one of id.phone_number or id.email").into();
     }
 
-    let sb = if let Some(fp_bid) = fp_bid {
-        let id = ScopedVaultIdentifier::OwnedFpBid {
-            fp_bid: &fp_bid,
-            uv_id: &su.vault_id,
-        };
-        let sb = ScopedVault::get(conn, id)
-            .optional()?
-            .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
-        Some(sb)
-    } else {
-        None
-    };
-
     if key.is_some() && !kind.allow_obc_key() {
         return Err(ValidationError("Cannot provide playbook key for this token kind").into());
     }
@@ -94,6 +82,7 @@ pub fn create_token(
     }
 
     // Determine arguments for the auth token based on the requested operation
+
     let (purpose, obc_id, wfr) = match kind {
         TokenOperationKind::User => (TokenCreationPurpose::ApiUser, None, None),
         TokenOperationKind::Inherit => {
@@ -101,6 +90,15 @@ pub fn create_token(
             let wfr = WorkflowRequest::get_active(conn, &su.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
             // Do we want to replace the obc.id on the auth token?
+
+            if let WorkflowRequestConfig::Document {
+                fp_bid: Some(fp_bid_from_wfr),
+                ..
+            } = &wfr.config
+            {
+                // Extract the fp_bid from the existing WorkflowRequest
+                fp_bid = Some(fp_bid_from_wfr.clone());
+            };
 
             let obc_id = wfr.ob_configuration_id.clone();
             (TokenCreationPurpose::ApiInherit, Some(obc_id), Some(wfr))
@@ -126,6 +124,19 @@ pub fn create_token(
             None,
             None,
         ),
+    };
+
+    let sb = if let Some(fp_bid) = fp_bid {
+        let id = ScopedVaultIdentifier::OwnedFpBid {
+            fp_bid: &fp_bid,
+            uv_id: &su.vault_id,
+        };
+        let sb = ScopedVault::get(conn, id)
+            .optional()?
+            .ok_or(ValidationError("Could not find a business owned by this user with the provided fp_bid. Make sure you're using an fp_bid and that the provided fp_bid is owned by the provided fp_id."))?;
+        Some(sb)
+    } else {
+        None
     };
 
     let context = NewUserSessionContext {

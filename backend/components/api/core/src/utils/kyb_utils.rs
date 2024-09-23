@@ -3,6 +3,7 @@ use crate::auth::session::onboarding::BoSession;
 use crate::config::LinkKind;
 use crate::decision::state::Authorize;
 use crate::decision::state::BoKycCompleted;
+use crate::decision::state::DocCollected;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
 use crate::errors::business::BusinessError;
@@ -24,6 +25,7 @@ use newtypes::BusinessOwnerKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
 use newtypes::PiiString;
+use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::pin::Pin;
 
@@ -147,6 +149,9 @@ pub async fn send_missing_secondary_bo_links(
 
 #[tracing::instrument(skip(state))]
 async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> FpResult<bool> {
+    if !matches!(biz_wf.kind, WorkflowKind::Kyb) {
+        return Ok(false);
+    }
     let svid = biz_wf.scoped_vault_id.clone();
     let obc_id = biz_wf.ob_configuration_id.clone();
     let (bvw, obc) = state
@@ -159,11 +164,10 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
         .await?;
 
     let dbo = bvw.decrypt_business_owners(state, &tenant.id).await?;
-
     send_missing_secondary_bo_links(state, biz_wf, &bvw, tenant, &dbo).await?;
 
-    // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF for
-    // the obc_id https://linear.app/footprint/issue/BE-513/consolidate-logic-for-bo-is-done-with-kyc
+    // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF
+    // for the obc_id https://linear.app/footprint/issue/BE-513/consolidate-logic-for-bo-is-done-with-kyc
     let all_bo_kyc_complete = dbo.iter().filter(|bo| bo.linked_bo.is_some()).all(|bo| {
         bo.scoped_user
             .as_ref()
@@ -176,23 +180,35 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn run_kyb(
+pub async fn progress_business_workflow(
     state: &State,
     tenant: &Tenant,
     biz_wf: Workflow,
     seqno: DataLifetimeSeqno,
 ) -> FpResult<()> {
     let wf_id = biz_wf.id.clone();
+    let action = match biz_wf.state {
+        // First see if we have to run authorize
+        WorkflowState::Kyb(KybState::DataCollection) => Some(WorkflowActions::Authorize(Authorize { seqno })),
+        // Handle the case where a document is being uploaded
+        WorkflowState::Document(newtypes::DocumentState::DataCollection) => {
+            Some(WorkflowActions::DocCollected(DocCollected {}))
+        }
+        // Handle other Kyb states
+        WorkflowState::Kyb(_) => None,
+        // Handle unknown states.
+        _ => {
+            tracing::error!(?biz_wf.state, "Unexpected business workflow state");
+            None
+        }
+    };
 
-    // First see if we have to run authorize
-    if matches!(biz_wf.state, WorkflowState::Kyb(KybState::DataCollection)) {
-        // Authorize is kind of a misnomer now - it doesn't actually mark the workflow as
-        // authorized - it just does some processing that normally happens after authorize
-        let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
+    let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
+    if let Some(action) = action {
         let _ = ww
-            .run(state, WorkflowActions::Authorize(Authorize { seqno }))
+            .run(state, action)
             .await
-            .map_err(|err| tracing::error!(?err, "Error running Authorize on KYB workflow"));
+            .map_err(|err| tracing::error!(?err, ?biz_wf.kind, "Error running business workflow"));
     }
 
     // Refresh the wf since it may have changed above
@@ -200,6 +216,7 @@ pub async fn run_kyb(
         .db_pool
         .db_query(move |conn| Workflow::get(conn, &wf_id))
         .await?;
+
     let should_run_kyb = should_run_kyb(state, &biz_wf, tenant).await?;
     tracing::info!(should_run_kyb, "should_run_kyb");
     if should_run_kyb {

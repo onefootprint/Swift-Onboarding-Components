@@ -143,7 +143,7 @@ pub fn get_or_start_onboarding(
         (wf.id, is_new_ob)
     };
 
-    if let Some(wfr) = wfr {
+    if let Some(wfr) = wfr.clone() {
         if wfr.workflow_id.is_none() {
             // If we're responding to a WorkflowRequest, save that we've created a WF for the request
             WorkflowRequest::set_wf_id(conn, &wfr.id, &wf_id)?;
@@ -156,12 +156,12 @@ pub fn get_or_start_onboarding(
         uv: &user_vault,
         insight_event,
         source,
+        wfr,
         // Default to the same fixture result for KYB as KYC if none provided
         fixture_result: kyb_fixture_result.or(fixture_result),
         force_create,
     };
     let biz_wf = maybe_create_business_wf(conn, args)?;
-
     if is_new_ob {
         maybe_create_doc_requests(conn, &wf_id, biz_wf.as_ref(), obc, is_secondary_bo)?;
     }
@@ -175,6 +175,7 @@ struct CreateBusinessWfArgs<'a> {
     uv: &'a Vault,
     insight_event: Option<CreateInsightEvent>,
     source: WorkflowSource,
+    wfr: Option<WorkflowRequest>,
     fixture_result: Option<WorkflowFixtureResult>,
     force_create: bool,
 }
@@ -186,12 +187,14 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
         uv,
         insight_event,
         source,
+        wfr,
         fixture_result,
         force_create,
     } = args;
     let Some(new_biz_args) = new_biz_args else {
         return Ok(None);
     };
+
     let sb = match new_biz_args {
         NewBusinessWfArgs::NewWorkflow { sb_id } => {
             // A scoped business has been attached to this session already, usually via user-specific
@@ -244,7 +247,7 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
         source,
         fixture_result,
         is_one_click: false,
-        wfr: None,
+        wfr,
         is_neuro_enabled: false, // not now
     };
     let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
@@ -270,20 +273,32 @@ fn maybe_create_doc_requests(
             obc.documents_to_collect.clone().unwrap_or_default(),
         )
         .collect(),
-        WorkflowConfig::Document(DocumentConfig { ref configs }) => configs.clone(),
+        WorkflowConfig::Document(DocumentConfig { ref configs, .. }) => configs.clone(),
         WorkflowConfig::Kyb(_) => {
             vec![]
         }
     };
     let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf));
-    let biz_doc_requests = (!is_secondary_bo)
+    let biz_doc_requests = match wf.config {
+        WorkflowConfig::Document(DocumentConfig {
+            ref business_configs, ..
+        }) => business_configs.clone(),
+        _ => {
+            vec![]
+        }
+    };
+
+    let biz_doc_requests = biz_doc_requests
+        .into_iter()
+        .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
+
+    let biz_docs_to_collect = (!is_secondary_bo)
         .then_some(obc.business_documents_to_collect.clone())
         .into_iter()
         .flatten()
         .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
 
-
-    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests)
+    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests, biz_docs_to_collect)
         .map(|(config, wf)| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             workflow_id: wf.id.clone(),
@@ -295,7 +310,7 @@ fn maybe_create_doc_requests(
     if doc_requests_to_create.is_empty() {
         return Ok(());
     }
-    DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
 
+    DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
     Ok(())
 }

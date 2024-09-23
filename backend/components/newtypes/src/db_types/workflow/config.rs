@@ -1,5 +1,6 @@
 pub use super::*;
 use crate::DocumentRequestConfig;
+use crate::FpId;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
@@ -57,6 +58,9 @@ impl From<AlpacaKycConfig> for WorkflowConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DocumentConfig {
     pub configs: Vec<DocumentRequestConfig>,
+    pub fp_bid: Option<FpId>,
+    #[serde(default)]
+    pub business_configs: Vec<DocumentRequestConfig>,
 }
 
 impl From<DocumentConfig> for WorkflowConfig {

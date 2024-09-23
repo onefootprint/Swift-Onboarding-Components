@@ -24,8 +24,10 @@ use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::workflow_request::WorkflowRequest;
 use newtypes::ObConfigurationKind;
 use newtypes::VerificationCheckKind;
+use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowSource;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -55,20 +57,29 @@ pub async fn post(
         .ob_configuration_id()
         .or(pk_obc_id)
         .ok_or(OnboardingError::NoObConfig)?;
-    let (scoped_user, ob_config, tenant, vw, seqno) = state
+
+    let wfr_id = user_auth.wfr_id.clone();
+    let (scoped_user, ob_config, tenant, vw, wfr) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
             let vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-            let seqno = vw.seqno;
-            Ok((su, ob_config, tenant, vw, seqno))
+            let wfr = wfr_id
+                .map(|id| WorkflowRequest::get(conn, &id, &su.id))
+                .transpose()?;
+            Ok((su, ob_config, tenant, vw, wfr))
         })
         .await?;
 
-    let should_create_biz_wf =
-        ob_config.kind == ObConfigurationKind::Kyb && user_auth.business_workflow_id().is_none();
+    let collecting_biz_doc = match wfr.map(|wfr| wfr.config) {
+        Some(WorkflowRequestConfig::Document { business_configs, .. }) => !business_configs.is_empty(),
+        _ => false,
+    };
+    let should_create_biz_wf = (ob_config.kind == ObConfigurationKind::Kyb || collecting_biz_doc)
+        && user_auth.business_workflow_id().is_none();
+
     let maybe_new_biz_args = if should_create_biz_wf {
         // If we're going to make a new business vault,
         if let Some(sb_id) = user_auth.scoped_business_id() {
@@ -110,7 +121,7 @@ pub async fn post(
                 wfr_id: user_auth.wfr_id.clone(),
                 force_create,
                 sv: &scoped_user,
-                seqno,
+                seqno: vw.seqno,
                 obc: &obc,
                 insight_event: Some(insight_event.clone()),
                 new_biz_args: maybe_new_biz_args,
