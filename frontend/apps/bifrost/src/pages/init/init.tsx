@@ -11,14 +11,11 @@ import type { IdDocOutcome, IdvBootstrapData, OverallOutcome, PublicOnboardingCo
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { useTimeout } from 'usehooks-ts';
 
 import { isAlphanumeric } from '@onefootprint/core';
 import { useRequestError } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import useProps from './hooks/use-props';
-
-const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 
 const { logError, logInfo, logTrack } = getLogger({ location: 'bifrost-init' });
 
@@ -71,24 +68,13 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
 
 const Init = () => {
   const [state, send] = useBifrostMachine();
-  const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
+  const { authToken: authTokenContext, publicKey: publicKeyContext } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const { getErrorCode } = useRequestError();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
-  const startMs = Date.now();
   const obConfigAuth = publicKeyContext ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext } : undefined;
   const toast = useToast();
 
-  useTimeout(() => {
-    logError(`User is stuck on init shimmer screen for ${(Date.now() - startMs) / 1000} seconds`, undefined, {
-      config: JSON.stringify(configContext),
-      isPropsSaved: isPropsSaved(state.context),
-      publicKey: String(publicKeyContext),
-    });
-  }, STUCK_ON_SHIMMER_TIMEOUT);
-
-  // TODO: delete this when all customers migrate to footprint-js v 3.8+
-  // When fetching the sdkArgs from API, we will also get back the onboarding config
   useGetOnboardingConfig(
     { obConfigAuth, authToken: authTokenContext },
     {
