@@ -197,4 +197,43 @@ describe('<SideNav />', () => {
       expect(tenants).toBeInTheDocument();
     });
   });
+
+  describe('when opening settings pages', () => {
+    beforeAll(() => {
+      window.scrollTo = jest.fn();
+    });
+
+    it('should show expanded settings menu when on /settings/business-profile', async () => {
+      mockRouter.setCurrentUrl('/settings/business-profile');
+      renderSideNav();
+
+      const businessProfile = await screen.findByRole('link', { name: 'Business profile' });
+      expect(businessProfile).toBeInTheDocument();
+
+      const teamAndRoles = await screen.findByRole('link', { name: 'Team & Roles' });
+      expect(teamAndRoles).toBeInTheDocument();
+    });
+
+    it('should show expanded settings menu when on /settings/team-roles', async () => {
+      mockRouter.setCurrentUrl('/settings/team-roles');
+      renderSideNav();
+
+      const businessProfile = await screen.findByRole('link', { name: 'Business profile' });
+      expect(businessProfile).toBeInTheDocument();
+
+      const teamAndRoles = await screen.findByRole('link', { name: 'Team & Roles' });
+      expect(teamAndRoles).toBeInTheDocument();
+    });
+
+    it('should not show expanded settings menu when on a different page', async () => {
+      mockRouter.setCurrentUrl('/dashboard');
+      renderSideNav();
+
+      const businessProfile = screen.queryByRole('link', { name: 'Business profile' });
+      expect(businessProfile).not.toBeInTheDocument();
+
+      const teamAndRoles = screen.queryByRole('link', { name: 'Team & Roles' });
+      expect(teamAndRoles).not.toBeInTheDocument();
+    });
+  });
 });

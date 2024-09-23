@@ -20,9 +20,8 @@ export type SettingsDropdownProps = {
 };
 
 const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation('settings');
   const router = useRouter();
+  const { t } = useTranslation('settings');
   const {
     data: { user, org },
   } = useSession();
@@ -32,14 +31,13 @@ const SettingsDropdown = ({ href, text, icon, badgeCount, selected }: SettingsDr
     { href: `${href}/business-profile`, text: t('pages.business-profile.title') },
     { href: `${href}/team-roles`, text: t('pages.team-roles.title') },
   ];
-
   const shouldShowBilling = (org?.id === 'org_AiK8peOw9mrqsb6yeHWEG8' && isAdmin) || user?.isFirmEmployee;
   if (shouldShowBilling) {
     subLinks.push({ href: `${href}/billing`, text: t('pages.billing.title') });
   }
 
   const menuActive = subLinks.some(subLink => router.pathname.startsWith(subLink.href));
-
+  const [isOpen, setIsOpen] = useState(menuActive);
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
