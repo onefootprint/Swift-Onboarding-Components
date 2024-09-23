@@ -1,3 +1,7 @@
-global.ResizeObserver = require('resize-observer-polyfill');
+import { ResizeObserver } from '@juggle/resize-observer';
 
-export {};
+if (!global.ResizeObserver) {
+  global.ResizeObserver = ResizeObserver;
+}
+
+export type {};

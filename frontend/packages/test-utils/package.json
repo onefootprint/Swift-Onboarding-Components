@@ -25,7 +25,6 @@
     "next-router-mock": "^0.9.13",
     "react": "^18",
     "react-dom": "^18",
-    "resize-observer-polyfill": "^1.5.1",
     "ts-node": "^10.9.2",
     "tsconfig": "*",
     "typescript": "^5.5.2"

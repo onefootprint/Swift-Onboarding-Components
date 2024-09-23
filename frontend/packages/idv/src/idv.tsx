@@ -9,6 +9,7 @@ import Router from './pages/router';
 import type { IdvProps } from './types';
 import { checkIsInIframe } from './utils';
 import type { IdvMachineArgs } from './utils/state-machine';
+import './config/initializers/load-polyfills';
 
 type RouterProps = ComponentProps<typeof Router>;
 type AppProps = IdvProps & RouterProps;
