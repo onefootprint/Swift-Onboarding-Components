@@ -15,9 +15,6 @@ const assumeRole = async ({ tenantId, authToken }: OrgAssumeRoleRequest) => {
   return response.data;
 };
 
-const useAssumeRole = () =>
-  useMutation({
-    mutationFn: assumeRole,
-  });
+const useAssumeRole = () => useMutation(assumeRole);
 
 export default useAssumeRole;

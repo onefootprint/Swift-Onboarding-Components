@@ -62,7 +62,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
     }
   }, [notes]);
 
-  const isLoading = getQuery.isLoading || createMutation.isPending || deleteMutation.isPending;
+  const isLoading = getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
   const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
   const showSave = !notes?.find(n => n.content === value) && value;
 
@@ -127,7 +127,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
           hasError={!!errors.note}
           hint={errors.note && t('errors.required')}
           value={value}
-          disabled={createMutation.isPending}
+          disabled={createMutation.isLoading}
           onChangeText={handleChangeText}
           ref={e => {
             // https://www.react-hook-form.com/faqs/#Howtosharerefusage

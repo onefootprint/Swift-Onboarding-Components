@@ -41,7 +41,7 @@ const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) 
     });
     onClose();
   };
-  const buttonsDisabled = !linkData || sendLinkMutation.isPending;
+  const buttonsDisabled = !linkData || sendLinkMutation.isLoading;
   const primaryButton = {
     label: t('link.copy-link'),
     disabled: buttonsDisabled,
@@ -50,7 +50,7 @@ const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) 
   const secondaryButton = {
     label: userHasPhone ? t('link.send-link-sms') : t('link.send-link-email'),
     onClick: handleSendLink,
-    loading: sendLinkMutation.isPending,
+    loading: sendLinkMutation.isLoading,
     disabled: buttonsDisabled,
   };
 

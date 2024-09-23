@@ -1,3 +1,4 @@
+import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { GetLivenessRequest, GetLivenessResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
@@ -17,11 +18,13 @@ const getAuthEvents = async ({ id }: GetLivenessRequest, authHeaders: AuthHeader
 const useEntityAuthEvents = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery<GetLivenessResponse, Error>({
-    queryKey: ['entity', 'authEvents', id, authHeaders],
-    queryFn: () => getAuthEvents({ id }, authHeaders),
-    enabled: !!id,
-  });
+  return useQuery<GetLivenessResponse, RequestError>(
+    ['entity', 'authEvents', id, authHeaders],
+    () => getAuthEvents({ id }, authHeaders),
+    {
+      enabled: !!id,
+    },
+  );
 };
 
 export default useEntityAuthEvents;

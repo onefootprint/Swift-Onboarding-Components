@@ -76,10 +76,10 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           />
         </Grid.Container>
         <ButtonContainer>
-          <Button disabled={mutation.isPending} onClick={onBack} variant="secondary">
+          <Button disabled={mutation.isLoading} onClick={onBack} variant="secondary">
             {allT('back')}
           </Button>
-          <Button loading={mutation.isPending} type="submit">
+          <Button loading={mutation.isLoading} type="submit">
             {allT('next')}
           </Button>
         </ButtonContainer>

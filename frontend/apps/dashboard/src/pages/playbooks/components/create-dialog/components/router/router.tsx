@@ -340,7 +340,7 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={handleAuthSubmitted}
-            isLoading={mutation.isPending}
+            isLoading={mutation.isLoading}
           />
         )}
         {state.matches('settingsDocOnly') && (
@@ -350,7 +350,7 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={handleDocOnlySubmitted}
-            isLoading={mutation.isPending}
+            isLoading={mutation.isLoading}
           />
         )}
         {state.matches('verificationChecks') && (
@@ -363,7 +363,7 @@ const Router = ({ onCreate }: RouterProps) => {
               send('verificationChecksSubmitted', { payload: { formData } });
               createPlaybook(state.context, formData);
             }}
-            isLoading={mutation.isPending}
+            isLoading={mutation.isLoading}
             requiresDoc={requiresIdDoc}
             allowInternationalResident={state.context.residencyForm?.allowInternationalResidents}
             isKyb={state.context.kind === 'kyb'}

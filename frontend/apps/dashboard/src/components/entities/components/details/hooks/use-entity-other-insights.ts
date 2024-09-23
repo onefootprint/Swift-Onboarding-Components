@@ -17,11 +17,9 @@ const getOtherInsights = async (userId: string, authHeaders: AuthHeaders) => {
 const useEntityOtherInsights = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['entity', id, 'otherInsights', authHeaders],
-    queryFn: () => getOtherInsights(id, authHeaders),
+  return useQuery(['entity', id, 'otherInsights', authHeaders], () => getOtherInsights(id, authHeaders), {
     enabled: !!id,
-    select: (response: GetUserInsightsResponse) =>
+    select: response =>
       response.map(item => ({
         ...item,
         scope: item.scope.toLocaleLowerCase(),

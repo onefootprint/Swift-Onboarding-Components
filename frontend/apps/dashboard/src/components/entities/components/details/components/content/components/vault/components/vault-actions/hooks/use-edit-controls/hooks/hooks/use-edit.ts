@@ -23,10 +23,9 @@ const useEdit = () => {
   const entityId = useEntityId();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (data: EditRequest) => edit(data, authHeaders),
+  return useMutation((data: EditRequest) => edit(data, authHeaders), {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['entity', entityId, 'timeline', authHeaders] });
+      queryClient.invalidateQueries(['entity', entityId, 'timeline', authHeaders]);
     },
   });
 };

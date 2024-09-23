@@ -20,11 +20,9 @@ const useTenantsOptions = () => {
   const { dangerouslyCastedData } = useSession();
   const authToken = dangerouslyCastedData.auth;
 
-  return useQuery({
-    queryKey: ['tenantsOptions', authToken],
-    queryFn: () => getAuthRoles({ authToken: dangerouslyCastedData.auth }),
+  return useQuery(['tenantsOptions', authToken], () => getAuthRoles({ authToken: dangerouslyCastedData.auth }), {
     enabled: !!authToken,
-    select: (res: GetAuthRoleResponse) =>
+    select: res =>
       res.map(tenant => ({
         label: tenant.name,
         value: tenant.id,

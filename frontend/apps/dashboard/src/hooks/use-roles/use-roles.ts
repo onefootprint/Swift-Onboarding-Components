@@ -22,10 +22,7 @@ const getRolesRequest = async (authHeaders: AuthHeaders, kind: RoleKind) => {
 
 const useRoles = (kind: RoleKind) => {
   const { authHeaders } = useSession();
-  const rolesQuery = useQuery({
-    queryKey: ['members', 'roles', kind, authHeaders],
-    queryFn: () => getRolesRequest(authHeaders, kind),
-  });
+  const rolesQuery = useQuery(['members', 'roles', kind, authHeaders], () => getRolesRequest(authHeaders, kind));
   const { error, data = [] } = rolesQuery;
   const options = data.map(role => ({ label: role.name, value: role.id }));
   return {

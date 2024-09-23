@@ -31,7 +31,7 @@ const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
 
   useEffect(() => {
     const shouldGenerate =
-      open && !generateSummaryMutation.isPending && !generateSummaryMutation.isError && !generateSummaryMutation.data;
+      open && !generateSummaryMutation.isLoading && !generateSummaryMutation.isError && !generateSummaryMutation.data;
     if (!shouldGenerate) {
       return;
     }
@@ -76,7 +76,7 @@ const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
     <Dialog size="default" title={t('label')} onClose={handleClose} open={open}>
       <Stack gap={3} direction="column" paddingBottom={4}>
         <AnimatePresence>
-          {generateSummaryMutation.isPending ? (
+          {generateSummaryMutation.isLoading ? (
             <EmptyState gap={5} direction="column" width="100%" height="420px" align="center" justify="center">
               <LoadingSpinner />
               <Text variant="label-3">{t('generating-summary')}</Text>

@@ -16,11 +16,9 @@ const getTags = async (authHeaders: AuthHeaders, id: string) => {
 const useTags = (id: string) => {
   const { authHeaders } = useSession();
 
-  const tagsQuery = useQuery({
-    queryKey: ['entities', id, 'tags', authHeaders],
-    queryFn: () => getTags(authHeaders, id),
+  const tagsQuery = useQuery(['entities', id, 'tags', authHeaders], () => getTags(authHeaders, id), {
     enabled: !!id,
-    select: (tags: { id: string; tag: string }[]) => tags.map(({ id, tag }) => ({ id, text: tag })),
+    select: tags => tags.map(({ id, tag }) => ({ id, text: tag })),
   });
 
   const { error, data } = tagsQuery;

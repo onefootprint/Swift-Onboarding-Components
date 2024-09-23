@@ -190,7 +190,7 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
               fallbackText={t('cta-not-allowed')}
               tooltipPosition="left"
             >
-              <Button variant="secondary" disabled={editMutation.isPending} onClick={handleStartEdit}>
+              <Button variant="secondary" disabled={editMutation.isLoading} onClick={handleStartEdit}>
                 {allT('edit')}
               </Button>
             </PermissionGate>
@@ -246,7 +246,7 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
           open={open}
           playbookId={playbook.id}
           ruleEdits={formatRuleFields()}
-          isSaveLoading={editMutation.isPending}
+          isSaveLoading={editMutation.isLoading}
           onSave={handleSave}
           onClose={() => setOpen(false)}
         />

@@ -21,8 +21,7 @@ const useRevealKey = (apiKey: ApiKey) => {
   const showRequestError = useRequestErrorToast();
   const { authHeaders } = useSession();
 
-  const mutation = useMutation({
-    mutationFn: (data: OrgApiKeyRevealRequest) => revealApiKey(authHeaders, data),
+  const mutation = useMutation((data: OrgApiKeyRevealRequest) => revealApiKey(authHeaders, data), {
     onSuccess: response => {
       updateApiCache(response);
     },

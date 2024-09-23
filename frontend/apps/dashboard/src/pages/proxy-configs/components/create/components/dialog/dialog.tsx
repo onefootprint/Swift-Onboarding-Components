@@ -78,11 +78,11 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
       primaryButton={{
         form: id,
         label: isLastStep ? allT('save') : allT('next'),
-        loading: mutation.isPending,
+        loading: mutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: mutation.isPending,
+        disabled: mutation.isLoading,
         label: allT('cancel'),
         onClick: isFirstStep ? onClose : confirmBeforeClosing,
       }}

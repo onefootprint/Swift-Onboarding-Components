@@ -22,16 +22,18 @@ const useEntityAnnotations = (id: string) => {
   const { authHeaders } = useSession();
   const { formatDateWithTime } = useIntl();
 
-  return useQuery({
-    queryKey: ['entity', id, 'annotations', authHeaders],
-    queryFn: () => getPinnedAnnotations({ entityId: id }, authHeaders),
-    enabled: !!id,
-    select: (response: Annotation[]) =>
-      response.map((annotation: Annotation) => ({
-        ...annotation,
-        timestamp: formatDateWithTime(new Date(annotation.timestamp)),
-      })),
-  });
+  return useQuery<Annotation[]>(
+    ['entity', id, 'annotations', authHeaders],
+    () => getPinnedAnnotations({ entityId: id }, authHeaders),
+    {
+      enabled: !!id,
+      select: response =>
+        response.map((annotation: Annotation) => ({
+          ...annotation,
+          timestamp: formatDateWithTime(new Date(annotation.timestamp)),
+        })),
+    },
+  );
 };
 
 export default useEntityAnnotations;

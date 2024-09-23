@@ -30,9 +30,7 @@ const transformToDuplicateTableData = (duplicateData: GetDuplicateDataResponse) 
 const useEntityDuplicateData = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['entity', id, 'duplicate-data', authHeaders],
-    queryFn: () => getDuplicateData({ id }, authHeaders),
+  return useQuery(['entity', id, 'duplicate-data', authHeaders], () => getDuplicateData({ id }, authHeaders), {
     enabled: !!id,
     select: transformToDuplicateTableData,
   });

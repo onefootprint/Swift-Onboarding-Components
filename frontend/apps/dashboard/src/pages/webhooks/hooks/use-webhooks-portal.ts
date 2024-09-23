@@ -1,3 +1,4 @@
+import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -26,10 +27,9 @@ const getWebhookPortal = async ({ authHeaders }: GetWebhooksPortalRequest) => {
 const useWebhookPortal = () => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['webhook-portal', authHeaders],
-    queryFn: () => getWebhookPortal({ authHeaders }),
-  });
+  return useQuery<GetWebhooksPortalResponse, RequestError>(['webhook-portal', authHeaders], () =>
+    getWebhookPortal({ authHeaders }),
+  );
 };
 
 export default useWebhookPortal;

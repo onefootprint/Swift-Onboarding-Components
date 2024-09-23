@@ -22,8 +22,8 @@ const ViewHistoricalDataDialog = ({ open, onClose }: ViewHistoricalDataDialogPro
   });
   const router = useRouter();
   const entityId = useEntityId();
-  const { data: events, isPending, error } = useCurrentEntityTimeline();
-  const viewDataMutation = { isPending: false };
+  const { data: events, isLoading, error } = useCurrentEntityTimeline();
+  const viewDataMutation = { isLoading: false };
 
   const handleViewHistorical = (data: HistoricalFormData) => {
     router.push({
@@ -40,19 +40,19 @@ const ViewHistoricalDataDialog = ({ open, onClose }: ViewHistoricalDataDialogPro
       onClose={onClose}
       open={open}
       primaryButton={{
-        disabled: viewDataMutation.isPending,
+        disabled: viewDataMutation.isLoading,
         form: 'view-historical-data-form',
         label: t('form.continue'),
-        loading: viewDataMutation.isPending,
+        loading: viewDataMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: viewDataMutation.isPending,
+        disabled: viewDataMutation.isLoading,
         label: t('form.cancel'),
         onClick: onClose,
       }}
     >
-      {isPending && <Loading />}
+      {isLoading && <Loading />}
       {events && events.length > 0 ? (
         <ViewHistoricalDataForm events={mergeAuditTrailTimelineEvents(events)} onSubmit={handleViewHistorical} />
       ) : (

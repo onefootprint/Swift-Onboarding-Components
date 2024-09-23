@@ -30,7 +30,7 @@ const useUpdateOrgLogo = () => {
       showErrorToast(error);
     },
     onSuccess: (response: UpdateOrgResponse) => {
-      queryClient.invalidateQueries({ queryKey: ['org'] });
+      queryClient.invalidateQueries(['org']);
       queryClient.setQueryData(['org'], response);
       session.setOrg({
         name: response.name,

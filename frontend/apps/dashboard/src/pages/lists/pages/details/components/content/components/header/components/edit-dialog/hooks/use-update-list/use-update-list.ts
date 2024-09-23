@@ -21,12 +21,11 @@ const useUpdateList = (listId: string) => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (payload: UpdateListRequest) => updateList(listId, payload, authHeaders),
+  return useMutation((payload: UpdateListRequest) => updateList(listId, payload, authHeaders), {
     onError: showErrorToast,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lists', listId, authHeaders] });
-      queryClient.invalidateQueries({ queryKey: ['list-timeline', listId, authHeaders] });
+      queryClient.invalidateQueries(['lists', listId, authHeaders]);
+      queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
     },
   });
 };

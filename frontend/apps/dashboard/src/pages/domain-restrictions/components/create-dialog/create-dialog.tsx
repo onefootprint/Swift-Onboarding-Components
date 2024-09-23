@@ -51,11 +51,11 @@ const CreateDialog = ({ open, onClose, allowedDomains = [] }: CreateDialogProps)
       primaryButton={{
         form: 'create-domain-restriction',
         label: t('create-dialog.save'),
-        loading: domainMutation.isPending,
+        loading: domainMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: domainMutation.isPending,
+        disabled: domainMutation.isLoading,
         label: t('create-dialog.cancel'),
         onClick: onClose,
       }}

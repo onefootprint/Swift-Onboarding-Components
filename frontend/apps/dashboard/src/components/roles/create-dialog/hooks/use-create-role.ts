@@ -39,7 +39,7 @@ const useCreateRole = () => {
         title: t('success.title'),
         description: t('success.description', { name: response.name }),
       });
-      queryClient.invalidateQueries({ queryKey: ['org', 'roles'] });
+      queryClient.invalidateQueries(['org', 'roles']);
     },
   });
 };

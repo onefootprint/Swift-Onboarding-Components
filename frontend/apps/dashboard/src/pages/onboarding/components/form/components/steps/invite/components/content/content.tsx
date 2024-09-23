@@ -78,13 +78,13 @@ const Content = ({ defaultRole, onBack, onComplete, org, roles }: ContentProps) 
           {shouldShowError && <ErrorComponent>{t('form.errors.invalid')}</ErrorComponent>}
           <ButtonContainer>
             <Button
-              disabled={inviteMembersMutations.isLoading || updateOrgMutation.isPending}
+              disabled={inviteMembersMutations.isLoading || updateOrgMutation.isLoading}
               onClick={onBack}
               variant="secondary"
             >
               {allT('back')}
             </Button>
-            <Button loading={inviteMembersMutations.isLoading || updateOrgMutation.isPending} type="submit">
+            <Button loading={inviteMembersMutations.isLoading || updateOrgMutation.isLoading} type="submit">
               {t('cta')}
             </Button>
           </ButtonContainer>

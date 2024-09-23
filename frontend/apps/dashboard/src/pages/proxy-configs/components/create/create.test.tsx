@@ -1,4 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
 
 import Create from './create';
 import { filloutForm, withCreateProxyConfig, withCreateProxyConfigError } from './create.test.config';
@@ -17,8 +17,10 @@ describe('<Create />', () => {
       renderCreate();
       await filloutForm();
 
-      const feedback = await screen.findByText('Vault proxy configuration created');
-      expect(feedback).toBeInTheDocument();
+      await waitFor(() => {
+        const feedback = screen.getByText('Vault proxy configuration created');
+        expect(feedback).toBeInTheDocument();
+      });
     });
   });
 
@@ -31,8 +33,10 @@ describe('<Create />', () => {
       renderCreate();
       await filloutForm();
 
-      const errorMessage = await screen.findByText('Error creating vault proxy configuration');
-      expect(errorMessage).toBeInTheDocument();
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Something went wrong');
+        expect(errorMessage).toBeInTheDocument();
+      });
     });
   });
 });

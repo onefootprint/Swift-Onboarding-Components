@@ -171,7 +171,7 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     onClick: isEditing ? undefined : enableEditMode,
     type: isEditing ? 'submit' : 'button',
     form: isEditing ? UPDATE_BP_FORM_ID : undefined,
-    disabled: updateTenantMutation.isPending,
+    disabled: updateTenantMutation.isLoading,
   };
 
   if (tenant.superTenantId) {

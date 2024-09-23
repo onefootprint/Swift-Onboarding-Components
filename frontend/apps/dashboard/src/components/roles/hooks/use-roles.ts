@@ -26,9 +26,7 @@ const useRoles = (kind: RoleKind) => {
   const filters = useRolesFilters();
   const { requestParams } = filters;
   const allReqParams = { ...requestParams, kind };
-  const rolesQuery = useQuery({
-    queryKey: ['org', 'roles', allReqParams, authHeaders],
-    queryFn: () => getRoles(authHeaders, allReqParams),
+  const rolesQuery = useQuery(['org', 'roles', allReqParams, authHeaders], () => getRoles(authHeaders, allReqParams), {
     enabled: filters.isReady,
     select: response => ({
       meta: response.meta,

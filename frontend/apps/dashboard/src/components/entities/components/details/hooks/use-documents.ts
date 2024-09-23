@@ -26,17 +26,20 @@ const useDocuments = (id: string, seqno?: string | undefined) => {
   const { authHeaders } = useSession();
   const requestParams = { entityId: id, seqno };
 
-  return useQuery({
-    queryKey: ['entities', id, 'documents', requestParams, authHeaders],
-    queryFn: () => getDocuments(authHeaders, { ...requestParams }),
-    enabled: !!id,
-    select: (documents: Document[]) => {
-      return [...documents].sort((doc1, doc2) => {
-        if (!doc1.startedAt || !doc2.startedAt) return 0;
-        return new Date(doc1.startedAt).getTime() - new Date(doc2.startedAt).getTime();
-      });
+  return useQuery(
+    ['entities', id, 'documents', requestParams, authHeaders],
+    () => getDocuments(authHeaders, { ...requestParams }),
+    {
+      enabled: !!id,
+      select: documents => {
+        documents.sort((doc1, doc2) => {
+          if (!doc1.startedAt || !doc2.startedAt) return 0;
+          return new Date(doc1.startedAt).getTime() - new Date(doc2.startedAt).getTime();
+        });
+        return documents;
+      },
     },
-  });
+  );
 };
 
 export default useDocuments;

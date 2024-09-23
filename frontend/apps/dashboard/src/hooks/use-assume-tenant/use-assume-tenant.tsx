@@ -30,8 +30,7 @@ const useAssumeTenant = () => {
   const { authHeaders } = useSession();
   const showErrorToast = useRequestErrorToast();
 
-  return useMutation({
-    mutationFn: (data: PostAssumeRequest) => postAssumeTenantReadOnly(authHeaders, data.tenantId),
+  return useMutation((data: PostAssumeRequest) => postAssumeTenantReadOnly(authHeaders, data.tenantId), {
     onError: (error: unknown) => {
       showErrorToast(error);
     },

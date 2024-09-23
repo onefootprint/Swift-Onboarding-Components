@@ -120,14 +120,14 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
     primaryButton = {
       form: 'request-more-info-form',
       label: t('next'),
-      loading: submitActionsMutation.isPending,
-      disabled: submitActionsMutation.isPending,
+      loading: submitActionsMutation.isLoading,
+      disabled: submitActionsMutation.isLoading,
       type: 'submit',
     };
     secondaryButton = {
       label: t('cancel'),
       onClick: handleClose,
-      disabled: submitActionsMutation.isPending,
+      disabled: submitActionsMutation.isLoading,
     };
     component = <RequestMoreInfoForm formId="request-more-info-form" onSubmit={handleGenerateLink} />;
   } else {

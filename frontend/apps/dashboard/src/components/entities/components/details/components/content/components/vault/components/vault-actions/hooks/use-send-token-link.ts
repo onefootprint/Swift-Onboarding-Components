@@ -19,7 +19,7 @@ const useSendTokenLinkMutation = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
 
-  const { isPending } = generateTokenMutation;
+  const { isLoading } = generateTokenMutation;
 
   const mutate = ({ entityId, kind, onDone }: SendLinkMutationProps) => {
     generateTokenMutation.mutate(
@@ -43,7 +43,7 @@ const useSendTokenLinkMutation = () => {
       },
     );
   };
-  return { mutate, isPending };
+  return { mutate, isLoading };
 };
 
 export default useSendTokenLinkMutation;

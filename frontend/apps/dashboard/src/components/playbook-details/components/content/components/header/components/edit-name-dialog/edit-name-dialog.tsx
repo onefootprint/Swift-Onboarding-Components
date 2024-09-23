@@ -38,13 +38,13 @@ const EditNameDialog = ({ open, playbook, onClose }: EditNameDialogProps) => {
       primaryButton={{
         form: 'edit-playbook-form',
         label: allT('save'),
-        loading: mutation.isPending,
+        loading: mutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: allT('cancel'),
         onClick: onClose,
-        disabled: mutation.isPending,
+        disabled: mutation.isLoading,
       }}
       onClose={onClose}
       open={open}

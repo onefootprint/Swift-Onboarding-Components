@@ -1,4 +1,5 @@
-import request, { type RequestError } from '@onefootprint/request';
+import type { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type { GetOrgFrequentNotesResponse, OrgFrequentNoteKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -31,10 +32,9 @@ export const getOrgFrequentNotesQueryKey = (kind?: OrgFrequentNoteKind, authHead
 const useOrgFrequentNotes = (kind: OrgFrequentNoteKind) => {
   const { authHeaders } = useSession();
 
-  return useQuery<GetOrgFrequentNotesResponse, RequestError>({
-    queryKey: getOrgFrequentNotesQueryKey(kind, authHeaders),
-    queryFn: () => getOrgFrequentNotes(kind, authHeaders),
-  });
+  return useQuery<GetOrgFrequentNotesResponse, RequestError>(getOrgFrequentNotesQueryKey(kind, authHeaders), () =>
+    getOrgFrequentNotes(kind, authHeaders),
+  );
 };
 
 export default useOrgFrequentNotes;

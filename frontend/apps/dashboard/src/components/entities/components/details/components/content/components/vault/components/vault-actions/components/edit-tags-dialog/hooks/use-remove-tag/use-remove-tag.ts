@@ -19,10 +19,9 @@ const useRemoveTag = () => {
   const queryClient = useQueryClient();
   const entityId = useEntityId();
 
-  return useMutation({
-    mutationFn: ({ id, tagId }: RemoveTagRequest) => removeTag({ id, tagId }, authHeaders),
+  return useMutation(({ id, tagId }: RemoveTagRequest) => removeTag({ id, tagId }, authHeaders), {
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['entities', entityId, 'tags', authHeaders] });
+      queryClient.invalidateQueries(['entities', entityId, 'tags', authHeaders]);
     },
   });
 };

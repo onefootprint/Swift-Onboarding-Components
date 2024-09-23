@@ -20,11 +20,9 @@ const getRiskSignals = async (authHeaders: AuthHeaders): Promise<GetOrgRiskSigna
 
 const useRiskSignals = (): UseQueryResult<GetOrgRiskSignalsResponse | null, Error> => {
   const { authHeaders } = useSession();
-  return useQuery({
-    queryKey: ['org', 'riskSignals'],
-    queryFn: () => getRiskSignals(authHeaders),
-    select: (riskSignals: GetOrgRiskSignalsResponse | null) =>
-      riskSignals ? riskSignals.sort((a, b) => (a.reasonCode > b.reasonCode ? 1 : -1)) : null,
+
+  return useQuery(['org', 'riskSignals'], () => getRiskSignals(authHeaders), {
+    select: riskSignals => (riskSignals ? riskSignals.sort((a, b) => (a.reasonCode > b.reasonCode ? 1 : -1)) : null),
   });
 };
 

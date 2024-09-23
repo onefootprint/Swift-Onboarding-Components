@@ -73,12 +73,12 @@ const Actions = ({ member }: ActionsProps) => {
           onClose={hideConfirmation}
           title={t('remove.confirmation.title')}
           primaryButton={{
-            loading: removeMemberMutation.isPending,
+            loading: removeMemberMutation.isLoading,
             label: allT('confirm.cta'),
             onClick: remove,
           }}
           secondaryButton={{
-            disabled: removeMemberMutation.isPending,
+            disabled: removeMemberMutation.isLoading,
             label: allT('confirm.cancel'),
             onClick: hideConfirmation,
           }}

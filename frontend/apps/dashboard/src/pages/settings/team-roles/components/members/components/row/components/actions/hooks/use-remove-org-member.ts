@@ -32,6 +32,7 @@ const useRemoveMember = (email: string) => {
       toast.show({
         title: t('notification.error.title'),
         description: getErrorMessage(error),
+
         variant: 'error',
       });
     },
@@ -40,9 +41,7 @@ const useRemoveMember = (email: string) => {
         title: t('notification.success.title'),
         description: t('notification.success.description', { email }),
       });
-      queryClient.invalidateQueries({
-        queryKey: ['org', 'members', requestParams],
-      });
+      queryClient.invalidateQueries(['org', 'members', requestParams]);
     },
   });
 };

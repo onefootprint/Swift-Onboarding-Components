@@ -20,15 +20,14 @@ const useCreateOrgTag = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ kind, text }: CreateOrgTagRequest) => createOrgTag({ kind, text }, authHeaders),
-    onError: (error: Error) => {
-      showErrorToast(error);
+  return useMutation(({ kind, text }: CreateOrgTagRequest) => createOrgTag({ kind, text }, authHeaders), {
+    onError: e => {
+      showErrorToast(e);
       // Clear out all the results in case the request did create the tag
-      queryClient.invalidateQueries({ queryKey: ['org', 'tags', authHeaders] });
+      queryClient.invalidateQueries(['org', 'tags', authHeaders]);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['org', 'tags', authHeaders] });
+      queryClient.invalidateQueries(['org', 'tags', authHeaders]);
     },
   });
 };

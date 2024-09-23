@@ -182,11 +182,15 @@ describe('<RequestMoreInfoDialog />', () => {
         name: 'Ask user to onboard onto an existing playbook',
       });
       fireEvent.click(playbookOption);
-      const playbookSelect = await screen.findByRole('button', {
+      await waitFor(() => {
+        const playbookSelect = screen.getByRole('button', {
+          name: 'Test playbook-1',
+        });
+        expect(playbookSelect).toBeInTheDocument();
+      });
+      const playbookSelect = screen.getByRole('button', {
         name: 'Test playbook-1',
       });
-      expect(playbookSelect).toBeInTheDocument();
-
       await selectEvents.openMenu(playbookSelect);
       const testPlaybookOption = screen.getByRole('option', {
         name: 'Test playbook-2',

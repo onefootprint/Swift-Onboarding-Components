@@ -29,14 +29,12 @@ const useComposeDocsLoginUrl = () => {
     data: { auth },
   } = useSession();
 
-  return useMutation({
-    mutationFn: async (docsRedirectUrl: string) => {
-      if (!auth) {
-        throw Error('User is not logged in');
-      }
-      const { token } = await generateDocsToken(auth);
-      return `${DOCS_BASE_URL}/auth?redirectUrl=${docsRedirectUrl}#${token}`;
-    },
+  return useMutation(async (docsRedirectUrl: string) => {
+    if (!auth) {
+      throw Error('User is not logged in');
+    }
+    const { token } = await generateDocsToken(auth);
+    return `${DOCS_BASE_URL}/auth?redirectUrl=${docsRedirectUrl}#${token}`;
   });
 };
 

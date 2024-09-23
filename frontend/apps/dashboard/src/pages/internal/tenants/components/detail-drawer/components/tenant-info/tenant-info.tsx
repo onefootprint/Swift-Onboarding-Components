@@ -205,7 +205,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     onClick: isEditing ? undefined : enableEditMode,
     type: isEditing ? 'submit' : 'button',
     form: isEditing ? UPDATE_TENANT_FORM_ID : undefined,
-    disabled: updateTenantMutation.isPending,
+    disabled: updateTenantMutation.isLoading,
   };
 
   return (

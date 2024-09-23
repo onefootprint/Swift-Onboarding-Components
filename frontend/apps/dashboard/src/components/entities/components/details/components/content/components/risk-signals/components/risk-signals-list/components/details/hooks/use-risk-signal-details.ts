@@ -19,11 +19,13 @@ const useRiskSignalDetails = (riskSignalId = '') => {
   const { authHeaders } = useSession();
   const entityId = useEntityId();
 
-  return useQuery({
-    queryKey: ['entity', entityId, 'risk-signals', riskSignalId],
-    queryFn: () => getRiskSignalDetails({ authHeaders, entityId, riskSignalId }),
-    enabled: !!riskSignalId,
-  });
+  return useQuery(
+    ['entity', entityId, 'risk-signals', riskSignalId],
+    () => getRiskSignalDetails({ authHeaders, entityId, riskSignalId }),
+    {
+      enabled: !!riskSignalId,
+    },
+  );
 };
 
 export default useRiskSignalDetails;

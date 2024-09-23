@@ -24,13 +24,11 @@ const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
       queries: {
         refetchOnWindowFocus: false,
         retry: 1,
+        onError: handleError,
       },
-    },
-  });
-
-  queryClient.setDefaultOptions({
-    mutations: {
-      onError: handleError,
+      mutations: {
+        onError: handleError,
+      },
     },
   });
 

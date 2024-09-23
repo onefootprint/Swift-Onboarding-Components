@@ -48,13 +48,13 @@ const FreeFormNoteEntryDialog = ({ open, onClose }: FreeFormNoteEntryDialogProps
       primaryButton={{
         form: 'free-form-note-form',
         label: t('dialog.save'),
-        loading: submitFreeFormMutation.isPending,
+        loading: submitFreeFormMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: t('dialog.cancel'),
         onClick: onClose,
-        disabled: submitFreeFormMutation.isPending,
+        disabled: submitFreeFormMutation.isLoading,
       }}
     >
       <ManualNoteEntryForm

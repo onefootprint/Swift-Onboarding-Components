@@ -88,7 +88,7 @@ const useCleanUpUserForm = ({ formId, onClose }: ToolFormProps) => {
   );
   return {
     component,
-    isLoading: cleanUpMutation.isPending,
+    isLoading: cleanUpMutation.isLoading,
   };
 };
 

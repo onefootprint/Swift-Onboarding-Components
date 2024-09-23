@@ -19,9 +19,7 @@ const decrypt = async ({ entityId, fields, reason }: DecryptRequest, authHeaders
 
 const useDecrypt = () => {
   const { authHeaders } = useSession();
-  return useMutation({
-    mutationFn: (data: DecryptRequest) => decrypt(data, authHeaders),
-  });
+  return useMutation((data: DecryptRequest) => decrypt(data, authHeaders));
 };
 
 export default useDecrypt;

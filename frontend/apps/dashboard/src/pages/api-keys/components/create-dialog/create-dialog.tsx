@@ -54,12 +54,12 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       primaryButton={{
         form: 'create-secret-key-form',
         label: t('cta.label'),
-        loading: createApiKeyMutation.isPending,
+        loading: createApiKeyMutation.isLoading,
         loadingAriaLabel: t('cta.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: createApiKeyMutation.isPending,
+        disabled: createApiKeyMutation.isLoading,
         label: t('cancel'),
         onClick: handleClose,
       }}

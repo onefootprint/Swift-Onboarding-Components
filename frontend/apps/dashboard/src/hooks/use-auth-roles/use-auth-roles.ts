@@ -16,9 +16,7 @@ const getAuthRoles = async ({ authToken }: GetAuthRolesRequest) => {
 };
 
 const useAuthRoles = (authToken: string) =>
-  useQuery({
-    queryKey: ['get-roles', authToken],
-    queryFn: () => getAuthRoles({ authToken }),
+  useQuery(['get-roles', authToken], () => getAuthRoles({ authToken }), {
     enabled: !!authToken,
   });
 

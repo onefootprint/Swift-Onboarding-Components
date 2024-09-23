@@ -38,7 +38,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
   const [listId, setListId] = React.useState<string>('');
   const addEntriesMutation = useAddEntries(listId);
   const decryptMutation = useDecrypt();
-  const isLoading = addEntriesMutation.isPending || decryptMutation.isPending;
+  const isLoading = addEntriesMutation.isLoading || decryptMutation.isLoading;
   const { reset, handleSubmit, watch, control } = useForm<FormData>();
 
   // Filter lists based on attributes the entity has

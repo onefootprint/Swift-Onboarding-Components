@@ -25,7 +25,7 @@ const Actions = ({ tenant }: ActionsProps) => {
       },
     });
   };
-  const isLoading = generateInvoiceMutation.isPending;
+  const isLoading = generateInvoiceMutation.isLoading;
 
   return (
     <Dropdown.Root>

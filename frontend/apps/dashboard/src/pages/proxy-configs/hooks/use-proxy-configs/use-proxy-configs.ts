@@ -19,11 +19,7 @@ const getProxyConfigs = async (authHeaders: AuthHeaders, filters?: GetProxyConfi
 const useProxyConfigs = (filters?: GetProxyConfigsRequest) => {
   const { authHeaders, isLive } = useSession();
 
-  const proxyConfigsQuery = useQuery({
-    queryKey: [QUERY_KEY, filters, isLive],
-    queryFn: () => getProxyConfigs(authHeaders, filters),
-  });
-
+  const proxyConfigsQuery = useQuery([QUERY_KEY, filters, isLive], () => getProxyConfigs(authHeaders, filters));
   const { error, data = [] } = proxyConfigsQuery;
   return {
     ...proxyConfigsQuery,

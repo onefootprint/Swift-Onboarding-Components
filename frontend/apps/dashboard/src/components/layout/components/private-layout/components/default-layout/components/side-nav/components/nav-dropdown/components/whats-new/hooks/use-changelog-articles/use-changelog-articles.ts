@@ -20,10 +20,9 @@ const getChangelogArticles = async () => {
 };
 
 const useChangelogArticles = () => {
-  return useQuery({
-    queryKey: ['whatsNews'],
+  return useQuery<PostDetails[]>(['whatsNews'], {
     queryFn: getChangelogArticles,
-    select: (posts: PostDetails[]) => {
+    select: posts => {
       return posts
         .filter(post => post.primaryTag?.slug === 'changelog')
         .slice(0, 3)

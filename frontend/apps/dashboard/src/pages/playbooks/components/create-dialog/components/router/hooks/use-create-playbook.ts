@@ -19,8 +19,7 @@ const useCreatePlaybook = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (data: OrgOnboardingConfigCreateRequest) => createPlaybook(authHeaders, data),
+  return useMutation((data: OrgOnboardingConfigCreateRequest) => createPlaybook(authHeaders, data), {
     onSettled: () => {
       queryClient.invalidateQueries();
     },

@@ -18,11 +18,9 @@ const getRules = async (authHeaders: AuthHeaders, playbookId: string) => {
 const useRules = (playbookId: string = '') => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: GET_QUERY_KEY(playbookId),
-    queryFn: () => getRules(authHeaders, playbookId),
+  const rulesQuery = useQuery(GET_QUERY_KEY(playbookId), () => getRules(authHeaders, playbookId), {
     enabled: !!playbookId,
-    select: (rules: Rule[]) => {
+    select: rules => {
       const formattedRules = {} as Record<RuleAction, Rule[]>;
 
       Object.values(RuleAction).forEach(action => {
@@ -40,6 +38,13 @@ const useRules = (playbookId: string = '') => {
       return { hasRules: !!rules.length, data: formattedRules };
     },
   });
+  const { error, data } = rulesQuery;
+
+  return {
+    ...rulesQuery,
+    error: error ?? undefined,
+    response: data,
+  };
 };
 
 export default useRules;

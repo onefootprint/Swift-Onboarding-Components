@@ -72,7 +72,7 @@ const useUploadDoc = () => {
   }
 
   return useMutation({
-    mutationFn: async (data: {
+    mutationFn: (data: {
       identifier: CustomDocumentIdentifier;
       file: File;
     }) => {

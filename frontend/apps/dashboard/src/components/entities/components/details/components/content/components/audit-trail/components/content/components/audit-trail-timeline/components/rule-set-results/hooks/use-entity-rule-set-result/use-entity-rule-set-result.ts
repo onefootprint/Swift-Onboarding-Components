@@ -22,49 +22,50 @@ const getRuleSetResult = async (payload: GetEntityRuleSetResultRequest, authHead
 const useEntityRuleSetResult = ({ entityId, ruleSetResultId }: UseEntityRuleSetResultProps) => {
   const { authHeaders } = useSession();
 
-  const ruleSetResultQuery = useQuery({
-    queryKey: ['entity', entityId, 'rule_set_result', ruleSetResultId],
-    queryFn: () => getRuleSetResult({ entityId, ruleSetResultId }, authHeaders),
-    enabled: !!ruleSetResultId,
-    select: (response: GetEntityRuleSetResultResponse | null) => {
-      if (!response) {
-        return {
-          actionTriggered: null,
-          obConfigurationId: null,
-          ruleResults: null,
-        };
-      }
-
-      const formattedRuleResults = {} as Record<RuleAction, Record<string, Rule[]>>;
-
-      Object.values(RuleAction).forEach(action => {
-        formattedRuleResults[action] = {
-          isPresent: [],
-          isNotPresent: [],
-        };
-      });
-
-      const sortedRuleResults = [...response.ruleResults].sort((a, b) =>
-        a.rule.createdAt > b.rule.createdAt ? 1 : -1,
-      );
-      sortedRuleResults.forEach(({ result, rule }) => {
-        if (result) {
-          formattedRuleResults[rule.action].isPresent.push(rule);
-        } else {
-          formattedRuleResults[rule.action].isNotPresent.push(rule);
+  const ruleSetResultQuery = useQuery(
+    ['entity', entityId, 'rule_set_result', ruleSetResultId],
+    () => getRuleSetResult({ entityId, ruleSetResultId }, authHeaders),
+    {
+      enabled: !!ruleSetResultId,
+      select: response => {
+        if (!response) {
+          return {
+            actionTriggered: null,
+            obConfigurationId: null,
+            ruleResults: null,
+          };
         }
-      });
 
-      return {
-        // On the backend, if there's a non-null API response, a null actionTriggered is an implied Pass
-        actionTriggered: response.actionTriggered ? response.actionTriggered : OnboardingDecisionRuleAction.pass,
-        obConfigurationId: response.obConfigurationId,
-        ruleResults: formattedRuleResults,
-      };
+        const formattedRuleResults = {} as Record<RuleAction, Record<string, Rule[]>>;
+
+        Object.values(RuleAction).forEach(action => {
+          formattedRuleResults[action] = {
+            isPresent: [],
+            isNotPresent: [],
+          };
+        });
+
+        const sortedRuleResults = [...response.ruleResults].sort((a, b) =>
+          a.rule.createdAt > b.rule.createdAt ? 1 : -1,
+        );
+        sortedRuleResults.forEach(({ result, rule }) => {
+          if (result) {
+            (formattedRuleResults[rule.action].isPresent as Rule[]).push(rule);
+          } else {
+            (formattedRuleResults[rule.action].isNotPresent as Rule[]).push(rule);
+          }
+        });
+
+        return {
+          // On the backend, if there's a non-null API response, a null actionTriggered is an implied Pass
+          actionTriggered: response.actionTriggered ? response.actionTriggered : OnboardingDecisionRuleAction.pass,
+          obConfigurationId: response.obConfigurationId,
+          ruleResults: formattedRuleResults,
+        };
+      },
     },
-  });
-
-  const error = ruleSetResultQuery.error as Error | null;
+  );
+  const { error } = ruleSetResultQuery;
 
   return {
     ...ruleSetResultQuery,

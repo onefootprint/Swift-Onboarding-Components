@@ -16,9 +16,7 @@ const getListEntries = async ({ authHeaders, listId }: GetListEntriesRequest) =>
 const useListEntries = (listId = '') => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['list-entries', listId, authHeaders],
-    queryFn: () => getListEntries({ authHeaders, listId }),
+  return useQuery(['list-entries', listId, authHeaders], () => getListEntries({ authHeaders, listId }), {
     enabled: !!listId,
   });
 };

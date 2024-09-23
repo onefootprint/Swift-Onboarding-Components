@@ -15,7 +15,6 @@
     "lint": "biome check src --fix --unsafe",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh",
     "start": "next start -p 3001",
-    "test:ci": "NODE_OPTIONS=--max-old-space-size=9216 jest --ci --bail --runInBand",
     "test:watch": "NODE_OPTIONS=--max-old-space-size=9216 NODE_OPTIONS=--max-old-space-size=9216 jest --watch",
     "test": "jest",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --noEmit"
@@ -39,8 +38,8 @@
     "@radix-ui/react-navigation-menu": "1.0.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-select": "2.0.0",
-    "@tanstack/react-query": "^5.56.2",
-    "@tanstack/react-query-devtools": "^5.56.2",
+    "@tanstack/react-query": "^4.35.7",
+    "@tanstack/react-query-devtools": "^4.35.7",
     "@tryghost/content-api": "^1.11.21",
     "@xstate/react": "^3.2.1",
     "cmdk": "^0.2.0",

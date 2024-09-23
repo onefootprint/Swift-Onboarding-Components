@@ -18,9 +18,7 @@ const getProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
 const useProxyConfig = (id: string = '') => {
   const { authHeaders } = useSession();
 
-  const proxyConfigQuery = useQuery({
-    queryKey: [QUERY_KEY, id],
-    queryFn: () => getProxyConfig(authHeaders, id),
+  const proxyConfigQuery = useQuery([QUERY_KEY, id], () => getProxyConfig(authHeaders, id), {
     enabled: !!id,
   });
   const { error, data } = proxyConfigQuery;

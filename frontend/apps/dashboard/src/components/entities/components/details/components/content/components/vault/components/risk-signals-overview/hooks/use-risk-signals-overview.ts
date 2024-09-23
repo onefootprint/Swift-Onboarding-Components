@@ -33,9 +33,7 @@ export const groupBySectionAndSeverity = (signals: RiskSignal[]): RiskSignalsSum
 const useRiskSignalsOverview = (id: string, seqno?: string | undefined) => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['entity', id, 'risk-signals-overview', seqno],
-    queryFn: () => getRiskSignals({ id, seqno }, authHeaders),
+  return useQuery(['entity', id, 'risk-signals-overview', seqno], () => getRiskSignals({ id, seqno }, authHeaders), {
     enabled: !!id,
   });
 };

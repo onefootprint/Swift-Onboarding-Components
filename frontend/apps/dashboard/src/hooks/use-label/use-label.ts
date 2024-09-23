@@ -16,11 +16,9 @@ const getLabel = async (id: string, authHeaders: AuthHeaders) => {
 const useLabel = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery({
-    queryKey: ['entities', id, 'label', authHeaders],
-    queryFn: () => getLabel(id, authHeaders),
+  return useQuery(['entities', id, 'label', authHeaders], () => getLabel(id, authHeaders), {
     enabled: !!id,
-    select: (label: GetLabelResponse) => label.kind,
+    select: label => label.kind,
   });
 };
 

@@ -71,7 +71,7 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
 
   return (
     <ConfirmationDialog
-      isLoading={removeRoleMutation.isPending}
+      isLoading={removeRoleMutation.isLoading}
       onClose={hideConfirmation}
       onConfirm={remove}
       open={open}

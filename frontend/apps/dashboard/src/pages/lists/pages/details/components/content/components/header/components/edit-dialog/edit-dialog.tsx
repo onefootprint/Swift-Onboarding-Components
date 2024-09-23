@@ -70,12 +70,12 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
       primaryButton={{
         form: 'update-list-form',
         label: t('cta.save.label'),
-        loading: updateListMutation.isPending,
+        loading: updateListMutation.isLoading,
         loadingAriaLabel: t('cta.save.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: updateListMutation.isPending,
+        disabled: updateListMutation.isLoading,
         label: t('cta.cancel'),
         onClick: onClose,
       }}

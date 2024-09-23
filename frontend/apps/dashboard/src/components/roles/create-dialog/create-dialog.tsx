@@ -26,11 +26,11 @@ const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {
       primaryButton={{
         form: 'roles-form',
         label: t('create'),
-        loading: createRoleMutation.isPending,
+        loading: createRoleMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: createRoleMutation.isPending,
+        disabled: createRoleMutation.isLoading,
         label: t('cancel'),
         onClick: handleClose,
       }}
