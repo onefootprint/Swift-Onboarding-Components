@@ -60,6 +60,7 @@ typedef HandoffHandler = void Function({
     final authToken = fpContext.authToken;
     final authTokenStatus = fpContext.authTokenStatus;
     final authValidationToken = fpContext.authValidationToken;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
 
     // If we already have a vaulting token, we don't need to authenticate
     if (vaultingToken != null && vaultingToken.isNotEmpty) {
@@ -68,10 +69,13 @@ typedef HandoffHandler = void Function({
 
     // If we have a verified auth token, we don't need to authenticate
     if (verifiedAuthToken != null && verifiedAuthToken.isNotEmpty) {
-      final vaultingToken = await createVaultingToken(verifiedAuthToken);
-      ref
-          .read(fpContextNotifierProvider.notifier)
-          .updateVaultingToken(vaultingToken.token);
+      if (obConfigKind != OnboardingConfigKind.auth) {
+        // Only create a vaulting token if the onboarding config is not an auth config
+        final vaultingToken = await createVaultingToken(verifiedAuthToken);
+        ref
+            .read(fpContextNotifierProvider.notifier)
+            .updateVaultingToken(vaultingToken.token);
+      }
       return (requiresAuth: false, validationToken: authValidationToken);
     }
 

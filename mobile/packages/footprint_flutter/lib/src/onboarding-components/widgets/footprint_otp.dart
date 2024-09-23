@@ -169,9 +169,11 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     ));
 
     ref.read(fpContextNotifierProvider.notifier).update(
-        verifiedAuthToken: authToken,
-        vaultingToken: vaultingToken,
-        authTokenStatus: AuthTokenStatus.validWithSufficientScope);
+          verifiedAuthToken: authToken,
+          vaultingToken: vaultingToken,
+          authTokenStatus: AuthTokenStatus.validWithSufficientScope,
+          authValidationToken: validationToken,
+        );
 
     return validationToken;
   }
