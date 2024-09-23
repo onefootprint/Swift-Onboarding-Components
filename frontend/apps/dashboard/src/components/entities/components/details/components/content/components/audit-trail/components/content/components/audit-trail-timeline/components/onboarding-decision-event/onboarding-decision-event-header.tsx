@@ -57,9 +57,9 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
       outcome = t('with-outcome', { status: statusToText[status] });
     }
     return (
-      <Stack direction="row" align="center" gap={2}>
+      <Stack direction="row" align="center" gap={2} flexWrap="wrap">
         <Stack align="center" testID="onboarding-decision-event-header">
-          <Text variant="label-3" color={color} display="flex" gap={2}>
+          <Text variant="label-3" color={color} display="flex" gap={2} whiteSpace="nowrap">
             <Trans
               i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.onboarded-onto"
               values={{ outcome }}

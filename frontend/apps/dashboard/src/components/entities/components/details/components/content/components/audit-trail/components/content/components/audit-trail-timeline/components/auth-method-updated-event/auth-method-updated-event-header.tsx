@@ -1,6 +1,6 @@
 import { AuthMethodAction, AuthMethodKind } from '@onefootprint/types';
 import type { AuthMethodUpdatedData } from '@onefootprint/types/src/data/timeline';
-import { Text, createFontStyles } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import InsightEventPopover from 'src/components/insight-event-popover';
 import styled, { css } from 'styled-components';
@@ -33,9 +33,9 @@ const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProp
   };
 
   return (
-    <>
+    <Stack direction="row" align="center" gap={2} flexWrap="wrap">
       <InsightEventPopover insightEvent={data.insightEvent}>{t('user')}</InsightEventPopover>
-      <Text variant="body-3" color="tertiary">
+      <Text variant="body-3" color="tertiary" whiteSpace="nowrap">
         <Trans
           i18nKey={getActionLabel(data.action)}
           components={{
@@ -46,7 +46,7 @@ const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProp
           }}
         />
       </Text>
-    </>
+    </Stack>
   );
 };
 

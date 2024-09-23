@@ -189,6 +189,7 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       width: fit-content;
       gap: ${smallSizes.includes($variant) ? theme.spacing[1] : theme.spacing[2]};
       fill: ${linkButton[styleVariant].color.text.initial};
+      white-space: nowrap;
       vertical-align: middle;
 
       &:hover {
