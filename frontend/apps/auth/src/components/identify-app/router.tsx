@@ -8,6 +8,7 @@ import { useFootprintProvider } from '../../provider-footprint';
 import PasskeyCancelled from '../passkey-cancelled';
 import PasskeyError from '../passkey-error';
 import PasskeySuccess from '../passkey-success';
+import UnexpectedError from '../unexpected-error';
 import IdentifyPage from './pages/identify-auth';
 import Init from './pages/init';
 import InvalidAuthConfig from './pages/invalid-auth-config';
@@ -87,6 +88,10 @@ const IdentifyRouter = () => {
 
   if (state.matches('invalidConfig')) {
     return <InvalidConfig />;
+  }
+
+  if (state.matches('unexpectedError')) {
+    return <UnexpectedError />;
   }
 };
 

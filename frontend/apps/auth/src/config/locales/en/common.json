@@ -18,6 +18,7 @@
   "success": "Success",
   "try-again-close-this-window": "Try adding it again later. You can close this window now.",
   "try-again-later": "You can try adding it again later.",
+  "unexpected-error-subtitle": "Something went wrong. Please try again later.",
   "unexpected-error": "Unexpected error",
   "validating-your-information": "Validating your information",
   "webauthn-not-supported-suggestion": "Your device doesn't support WebAuthn. Please update or switch to a compatible device.",

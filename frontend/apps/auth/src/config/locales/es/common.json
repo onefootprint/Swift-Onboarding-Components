@@ -19,6 +19,7 @@
   "try-again-close-this-window": "Trata de agregarla más tarde. Ya puedes cerrar esta ventana.",
   "try-again-later": "Puedes intentarlo de nuevo más tarde.",
   "unexpected-error": "Error inesperado",
+  "unexpected-error-subtitle": "Algo salió mal. Por favor, intentarlo de nuevo más tarde.",
   "validating-your-information": "Estamos validando tu información",
   "webauthn-not-supported-suggestion": "Tu dispositivo no es compatible con WebAuthn. Actualiza o usa un dispositivo compatible.",
   "webauthn-not-supported": "WebAuthn no compatible",

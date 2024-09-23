@@ -69,6 +69,7 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         passkeyError: { type: 'final' },
         passkeySuccess: { type: 'final' },
         sdkUrlNotAllowed: { type: 'final' },
+        unexpectedError: { type: 'final' },
       },
     },
     {

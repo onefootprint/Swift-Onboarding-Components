@@ -32,6 +32,7 @@ export interface Typegen0 {
     | 'passkeyOptionalRegistration'
     | 'passkeyProcessing'
     | 'passkeySuccess'
-    | 'sdkUrlNotAllowed';
+    | 'sdkUrlNotAllowed'
+    | 'unexpectedError';
   tags: never;
 }
