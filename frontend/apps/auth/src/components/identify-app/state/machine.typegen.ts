@@ -13,10 +13,11 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'identifyCompleted';
+    assignIdentificationResult: 'identifyCompleted';
     assignInitProps: 'initPropsReceived';
     assignPasskeyRegistrationWindow: 'passkeyRegistrationTabOpened';
     assignScopedAuthToken: 'scopedAuthTokenReceived';
+    assignValidationToken: 'onboardingValidationCompleted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -27,11 +28,11 @@ export interface Typegen0 {
     | 'init'
     | 'invalidAuthConfig'
     | 'invalidConfig'
+    | 'onboardingValidation'
     | 'passkeyCancelled'
     | 'passkeyError'
     | 'passkeyOptionalRegistration'
     | 'passkeyProcessing'
-    | 'passkeySuccess'
     | 'sdkUrlNotAllowed'
     | 'unexpectedError';
   tags: never;

@@ -5,6 +5,8 @@ import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { getLogger } from '@onefootprint/idv';
 
 import { useConfirmationDialog } from '@onefootprint/ui';
+import truncate from 'lodash/truncate';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFootprintProvider } from '../../provider-footprint';
 import ClientLayout from '../client-layout';
@@ -15,17 +17,28 @@ type LayoutProps = {
   variant?: Variant;
 };
 
-const { logTrack } = getLogger({ location: 'identify-app-layout' });
+const { logTrack, logError } = getLogger({ location: 'identify-app-layout' });
 
 const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
   const [state] = useAuthIdentifyAppMachine();
+  const { config, validationToken } = state.context;
   const fpProvider = useFootprintProvider();
   const confirmationDialog = useConfirmationDialog();
   const { t } = useTranslation('common');
-  const isSandbox = state.context.config?.isLive === false;
+  const isDone = state.matches('done');
+  const shouldHideCloseButton = state.matches('passkeyOptionalRegistration');
+  const isSandbox = config?.isLive === false;
+
+  const handleCompleteWithValidationToken = (validationToken?: string): void => {
+    if (validationToken) {
+      logTrack(`Validation token sent: ${truncate(validationToken, { length: 20 })}`);
+      fpProvider.send(FootprintPublicEvent.completed, validationToken);
+    }
+  };
 
   const handleClose = () => {
     if (!state.matches('identify') && !state.matches('passkeyProcessing')) {
+      handleCompleteWithValidationToken(validationToken);
       fpProvider.send(FootprintPublicEvent.closed);
       return;
     }
@@ -38,6 +51,7 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
         label: t('yes'),
         onClick: () => {
           logTrack('User clicked and confirmed close button');
+          handleCompleteWithValidationToken(validationToken);
           fpProvider.send(FootprintPublicEvent.canceled);
           fpProvider.send(FootprintPublicEvent.closed);
         },
@@ -45,8 +59,21 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
     });
   };
 
+  useEffect(() => {
+    if (!isDone) return;
+    if (!validationToken) return logError('Missing validation token');
+
+    handleCompleteWithValidationToken(validationToken);
+    fpProvider.send(FootprintPublicEvent.closed);
+  }, [validationToken, fpProvider, isDone]);
+
   return (
-    <ClientLayout config={state.context.config} isSandbox={isSandbox} onClose={handleClose} variant={variant}>
+    <ClientLayout
+      config={state.context.config}
+      isSandbox={isSandbox}
+      onClose={shouldHideCloseButton ? undefined : handleClose}
+      variant={variant}
+    >
       {children}
     </ClientLayout>
   );

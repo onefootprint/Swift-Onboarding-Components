@@ -3,7 +3,7 @@
 import ModalLoading from '@/src/components/client-loading/modal-loading';
 import type { Variant } from '@/src/types';
 import { isEmbeddedInIframe } from '@/src/utils';
-import { getWindowUrl, isTokenFormat } from '@onefootprint/core';
+import { getTokenFromUrlHash, getWindowUrl, isTokenFormat } from '@onefootprint/core';
 import { getSessionIdFromQueryParam } from '@onefootprint/dev-tools';
 import type { DeviceInfo } from '@onefootprint/idv';
 import {
@@ -11,7 +11,6 @@ import {
   Logger,
   NavigationHeader,
   getLogger,
-  getSdkArgsToken,
   useDeviceInfo,
   useGetD2PStatus,
   useUpdateD2PStatus,
@@ -36,12 +35,6 @@ const isTestEnv = process.env.NODE_ENV === 'test';
 const EmptyConfig = {} as PublicOnboardingConfig;
 
 const isInIframe = isTestEnv ? false : isEmbeddedInIframe();
-const urlFragmentToken = () => {
-  if (isInIframe) {
-    return '';
-  }
-  return getSdkArgsToken(getWindowUrl().split('#')[1]) ?? '';
-};
 
 const { logError } = getLogger({ location: 'register-passkey-app' });
 
@@ -58,7 +51,8 @@ const startLogger = ({ meta }: GetD2PResponse) => {
 const startLoggerOnce = once(startLogger);
 
 const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.Element | null => {
-  const authToken = urlFragmentToken();
+  const windowUrl = getWindowUrl();
+  const authToken = getTokenFromUrlHash(windowUrl) || '';
   const [state, setState] = useState<State>('init');
   const [device, setDevice] = useState<DeviceInfo | undefined>(undefined);
 
@@ -86,7 +80,7 @@ const PasskeyRegistrationApp = ({ variant }: PasskeyRegistrationAppProps): JSX.E
         d2dStatus.current = data.status;
         startLoggerOnce(data);
 
-        if (data.status === D2PStatus.inProgress) {
+        if (data.status === D2PStatus.inProgress || (state === 'init' && data.status === D2PStatus.waiting)) {
           setState('inProgress');
         } else if (data.status === D2PStatus.completed) {
           setState('completed');

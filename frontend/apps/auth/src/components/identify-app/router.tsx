@@ -2,18 +2,15 @@
 
 import { getLogger } from '@onefootprint/idv';
 
-import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { useEffect } from 'react';
-import { useFootprintProvider } from '../../provider-footprint';
 import PasskeyCancelled from '../passkey-cancelled';
 import PasskeyError from '../passkey-error';
-import PasskeySuccess from '../passkey-success';
 import UnexpectedError from '../unexpected-error';
-import IdentifyPage from './pages/identify-auth';
+import IdentifyAuth from './pages/identify-auth';
 import Init from './pages/init';
 import InvalidAuthConfig from './pages/invalid-auth-config';
 import InvalidConfig from './pages/invalid-config';
 import InvalidDomain from './pages/invalid-domain';
+import OnboardingValidation from './pages/onboarding-validation';
 import PasskeyAdd from './pages/passkey-add';
 import PasskeyProcessing from './pages/passkey-processing';
 import Success from './pages/success';
@@ -23,14 +20,8 @@ const { logTrack, logWarn } = getLogger({ location: 'auth-identify-router' });
 
 const IdentifyRouter = () => {
   const [state, send] = useAuthIdentifyAppMachine();
-  const fpProvider = useFootprintProvider();
   const { authToken, device } = state.context;
   const isDone = state.matches('done');
-
-  useEffect(() => {
-    if (!isDone) return;
-    fpProvider.send(FootprintPublicEvent.closed);
-  }, [fpProvider, isDone]);
 
   if (isDone) return <Success />;
 
@@ -39,7 +30,11 @@ const IdentifyRouter = () => {
   }
 
   if (state.matches('identify')) {
-    return <IdentifyPage />;
+    return <IdentifyAuth />;
+  }
+
+  if (state.matches('onboardingValidation')) {
+    return <OnboardingValidation />;
   }
 
   if (state.matches('passkeyOptionalRegistration') && authToken && device) {
@@ -47,6 +42,7 @@ const IdentifyRouter = () => {
       <PasskeyAdd
         authToken={authToken}
         device={device}
+        onSkip={() => send({ type: 'passkeyRegistrationSkip' })}
         onError={(error: unknown) => {
           logWarn('Error on optional passkey registration', error);
           send({ type: 'passkeyRegistrationError', payload: error });
@@ -72,10 +68,6 @@ const IdentifyRouter = () => {
 
   if (state.matches('passkeyError')) {
     return <PasskeyError />;
-  }
-
-  if (state.matches('passkeySuccess')) {
-    return <PasskeySuccess />;
   }
 
   if (state.matches('invalidAuthConfig')) {

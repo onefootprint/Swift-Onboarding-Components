@@ -4,6 +4,7 @@ import { interpret } from 'xstate';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import createAuthIdentifyAppMachine from './machine';
 
+const fakeTab = { location: { href: 'https://fake.com' } } as unknown as Window;
 const device = {
   browser: 'Mobile Safari',
   hasSupportForWebauthn: true,
@@ -89,7 +90,7 @@ describe('Auth Identify App Machine', () => {
     expect(state.done).toEqual(true);
   });
 
-  it('should ends early because user has passkey already', () => {
+  it('should ends at unexpectedError when validation failed', () => {
     const machine = createMachine();
     let { state } = machine;
 
@@ -109,7 +110,49 @@ describe('Auth Identify App Machine', () => {
     expect(state.context.config).toEqual(authConfig);
     expect(state.context.device).toEqual(device);
 
-    state = machine.send({ type: 'doneReceived' });
+    state = machine.send({
+      type: 'identifyCompleted',
+      payload: { authToken: 'utok_123', isPasskeyAlreadyRegistered: true },
+    });
+    expect(state.value).toEqual('onboardingValidation');
+    expect(state.context.authToken).toEqual('utok_123');
+    expect(state.context.isPasskeyAlreadyRegistered).toEqual(true);
+
+    state = machine.send({ type: 'onboardingValidationError', payload: new Error('error') });
+    expect(state.value).toEqual('unexpectedError');
+
+    expect(state.done).toEqual(true);
+  });
+
+  it('should ends early when passkey is already registered', () => {
+    const machine = createMachine();
+    let { state } = machine;
+
+    expect(state.value).toEqual('init');
+    expect(state.context).toEqual({});
+
+    state = machine.send({
+      type: 'initPropsReceived',
+      payload: {
+        config: authConfig,
+        device,
+        props: authProps,
+      },
+    });
+    expect(state.value).toEqual('identify');
+    expect(state.context.props).toEqual(authProps);
+    expect(state.context.config).toEqual(authConfig);
+    expect(state.context.device).toEqual(device);
+
+    state = machine.send({
+      type: 'identifyCompleted',
+      payload: { authToken: 'utok_123', isPasskeyAlreadyRegistered: true },
+    });
+    expect(state.value).toEqual('onboardingValidation');
+    expect(state.context.authToken).toEqual('utok_123');
+    expect(state.context.isPasskeyAlreadyRegistered).toEqual(true);
+
+    state = machine.send({ type: 'onboardingValidationCompleted', payload: { validationToken: 'vtok_123' } });
     expect(state.value).toEqual('done');
 
     expect(state.done).toEqual(true);
@@ -135,7 +178,15 @@ describe('Auth Identify App Machine', () => {
     expect(state.context.config).toEqual(authConfig);
     expect(state.context.device).toEqual(device);
 
-    state = machine.send({ type: 'identifyCompleted', payload: { authToken: 'vtok_123' } });
+    state = machine.send({
+      type: 'identifyCompleted',
+      payload: { authToken: 'utok_123', isPasskeyAlreadyRegistered: false },
+    });
+    expect(state.context.authToken).toEqual('utok_123');
+    expect(state.context.isPasskeyAlreadyRegistered).toEqual(false);
+    expect(state.value).toEqual('onboardingValidation');
+
+    state = machine.send({ type: 'onboardingValidationCompleted', payload: { validationToken: 'vtok_123' } });
     expect(state.value).toEqual('passkeyOptionalRegistration');
 
     state = machine.send({ type: 'passkeyRegistrationError', payload: new Error('error') });
@@ -164,11 +215,20 @@ describe('Auth Identify App Machine', () => {
     expect(state.context.config).toEqual(authConfig);
     expect(state.context.device).toEqual(device);
 
-    state = machine.send({ type: 'identifyCompleted', payload: { authToken: 'vtok_123' } });
+    state = machine.send({
+      type: 'identifyCompleted',
+      payload: { authToken: 'utok_123', isPasskeyAlreadyRegistered: false },
+    });
+    expect(state.context.authToken).toEqual('utok_123');
+    expect(state.context.isPasskeyAlreadyRegistered).toEqual(false);
+    expect(state.value).toEqual('onboardingValidation');
+
+    state = machine.send({ type: 'onboardingValidationCompleted', payload: { validationToken: 'vtok_123' } });
     expect(state.value).toEqual('passkeyOptionalRegistration');
 
-    state = machine.send({ type: 'passkeyRegistrationTabOpened', payload: {} as Window });
+    state = machine.send({ type: 'passkeyRegistrationTabOpened', payload: fakeTab });
     state = machine.send({ type: 'scopedAuthTokenReceived', payload: 'tok_scoped' });
+    expect(state.context.passkeyRegistrationWindow).toEqual(fakeTab);
     expect(state.context.scopedAuthToken).toEqual('tok_scoped');
     expect(state.value).toEqual('passkeyProcessing');
 
@@ -178,7 +238,7 @@ describe('Auth Identify App Machine', () => {
     expect(state.done).toEqual(true);
   });
 
-  it('should ends at passkeySuccess', () => {
+  it('should ends when passkeySuccess', () => {
     const machine = createMachine();
     let { state } = machine;
 
@@ -198,16 +258,26 @@ describe('Auth Identify App Machine', () => {
     expect(state.context.config).toEqual(authConfig);
     expect(state.context.device).toEqual(device);
 
-    state = machine.send({ type: 'identifyCompleted', payload: { authToken: 'vtok_123' } });
+    state = machine.send({
+      type: 'identifyCompleted',
+      payload: { authToken: 'utok_123', isPasskeyAlreadyRegistered: false },
+    });
+    expect(state.context.authToken).toEqual('utok_123');
+    expect(state.context.isPasskeyAlreadyRegistered).toEqual(false);
+    expect(state.value).toEqual('onboardingValidation');
+
+    state = machine.send({ type: 'onboardingValidationCompleted', payload: { validationToken: 'vtok_123' } });
+    expect(state.context.validationToken).toEqual('vtok_123');
     expect(state.value).toEqual('passkeyOptionalRegistration');
 
-    state = machine.send({ type: 'passkeyRegistrationTabOpened', payload: {} as Window });
+    state = machine.send({ type: 'passkeyRegistrationTabOpened', payload: fakeTab });
     state = machine.send({ type: 'scopedAuthTokenReceived', payload: 'tok_scoped' });
+    expect(state.context.passkeyRegistrationWindow).toEqual(fakeTab);
     expect(state.context.scopedAuthToken).toEqual('tok_scoped');
     expect(state.value).toEqual('passkeyProcessing');
 
     state = machine.send({ type: 'passkeyProcessingCompleted' });
-    expect(state.value).toEqual('passkeySuccess');
+    expect(state.value).toEqual('done');
 
     expect(state.done).toEqual(true);
   });

@@ -1,6 +1,6 @@
 import type { DeviceInfo } from '@onefootprint/idv';
 import { createHandoffUrlAuth, useGenerateScopedAuthToken } from '@onefootprint/idv';
-import { Box, LinkButton, Text } from '@onefootprint/ui';
+import { Box, Button } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Notification from '../../../notification';
@@ -8,12 +8,20 @@ import Notification from '../../../notification';
 type PasskeyAddProps = {
   authToken: string;
   device: DeviceInfo;
+  onSkip: () => void;
   onError?: (error: unknown) => void;
   onNewTabOpened?: (tab: Window) => void;
   onScopedAuthTokenGenerated: (token: string) => void;
 };
 
-const PasskeyAdd = ({ authToken, device, onError, onNewTabOpened, onScopedAuthTokenGenerated }: PasskeyAddProps) => {
+const PasskeyAdd = ({
+  authToken,
+  device,
+  onSkip,
+  onError,
+  onNewTabOpened,
+  onScopedAuthTokenGenerated,
+}: PasskeyAddProps) => {
   const { t, i18n } = useTranslation('common');
   const retryScopedToken = useRef(3);
   const [scopedAuthToken, setScopedAuthToken] = useState<string>('');
@@ -58,14 +66,14 @@ const PasskeyAdd = ({ authToken, device, onError, onNewTabOpened, onScopedAuthTo
   };
 
   return (
-    <Notification variant="success" title={`${t('success')}!`} subtitle={t('passkey-subtitle-suggestion')}>
-      <Box display="flex" flexDirection="column" gap={8} padding={2} alignItems="center">
-        <LinkButton onClick={handleAddPassKeyClick} disabled={isLoading}>
-          {t('add-your-passkey')}
-        </LinkButton>
-        <Text variant="caption-1" color="tertiary">
-          {t('or-close-this-window')}
-        </Text>
+    <Notification title={`${t('add-a-passkey')}`} subtitle={t('passkey-subtitle-suggestion')}>
+      <Box display="flex" flexDirection="column" gap={4} paddingTop={7} paddingBottom={2} alignItems="center">
+        <Button onClick={handleAddPassKeyClick} fullWidth size="large" disabled={isLoading}>
+          {t('launch-registration')}
+        </Button>
+        <Button onClick={onSkip} fullWidth size="large" variant="secondary">
+          {t('do-later')}
+        </Button>
       </Box>
     </Notification>
   );

@@ -15,11 +15,10 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
       initial: 'init',
       context: {},
       on: {
-        scopedAuthTokenReceived: { actions: ['assignScopedAuthToken'] },
         invalidAuthConfigReceived: { target: 'invalidAuthConfig' },
         invalidConfigReceived: { target: 'invalidConfig' },
+        scopedAuthTokenReceived: { actions: ['assignScopedAuthToken'] },
         sdkUrlNotAllowedReceived: { target: 'sdkUrlNotAllowed' },
-        doneReceived: [{ target: 'done' }],
       },
       states: {
         init: {
@@ -36,16 +35,35 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
           on: {
             identifyCompleted: [
               {
-                cond: ctx => !!ctx.device?.hasSupportForWebauthn,
-                target: 'passkeyOptionalRegistration',
-                actions: ['assignAuthToken'],
+                target: 'onboardingValidation',
+                actions: ['assignIdentificationResult'],
               },
-              { target: 'done' },
+            ],
+          },
+        },
+        onboardingValidation: {
+          on: {
+            onboardingValidationError: { target: 'unexpectedError' },
+            onboardingValidationCompleted: [
+              {
+                cond: ctx => {
+                  const noWebauthnSupport = !ctx.device?.hasSupportForWebauthn;
+                  const passkeyAlreadyRegistered = !!ctx.isPasskeyAlreadyRegistered;
+                  return noWebauthnSupport || passkeyAlreadyRegistered;
+                },
+                target: 'done',
+                actions: ['assignValidationToken'],
+              },
+              {
+                target: 'passkeyOptionalRegistration',
+                actions: ['assignValidationToken'],
+              },
             ],
           },
         },
         passkeyOptionalRegistration: {
           on: {
+            passkeyRegistrationSkip: [{ target: 'done' }],
             passkeyRegistrationError: [{ target: 'passkeyError' }],
             passkeyRegistrationTabOpened: [
               {
@@ -58,7 +76,7 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         passkeyProcessing: {
           on: {
             passkeyProcessingCancelled: [{ target: 'passkeyCancelled' }],
-            passkeyProcessingCompleted: [{ target: 'passkeySuccess' }],
+            passkeyProcessingCompleted: [{ target: 'done' }],
             passkeyProcessingError: [{ target: 'passkeyError' }],
           },
         },
@@ -67,7 +85,6 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         invalidConfig: { type: 'final' },
         passkeyCancelled: { type: 'final' },
         passkeyError: { type: 'final' },
-        passkeySuccess: { type: 'final' },
         sdkUrlNotAllowed: { type: 'final' },
         unexpectedError: { type: 'final' },
       },
@@ -81,9 +98,15 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
           ctx.props = payload.props ? { ...payload.props } : ctx.props;
           return ctx;
         }),
-        assignAuthToken: assign((ctx, { payload }) => {
+        assignIdentificationResult: assign((ctx, { payload }) => {
           if (!payload || !payload.authToken) return ctx;
           ctx.authToken = payload.authToken;
+          ctx.isPasskeyAlreadyRegistered = Boolean(payload.isPasskeyAlreadyRegistered);
+          return ctx;
+        }),
+        assignValidationToken: assign((ctx, { payload }) => {
+          if (!payload || !payload.validationToken) return ctx;
+          ctx.validationToken = payload.validationToken;
           return ctx;
         }),
         assignScopedAuthToken: assign((ctx, { payload }) => {

@@ -13,10 +13,12 @@ export type AuthIdentifyAppMachineContext = {
   authToken?: string;
   config?: PublicOnboardingConfig;
   device?: DeviceInfo;
+  isPasskeyAlreadyRegistered?: boolean;
   notification?: NotificationProps;
   passkeyRegistrationWindow?: Window;
   props?: AuthDataPropsWithToken;
   scopedAuthToken?: string;
+  validationToken?: string;
 };
 
 export type AuthIdentifyAppMachineEvents =
@@ -28,15 +30,16 @@ export type AuthIdentifyAppMachineEvents =
         props: AuthDataPropsWithToken;
       };
     }
-  | { type: 'doneReceived' }
-  | { type: 'identifyCompleted'; payload: { authToken: string } }
+  | { type: 'identifyCompleted'; payload: { authToken: string; isPasskeyAlreadyRegistered: boolean } }
   | { type: 'invalidAuthConfigReceived' }
   | { type: 'invalidConfigReceived' }
-  | { type: 'notificationReceived'; payload: NotificationProps }
+  | { type: 'onboardingValidationCompleted'; payload: { validationToken: string } }
+  | { type: 'onboardingValidationError'; payload: unknown }
   | { type: 'passkeyProcessingCancelled'; payload?: never }
   | { type: 'passkeyProcessingCompleted' }
   | { type: 'passkeyProcessingError' }
   | { type: 'passkeyRegistrationError'; payload: unknown }
+  | { type: 'passkeyRegistrationSkip' }
   | { type: 'passkeyRegistrationTabOpened'; payload: Window }
   | { type: 'scopedAuthTokenReceived'; payload: string }
   | { type: 'sdkUrlNotAllowedReceived' };

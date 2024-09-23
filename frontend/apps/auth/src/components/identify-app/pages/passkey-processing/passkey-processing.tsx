@@ -68,7 +68,7 @@ const PasskeyProcessing = ({ onCancelError }: PasskeyProcessingProps) => {
 
   return (
     <Notification title={t('add-a-passkey')} subtitle={t('passkey-tab-instructions')}>
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box display="flex" flexDirection="column" alignItems="center" paddingTop={7} gap={7}>
         <LoadingSpinner />
         <LinkButton onClick={handleCancelD2p} data-dd-action-name="transfer-processing:cancel">
           {t('cancel')}
