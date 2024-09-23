@@ -107,7 +107,7 @@ const Content = ({ fallback }: ContentProps) => {
     setFieldErrors(undefined);
     setFormErrorMessage(undefined);
 
-    if (usersVaultMutation.isLoading) {
+    if (usersVaultMutation.isPending) {
       logTrack('Vault mutation is already in progress, skipping save');
       return;
     }
@@ -152,7 +152,7 @@ const Content = ({ fallback }: ContentProps) => {
     return <Invalid onClose={handleClose} />;
   }
 
-  const { vaultFields, expiresAt } = data;
+  const { vaultFields, expiresAt } = data ?? {};
   const sections = getFormSectionsFromFields(vaultFields);
   if (!sections.length) {
     logError('Auth token is missing fields');
@@ -181,7 +181,7 @@ const Content = ({ fallback }: ContentProps) => {
       title={title}
       sections={sections}
       variant={variant}
-      isLoading={usersVaultMutation.isLoading}
+      isLoading={usersVaultMutation.isPending}
       hideFootprintLogo={hideFootprintLogo}
       hideSaveButton={hideButtons}
       hideCancelButton={hideCancelButton || hideButtons}

@@ -1,7 +1,7 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import { mockRouter, render, screen, waitFor } from '@onefootprint/test-utils';
+import { mockRouter, render, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ProviderReturn } from 'src/components/footprint-provider';
@@ -43,11 +43,6 @@ describe('<Content />', () => {
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
-    logger: {
-      log: () => undefined,
-      warn: () => undefined,
-      error: () => undefined,
-    },
     defaultOptions: {
       queries: {
         retry: false,
@@ -83,7 +78,6 @@ describe('<Content />', () => {
       });
     });
   });
-
   describe('when auth token is expired', () => {
     beforeEach(() => {
       withSdkArgs();
@@ -92,9 +86,9 @@ describe('<Content />', () => {
 
     it('should show invalid page', async () => {
       renderContent(getMockClient());
-      await waitFor(() => {
-        expect(screen.getByTestId('invalid-form')).toBeInTheDocument();
-      });
+      await waitForElementToBeRemoved(() => screen.queryByTestId('init-shimmer'));
+      const invalidForm = await screen.findByTestId('invalid-form', {}, { timeout: 5000 });
+      expect(invalidForm).toBeInTheDocument();
     });
   });
 

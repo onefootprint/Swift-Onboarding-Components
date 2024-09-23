@@ -20,6 +20,10 @@ const entitiesVaultDecrypt = async (payload: EntitiesVaultDecryptRequest) => {
   return response.data;
 };
 
-const useEntitiesVaultDecrypt = () => useMutation(entitiesVaultDecrypt);
+const useEntitiesVaultDecrypt = () => {
+  return useMutation({
+    mutationFn: entitiesVaultDecrypt,
+  });
+};
 
 export default useEntitiesVaultDecrypt;

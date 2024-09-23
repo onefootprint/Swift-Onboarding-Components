@@ -28,7 +28,9 @@ const clientTokenFields = async (request: ClientTokenFieldsRequest) => {
 };
 
 const useClientTokenFields = (authToken?: string) =>
-  useQuery(['client-token-fields', authToken], () => clientTokenFields({ authToken: authToken ?? '' }), {
+  useQuery({
+    queryKey: ['client-token-fields', authToken],
+    queryFn: () => clientTokenFields({ authToken: authToken ?? '' }),
     enabled: !!authToken,
   });
 

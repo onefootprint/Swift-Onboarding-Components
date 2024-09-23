@@ -33,7 +33,7 @@
     "@onefootprint/test-utils": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@tanstack/react-query": "^4.29.5",
+    "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.4",
     "constate": "^3.3.2",
     "creditcardutils": "^1.0.0",

@@ -22,7 +22,7 @@ const Content = ({ fallback }: ContentProps) => {
   const [props, setProps] = useState<FootprintRenderDataProps>();
   useProps<FootprintRenderDataProps>(setProps);
   const decryptMutation = useEntitiesVaultDecrypt();
-  const { data, isError, error, isSuccess, isLoading: isMutationLoading } = decryptMutation;
+  const { data, isError, error, isSuccess, isPending: isMutationLoading } = decryptMutation;
 
   const { authToken = '', id = '', label, canCopy, showHiddenToggle, defaultHidden } = props || {};
 

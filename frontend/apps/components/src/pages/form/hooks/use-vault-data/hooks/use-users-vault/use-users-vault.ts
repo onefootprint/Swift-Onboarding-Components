@@ -18,6 +18,10 @@ const usersVaultRequest = async (payload: UsersVaultRequest) => {
   return response.data;
 };
 
-const useUsersVault = () => useMutation(usersVaultRequest);
+const useUsersVault = () => {
+  return useMutation({
+    mutationFn: usersVaultRequest,
+  });
+};
 
 export default useUsersVault;
