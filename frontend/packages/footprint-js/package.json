@@ -10,13 +10,8 @@
   "style": "./dist/footprint-js.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "kyc",
-    "identity verification"
-  ],
+  "files": ["dist"],
+  "keywords": ["kyc", "identity verification"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
