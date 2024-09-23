@@ -236,7 +236,7 @@ const CollectData = ({ onDone }: { onDone: () => void }) => {
   const handleSubmit = async (formValues: FormValues) => {
     setPending('saving');
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       fp.handoff({ onComplete: onDone })
     } catch (e) {
       console.log('Error', e);
@@ -420,7 +420,7 @@ const CollectData = ({ onDone }: { onDone: () => void }) => {
   const handleSubmit = async (formValues: FormValues) => {
     setPending('saving');
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       fp.handoff({ onComplete: onDone })
     } catch (e) {
       console.log('Error', e);

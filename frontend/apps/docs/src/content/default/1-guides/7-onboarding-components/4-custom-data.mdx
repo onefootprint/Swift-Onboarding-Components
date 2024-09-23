@@ -80,7 +80,7 @@ const Flow = () => {
 
 ### Saving
 
-Once the data is collected, just use `fp.save` as usual:
+Once the data is collected, just use `fp.vault` as usual:
 
 ```jsx filename="app.tsx" highlight="12,14,15,16,19"
 import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
@@ -97,7 +97,7 @@ const Flow = () => {
   const { fp } = useFootprint();
 
   const handleSubmit = (data: Di) => {
-    fp.save(data, { onSuccess: () => console.log('Saved!') });
+    fp.vault(data, { onSuccess: () => console.log('Saved!') });
   };
 
   return (

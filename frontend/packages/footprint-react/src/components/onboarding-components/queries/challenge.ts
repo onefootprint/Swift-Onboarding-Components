@@ -125,18 +125,18 @@ const verify = async (payload: { challenge: string; challengeToken: string }, op
   return response;
 };
 
-export const getValidationToken = async (options: { token: string }) => {
+export const getValidationToken = async (options: { authToken: string }) => {
   const response = await request<{ validationToken: string }>({
     url: '/hosted/identify/validation_token',
     method: 'POST',
     headers: {
-      'X-Fp-Authorization': options.token,
+      'X-Fp-Authorization': options.authToken,
     },
   });
-  return response.validationToken;
+  return response;
 };
 
-export const initOnboarding = async (options: { token: string; sandboxOutcome?: SandboxOutcome }) => {
+export const initOnboarding = async (options: { authToken: string; sandboxOutcome?: SandboxOutcome }) => {
   const response = await request<{ authToken: string }>({
     url: '/hosted/onboarding',
     method: 'POST',
@@ -144,7 +144,7 @@ export const initOnboarding = async (options: { token: string; sandboxOutcome?: 
       fixture_result: options.sandboxOutcome?.overallOutcome,
     },
     headers: {
-      'X-Fp-Authorization': options.token,
+      'X-Fp-Authorization': options.authToken,
     },
   });
   return response;
@@ -169,12 +169,13 @@ export const verifyChallenge = async (
   options: { token: string; sandboxOutcome?: SandboxOutcome },
 ) => {
   const response = await verify(payload, options);
-  await initOnboarding({ token: response.authToken, sandboxOutcome: options.sandboxOutcome });
-  const [validationToken, requirements, vaultingToken] = await Promise.all([
-    getValidationToken({ token: response.authToken }),
-    getRequirements({ token: response.authToken }),
+  await initOnboarding({ authToken: response.authToken, sandboxOutcome: options.sandboxOutcome });
+  const [{ validationToken }, requirements, vaultingToken] = await Promise.all([
+    getValidationToken({ authToken: response.authToken }),
+    getRequirements({ authToken: response.authToken }),
     createVaultingToken({ authToken: response.authToken }),
   ]);
+
   return {
     authToken: response.authToken,
     vaultingToken: vaultingToken.token,

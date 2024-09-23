@@ -9,7 +9,7 @@ const getDataKind = (data: Record<string, unknown>) => {
   return { hasId, hasBusiness };
 };
 
-const save = async (payload: UserDataRequest) => {
+const vault = async (payload: UserDataRequest) => {
   const data = payload.data;
   const hasData = Object.entries(data).length;
   if (!hasData) {
@@ -34,4 +34,4 @@ const save = async (payload: UserDataRequest) => {
   return response;
 };
 
-export default save;
+export default vault;

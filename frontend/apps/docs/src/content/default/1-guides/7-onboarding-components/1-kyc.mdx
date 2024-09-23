@@ -352,7 +352,7 @@ const Flow = () => {
   };
 
   const handleSubmitData = (formValues: Di) => {
-    fp.save(formValues, {
+    fp.vault(formValues, {
       onSuccess: () => {
         console.log('done');
       },
@@ -481,7 +481,7 @@ const Flow = () => {
   };
 
   const handleSubmitData = (formValues: Di) => {
-    fp.save(formValues, {
+    fp.vault(formValues, {
       onSuccess: fp.handoff,
     });
   };

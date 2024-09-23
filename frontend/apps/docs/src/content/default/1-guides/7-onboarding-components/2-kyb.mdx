@@ -124,7 +124,7 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = (data: Di) => {
-    fp.save(data, { onSuccess: onDone });
+    fp.vault(data, { onSuccess: onDone });
   };
 
   return (
@@ -241,7 +241,7 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = (data: Di) => {
-    fp.save(data, { onSuccess: onDone });
+    fp.vault(data, { onSuccess: onDone });
   };
 
   return (
@@ -338,7 +338,7 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = (data: Di) => {
-    fp.save(data, { onSuccess: () => fp.handoff({ onComplete: onDone }) });
+    fp.vault(data, { onSuccess: () => fp.handoff({ onComplete: onDone }) });
   };
 
   return (

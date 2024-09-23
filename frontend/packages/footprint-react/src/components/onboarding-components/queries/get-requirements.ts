@@ -1,17 +1,25 @@
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 import request from '../utils/request';
 
-const getRequirements = async (options: { token: string }) => {
+const getRequirements = async (options: { authToken: string }) => {
   const response = await request<OnboardingStatusResponse>({
     method: 'GET',
     url: '/hosted/onboarding/status',
     headers: {
-      'X-Fp-Authorization': options.token,
+      'X-Fp-Authorization': options.authToken,
     },
   });
-  const all = response.allRequirements;
-  const missing = all.filter(requirement => !requirement.isMet);
-  return { all, missing, isCompleted: missing.length === 0 };
+
+  const allRequirements = response.allRequirements;
+  const missingRequirements = allRequirements.filter(requirement => !requirement.isMet);
+  const isCompleted = missingRequirements.length === 0;
+
+  return {
+    all: allRequirements,
+    missing: missingRequirements,
+    isCompleted: isCompleted,
+    isMissing: !isCompleted,
+  };
 };
 
 export default getRequirements;

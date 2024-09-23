@@ -1,6 +1,6 @@
 import type { FormValues } from '@onefootprint/footprint-react';
-import { Fp, useFootprint } from '@onefootprint/footprint-react';
-import { Box, Button, Container, Divider, LoadingSpinner, Shimmer, Stack, Stepper, Text } from '@onefootprint/ui';
+import { Fp, InlineProcessError, useFootprint } from '@onefootprint/footprint-react';
+import { Box, Button, Container, Divider, LoadingSpinner, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 
 import Header from './components/header';
@@ -168,7 +168,7 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const handleSubmit = async (formValues: FormValues) => {
     try {
       setBusy(true);
-      await fp.save(formValues);
+      await fp.vault(formValues);
       onDone();
     } catch (e) {
       console.log(e);
@@ -227,12 +227,15 @@ const Address = ({ onDone }: { onDone: (validationToken: string) => void }) => {
   const [busy, setBusy] = useState(false);
 
   const handleSubmit = async (formValues: FormValues) => {
+    setBusy(true);
     try {
-      setBusy(true);
-      await fp.save(formValues);
-      fp.handoff({ onComplete: onDone });
+      await fp.vault(formValues);
+      const { validationToken } = await fp.process();
+      onDone(validationToken);
     } catch (e) {
-      console.log(e);
+      if (e instanceof InlineProcessError) {
+        fp.handoff({ onComplete: onDone });
+      }
     } finally {
       setBusy(false);
     }
@@ -296,36 +299,5 @@ const Success = () => (
     </Box>
   </Layout>
 );
-
-const _Loading = () => {
-  return (
-    <Stack direction="row" width="100%">
-      <Stack direction="column" width="100%">
-        <Stack direction="column" width="100%" alignItems="center">
-          <Shimmer height="32px" width="160px" marginBottom={4} marginTop={4} />
-          <Divider />
-        </Stack>
-        <Container>
-          <Stack marginTop={7} gap={8}>
-            <Stack direction="column" width="30%" gridArea="left">
-              <Shimmer height="24px" width="160px" marginBottom={4} />
-              <Shimmer height="24px" width="160px" marginBottom={4} />
-              <Shimmer height="24px" width="160px" />
-            </Stack>
-            <Stack direction="column" width="100%" maxWidth="480px" gridArea="center" alignItems="left">
-              <Shimmer height="32px" width="300px" marginBottom={5} />
-              <Shimmer height="16px" width="100px" marginBottom={2} />
-              <Shimmer height="32px" width="100%" marginBottom={5} />
-              <Shimmer height="16px" width="100px" marginBottom={2} />
-              <Shimmer height="32px" width="100%" marginBottom={5} />
-              <Divider />
-              <Shimmer height="32px" width="100%" marginTop={5} />
-            </Stack>
-          </Stack>
-        </Container>
-      </Stack>
-    </Stack>
-  );
-};
 
 export default Demo;

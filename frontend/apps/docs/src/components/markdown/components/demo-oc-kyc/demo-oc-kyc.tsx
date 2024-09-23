@@ -123,7 +123,7 @@ const Step5 = () => {
 
   const handleSubmitData = async (formValues: FormValues) => {
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       console.log('done');
     } catch (e) {
       console.log(e);
@@ -234,7 +234,7 @@ const Step6 = () => {
 
   const handleSubmitData = async (formValues: FormValues) => {
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       fp.handoff();
     } catch (e) {
       console.log(e);

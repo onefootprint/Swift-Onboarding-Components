@@ -38,8 +38,8 @@ const validateAuthToken = async ({
     // We just check if the tokenScopes is not empty
     // Relevant code in FE: frontend/packages/idv/src/components/identify/components/init-auth-token/init-auth-token.tsx
     if (tokenScopes?.length) {
-      await getValidationToken({ token: authToken });
-      await initOnboarding({ token: authToken, sandboxOutcome });
+      await getValidationToken({ authToken });
+      await initOnboarding({ authToken, sandboxOutcome });
       const vaultingTokenResponse = await createVaultingToken({
         authToken,
       });

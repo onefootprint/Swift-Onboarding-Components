@@ -11,7 +11,7 @@ const PersonalInformation = ({ onFormSubmit, onInputEvent }: StepProps) => {
   const handleSubmit = async (formValues: FormValues) => {
     setFormState('loading');
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       fp.handoff({ onComplete: onFormSubmit });
     } catch (e) {
       console.log(e);

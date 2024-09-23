@@ -139,7 +139,7 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
 
   const handleSubmit = async (formValues: FormValues) => {
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       onDone();
     } catch (e) {
       console.log(e);
@@ -213,7 +213,7 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
 
   const handleSubmit = async (formValues: FormValues) => {
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       onDone();
     } catch (e) {
       console.log(e);
@@ -266,7 +266,7 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
 
   const handleSubmit = async (formValues: FormValues) => {
     try {
-      await fp.save(formValues);
+      await fp.vault(formValues);
       fp.handoff({ onComplete: onDone });
     } catch (e) {
       console.log(e);
