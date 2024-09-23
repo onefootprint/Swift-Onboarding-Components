@@ -203,6 +203,7 @@ export const TimelineFixture: Timeline = [
                 },
               },
             ],
+            businessConfigs: [],
           },
         },
         actor: {
