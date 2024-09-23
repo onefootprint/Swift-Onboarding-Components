@@ -17,6 +17,10 @@ const getOnboardingSession = async (authToken: string) => {
   return response;
 };
 
-const useGetOnboardingSession = () => useMutation((authToken: string) => getOnboardingSession(authToken), { retry: 3 });
+const useGetOnboardingSession = () =>
+  useMutation({
+    mutationFn: (authToken: string) => getOnboardingSession(authToken),
+    retry: 3,
+  });
 
 export default useGetOnboardingSession;

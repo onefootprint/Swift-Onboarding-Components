@@ -4,6 +4,7 @@ import type { ProviderReturn } from '@onefootprint/idv';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 import getSdkContext from '../../../../utils/sdk-context';
 
@@ -34,11 +35,24 @@ const useGetSdkArgs = (
     onSuccess: (data: GetSdkArgsResponse) => void;
     onError: (error: RequestError) => void;
   },
-) =>
-  useQuery([authToken, 'get-sdk-args'], () => getSdkArgs(authToken, fpProvider), {
+) => {
+  const query = useQuery({
+    queryKey: ['get-sdk-args', authToken],
+    queryFn: () => getSdkArgs(authToken, fpProvider),
     enabled: isTokenFormat(authToken),
-    onSuccess: options?.onSuccess,
-    onError: options?.onError,
   });
+
+  useEffect(() => {
+    if (query.isSuccess && options?.onSuccess) {
+      options.onSuccess(query.data);
+    }
+    if (query.isError && options?.onError) {
+      options.onError(query.error as RequestError);
+    }
+    // don't pass options?.isSUccess and options?.onError - triggers infinite loop
+  }, [query.isSuccess, query.isError, query.data, query.error]);
+
+  return query;
+};
 
 export default useGetSdkArgs;
