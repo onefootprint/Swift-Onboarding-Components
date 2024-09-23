@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS business_owner_business_vault_id;

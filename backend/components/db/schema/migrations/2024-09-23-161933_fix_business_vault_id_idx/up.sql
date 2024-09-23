@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS business_owner_business_vault_id2 ON business_owner(business_vault_id);
