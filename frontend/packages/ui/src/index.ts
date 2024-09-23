@@ -102,6 +102,7 @@ export {
   Container,
   CopyButton,
   CountrySelect,
+  Command,
   DateRangeInput,
   DateRangeSelector,
   DateSelectorSheet,

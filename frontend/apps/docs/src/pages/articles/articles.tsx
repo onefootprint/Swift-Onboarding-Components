@@ -5,10 +5,10 @@ import type { Page } from 'src/types/page';
 import styled, { css } from 'styled-components';
 import Page404 from '../404/404';
 import AppHeader from './components/app-header';
-import Cmd from './components/cmd';
 import DesktopNav from './components/nav/desktop-nav';
 import MobileNav from './components/nav/mobile-nav';
 import Sections from './components/sections';
+import Shortcuts from './components/shortcuts';
 
 type ArticlesProps = {
   article: Article;
@@ -30,7 +30,7 @@ const Articles = ({ article, page: { navigation } }: ArticlesProps) => {
           <Sections sections={article.data.sections} />
         </GridAssigner>
       </Main>
-      <Cmd navigation={navigation} />
+      <Shortcuts navigation={navigation} />
     </>
   ) : (
     <Page404 />

@@ -12,9 +12,9 @@ import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import Actions from './components/actions';
-import Cmdk from './components/cmdk';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
+import Shortcuts from './components/shortcuts';
 import useDecryptControls from './hooks/use-decrypt-controls';
 import useEditControls from './hooks/use-edit-controls';
 
@@ -110,7 +110,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
         onSubmit={handleDecryptSubmit}
         open={decryptControls.isOpen}
       />
-      <Cmdk entity={entity} />
+      <Shortcuts entity={entity} />
     </>
   );
 

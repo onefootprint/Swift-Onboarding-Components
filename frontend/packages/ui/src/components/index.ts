@@ -143,3 +143,4 @@ export type { ToggleProps } from './toggle';
 export { default as Toggle } from './toggle';
 export type { TooltipProps } from './tooltip';
 export { default as Tooltip } from './tooltip';
+export { default as Command } from './command';

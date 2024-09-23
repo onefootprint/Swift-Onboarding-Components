@@ -314,6 +314,9 @@
     "date-range": {
       "error-future": "La fecha debe ser hoy o previa a hoy.",
       "error-past": "La fecha debe ser hoy o posterior a hoy."
+    },
+    "command": {
+      "erase-search": "Erase search"
     }
   }
 }

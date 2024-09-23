@@ -65,8 +65,8 @@ const Option = ({ children, value, onClick, onDelete, isEdit }: OptionProps) => 
     <Container ref={hoverRef} $isHovered={isHovered} $isCopied={isCopied} onClick={handleOnClick}>
       <Stack direction="row" gap={3} padding={4} align="start">
         <IconContainer
-          isHovered={isHovered}
-          isEdit={isEdit}
+          $isHovered={isHovered}
+          $isEdit={isEdit}
           align="start"
           justify="center"
           borderRadius="full"
@@ -125,10 +125,10 @@ const Container = styled(motion.div)<{
 `;
 
 const IconContainer = styled(Stack)<{
-  isHovered?: boolean;
-  isEdit?: boolean;
+  $isHovered?: boolean;
+  $isEdit?: boolean;
 }>`
-  ${({ theme, isHovered, isEdit }) => css`
+  ${({ theme, $isHovered, $isEdit }) => css`
     height: 100%;
     width: fit-content;
     transition: all 0.2s ease-in-out;
@@ -136,24 +136,24 @@ const IconContainer = styled(Stack)<{
     background-color: ${theme.backgroundColor.secondary};
 
     ${
-      isEdit &&
-      !isHovered &&
+      $isEdit &&
+      !$isHovered &&
       css`
       background-color: ${theme.backgroundColor.secondary};
     `
     }
 
     ${
-      isHovered &&
-      !isEdit &&
+      $isHovered &&
+      !$isEdit &&
       css`
       background-color: ${theme.backgroundColor.senary};
     `
     }
 
     ${
-      isHovered &&
-      isEdit &&
+      $isHovered &&
+      $isEdit &&
       css`
       background-color: ${theme.backgroundColor.error};
       svg {
