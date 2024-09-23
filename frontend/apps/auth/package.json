@@ -31,7 +31,7 @@
     "@onefootprint/postmate": "2.1.2",
     "@onefootprint/request": "*",
     "@onefootprint/ui": "*",
-    "@tanstack/react-query": "^4.35.7",
+    "@tanstack/react-query": "^5.56.2",
     "@xstate/react": "^3.2.1",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
