@@ -24,7 +24,6 @@ const useOtp = () => {
     vaultingToken,
     verifiedAuthToken,
   } = context;
-  const isReadyForAuth = !!onboardingConfig;
 
   const authTokenStatusToRequirement = (status: AuthTokenStatus): boolean => {
     if (status === AuthTokenStatus.validWithSufficientScope) {
@@ -259,7 +258,6 @@ const useOtp = () => {
     createAuthTokenBasedChallenge,
     verify,
     requiresAuth,
-    isReadyForAuth,
   };
 };
 

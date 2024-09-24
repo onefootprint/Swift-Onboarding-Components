@@ -29,6 +29,7 @@ export type ContextData = {
   publicKey: string;
   locale?: SupportedLocale;
 
+  isReady: boolean;
   authTokenStatus?: AuthTokenStatus;
   challengeData?: ChallengeData;
   didCallRequiresAuth: boolean;
@@ -44,11 +45,11 @@ const Context = createContext<[ContextData, UpdateContext]>([
     didCallRequiresAuth: false,
     locale: 'en-US',
     publicKey: '',
+    isReady: false,
   },
   () => undefined,
 ]);
 
-// These are the props users can set on the provider
 export type ProviderProps = Pick<
   ContextData,
   'appearance' | 'authToken' | 'publicKey' | 'locale' | 'sandboxOutcome' | 'sandboxId'
@@ -72,6 +73,7 @@ const Provider = ({
     sandboxOutcome,
     sandboxId,
     publicKey,
+    isReady: false,
     // when calling handoff, we can listen to fp instance events
     handoffCallbacks: {
       onCancel: undefined,
@@ -111,7 +113,7 @@ const Provider = ({
         }
       }
       if (!sandboxId) {
-        // create a random sandboxId with both letters and numbers of lenth 12
+        // create a random sandboxId with both letters and numbers of length 12
         newSandboxId = Math.random().toString(36).substring(2, 14);
       }
 
@@ -122,14 +124,12 @@ const Provider = ({
     return { sandboxId: newSandboxId, sandboxOutcome: newSandboxOutcome };
   };
 
-  const getOnboardingConfig = async (pKey?: string) => {
-    if (!pKey) {
-      throw new Error('No publicKey found');
-    }
+  const getOnboardingConfig = async (pKey: string) => {
     const response = await getOnboardingConfigReq(pKey);
     const { sandboxId, sandboxOutcome } = getSandboxProps(response);
     setContext(prev => ({
       ...prev,
+      isReady: true,
       onboardingConfig: response,
       sandboxId,
       sandboxOutcome,
@@ -137,7 +137,11 @@ const Provider = ({
   };
 
   useEffect(() => {
-    getOnboardingConfig(publicKey);
+    if (publicKey) {
+      getOnboardingConfig(publicKey);
+    } else {
+      throw new Error('No publicKey found');
+    }
   }, [publicKey]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

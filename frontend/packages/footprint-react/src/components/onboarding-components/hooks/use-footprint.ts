@@ -125,6 +125,7 @@ export const useFootprint = () => {
   };
 
   return {
+    isReady: context.isReady,
     getRequirements,
     handoff,
     process,
