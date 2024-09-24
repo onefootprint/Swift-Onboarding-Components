@@ -12,6 +12,11 @@
         "lambda:*"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["cloudfront:*", "wafv2:*"],
+      "Resource": "*"
     }
   ]
 }
