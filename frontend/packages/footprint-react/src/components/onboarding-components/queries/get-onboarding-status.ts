@@ -33,7 +33,12 @@ const getOnboardingStatus = async (options: { authToken: string }) => {
       const missingAttributes =
         requirement.missingAttributes
           ?.flatMap(cdo => CdoToAllDisMap[cdo])
-          .filter(attr => attr !== 'id.address_line2') || [];
+          .filter(attr => {
+            if (attr === 'id.address_line2' || attr === 'id.middle_name') {
+              optionalAttributes.push(attr);
+            }
+            return attr !== 'id.address_line2' && attr !== 'id.middle_name';
+          }) || [];
 
       fields.optional.push(...optionalAttributes);
       fields.collected.push(...populatedAttributes);
