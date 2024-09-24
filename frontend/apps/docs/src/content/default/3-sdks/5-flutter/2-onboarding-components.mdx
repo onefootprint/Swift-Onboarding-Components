@@ -91,10 +91,10 @@ With the Provider in place, you can now start using Onboarding components. Let's
 
 ### 4.1 Check auth requirements
 
-We start by calling the function `requiresAuth()` . This function needs to be called only once and after the first frame is render. So, we put it inside `initState()` in a callback to `WidgetsBinding.instance.addPostFrameCallback` . `requiresAuth` will return `({FootprintAuthMethods? authMethod, bool requiresAuth})` .
+We start by calling the function `requiresAuth()` . This function needs to be called only once and after the first frame is render. So, we put it inside `initState()` in a callback to `WidgetsBinding.instance.addPostFrameCallback` . `requiresAuth` will return `({String? validationToken, bool requiresAuth})` .
 
 - `requiresAuth` will tell you if you need to authenticate at all. If you provided a fully scoped `authToken` , you will most likely not need to authenticate again.
-- The `FootprintAuthMethods? authMethod` will tell you what kind of auth method is required. It can be `authToken` or `emailAndPhone` . If `requiresAuth` is false i.e. you don’t need to authenticate, `authMethod` will return `null` .
+- The `String? validationToken` will provide you a validation token that you can use to find the `fp_id` using [this API](/api-reference#post-onboarding-session-validate). It's going to be `null` if the `requiresAuth` prop above returns `true` i.e. if you need to authenticate.
 
 _Note: You can skip calling this function if you didn’t provide auth token and authenticate using email and phone._
 
@@ -424,9 +424,9 @@ class _IdentifyState extends State<Identify> {
 
 ### 4.2 Verify challenge
 
-Finally we need verify the challenge using `verifyOtpChallenge` .
+Finally we need verify the challenge using `verifyOtpChallenge` returns a `validationToken` that you can use to find the fp_id.
 
-```dart highlight="148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 120, 121, 122"
+```dart highlight="148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 120, 121, 122"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -581,7 +581,8 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
+                otpUtils.verifyOtpChallenge(verificationCode: value).then((validationToken) {
+                  print(validationToken); // Use the validation token to retrieve fp_id if you want. We will skip this line in the rest of the docs
                   handleVerfied();
                 });
               },
@@ -662,7 +663,8 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
+              otpUtils.verifyOtpChallenge(verificationCode: value).then((validationToken) {
+                print(validationToken); // Use the validation token to retrieve fp_id if you want. We will skip this line in the rest of the docs
                 handleVerfied();
               });
             },
