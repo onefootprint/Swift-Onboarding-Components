@@ -16,18 +16,17 @@ const useGetActionName = () => {
     } else if (config.kind === TriggerKind.Document) {
       // TODO when we start supporting requesting multiple documents, adjust the timeline event
       // accordingly
-      const { configs, businessConfigs } = config.data;
-      const docConfigs = [...configs, ...businessConfigs];
-      const customConfig = docConfigs.find(c => c.kind === DocumentRequestKind.Custom);
-      if (docConfigs.some(c => c.kind === DocumentRequestKind.ProofOfAddress)) {
+      const { configs } = config.data;
+      const customConfig = configs.find(c => c.kind === DocumentRequestKind.Custom);
+      if (configs.some(c => c.kind === DocumentRequestKind.ProofOfAddress)) {
         action = t('actions.proof_of_address');
-      } else if (docConfigs.some(c => c.kind === DocumentRequestKind.ProofOfSsn)) {
+      } else if (configs.some(c => c.kind === DocumentRequestKind.ProofOfSsn)) {
         action = t('actions.proof_of_ssn');
       } else if (customConfig && 'name' in customConfig.data) {
         action = t('actions.custom_document', {
           docName: customConfig.data.name,
         });
-      } else if (docConfigs.some(c => c.kind === DocumentRequestKind.Identity)) {
+      } else if (configs.some(c => c.kind === DocumentRequestKind.Identity)) {
         action = t('actions.id_document');
       }
     }

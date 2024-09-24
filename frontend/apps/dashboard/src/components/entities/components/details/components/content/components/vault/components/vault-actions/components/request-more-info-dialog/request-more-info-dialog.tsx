@@ -90,7 +90,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
           });
         }
       });
-      trigger = { kind: TriggerKind.Document, data: { configs, businessConfigs: [] } };
+      trigger = { kind: TriggerKind.Document, data: { configs } };
     }
     const actions: ActionRequest[] = [{ trigger, note: note || undefined, kind: ActionRequestKind.trigger }];
     if (data.clearManualReview) {

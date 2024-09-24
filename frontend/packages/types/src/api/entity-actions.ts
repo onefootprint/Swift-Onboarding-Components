@@ -38,7 +38,6 @@ export type WorkflowRequestConfig =
       kind: TriggerKind.Document;
       data: {
         configs: DocumentRequestConfig[];
-        businessConfigs: DocumentRequestConfig[];
       };
     }
   | {
