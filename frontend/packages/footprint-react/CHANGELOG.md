@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.6.0
+
+### Minor Changes
+
+- 8dcf41dbcf: Add is ready
+
 ## 7.5.0
 
 ### Minor Changes
