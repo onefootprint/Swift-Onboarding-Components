@@ -1,7 +1,6 @@
+import { API_BASE_URL, CLIENT_VERSION } from '../../../../config/constants';
 import { ApiError } from '../../../../types';
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
-
-const API_BASE_URL = process.env.API_BASE_URL ?? 'https://api.onefootprint.com';
 
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
@@ -30,6 +29,7 @@ async function request<T>(options: Options): Promise<T> {
   const queryParams = new URLSearchParams(convertToRecordString(snakeCaseParams));
   const requestHeaders = new Headers({
     'Content-Type': 'application/json',
+    'x-fp-client-version': CLIENT_VERSION,
     Accept: 'application/json',
   });
   Object.entries(headers).forEach(([key, value]) => {
