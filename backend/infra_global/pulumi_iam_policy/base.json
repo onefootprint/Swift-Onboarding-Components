@@ -1,0 +1,77 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "acm",
+      "Effect": "Allow",
+      "Action": [
+        "acm:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "cloudformation",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*",
+        "lambda:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "cloudfront",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:*",
+        "wafv2:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "cloudwatch",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ec2",
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:*",
+        "ec2:*",
+        "ecr:*",
+        "ecs:*",
+        "elasticloadbalancing:*",
+        "application-autoscaling:*",
+        "scheduler:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "rds",
+      "Effect": "Allow",
+      "Action": [
+        "rds:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "route53",
+      "Effect": "Allow",
+      "Action": [
+        "route53:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "s3",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": "arn:aws:s3:::*"
+    }
+  ]
+}
