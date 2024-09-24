@@ -15,9 +15,9 @@ export type RiskSignalsOverviewProps = {
 const RiskSignalsOverview = ({ type }: RiskSignalsOverviewProps) => {
   const id = useEntityId();
   const seqno = useEntitySeqno();
-  const { data, isLoading, error } = useRiskSignalsOverview(id, seqno);
+  const { data, isPending, error } = useRiskSignalsOverview(id, seqno);
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
   }
   if (error) {

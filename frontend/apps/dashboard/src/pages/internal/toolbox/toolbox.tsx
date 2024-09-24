@@ -20,7 +20,7 @@ export type ToolFormProps = {
 
 export type DialogComponentOutput = {
   component: React.ReactNode;
-  isLoading: boolean;
+  isPending: boolean;
 };
 
 type Tool = {
@@ -123,7 +123,7 @@ const SelectedToolDialog = ({
   if (!selectedTool.useDialogComponent) {
     return null;
   }
-  const { component, isLoading } = selectedTool.useDialogComponent({
+  const { component, isPending } = selectedTool.useDialogComponent({
     formId: 'tool-form',
     onClose: handleDialogClose,
   });
@@ -138,7 +138,7 @@ const SelectedToolDialog = ({
         form: 'tool-form',
         label: 'Submit',
         type: 'submit',
-        loading: isLoading,
+        loading: isPending,
       }}
     >
       {component}

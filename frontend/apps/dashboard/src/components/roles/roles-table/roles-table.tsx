@@ -9,11 +9,11 @@ import Row from './components/row';
 type RolesTableProps = {
   data?: Role[];
   errorMessage?: string;
-  isLoading?: boolean;
+  isPending?: boolean;
   kind: RoleKind;
 };
 
-const RolesTable = ({ data, errorMessage, isLoading, kind }: RolesTableProps) => {
+const RolesTable = ({ data, errorMessage, isPending, kind }: RolesTableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
   const filters = useRolesFilters();
   const columns = [
@@ -45,7 +45,7 @@ const RolesTable = ({ data, errorMessage, isLoading, kind }: RolesTableProps) =>
       emptyStateText={errorMessage || t('table.empty-state')}
       getKeyForRow={role => role.id}
       initialSearch={filters.values.search}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       onChangeSearchText={handleSearchChange}
       renderTr={({ item: role }) => <Row role={role} />}

@@ -103,7 +103,7 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
     onClick: isEditing ? undefined : enableEditMode,
     type: isEditing ? 'submit' : 'button',
     form: isEditing ? UPDATE_TVC_FORM_ID : undefined,
-    disabled: updateTenantMutation.isLoading,
+    disabled: updateTenantMutation.isPending,
   };
 
   return (

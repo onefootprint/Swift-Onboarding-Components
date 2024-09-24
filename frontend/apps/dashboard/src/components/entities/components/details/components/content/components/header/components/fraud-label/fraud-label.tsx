@@ -13,7 +13,7 @@ const FraudLabel = () => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'header.fraud-label' });
   const labelT = useLabelText();
   const entityId = useEntityId();
-  const { data: label, isLoading, error } = useLabel(entityId);
+  const { data: label, isPending, error } = useLabel(entityId);
   const [isOpen, setIsOpen] = useState(false);
   const editLabelMutation = useEditLabel();
 
@@ -32,7 +32,7 @@ const FraudLabel = () => {
     );
   };
 
-  if (error || isLoading) return null;
+  if (error || isPending) return null;
 
   return (
     <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>

@@ -22,7 +22,7 @@ const Home = () => {
       <Text variant="heading-2" marginBottom={7}>
         {t('header.title')}
       </Text>
-      <Box aria-busy={metrics.isLoading}>
+      <Box aria-busy={metrics.isPending}>
         <SectionTitle>
           <Text variant="heading-5" tag="h1">
             {t('onboarding-metrics.title')}
@@ -32,7 +32,7 @@ const Home = () => {
             <PlaybooksFilter />
           </Stack>
         </SectionTitle>
-        {metrics.isLoading ? <Loading /> : null}
+        {metrics.isPending ? <Loading /> : null}
         {metrics.error ? <ErrorComponent error={metrics.error} /> : null}
         {metrics.data ? <Content metrics={metrics.data} /> : null}
       </Box>

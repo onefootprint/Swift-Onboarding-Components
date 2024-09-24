@@ -16,7 +16,10 @@ const getAllowedDomains = async (authHeaders: AuthHeaders) => {
 
 const useAllowedDomains = () => {
   const { authHeaders, isLive } = useSession();
-  return useQuery(['allowed-domains', isLive], () => getAllowedDomains(authHeaders));
+  return useQuery({
+    queryKey: ['allowed-domains', isLive],
+    queryFn: () => getAllowedDomains(authHeaders),
+  });
 };
 
 export default useAllowedDomains;

@@ -86,7 +86,7 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
                 fallbackText={t('create-link.no-permission')}
                 tooltipPosition="left"
               >
-                <LinkButton onClick={openLinkDialog} disabled={generateTokenMutation.isLoading} variant="label-3">
+                <LinkButton onClick={openLinkDialog} disabled={generateTokenMutation.isPending} variant="label-3">
                   {t('create-link.label')}
                 </LinkButton>
               </PermissionGate>

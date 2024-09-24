@@ -5,4 +5,6 @@ export type EditLabelRequest = {
   kind: EntityLabel | null;
 };
 
-export type EditLabelResponse = {};
+export type EditLabelResponse = {
+  id: string;
+};

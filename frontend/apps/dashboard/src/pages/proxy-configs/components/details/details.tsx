@@ -12,20 +12,20 @@ const Details = () => {
   const { t } = useTranslation();
   const { query, clear } = useFilters();
   const isOpen = !!query.proxy_config_id;
-  const { data, isLoading, error } = useProxyConfig(query.proxy_config_id);
+  const { data, isPending, error } = useProxyConfig(query.proxy_config_id);
 
   const getDrawerTitle = () => {
     if (data) {
       return data.name;
     }
-    return isLoading ? t('notifications.loading') : t('notifications.error');
+    return isPending ? t('notifications.loading') : t('notifications.error');
   };
 
   return (
     <Drawer open={isOpen} title={getDrawerTitle()} onClose={clear}>
       <>
         {data && <Content proxyConfig={data} />}
-        {isLoading && <Loading />}
+        {isPending && <Loading />}
         {error && <ErrorComponent message={getErrorMessage(error)} />}
       </>
     </Drawer>

@@ -16,7 +16,7 @@ const Playbooks = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hasHadPlaybook, setHasHadPlaybook] = useState(false);
-  const { data: response, errorMessage, isLoading, pagination } = usePlaybooks();
+  const { data: response, errorMessage, isPending, pagination } = usePlaybooks();
   const filters = useFilters();
 
   const handleOpen = () => {
@@ -70,7 +70,7 @@ const Playbooks = () => {
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
-        <Table data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
+        <Table data={response?.data} errorMessage={errorMessage} isPending={isPending} />
         {response && response.meta.count > 0 && (
           <Pagination
             hasNextPage={pagination.hasNextPage}

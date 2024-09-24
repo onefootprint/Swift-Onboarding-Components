@@ -18,7 +18,7 @@ const useDecryptControls = () => {
     state.matches(State.decrypting) ||
     state.matches(State.decryptingAll);
   const isIdle = state.matches(State.idle);
-  const isLoading = state.matches(State.decrypting) || state.matches(State.decryptingAll);
+  const isPending = state.matches(State.decrypting) || state.matches(State.decryptingAll);
   const inProgress =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
@@ -90,7 +90,7 @@ const useDecryptControls = () => {
     cancel,
     isOpen,
     isIdle,
-    isLoading,
+    isPending,
     submitFields,
     submitAllFields,
     inProgress,

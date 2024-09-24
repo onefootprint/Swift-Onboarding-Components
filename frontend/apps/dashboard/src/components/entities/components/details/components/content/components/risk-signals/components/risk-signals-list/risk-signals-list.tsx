@@ -18,7 +18,7 @@ const RiskSignalsList = () => {
     keyPrefix: 'pages.entity.risk-signals.table',
   });
   const isViewingHistorical = !!useEntitySeqno();
-  const { isLoading, error, data } = useCurrentEntityRiskSignals();
+  const { isPending, error, data } = useCurrentEntityRiskSignals();
   const filters = useRiskSignalsFilters();
   const columns = [
     { text: t('header.severity'), width: '15%' },
@@ -42,7 +42,7 @@ const RiskSignalsList = () => {
         emptyStateText={error ? getErrorMessage(error) : t('empty-state')}
         getKeyForRow={(signal: RiskSignal) => signal.id}
         initialSearch={filters.query.risk_signal_description}
-        isLoading={isLoading}
+        isLoading={isPending}
         items={data}
         onChangeSearchText={handleSearchChange}
         onRowClick={handleRowClick}

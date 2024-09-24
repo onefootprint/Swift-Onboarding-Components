@@ -45,7 +45,7 @@ const Content = ({ entity, livenessData }: ContentProps) => {
           key={id}
           type={type}
           entity={entity}
-          isLoading={entry.cardIsLoading}
+          isPending={entry.cardisPending}
           isSelected={isSelected}
           onSelect={onSelectedIdChange}
         />,

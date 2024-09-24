@@ -23,7 +23,9 @@ const getMatchSignals = async (payload: GetEntityMatchSignalsRequest, authHeader
 const useEntityMatchSignals = ({ id }: UseEntityMatchSignalsProps) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, 'match_signals'], () => getMatchSignals({ id }, authHeaders), {
+  return useQuery({
+    queryKey: ['entity', id, 'match_signals'],
+    queryFn: () => getMatchSignals({ id }, authHeaders),
     select: transformResponse,
   });
 };

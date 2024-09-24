@@ -17,7 +17,9 @@ const getBusinessIds = async ({ entityId }: GetEntityOwnedBusinessIdsRequest, au
 const useGetEntityOwnedBusinessIds = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, 'owned_business_ids'], () => getBusinessIds({ entityId: id }, authHeaders), {
+  return useQuery({
+    queryKey: ['entity', id, 'owned_business_ids'],
+    queryFn: () => getBusinessIds({ entityId: id }, authHeaders),
     enabled: !!id,
   });
 };

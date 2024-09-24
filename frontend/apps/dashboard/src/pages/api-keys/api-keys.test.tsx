@@ -68,8 +68,8 @@ describe.skip('<ApiKeys />', () => {
 
         await waitFor(() => {
           const table = screen.getByRole('table');
-          const isLoading = table.getAttribute('aria-busy');
-          expect(isLoading).toBe('false');
+          const isPending = table.getAttribute('aria-busy');
+          expect(isPending).toBe('false');
         });
 
         const table = screen.getByRole('table');

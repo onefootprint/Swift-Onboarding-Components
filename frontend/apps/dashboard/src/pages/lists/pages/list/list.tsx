@@ -13,7 +13,7 @@ import Table from './components/table';
 const List = () => {
   const { t } = useTranslation('lists', { keyPrefix: 'list' });
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { data: response, errorMessage, isLoading } = useLists();
+  const { data: response, errorMessage, isPending } = useLists();
 
   const handleOpen = () => {
     setDialogOpen(true);
@@ -46,7 +46,7 @@ const List = () => {
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
-        <Table data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
+        <Table data={response?.data} errorMessage={errorMessage} isPending={isPending} />
       </Stack>
       <CreateDialog open={dialogOpen} onClose={handleClose} />
     </Container>

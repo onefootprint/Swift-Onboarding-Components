@@ -65,12 +65,12 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
         label: t('form.cta'),
         type: 'submit',
         form: 'copy-playbook-form',
-        loading: copyPlaybookMutation.isLoading,
+        loading: copyPlaybookMutation.isPending,
       }}
       secondaryButton={{
         label: t('form.cancel'),
         onClick: handleClose,
-        disabled: copyPlaybookMutation.isLoading,
+        disabled: copyPlaybookMutation.isPending,
       }}
       size="compact"
       title={t('title')}

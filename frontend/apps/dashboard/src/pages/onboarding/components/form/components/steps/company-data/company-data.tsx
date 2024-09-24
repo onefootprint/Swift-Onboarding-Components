@@ -20,7 +20,7 @@ const CompanyData = ({ onBack, onComplete }: CompanyDataProps) => {
   return (
     <>
       <Header title={t('title')} subtitle={t('subtitle')} />
-      {orgQuery.isLoading && <Loading />}
+      {orgQuery.isPending && <Loading />}
       {orgQuery.data && <Content onBack={onBack} onComplete={onComplete} organization={orgQuery.data} />}
       {orgQuery.error && <ErrorComponent error={orgQuery.error} />}
     </>

@@ -23,7 +23,7 @@ const Invite = ({ onBack, onComplete }: InviteProps) => {
   return (
     <>
       <Header title={t('title')} subtitle={t('subtitle')} />
-      {(rolesQuery.isLoading || orgQuery.isLoading) && <Loading />}
+      {(rolesQuery.isPending || orgQuery.isPending) && <Loading />}
       {rolesQuery.data && orgQuery.data && (
         <Content
           defaultRole={rolesQuery.options[0]}

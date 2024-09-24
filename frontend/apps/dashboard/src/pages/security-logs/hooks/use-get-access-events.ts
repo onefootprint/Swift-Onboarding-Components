@@ -21,14 +21,13 @@ const useGetAccessEvents = () => {
   const { authHeaders } = useSession();
   const filters = useSecurityLogsFilters();
 
-  return useInfiniteQuery(
-    ['accessEvents', filters.requestParams, authHeaders],
-    ({ pageParam }) => getAccessEventsRequest({ ...filters.requestParams, cursor: pageParam }, authHeaders),
-    {
-      getNextPageParam: lastPage => lastPage.meta.next,
-      enabled: filters.isReady,
-    },
-  );
+  return useInfiniteQuery({
+    queryKey: ['accessEvents', filters.requestParams, authHeaders],
+    queryFn: ({ pageParam }) => getAccessEventsRequest({ ...filters.requestParams, cursor: pageParam }, authHeaders),
+    getNextPageParam: lastPage => lastPage.meta.next,
+    initialPageParam: undefined as undefined | string,
+    enabled: filters.isReady,
+  });
 };
 
 export default useGetAccessEvents;

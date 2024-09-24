@@ -54,12 +54,12 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       primaryButton={{
         form: 'create-secret-key-form',
         label: t('cta.label'),
-        loading: createApiKeyMutation.isLoading,
+        loading: createApiKeyMutation.isPending,
         loadingAriaLabel: t('cta.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: createApiKeyMutation.isLoading,
+        disabled: createApiKeyMutation.isPending,
         label: t('cancel'),
         onClick: handleClose,
       }}
@@ -85,7 +85,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
               <Form.Errors>{errors.name?.message}</Form.Errors>
             </Form.Field>
           </StyledGridItem>
-          {rolesQuery.isLoading && (
+          {rolesQuery.isPending && (
             <StyledGridItem>
               <Loading />
             </StyledGridItem>

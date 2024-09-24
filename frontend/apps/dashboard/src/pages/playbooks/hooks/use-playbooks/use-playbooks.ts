@@ -23,17 +23,15 @@ const usePlaybooks = () => {
   const filters = useFilters();
   const { requestParams } = filters;
   const { authHeaders, isLive } = useSession();
-  const onboardingConfigsQuery = useQuery(
-    ['onboarding_configs', isLive, requestParams],
-    () => getPlaybooks(authHeaders, { ...requestParams }),
-    {
-      enabled: filters.isReady,
-    },
-  );
+  const onboardingConfigsQuery = useQuery({
+    queryKey: ['onboarding_configs', isLive, requestParams],
+    queryFn: () => getPlaybooks(authHeaders, { ...requestParams }),
+    enabled: filters.isReady,
+  });
   const { data, error } = onboardingConfigsQuery;
   const pagination = usePagination({
-    count: data?.meta.count,
-    next: data?.meta.nextPage,
+    count: data?.meta?.count,
+    next: data?.meta?.nextPage,
     onChange: newPage => filters.push({ onboarding_configs_page: newPage }),
     page: filters.values.page,
     pageSize: 10,

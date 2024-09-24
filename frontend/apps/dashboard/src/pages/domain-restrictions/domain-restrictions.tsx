@@ -13,7 +13,7 @@ import useAllowedDomains from './hooks/use-allowed-domains';
 const DomainRestrictions = () => {
   const { t } = useTranslation('domain-restrictions');
   const { hasPermission } = usePermissions();
-  const { data, isLoading, error } = useAllowedDomains();
+  const { data, isPending, error } = useAllowedDomains();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const hasRestrictions = !!data?.allowedOrigins?.length;
 
@@ -41,7 +41,7 @@ const DomainRestrictions = () => {
           </Box>
         </Stack>
         <Stack
-          aria-busy={isLoading}
+          aria-busy={isPending}
           borderColor="tertiary"
           borderRadius="default"
           borderWidth={1}
@@ -49,8 +49,8 @@ const DomainRestrictions = () => {
           gap={5}
           padding={5}
         >
-          <Header hasRestrictions={hasRestrictions} isLoading={isLoading} />
-          <List allowedDomains={data?.allowedOrigins} error={error} isLoading={isLoading} />
+          <Header hasRestrictions={hasRestrictions} isPending={isPending} />
+          <List allowedDomains={data?.allowedOrigins} error={error} isPending={isPending} />
         </Stack>
         <CreateDialog allowedDomains={data?.allowedOrigins} onClose={handleClose} open={addDialogOpen} />
       </Box>

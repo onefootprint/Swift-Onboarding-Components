@@ -22,20 +22,20 @@ const useEntityInitialData = () => {
   const entityOtherInsights = useEntityOtherInsights(id);
   const entityOwnedBusinesses = useEntityOwnedBusinesses(id);
   const businessOwners = useBusinessOwners(id);
-  const isLoadingVault = entityVaultQuery.isLoading && !entityQuery.isError;
+  const isPendingVault = entityVaultQuery.isPending && !entityQuery.isError;
 
   return {
     ...entityQuery,
-    isLoading:
-      entityQuery.isLoading ||
-      entityTimelineQuery.isLoading ||
-      entityRiskSignalsQuery.isLoading ||
-      entityLivenessQuery.isLoading ||
-      entityAnnotations.isLoading ||
-      entityOtherInsights.isLoading ||
-      entityOwnedBusinesses.isLoading ||
-      businessOwners.isLoading ||
-      isLoadingVault,
+    isPending:
+      entityQuery.isPending ||
+      entityTimelineQuery.isPending ||
+      entityRiskSignalsQuery.isPending ||
+      entityLivenessQuery.isPending ||
+      entityAnnotations.isPending ||
+      entityOtherInsights.isPending ||
+      entityOwnedBusinesses.isPending ||
+      businessOwners.isPending ||
+      isPendingVault,
   };
 };
 

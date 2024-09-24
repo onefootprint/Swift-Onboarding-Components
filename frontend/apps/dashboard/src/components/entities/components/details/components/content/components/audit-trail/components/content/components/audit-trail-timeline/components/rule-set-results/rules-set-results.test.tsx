@@ -4,8 +4,8 @@ import type { RuleSetResultsProps } from './rule-set-results';
 import RuleSetResults from './rule-set-results';
 import { ruleResultResponseFixture, selectRulesNotTriggered, withLists } from './rules-set-results.test.config';
 
-const renderRules = ({ data, isLoading, errorMessage }: RuleSetResultsProps) =>
-  customRender(<RuleSetResults data={data} isLoading={isLoading} errorMessage={errorMessage} />);
+const renderRules = ({ data, isPending, errorMessage }: RuleSetResultsProps) =>
+  customRender(<RuleSetResults data={data} isPending={isPending} errorMessage={errorMessage} />);
 
 describe('<Rules />', () => {
   describe('when data is passed in', () => {
@@ -14,7 +14,7 @@ describe('<Rules />', () => {
     });
 
     it('should show only triggered rules by default', () => {
-      renderRules({ data: ruleResultResponseFixture, isLoading: false });
+      renderRules({ data: ruleResultResponseFixture, isPending: false });
 
       const failSection = screen.getByRole('group', {
         name: 'Fail',
@@ -56,7 +56,7 @@ describe('<Rules />', () => {
     });
 
     it('should show only not triggered rules when that dropdown option is selected', async () => {
-      renderRules({ data: ruleResultResponseFixture, isLoading: false });
+      renderRules({ data: ruleResultResponseFixture, isPending: false });
 
       const failSection = screen.getByRole('group', {
         name: 'Fail',
@@ -148,9 +148,9 @@ describe('<Rules />', () => {
     });
   });
 
-  describe('when isLoading is true', () => {
+  describe('when isPending is true', () => {
     it('should show a loading icon', async () => {
-      renderRules({ isLoading: true });
+      renderRules({ isPending: true });
 
       const loading = await screen.findByRole('progressbar', {
         name: 'Loading...',
@@ -162,7 +162,7 @@ describe('<Rules />', () => {
   describe('when an error message is passed in', () => {
     it('should show an error message', async () => {
       renderRules({
-        isLoading: false,
+        isPending: false,
         errorMessage: 'Something went wrong',
       });
 

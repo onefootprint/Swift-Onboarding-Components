@@ -8,12 +8,12 @@ import styled, { css } from 'styled-components';
 type ProtectedDetailsProps = {
   entity: Entity;
   onClick: () => void;
-  isLoading: boolean;
+  isPending: boolean;
 };
 
 const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.middleName, IdDI.lastName, IdDI.dob];
 
-const ProtectedDetails = ({ entity, onClick, isLoading }: ProtectedDetailsProps) => {
+const ProtectedDetails = ({ entity, onClick, isPending }: ProtectedDetailsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.risk-signals.details.matches.protected-details',
   });
@@ -28,7 +28,7 @@ const ProtectedDetails = ({ entity, onClick, isLoading }: ProtectedDetailsProps)
       <Text variant="body-3">{t('description')}</Text>
       {canDecrypt ? (
         <Box marginTop={3}>
-          <Button loading={isLoading} onClick={onClick}>
+          <Button loading={isPending} onClick={onClick}>
             {t('button')}
           </Button>
         </Box>

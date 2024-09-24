@@ -17,7 +17,9 @@ const getTenant = async (authHeaders: AuthHeaders, id?: string) => {
 const useTenant = ({ id }: { id?: string }) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['super-admin', 'tenants', id, authHeaders], () => getTenant(authHeaders, id), {
+  return useQuery({
+    queryKey: ['super-admin', 'tenants', id, authHeaders],
+    queryFn: () => getTenant(authHeaders, id),
     enabled: !!id,
   });
 };

@@ -62,7 +62,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
     }
   }, [notes]);
 
-  const isLoading = getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
+  const isPending = getQuery.isPending || createMutation.isPending || deleteMutation.isPending;
   const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
   const showSave = !notes?.find(n => n.content === value) && value;
 
@@ -127,7 +127,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
           hasError={!!errors.note}
           hint={errors.note && t('errors.required')}
           value={value}
-          disabled={createMutation.isLoading}
+          disabled={createMutation.isPending}
           onChangeText={handleChangeText}
           ref={e => {
             // https://www.react-hook-form.com/faqs/#Howtosharerefusage
@@ -140,7 +140,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
 
         {hasEditPermissions && (
           <Stack marginBottom={5}>
-            <LinkButton disabled={isLoading || !showSave} onClick={handleSave}>
+            <LinkButton disabled={isPending || !showSave} onClick={handleSave}>
               {t('save')}
             </LinkButton>
           </Stack>
@@ -159,7 +159,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
               <Stack direction="row" justify="space-between" align="center" marginRight={2} marginTop={3}>
                 <Title>{t('title')}</Title>
                 {hasEditPermissions && (
-                  <LinkButton disabled={isLoading} onClick={() => setIsEdit(!isEdit)}>
+                  <LinkButton disabled={isPending} onClick={() => setIsEdit(!isEdit)}>
                     {t(`${isEdit ? 'done' : 'edit'}` as ParseKeys<'common'>)}
                   </LinkButton>
                 )}

@@ -5,14 +5,14 @@ import MembersTable from './components/members-table';
 import useMembers from './hooks/use-members';
 
 const Members = () => {
-  const { data: response, errorMessage, isLoading, pagination } = useMembers();
+  const { data: response, errorMessage, isPending, pagination } = useMembers();
 
   return (
     <Box testID="people-table" tag="section">
       <Portal selector="#team-roles-actions">
         <Invite />
       </Portal>
-      <MembersTable data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
+      <MembersTable data={response?.data} errorMessage={errorMessage} isPending={isPending} />
       {response && response.meta.count > 0 && (
         <Pagination
           hasNextPage={pagination.hasNextPage}

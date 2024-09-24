@@ -16,10 +16,10 @@ type AddressCardProps = {
   entity: Entity;
   isSelected?: boolean;
   onSelect?: (id: string) => void;
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
-const AddressCard = ({ id, type, entity, isSelected, onSelect, isLoading }: AddressCardProps) => {
+const AddressCard = ({ id, type, entity, isSelected, onSelect, isPending }: AddressCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights.address-card',
   });
@@ -48,7 +48,7 @@ const AddressCard = ({ id, type, entity, isSelected, onSelect, isLoading }: Addr
     field => !field || (decryptableSet.has(field.name) && field.canDecrypt),
   );
   const decryptControls = useDecryptControls();
-  const isCtaLoading = isLoading || decryptControls.isLoading;
+  const isCtaLoading = isPending || decryptControls.isPending;
   const isCtaVisible = decryptableFields.length > 0 || isCtaLoading;
 
   let ctaElem;

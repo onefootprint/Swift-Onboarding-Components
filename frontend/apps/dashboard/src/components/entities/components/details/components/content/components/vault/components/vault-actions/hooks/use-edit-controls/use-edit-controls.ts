@@ -15,7 +15,7 @@ const useEditControls = () => {
   const editFields = useEditFields();
   const toast = useToast();
   const isIdle = state.matches(State.idle);
-  const isLoading = state.matches(State.savingEdit);
+  const isPending = state.matches(State.savingEdit);
   const inProgress = state.matches(State.editingFields) || state.matches(State.savingEdit);
 
   const start = () => {
@@ -78,7 +78,7 @@ const useEditControls = () => {
     start,
     cancel,
     isIdle,
-    isLoading,
+    isPending,
     submitFields,
     inProgress,
     saveEdit,

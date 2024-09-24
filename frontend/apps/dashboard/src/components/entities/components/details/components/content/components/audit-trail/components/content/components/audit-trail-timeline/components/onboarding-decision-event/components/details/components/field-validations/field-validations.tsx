@@ -20,7 +20,7 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
   });
-  const { data, isError, error, isLoading } = useEntityMatchSignals({
+  const { data, isError, error, isPending } = useEntityMatchSignals({
     id: entityId,
   });
 
@@ -49,8 +49,8 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
   return (
     <Container>
       {isError && <ErrorComponent error={error} />}
-      {isLoading && <Loading />}
-      {!isError && !isLoading && getContent()}
+      {isPending && <Loading />}
+      {!isError && !isPending && getContent()}
     </Container>
   );
 };

@@ -61,7 +61,7 @@ const DecryptHistoricalButton = ({ entity }: DecryptHistoricalProps) => {
         </Stack>
       )}
       <ReasonDialog
-        loading={decryptControls.isLoading}
+        loading={decryptControls.isPending}
         onClose={decryptControls.cancel}
         onSubmit={handleDecryptSubmit}
         open={decryptControls.isOpen}

@@ -8,10 +8,10 @@ import Loading from './components/loading';
 export type ListProps = {
   allowedDomains?: string[];
   error: unknown;
-  isLoading: boolean;
+  isPending: boolean;
 };
 
-const List = ({ allowedDomains = [], error, isLoading }: ListProps) => {
+const List = ({ allowedDomains = [], error, isPending }: ListProps) => {
   const domainMutation = useUpdateAllowedDomains();
 
   const handleRemove = (domain: string) => {
@@ -20,7 +20,7 @@ const List = ({ allowedDomains = [], error, isLoading }: ListProps) => {
     });
   };
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
   }
 
@@ -29,7 +29,7 @@ const List = ({ allowedDomains = [], error, isLoading }: ListProps) => {
   }
 
   return allowedDomains.length ? (
-    <Stack direction="column" gap={5} aria-busy={isLoading} role="list">
+    <Stack direction="column" gap={5} aria-busy={isPending} role="list">
       {allowedDomains.map(domain => (
         <Domain key={domain} domain={domain} onRemove={handleRemove} />
       ))}

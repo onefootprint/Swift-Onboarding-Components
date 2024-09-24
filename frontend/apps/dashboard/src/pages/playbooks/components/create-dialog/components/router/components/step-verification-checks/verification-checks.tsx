@@ -12,7 +12,7 @@ import KycCheck from './components/kyc-checks';
 
 export type VerificationChecksProps = {
   defaultAmlValues: AMLFormData;
-  isLoading: boolean;
+  isPending: boolean;
   requiresDoc?: boolean;
   allowInternationalResident?: boolean;
   isKyb?: boolean;
@@ -24,7 +24,7 @@ export type VerificationChecksProps = {
 
 const VerificationChecks = ({
   defaultAmlValues,
-  isLoading,
+  isPending,
   requiresDoc,
   allowInternationalResident,
   isKyb = false,
@@ -85,10 +85,10 @@ const VerificationChecks = ({
             <Aml showError={showError} disabled={isAmlDisabled} />
           </Stack>
           <ButtonContainer>
-            <Button variant="secondary" onClick={onBack} disabled={isLoading}>
+            <Button variant="secondary" onClick={onBack} disabled={isPending}>
               {allT('back')}
             </Button>
-            <Button type="submit" loading={isLoading}>
+            <Button type="submit" loading={isPending}>
               {allT('create')}
             </Button>
           </ButtonContainer>

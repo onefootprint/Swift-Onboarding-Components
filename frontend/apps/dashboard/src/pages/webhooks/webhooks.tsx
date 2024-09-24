@@ -11,7 +11,7 @@ import useWebhookPortal from './hooks/use-webhooks-portal';
 
 const Webhooks = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.webhooks' });
-  const { data, error, isLoading } = useWebhookPortal();
+  const { data, error, isPending } = useWebhookPortal();
   const showSpinner = useFakeSpinnerTimeout();
 
   return (
@@ -19,7 +19,7 @@ const Webhooks = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Box aria-busy={isLoading}>
+      <Box aria-busy={isPending}>
         <Stack direction="column" gap={2} marginBottom={7}>
           <Text variant="heading-2">{t('header.title')}</Text>
           <Text variant="body-2" color="secondary">
@@ -29,7 +29,7 @@ const Webhooks = () => {
         <Box display={showSpinner ? 'none' : 'block'}>
           {data && <Content data={data} />}
           {error && <ErrorComponent message={getErrorMessage(error)} />}
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
         </Box>
         {showSpinner && <Loading />}
       </Box>

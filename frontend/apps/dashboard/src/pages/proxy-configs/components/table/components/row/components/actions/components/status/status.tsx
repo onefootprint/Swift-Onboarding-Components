@@ -56,7 +56,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ proxyConfig }, ref) => 
 
   return (
     <ConfirmationDialog
-      isLoading={mutation.isLoading}
+      isPending={mutation.isPending}
       onClose={hideConfirmation}
       onConfirm={disable}
       open={open}

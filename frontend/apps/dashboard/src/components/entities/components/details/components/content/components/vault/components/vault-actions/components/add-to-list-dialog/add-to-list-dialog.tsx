@@ -38,7 +38,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
   const [listId, setListId] = React.useState<string>('');
   const addEntriesMutation = useAddEntries(listId);
   const decryptMutation = useDecrypt();
-  const isLoading = addEntriesMutation.isLoading || decryptMutation.isLoading;
+  const isPending = addEntriesMutation.isPending || decryptMutation.isPending;
   const { reset, handleSubmit, watch, control } = useForm<FormData>();
 
   // Filter lists based on attributes the entity has
@@ -138,13 +138,13 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
       primaryButton={{
         form: 'add-to-list-form',
         label: t('form.save'),
-        loading: isLoading,
+        loading: isPending,
         type: 'submit',
       }}
       secondaryButton={{
         label: t('form.cancel'),
         onClick: onClose,
-        disabled: isLoading,
+        disabled: isPending,
       }}
     >
       <form onSubmit={handleSubmit(handleBeforeSubmit)} id="add-to-list-form">

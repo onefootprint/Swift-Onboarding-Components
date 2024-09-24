@@ -36,9 +36,9 @@ const useEntityOwnedBusinesses = (id: string) => {
       })) || [],
   });
 
-  const isLoading = businessIdsMutation.isLoading || businessQueries.some(query => query.isLoading);
-  const isError = businessIdsMutation.error || businessQueries.some(query => query.isError);
-  const isSuccess = businessIdsMutation.isSuccess && businessQueries.every(query => query.data !== undefined);
+  const isPending = businessIdsMutation.isPending || businessQueries.some(query => query.isPending);
+  const isError = businessIdsMutation.isError || businessQueries.some(query => query.isError);
+  const isSuccess = businessIdsMutation.isSuccess && businessQueries.every(query => query.isSuccess);
 
   const businesses = isSuccess ? businessQueries.map(query => query.data as EntityOwnedBusinessInfo) : undefined;
 
@@ -47,7 +47,7 @@ const useEntityOwnedBusinesses = (id: string) => {
   return {
     hasBusinesses,
     ownedBusinesses: businesses,
-    isLoading,
+    isPending,
     isError,
     isSuccess,
   };

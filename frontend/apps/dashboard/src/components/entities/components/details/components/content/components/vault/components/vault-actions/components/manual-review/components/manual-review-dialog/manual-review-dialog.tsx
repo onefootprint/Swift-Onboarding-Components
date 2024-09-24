@@ -61,13 +61,13 @@ const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) 
       primaryButton={{
         form: 'manual-review-form',
         label: t('dialog.complete'),
-        loading: submitActionsMutation.isLoading,
+        loading: submitActionsMutation.isPending,
         type: 'submit',
       }}
       secondaryButton={{
         label: t('dialog.cancel'),
         onClick: onClose,
-        disabled: submitActionsMutation.isLoading,
+        disabled: submitActionsMutation.isPending,
       }}
     >
       <ManualNoteEntryForm

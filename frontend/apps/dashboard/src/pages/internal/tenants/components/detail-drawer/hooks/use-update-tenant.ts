@@ -62,7 +62,7 @@ const useUpdateTenant = (id: string) => {
   return useMutation({
     mutationFn: (data: PrivatePatchTenantRequest) => patchTenant(authHeaders, id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
     },
   });
 };

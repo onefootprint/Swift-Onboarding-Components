@@ -10,10 +10,10 @@ import Row from './components/row';
 type TableProps = {
   data?: List[];
   errorMessage?: string;
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
-const Table = ({ data, isLoading, errorMessage }: TableProps) => {
+const Table = ({ data, isPending, errorMessage }: TableProps) => {
   const { t } = useTranslation('lists', { keyPrefix: 'list' });
   const session = useSession();
   const router = useRouter();
@@ -45,7 +45,7 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       emptyStateText={errorMessage || t('empty-description')}
       getAriaLabelForRow={list => list.name}
       getKeyForRow={list => list.id}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       onRowClick={handleRowClick}
       renderTr={({ item: list }) => <Row list={list} />}

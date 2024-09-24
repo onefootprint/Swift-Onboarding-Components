@@ -10,8 +10,8 @@ export type BusinessOwnersProps = {
 };
 
 const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
-  const { isLoading, error, data } = useBusinessOwners(entity.id);
-  if (isLoading) {
+  const { isPending, error, data } = useBusinessOwners(entity.id);
+  if (isPending) {
     return <Loading />;
   }
   if (error) {

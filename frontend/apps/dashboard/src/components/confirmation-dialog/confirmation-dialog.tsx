@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 export type ConfirmationDialogProps = {
   children: React.ReactNode;
-  isLoading: boolean;
+  isPending: boolean;
   onClose: () => void;
   onConfirm: () => void;
   open: boolean;
   title: string;
 };
 
-const ConfirmationDialog = ({ children, isLoading, onClose, onConfirm, open, title }: ConfirmationDialogProps) => {
+const ConfirmationDialog = ({ children, isPending, onClose, onConfirm, open, title }: ConfirmationDialogProps) => {
   const { t } = useTranslation();
 
   return (
@@ -23,11 +23,11 @@ const ConfirmationDialog = ({ children, isLoading, onClose, onConfirm, open, tit
       title={title}
       primaryButton={{
         label: t('confirm.cta'),
-        loading: isLoading,
+        loading: isPending,
         onClick: onConfirm,
       }}
       secondaryButton={{
-        disabled: isLoading,
+        disabled: isPending,
         label: t('confirm.cancel'),
         onClick: onClose,
       }}

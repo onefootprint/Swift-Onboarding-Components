@@ -25,22 +25,21 @@ const useTenants = () => {
   const { authHeaders } = useSession();
   const filters = useFilters();
 
-  const query = useQuery(
-    ['super-admin', 'tenants', filters.requestParams, authHeaders],
-    () => getTenants(authHeaders, filters.requestParams),
-    {
-      select: tenants => ({
-        ...tenants,
-        data: tenants.data.map(tenant => {
-          const createdAt = new Date(tenant.createdAt);
-          return {
-            ...tenant,
-            createdAt: formatDateWithTime(createdAt),
-          };
-        }),
+  const query = useQuery({
+    queryKey: ['super-admin', 'tenants', filters.requestParams, authHeaders],
+    queryFn: () => getTenants(authHeaders, filters.requestParams),
+    select: tenants => ({
+      ...tenants,
+      data: tenants.data.map(tenant => {
+        const createdAt = new Date(tenant.createdAt);
+        return {
+          ...tenant,
+          createdAt: formatDateWithTime(createdAt),
+        };
       }),
-    },
-  );
+    }),
+  });
+
   const pagination = usePagination({
     count: query.data?.meta.count,
     next: query.data?.meta.nextPage,

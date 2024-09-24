@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
+import useSession from 'src/hooks/use-session';
 
 import usePermissionsByRoute from './hooks/use-permissions';
 
@@ -11,6 +12,7 @@ export type GateProps = {
 const Gate = ({ children }: GateProps) => {
   const router = useRouter();
   const [shouldShowPage, setShowPage] = useState(false);
+  const { logOut } = useSession();
 
   const next = () => {
     setShowPage(true);
@@ -40,6 +42,7 @@ const Gate = ({ children }: GateProps) => {
       },
       onError: ({ isLoggedIn, requiresOnboarding }) => {
         if (!isLoggedIn) {
+          logOut();
           const currentPath = `${window.location.pathname}${window.location.search}`;
           redirect('/authentication/sign-in', { redirectUrl: encodeURIComponent(currentPath) });
           return;

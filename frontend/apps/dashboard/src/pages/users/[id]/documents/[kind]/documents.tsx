@@ -10,7 +10,7 @@ import useDocument from './hooks/use-document';
 
 const Documents = () => {
   const { t } = useTranslation('entity-documents');
-  const { meta, isLoading, errorMessage, data } = useDocument();
+  const { meta, isPending, errorMessage, data } = useDocument();
 
   return (
     <>
@@ -20,9 +20,9 @@ const Documents = () => {
       {meta.notFound ? (
         <NotFound />
       ) : (
-        <Box aria-busy={isLoading}>
+        <Box aria-busy={isPending}>
           {data && <Content documents={data} meta={meta} />}
-          {isLoading && <Loading />}
+          {isPending && <Loading />}
           {errorMessage && <ErrorComponent message={errorMessage} />}
         </Box>
       )}

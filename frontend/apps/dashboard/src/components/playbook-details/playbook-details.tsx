@@ -4,12 +4,12 @@ import Loading from './components/loading';
 import usePlaybook from './hooks/use-playbook';
 
 const PlaybookDetails = () => {
-  const { data, isLoading, errorMessage } = usePlaybook();
+  const { data, isPending, errorMessage } = usePlaybook();
 
   return (
     <>
       {data && <Content playbook={data} />}
-      {isLoading && <Loading />}
+      {isPending && <Loading />}
       {errorMessage && <ErrorComponent message={errorMessage} />}
     </>
   );

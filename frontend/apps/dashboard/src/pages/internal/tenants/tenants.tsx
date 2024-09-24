@@ -19,7 +19,7 @@ const Tenants = () => {
   const { logIn } = useSession();
   const router = useRouter();
   const filters = useFilters();
-  const { data: response, isLoading, errorMessage, pagination } = useTenants();
+  const { data: response, isPending, errorMessage, pagination } = useTenants();
   const [drawerTenantId, setDrawerTenantId] = useState<string | undefined>(undefined);
   const columns = [
     { text: t('table.header.name'), width: '30%' },
@@ -93,7 +93,7 @@ const Tenants = () => {
           emptyStateText={emptyState}
           getKeyForRow={(tenant: Tenant) => tenant.id}
           initialSearch=""
-          isLoading={isLoading}
+          isLoading={isPending}
           items={response?.data}
           onChangeSearchText={handleSearchChange}
           renderTr={tenant => <Row tenant={tenant.item} onAssumeTenant={handleAssumeTenant} />}

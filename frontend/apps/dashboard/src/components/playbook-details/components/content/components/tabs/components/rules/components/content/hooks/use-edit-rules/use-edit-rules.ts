@@ -21,10 +21,11 @@ const useEditRules = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation(({ playbookId, fields }: EditRulesRequest) => editRules({ playbookId, fields }, authHeaders), {
+  return useMutation({
+    mutationFn: ({ playbookId, fields }: EditRulesRequest) => editRules({ playbookId, fields }, authHeaders),
     onSuccess: ({ playbookId }) => {
       // Updates both the playbook (for the ruleSet value) and playbook rules
-      queryClient.invalidateQueries(['onboarding_configs', playbookId]);
+      queryClient.invalidateQueries({ queryKey: ['onboarding_configs', playbookId] });
     },
   });
 };

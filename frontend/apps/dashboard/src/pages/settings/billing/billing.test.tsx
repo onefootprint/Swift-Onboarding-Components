@@ -36,7 +36,7 @@ describe.skip('<Billing />', () => {
   it('should render with line items and display the info text', () => {
     (useGetPreviewInvoice as jest.Mock).mockReturnValue({
       data: mockInvoiceDataWithLineItems,
-      isLoading: false,
+      isPending: false,
       isError: false,
     });
 
@@ -52,7 +52,7 @@ describe.skip('<Billing />', () => {
   it('should render without line items and display the no invoice text', () => {
     (useGetPreviewInvoice as jest.Mock).mockReturnValue({
       data: mockInvoiceDataWithoutLineItems,
-      isLoading: false,
+      isPending: false,
       isError: false,
     });
 

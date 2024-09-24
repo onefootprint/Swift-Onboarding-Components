@@ -23,7 +23,7 @@ const List = ({ children, title, subtitle, kind, basePath, defaultFilters }: Lis
   const router = useRouter();
   const filters = useFilters();
   const session = useSession();
-  const { data: response, isLoading, errorMessage, pagination } = useEntities(kind, defaultFilters);
+  const { data: response, isPending, errorMessage, pagination } = useEntities(kind, defaultFilters);
 
   const handleRowClick = (entity: Entity) => {
     const mode = session.isLive ? 'live' : 'sandbox';
@@ -43,7 +43,7 @@ const List = ({ children, title, subtitle, kind, basePath, defaultFilters }: Lis
       data={response?.data}
       errorMessage={errorMessage}
       initialSearch={filters.query.search}
-      isLoading={isLoading}
+      isPending={isPending}
       onRowClick={handleRowClick}
       onSearchChange={handleSearchChange}
     >

@@ -49,7 +49,7 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ proxyConfig }, ref) => 
 
   return (
     <ConfirmationDialog
-      isLoading={mutation.isLoading}
+      isPending={mutation.isPending}
       onClose={hideConfirmation}
       onConfirm={remove}
       open={open}

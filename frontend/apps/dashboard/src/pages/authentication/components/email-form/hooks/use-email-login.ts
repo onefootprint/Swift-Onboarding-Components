@@ -11,6 +11,10 @@ const login = async (payload: OrgAuthMagicLinkRequest) => {
   return response.data;
 };
 
-const useEmailLogin = () => useMutation(login);
+const useEmailLogin = () => {
+  return useMutation({
+    mutationFn: login,
+  });
+};
 
 export default useEmailLogin;

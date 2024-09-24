@@ -15,7 +15,7 @@ const withCommas = (v: string) => v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const Billing = () => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.billing' });
-  const { data: invoice, isLoading, isError } = useGetPreviewInvoice();
+  const { data: invoice, isPending, isError } = useGetPreviewInvoice();
   const {
     data: { user, org },
   } = useSession();
@@ -55,7 +55,7 @@ const Billing = () => {
               columns={columns}
               emptyStateText={isError ? t('table.error') : t('table.no-results')}
               getKeyForRow={(r: InvoiceItem) => r.id}
-              isLoading={isLoading}
+              isLoading={isPending}
               items={invoice?.lineItems}
               renderTr={({ item }) => (
                 <>

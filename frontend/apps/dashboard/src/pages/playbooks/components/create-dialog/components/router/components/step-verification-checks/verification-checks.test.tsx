@@ -28,7 +28,7 @@ describe('<VerificationChecks />', () => {
     allowInternationalResident = false,
     collectBO = false,
     isKyb = false,
-    isLoading = false,
+    isPending = false,
     onBack = jest.fn(),
     onSubmit = jest.fn(),
     requiresDoc = false,
@@ -40,7 +40,7 @@ describe('<VerificationChecks />', () => {
         collectBO={collectBO}
         defaultAmlValues={defaultAmlValues}
         isKyb={isKyb}
-        isLoading={isLoading}
+        isPending={isPending}
         onBack={onBack}
         onSubmit={onSubmit}
         requiresDoc={requiresDoc}
@@ -199,7 +199,7 @@ describe('<VerificationChecks />', () => {
 
     describe('when it is loading', () => {
       it('should show the loading state', () => {
-        renderAml({ isLoading: true });
+        renderAml({ isPending: true });
 
         const back = screen.getByRole('button', { name: 'Back' });
         expect(back).toBeDisabled();

@@ -16,7 +16,10 @@ const getListTimeline = async ({ authHeaders, id }: GetListTimelineRequest) => {
 
 const useListTimeline = (id: string = '') => {
   const { authHeaders } = useSession();
-  const query = useQuery(['list-timeline', id, authHeaders], () => getListTimeline({ authHeaders, id }));
+  const query = useQuery({
+    queryKey: ['list-timeline', id, authHeaders],
+    queryFn: () => getListTimeline({ authHeaders, id }),
+  });
   const { error } = query;
   const errorMessage = error ? getErrorMessage(error) : undefined;
 

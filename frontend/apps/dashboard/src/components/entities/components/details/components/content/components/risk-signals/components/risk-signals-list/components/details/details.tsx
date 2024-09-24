@@ -16,7 +16,7 @@ const Details = () => {
   const { t } = useTranslation();
   const { query, clear } = useRiskSignalsFilters();
   const isOpen = !!query.risk_signal_id;
-  const { data, isLoading, error } = useRiskSignalDetails(query.risk_signal_id);
+  const { data, isPending, error } = useRiskSignalDetails(query.risk_signal_id);
   const [amlMedia, setAmlMedia] = useState([] as AmlHitMedia[]);
 
   const getDrawerTitle = () => {
@@ -29,7 +29,7 @@ const Details = () => {
       }
       return data.note;
     }
-    return isLoading ? t('notifications.loading') : t('notifications.error');
+    return isPending ? t('notifications.loading') : t('notifications.error');
   };
 
   const handleHideAmlMedia = () => setAmlMedia([]);
@@ -49,7 +49,7 @@ const Details = () => {
     >
       <>
         {data && <Content riskSignal={data} handleShowAmlMedia={setAmlMedia} amlMedia={amlMedia} />}
-        {isLoading && <Loading />}
+        {isPending && <Loading />}
         {error && <ErrorComponent error={error} />}
       </>
     </Drawer>

@@ -4,12 +4,12 @@ import DecryptedContent from '../decrypted-content';
 import Loading from '../loading';
 
 const Content = () => {
-  const { error, isLoading, data } = useCurrentEntityBusinessInsights();
+  const { error, isPending, data } = useCurrentEntityBusinessInsights();
 
   return (
     <>
       {error && <ErrorComponent error={error} />}
-      {isLoading && <Loading />}
+      {isPending && <Loading />}
       {data && <DecryptedContent insights={data} />}
     </>
   );

@@ -18,7 +18,7 @@ const DuplicateData = () => {
   const {
     data: { org },
   } = useSession();
-  const { data: duplicateData, isLoading, error } = useCurrentEntityDuplicateData();
+  const { data: duplicateData, isPending, error } = useCurrentEntityDuplicateData();
   const isSameTenantDataEmpty = !duplicateData?.sameTenant?.length;
 
   const columns = [
@@ -43,7 +43,7 @@ const DuplicateData = () => {
         columns={columns}
         emptyStateText={error ? getErrorMessage(error) : t('table.empty-state', { orgName: org?.name ?? '' })}
         getKeyForRow={(duplicateDataItem: DuplicateDataItem) => duplicateDataItem.fpId}
-        isLoading={isLoading}
+        isLoading={isPending}
         items={duplicateData?.sameTenant}
         onRowClick={handleRowClick}
         renderTr={({ item }) => <Row duplicateDataItem={item} />}

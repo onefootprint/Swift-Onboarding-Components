@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 type HeaderProps = {
   hasRestrictions: boolean;
-  isLoading: boolean;
+  isPending: boolean;
 };
 
-const Header = ({ hasRestrictions, isLoading }: HeaderProps) => {
+const Header = ({ hasRestrictions, isPending }: HeaderProps) => {
   const { t } = useTranslation('domain-restrictions');
 
   return (
@@ -17,7 +17,7 @@ const Header = ({ hasRestrictions, isLoading }: HeaderProps) => {
           {hasRestrictions ? <IcoLock24 /> : <IcoLockOpen24 />}
           <Text variant="label-3">{t('header.title')}</Text>
         </Stack>
-        {isLoading ? (
+        {isPending ? (
           <Shimmer height="26px" width="145px" borderRadius="xl" />
         ) : (
           <Box>

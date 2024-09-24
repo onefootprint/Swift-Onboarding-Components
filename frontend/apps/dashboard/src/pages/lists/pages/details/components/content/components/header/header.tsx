@@ -12,13 +12,13 @@ import EditDialog from './components/edit-dialog';
 const Header = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading, error, data } = useListDetails(id);
+  const { isPending, error, data } = useListDetails(id);
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.header',
   });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  if (isLoading || error || !data) {
+  if (isPending || error || !data) {
     return null;
   }
 

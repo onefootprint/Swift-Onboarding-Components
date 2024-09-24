@@ -9,10 +9,10 @@ import Filters from './components/filters';
 type MembersTableProps = {
   data?: Member[];
   errorMessage?: string;
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
-const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
+const MembersTable = ({ data, isPending, errorMessage }: MembersTableProps) => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.members' });
   const filters = useMembersFilters();
   const columns = [
@@ -34,7 +34,7 @@ const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
       emptyStateText={errorMessage || t('table.empty-state')}
       getKeyForRow={member => member.id}
       initialSearch={filters.values.search}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       onChangeSearchText={handleSearchChange}
       renderActions={() => <Filters />}

@@ -7,7 +7,7 @@ export const useOpenDatadog = () => {
   // these session IDs to quickly get the set of session IDs used by an fp_id.
   // Note, this won't show sessions created via implicit auth, but this is only an experimental feature.
   // In the future, we can migrate this to a different source that even handles implicit auth.
-  const { data, isLoading, isError } = useEntityAuthEvents(entityId);
+  const { data, isPending, isError } = useEntityAuthEvents(entityId);
   const sessionIds = [...new Set(data?.map(e => e.insight.sessionId).filter(sessionId => !!sessionId))];
 
   const openDatadog = () => {
@@ -18,7 +18,7 @@ export const useOpenDatadog = () => {
   };
 
   return {
-    isEnabled: !isLoading && !isError && !!sessionIds?.length,
+    isEnabled: !isPending && !isError && !!sessionIds?.length,
     openDatadog,
   };
 };

@@ -18,8 +18,8 @@ const SecurityLogs = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.security-logs' });
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
-  const accessEvents =
-    (getAccessEvents.data?.pages || []).reduce((allPages, page) => [...allPages, ...page.data], [] as AccessEvent[]) ||
+  const accessEvents: AccessEvent[] =
+    getAccessEvents.data?.pages.reduce<AccessEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
   const items = accessEvents.map(item => ({
@@ -29,26 +29,26 @@ const SecurityLogs = () => {
     bodyComponent: <SecurityLogBody accessEvent={item} />,
   }));
 
-  const handleScroll = () => {
-    // Just before reaching the bottom of the page, start loading the next page of data
-    const mainContainer = document.getElementById(MAIN_PAGE_ID);
-    if (!mainContainer) return;
-    const offset = mainContainer.clientHeight * 0.25;
-    const reachedBottom = mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + offset;
-    if (reachedBottom) {
-      if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
-        getAccessEvents.fetchNextPage();
-      }
-    }
-  };
-
   useEffect(() => {
+    const handleScroll = () => {
+      // Just before reaching the bottom of the page, start loading the next page of data
+      const mainContainer = document.getElementById(MAIN_PAGE_ID);
+      if (!mainContainer) return;
+      const offset = mainContainer.clientHeight * 0.25;
+      const reachedBottom = mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + offset;
+      if (reachedBottom) {
+        if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
+          getAccessEvents.fetchNextPage();
+        }
+      }
+    };
+
     const mainContainer = document.getElementById(MAIN_PAGE_ID);
     mainContainer?.addEventListener('scroll', handleScroll);
     return () => {
       mainContainer?.removeEventListener('scroll', handleScroll);
     };
-  });
+  }, [getAccessEvents.isFetchingNextPage, getAccessEvents.hasNextPage]);
 
   return (
     <>
@@ -68,7 +68,7 @@ const SecurityLogs = () => {
         />
         <SecurityLogsFilters />
       </FiltersContainer>
-      <Timeline items={items} isLoading={getAccessEvents.isLoading || getAccessEvents.isFetchingNextPage} />
+      <Timeline items={items} isPending={getAccessEvents.isPending || getAccessEvents.isFetchingNextPage} />
     </>
   );
 };

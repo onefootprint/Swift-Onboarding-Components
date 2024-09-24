@@ -6,7 +6,7 @@ type UseEntitiesContext = {
   data?: Entity[];
   errorMessage?: string;
   initialSearch?: string;
-  isLoading: boolean;
+  isPending: boolean;
   onRowClick: (entity: Entity) => void;
   onSearchChange: (search: string) => void;
 };

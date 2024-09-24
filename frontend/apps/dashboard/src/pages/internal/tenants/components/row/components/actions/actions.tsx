@@ -25,12 +25,12 @@ const Actions = ({ tenant }: ActionsProps) => {
       },
     });
   };
-  const isLoading = generateInvoiceMutation.isLoading;
+  const isPending = generateInvoiceMutation.isPending;
 
   return (
     <Dropdown.Root>
       <Dropdown.Trigger aria-label={'Actions'}>
-        {isLoading ? <LoadingSpinner /> : <IcoDotsHorizontal24 />}
+        {isPending ? <LoadingSpinner /> : <IcoDotsHorizontal24 />}
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end">

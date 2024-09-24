@@ -31,8 +31,10 @@ const useGetPreviewInvoice = () => {
   const { authHeaders } = useSession();
   const { formatRelativeDate } = useIntl();
 
-  return useQuery(['invoice-preview', authHeaders], () => getPreviewInvoice(authHeaders), {
-    select: data => ({
+  return useQuery({
+    queryKey: ['invoice-preview', authHeaders],
+    queryFn: () => getPreviewInvoice(authHeaders),
+    select: (data: PreviewInvoice) => ({
       ...data,
       lastUpdatedAt: data?.lastUpdatedAt ? formatRelativeDate(new Date(data.lastUpdatedAt)) : null,
     }),

@@ -9,11 +9,11 @@ type DetailDrawerProps = {
 };
 
 const DetailDrawer = ({ tenantId, onClose }: DetailDrawerProps) => {
-  const { data: tenant, isLoading, isError } = useTenant({ id: tenantId });
+  const { data: tenant, isPending, isError } = useTenant({ id: tenantId });
 
   return (
     <Drawer open={!!tenantId} title={tenant?.name || 'Tenant details'} onClose={onClose}>
-      {isLoading && (
+      {isPending && (
         <Stack justifyContent="center">
           <LoadingSpinner />
         </Stack>

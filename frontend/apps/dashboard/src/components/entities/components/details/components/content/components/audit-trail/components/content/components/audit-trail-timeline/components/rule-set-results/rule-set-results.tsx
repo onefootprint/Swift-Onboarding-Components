@@ -6,11 +6,11 @@ import Loading from './components/loading';
 
 export type RuleSetResultsProps = {
   data?: Record<string, boolean | string | Record<RuleAction, Record<string, boolean | Rule[]>> | null>;
-  isLoading: boolean;
+  isPending: boolean;
   errorMessage?: string;
 };
 
-const RuleSetResults = ({ data, isLoading, errorMessage }: RuleSetResultsProps) => (
+const RuleSetResults = ({ data, isPending, errorMessage }: RuleSetResultsProps) => (
   <>
     {data && (
       <Content
@@ -18,7 +18,7 @@ const RuleSetResults = ({ data, isLoading, errorMessage }: RuleSetResultsProps) 
         actionTriggered={data.actionTriggered as RuleAction}
       />
     )}
-    {isLoading && <Loading />}
+    {isPending && <Loading />}
     {errorMessage && <ErrorComponent errorMessage={errorMessage} />}
   </>
 );

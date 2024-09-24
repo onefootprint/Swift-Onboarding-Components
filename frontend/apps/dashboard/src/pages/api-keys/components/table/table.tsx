@@ -10,7 +10,7 @@ import useApiKeys from './hooks/use-api-keys';
 const renderTr = ({ item }: TableRow<ApiKey>) => <Row apiKey={item} />;
 
 const ApiKeysTable = () => {
-  const { isLoading, error, data } = useApiKeys();
+  const { isPending, error, data } = useApiKeys();
   const { t } = useTranslation('api-keys', {});
   const columns = [
     { text: t('table.header.name'), width: '15%' },
@@ -29,7 +29,7 @@ const ApiKeysTable = () => {
       emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
       getAriaLabelForRow={(apiKey: ApiKey) => apiKey.name}
       getKeyForRow={(apiKey: ApiKey) => apiKey.id}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       renderTr={renderTr}
       hasRowEmphasis={() => true}

@@ -10,7 +10,7 @@ const PlaybooksFilter = () => {
     keyPrefix: 'onboarding-metrics.filters',
   });
   const filters = useFilters();
-  const { data, isLoading } = usePlaybookOptions({});
+  const { data, isPending } = usePlaybookOptions({});
 
   const allPlaybooksOption = {
     label: t('all-playbooks'),
@@ -32,7 +32,7 @@ const PlaybooksFilter = () => {
 
   return (
     <>
-      {isLoading && <Loading />}
+      {isPending && <Loading />}
       {data && (
         <SelectNew
           disabled={playbooksData.length === 1}

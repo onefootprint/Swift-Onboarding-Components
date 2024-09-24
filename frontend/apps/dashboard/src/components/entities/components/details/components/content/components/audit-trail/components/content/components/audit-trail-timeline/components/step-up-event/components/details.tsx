@@ -17,7 +17,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
   });
   const entityId = useEntityId();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const { data, errorMessage, isLoading } = useEntityRuleSetResult({
+  const { data, errorMessage, isPending } = useEntityRuleSetResult({
     entityId,
     ruleSetResultId,
   });
@@ -43,7 +43,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
           setDrawerOpen(false);
         }}
       >
-        <RuleSetResults data={data} errorMessage={errorMessage} isLoading={isLoading} />
+        <RuleSetResults data={data} errorMessage={errorMessage} isPending={isPending} />
       </Drawer>
     </>
   );

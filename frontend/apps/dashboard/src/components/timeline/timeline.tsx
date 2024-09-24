@@ -16,7 +16,7 @@ export type TimelineItem = {
 
 type TimelineProps = {
   items: TimelineItem[];
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
 const HEADER_HEIGHT = '32px';
@@ -31,9 +31,9 @@ export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
   return `${time.start}-${time.end}`;
 };
 
-const Timeline = ({ items, isLoading }: TimelineProps) => {
+const Timeline = ({ items, isPending }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
-  if (!isLoading && !items.length) {
+  if (!isPending && !items.length) {
     return <Text variant="body-3">{t('empty')}</Text>;
   }
 
@@ -101,7 +101,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
           );
         })}
       </Stack>
-      {isLoading && (
+      {isPending && (
         <Stack padding={7} width="100%" align="center" justify="center">
           <LoadingSpinner />
         </Stack>

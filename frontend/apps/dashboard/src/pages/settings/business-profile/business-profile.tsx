@@ -14,7 +14,7 @@ const BusinessProfile = () => {
   const { t } = useTranslation('settings', {
     keyPrefix: 'pages.business-profile',
   });
-  const { isLoading, data, error } = useOrg();
+  const { isPending, data, error } = useOrg();
 
   return (
     <>
@@ -31,10 +31,10 @@ const BusinessProfile = () => {
         <Box marginBottom={5}>
           <StyledDivider />
         </Box>
-        <Container aria-busy={isLoading} aria-live="polite">
+        <Container aria-busy={isPending} aria-live="polite">
           <>
             {error && <ErrorDisplay message={getErrorMessage(error)} />}
-            {isLoading && <Loading />}
+            {isPending && <Loading />}
             {data && <Content organization={data} />}
           </>
         </Container>

@@ -25,7 +25,7 @@ const useUpdateOrg = () => {
     mutationFn: (payload: UpdateOrgRequest) => updateOrgRequest(session.authHeaders, payload),
     onError: showErrorToast,
     onSuccess: (response: UpdateOrgResponse) => {
-      queryClient.invalidateQueries(['org']);
+      queryClient.invalidateQueries({ queryKey: ['org'] });
       queryClient.setQueryData(['org'], response);
       session.setOrg({
         name: response.name,

@@ -29,4 +29,7 @@ export const getOrgMemberRequest = async ({ auth, isLive, isAssumedSessionEditMo
 };
 
 export const useGetOrgMember = (req: GetOrgMemberRequest) =>
-  useQuery(['org-member', req], () => getOrgMemberRequest(req));
+  useQuery({
+    queryKey: ['org-member', req],
+    queryFn: () => getOrgMemberRequest(req),
+  });

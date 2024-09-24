@@ -37,11 +37,11 @@ const UploadDocDialog = ({ open, onClose }: UploadDocDialogProps) => {
       primaryButton={{
         form: 'upload-doc-form',
         label: allT('save'),
-        loading: mutation.isLoading,
+        loading: mutation.isPending,
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: mutation.isLoading,
+        disabled: mutation.isPending,
         label: allT('close'),
         onClick: onClose,
       }}

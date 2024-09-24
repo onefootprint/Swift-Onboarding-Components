@@ -55,7 +55,7 @@ const DetailDrawer = ({ entity, open, onClose }: DetailDrawerProps) => {
             <Button onClick={editControls.cancel} variant="secondary">
               {t('cancel')}
             </Button>
-            <Button form={EDIT_VAULT_FORM_ID} type="submit" loading={!!editControls.isLoading}>
+            <Button form={EDIT_VAULT_FORM_ID} type="submit" loading={!!editControls.isPending}>
               {t('cta')}
             </Button>
           </Stack>

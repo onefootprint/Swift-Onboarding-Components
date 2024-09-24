@@ -8,10 +8,10 @@ import Row from './components/row';
 type TableProps = {
   data?: ProxyConfig[];
   errorMessage?: string;
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
-const Table = ({ data, isLoading, errorMessage }: TableProps) => {
+const Table = ({ data, isPending, errorMessage }: TableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
   const filters = useFilters();
   const columns = [
@@ -35,7 +35,7 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       emptyStateText={errorMessage || t('table.empty-state')}
       getAriaLabelForRow={proxyConfig => proxyConfig.name}
       getKeyForRow={proxyConfig => proxyConfig.id}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       onRowClick={handleClick}
       renderTr={({ item: proxyConfig }) => <Row proxyConfig={proxyConfig} />}

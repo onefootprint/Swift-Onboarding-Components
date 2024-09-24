@@ -95,7 +95,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
       <Button
         form={decryptControls.inProgress ? DECRYPT_VAULT_FORM_ID : EDIT_VAULT_FORM_ID}
         type="submit"
-        loading={!!editControls.isLoading}
+        loading={!!editControls.isPending}
       >
         {decryptControls.inProgress ? t('next') : t('save')}
       </Button>
@@ -105,7 +105,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   const renderDialogsAndCmdk = () => (
     <>
       <ReasonDialog
-        loading={decryptControls.isLoading}
+        loading={decryptControls.isPending}
         onClose={decryptControls.cancel}
         onSubmit={handleDecryptSubmit}
         open={decryptControls.isOpen}

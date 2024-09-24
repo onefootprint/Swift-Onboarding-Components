@@ -18,7 +18,7 @@ const Filters = () => {
         {
           kind: 'multi-select',
           label: t('role.label'),
-          loading: rolesQuery.isLoading,
+          loading: rolesQuery.isPending,
           options: rolesQuery.options,
           query: 'members_role',
           selectedOptions: filters.values.role,

@@ -15,12 +15,12 @@ const ActivityLog = () => {
   });
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading: detailsLoading, error: detailsError, data: details } = useListDetails(id);
-  const { isLoading: timelineLoading, error: timelineError, data: timeline } = useListTimeline(id);
-  const isLoading = timelineLoading || detailsLoading;
+  const { isPending: detailsLoading, error: detailsError, data: details } = useListDetails(id);
+  const { isPending: timelineLoading, error: timelineError, data: timeline } = useListTimeline(id);
+  const isPending = timelineLoading || detailsLoading;
   const error = timelineError || detailsError;
 
-  return isLoading ? (
+  return isPending ? (
     <Loading />
   ) : (
     <Stack gap={4} direction="column">

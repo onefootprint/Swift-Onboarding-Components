@@ -15,12 +15,16 @@ const TenantSwitcher = ({ children, entityId, Loading }: TenantSwitcherProps) =>
     data: { user },
   } = useSession();
   const isFirmEmployee = !!user?.isFirmEmployee;
-  const { isLoading, isSuccess } = useAssumeToViewEntity({
+  const { isPending, isSuccess } = useAssumeToViewEntity({
     entityId,
     isFirmEmployee,
   });
 
-  return isFirmEmployee && (isLoading || isSuccess) ? <Loading /> : <Box>{children}</Box>;
+  if (isFirmEmployee && (isPending || isSuccess)) {
+    return <Loading />;
+  }
+
+  return <Box>{children}</Box>;
 };
 
 export default TenantSwitcher;

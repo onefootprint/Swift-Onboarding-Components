@@ -30,7 +30,7 @@ const EditTagsDialog = ({ entity, open, onClose, onSave }: EditTagsDialogProps) 
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'header.actions.edit-tags',
   });
-  const { data: currentEntityTags, isLoading, error } = useTags(entity.id);
+  const { data: currentEntityTags, isPending, error } = useTags(entity.id);
   const [activeTags, setActiveTags] = useState<EditedTag[]>(currentEntityTags ?? []);
   const [isAddingTag, setIsAddingTag] = useState(false);
   const createTagMutation = useCreateOrgTag();
@@ -149,8 +149,8 @@ const EditTagsDialog = ({ entity, open, onClose, onSave }: EditTagsDialogProps) 
       open={open}
       primaryButton={{
         label: t('save'),
-        loading: isLoading,
-        disabled: isLoading || !!error,
+        loading: isPending,
+        disabled: isPending || !!error,
         onClick: handleSave,
       }}
       secondaryButton={{
@@ -161,7 +161,7 @@ const EditTagsDialog = ({ entity, open, onClose, onSave }: EditTagsDialogProps) 
     >
       <Stack direction="column" justify="flex-start" gap={5}>
         <Text variant="body-3">{t('description')}</Text>
-        {isLoading && <Loading />}
+        {isPending && <Loading />}
         {error && <ErrorComponent error={error} />}
         {currentEntityTags && (
           <>

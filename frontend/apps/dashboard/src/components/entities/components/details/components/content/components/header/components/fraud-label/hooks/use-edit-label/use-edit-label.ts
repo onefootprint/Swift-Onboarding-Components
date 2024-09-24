@@ -21,24 +21,26 @@ const useEditLabel = () => {
   const queryClient = useQueryClient();
   const queryKey = (id: string) => ['entities', id, 'label', authHeaders];
 
-  return useMutation(({ id, kind }: EditLabelRequest) => editLabel({ id, kind }, authHeaders), {
+  return useMutation<EditLabelResponse, Error, EditLabelRequest, { previousLabel?: EditLabelResponse }>({
+    mutationFn: ({ id, kind }: EditLabelRequest) => editLabel({ id, kind }, authHeaders),
     onMutate: async ({ id, kind }) => {
-      await queryClient.cancelQueries();
+      await queryClient.cancelQueries({ queryKey: queryKey(id) });
       const previousLabel = queryClient.getQueryData<EditLabelResponse>(queryKey(id));
       queryClient.setQueryData<EditLabelResponse>(queryKey(id), old => ({
         ...old,
+        id: id,
         kind,
       }));
       return { previousLabel };
     },
-    onError: (err, response, context) => {
+    onError: (err: Error, variables: EditLabelRequest, context) => {
       showErrorToast(err);
       if (context?.previousLabel) {
-        queryClient.setQueryData<EditLabelResponse>(queryKey(response.id), context.previousLabel);
+        queryClient.setQueryData<EditLabelResponse>(queryKey(variables.id), context.previousLabel);
       }
     },
-    onSuccess: ({ id }) => {
-      queryClient.invalidateQueries(queryKey(id));
+    onSuccess: (response: EditLabelResponse) => {
+      queryClient.invalidateQueries({ queryKey: queryKey(response.id) });
     },
   });
 };

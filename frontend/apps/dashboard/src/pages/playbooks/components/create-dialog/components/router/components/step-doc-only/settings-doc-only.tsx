@@ -11,12 +11,12 @@ import Header from '../header';
 
 type StepDocOnlyProps = {
   defaultValues: DataToCollectFormData;
-  isLoading?: boolean;
+  isPending?: boolean;
   onBack: () => void;
   onSubmit: (data: DataToCollectFormData) => void;
 };
 
-const StepDocOnly = ({ onSubmit, onBack, defaultValues, isLoading }: StepDocOnlyProps) => {
+const StepDocOnly = ({ onSubmit, onBack, defaultValues, isPending }: StepDocOnlyProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'create.settings-doc-only',
@@ -55,7 +55,7 @@ const StepDocOnly = ({ onSubmit, onBack, defaultValues, isLoading }: StepDocOnly
             <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button disabled={isNextDisabled()} type="submit" loading={isLoading}>
+            <Button disabled={isNextDisabled()} type="submit" loading={isPending}>
               {allT('create')}
             </Button>
           </ButtonContainer>

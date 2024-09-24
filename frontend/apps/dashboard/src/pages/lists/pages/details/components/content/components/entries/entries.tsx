@@ -23,7 +23,7 @@ const Entries = () => {
   });
   const router = useRouter();
   const listId = router.query.id as string;
-  const { isLoading, error, data } = useListEntries(listId);
+  const { isPending, error, data } = useListEntries(listId);
   const filters = useListDetailsFilters();
   const [showAllEntries, setShowAllEntries] = useState(false);
   const toggleExpanded = () => setShowAllEntries(!showAllEntries);
@@ -63,7 +63,7 @@ const Entries = () => {
     return <ErrorComponent error={error} />;
   }
 
-  return isLoading ? null : (
+  return isPending ? null : (
     <Stack gap={5} direction="column">
       <SectionTitle
         title={t('title')}

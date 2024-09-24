@@ -105,12 +105,12 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       primaryButton={{
         form: 'create-list-form',
         label: t('cta.create.label'),
-        loading: createListMutation.isLoading,
+        loading: createListMutation.isPending,
         loadingAriaLabel: t('cta.create.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: createListMutation.isLoading,
+        disabled: createListMutation.isPending,
         label: t('cta.cancel'),
         onClick: handleCancel,
       }}

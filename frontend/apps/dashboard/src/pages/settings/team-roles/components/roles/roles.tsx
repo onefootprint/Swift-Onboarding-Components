@@ -5,7 +5,7 @@ import RolesTable from 'src/components/roles/roles-table';
 import Create from './components/create';
 
 const Roles = () => {
-  const { data: response, errorMessage, isLoading, pagination } = useRoles(RoleKind.dashboardUser);
+  const { data: response, errorMessage, isPending, pagination } = useRoles(RoleKind.dashboardUser);
 
   return (
     <Box testID="roles-table" tag="section">
@@ -15,7 +15,7 @@ const Roles = () => {
       <RolesTable
         data={response?.data}
         errorMessage={errorMessage}
-        isLoading={isLoading}
+        isPending={isPending}
         kind={RoleKind.dashboardUser}
       />
       {response && response.meta.count > 0 && (

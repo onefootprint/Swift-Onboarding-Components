@@ -41,7 +41,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   };
 
   useEffect(() => {
-    const shouldGenerateToken = open && !generateTokenMutation.isLoading && !generateTokenMutation.data;
+    const shouldGenerateToken = open && !generateTokenMutation.isPending && !generateTokenMutation.data;
     if (!shouldGenerateToken) {
       return;
     }
@@ -82,13 +82,13 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
       primaryButton={{
         label: t('copy-link'),
         onClick: handleCopyLink,
-        disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
+        disabled: sendLinkMutation.isPending || generateTokenMutation.isPending,
       }}
       secondaryButton={{
         label: userHasPhone ? t('send-link-sms') : t('send-link-email'),
         onClick: handleSendLink,
-        disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
-        loading: sendLinkMutation.isLoading,
+        disabled: sendLinkMutation.isPending || generateTokenMutation.isPending,
+        loading: sendLinkMutation.isPending,
       }}
     >
       <Stack gap={3} direction="column">
@@ -112,7 +112,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
             {t('update-passkey')}
           </Text>
         </StyledLi> */}
-        {generateTokenMutation.isLoading ? (
+        {generateTokenMutation.isPending ? (
           <Shimmer height="32px" width="100%" />
         ) : (
           <TextInput

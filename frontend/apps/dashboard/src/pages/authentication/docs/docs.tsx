@@ -24,7 +24,7 @@ const DocsLogin = () => {
   const showErrorToast = useRequestErrorToast();
 
   useEffect(() => {
-    if (!isReady || composeDocsLoginUrl.isLoading || composeDocsLoginUrl.isError) {
+    if (!isReady || composeDocsLoginUrl.isPending || composeDocsLoginUrl.isError) {
       return;
     }
     if (!isLoggedIn) {

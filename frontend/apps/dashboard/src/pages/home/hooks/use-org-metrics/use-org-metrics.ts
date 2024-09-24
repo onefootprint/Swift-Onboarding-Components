@@ -20,13 +20,11 @@ const useOrgMetrics = () => {
   const { authHeaders } = useSession();
   const { requestParams, isReady } = useFilters();
 
-  return useQuery(
-    ['org', 'metrics', requestParams, authHeaders],
-    () => getOrgMetrics(authHeaders, { ...requestParams }),
-    {
-      enabled: isReady,
-    },
-  );
+  return useQuery({
+    queryKey: ['org', 'metrics', requestParams, authHeaders],
+    queryFn: () => getOrgMetrics(authHeaders, { ...requestParams }),
+    enabled: isReady,
+  });
 };
 
 export default useOrgMetrics;

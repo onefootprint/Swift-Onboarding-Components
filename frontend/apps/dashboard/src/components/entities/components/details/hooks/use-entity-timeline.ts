@@ -17,7 +17,9 @@ const getTimeline = async (userId: string, authHeaders: AuthHeaders) => {
 const useEntityTimeline = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, 'timeline', authHeaders], () => getTimeline(id, authHeaders), {
+  return useQuery({
+    queryKey: ['entity', id, 'timeline', authHeaders],
+    queryFn: () => getTimeline(id, authHeaders),
     enabled: !!id,
   });
 };

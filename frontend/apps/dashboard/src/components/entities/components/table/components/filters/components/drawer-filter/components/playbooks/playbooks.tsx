@@ -21,7 +21,7 @@ const Playbooks = () => {
   });
   const methods = useFormContext<FormData>();
   const { register, getValues } = methods;
-  const { data, isLoading: playbooksLoading, isError: playbooksError } = usePlaybookOptions({});
+  const { data, isPending: playbooksLoading, isError: playbooksError } = usePlaybookOptions({});
   const [showAllPlaybooks, setShowAllPlaybooks] = useState(false);
 
   // Sort the playbooks to show the selected ones first when the panel first launches

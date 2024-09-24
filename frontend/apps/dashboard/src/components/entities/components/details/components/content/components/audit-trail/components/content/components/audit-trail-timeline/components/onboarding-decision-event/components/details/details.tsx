@@ -27,7 +27,7 @@ const Details = ({ onboardingDecision, ruleSetResultId }: DetailsProps) => {
     { value: 'field-validations', label: t('drawer.tabs.field-validations') },
   ];
   const [tab, setTab] = useState(options[0].value);
-  const { data, errorMessage, isLoading } = useEntityRuleSetResult({
+  const { data, errorMessage, isPending } = useEntityRuleSetResult({
     entityId,
     ruleSetResultId,
   });
@@ -61,7 +61,7 @@ const Details = ({ onboardingDecision, ruleSetResultId }: DetailsProps) => {
         {showRulesTab ? (
           <Stack direction="column" gap={7}>
             <Tabs options={options} onChange={handleChange} />
-            {tab === 'rules' && <RuleSetResults data={data} errorMessage={errorMessage} isLoading={isLoading} />}
+            {tab === 'rules' && <RuleSetResults data={data} errorMessage={errorMessage} isPending={isPending} />}
             {tab === 'field-validations' && <FieldValidations entityId={entityId} />}
           </Stack>
         ) : (

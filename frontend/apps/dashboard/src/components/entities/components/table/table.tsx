@@ -22,7 +22,7 @@ const Table = ({ 'aria-label': ariaLabel, columns, emptyStateText, searchPlaceho
       emptyStateText={context.errorMessage || emptyStateText}
       getKeyForRow={(entity: Entity) => entity.id}
       initialSearch={context.initialSearch}
-      isLoading={context.isLoading}
+      isLoading={context.isPending}
       items={context.data}
       onChangeSearchText={context.onSearchChange}
       onRowClick={context.onRowClick}

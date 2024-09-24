@@ -35,18 +35,18 @@ const Dialog = ({ onClose, open }: DialogProps) => {
       primaryButton={{
         form: 'members-invite-form',
         label: 'Invite',
-        loading: inviteMembersMutation.isLoading,
-        disabled: rolesQuery.isLoading,
+        loading: inviteMembersMutation.isPending,
+        disabled: rolesQuery.isPending,
         type: 'submit',
       }}
       secondaryButton={{
         label: 'Cancel',
-        disabled: inviteMembersMutation.isLoading,
+        disabled: inviteMembersMutation.isPending,
         onClick: onClose,
       }}
     >
       <>
-        {rolesQuery.isLoading && <Loading />}
+        {rolesQuery.isPending && <Loading />}
         {rolesQuery.data && (
           <Data roles={rolesQuery.options} defaultRole={rolesQuery.options[0]} onSubmit={handleSubmit} />
         )}

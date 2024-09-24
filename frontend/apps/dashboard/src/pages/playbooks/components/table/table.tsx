@@ -10,10 +10,10 @@ import Row from './components/row';
 type TableProps = {
   data?: OnboardingConfig[];
   errorMessage?: string;
-  isLoading?: boolean;
+  isPending?: boolean;
 };
 
-const Table = ({ data, isLoading, errorMessage }: TableProps) => {
+const Table = ({ data, isPending, errorMessage }: TableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
   const router = useRouter();
   const filters = useFilters();
@@ -42,7 +42,7 @@ const Table = ({ data, isLoading, errorMessage }: TableProps) => {
       emptyStateText={errorMessage || t('empty-description')}
       getAriaLabelForRow={onboardingConfig => onboardingConfig.name}
       getKeyForRow={onboardingConfig => onboardingConfig.id}
-      isLoading={isLoading}
+      isLoading={isPending}
       items={data}
       onRowClick={handleRowClick}
       renderTr={({ item: playbook }) => <Row playbook={playbook} />}

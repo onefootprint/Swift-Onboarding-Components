@@ -14,12 +14,12 @@ const Playbooks = () => {
   });
   const router = useRouter();
   const id = router.query.id as string;
-  const { isLoading, error, data } = useListDetails(id);
+  const { isPending, error, data } = useListDetails(id);
 
   return (
     <Stack gap={5} direction="column">
       <SectionTitle title={t('title', { alias: data?.alias })} />
-      {isLoading && <Loading />}
+      {isPending && <Loading />}
       {error ? <ErrorComponent error={error} /> : null}
       {data && <Content list={data} />}
     </Stack>

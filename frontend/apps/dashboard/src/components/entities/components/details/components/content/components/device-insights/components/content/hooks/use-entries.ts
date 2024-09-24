@@ -17,7 +17,7 @@ type Entry = {
   type: MultiSelectOptionValue;
   coordinates?: { lat: number; lng: number };
   data?: AuthEvent;
-  cardIsLoading?: boolean;
+  cardisPending?: boolean;
   marker?: MapMarkerProps;
   liveness?: AuthEvent;
 };
@@ -25,13 +25,13 @@ type Entry = {
 const useEntries = (entity: Entity, livenessData: AuthEvent[], options: MultiSelectOption[]) => {
   const {
     data: businessData,
-    isLoading: businessCoordLoading,
+    isPending: businessCoordLoading,
     isError: businessError,
   } = useAddressCoordinates(entity, AddressType.business);
 
   const {
     data: residentialData,
-    isLoading: residentialCoordLoading,
+    isPending: residentialCoordLoading,
     isError: residentialError,
   } = useAddressCoordinates(entity, AddressType.residential);
 
@@ -83,7 +83,7 @@ const useEntries = (entity: Entity, livenessData: AuthEvent[], options: MultiSel
         id,
         type: MultiSelectOptionValue.businessAddress,
         coordinates: hasCoords ? { lat: businessLat, lng: businessLng } : undefined,
-        cardIsLoading: businessCoordLoading && !businessError,
+        cardisPending: businessCoordLoading && !businessError,
         marker: hasCoords
           ? {
               id,
@@ -103,7 +103,7 @@ const useEntries = (entity: Entity, livenessData: AuthEvent[], options: MultiSel
         id,
         type: MultiSelectOptionValue.residentialAddress,
         coordinates: hasCoords ? { lat: residentialLat, lng: residentialLng } : undefined,
-        cardIsLoading: residentialCoordLoading && !residentialError,
+        cardisPending: residentialCoordLoading && !residentialError,
         marker: hasCoords
           ? {
               id,

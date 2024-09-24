@@ -9,12 +9,12 @@ import Signup from './components/sign-up';
 
 type StepAuthProps = {
   defaultValues: DataToCollectFormData;
-  isLoading?: boolean;
+  isPending?: boolean;
   onBack: () => void;
   onSubmit: (data: DataToCollectFormData) => void;
 };
 
-const StepAuth = ({ onSubmit, onBack, defaultValues, isLoading }: StepAuthProps) => {
+const StepAuth = ({ onSubmit, onBack, defaultValues, isPending }: StepAuthProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'create.settings-auth',
@@ -34,7 +34,7 @@ const StepAuth = ({ onSubmit, onBack, defaultValues, isLoading }: StepAuthProps)
             <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button type="submit" loading={isLoading}>
+            <Button type="submit" loading={isPending}>
               {allT('create')}
             </Button>
           </ButtonContainer>

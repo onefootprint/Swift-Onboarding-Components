@@ -9,7 +9,7 @@ import useProxyConfigs from './hooks/use-proxy-configs';
 
 const ProxyConfigs = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
-  const { data, errorMessage, isLoading } = useProxyConfigs();
+  const { data, errorMessage, isPending } = useProxyConfigs();
 
   return (
     <>
@@ -26,7 +26,7 @@ const ProxyConfigs = () => {
         <Create />
       </Stack>
       <Box testID="proxy-configs-section" tag="section">
-        <Table data={data} errorMessage={errorMessage} isLoading={isLoading} />
+        <Table data={data} errorMessage={errorMessage} isPending={isPending} />
         <Details />
       </Box>
     </>
