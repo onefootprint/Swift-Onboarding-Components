@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import Text from '../../text';
 import type { TriggerProps } from '../dropdown.types';
 
-const DropdownTrigger = ({ children, variant = 'default', maxWidth, ...props }: TriggerProps) => {
+const Trigger = ({ children, variant = 'default', maxWidth, ...props }: TriggerProps) => {
   if (variant === 'chevron') {
     return (
       <ChevronTriggerContainer {...props}>
@@ -90,4 +90,4 @@ const DefaultTriggerContainer = styled(RadixDropdown.Trigger)`
   `}
 `;
 
-export default DropdownTrigger;
+export default Trigger;

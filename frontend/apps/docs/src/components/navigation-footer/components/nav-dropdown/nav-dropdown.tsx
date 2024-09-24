@@ -55,7 +55,7 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
                 </Text>
               </Box>
             </Dropdown.Group>
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             <Dropdown.Group>
               <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
                 <Link href={`${DASHBOARD_BASE_URL}`} target="_blank">
@@ -73,7 +73,7 @@ const NavDropdown = ({ user, isApiReference, handleOpenSupportDialog }: NavDropd
                 </button>
               </Dropdown.Item>
             </Dropdown.Group>
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             <Dropdown.Group>
               <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
                 {t('log-out')}

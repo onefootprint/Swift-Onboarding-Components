@@ -129,7 +129,7 @@ const Actions = ({ entity }: WithEntityProps) => {
                 {t('summarize.label')}
               </Dropdown.Item>
             </Dropdown.Group>
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             {hasPermission(RoleScopeKind.manualReview) && (
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('groups.user-requests')}</Dropdown.GroupTitle>
@@ -141,7 +141,7 @@ const Actions = ({ entity }: WithEntityProps) => {
                 </Dropdown.Item>
               </Dropdown.Group>
             )}
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             {user?.isFirmEmployee && isOpenDatadogEnabled && (
               <Dropdown.Group>
                 <Dropdown.GroupTitle>{t('groups.internal')}</Dropdown.GroupTitle>

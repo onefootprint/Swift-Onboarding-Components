@@ -79,11 +79,11 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
         <Dropdown.Portal>
           <Dropdown.Content sideOffset={8} maxWidth="260px" align="start">
             <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             {tenants?.length > 1 ? (
               <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
             ) : null}
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             <Dropdown.Group>
               <Dropdown.Item iconRight={StyledIcoArrowTopRight16}>
                 <Link href={`${DOCS_BASE_URL}/login?redirectUrl=/`} target="_blank">
@@ -111,7 +111,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
                 </button>
               </Dropdown.Item>
             </Dropdown.Group>
-            <Dropdown.Separator />
+            <Dropdown.Divider />
             <Dropdown.Group>
               <Dropdown.Item onSelect={handleLogout} iconLeft={IcoLogOut16}>
                 {t('log-out')}

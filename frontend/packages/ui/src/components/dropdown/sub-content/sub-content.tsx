@@ -1,7 +1,7 @@
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import type * as CSS from 'csstype';
 import styled, { css } from 'styled-components';
-import type { SubContentProps } from '../../dropdown.types';
+import type { SubContentProps } from '../dropdown.types';
 
 const SubContent = ({ maxWidth, minWidth, ...props }: SubContentProps) => {
   return <Container sideOffset={4} {...props} $maxWidth={maxWidth} $minWidth={minWidth} />;

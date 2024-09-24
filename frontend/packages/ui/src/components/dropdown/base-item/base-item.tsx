@@ -1,10 +1,10 @@
 import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../../utils';
 import Box from '../../box';
-import type { BaseItemContainerProps } from '../dropdown.types';
+import type { BaseItemProps } from '../dropdown.types';
 import { DROPDOWN_ITEM_SIZE } from '../dropdown.types';
 
-const BaseItemContainer = styled(Box)<BaseItemContainerProps>`
+const BaseItem = styled(Box)<BaseItemProps>`
   ${({ theme, variant = 'default', size = 'default', $height, layout = 'default' }) => {
     const getHeight = () => {
       if ($height === 'fit-content') return 'fit-content';
@@ -88,4 +88,4 @@ const BaseItemContainer = styled(Box)<BaseItemContainerProps>`
   }}
 `;
 
-export default BaseItemContainer;
+export default BaseItem;

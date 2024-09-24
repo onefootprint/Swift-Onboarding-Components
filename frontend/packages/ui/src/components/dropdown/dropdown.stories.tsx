@@ -14,9 +14,17 @@ const Template: StoryFn<TriggerProps> = ({ children, ...args }) => (
       <Dropdown.Trigger {...args}>{children}</Dropdown.Trigger>
       <Dropdown.Content>
         <Dropdown.Group>
+          <Dropdown.GroupTitle>Group 1</Dropdown.GroupTitle>
           <Dropdown.Item>Item 1</Dropdown.Item>
           <Dropdown.Item>Item 2</Dropdown.Item>
           <Dropdown.Item>Item 3</Dropdown.Item>
+        </Dropdown.Group>
+        <Dropdown.Divider />
+        <Dropdown.Group>
+          <Dropdown.GroupTitle>Group 2</Dropdown.GroupTitle>
+          <Dropdown.Item>Item 4</Dropdown.Item>
+          <Dropdown.Item>Item 5</Dropdown.Item>
+          <Dropdown.Item>Item 6</Dropdown.Item>
         </Dropdown.Group>
       </Dropdown.Content>
     </Dropdown.Root>

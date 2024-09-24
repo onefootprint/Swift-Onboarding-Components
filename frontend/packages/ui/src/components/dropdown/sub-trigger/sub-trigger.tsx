@@ -1,8 +1,8 @@
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
 import styled, { css } from 'styled-components';
-import { createFontStyles } from '../../../../utils';
+import { createFontStyles } from '../../../utils';
 
-import { DROPDOWN_ITEM_SIZE } from '../../dropdown.types';
+import { DROPDOWN_ITEM_SIZE } from '../dropdown.types';
 
 const SubTrigger = styled(RadixDropdown.SubTrigger)<{
   $asButton?: boolean;

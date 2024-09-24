@@ -76,7 +76,7 @@ const FraudLabel = () => {
             </Dropdown.Group>
             {label && (
               <>
-                <Dropdown.Separator />
+                <Dropdown.Divider />
                 <Dropdown.Group>
                   <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
                     {t('labels.remove')}

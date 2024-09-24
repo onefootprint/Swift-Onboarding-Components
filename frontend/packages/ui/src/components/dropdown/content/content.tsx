@@ -27,7 +27,7 @@ const translateOut = keyframes`
   }
 `;
 
-const Content = ({ children, minWidth, maxWidth, width, sideOffset = 4, ...props }: ContentProps) => {
+const Content = ({ children, minWidth = '200px', maxWidth, width, sideOffset = 4, ...props }: ContentProps) => {
   return (
     <Container sideOffset={sideOffset} $minWidth={minWidth} $maxWidth={maxWidth} $width={width} {...props}>
       {children}

@@ -4,11 +4,10 @@ import { createFontStyles } from '../../../utils';
 
 const GroupTitle = styled(RadixDropdown.Label)`
   ${({ theme }) => css`
-    ${createFontStyles('caption-3')};
-    text-transform: uppercase;
+    ${createFontStyles('caption-1')};
     color: ${theme.color.quaternary};
     display: flex;
-    padding: ${theme.spacing[3]} ${theme.spacing[4]} ${theme.spacing[2]};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
   `};
 `;
 

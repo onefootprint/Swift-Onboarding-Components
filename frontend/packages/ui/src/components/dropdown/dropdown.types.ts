@@ -49,7 +49,7 @@ export type SubContentProps = DropdownMenuSubContentProps & {
   maxWidth?: CSS.Property.Width;
 };
 
-export type BaseItemContainerProps = {
+export type BaseItemProps = {
   $height?: CSS.Property.Height;
   variant?: 'default' | 'destructive';
   size?: 'default' | 'compact' | 'tiny';

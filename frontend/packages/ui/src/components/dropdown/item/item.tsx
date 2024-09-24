@@ -6,7 +6,7 @@ import { IcoArrowTopRight16 } from '@onefootprint/icons';
 import type { ItemProps } from '../dropdown.types';
 
 import Stack from '../../stack';
-import BaseItemContainer from '../base-item-container';
+import BaseItem from '../base-item';
 
 const Item = ({
   iconLeft: IconLeft,
@@ -24,13 +24,13 @@ const Item = ({
 
   return (
     <RadixDropdown.Item {...props} onSelect={onSelect} asChild>
-      <BaseItemContainer size={size} variant={variant} $height={height} layout="default">
+      <BaseItem size={size} variant={variant} $height={height} layout="default">
         {IconLeft && <IconLeft color={variant === 'destructive' ? 'error' : undefined} />}
         <Stack direction="column" gap={1} flex={1} textDecoration="none">
           {children}
         </Stack>
         {IconRight && <IconRight />}
-      </BaseItemContainer>
+      </BaseItem>
     </RadixDropdown.Item>
   );
 };
