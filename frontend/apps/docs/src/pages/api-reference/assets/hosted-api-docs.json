@@ -44,6 +44,7 @@
                 ],
                 "description": "Updates data in a business vault. Can be used to update `business.` data",
                 "requestBody": {
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -118,6 +119,7 @@
                 ],
                 "description": "Checks if provided vault data is valid before adding it to the business vault",
                 "requestBody": {
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -359,6 +361,7 @@
                 ],
                 "description": "Respond to a KBA challenge to prove knowledge of existing data in the vault.",
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -1948,6 +1951,7 @@
                 ],
                 "description": "Updates data in a user vault",
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -2022,6 +2026,7 @@
                 ],
                 "description": "Checks if provided vault data is valid before adding it to the vault",
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {

@@ -6506,7 +6506,7 @@ dependencies = [
 [[package]]
 name = "paperclip"
 version = "0.9.0"
-source = "git+https://github.com/onefootprint/paperclip?rev=31cef9c3e14bfbf15147060fbb02dca13f62577f#31cef9c3e14bfbf15147060fbb02dca13f62577f"
+source = "git+https://github.com/onefootprint/paperclip?rev=cc3f079a31a73b93f8ea654c140b55a59bc5bacb#cc3f079a31a73b93f8ea654c140b55a59bc5bacb"
 dependencies = [
  "anyhow",
  "itertools",
@@ -6527,7 +6527,7 @@ dependencies = [
 [[package]]
 name = "paperclip-actix"
 version = "0.7.0"
-source = "git+https://github.com/onefootprint/paperclip?rev=31cef9c3e14bfbf15147060fbb02dca13f62577f#31cef9c3e14bfbf15147060fbb02dca13f62577f"
+source = "git+https://github.com/onefootprint/paperclip?rev=cc3f079a31a73b93f8ea654c140b55a59bc5bacb#cc3f079a31a73b93f8ea654c140b55a59bc5bacb"
 dependencies = [
  "actix-service",
  "actix-web",
@@ -6545,7 +6545,7 @@ dependencies = [
 [[package]]
 name = "paperclip-core"
 version = "0.7.0"
-source = "git+https://github.com/onefootprint/paperclip?rev=31cef9c3e14bfbf15147060fbb02dca13f62577f#31cef9c3e14bfbf15147060fbb02dca13f62577f"
+source = "git+https://github.com/onefootprint/paperclip?rev=cc3f079a31a73b93f8ea654c140b55a59bc5bacb#cc3f079a31a73b93f8ea654c140b55a59bc5bacb"
 dependencies = [
  "actix-multipart",
  "actix-session",
@@ -6571,7 +6571,7 @@ dependencies = [
 [[package]]
 name = "paperclip-macros"
 version = "0.6.3"
-source = "git+https://github.com/onefootprint/paperclip?rev=31cef9c3e14bfbf15147060fbb02dca13f62577f#31cef9c3e14bfbf15147060fbb02dca13f62577f"
+source = "git+https://github.com/onefootprint/paperclip?rev=cc3f079a31a73b93f8ea654c140b55a59bc5bacb#cc3f079a31a73b93f8ea654c140b55a59bc5bacb"
 dependencies = [
  "heck 0.4.0",
  "http 0.2.9",

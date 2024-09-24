@@ -680,6 +680,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -802,6 +803,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the business's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -1113,6 +1115,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -1243,6 +1246,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -2980,6 +2984,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -3153,6 +3158,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
