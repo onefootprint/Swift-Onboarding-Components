@@ -154,27 +154,38 @@ pub async fn post(
 
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
-                VerifiedCredential::Otp(verified_data, lifetime_id) => {
+                VerifiedCredential::Otp(verified_data, ci_dl_id, ci_kind) => {
                     let added_auth_methods = if let Some((su, data)) = su.as_ref().zip(verified_data) {
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
-                        let ci = ContactInfo::get(conn, &lifetime_id)?;
-                        // Note, this arbitrarily doesn't allow portablizing data that was written by the
-                        // tenant, even after it's been OTP-verified by the user.
-                        // We need to better think through when to portablize login methods.
+
+                        // The contact info used for identifying the user may be from a different
+                        // tenant if we're onboarding to a new tenant.
+                        let ci = ContactInfo::get(conn, &ci_dl_id)?;
+                        let onboarding_tenant_eq_identify_tenant = vw
+                            .get(&ci_kind.di())
+                            .is_some_and(|ci_dl| ci_dl.lifetime_id() == &ci_dl_id);
+
+                        // Note, this arbitrarily doesn't allow portablizing data that was written
+                        // by the tenant, even after it's been OTP-verified by the user. We need to
+                        // better think through when to portablize login methods.
                         let is_first_time_verifying = !ci.is_otp_verified();
                         if is_first_time_verifying {
                             // Save the `id.verified_xxx` data.
                             let seqno = vw.save_ci_after_otp(conn, data)?;
-                            // Portablize and verify the existing piece of `id.xxx` contact info.
-                            DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
-                            ContactInfo::mark_otp_verified(conn, &ci.id)?;
+
+                            if onboarding_tenant_eq_identify_tenant {
+                                // Portablize and verify the existing piece of `id.xxx` contact info.
+                                DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+                                ContactInfo::mark_otp_verified(conn, &ci.id)?;
+                            }
                         }
                         is_first_time_verifying
                     } else {
                         false
                     };
+
                     (None, added_auth_methods)
                 }
                 VerifiedCredential::Passkey(result) => {
@@ -330,10 +341,10 @@ async fn on_otp_verify(
     } else {
         None
     };
-    Ok(VerifiedCredential::Otp(data, s.lifetime_id))
+    Ok(VerifiedCredential::Otp(data, s.lifetime_id, cik))
 }
 
 enum VerifiedCredential {
-    Otp(Option<FingerprintedDataRequest>, DataLifetimeId),
+    Otp(Option<FingerprintedDataRequest>, DataLifetimeId, ContactInfoKind),
     Passkey(WebauthnAuthenticationResult),
 }
