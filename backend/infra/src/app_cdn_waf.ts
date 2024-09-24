@@ -25,9 +25,9 @@ function rateLimitExceededAction() {
 }
 
 export const APP_CDN_WAF_RULES = [
-    awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0, true),
-    awsManagedRule('AWSManagedRulesCommonRuleSet', 1, false),
-    awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2, true),
+    awsManagedRule('AWSManagedRulesAmazonIpReputationList', 0),
+    awsManagedRule('AWSManagedRulesCommonRuleSet', 1),
+    awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2),
     ipBlockRule({
       name: 'BlockedIpSet',
       priority: 3,
@@ -70,7 +70,7 @@ export const APP_CDN_WAF_RULES = [
     }),
 ];
 
-function awsManagedRule(name: string, priority: number, sample: boolean) {
+function awsManagedRule(name: string, priority: number) {
   return {
     name: name,
     priority: priority,
@@ -87,7 +87,8 @@ function awsManagedRule(name: string, priority: number, sample: boolean) {
     visibilityConfig: {
       metricName: name,
       cloudwatchMetricsEnabled: true,
-      sampledRequestsEnabled: sample,
+      // Critical: Disable sampling to avoid leaking API keys.
+      sampledRequestsEnabled: false,
     },
   };
 }

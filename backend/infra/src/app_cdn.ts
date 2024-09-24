@@ -147,6 +147,79 @@ export function CreateAppCloudfrontDistribution(
     rules: APP_CDN_WAF_RULES,
   });
 
+  const wafLogGroup = new aws.cloudwatch.LogGroup("app-cdn-waf-log-gorup", {
+      // Must start with aws-waf-logs-
+      name: `aws-waf-logs-app-cdn-${config.stack.shortStackName}`,
+      tags: {
+          Environment: "production",
+          Application: "serviceA",
+      },
+  });
+
+  const wafLoggingConfig = new aws.wafv2.WebAclLoggingConfiguration(
+    'app-cdn-waf-logging',
+    {
+     resourceArn: waf.arn,
+     logDestinationConfigs: [
+        wafLogGroup.arn,
+     ],
+     // Only log on COUNT/BLOCK.
+     loggingFilter: {
+       defaultBehavior: "DROP",
+       filters: [
+          {
+            behavior: "KEEP",
+            conditions: [
+              {
+                actionCondition: {
+                  action: "COUNT",
+                },
+              },
+              {
+                actionCondition: {
+                  action: "BLOCK",
+                },
+              },
+            ],
+            requirement: "MEETS_ANY",
+          },
+       ]
+     },
+     redactedFields: [
+       {
+         singleHeader: {
+           name: "x-footprint-secret-key",
+         },
+       },
+       {
+         singleHeader: {
+           name: "authorization",
+         },
+       },
+       {
+         singleHeader: {
+           name: "x-fp-authorization",
+         },
+       },
+       {
+         singleHeader: {
+           name: "x-fp-protected-custodian-key",
+         },
+       },
+       {
+         singleHeader: {
+           name: "x-fp-dashboard-authorization",
+         },
+       },
+       {
+         singleHeader: {
+           name: "x-fp-dashboard-authorization-secondary",
+         },
+       },
+     ],
+    },
+  );
+
   const logBucket = createLogBucket(config);
 
   const cdn = new aws.cloudfront.Distribution('app-cdn', {
