@@ -13,6 +13,7 @@ use tracing_core::Event;
 use tracing_opentelemetry::OtelData;
 use tracing_serde::fields::AsMap;
 use tracing_serde::AsSerde;
+use tracing_serde::SerdeMapVisitor;
 use tracing_subscriber::fmt::format::Writer;
 use tracing_subscriber::fmt::FmtContext;
 use tracing_subscriber::fmt::FormatEvent;
@@ -44,13 +45,14 @@ where
         let mut visit = || {
             let mut s = serde_json::Serializer::new(WriteAdaptor(&mut writer));
 
-            let mut s = s.serialize_map(None)?;
+            let s = s.serialize_map(None)?;
+            let mut s = TrackKeysSerializeMap::new(s);
+
             s.serialize_entry(
                 "timestamp",
                 &Utc::now().to_rfc3339_opts(SecondsFormat::Micros, true),
             )?;
             s.serialize_entry("level", &meta.level().as_serde())?;
-            s.serialize_entry("fields", &event.field_map())?;
             s.serialize_entry("target", meta.target())?;
 
             if let Some(file) = meta.file() {
@@ -61,6 +63,7 @@ where
             }
 
             if let Some(ref span_ref) = ctx.lookup_current() {
+                // Attach all properties of the root span to each log line that we emit
                 if let Some(root_span_ref) = span_ref.scope().from_root().next() {
                     ser_root_span_attrs(&root_span_ref, &mut s)?;
                 }
@@ -68,12 +71,22 @@ where
                 if let Some((trace_id, span_id)) = lookup_trace_ids(span_ref) {
                     s.serialize_entry("dd.trace_id", &trace_id.to_string())?;
                     s.serialize_entry("dd.span_id", &span_id.to_string())?;
-                    // Emit the trace ID to support finding other logs from this trace
+                    // Also emit the trace ID to support finding other logs from this trace. The above fields
+                    // are absorbed by datadog
                     s.serialize_entry("trace_id", &trace_id.to_string())?;
                 }
             }
 
-            s.end()
+            // Keeping this for backwards compatibility.
+            // TODO: will remove soon
+            s.serialize_entry("fields", &event.field_map())?;
+
+            // AS THE VERY LAST STEP, serialize all user-provided fields from the log line.
+            // Our TrackKeysSerializeMap will automatically prefix any user-provided fields that conflict with
+            // any of the reserved fields set above.
+            let mut visitor = SerdeMapVisitor::new(s);
+            event.record(&mut visitor);
+            visitor.finish()
         };
 
         visit().map_err(|_| std::fmt::Error)?;
@@ -116,6 +129,38 @@ where
     })
 }
 
+/// These fields are set on the root tracing span and are automatically attached to each log line
+/// when populated. They generally should not be set explicitly in any `tracing::info!` (or other
+/// `tracing::event!`) log lines, unless it is known that the root span is missing the field.
+const RESERVED_ROOT_SPAN_FIELDS: &[&str] = &[
+    "tenant_id",
+    "fp_id",
+    "vault_id",
+    "is_live",
+    "auth_method",
+    "auth_token_hash",
+    "meta",
+    "client_version",
+    "session_id",
+    "fp_session_id",
+    "is_integration_test_req",
+    "route",
+    "ip_address",
+    "country",
+    "support_id",
+    "request_id",
+    "server_git_hash",
+    "exception.message",
+    "exception.details",
+    "http.client_ip",
+    "http.host",
+    "http.user_agent",
+    "http.method",
+    "http.status_code",
+    "http.route",
+    "http.target",
+];
+
 // Copies root span attributes to associated log events.
 fn ser_root_span_attrs<S, T>(root_span_ref: &SpanRef<T>, serializer: &mut S) -> Result<(), S::Error>
 where
@@ -126,59 +171,86 @@ where
     if let Some(attributes) = ext.get::<OtelData>().and_then(|o| o.builder.attributes.as_ref()) {
         for (k, v) in attributes {
             let k = k.as_str();
-            match k {
-                // Note that these fields are written at the top level of the log event for ease of
-                // querying, so they must not collide with standard attributes.
-                //
-                // Omitted fields:
-                //   - server_git_hash: Redundant with Datadog's version tag.
-                "tenant_id"
-                | "fp_id"
-                | "vault_id"
-                | "is_live"
-                | "auth_method"
-                | "auth_token_hash"
-                | "meta"
-                | "client_version"
-                | "session_id"
-                | "fp_session_id"
-                | "is_integration_test_req"
-                | "route"
-                | "ip_address"
-                | "country"
-                | "support_id"
-                | "request_id"
-                | "server_git_hash"
-                | "exception.message"
-                | "exception.details"
-                | "http.client_ip"
-                | "http.host"
-                | "http.user_agent"
-                | "http.method"
-                | "http.status_code"
-                | "http.route"
-                | "http.target" => match v {
-                    opentelemetry::Value::Bool(v) => serializer.serialize_entry(k, v)?,
-                    opentelemetry::Value::I64(v) => serializer.serialize_entry(k, v)?,
-                    opentelemetry::Value::F64(v) => serializer.serialize_entry(k, v)?,
-                    opentelemetry::Value::String(v) => serializer.serialize_entry(k, v.as_ref())?,
-                    opentelemetry::Value::Array(opentelemetry::Array::Bool(v)) => {
-                        serializer.serialize_entry(k, &v)?
-                    }
-                    opentelemetry::Value::Array(opentelemetry::Array::I64(v)) => {
-                        serializer.serialize_entry(k, &v)?
-                    }
-                    opentelemetry::Value::Array(opentelemetry::Array::F64(v)) => {
-                        serializer.serialize_entry(k, &v)?
-                    }
-                    opentelemetry::Value::Array(opentelemetry::Array::String(v)) => {
-                        serializer.serialize_entry(k, &v.iter().map(|v| v.as_str()).collect_vec())?
-                    }
-                },
-                _ => {}
+            if !RESERVED_ROOT_SPAN_FIELDS.contains(&k) {
+                continue;
+            }
+            // Note that these fields are written at the top level of the log event for ease of
+            // querying, so they must not collide with standard attributes.
+            //
+            // Omitted fields:
+            //   - server_git_hash: Redundant with Datadog's version tag.
+            match v {
+                opentelemetry::Value::Bool(v) => serializer.serialize_entry(k, v)?,
+                opentelemetry::Value::I64(v) => serializer.serialize_entry(k, v)?,
+                opentelemetry::Value::F64(v) => serializer.serialize_entry(k, v)?,
+                opentelemetry::Value::String(v) => serializer.serialize_entry(k, v.as_ref())?,
+                opentelemetry::Value::Array(opentelemetry::Array::Bool(v)) => {
+                    serializer.serialize_entry(k, &v)?
+                }
+                opentelemetry::Value::Array(opentelemetry::Array::I64(v)) => {
+                    serializer.serialize_entry(k, &v)?
+                }
+                opentelemetry::Value::Array(opentelemetry::Array::F64(v)) => {
+                    serializer.serialize_entry(k, &v)?
+                }
+                opentelemetry::Value::Array(opentelemetry::Array::String(v)) => {
+                    serializer.serialize_entry(k, &v.iter().map(|v| v.as_str()).collect_vec())?
+                }
             }
         }
     }
 
     Ok(())
+}
+
+/// Wrapper around a SerializeMap that keeps track of which fields have been written.
+/// If a single key is written twice, we prefix it `CONFLICTING_FIELD.` to deduplicate
+pub struct TrackKeysSerializeMap<S> {
+    inner: S,
+    fields: Vec<String>,
+}
+
+impl<S> TrackKeysSerializeMap<S> {
+    fn new(inner: S) -> Self {
+        Self {
+            inner,
+            fields: vec![],
+        }
+    }
+}
+
+impl<S> SerializeMap for TrackKeysSerializeMap<S>
+where
+    S: SerializeMap,
+{
+    type Error = S::Error;
+    type Ok = S::Ok;
+
+    fn serialize_key<T: serde::Serialize + ?Sized>(
+        &mut self,
+        key: &T,
+    ) -> std::result::Result<(), Self::Error> {
+        if let Ok(serde_json::Value::String(key)) = serde_json::to_value(key) {
+            let key_is_already_used = self.fields.contains(&key);
+            if key_is_already_used {
+                tracing::info!(field_key=%key, "Conflicting tracing field");
+                // Add a prefix to the key so we don't overwrite any existing fields
+                let key = format!("CONFLICTING_FIELD.{}", key);
+                return self.serialize_key(&key);
+            }
+            self.fields.push(key);
+        }
+        self.inner.serialize_key(key)
+    }
+
+    fn serialize_value<T: serde::Serialize + ?Sized>(
+        &mut self,
+        value: &T,
+    ) -> std::result::Result<(), Self::Error> {
+        self.inner.serialize_value(value)
+    }
+
+    fn end(self) -> std::result::Result<Self::Ok, Self::Error> {
+        self.inner.end()
+    }
 }
