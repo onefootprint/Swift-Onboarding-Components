@@ -193,8 +193,8 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "3ruc9MwHfchgh2LRm9",
-          authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
+          sandboxId: "3ruc9MwHkjmlksnapnqww",
+          // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
           child: Container(
             alignment: Alignment.center,
             decoration: const BoxDecoration(
@@ -210,7 +210,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
                         handleComplete();
                       },
                       useAuthToken:
-                          true, // True if an auth token was provided to the FootprintProvider
+                          false, // True if an auth token was provided to the FootprintProvider
                     ),
                   if (currentStep == Steps.dataCollection)
                     DataCollection(
@@ -373,7 +373,7 @@ class _IdentifyState extends State<Identify> {
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 16),
                     FootprintField(
-                      name: "id.email",
+                      name: DataIdentifier.idEmail,
                       createField: ({error}) {
                         return FootprintTextInput(
                           labelText: "Email",
@@ -385,7 +385,7 @@ class _IdentifyState extends State<Identify> {
                     ),
                     const SizedBox(height: 12),
                     FootprintField(
-                      name: "id.phone_number",
+                      name: DataIdentifier.idPhoneNumber,
                       child: FootprintTextInput(
                         labelText: "Phone Number",
                         decoration: inputDecoration("Phone Number"),
@@ -494,7 +494,7 @@ class DataCollection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 16),
                 FootprintField(
-                  name: "id.first_name",
+                  name: DataIdentifier.idFirstName,
                   child: FootprintTextInput(
                     labelText: "First Name",
                     decoration: inputDecoration("First Name"),
@@ -502,7 +502,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.middle_name",
+                  name: DataIdentifier.idMiddleName,
                   child: FootprintTextInput(
                     labelText: "Middle Name (Optional)",
                     decoration: inputDecoration("Middle Name (Optional)"),
@@ -510,7 +510,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.last_name",
+                  name: DataIdentifier.idLastName,
                   child: FootprintTextInput(
                     labelText: "Last Name",
                     decoration: inputDecoration("Last Name"),
@@ -518,7 +518,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.dob",
+                  name: DataIdentifier.idDob,
                   child: FootprintTextInput(
                     labelText: "Date of Birth",
                     decoration: inputDecoration("Date of Birth"),

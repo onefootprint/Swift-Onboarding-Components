@@ -55,7 +55,8 @@ enum DataIdentifier {
   businessCountry("business.country"),
   businessZip("business.zip"),
   businessFormationState("business.formation_state"),
-  businessFormationDate("business.formation_date");
+  businessFormationDate("business.formation_date"),
+  custom("custom.");
 
   final String value;
   const DataIdentifier(this.value);
@@ -162,8 +163,15 @@ enum DataIdentifier {
         return DataIdentifier.businessFormationState;
       case "business.formation_date":
         return DataIdentifier.businessFormationDate;
+      case "custom":
+        return DataIdentifier.custom;
       default:
         return null;
     }
+  }
+
+  @override
+  String toString() {
+    return value;
   }
 }

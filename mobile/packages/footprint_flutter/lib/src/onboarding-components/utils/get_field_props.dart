@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/config/corporation_types.dart';
 import 'package:footprint_flutter/src/config/countries.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/validators.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -17,18 +18,32 @@ typedef InputProps = ({
   List<String>? autofillHints,
 });
 
-typedef FieldProps = ({String name, InputProps? inputProps});
+typedef FieldProps = ({
+  DataIdentifier name,
+  String? additionalIdentifier,
+  InputProps? inputProps
+});
 
-FieldProps getFieldProps(WidgetRef ref, String name) {
+FieldProps getFieldProps(
+    WidgetRef ref, DataIdentifier name, String? additionalIdentifier) {
   final fpContext = ref.watch(fpContextNotifierProvider);
 
   final locale = fpContext.locale;
 
-  if (name.isEmpty) {
-    throw Exception('Input must be used inside a Field component');
+  if (name.toString().isEmpty) {
+    // Should never happen, but just in case
+    throw Exception('Field name is empty');
   }
 
-  final props = getProps(name, locale);
+  if (name == DataIdentifier.businessKycedBeneficialOwners ||
+      name == DataIdentifier.businessBeneficialOwners ||
+      name == DataIdentifier.custom) {
+    if (additionalIdentifier == null) {
+      throw Exception('Field $name requires additional identifier');
+    }
+  }
+
+  final props = getProps(name, additionalIdentifier, locale);
   if (props == null) {
     throw Exception('Field $name is not supported');
   }
@@ -36,6 +51,7 @@ FieldProps getFieldProps(WidgetRef ref, String name) {
   return (
     name: name,
     inputProps: props,
+    additionalIdentifier: additionalIdentifier,
   );
 }
 
@@ -445,76 +461,81 @@ Map<String, InputProps> getBoProps() {
   };
 }
 
-InputProps? getProps(String name, FootprintSupportedLocale? locale) {
+InputProps? getProps(DataIdentifier name, String? additionalIdentifier,
+    FootprintSupportedLocale? locale) {
   final personProps = getPersonProps(locale);
   final commonProps = getCommonProps();
   final businessProps = getBusinessProps();
   final boProps = getBoProps();
 
   switch (name) {
-    case "id.email":
+    case DataIdentifier.idEmail:
       return personProps['email'];
-    case "id.phone_number":
+    case DataIdentifier.idPhoneNumber:
       return personProps['phoneNumber'];
-    case "id.dob":
+    case DataIdentifier.idDob:
       return personProps['dob'];
-    case "id.ssn4":
+    case DataIdentifier.idSsn4:
       return personProps['ssn4'];
-    case "id.ssn9":
+    case DataIdentifier.idSsn9:
       return personProps['ssn9'];
-    case "id.first_name":
+    case DataIdentifier.idFirstName:
       return personProps['firstName'];
-    case "id.last_name":
+    case DataIdentifier.idLastName:
       return personProps['lastName'];
-    case "id.middle_name":
+    case DataIdentifier.idMiddleName:
       return personProps['middleName'];
-    case "id.country" || "business.country":
+    case DataIdentifier.idCountry || DataIdentifier.businessCountry:
       return commonProps['country'];
-    case "id.city" || "business.city":
+    case DataIdentifier.idCity || DataIdentifier.businessCity:
       return commonProps['city'];
-    case "id.address_line1" || "business.address_line1":
+    case DataIdentifier.idAddressLine1 || DataIdentifier.businessAddressLine1:
       return commonProps['addressLine1'];
-    case "id.address_line2" || "business.address_line2":
+    case DataIdentifier.idAddressLine2 || DataIdentifier.businessAddressLine2:
       return commonProps['addressLine2'];
-    case "id.zip" || "business.zip":
+    case DataIdentifier.idZip || DataIdentifier.businessZip:
       return commonProps['zip'];
-    case "id.state" || "business.state":
+    case DataIdentifier.idState || DataIdentifier.businessState:
       return commonProps['state'];
-    case "business.name":
+    case DataIdentifier.businessName:
       return businessProps['businessName'];
-    case "business.dba":
+    case DataIdentifier.businessDba:
       return businessProps['dba'];
-    case "business.tin":
+    case DataIdentifier.businessTin:
       return businessProps['businessTin'];
-    case "business.website":
+    case DataIdentifier.businessWebsite:
       return businessProps['businessWebsite'];
-    case "business.phone_number":
+    case DataIdentifier.businessPhoneNumber:
       return businessProps['businessPhoneNumber'];
-    case "business.corporation_type":
+    case DataIdentifier.businessCorporationType:
       return businessProps['businessCorporationType'];
-
+    case DataIdentifier.custom:
+      return commonProps['custom'];
     default:
-      if (name.startsWith('custom.')) {
-        return commonProps['custom'];
-      }
-      if (name.startsWith("business.beneficial_owners") ||
-          name.startsWith("business.kyced_beneficial_owners")) {
-        if (name.endsWith("first_name")) {
+      if (name == DataIdentifier.businessBeneficialOwners ||
+          name == DataIdentifier.businessKycedBeneficialOwners) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("first_name")) {
           return personProps['firstName'];
         }
-        if (name.endsWith("last_name")) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("last_name")) {
           return personProps['lastName'];
         }
-        if (name.endsWith("middle_name")) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("middle_name")) {
           return personProps['middleName'];
         }
-        if (name.endsWith("email")) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("email")) {
           return personProps['email'];
         }
-        if (name.endsWith("phone_number")) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("phone_number")) {
           return personProps['phoneNumber'];
         }
-        if (name.endsWith("ownership_stake")) {
+        if (additionalIdentifier != null &&
+            additionalIdentifier.endsWith("ownership_stake")) {
           return boProps['ownershipStake'];
         }
       }

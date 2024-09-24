@@ -102,8 +102,16 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
 
   @override
   Widget build(BuildContext context) {
-    final fieldProps = FieldContext.of(context)!.props;
-    final (:name, :inputProps) = fieldProps;
+    final fieldContext = FieldContext.of(context);
+    if (fieldContext == null) {
+      throw Exception(
+          "FootprintTextInput must be used inside a FootprintField");
+    }
+    final fieldProps = fieldContext.props;
+    final (:name, :inputProps, :additionalIdentifier) = fieldProps;
+    String di = additionalIdentifier != null
+        ? "$name$additionalIdentifier"
+        : name.toString();
 
     // Listen to form context changes and update the text field value
     // Used in case the form context is updated calling setValue in tenant code
@@ -137,9 +145,7 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
       return FormField(
           validator: validator,
           onSaved: (value) {
-            ref
-                .read(formContextNotifierProvider.notifier)
-                .setValue(name, value);
+            ref.read(formContextNotifierProvider.notifier).setValue(di, value);
           },
           key: ValueKey(name),
           builder: (FormFieldState state) {
@@ -197,7 +203,7 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
       onFieldSubmitted: widget.onFieldSubmitted,
       autofillHints: autofillHints,
       onSaved: (value) {
-        ref.read(formContextNotifierProvider.notifier).setValue(name, value);
+        ref.read(formContextNotifierProvider.notifier).setValue(di, value);
       },
       validator: validator,
     );
