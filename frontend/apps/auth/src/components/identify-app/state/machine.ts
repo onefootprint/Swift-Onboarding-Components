@@ -63,6 +63,7 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
         },
         passkeyOptionalRegistration: {
           on: {
+            passkeyProcessingCompleted: [{ target: 'done' }],
             passkeyRegistrationSkip: [{ target: 'done' }],
             passkeyRegistrationError: [{ target: 'passkeyError' }],
             passkeyRegistrationTabOpened: [

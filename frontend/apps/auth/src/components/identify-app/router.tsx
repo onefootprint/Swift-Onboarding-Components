@@ -1,7 +1,9 @@
 'use client';
 
-import { getLogger } from '@onefootprint/idv';
+import { Liveness, NavigationHeader, getLogger } from '@onefootprint/idv';
+import { UserChallengeActionKind } from '@onefootprint/types';
 
+import { isEmbeddedInIframe } from '@/src/utils';
 import PasskeyCancelled from '../passkey-cancelled';
 import PasskeyError from '../passkey-error';
 import UnexpectedError from '../unexpected-error';
@@ -22,6 +24,7 @@ const IdentifyRouter = () => {
   const [state, send] = useAuthIdentifyAppMachine();
   const { authToken, device } = state.context;
   const isDone = state.matches('done');
+  const isInIframe = isEmbeddedInIframe();
 
   if (isDone) return <Success />;
 
@@ -38,6 +41,20 @@ const IdentifyRouter = () => {
   }
 
   if (state.matches('passkeyOptionalRegistration') && authToken && device) {
+    if (!isInIframe) {
+      return (
+        <>
+          <NavigationHeader leftButton={{ variant: 'close' }} />
+          <Liveness
+            actionKind={UserChallengeActionKind.addPrimary}
+            idvContext={{ authToken, device, isInIframe }}
+            onCustomSkip={() => send({ type: 'passkeyRegistrationSkip' })}
+            onDone={() => send({ type: 'passkeyProcessingCompleted' })}
+          />
+        </>
+      );
+    }
+
     return (
       <PasskeyAdd
         authToken={authToken}
