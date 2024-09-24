@@ -30,7 +30,7 @@ const useOtp = () => {
       return false;
     }
     if (status === AuthTokenStatus.validWithInsufficientScope) {
-      return false;
+      return true;
     }
     throw new Error('Invalid auth token. Please use a valid auth token.');
   };
@@ -188,7 +188,7 @@ const useOtp = () => {
     const { sandboxId, onboardingConfig, authToken, authTokenStatus } = context;
 
     if (!didCallRequiresAuth) {
-      throw new Error('Please call "requiresAuth" to check the available auth methods before creating a challenge');
+      throw new Error('Please call "requiresAuth" to check the auth requirement before creating a challenge');
     }
     if (!onboardingConfig) {
       throw new Error('Onboarding config not found. Please check your public key');
