@@ -17,8 +17,6 @@ pub struct CreateTokenRequest {
     /// The kind of token to create.
     /// - `onboard` creates a token that onboards the user onto a specific playbook, specified by
     ///   the `key`.
-    /// - `reonboard` creates a token that reonboards the user onto the last playbook that they
-    ///   onboarded onto.
     /// - `inherit` creates a token that inherits any operation previously requested via the
     ///   dashboard.
     /// - `user` simply create a token for the user. A playbook key may be provided directly to the
@@ -69,7 +67,7 @@ pub struct CreateTokenRequest {
     #[serde(default)]
     pub use_third_party_auth: bool,
 
-    /// Only valid for sessions of kind `onboard`, `reonboard`, and `user`. Allow the user to
+    /// Only valid for sessions of kind `onboard` and `user`. Allow the user to
     /// re-onboard onto this playbook even if they have already onboarded onto it. Defaults to
     /// true.
     #[openapi(example = "null")]
@@ -99,6 +97,7 @@ pub enum TokenOperationKind {
     /// Verify SDK
     Onboard,
     /// Reonboard onto the last playbook that the user onboarded onto
+    #[openapi(skip)]
     Reonboard,
     /// Inherit any operation previously requested via the dashboard
     Inherit,

@@ -9884,7 +9884,6 @@
                         "type": "string",
                         "enum": [
                             "onboard",
-                            "reonboard",
                             "inherit",
                             "user",
                             "update_auth_methods"

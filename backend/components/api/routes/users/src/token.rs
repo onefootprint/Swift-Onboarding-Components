@@ -59,7 +59,6 @@ pub async fn post(
         allow_reonboard,
     } = request.0.unwrap_or_default();
     let allow_reonboard = allow_reonboard.unwrap_or(true);
-    tracing::info!(has_fpbid=%fp_bid.is_some(), "Creating token with fp_bid");
 
     let kind = if let Some(kind) = kind {
         kind
@@ -87,6 +86,7 @@ pub async fn post(
         };
         is_legacy_tenant
     });
+    tracing::info!(%kind, has_key=%key.is_some(), has_fpbid=%fp_bid.is_some(), %use_third_party_auth, %use_implicit_auth, ?ttl_min, %allow_reonboard, "Creating token");
 
 
     let is_live = auth.is_live()?;

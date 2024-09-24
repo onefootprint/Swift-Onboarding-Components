@@ -171,7 +171,6 @@ pub async fn get_requirements_for_person_and_maybe_business(
             };
             let person_requirements = get_requirements_inner(conn, entity, &person_obc, requirement_opts)?;
 
-
             let business_requirements =
                 if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
                     let entity = EntityInfo {

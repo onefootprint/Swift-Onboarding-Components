@@ -61,8 +61,7 @@ You should select the kind of token to match the SDK you are using and the flow 
 | Token kind            | Description                                                                                                                                             | SDK Component |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | `onboard`             | Onboard the user onto a specific playbook, specified by the `key` (from the [Playbooks tab](https://dashboard.onefootprint.com/playbooks)).             | Verify        |
-| `reonboard`           | Convenience method to reonboard the user onto the last playbook that they onboarded onto.                                                               | Verify        |
-| `inherit`             | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. | Verify        |
+| `inherit`             | Inherit any operation previously requested via the dashboard, including onboarding onto a playbook and document collection. More info below.            | Verify        |
 | `user`                | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          | Verify        |
 | `update_auth_methods` | Allows the user to update any/all of their login methods (phone and email) using the Footprint Auth component.                                          | Auth          |
 
