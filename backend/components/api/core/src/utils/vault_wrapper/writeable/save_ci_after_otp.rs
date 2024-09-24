@@ -3,22 +3,25 @@ use super::FingerprintedDataRequest;
 use super::WriteableVw;
 use crate::errors::ValidationError;
 use crate::FpResult;
+use api_errors::AssertionError;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::DataLifetimeSeqno;
 
 impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::save_ci_after_otp", skip_all)]
     /// Save phone/email after a successful OTP.
+    ///
+    /// Returns the DataLifetime transaction used for the patch operation.
     pub fn save_ci_after_otp(
         self, // consume self, since we don't want stale data getting used
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
-    ) -> FpResult<DataLifetimeSeqno> {
+    ) -> FpResult<DataLifetimeSeqnoTxn<'static>> {
         let vault_id = self.vault.id.clone();
         let sv_id = self.sv.id.clone();
 
@@ -33,12 +36,17 @@ impl<Type> WriteableVw<Type> {
 
         let request = self.validate_request(conn, request, &DataRequestSource::OtpVerified)?;
         let result = self.internal_save_data(conn, request, None)?;
+
+        let Some(updates) = result.updates else {
+            return AssertionError("No vault updates in save_ci_after_otp").into();
+        };
+
         // Since the data saved here is always OTP verified, immediately portablize the new DLs and mark the
         // CIs as OTP verified
-        for vd in &result.new_vd {
-            DataLifetime::portablize(conn, &vd.lifetime_id, result.seqno)?;
+        for vd in &updates.vd {
+            DataLifetime::portablize(conn, &updates.sv_txn, &vd.lifetime_id)?;
         }
-        for (_, ci) in &result.new_ci {
+        for (_, ci) in &updates.ci {
             ContactInfo::mark_otp_verified(conn, &ci.id)?;
         }
 
@@ -50,6 +58,6 @@ impl<Type> WriteableVw<Type> {
         };
         ScopedVault::update(conn, &sv_id, update)?;
 
-        Ok(result.seqno)
+        Ok(updates.sv_txn)
     }
 }

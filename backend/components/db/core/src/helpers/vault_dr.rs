@@ -285,54 +285,55 @@ mod tests {
         let batch_size: usize = 5;
         let mut dls = vec![];
         for _ in 0..=5 {
-            let seqno1 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+            let sv1_txn1 = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
             DataLifetime::bulk_deactivate_kinds(
                 conn,
-                &sv1,
+                &sv1_txn1,
                 vec![DataIdentifier::Id(IdentityDataKind::Dob)],
-                seqno1,
             )
             .unwrap();
-            let dl =
-                fixtures::data_lifetime::build(conn, &v1_id, &sv1, seqno1, None, None, IdentityDataKind::Dob);
+            let (dl, _) = DataLifetime::create(
+                conn,
+                &sv1_txn1,
+                IdentityDataKind::Dob.into(),
+                newtypes::DataLifetimeSource::LikelyHosted,
+                None,
+            )
+            .unwrap();
             dls.push(dl);
 
-            let seqno2 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+            let sv1_txn2 = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
             DataLifetime::bulk_deactivate_kinds(
                 conn,
-                &sv1,
+                &sv1_txn2,
                 vec![DataIdentifier::Id(IdentityDataKind::Email)],
-                seqno2,
             )
             .unwrap();
-            let dl = fixtures::data_lifetime::build(
+            let (dl, _) = DataLifetime::create(
                 conn,
-                &v1_id,
-                &sv1,
-                seqno2,
+                &sv1_txn2,
+                IdentityDataKind::Email.into(),
+                newtypes::DataLifetimeSource::LikelyHosted,
                 None,
-                None,
-                IdentityDataKind::Email,
-            );
+            )
+            .unwrap();
             dls.push(dl);
 
             // Create another DL at the same seqno.
             DataLifetime::bulk_deactivate_kinds(
                 conn,
-                &sv1,
+                &sv1_txn2,
                 vec![DataIdentifier::Id(IdentityDataKind::FirstName)],
-                seqno2,
             )
             .unwrap();
-            let dl = fixtures::data_lifetime::build(
+            let (dl, _) = DataLifetime::create(
                 conn,
-                &v1_id,
-                &sv1,
-                seqno2,
+                &sv1_txn2,
+                IdentityDataKind::FirstName.into(),
+                newtypes::DataLifetimeSource::LikelyHosted,
                 None,
-                None,
-                IdentityDataKind::FirstName,
-            );
+            )
+            .unwrap();
             dls.push(dl);
         }
 
@@ -341,14 +342,14 @@ mod tests {
         assert_eq!(dls[batch_size - 1].created_seqno, dls[batch_size].created_seqno);
 
         // Deactivate the last DL.
-        let deactivate_seqno = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let deactivate_txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
         DataLifetime::bulk_deactivate_kinds(
             conn,
-            &sv1,
+            &deactivate_txn,
             vec![DataIdentifier::Id(IdentityDataKind::FirstName)],
-            deactivate_seqno,
         )
         .unwrap();
+        let deactivate_seqno = deactivate_txn.seqno();
 
         let expected_batch_sizes = vec![
             // (blob count, svv/manifest count)

@@ -10,6 +10,7 @@ use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ApiResponse;
+use db::models::data_lifetime::DataLifetime;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentDiKind;
@@ -54,8 +55,10 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
             let doc = uvw.put_document_unsafe(
                 conn,
+                &sv_txn,
                 di,
                 file.mime_type,
                 file.filename,

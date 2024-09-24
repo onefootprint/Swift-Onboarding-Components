@@ -173,11 +173,11 @@ pub async fn post(
                         let is_first_time_verifying = !ci.is_otp_verified();
                         if is_first_time_verifying {
                             // Save the `id.verified_xxx` data.
-                            let seqno = vw.save_ci_after_otp(conn, data)?;
+                            let sv_txn = vw.save_ci_after_otp(conn, data)?;
 
                             if onboarding_tenant_eq_identify_tenant {
                                 // Portablize and verify the existing piece of `id.xxx` contact info.
-                                DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+                                DataLifetime::portablize(conn, &sv_txn, &ci.lifetime_id)?;
                                 ContactInfo::mark_otp_verified(conn, &ci.id)?;
                             }
                         }

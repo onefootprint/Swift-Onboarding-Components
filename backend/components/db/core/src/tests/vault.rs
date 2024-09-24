@@ -25,28 +25,35 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     Vault::mark_verified(conn, &uv.id).unwrap();
     let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
-    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
+    let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+    let (dl, _) = DataLifetime::create(
+        conn,
+        &sv_txn,
+        IDK::PhoneNumber.into(),
+        newtypes::DataLifetimeSource::LikelyHosted,
+        None,
+    )
+    .unwrap();
+
+    if is_portablized {
+        DataLifetime::portablize(conn, &sv_txn, &dl.id).unwrap();
+    }
+
+    if is_deactivated {
+        DataLifetime::bulk_deactivate(conn, &sv_txn, vec![dl.id.clone()]).unwrap();
+    }
 
     let fingerprint = Fingerprint(vec![10]);
-    let lifetime = fixtures::data_lifetime::build(
-        conn,
-        &uv.id,
-        &sv,
-        seqno,
-        is_portablized.then_some(seqno),
-        is_deactivated.then_some(seqno),
-        IDK::PhoneNumber,
-    );
     fixtures::fingerprint::create(
         conn,
-        &lifetime.id,
+        &dl.id,
         fingerprint.clone(),
         IDK::PhoneNumber.into(),
         FingerprintScope::Global,
         &sv,
     );
     if is_deactivated {
-        DbFingerprint::bulk_deactivate(conn, vec![&lifetime.id], Utc::now()).unwrap();
+        DbFingerprint::bulk_deactivate(conn, vec![&dl.id], Utc::now()).unwrap();
     }
 
     // Should never be able to find with wrong sandbox id

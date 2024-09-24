@@ -1,5 +1,5 @@
 use super::data_lifetime::DataLifetime;
-use super::scoped_vault::ScopedVault;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use crate::DbResult;
 use crate::HasLifetime;
 use crate::PgConn;
@@ -11,15 +11,12 @@ use db_schema::schema::document_data;
 use diesel::prelude::*;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
-use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::DocumentDataId;
-use newtypes::Locked;
 use newtypes::PiiString;
 use newtypes::S3Url;
 use newtypes::SealedVaultDataKey;
-use newtypes::VaultId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
@@ -53,18 +50,16 @@ impl DocumentData {
     #[allow(clippy::too_many_arguments)]
     pub fn create(
         conn: &mut TxnPgConn,
-        vault_id: &VaultId,
-        scoped_vault: &Locked<ScopedVault>,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         kind: DataIdentifier,
         mime_type: String,
         filename: String,
         s3_url: S3Url,
         e_data_key: SealedVaultDataKey,
-        seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let (dl, _) = DataLifetime::create(conn, vault_id, scoped_vault, kind.clone(), seqno, source, actor)?;
+        let (dl, _) = DataLifetime::create(conn, sv_txn, kind.clone(), source, actor)?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

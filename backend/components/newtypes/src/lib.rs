@@ -10,6 +10,7 @@ use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
 pub use b64::Base64Data;
 pub use b64::Base64EncodedString;
+pub use borrowed_or_owned::*;
 pub use challenge_kind::*;
 pub use country_codes::*;
 pub use data_identifier::*;
@@ -55,6 +56,7 @@ pub mod secret_api_key;
 mod us_states;
 mod user_auth_scope;
 
+pub mod borrowed_or_owned;
 pub mod document_upload_settings;
 pub mod filter_function;
 pub mod fingerprint_salt;

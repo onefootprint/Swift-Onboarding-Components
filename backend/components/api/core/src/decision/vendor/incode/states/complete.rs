@@ -25,10 +25,10 @@ use crate::State;
 use async_trait::async_trait;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::models::document::DocumentUpdate;
-use db::models::document_data::DocumentData;
 use db::models::document_upload::DocumentUpload;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
@@ -43,7 +43,6 @@ use itertools::Itertools;
 use newtypes::BillingEventKind;
 use newtypes::CleanAndValidate;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DocumentDiKind;
@@ -320,13 +319,15 @@ pub(super) fn compute_risk_signals<'a>(
 
 /// Now that we have the correct type of the document, add the images to the vault under the correct
 /// type
+/// Don't read from vw after this is called.
 #[tracing::instrument(skip_all)]
-fn vault_complete_images(
+fn vault_complete_images_unsafe(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
+    sv_txn: &DataLifetimeSeqnoTxn<'_>,
     dk: IdDocKind,
     id_doc: &Document,
-) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
+) -> FpResult<()> {
     // When we vault .latest_upload, we use the document_type that is provided by the user, not the
     // eventual doc_type from incode which is the one we vault the complete images for
     let doc_type = IdDocKind::try_from(id_doc.document_type)?;
@@ -348,7 +349,11 @@ fn vault_complete_images(
             }
         })
         .collect_vec();
-    vw.put_documents_unsafe(conn, docs, None, false)
+
+    // Don't read from uvw after this point.
+    vw.put_documents_unsafe(conn, sv_txn, docs, None, false)?;
+
+    Ok(())
 }
 
 pub struct CompleteArgs<'a> {
@@ -390,16 +395,18 @@ impl Complete {
         };
         UserTimeline::create(conn, info, vault.id.clone(), sv_id.clone())?;
 
+        let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
+
         // The images were only vaulted under `.latest_upload` DIs. Now, vault them under the `.image` DIs.
         // Note that the dk here may be incorrect if we can't extract it from incode
-        vault_complete_images(conn, &uvw, validated_doc_kind, &id_doc)?;
+        // Don't read from uvw after this point.
+        vault_complete_images_unsafe(conn, &uvw, &sv_txn, validated_doc_kind, &id_doc)?;
 
         // Clear all OCR data for this document kind, even if we're not replacing it
         let odks_to_clear = ODK::iter()
             .map(|odk| DocumentDiKind::OcrData(validated_doc_kind, odk).into())
             .collect();
-        let seqno = DataLifetime::get_next_seqno(conn, &uvw.sv)?;
-        DataLifetime::bulk_deactivate_kinds(conn, &uvw.sv, odks_to_clear, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, odks_to_clear)?;
 
         // Save Risk Signals
         RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;

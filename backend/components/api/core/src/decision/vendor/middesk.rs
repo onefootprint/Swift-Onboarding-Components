@@ -830,10 +830,10 @@ impl MiddeskResponseDerivedVaultData {
 
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
 
-        let seqno = DataLifetime::get_next_seqno(conn, &uvw.sv)?;
+        let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
 
         // Clear all derived data kinds
-        DataLifetime::bulk_deactivate_kinds(conn, &uvw.sv, dis, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, dis)?;
 
         // note: there is an edge case here where the formation is null which
         // means we should deactivate the old DIs. We should handle this properly

@@ -1,3 +1,4 @@
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use crate::DbResult;
 use crate::NonNullVec;
 use crate::PgConn;
@@ -86,7 +87,6 @@ pub struct NewDocumentUploadArgs {
     pub side: DocumentSide,
     pub s3_url: S3Url,
     pub e_data_key: SealedVaultDataKey,
-    pub created_seqno: DataLifetimeSeqno,
     pub is_instant_app: Option<bool>,
     pub is_app_clip: Option<bool>,
     pub is_manual: Option<bool>,
@@ -101,13 +101,16 @@ impl DocumentUpload {
     pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
 
     #[tracing::instrument("DocumentUpload::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, args: NewDocumentUploadArgs) -> DbResult<Self> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
+        args: NewDocumentUploadArgs,
+    ) -> DbResult<Self> {
         let NewDocumentUploadArgs {
             document_id,
             side,
             s3_url,
             e_data_key,
-            created_seqno,
             is_instant_app,
             is_app_clip,
             is_manual,
@@ -115,6 +118,9 @@ impl DocumentUpload {
             is_upload,
             is_forced_upload,
         } = args;
+
+        let created_seqno = sv_txn.seqno();
+
         // Deactivate existing upload, if any
         // TODO this kind of silently replaces an old image, but maybe we don't want to allow this...
         // only allow re-uploading an image if the last image explicitly failed.

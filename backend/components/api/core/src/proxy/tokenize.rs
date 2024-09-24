@@ -15,6 +15,7 @@ use crate::State;
 use api_errors::FpError;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -188,6 +189,9 @@ pub async fn vault_pii(
                         newtypes::VaultKind::Person => {
                             let uvw: utils::vault_wrapper::WriteableVw<Person> =
                                 VaultWrapper::<Person>::lock_for_onboarding(conn, &sv.id)?;
+
+                            let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
+
                             let _ = documents
                                 .into_iter()
                                 .map(
@@ -200,8 +204,11 @@ pub async fn vault_pii(
                                      }| {
                                         let di = kind.into();
                                         let source = data_source.dl_source(&di);
+
+                                        // Don't read from uvw after this point.
                                         uvw.put_document_unsafe(
                                             conn,
+                                            &sv_txn,
                                             di,
                                             mime_type,
                                             filename,

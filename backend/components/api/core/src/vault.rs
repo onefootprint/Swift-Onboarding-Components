@@ -121,7 +121,7 @@ pub async fn create_non_portable_vault(
             let svv = if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
-                let PatchDataResult { new_version, .. } =
+                let PatchDataResult { version, .. } =
                     uvw.patch_data(conn, request, DataRequestSource::TenantPatchVault(actor))?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
@@ -139,7 +139,7 @@ pub async fn create_non_portable_vault(
                 };
                 AuditEvent::create(conn, event)?;
 
-                new_version
+                version
             } else {
                 ScopedVaultVersion::latest_version_number(conn, &su.id)?
             };

@@ -4,7 +4,7 @@ use crate::FpResult;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::data_lifetime::DataLifetime;
-use db::models::scoped_vault_version::ScopedVaultVersion;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::vault_data::NewVaultData;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
@@ -12,7 +12,6 @@ use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedVaultVersionNumber;
 use std::collections::HashSet;
 
@@ -44,11 +43,15 @@ pub struct ValidatedDataRequest {
 pub struct SavedData {
     pub vd: Vec<VaultData>,
     pub ci: Vec<ContactInfo>,
-    pub seqno: DataLifetimeSeqno,
+    pub sv_txn: DataLifetimeSeqnoTxn<'static>,
     pub new_version: ScopedVaultVersionNumber,
 }
 
 impl ValidatedDataRequest {
+    pub(super) fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+
     /// Saves the validated updates to the DB
     #[tracing::instrument("ValidatedDataRequest::save", skip_all)]
     pub(super) fn save<Type>(
@@ -65,21 +68,9 @@ impl ValidatedDataRequest {
             is_prefill: _,
         } = self;
 
-        if data.is_empty() {
-            // The request is a no-op, no reason to increment the seqno.
-            let seqno = DataLifetime::get_current_seqno(conn)?;
-            let latest_version = ScopedVaultVersion::version_number_at_seqno(conn, &vw.sv.id, seqno)?;
-            return Ok(SavedData {
-                vd: vec![],
-                ci: vec![],
-                seqno,
-                new_version: latest_version,
-            });
-        }
         let fingerprints = fingerprints.validate(&vw)?;
 
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Saving DIs");
-        let v_id = &vw.vault.id;
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
         let overwrite_kinds = new_cdos
@@ -93,15 +84,16 @@ impl ValidatedDataRequest {
             .chain(overwrite_kinds)
             .unique()
             .collect();
-        let seqno = DataLifetime::get_next_seqno(conn, &vw.sv)?;
-        DataLifetime::bulk_deactivate_kinds(conn, &vw.sv, kinds_to_deactivate, seqno)?;
+        let sv_txn = DataLifetime::new_sv_txn(conn, vw.sv)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, kinds_to_deactivate)?;
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());
-        let (vd, svv) = VaultData::bulk_create(conn, v_id, &vw.sv, data, seqno, actor)?;
+        let (vd, svv) = VaultData::bulk_create(conn, &sv_txn, data, actor)?;
 
         // Save fingerprints
-        fingerprints.save(conn, &vw.sv, &vd)?;
+        let sv = sv_txn.scoped_vault();
+        fingerprints.save(conn, sv, &vd)?;
 
         // Add contact info for the new CIs added
         let new_contact_info = vd
@@ -122,7 +114,7 @@ impl ValidatedDataRequest {
         let saved_data = SavedData {
             vd,
             ci,
-            seqno,
+            sv_txn,
             new_version: svv,
         };
         Ok(saved_data)

@@ -14,9 +14,11 @@ use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::document_data::DocumentData;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
+use db::models::scoped_vault_version::ScopedVaultVersion;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
@@ -29,7 +31,6 @@ use newtypes::DataCollectedInfo;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
-use newtypes::FireWebhookArgs;
 use newtypes::KycedBusinessOwnerData;
 use newtypes::PiiString;
 use newtypes::S3Url;
@@ -44,10 +45,22 @@ use newtypes::WebhookEvent;
 type NewContactInfo = (DataIdentifier, ContactInfo);
 
 pub struct PatchDataResult {
-    pub new_vd: Vec<VaultData>,
-    pub new_ci: Vec<NewContactInfo>,
+    // None if the patch was a no-op.
+    pub updates: Option<PatchDataResultUpdates>,
+
+    // The seqno of the new data, or the latest seqno if there was no update.
     pub seqno: DataLifetimeSeqno,
-    pub new_version: ScopedVaultVersionNumber,
+
+    // The version number of the scoped vault after the update.
+    // May be the same as the previous version if no data was updated.
+    pub version: ScopedVaultVersionNumber,
+}
+
+pub struct PatchDataResultUpdates {
+    pub vd: Vec<VaultData>,
+    pub ci: Vec<NewContactInfo>,
+
+    pub(in crate::utils::vault_wrapper::writeable) sv_txn: DataLifetimeSeqnoTxn<'static>,
 }
 
 pub struct NewDocument {
@@ -73,16 +86,21 @@ impl<Type> WriteableVw<Type> {
         request_source: DataRequestSource,
     ) -> FpResult<PatchDataResult> {
         let vault_id = self.vault().id.clone();
-        let tenant_id = self.sv.tenant_id.clone();
-        let scoped_vault_id = self.sv.id.clone();
         let fp_id = self.sv.fp_id.clone();
         let is_live = self.sv.is_live;
 
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
+
         let fields = request.data.keys().cloned().collect_vec();
         let request = self.validate_request(conn, request, &request_source)?;
         let result = self.internal_save_data(conn, request, request_source.actor().cloned())?;
         Self::create_bos_if_needed(conn, vault_id, kyced_bos)?;
+
+        let Some(updates) = &result.updates else {
+            // Update was a no-op.
+            return Ok(result);
+        };
+        let sv = updates.sv_txn.scoped_vault();
 
         // create a webhook task for the vault update
         // currently we do this only for dashboard actors
@@ -99,16 +117,9 @@ impl<Type> WriteableVw<Type> {
                 fields,
             });
 
-            // Temporarily constructing manually.
-            let task_data = FireWebhookArgs {
-                scoped_vault_id,
-                tenant_id,
-                is_live,
-                webhook_event,
-            };
+            let task_data = sv.webhook_event(webhook_event);
             Task::create(conn, Utc::now(), task_data)?;
         }
-
 
         Ok(result)
     }
@@ -122,14 +133,26 @@ impl<Type> WriteableVw<Type> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
 
+        if request.is_empty() {
+            // The request is a no-op, no reason to increment the seqno.
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+            let latest_version = ScopedVaultVersion::version_number_at_seqno(conn, &self.sv.id, seqno)?;
+
+            let result = PatchDataResult {
+                updates: None,
+                seqno,
+                version: latest_version,
+            };
+            return Ok(result);
+        }
+
         let is_billable_for_vault_storage = self.sv.is_billable_for_vault_storage;
-        let vault_id = self.sv.vault_id.clone();
         let sv_id = self.sv.id.clone();
 
         let SavedData {
             vd,
             ci,
-            seqno,
+            sv_txn,
             new_version,
         } = request.save(conn, self, actor.clone())?;
 
@@ -143,9 +166,7 @@ impl<Type> WriteableVw<Type> {
         }
 
         // Add timeline event for all the newly added data.
-        // NOTE: this must happen after saving data for the seqno to be correct on the timeline event.
-        // TODO let's make this accept the seqno as an argument
-        Self::add_timeline_event(conn, vault_id, sv_id, keys, actor, is_prefill)?;
+        Self::add_timeline_event(conn, &sv_txn, keys, actor, is_prefill)?;
 
         // Zip new CIs with their DI
         let new_ci = ci
@@ -156,11 +177,15 @@ impl<Type> WriteableVw<Type> {
             })
             .collect();
 
+        let seqno = sv_txn.seqno();
         let result = PatchDataResult {
-            new_vd: vd,
-            new_ci,
+            updates: Some(PatchDataResultUpdates {
+                vd,
+                ci: new_ci,
+                sv_txn,
+            }),
             seqno,
-            new_version,
+            version: new_version,
         };
         Ok(result)
     }
@@ -189,8 +214,7 @@ impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::add_timeline_event", skip_all)]
     fn add_timeline_event(
         conn: &mut TxnPgConn,
-        vault_id: VaultId,
-        sv_id: ScopedVaultId,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         keys: Vec<DataIdentifier>,
         actor: Option<AuthActor>,
         is_prefill: bool,
@@ -205,7 +229,8 @@ impl<Type> WriteableVw<Type> {
                 actor: actor.map(|a| a.into()),
                 is_prefill,
             };
-            UserTimeline::create(conn, info, vault_id, sv_id.clone())?;
+            let sv = sv_txn.scoped_vault();
+            UserTimeline::create(conn, info, sv.vault_id.clone(), sv.id.clone())?;
         }
         Ok(())
     }
@@ -221,6 +246,7 @@ impl WriteableVw<Person> {
     pub fn put_document_unsafe(
         &self,
         conn: &mut TxnPgConn,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         kind: DataIdentifier,
         mime_type: String,
         filename: String,
@@ -229,7 +255,7 @@ impl WriteableVw<Person> {
         source: DataLifetimeSource,
         actor: Option<AuthActor>,
         make_timeline_event: bool,
-    ) -> FpResult<(DocumentData, DataLifetimeSeqno)> {
+    ) -> FpResult<DocumentData> {
         let new_doc = NewDocument {
             kind,
             mime_type,
@@ -239,28 +265,27 @@ impl WriteableVw<Person> {
             source,
         };
 
-        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc], actor, make_timeline_event)?;
+        let docs = self.put_documents_unsafe(conn, sv_txn, vec![new_doc], actor, make_timeline_event)?;
         let doc = docs
             .into_iter()
             .next()
             .ok_or(AssertionError("No document inserted"))?;
 
-        Ok((doc, seqno))
+        Ok(doc)
     }
 
+    /// NOTE: do not read from `self` after using this util as `self` will be stale
     #[allow(clippy::too_many_arguments)]
     pub fn put_documents_unsafe(
         &self,
         conn: &mut TxnPgConn,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         docs: Vec<NewDocument>,
         actor: Option<AuthActor>,
         make_timeline_event: bool,
-    ) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
-        let vault_id = self.vault.id.clone();
-
-        let seqno = DataLifetime::get_next_seqno(conn, &self.sv)?;
+    ) -> FpResult<Vec<DocumentData>> {
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_kinds(conn, &self.sv, kinds.clone(), seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, sv_txn, kinds.clone())?;
 
         let docs = docs
             .into_iter()
@@ -275,14 +300,12 @@ impl WriteableVw<Person> {
                 } = d;
                 DocumentData::create(
                     conn,
-                    &vault_id,
-                    &self.sv,
+                    sv_txn,
                     kind,
                     mime_type,
                     filename,
                     s3_url,
                     e_data_key,
-                    seqno,
                     source,
                     actor.clone().map(|a| a.into()),
                 )
@@ -290,10 +313,10 @@ impl WriteableVw<Person> {
             .collect::<db::DbResult<Vec<_>>>()?;
 
         if make_timeline_event {
-            Self::add_timeline_event(conn, vault_id, self.sv.id.clone(), kinds, actor, false)?;
+            Self::add_timeline_event(conn, sv_txn, kinds, actor, false)?;
         }
 
-        Ok((docs, seqno))
+        Ok(docs)
     }
 }
 

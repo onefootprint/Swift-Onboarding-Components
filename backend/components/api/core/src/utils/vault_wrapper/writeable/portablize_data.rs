@@ -69,8 +69,6 @@ impl WriteableVw<Person> {
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
         let Self { uvw, sv } = self;
-        // Use the same seqno to deactivate old data and portablize new data
-        let seqno = DataLifetime::get_next_seqno(conn, &sv)?;
 
         if !uvw.vault.is_portable {
             Vault::mark_portable(conn, &uvw.vault.id)?;
@@ -105,9 +103,10 @@ impl WriteableVw<Person> {
             .filter_map(|di| speculative.remove(&di))
             .collect();
 
-        DataLifetime::bulk_portablize_for_tenant(conn, to_portablize_ids, &sv.id, seqno)?;
+        let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+        DataLifetime::bulk_portablize_for_tenant(conn, &sv_txn, to_portablize_ids)?;
 
-        Ok(seqno)
+        Ok(sv_txn.seqno())
     }
 }
 

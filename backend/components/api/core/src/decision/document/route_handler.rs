@@ -232,10 +232,14 @@ pub async fn handle_document_upload(
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
+
+            let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
+
             // Vault the images under latest uploads
             let source = DataLifetimeSource::LikelyHosted;
-            let (d, seqno) = uvw.put_document_unsafe(
+            let d = uvw.put_document_unsafe(
                 conn,
+                &sv_txn,
                 di,
                 file.mime_type,
                 file.filename,
@@ -250,7 +254,6 @@ pub async fn handle_document_upload(
                 side,
                 s3_url: d.s3_url,
                 e_data_key: d.e_data_key,
-                created_seqno: seqno,
                 is_instant_app: meta.is_instant_app,
                 is_app_clip: meta.is_app_clip,
                 is_manual: meta.is_manual,
@@ -258,7 +261,7 @@ pub async fn handle_document_upload(
                 is_upload: meta.is_upload,
                 is_forced_upload: meta.is_forced_upload,
             };
-            DocumentUpload::create(conn, args)?;
+            DocumentUpload::create(conn, &sv_txn, args)?;
 
             // Now that the document is created, either initiate IDV reqs or create fixture data
             if should_initiate_reqs {
@@ -270,6 +273,7 @@ pub async fn handle_document_upload(
                     DecisionIntentKind::DocScan,
                 )?;
             };
+
             Ok(())
         })
         .await?;

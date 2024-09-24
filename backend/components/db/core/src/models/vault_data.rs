@@ -1,6 +1,6 @@
 use super::data_lifetime::DataLifetime;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::data_lifetime::NewDataLifetimeArgs;
-use super::scoped_vault::ScopedVault;
 use crate::errors::AssertionError;
 use crate::DbError;
 use crate::DbResult;
@@ -15,16 +15,13 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
-use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
-use newtypes::Locked;
 use newtypes::PiiString;
 use newtypes::ScopedVaultVersionNumber;
 use newtypes::SealedVaultBytes;
 use newtypes::StorageType;
 use newtypes::VaultDataFormat;
-use newtypes::VaultId;
 use newtypes::VdId;
 use std::collections::HashMap;
 
@@ -68,10 +65,8 @@ impl VaultData {
     #[tracing::instrument("VaultData::bulk_create", skip_all)]
     pub fn bulk_create(
         conn: &mut TxnPgConn,
-        user_vault_id: &VaultId,
-        scoped_vault: &Locked<ScopedVault>,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         data: Vec<NewVaultData>,
-        seqno: DataLifetimeSeqno,
         actor: Option<DbActor>,
     ) -> DbResult<(Vec<Self>, ScopedVaultVersionNumber)> {
         // One more sanity check that we don't store plaintext data where not desired
@@ -103,7 +98,7 @@ impl VaultData {
                 source: d.source,
             })
             .collect();
-        let (dls, svv) = DataLifetime::bulk_create(conn, user_vault_id, scoped_vault, dl_data, seqno, actor)?;
+        let (dls, svv) = DataLifetime::bulk_create(conn, sv_txn, dl_data, actor)?;
         let mut dls: HashMap<_, _> = dls.into_iter().map(|dl| (dl.kind.clone(), dl)).collect();
         let new_rows: Vec<_> = data
             .into_iter()

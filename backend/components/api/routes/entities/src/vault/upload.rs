@@ -20,6 +20,7 @@ use api_core::utils::{
 };
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -191,7 +192,9 @@ async fn post_upload_inner(
                 None
             };
             let docs = vec![Some(doc), derived_doc].into_iter().flatten().collect();
-            let doc = uvw.put_documents_unsafe(conn, docs, Some(actor), true)?;
+
+            let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
+            uvw.put_documents_unsafe(conn, &sv_txn, docs, Some(actor), true)?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
 
@@ -208,7 +211,7 @@ async fn post_upload_inner(
             };
             AuditEvent::create(conn, event)?;
 
-            Ok(doc)
+            Ok(())
         })
         .await?;
 

@@ -5,10 +5,11 @@ use itertools::Itertools;
 use macros::db_test;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentSide;
 use newtypes::IdDocKind;
-use newtypes::IdentityDataKind;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::VaultId;
@@ -37,13 +38,7 @@ struct TestData {
     su2: ScopedVaultId,
     /// v1, t2
     su3: ScopedVaultId,
-    seqno0: DataLifetimeSeqno,
-    seqno1: DataLifetimeSeqno,
-    seqno2: DataLifetimeSeqno,
-    seqno3: DataLifetimeSeqno,
-    seqno4: DataLifetimeSeqno,
-    seqno5: DataLifetimeSeqno,
-    seqno6: DataLifetimeSeqno,
+    seqnos: Vec<DataLifetimeSeqno>,
     dl1: DataLifetime,
     dl2: DataLifetime,
     dl3: DataLifetime,
@@ -54,18 +49,7 @@ struct TestData {
 
 impl TestData {
     /**
-    Creates a series of DLs for different users with different lifecycles. The table below shows
-    the owernship and lifecycle of each fixture DL
-    ```
-    |     | v | t | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
-    |-----|---|---|---|---|---|---|---|---|---|---|
-    | DL1 | 1 | 1 |   | C |   |   |   |   |   |   |
-    | DL2 | 1 | 1 |   | C |   | P |   |   |   |   |
-    | DL3 | 1 | 1 |   | C |   |   | P | D |   |   |
-    | DL4 | 1 | 2 |   | C |   |   | P |   |   |   |
-    | DL5 | 2 | 1 |   | C |   |   |   |   |   |   |
-    | DL6 | 2 | 1 |   | C |   | P |   |   |   |   |
-    ````
+    Creates a series of DLs for different users with different lifecycles.
      */
     fn build(conn: &mut TestPgConn) -> Self {
         // Create tenants
@@ -83,69 +67,102 @@ impl TestData {
 
         // Create scoped users
         let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id);
-        let sv2 = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id);
-        let sv3 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id);
+        let sv2 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id);
+        let sv3 = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id);
 
         // Timeline of seqnos
-        let seqno0 = DataLifetime::get_current_seqno(conn).unwrap();
-        // FIXME: SVs don't correspond with the right seqnos.
-        let seqno1 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
-        let seqno2 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
-        let seqno3 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
-        let seqno4 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
-        let seqno5 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
-        let seqno6 = DataLifetime::get_next_seqno(conn, &sv1).unwrap();
+        let mut seqnos = vec![];
+
+        let start_seqno = DataLifetime::get_current_seqno(conn).unwrap();
+        seqnos.push(start_seqno);
+
+        let source = DataLifetimeSource::LikelyHosted;
 
         // Place some DataLifetimes at various points along the timeline
-        let dl1 =
-            fixtures::data_lifetime::build(conn, &v1_id, &sv1, seqno1, None, None, IdentityDataKind::Email);
-        let dl2 = fixtures::data_lifetime::build(
-            conn,
-            &v1_id,
-            &sv1,
-            seqno1,
-            Some(seqno3),
-            None,
-            IdentityDataKind::FirstName,
+        let txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
+        let (dl1, svvn) = DataLifetime::create(conn, &txn, IDK::Email.into(), source, None).unwrap();
+        assert_eq!(
+            svvn,
+            1.into(),
+            "ScopedVaultVersion should be 1 for entire first txn"
         );
-        let dl3 = fixtures::data_lifetime::build(
-            conn,
-            &v1_id,
-            &sv1,
-            seqno1,
-            Some(seqno4),
-            Some(seqno5),
-            IdentityDataKind::LastName,
+        let (dl2, svvn) = DataLifetime::create(conn, &txn, IDK::FirstName.into(), source, None).unwrap();
+        assert_eq!(
+            svvn,
+            1.into(),
+            "ScopedVaultVersion should be 1 for entire first txn"
         );
+        seqnos.push(txn.seqno());
+
+        let txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
+        let (dl3, svvn) = DataLifetime::create(conn, &txn, IDK::LastName.into(), source, None).unwrap();
+        assert_eq!(svvn, 2.into(), "ScopedVaultVersion should advance for second txn");
+        seqnos.push(txn.seqno());
+
         // For same user, different scoped user
-        let dl4 = fixtures::data_lifetime::build(
-            conn,
-            &v1_id,
-            &sv3,
-            seqno1,
-            Some(seqno4),
-            None,
-            IdentityDataKind::PhoneNumber,
+        let txn = DataLifetime::new_sv_txn(conn, &sv2).unwrap();
+        let (dl4, svvn) = DataLifetime::create(conn, &txn, IDK::PhoneNumber.into(), source, None).unwrap();
+        assert_eq!(
+            svvn,
+            1.into(),
+            "ScopedVaultVersion should be 1 for entire first txn"
         );
+        seqnos.push(txn.seqno());
+
         // For different user
-        let dl5 = fixtures::data_lifetime::build(
+        let txn = DataLifetime::new_sv_txn(conn, &sv3).unwrap();
+        let (dl5, svvn) = DataLifetime::create(
             conn,
-            &v2_id,
-            &sv2,
-            seqno1,
+            &txn,
+            DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front).into(),
+            source,
             None,
-            None,
-            DocumentDiKind::Image(IdDocKind::Passport, DocumentSide::Front),
+        )
+        .unwrap();
+        assert_eq!(
+            svvn,
+            1.into(),
+            "ScopedVaultVersion should be 1 for entire first txn"
         );
-        let dl6 = fixtures::data_lifetime::build(
-            conn,
-            &v2_id,
-            &sv2,
-            seqno1,
-            Some(seqno3),
-            None,
-            IdentityDataKind::AddressLine1,
+        let (dl6, svvn) = DataLifetime::create(conn, &txn, IDK::AddressLine1.into(), source, None).unwrap();
+        assert_eq!(
+            svvn,
+            1.into(),
+            "ScopedVaultVersion should be 1 for entire first txn"
         );
+        seqnos.push(txn.seqno());
+
+        // Portablize some of the DLs
+        let txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
+        let dl2 = DataLifetime::portablize(conn, &txn, &dl2.id).unwrap();
+        seqnos.push(txn.seqno());
+
+        let txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
+        let dl3 = DataLifetime::portablize(conn, &txn, &dl3.id).unwrap();
+        seqnos.push(txn.seqno());
+
+        let txn = DataLifetime::new_sv_txn(conn, &sv2).unwrap();
+        let dl4 = DataLifetime::portablize(conn, &txn, &dl4.id).unwrap();
+        seqnos.push(txn.seqno());
+
+        let txn = DataLifetime::new_sv_txn(conn, &sv3).unwrap();
+        let dl6 = DataLifetime::portablize(conn, &txn, &dl6.id).unwrap();
+        seqnos.push(txn.seqno());
+
+        // Delete a DL
+        let txn = DataLifetime::new_sv_txn(conn, &sv1).unwrap();
+        let (_, svvn) = DataLifetime::bulk_deactivate(conn, &txn, vec![dl3.id.clone()]).unwrap();
+        assert_eq!(svvn, 3.into(), "ScopedVaultVersion should advance upon deletion");
+
+        let (_, svvn_2) = DataLifetime::bulk_deactivate(conn, &txn, vec![dl3.id.clone()]).unwrap();
+        assert_eq!(
+            svvn_2, svvn,
+            "ScopedVaultVersion should not advance since already deactivated"
+        );
+        seqnos.push(txn.seqno());
+
+        let is_sorted = seqnos.iter().tuple_windows().all(|(a, b)| a < b);
+        assert!(is_sorted, "Seqnos should be monotonically increasing");
 
         Self {
             t1: t1_id,
@@ -156,13 +173,7 @@ impl TestData {
             su: sv1.into_inner().id,
             su2: sv2.into_inner().id,
             su3: sv3.into_inner().id,
-            seqno0,
-            seqno1,
-            seqno2,
-            seqno3,
-            seqno4,
-            seqno5,
-            seqno6,
+            seqnos,
             dl1,
             dl2,
             dl3,
@@ -178,37 +189,44 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
     // Test getting all of the DLs that are visible in a my1fp context - only the portable ones
     let c = TestData::build(conn);
 
+    assert_eq!(c.seqnos.len(), 10);
     let tests = vec![
         //
         // v1
-        (&c.v1, c.seqno0, vec![]),
-        (&c.v1, c.seqno1, vec![]),
-        (&c.v1, c.seqno2, vec![]),
+        (&c.v1, c.seqnos[0], vec![]),
+        (&c.v1, c.seqnos[1], vec![]),
+        (&c.v1, c.seqnos[2], vec![]),
+        (&c.v1, c.seqnos[3], vec![]),
+        (&c.v1, c.seqnos[4], vec![]),
         // DL2 portablized
-        (&c.v1, c.seqno3, vec![&c.dl2]),
+        (&c.v1, c.seqnos[5], vec![&c.dl2]),
         // DL3 and DL4 portablized
-        (&c.v1, c.seqno4, vec![&c.dl2, &c.dl3, &c.dl4]),
+        (&c.v1, c.seqnos[6], vec![&c.dl2, &c.dl3]),
+        (&c.v1, c.seqnos[7], vec![&c.dl2, &c.dl3, &c.dl4]),
+        (&c.v1, c.seqnos[8], vec![&c.dl2, &c.dl3, &c.dl4]),
         // DL3 deactivated, but the portable view doesn't respect deactivated_at
-        (&c.v1, c.seqno5, vec![&c.dl2, &c.dl3, &c.dl4]),
-        (&c.v1, c.seqno6, vec![&c.dl2, &c.dl3, &c.dl4]),
+        (&c.v1, c.seqnos[9], vec![&c.dl2, &c.dl3, &c.dl4]),
         //
         // v2
-        (&c.v2, c.seqno0, vec![]),
-        (&c.v2, c.seqno1, vec![]),
-        (&c.v2, c.seqno2, vec![]),
+        (&c.v2, c.seqnos[0], vec![]),
+        (&c.v2, c.seqnos[1], vec![]),
+        (&c.v2, c.seqnos[2], vec![]),
+        (&c.v2, c.seqnos[3], vec![]),
+        (&c.v2, c.seqnos[4], vec![]),
+        (&c.v2, c.seqnos[5], vec![]),
+        (&c.v2, c.seqnos[6], vec![]),
+        (&c.v2, c.seqnos[7], vec![]),
         // DL6 portablized
-        (&c.v2, c.seqno3, vec![&c.dl6]),
-        (&c.v2, c.seqno4, vec![&c.dl6]),
-        (&c.v2, c.seqno5, vec![&c.dl6]),
-        (&c.v2, c.seqno6, vec![&c.dl6]),
+        (&c.v2, c.seqnos[8], vec![&c.dl6]),
+        (&c.v2, c.seqnos[9], vec![&c.dl6]),
         //
         // vx
-        (&c.vx, c.seqno6, vec![]),
+        (&c.vx, c.seqnos[6], vec![]),
     ];
 
-    for (v_id, seqno, expected_dls) in tests {
+    for (test_num, (v_id, seqno, expected_dls)) in tests.into_iter().enumerate() {
         let results = DataLifetime::get_portable_at(conn, v_id, seqno).unwrap();
-        assert_eq!(ids(results), ids(expected_dls));
+        assert_eq!(ids(results), ids(expected_dls), "Test #{}", test_num);
     }
 }
 
@@ -216,37 +234,55 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
 fn test_bulk_get_added_by_tenant(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
 
+    assert_eq!(c.seqnos.len(), 10);
     let tests = vec![
         //
         // su_id
-        (&c.su, c.seqno0, vec![]),
-        (&c.su, c.seqno1, vec![&c.dl1, &c.dl2, &c.dl3]),
-        (&c.su, c.seqno2, vec![&c.dl1, &c.dl2, &c.dl3]),
-        (&c.su, c.seqno3, vec![&c.dl1, &c.dl2, &c.dl3]),
-        (&c.su, c.seqno4, vec![&c.dl1, &c.dl2, &c.dl3]),
-        (&c.su, c.seqno5, vec![&c.dl1, &c.dl2]),
-        (&c.su, c.seqno6, vec![&c.dl1, &c.dl2]),
+        (&c.su, c.seqnos[0], vec![]),
+        (&c.su, c.seqnos[1], vec![&c.dl1, &c.dl2]), // Added in same txn
+        (&c.su, c.seqnos[2], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[3], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[4], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[5], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[6], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[7], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[8], vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqnos[9], vec![&c.dl1, &c.dl2]),
         //
         // su2_id
-        (&c.su2, c.seqno0, vec![]),
-        (&c.su2, c.seqno1, vec![&c.dl5, &c.dl6]),
-        (&c.su2, c.seqno6, vec![&c.dl5, &c.dl6]),
+        (&c.su2, c.seqnos[0], vec![]),
+        (&c.su2, c.seqnos[1], vec![]),
+        (&c.su2, c.seqnos[2], vec![]),
+        (&c.su2, c.seqnos[3], vec![&c.dl4]),
+        (&c.su2, c.seqnos[4], vec![&c.dl4]),
+        (&c.su2, c.seqnos[5], vec![&c.dl4]),
+        (&c.su2, c.seqnos[6], vec![&c.dl4]),
+        (&c.su2, c.seqnos[7], vec![&c.dl4]),
+        (&c.su2, c.seqnos[8], vec![&c.dl4]),
+        (&c.su2, c.seqnos[9], vec![&c.dl4]),
         //
         // su3_id
-        (&c.su3, c.seqno0, vec![]),
-        (&c.su3, c.seqno1, vec![&c.dl4]),
-        (&c.su3, c.seqno6, vec![&c.dl4]),
+        (&c.su3, c.seqnos[0], vec![]),
+        (&c.su3, c.seqnos[1], vec![]),
+        (&c.su3, c.seqnos[2], vec![]),
+        (&c.su3, c.seqnos[3], vec![]),
+        (&c.su3, c.seqnos[4], vec![&c.dl5, &c.dl6]),
+        (&c.su3, c.seqnos[5], vec![&c.dl5, &c.dl6]),
+        (&c.su3, c.seqnos[6], vec![&c.dl5, &c.dl6]),
+        (&c.su3, c.seqnos[7], vec![&c.dl5, &c.dl6]),
+        (&c.su3, c.seqnos[8], vec![&c.dl5, &c.dl6]),
+        (&c.su3, c.seqnos[9], vec![&c.dl5, &c.dl6]),
     ];
 
-    for (sv_id, seqno, expected_dls) in tests {
+    for (test_num, (sv_id, seqno, expected_dls)) in tests.into_iter().enumerate() {
         // Test both when we have other users fetched alongside in bulk AND when fetching independently
         let results = DataLifetime::bulk_get_active_at(conn, vec![sv_id], seqno).unwrap();
-        assert_eq!(ids(results), ids(expected_dls.clone()));
+        assert_eq!(ids(results), ids(expected_dls.clone()), "Test #{}", test_num);
         let results = DataLifetime::bulk_get_active_at(conn, vec![&c.su, &c.su2, &c.su3], seqno)
             .unwrap()
             .into_iter()
             .filter(|dl| &dl.scoped_vault_id == sv_id)
             .collect_vec();
-        assert_eq!(ids(results), ids(expected_dls));
+        assert_eq!(ids(results), ids(expected_dls), "Test #{}", test_num);
     }
 }

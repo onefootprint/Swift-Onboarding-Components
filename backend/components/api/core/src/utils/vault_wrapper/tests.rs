@@ -83,8 +83,8 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             source: DataLifetimeSource::LikelyHosted,
         },
     ];
-    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
-    let (vds, svv) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+    let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+    let (vds, svv) = VaultData::bulk_create(conn, &sv_txn, data, None).unwrap();
 
     assert_eq!(svv, ScopedVaultVersionNumber::from(1));
 
@@ -93,7 +93,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
         .into_iter()
         .find(|vd| vd.kind == IDK::PhoneNumber.into())
         .unwrap();
-    DataLifetime::portablize(conn, &phone_data.lifetime_id, seqno).unwrap();
+    DataLifetime::portablize(conn, &sv_txn, &phone_data.lifetime_id).unwrap();
 
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();
     let tests = vec![
@@ -221,14 +221,14 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     for (sv_id, portablize, data) in data {
         let sv = ScopedVault::lock(conn, sv_id).unwrap();
 
-        let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
+        let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
         let kinds = data.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_kinds(conn, &sv, kinds, seqno).unwrap();
-        let (vds, _) = VaultData::bulk_create(conn, &uv.id, &sv, data, seqno, None).unwrap();
+        DataLifetime::bulk_deactivate_kinds(conn, &sv_txn, kinds).unwrap();
+        let (vds, _) = VaultData::bulk_create(conn, &sv_txn, data, None).unwrap();
 
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
-            DataLifetime::bulk_portablize_for_tenant(conn, ids, sv_id, seqno).unwrap();
+            DataLifetime::bulk_portablize_for_tenant(conn, &sv_txn, ids).unwrap();
         }
     }
 
@@ -300,8 +300,8 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             source: DataLifetimeSource::LikelyHosted,
         },
     ];
-    let seqno = DataLifetime::get_next_seqno(conn, &sv).unwrap();
-    VaultData::bulk_create(conn, &bv.id, &sv, data, seqno, None).unwrap();
+    let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
+    VaultData::bulk_create(conn, &sv_txn, data, None).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sv.id)).unwrap();
     let tests = vec![
@@ -921,10 +921,13 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     ];
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
 
+    let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv).unwrap();
+
     // add an identity document
     let _ = uvw
         .put_document_unsafe(
             conn,
+            &sv_txn,
             DocumentDiKind::Image(IdDocKind::DriversLicense, DocumentSide::Front).into(),
             "image/png".into(),
             "filename.png".into(),

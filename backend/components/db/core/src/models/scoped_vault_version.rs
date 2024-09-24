@@ -1,5 +1,5 @@
 use super::data_lifetime::DataLifetime;
-use super::scoped_vault::ScopedVault;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
@@ -9,7 +9,6 @@ use chrono::Utc;
 use db_schema::schema::scoped_vault_version;
 use diesel::prelude::*;
 use newtypes::DataLifetimeSeqno;
-use newtypes::Locked;
 use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
 use newtypes::ScopedVaultVersionNumber;
@@ -42,11 +41,10 @@ struct NewScopedVaultVersion {
 
 impl ScopedVaultVersion {
     #[tracing::instrument("ScopedVaultVersion::get_or_create", skip_all)]
-    pub fn get_or_create(
-        conn: &mut TxnPgConn,
-        scoped_vault: &Locked<ScopedVault>,
-        seqno: DataLifetimeSeqno,
-    ) -> DbResult<Self> {
+    pub fn get_or_create(conn: &mut TxnPgConn, sv_txn: &DataLifetimeSeqnoTxn<'_>) -> DbResult<Self> {
+        let scoped_vault = sv_txn.scoped_vault();
+        let seqno = sv_txn.seqno();
+
         let scoped_vault_id = &scoped_vault.id;
         let tenant_id = scoped_vault.tenant_id.clone();
         let is_live = scoped_vault.is_live;

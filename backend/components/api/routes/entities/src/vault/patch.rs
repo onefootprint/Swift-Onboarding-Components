@@ -207,7 +207,7 @@ async fn patch_inner(
     let updates = FingerprintedDataRequest::build(state, updates, &sv.id).await?;
 
     let actor = auth.actor();
-    let new_version = state
+    let svv = state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
@@ -216,7 +216,7 @@ async fn patch_inner(
             // event with context on what was updated, deleted, and added
             let DeleteDataResult { deleted_dis, .. } = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
-            let PatchDataResult { new_version: svv, .. } = uvw.patch_data(conn, updates, source)?;
+            let PatchDataResult { version: svv, .. } = uvw.patch_data(conn, updates, source)?;
 
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let principal: DbActor = actor.into();
@@ -254,7 +254,7 @@ async fn patch_inner(
         .await?;
 
     let vault_version = if tenant.can_access_preview(&PreviewApi::VaultVersioning) {
-        Some(new_version)
+        Some(svv)
     } else {
         None
     };

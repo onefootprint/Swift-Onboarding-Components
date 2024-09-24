@@ -443,8 +443,8 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
     let lifetime = vw.get_lifetime(&IDK::PhoneNumber.into()).unwrap().clone();
     let ci = ContactInfo::get(conn, &lifetime.id).unwrap();
-    let seqno = vw.save_ci_after_otp(conn, data).unwrap();
-    DataLifetime::portablize(conn, &lifetime.id, seqno).unwrap();
+    let sv_txn = vw.save_ci_after_otp(conn, data).unwrap();
+    DataLifetime::portablize(conn, &sv_txn, &lifetime.id).unwrap();
     ContactInfo::mark_otp_verified(conn, &ci.id).unwrap();
 
     TestData {
@@ -493,7 +493,10 @@ impl<Type> WriteableVw<Type> {
             FingerprintedDataRequest::no_fingerprints_for_validation(request)
         };
         let source = DataRequestSource::HostedPatchVault(DataLifetimeSource::LikelyHosted.into());
-        let new_ci = self.patch_data(conn, request, source)?.new_ci;
+
+        let result = self.patch_data(conn, request, source)?;
+        let new_ci = result.updates.map(|updates| updates.ci).unwrap_or_default();
+
         Ok(new_ci)
     }
 }
