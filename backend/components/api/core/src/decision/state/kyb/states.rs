@@ -163,6 +163,10 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     ) -> FpResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let bo_obds = async_res;
+        // TODO: this will be fixed in another stack https://github.com/onefootprint/monorepo/pull/12144
+        // Create the risk signal group. We'll add other risk signals into here
+        let rsg = RiskSignalGroup::create(conn, &wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
+
         if bo_obds.iter().any(|o| o.status == DecisionStatus::Fail) {
             // Add risk signal for BO failing KYC
             // TODO: one of these days we need to drop the non-null vres constraint
@@ -185,8 +189,6 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
                     bo_risk_signal.verification_result_id.clone(),
                 );
 
-                let rsg =
-                    RiskSignalGroup::get_or_create(conn, &wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, vec![bo_rs], false, rsg.id)?;
             };
         }
