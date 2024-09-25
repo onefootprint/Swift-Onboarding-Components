@@ -414,7 +414,6 @@ impl TryFrom<Task> for TaskKind {
             .ok_or(Error::MissingField("sub_label".to_owned()))?;
 
         let e = Error::UnrecognizedTask(key.clone(), sub_label.clone());
-
         let task_kind = match TaskKindDiscriminant::from_str(&key).map_err(|_| e.clone())? {
             TaskKindDiscriminant::Name => TaskKind::Name(NameTask::from_str(&sub_label).map_err(|_| e)?),
             TaskKindDiscriminant::DbaName => {
@@ -526,6 +525,10 @@ pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReason
                     let task_kind = TaskKind::try_from(t.clone());
                     match task_kind {
                         Ok(tk) => Into::<Option<FootprintReasonCode>>::into(tk),
+                        Err(Error::UnrecognizedTask(key, sub_label)) => {
+                            tracing::info!(key, sub_label, "Unrecognized Middesk TaskKind");
+                            None
+                        }
                         Err(err) => {
                             tracing::error!(?err, "Error parsing Middesk TaskKind");
                             None
