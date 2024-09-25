@@ -93,8 +93,8 @@ impl AuthSession {
         let data = data.into();
         let tok_prefix = data.token_prefix();
         let token = SessionAuthToken::generate(tok_prefix);
-        let auth_token_hash = token.id();
-        tracing::info!(%auth_token_hash, "Token created");
+        let new_auth_token_hash = token.id();
+        tracing::info!(%new_auth_token_hash, "Token created");
         let expires_at = match expiry.into() {
             Expiry::ExpiresIn(expires_in) => Utc::now() + expires_in,
             Expiry::ExpiresAt(expires_at) => expires_at,

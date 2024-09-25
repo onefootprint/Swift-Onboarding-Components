@@ -106,12 +106,11 @@ impl InsightHeaders {
         }
     }
 
-    /// Log all extracted header values
+    /// Log extracted header values that aren't put on RootSpan (since all RootSpan attributes are
+    /// automatically included on log lines)
     fn log(&self) {
         let Self {
-            ip_address,
             city,
-            country,
             region,
             region_name,
             latitude,
@@ -120,7 +119,6 @@ impl InsightHeaders {
             postal_code,
             time_zone,
             user_agent,
-            timestamp,
             is_android_user,
             is_desktop_viewer,
             is_ios_viewer,
@@ -133,13 +131,16 @@ impl InsightHeaders {
             http_version,
             tls,
             origin,
-            session_id,
-            // Add new fields to the tracing::info! call below
+            // These are already exported to datadog when the root span attributes are written onto the log
+            // lines
+            ip_address: _,
+            timestamp: _,
+            country: _,
+            session_id: _,
+            // NOTE: Add new fields to the tracing::info! call below
         } = self;
         tracing::info!(
-            ip_address,
             city,
-            country,
             region,
             region_name,
             latitude,
@@ -148,7 +149,6 @@ impl InsightHeaders {
             postal_code,
             time_zone,
             user_agent,
-            timestamp=%timestamp,
             is_android_user,
             is_desktop_viewer,
             is_ios_viewer,
@@ -161,8 +161,6 @@ impl InsightHeaders {
             http_version,
             tls,
             origin,
-            // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved for Datadog RUM.
-            fp_session_id = session_id,
             "Extracted InsightHeaders"
         );
     }

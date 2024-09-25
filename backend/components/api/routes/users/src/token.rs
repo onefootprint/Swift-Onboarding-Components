@@ -161,10 +161,11 @@ pub async fn post(
             let implicit_auth_events = if can_use_implicit_auth {
                 AuthEvent::list_recent(conn, &su.id)?
             } else {
-                // Regardless of whether implicit auth is enabled, if 3p auth was used, we should inherit the event
+                // Regardless of whether implicit auth is enabled, if 3p auth was used, we should inherit the
+                // event
                 third_party_auth_event.into_iter().collect()
             };
-            tracing::info!(num_events=%implicit_auth_events.len(), tenant_id=%tenant.id, %is_live, "Creating token with implied auth events");
+            tracing::info!(num_events=%implicit_auth_events.len(), "Creating token with implied auth events");
             let kinds = implicit_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
             let auth_events = implicit_auth_events

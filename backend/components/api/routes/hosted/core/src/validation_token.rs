@@ -53,8 +53,6 @@ pub async fn create_validation_token(
             });
             let (validation_token, _) =
                 AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
-            let auth_token_hash = validation_token.id();
-            tracing::info!(%auth_token_hash, "Created validation token");
             Ok(validation_token)
         })
         .await?;
