@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "🚀 Initializing sourcemap upload for $SERVICE..."
+echo "🚀 Initializing sourcemap upload"
 
 # Parse arguments
 SERVICE=""
@@ -54,4 +54,4 @@ if [ -z "$DATADOG_API_KEY" ]; then
   exit 0
 fi
 
-datadog-ci sourcemaps upload .next/static --service="$SERVICE" --release-version="${SERVICE}-${VERCEL_GIT_COMMIT_SHA}" --minified-path-prefix=https://$SERVICE.onefootprint.com/_next/static
+datadog-ci sourcemaps upload .next/static --disable-git --service="$SERVICE" --release-version="${SERVICE}-${VERCEL_GIT_COMMIT_SHA}" --minified-path-prefix=https://$SERVICE.onefootprint.com/_next/static

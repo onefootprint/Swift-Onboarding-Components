@@ -5,6 +5,7 @@
   "scripts": {
     "build:analyze": "ANALYZE=true yarn build",
     "build": "next build",
+    "postbuild": "yarn upload:sourcemaps",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "dev": "yarn i18n:copy-watch & next dev -p 3004",
     "i18n:clean": "rm -rf ./public/locales/",
