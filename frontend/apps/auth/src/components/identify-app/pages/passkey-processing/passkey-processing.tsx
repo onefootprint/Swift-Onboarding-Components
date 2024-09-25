@@ -1,4 +1,4 @@
-import { useCancelD2P } from '@onefootprint/idv';
+import { trackAction, useCancelD2P } from '@onefootprint/idv';
 import { Box, LinkButton, LoadingSpinner } from '@onefootprint/ui';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ const PasskeyProcessing = ({ onCancelError }: PasskeyProcessingProps) => {
   const { passkeyRegistrationWindow, scopedAuthToken = '' } = state.context;
 
   const handlePasskeyCancelled = () => {
+    trackAction('auth:passkey-cancelled');
     send({ type: 'passkeyProcessingCancelled' });
     passkeyRegistrationWindow?.close();
   };
@@ -40,10 +41,12 @@ const PasskeyProcessing = ({ onCancelError }: PasskeyProcessingProps) => {
         }
 
         if (status === D2PStatus.completed) {
+          trackAction('auth:passkey-completed');
           return send({ type: 'passkeyProcessingCompleted' });
         }
 
         if (status === D2PStatus.failed) {
+          trackAction('auth:passkey-failed');
           return send({ type: 'passkeyProcessingError' });
         }
       },

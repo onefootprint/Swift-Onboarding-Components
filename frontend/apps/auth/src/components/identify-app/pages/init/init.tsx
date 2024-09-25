@@ -4,7 +4,7 @@ import useGetOnboardingConfig from '@/src/queries/use-get-onboarding-config';
 import { isSdkUrlAllowed } from '@/src/utils';
 import type { FootprintAuthDataProps } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
-import { getLogger, isAuth, useDeviceInfo } from '@onefootprint/idv';
+import { getLogger, isAuth, trackAction, useDeviceInfo } from '@onefootprint/idv';
 import Loading from '@onefootprint/idv/src/components/identify/components/loading';
 import { useEffect, useState } from 'react';
 import { useFootprintProvider } from '../../../../provider-footprint';
@@ -43,6 +43,15 @@ const Init = (): JSX.Element | null => {
       return;
     }
 
+    if (!isAuth(onboardingConfig.data?.kind)) {
+      logError(`Invalid auth kind, ${onboardingConfig.data?.kind}`);
+      send({ type: 'invalidAuthConfigReceived' });
+    } else if (!isSdkUrlAllowed(fpProvider, onboardingConfig.data?.allowedOrigins)) {
+      logError(`SDK URL not allowed, ${onboardingConfig.data?.allowedOrigins?.join(', ')}`);
+      send({ type: 'sdkUrlNotAllowedReceived' });
+    }
+
+    trackAction('auth:started');
     send({
       type: 'initPropsReceived',
       payload: {
@@ -51,14 +60,6 @@ const Init = (): JSX.Element | null => {
         props: authProps,
       },
     });
-
-    if (!isAuth(onboardingConfig.data?.kind)) {
-      logError(`Invalid auth kind, ${onboardingConfig.data?.kind}`);
-      send({ type: 'invalidAuthConfigReceived' });
-    } else if (!isSdkUrlAllowed(fpProvider, onboardingConfig.data?.allowedOrigins)) {
-      logError(`SDK URL not allowed, ${onboardingConfig.data?.allowedOrigins?.join(', ')}`);
-      send({ type: 'sdkUrlNotAllowedReceived' });
-    }
   }, [onboardingConfig, authProps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <Loading />;

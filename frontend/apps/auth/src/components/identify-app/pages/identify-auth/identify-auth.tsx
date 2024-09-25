@@ -1,6 +1,7 @@
 'use client';
 
 import type { DeviceInfo } from '@onefootprint/idv';
+import { trackAction } from '@onefootprint/idv';
 import { Identify, IdentifyVariant } from '@onefootprint/idv/src/components/identify';
 import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, type PublicOnboardingConfig } from '@onefootprint/types';
@@ -44,6 +45,7 @@ const IdentifyAuthPage = () => {
       }
       onDone={args => {
         const isPasskeyAlreadyRegistered = args.availableChallengeKinds?.includes(ChallengeKind.biometric);
+        trackAction('auth:identify-completed');
         send({
           type: 'identifyCompleted',
           payload: { authToken: args.authToken, isPasskeyAlreadyRegistered: !!isPasskeyAlreadyRegistered },

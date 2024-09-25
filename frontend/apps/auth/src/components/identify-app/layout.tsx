@@ -2,7 +2,7 @@
 
 import type { Variant } from '@/src/types';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { getLogger } from '@onefootprint/idv';
+import { getLogger, trackAction } from '@onefootprint/idv';
 
 import { useConfirmationDialog } from '@onefootprint/ui';
 import truncate from 'lodash/truncate';
@@ -63,6 +63,7 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
     if (!isDone) return;
     if (!validationToken) return logError('Missing validation token');
 
+    trackAction('auth:completed');
     handleCompleteWithValidationToken(validationToken);
     fpProvider.send(FootprintPublicEvent.closed);
   }, [validationToken, fpProvider, isDone]);

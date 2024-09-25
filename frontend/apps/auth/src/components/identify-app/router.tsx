@@ -1,9 +1,9 @@
 'use client';
 
-import { Liveness, NavigationHeader, getLogger } from '@onefootprint/idv';
-import { UserChallengeActionKind } from '@onefootprint/types';
-
 import { isEmbeddedInIframe } from '@/src/utils';
+import { Liveness, NavigationHeader, getLogger, trackAction } from '@onefootprint/idv';
+import { getErrorMessage } from '@onefootprint/request';
+import { UserChallengeActionKind } from '@onefootprint/types';
 import PasskeyCancelled from '../passkey-cancelled';
 import PasskeyError from '../passkey-error';
 import UnexpectedError from '../unexpected-error';
@@ -59,12 +59,18 @@ const IdentifyRouter = () => {
       <PasskeyAdd
         authToken={authToken}
         device={device}
-        onSkip={() => send({ type: 'passkeyRegistrationSkip' })}
+        onSkip={() => {
+          trackAction('auth:passkey-skipped');
+          logTrack('Passkey registration skipped');
+          send({ type: 'passkeyRegistrationSkip' });
+        }}
         onError={(error: unknown) => {
-          logWarn('Error on optional passkey registration', error);
+          trackAction('auth:passkey-started-error', { error: getErrorMessage(error) });
+          logWarn('Passkey registration error', error);
           send({ type: 'passkeyRegistrationError', payload: error });
         }}
         onNewTabOpened={(tab: Window) => {
+          trackAction('auth:passkey-started');
           logTrack('Passkey registration tab opened');
           send({ type: 'passkeyRegistrationTabOpened', payload: tab });
         }}
