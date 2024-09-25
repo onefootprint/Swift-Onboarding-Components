@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS manual_review_scoped_vault_id_where_incomplete ON manual_review(scoped_vault_id) WHERE completed_at IS NULL;

@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS manual_review_scoped_vault_id_where_incomplete;
