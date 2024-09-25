@@ -2,7 +2,7 @@ import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onef
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
+import { DocumentUploadSettings, getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import type { BootstrapBusinessData, UserData } from '../../../../../../types';
 import { getLogger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
@@ -158,8 +158,14 @@ const createOnboardingRequirementsMachine = ({
     {
       actions: {
         assignMissingRequirements: assign((ctx, event) => {
-          const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, event.payload[0]);
-          if (isRepeat) {
+          const currentRequirement = event.payload[0];
+          const isRepeat = isRepeatRequirement(ctx.lastHandledRequirement, currentRequirement);
+          const isPreferUpload =
+            currentRequirement?.kind === OnboardingRequirementKind.document &&
+            currentRequirement?.uploadSettings === DocumentUploadSettings.preferUpload;
+          // when the playbook has the preferUpload setting, we show the button "continue on mobile", which moves the user to the handoff but the requirement is still the same
+          // in this case, we don't want to log as an error
+          if (isRepeat && !isPreferUpload) {
             const requirements = JSON.stringify({
               lastRequirement: ctx.lastHandledRequirement,
               nextRequirement: event.payload[0],
