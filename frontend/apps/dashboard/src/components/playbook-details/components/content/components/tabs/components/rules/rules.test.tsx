@@ -609,7 +609,7 @@ describe('<Rules />', () => {
     it('should show an alert', async () => {
       await renderRules({ playbook: kybPlaybookFixture });
 
-      const alert = await screen.findByText("These rules are only applied when verifying a Business Owner's identity.");
+      const alert = await screen.findByText('These rules apply to Business Owners and Businesses.');
       expect(alert).toBeInTheDocument();
     });
   });

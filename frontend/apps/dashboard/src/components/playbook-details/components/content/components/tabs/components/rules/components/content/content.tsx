@@ -197,7 +197,7 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
           )}
         </Stack>
         {playbook.kind === OnboardingConfigKind.kyb && hasRules && (
-          <InlineAlert variant="info">{t('alerts.kyb-alert')}</InlineAlert>
+          <InlineAlert variant="info">{t('kyb-alert')}</InlineAlert>
         )}
         {hasRules || isEditing ? (
           Object.values(RuleAction).map(action => (
