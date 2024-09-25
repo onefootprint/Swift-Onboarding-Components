@@ -98,7 +98,7 @@ impl BillingCounts {
                     // If there is no price set up for this tenant but they have used the product,
                     // error by adding a line item to the invoice that shows the uncontracted price.
                     // These require manual human action, but we don't want to prevent invoice generation
-                    tracing::error!(tenant_id=%tenant_id, product=%product, "Billing line item is uncontracted");
+                    tracing::error!(tenant_id=%tenant_id, product=%product, "Billing line item {} is uncontracted for {}", tenant_id, product);
                     LineItemPrice::Uncontracted
                 };
                 Ok(LineItem { product, price, count })
