@@ -10,6 +10,7 @@ use db_schema::schema::vault;
 use db_schema::schema::{
     self,
 };
+use diesel::dsl::exists;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
@@ -135,29 +136,31 @@ macro_rules! list_query {
 
         // Filter on whether user is in manual review
         if let Some(requires_manual_review) = $params.requires_manual_review {
-            let matching_ids = manual_review::table
-                .filter(manual_review::completed_at.is_null())
-                .select(manual_review::scoped_vault_id)
-                .distinct();
+            let q_has_manual_review = exists(
+                manual_review::table
+                    .filter(manual_review::completed_at.is_null())
+                    .filter(manual_review::scoped_vault_id.eq(scoped_vault::id)),
+            );
             if requires_manual_review {
-                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+                query = query.filter(q_has_manual_review)
             } else {
-                query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
+                query = query.filter(not(q_has_manual_review))
             }
         }
 
         // Filter on whether user has a watchlist hit
         if let Some(watchlist_hit) = $params.watchlist_hit.as_ref() {
-            let matching_ids = watchlist_check::table
-                .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
-                .filter(watchlist_check::deactivated_at.is_null())
-                .filter(not(watchlist_check::completed_at.is_null()))
-                .select(watchlist_check::scoped_vault_id)
-                .distinct();
+            let q_has_watchlist_hit = exists(
+                watchlist_check::table
+                    .filter(watchlist_check::status.eq(WatchlistCheckStatusKind::Fail))
+                    .filter(watchlist_check::deactivated_at.is_null())
+                    .filter(not(watchlist_check::completed_at.is_null()))
+                    .filter(watchlist_check::scoped_vault_id.eq(scoped_vault::id)),
+            );
             if *watchlist_hit {
-                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+                query = query.filter(q_has_watchlist_hit)
             } else {
-                query = query.filter(diesel::dsl::not(scoped_vault::id.eq_any(matching_ids)))
+                query = query.filter(not(q_has_watchlist_hit))
             }
         }
 
@@ -183,31 +186,34 @@ macro_rules! list_query {
         }
 
         if let Some(playbook_ids) = $params.playbook_ids.as_ref() {
-            let matching_ids = workflow::table
-                .filter(workflow::ob_configuration_id.eq_any(playbook_ids))
-                .select(workflow::scoped_vault_id)
-                .distinct();
-            query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            let q_onboarded_onto_playbook = exists(
+                workflow::table
+                    .filter(workflow::ob_configuration_id.eq_any(playbook_ids))
+                    .filter(workflow::scoped_vault_id.eq(scoped_vault::id)),
+            );
+            query = query.filter(q_onboarded_onto_playbook)
         }
 
         if let Some(has_outstanding_workflow_request) = $params.has_outstanding_workflow_request.as_ref() {
-            let matching_ids = workflow_request::table
-                .filter(workflow_request::deactivated_at.is_null())
-                .select(workflow_request::scoped_vault_id)
-                .distinct();
+            let q_has_wfr = exists(
+                workflow_request::table
+                    .filter(workflow_request::deactivated_at.is_null())
+                    .filter(workflow_request::scoped_vault_id.eq(scoped_vault::id)),
+            );
             if *has_outstanding_workflow_request {
-                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+                query = query.filter(q_has_wfr)
             } else {
-                query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))
+                query = query.filter(not(q_has_wfr))
             }
         }
 
         if let Some(has_workflow) = $params.has_workflow.as_ref() {
-            let matching_ids = workflow::table.select(workflow::scoped_vault_id).distinct();
+            let q_has_workflow =
+                exists(workflow::table.filter(workflow::scoped_vault_id.eq(scoped_vault::id)));
             if *has_workflow {
-                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+                query = query.filter(q_has_workflow)
             } else {
-                query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))
+                query = query.filter(not(q_has_workflow))
             }
         }
 
@@ -220,12 +226,13 @@ macro_rules! list_query {
         }
 
         if !$params.labels.is_empty() {
-            let matching_ids = scoped_vault_label::table
-                .filter(scoped_vault_label::deactivated_at.is_null())
-                .filter(scoped_vault_label::kind.eq_any(&$params.labels))
-                .select(scoped_vault_label::scoped_vault_id)
-                .distinct();
-            query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            let q_has_matching_label = exists(
+                scoped_vault_label::table
+                    .filter(scoped_vault_label::deactivated_at.is_null())
+                    .filter(scoped_vault_label::kind.eq_any(&$params.labels))
+                    .filter(scoped_vault_label::scoped_vault_id.eq(scoped_vault::id)),
+            );
+            query = query.filter(q_has_matching_label)
         }
 
         query
