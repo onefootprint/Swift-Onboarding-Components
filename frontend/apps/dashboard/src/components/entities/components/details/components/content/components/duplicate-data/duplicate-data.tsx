@@ -11,8 +11,8 @@ import OtherTenantSummary from './components/other-tenant-summary';
 import Row from './components/row';
 
 const DuplicateData = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.duplicate-data',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'duplicate-data',
   });
   const router = useRouter();
   const {

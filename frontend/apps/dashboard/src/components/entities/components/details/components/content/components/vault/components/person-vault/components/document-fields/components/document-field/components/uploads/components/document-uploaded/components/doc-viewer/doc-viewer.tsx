@@ -16,8 +16,8 @@ type DocViewerProps = {
 };
 
 const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads.doc-viewer',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.uploads.doc-viewer',
   });
   const [isOpen, setIsOpen] = useState(false);
 

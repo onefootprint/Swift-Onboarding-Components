@@ -28,7 +28,7 @@ export type EditTagsDialogProps = WithEntityProps & {
 
 const EditTagsDialog = ({ entity, open, onClose, onSave }: EditTagsDialogProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.edit-tags',
+    keyPrefix: 'header-default.actions.edit-tags',
   });
   const { data: currentEntityTags, isPending, error } = useTags(entity.id);
   const [activeTags, setActiveTags] = useState<EditedTag[]>(currentEntityTags ?? []);

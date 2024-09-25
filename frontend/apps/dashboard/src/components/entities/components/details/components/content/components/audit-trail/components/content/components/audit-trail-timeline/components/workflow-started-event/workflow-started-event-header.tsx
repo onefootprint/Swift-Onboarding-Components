@@ -9,8 +9,8 @@ type WorkflowStartedEventHeaderProps = {
 };
 
 const WorkflowStartedEventHeader = ({ data }: WorkflowStartedEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-started-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.workflow-started-event',
   });
 
   if (data.kind === WorkflowStartedEventKind.playbook) {

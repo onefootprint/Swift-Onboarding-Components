@@ -12,9 +12,10 @@ type BreadcrumbProps = {
 };
 
 const Breadcrumb = ({ isDisabled }: BreadcrumbProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.breadcrumb',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'breadcrumb',
   });
+
   const { kind, listPath } = useEntityContext();
   const { searchParams } = useFilters();
   const label = t(`${kind}.label` as ParseKeys<'common'>);

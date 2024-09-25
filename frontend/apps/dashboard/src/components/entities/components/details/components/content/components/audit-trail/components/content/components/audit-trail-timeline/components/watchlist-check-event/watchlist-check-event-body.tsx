@@ -34,8 +34,8 @@ const statusIcons = {
 };
 
 const WatchlistCheckEventBody = ({ data, lineHeight = 'large', showIcons }: WatchlistCheckEventBodyProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.watchlist-check-event',
   });
   const { status } = data;
   const color = textColors[status];

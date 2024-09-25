@@ -14,8 +14,8 @@ type RequestOnboardProps = {
 };
 
 const RequestOnboard = ({ visible }: RequestOnboardProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info.form.onboard',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info.form.onboard',
   });
   const { control, watch, setValue } = useFormContext();
   const selectedPlaybook = watch('playbook');

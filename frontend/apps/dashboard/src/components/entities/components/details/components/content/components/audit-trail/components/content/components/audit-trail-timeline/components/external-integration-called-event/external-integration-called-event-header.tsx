@@ -7,8 +7,8 @@ type ExternalIntegrationCalledEventHeaderProps = {
 };
 
 const ExternalIntegrationCalledEventHeader = ({ data }: ExternalIntegrationCalledEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.external-integration-called',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.external-integration-called',
   });
 
   return (

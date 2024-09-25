@@ -2,8 +2,8 @@ import { BusinessDetail } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useOtherDetailText = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.details',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.details',
   });
 
   return (detailKind: BusinessDetail) => {

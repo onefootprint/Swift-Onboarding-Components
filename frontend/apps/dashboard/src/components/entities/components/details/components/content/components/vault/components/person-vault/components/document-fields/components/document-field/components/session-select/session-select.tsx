@@ -14,8 +14,8 @@ export type SessionSelectProps = {
 
 const SessionSelect = ({ documents, activeDocumentVersion, onActiveDocumentVersionChange }: SessionSelectProps) => {
   const { formatDateWithTime } = useIntl();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.session-selector',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.session-selector',
   });
   // Hide the whole session selector if any of the sessions don't have a start date.
   // These aren't real sessions, just a series of images uploaded via API rather than via bifrost.

@@ -19,7 +19,7 @@ type HeaderProps = WithEntityProps & {
 };
 
 const Header = ({ entity, isDisabled }: HeaderProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header' });
   const { kind } = useEntityContext();
   const { hasPermission } = usePermissions();
   const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);

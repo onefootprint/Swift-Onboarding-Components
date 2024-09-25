@@ -28,8 +28,8 @@ type AddToListDialogProps = {
 };
 
 const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.add-to-list',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.add-to-list',
   });
   const { data: entity } = useCurrentEntity();
   const { data } = useLists();

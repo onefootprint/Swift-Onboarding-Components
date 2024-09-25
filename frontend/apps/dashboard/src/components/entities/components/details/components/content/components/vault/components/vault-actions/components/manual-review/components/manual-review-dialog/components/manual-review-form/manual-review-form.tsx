@@ -20,8 +20,8 @@ type ManualReviewFormProps = {
 };
 
 const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.manual-review',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'manual-review',
   });
   const {
     register,

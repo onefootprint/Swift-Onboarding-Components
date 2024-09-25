@@ -11,8 +11,8 @@ type LivenessEventBodyProps = {
 };
 
 const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.liveness-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.liveness-event',
   });
   const {
     insightEvent: { ipAddress },

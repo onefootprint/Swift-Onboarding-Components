@@ -18,7 +18,7 @@ type DocumentFieldOrPlaceholderProps = {
 };
 
 const DocumentFieldOrPlaceholder = ({ kind, entity, vault, documents }: DocumentFieldOrPlaceholderProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'decrypt' });
   const { register } = useFormContext();
   const field = useDocumentField(entity)(kind);
   const decrypt = useDecryptControls();

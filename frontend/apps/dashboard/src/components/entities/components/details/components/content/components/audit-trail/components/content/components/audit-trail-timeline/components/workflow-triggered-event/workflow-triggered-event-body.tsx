@@ -18,8 +18,8 @@ type WorkflowTriggeredEventBodyProps = {
 };
 
 const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBodyProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.workflow-triggered-event',
   });
   const generateTokenMutation = useGenerateTokenRequest();
   const [isDialogOpen, setIsDialogOpen] = useState(false);

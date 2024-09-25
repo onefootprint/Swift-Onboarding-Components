@@ -17,8 +17,8 @@ export type UpdateAuthDialogProps = {
 };
 
 const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.update-auth-methods',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.update-auth-methods',
   });
   const generateTokenMutation = useGenerateTokenRequest();
   const sendLinkMutation = useSendTokenLinkMutation();

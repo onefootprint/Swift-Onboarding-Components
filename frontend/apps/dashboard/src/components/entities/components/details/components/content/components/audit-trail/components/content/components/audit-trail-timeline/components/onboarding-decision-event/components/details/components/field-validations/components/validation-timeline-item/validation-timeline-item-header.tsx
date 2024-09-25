@@ -24,8 +24,8 @@ const matchColors: MatchColorsType = {
 };
 
 const ValidationTimelineItemHeader = ({ attribute, matchLevel }: ValidationTimelineItemHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
   });
 
   return (

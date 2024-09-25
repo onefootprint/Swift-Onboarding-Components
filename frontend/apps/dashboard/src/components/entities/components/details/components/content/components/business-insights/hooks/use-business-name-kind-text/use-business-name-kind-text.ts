@@ -2,8 +2,8 @@ import { BusinessNameKind } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useBusinessNameKindText = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.name.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.name.table',
   });
 
   return (status: BusinessNameKind | null) => {

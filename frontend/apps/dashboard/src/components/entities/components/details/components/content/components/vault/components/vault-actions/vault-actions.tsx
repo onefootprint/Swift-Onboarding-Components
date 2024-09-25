@@ -21,7 +21,7 @@ import useEditControls from './hooks/use-edit-controls';
 export type VaultActionsControlsProps = WithEntityProps;
 
 const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('entity-details');
   const { data: entityData } = useCurrentEntity();
   const isViewingHistorical = !!useEntitySeqno();
   const { data, update: updateVault } = useEntityVault(entity.id, entity);
@@ -54,19 +54,19 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
     return (
       <Stack gap={3} align="center">
         {!isViewingHistorical && (
-          <Tooltip disabled={canDecrypt} text={t('pages.entity.decrypt.not-allowed')}>
+          <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
               size="compact"
               options={[
                 {
-                  label: t('pages.entity.decrypt.start'),
+                  label: t('decrypt.start'),
                   value: 'start',
                   onSelect: decryptControls.start,
                 },
                 {
-                  label: t('pages.entity.decrypt.start-all'),
+                  label: t('decrypt.start-all'),
                   value: 'start-all',
                   onSelect: () => decryptControls.submitAllFields(),
                 },
@@ -75,10 +75,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
           </Tooltip>
         )}
         {shouldRenderManualReview && (
-          <PermissionGate
-            scopeKind={RoleScopeKind.manualReview}
-            fallbackText={t('pages.entity.manual-review-not-allowed')}
-          >
+          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('manual-review-not-allowed')}>
             <ManualReview status={entityData.status} kind={entityData.kind} />
           </PermissionGate>
         )}

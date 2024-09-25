@@ -2,8 +2,8 @@ import { FilingStatus } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useFilingStatusText = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.sos-filings.status',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.sos-filings.status',
   });
 
   return (status: FilingStatus) => {

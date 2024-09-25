@@ -20,8 +20,8 @@ type AddressCardProps = {
 };
 
 const AddressCard = ({ id, type, entity, isSelected, onSelect, isPending }: AddressCardProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.device-insights.address-card',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'device-insights.address-card',
   });
 
   const { getAddressFieldsProps, getAddressDis } = useAddressFieldsProps(entity);
@@ -60,7 +60,8 @@ const AddressCard = ({ id, type, entity, isSelected, onSelect, isPending }: Addr
         <Stack width="100%" direction="column" align="flex-start" zIndex={2}>
           <Text variant="label-3">
             <Trans
-              i18nKey="pages.entity.device-insights.address-card.cta.text"
+              ns="entity-details"
+              i18nKey="device-insights.address-card.cta.text"
               components={{
                 link: <LinkButton onClick={handleClick}>{t('cta.link')}</LinkButton>,
               }}

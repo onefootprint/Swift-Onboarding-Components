@@ -58,7 +58,7 @@ type FieldProps =
 
 const useFieldProps = (di: DataIdentifier): FieldProps => {
   const { t } = useTranslation('common');
-
+  const { t: entityT } = useTranslation('entity-details');
   const { clearErrors } = useFormContext<EditDetailsFormData>();
   const formValues = useFormValues();
   const fieldValue = get(formValues, di as keyof EditDetailsFormData);
@@ -69,11 +69,11 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.name.required');
+            return entityT('edit.errors.name.required');
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
-            return t('pages.entity.edit.errors.name.special-chars');
+            return entityT('edit.errors.name.special-chars');
           }
           return true;
         },
@@ -86,7 +86,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         validate: (value: string) => {
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
-            return t('pages.entity.edit.errors.name.special-chars');
+            return entityT('edit.errors.name.special-chars');
           }
           return true;
         },
@@ -98,11 +98,11 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.name.required');
+            return entityT('edit.errors.name.required');
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
-            return t('pages.entity.edit.errors.name.special-chars');
+            return entityT('edit.errors.name.special-chars');
           }
           return true;
         },
@@ -116,14 +116,14 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         inputMode: 'numeric',
         pattern: {
           value: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
-          message: t('pages.entity.edit.errors.dob.pattern'),
+          message: entityT('edit.errors.dob.pattern'),
         },
         validate: (value: string) => {
-          if (!value) return t('pages.entity.edit.errors.dob.required');
-          if (!isValidDate(value)) return t('pages.entity.edit.errors.dob.pattern');
-          if (isDobInTheFuture(value)) return t('pages.entity.edit.errors.dob.future-date');
-          if (isDobTooOld(value)) return t('pages.entity.edit.errors.dob.too-old');
-          if (isDobTooYoung(value)) return t('pages.entity.edit.errors.dob.too-young');
+          if (!value) return entityT('edit.errors.dob.required');
+          if (!isValidDate(value)) return entityT('edit.errors.dob.pattern');
+          if (isDobInTheFuture(value)) return entityT('edit.errors.dob.future-date');
+          if (isDobTooOld(value)) return entityT('edit.errors.dob.too-old');
+          if (isDobTooYoung(value)) return entityT('edit.errors.dob.too-young');
           return true;
         },
       },
@@ -135,10 +135,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         type: 'tel',
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.ssn.required');
+            return entityT('edit.errors.ssn.required');
           }
           if (!isSSN9Flexible(value)) {
-            return t('pages.entity.edit.errors.ssn.pattern');
+            return entityT('edit.errors.ssn.pattern');
           }
           return true;
         },
@@ -150,10 +150,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.ssn.required');
+            return entityT('edit.errors.ssn.required');
           }
           if (!isSsn4(value)) {
-            return t('pages.entity.edit.errors.ssn.pattern');
+            return entityT('edit.errors.ssn.pattern');
           }
           return true;
         },
@@ -165,10 +165,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.address-line.required');
+            return entityT('edit.errors.address-line.required');
           }
           if (!isAddressLine(value)) {
-            return t('pages.entity.edit.errors.address-line.pattern');
+            return entityT('edit.errors.address-line.pattern');
           }
           return true;
         },
@@ -179,7 +179,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     return {
       inputOptions: {
         validate: (value: string) => {
-          if (!value || typeof value !== 'string') return t('pages.entity.edit.errors.city');
+          if (!value || typeof value !== 'string') return entityT('edit.errors.city');
           return true;
         },
       },
@@ -194,7 +194,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           'aria-label': 'state',
           validate: (value: string) => {
             if (!value || value === EMPTY_SELECT_VALUE) {
-              return t('pages.entity.edit.errors.state.required');
+              return entityT('edit.errors.state.required');
             }
             return true;
           },
@@ -205,7 +205,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.state.required');
+            return entityT('edit.errors.state.required');
           }
           return true;
         },
@@ -220,13 +220,13 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         options: [
           {
             value: EMPTY_SELECT_VALUE,
-            label: t('pages.entity.edit.legal-status.nationality-mapping.none'),
+            label: entityT('edit.legal-status.nationality-mapping.none'),
           },
           ...(COUNTRIES as SelectOption[]),
         ],
         validate: (value: string) => {
           if (formLegalStatus !== EMPTY_SELECT_VALUE && value === EMPTY_SELECT_VALUE) {
-            return t('pages.entity.edit.errors.nationality');
+            return entityT('edit.errors.nationality');
           }
           return true;
         },
@@ -238,13 +238,13 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       selectOptions: {
         'aria-label': 'Legal status',
         options: [
-          { value: EMPTY_SELECT_VALUE, label: t('pages.entity.edit.legal-status.legal-status-mapping.none') },
-          { value: UsLegalStatus.citizen, label: t('pages.entity.edit.legal-status.legal-status-mapping.citizen') },
+          { value: EMPTY_SELECT_VALUE, label: entityT('edit.legal-status.legal-status-mapping.none') },
+          { value: UsLegalStatus.citizen, label: entityT('edit.legal-status.legal-status-mapping.citizen') },
           {
             value: UsLegalStatus.permanentResident,
-            label: t('pages.entity.edit.legal-status.legal-status-mapping.permanent_resident'),
+            label: entityT('edit.legal-status.legal-status-mapping.permanent_resident'),
           },
-          { value: UsLegalStatus.visa, label: t('pages.entity.edit.legal-status.legal-status-mapping.visa') },
+          { value: UsLegalStatus.visa, label: entityT('edit.legal-status.legal-status-mapping.visa') },
         ],
         onChange: () => clearErrors([IdDI.nationality, IdDI.citizenships, IdDI.visaKind, IdDI.visaExpirationDate]),
       },
@@ -254,22 +254,22 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     const formLegalStatus = get(formValues, IdDI.usLegalStatus) || '';
     return {
       inputOptions: {
-        hint: t('pages.entity.edit.errors.citizenships.hint'),
+        hint: entityT('edit.errors.citizenships.hint'),
         // we expect a string[] of countries - if no array, it's empty!
         defaultValue: Array.isArray(fieldValue) ? fieldValue.join(', ') : '',
         validate: (countriesStr: string) => {
           const validationError = validateCitizenships(countriesStr, formLegalStatus);
           if (validationError?.errorType === CitizenshipsValidationError.REQUIRED) {
-            return t('pages.entity.edit.errors.citizenships.required');
+            return entityT('edit.errors.citizenships.required');
           }
           if (validationError?.errorType === CitizenshipsValidationError.SHOULD_BE_EMPTY) {
-            return t('pages.entity.edit.errors.citizenships.should-be-empty');
+            return entityT('edit.errors.citizenships.should-be-empty');
           }
           if (validationError?.errorType === CitizenshipsValidationError.US_CITIZENSHIP) {
-            return t('pages.entity.edit.errors.citizenships.us-citizenship');
+            return entityT('edit.errors.citizenships.us-citizenship');
           }
           if (validationError?.errorType === CitizenshipsValidationError.INVALID) {
-            return t('pages.entity.edit.errors.citizenships.invalid', { countries: validationError.data });
+            return entityT('edit.errors.citizenships.invalid', { countries: validationError.data });
           }
           return true;
         },
@@ -284,7 +284,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         options: COUNTRIES as SelectOption[],
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.country.required');
+            return entityT('edit.errors.country.required');
           }
           return true;
         },
@@ -298,11 +298,11 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.name.required');
+            return entityT('edit.errors.name.required');
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
-            return t('pages.entity.edit.errors.name.special-chars');
+            return entityT('edit.errors.name.special-chars');
           }
           return true;
         },
@@ -314,11 +314,11 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.name.required');
+            return entityT('edit.errors.name.required');
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
-            return t('pages.entity.edit.errors.name.special-chars');
+            return entityT('edit.errors.name.special-chars');
           }
           return true;
         },
@@ -328,10 +328,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
   if (di === BusinessDI.website) {
     return {
       inputOptions: {
-        placeholder: t('pages.entity.edit.errors.website.placeholder'),
+        placeholder: entityT('edit.errors.website.placeholder'),
         validate: (value: string) => {
           if (!isURL(value ?? '')) {
-            return t('pages.entity.edit.errors.website.invalid');
+            return entityT('edit.errors.website.invalid');
           }
           return true;
         },
@@ -343,10 +343,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.tin.required');
+            return entityT('edit.errors.tin.required');
           }
           if (!isTin(value)) {
-            return t('pages.entity.edit.errors.tin.invalid');
+            return entityT('edit.errors.tin.invalid');
           }
           return true;
         },
@@ -390,10 +390,10 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.address-line.required');
+            return entityT('edit.errors.address-line.required');
           }
           if (!isAddressLine(value)) {
-            return t('pages.entity.edit.errors.address-line.pattern');
+            return entityT('edit.errors.address-line.pattern');
           }
           return true;
         },
@@ -404,7 +404,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     return {
       inputOptions: {
         validate: (value: string) => {
-          if (!value || typeof value !== 'string') return t('pages.entity.edit.errors.city');
+          if (!value || typeof value !== 'string') return entityT('edit.errors.city');
           return true;
         },
       },
@@ -418,7 +418,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           options: STATES,
           validate: (value: string) => {
             if (!value || value === EMPTY_SELECT_VALUE) {
-              return t('pages.entity.edit.errors.state.required');
+              return entityT('edit.errors.state.required');
             }
             return true;
           },
@@ -429,7 +429,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return t('pages.entity.edit.errors.state.required');
+            return entityT('edit.errors.state.required');
           }
           return true;
         },
@@ -454,12 +454,12 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         pattern: {
           value: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
-          message: t('pages.entity.edit.errors.dob.pattern'),
+          message: entityT('edit.errors.dob.pattern'),
         },
         validate: (value: string) => {
-          if (!value) return t('pages.entity.edit.errors.dob.required');
-          if (!isValidDate(value)) return t('pages.entity.edit.errors.dob.pattern');
-          if (isDobInTheFuture(value)) return t('pages.entity.edit.errors.dob.future-date');
+          if (!value) return entityT('edit.errors.dob.required');
+          if (!isValidDate(value)) return entityT('edit.errors.dob.pattern');
+          if (isDobInTheFuture(value)) return entityT('edit.errors.dob.future-date');
           return true;
         },
       },

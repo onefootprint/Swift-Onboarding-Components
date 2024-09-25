@@ -9,7 +9,7 @@ type IdDropdownProps = {
 };
 
 const IdDropdown = ({ entity }: IdDropdownProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header.id-dropdown' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header.id-dropdown' });
   const toast = useToast();
   const ids = [
     {

@@ -1,5 +1,5 @@
 {
-  "header": {
+  "header-default": {
     "fraud-label": {
       "aria-label": "Fraud label dropdown",
       "add-label": "Add fraud label",
@@ -184,5 +184,1132 @@
     "onboarding": "Onboarding",
     "behavior": "Behavior",
     "device": "Browser / IP behavior"
+  },
+
+  "banner": {
+    "cta": "See audit trail",
+    "incomplete": {
+      "header": {
+        "person": "User dropped off before providing all information.",
+        "business": "All business information was not collected."
+      }
+    },
+    "manual-review": {
+      "verified-needs-review": "Although this user is already verified, they need to be manually reviewed.",
+      "failed-needs-review": "This user could not be verified and needs to be manually reviewed."
+    }
+  },
+  "pinned-notes": {
+    "title": "Pinned notes",
+    "title-by-author": "From {{author}}",
+    "note": "Note",
+    "unpin-button-text": "Unpin note",
+    "sort-ascending": "Show newest first",
+    "sort-descending": "Show oldest first",
+    "carousel-buttons": {
+      "left-aria-label": "Previous note",
+      "right-aria-label": "Next note"
+    },
+    "note-added-by-source": {
+      "firm_employee": "Footprint Risk Ops",
+      "footprint": "Footprint",
+      "api_key": "API key"
+    }
+  },
+  "breadcrumb": {
+    "title": "{{kind}} details breadcrumb",
+    "details": "Details",
+    "business": {
+      "label": "Business",
+      "title": "Businesses"
+    },
+    "person": {
+      "label": "User",
+      "title": "Users"
+    }
+  },
+  "header": {
+    "business": {
+      "title": "Business info"
+    },
+    "person": {
+      "title": "User info"
+    },
+    "watchlist": {
+      "on-watchlist-person": "This user is on a watchlist",
+      "on-watchlist-business": "This business is on a watchlist"
+    },
+    "id-dropdown": {
+      "footprint-id": "Copy FP ID",
+      "sandbox-id": "Copy Sandbox ID",
+      "external-id": "Copy External ID",
+      "copied": "Copied!",
+      "copy-to-clipboard": "Copy to clipboard",
+      "copied-to-clipboard": "copied to clipboard"
+    }
+  },
+  "manual-review-not-allowed": "You're not allowed to manually review users",
+  "fieldset": {
+    "select-all": "Select all",
+    "deselect-all": "Deselect all",
+    "custom": {
+      "see-document": "See document"
+    },
+    "document": {
+      "see-details": "See details",
+      "cannot-edit": "Can't be edited",
+      "close-aria-label": "Close document details",
+      "drawer": {
+        "drivers_license.title": "Driver's license and selfie",
+        "id_card.title": "ID card and selfie",
+        "passport.title": "Passport and selfie",
+        "residence_document.title": "Residence card / Green card and selfie",
+        "permit.title": "Work permit / EAD card and selfie",
+        "visa.title": "Visa and selfie",
+        "voter_identification.title": "Voter identification",
+        "proof_of_address.title": "Proof of Address",
+        "passport_card.title": "Passport card and selfie",
+        "ssn_card.title": "SSN Card",
+        "session-selector": {
+          "title": "Session",
+          "session": "Session"
+        },
+        "document-data": {
+          "title": "Extracted document data",
+          "labels": {
+            "full_name": "Full name",
+            "dob": "Date of birth",
+            "gender": "Gender",
+            "full_address": "Address",
+            "document_number": "Document number",
+            "issued_at": "Issued at",
+            "expires_at": "Expires at",
+            "issuing_country": "Issuing country",
+            "issuing_state": "Issuing state",
+            "ref_number": "Ref number",
+            "document_type": "Classified document type",
+            "nationality": "Nationality",
+            "curp": "CURP"
+          }
+        },
+        "confidence-scores": {
+          "title": "Scores",
+          "labels": {
+            "document": "Document",
+            "extracted-data": "Extracted data",
+            "face-match": "Face match"
+          }
+        },
+        "uploads": {
+          "title": "Uploads",
+          "front": "FRONT",
+          "back": "BACK",
+          "selfie": "Selfie",
+          "doc-viewer": {
+            "expand": "View in full screen"
+          },
+          "success": "successfully uploaded",
+          "failed": "upload failed",
+          "image-alt": "Upload image",
+          "no-uploads": "No images have been uploaded during this session.",
+          "extra-compressed": "We detected the user's internet connection was slow and further compressed the image.",
+          "uploaded-from": "Uploaded via",
+          "upload-source": {
+            "mobile": "mobile",
+            "desktop": "desktop",
+            "api": "API"
+          },
+          "document-types": {
+            "id_card": "ID",
+            "drivers_license": "Driver's License",
+            "passport": "Passport",
+            "residence_document": "Residence card / Green card",
+            "permit": "Work permit / EAD card",
+            "visa": "Visa",
+            "voter_identification": "Voter Identification",
+            "ssn_card": "SSN Card",
+            "lease": "Lease",
+            "bank_statement": "Bank Statement",
+            "utility_bill": "Utility Bill",
+            "proof_of_address": "Proof of Address",
+            "passport_card": "Passport card"
+          },
+          "failure-reasons": {
+            "doc_type_mismatch": "Document type didn't match.",
+            "unknown_document_type": "We couldn't classify this document.",
+            "unsupported_document_type": "The uploaded document type is not supported.",
+            "wrong_document_side": "Wrong side of your document.",
+            "wrong_one_sided_document": "Incorrect document type detected.",
+            "document_not_readable": "Your document could not be read.",
+            "document_glare": "Your document's picture has image glare.",
+            "document_sharpness": "The document image is blurry.",
+            "id_type_not_acceptable": "Invalid document type detected.",
+            "unable_to_align_document": "One or more corners of the document are not within the borders of the image.",
+            "unknown_country_code": "We couldn't detect the issuer country from your document.",
+            "country_code_mismatch": "The issuer country didn't match.",
+            "selfie_face_not_found": "We could not detect a face in the selfie.",
+            "selfie_low_confidence": "We could not verify the selfie.",
+            "selfie_too_dark": "Your image was too dark.",
+            "selfie_glare": "Your selfie had too much glare.",
+            "selfie_has_lenses": "We detected glasses in the selfie.",
+            "selfie_has_face_mask": "We detected a face mask in the selfie.",
+            "selfie_blurry": "Your selfie was too blurry.",
+            "selfie_image_size_unsupported": "Your selfie image was too small.",
+            "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation.",
+            "selfie_bad_image_compression": "Your selfie image has the incorrect image compression.",
+            "drivers_license_permit_not_allowed": "Driver's license permits are not allowed.",
+            "unknown_error": "An error occurred.",
+            "face_not_found": "We could not detect a face in the document provided.",
+            "military_id_not_allowed": "We cannot accept Military IDs per federal law. Please try again with another type of ID."
+          }
+        },
+        "raw-json-data": {
+          "title": "Raw JSON data",
+          "curp-validation-response": "CURP validation response",
+          "json": "JSON"
+        }
+      }
+    },
+    "cards": {
+      "title_other": "({{count}} cards)",
+      "title_one": "",
+      "card-brands": {
+        "visa": "Visa",
+        "mir": "Mir",
+        "master_card": "MasterCard",
+        "amex": "American Express",
+        "diners_club": "Diners Club",
+        "discover": "Discover",
+        "union_pay": "UnionPay",
+        "jcb": "JCB",
+        "visa_electron": "Visa Electron",
+        "maestro": "Maestro",
+        "forbrugsforeningen": "Forbrugsforeningen",
+        "dankort": "Dankort",
+        "unknown": "Unknown"
+      }
+    }
+  },
+  "edit": {
+    "decrypt-first": "Only decrypted data can be edited",
+    "not-allowed": "Can't be edited",
+    "success-toast": {
+      "title": "Success!",
+      "description": "Edit saved."
+    },
+    "error-toast": {
+      "title": "Uh-oh!"
+    },
+    "legal-status": {
+      "legal-status-mapping": {
+        "none": "Select",
+        "citizen": "Citizen",
+        "permanent_resident": "Green Card/permanent resident",
+        "visa": "Visa"
+      },
+      "nationality-mapping": {
+        "none": "Select"
+      },
+      "visa-kind-mapping": {
+        "none": "Select",
+        "e1": "E-1",
+        "e2": "E-2",
+        "e3": "E-3",
+        "f1": "F-1",
+        "g4": "G-4",
+        "h1b": "H-1B",
+        "l1": "L-1",
+        "o1": "O-1",
+        "tn1": "TN-1",
+        "other": "Other"
+      }
+    },
+    "state-mapping": {
+      "none": "Select"
+    },
+    "errors": {
+      "name": {
+        "special-chars": "Cannot contain special characters",
+        "required": "Cannot be empty"
+      },
+      "email": "Cannot be empty",
+      "phone-number": {
+        "required": "Cannot be empty",
+        "pattern": "Must include a '+' and country code (e.g. +1555550100)"
+      },
+      "dob": {
+        "hint": "Must be formatted YYYY-MM-DD",
+        "required": "Cannot be empty",
+        "pattern": "Must be formatted YYYY-MM-DD",
+        "invalid": "Cannot be invalid",
+        "future-date": "Cannot be in the future",
+        "too-young": "Must be at least 18 years old",
+        "too-old": "Cannot be before 1900"
+      },
+      "ssn": {
+        "required": "Cannot be empty",
+        "pattern": "Must be of format 123-45-6789"
+      },
+      "address-line": {
+        "required": "Cannot be empty",
+        "pattern": "Must be a residential address (e.g. cannot be a P.O. Box)"
+      },
+      "country": {
+        "required": "Cannot be empty"
+      },
+      "city": "Cannot be empty",
+      "state": {
+        "required": "Cannot be empty",
+        "should-be-empty": "Please leave blank unless the country is the US"
+      },
+      "zip": {
+        "pattern": "Cannot be invalid",
+        "required": "Cannot be empty"
+      },
+      "nationality": "Cannot be empty",
+      "us-legal-status": "Cannot be empty",
+      "visa-kind": {
+        "required": "Cannot be empty if the legal status is Visa",
+        "should-be-empty": "Please leave blank unless the legal status is Visa"
+      },
+      "visa-expiration": {
+        "hint": "Must be formatted YYYY-MM-DD",
+        "required": "Cannot be empty if the legal status is Visa",
+        "pattern": "Must be formatted YYYY-MM-DD",
+        "should-be-empty": "Please leave blank unless the legal status is Visa",
+        "invalid": "Cannot be invalid date",
+        "invalid-timeframe": "Cannot be invalid date"
+      },
+      "citizenships": {
+        "hint": "List 2-letter country codes separated by commas \n(e.g. 'CA' or 'CA, MX')",
+        "required": "Cannot be empty if the legal status is Green Card or Visa",
+        "should-be-empty": "Please leave blank unless the legal status is Green Card or Visa",
+        "us-citizenship": "If user is a US citizen, select the Citizen legal status option",
+        "invalid": "Invalid country code: {{ countries }}"
+      },
+      "website": {
+        "placeholder": "https://www.acmebank.com",
+        "invalid": "Invalid website URL"
+      },
+      "tin": {
+        "hint": "Cannot contain special characters",
+        "required": "Cannot be empty",
+        "invalid": "Cannot be invalid or contain special characters"
+      }
+    }
+  },
+  "decrypt": {
+    "start": "Decrypt",
+    "start-all": "Decrypt all",
+    "decrypt": "Decrypt",
+    "not-allowed": "You're not allowed to decrypt data",
+    "empty-not-allowed": "Cannot decrypt empty field",
+    "status": {
+      "upload_failed": "Upload failed",
+      "upload_incomplete": "Upload pending",
+      "uploaded_via_api": "Uploaded manually",
+      "pending_machine_review": "Pending",
+      "reviewed_by_machine": "Processed",
+      "pending_human_review": "Review required",
+      "reviewed_by_human": "Reviewed"
+    },
+    "reason-dialog": {
+      "title": "Decrypt data",
+      "description": "Why are you decrypting this data?",
+      "form": {
+        "reason": {
+          "label": "Reason",
+          "placeholder": "Select...",
+          "errors": {
+            "required": "A reason is needed"
+          },
+          "options": {
+            "customer-support-inquiry": "Responding to customer support inquiry",
+            "customer-communication": "Sending communication to customer",
+            "customer-verification": "Verifying customer identity",
+            "auditor-review": "Auditor review",
+            "transation-over-5k": "Transaction over $5k",
+            "change-of-direct-deposit": "Change of direct deposit",
+            "other": "Other"
+          }
+        },
+        "custom-reason": {
+          "placeholder": "Type the reason here...",
+          "errors": {
+            "required": "A reason is needed"
+          }
+        }
+      },
+      "disclaimer": "All data attribute access are logged for security reasons."
+    }
+  },
+  "manual-review": {
+    "status": {
+      "pass": "Pass",
+      "fail": "Fail"
+    },
+    "button": {
+      "review-person": "Review user",
+      "review-business": "Review business",
+      "mark-as-verified": "Mark as Pass",
+      "mark-as-failed": "Mark as Fail"
+    },
+    "dropdown": {
+      "mark-as": "Mark user as {{status}}",
+      "keep-as": "Keep user as {{status}}"
+    },
+    "dialog": {
+      "title": "Review",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "form": {
+        "prompt": "Why are you marking this user as {{status}}?",
+        "placeholder": "Type here...",
+        "disclaimer": "",
+        "note": {
+          "label": "Manual review note",
+          "placeholder": "Your note",
+          "errors": {
+            "required": "A note is required"
+          }
+        },
+        "toggle": {
+          "label": "Toggle"
+        }
+      }
+    },
+    "feedback": {
+      "success": {
+        "title": "Success!",
+        "description": "Review submitted successfully"
+      }
+    }
+  },
+  "actions": {
+    "cta": "Open actions",
+    "groups": {
+      "user-management": "User Management",
+      "user-requests": "User Requests",
+      "internal": "Internal"
+    },
+    "edit-user": {
+      "label": "Edit user information",
+      "not-allowed": "You're not allowed to edit user information"
+    },
+    "edit-tags": {
+      "edit-label": "Edit tags",
+      "add-label": "Add tags",
+      "not-allowed": "You are not allowed to edit tags"
+    },
+    "open-datadog": "Open in Datadog",
+    "summarize": {
+      "label": "Summarize with AI",
+      "title": "Summarize user identity results",
+      "detail": "Using AI, Footprint creates a human-readable summary of the user's verification decision, including manual review annotations, risk signals, rules triggered, authentication events, and timeline attributes.",
+      "generate": "Re-generate summary",
+      "generating-summary": "Generating summary...",
+      "summary": "Summary",
+      "details": "Details",
+      "risk-signal-analysis": "Risk signal analysis",
+      "conclusion": "Conclusion"
+    },
+    "request-more-info": {
+      "label": "Request more information",
+      "title": "Request more information",
+      "not-allowed": "You're not allowed to request additional information",
+      "send-request": "Send request",
+      "next": "Next",
+      "cancel": "Cancel",
+      "form": {
+        "request-variant": {
+          "document": "Ask user to upload documents",
+          "onboard": "Ask user to onboard onto an existing playbook"
+        },
+        "kind": {
+          "placeholder": "Select option",
+          "cannot-request-document": "Cannot request more documents from this user until they onboard onto a playbook",
+          "required-error": {
+            "document": "You must select a document type",
+            "onboard": "You must select a playbook"
+          }
+        },
+        "document": {
+          "title": "Request from user",
+          "id-photo": {
+            "title": "Upload ID photo",
+            "collect-selfie": "Request a selfie"
+          },
+          "proof-of-ssn": {
+            "title": "Proof of SSN"
+          },
+          "proof-of-address": {
+            "title": "Proof of address"
+          },
+          "custom-document": {
+            "title": "Custom document",
+            "add-another": "Add another",
+            "remove": "Remove"
+          }
+        },
+        "onboard": {
+          "title": "Onboard onto a playbook",
+          "use-playbook": "Use playbook",
+          "select-a-playbook": "Select a playbook...",
+          "playbook-required": "Playbook is required"
+        },
+        "note-for-user": {
+          "label": "Note for user (optional)",
+          "placeholder": "We need you to check if there's a typo in the address information you provided..."
+        },
+        "clear-review": "Clear manual review after request"
+      },
+      "link": {
+        "header-generated": "Link generated!",
+        "header-generating": "Generating link...",
+        "share-this-link": "Share this link with the user. They will be asked to log in and securely provide the requested information.",
+        "copy-link": "Copy link",
+        "expires-in": "Link will automatically expire in {{numDays}} days",
+        "send-link-sms": "Send via SMS",
+        "send-link-email": "Send via email",
+        "copied": {
+          "header": "Success!",
+          "description": "Link copied to clipboard"
+        }
+      },
+      "success-toast": {
+        "description-phone": "User will receive an SMS detailing the next steps shortly",
+        "description-email": "User will receive an email detailing the next steps shortly",
+        "title": "Request sent"
+      }
+    },
+    "add-to-list": {
+      "label": "Add to list",
+      "title": "Add to list",
+      "description": "Add, edit, and remove lists from",
+      "not-allowed": "You're not allowed to add entries to lists",
+      "lists": "Lists section",
+      "decrypt-reason": "Decrypting user data to add to list",
+      "form": {
+        "list": {
+          "label": "Available lists",
+          "placeholder": "Select a list...",
+          "errors": {
+            "required": "Please select one list"
+          }
+        },
+        "ip-addresses": {
+          "label": "Available IP addresses"
+        },
+        "save": "Add to list",
+        "cancel": "Cancel"
+      },
+      "success-toast": {
+        "title": "Success!",
+        "description": "Successfully added to list."
+      }
+    },
+    "update-auth-methods": {
+      "label": "Allow updating login methods",
+      "title": "Allowing updating login methods",
+      "header": "Allow user to update authentication methods",
+      "not-allowed": "You are not allowed to perform this action",
+      "share-this-link": "Share this link with the user. They will be asked to log in using one of their current auth methods and then will be able to:",
+      "update-phone": "Update their phone number",
+      "update-email": "Update their email address",
+      "update-passkey": "Update their passkey",
+      "copied": {
+        "header": "Success!",
+        "description": "Link copied to clipboard"
+      },
+      "copy-link": "Copy link",
+      "send-link-sms": "Send via SMS",
+      "send-link-email": "Send via email"
+    },
+    "view-historical-data": {
+      "label": "View historical data",
+      "title": "View historical data",
+      "not-allowed": "You are not allowed to view historical data",
+      "no-events": "This user has no events to select from, so there is no historical data available.",
+      "form": {
+        "heading": "Select event in time",
+        "subheading": "You will see this user's details as they were at that particular moment in time.",
+        "required-error": "Please select an event",
+        "continue": "Continue",
+        "cancel": "Cancel"
+      },
+      "footer": {
+        "viewing": "Viewing user as in: ",
+        "exit": "Exit"
+      }
+    },
+    "share": {
+      "label": "Share"
+    },
+    "send-link": {
+      "header": "Success!",
+      "description": {
+        "phone": "User will receive an SMS detailing the next steps shortly",
+        "email": "User will receive an email detailing the next steps shortly"
+      }
+    },
+    "edit-business": {
+      "label": "Edit business information",
+      "not-allowed": "You're not allowed to edit business information"
+    }
+  },
+  "manual-note-entry-form": {
+    "note": {
+      "label": "Note",
+      "placeholder": "Type here..."
+    },
+    "toggle": {
+      "label": "Pin note to the top of the page"
+    },
+    "disclaimer": "This action will be logged for security reasons."
+  },
+  "risks": {
+    "cta": "See details",
+    "empty-state": "No risk signals",
+    "low_one": "{{count}} <a>Low</a> risk signal",
+    "low_other": "{{count}} <a>Low</a> risk signals",
+    "medium_one": "{{count}} <a>Medium</a> risk signal",
+    "medium_other": "{{count}} <a>Medium</a> risk signals",
+    "high_one": "{{count}} <a>High</a> risk signal",
+    "high_other": "{{count}} <a>High</a> risk signals",
+    "low-medium": "{{mediumCount}} <a>Medium</a> and {{lowCount}} <b>Low</b> risk signals",
+    "low-high": "{{highCount}} <a>High</a> and {{lowCount}} <b>Low</b> risk signals",
+    "medium-high": "{{highCount}} <a>High</a> and {{mediumCount}} <b>Medium</b> risk signals",
+    "low-medium-high": "{{highCount}} <a>High</a>, {{mediumCount}} <b>Medium</b> and {{lowCount}} <c>Low</c> risk signals",
+    "list-dialog": {
+      "title": "Identity data's risk signal",
+      "description": "Select a risk signal"
+    }
+  },
+  "actor": {
+    "footprint": "Footprint",
+    "firm-employee": "Footprint Risk Ops"
+  },
+  "audit-trail": {
+    "title": "Audit trail",
+    "empty": "No entries",
+    "free-form-note": {
+      "add-note-button": {
+        "title": "Add note",
+        "cta-not-allowed": "You're not allowed to add a note"
+      },
+      "dialog": {
+        "title": "Add note",
+        "save": "Save",
+        "cancel": "Cancel",
+        "form": {
+          "prompt": "Why are you marking this user as {{status}}?",
+          "placeholder": "Type your note..."
+        }
+      }
+    },
+    "timeline": {
+      "free-form-note-event": {
+        "note-added-by": "Note added by"
+      },
+      "liveness-event": {
+        "success-title": "Liveness check succeeded",
+        "skipped-title": "Liveness check skipped",
+        "attested-by": "Attested by ",
+        "device-os": "Device & OS: ",
+        "ip-address": "IP address: "
+      },
+      "document-uploaded-event": {
+        "title": {
+          "complete": "Collected ",
+          "success": "Collected ",
+          "pending": "Started collecting ",
+          "failed": "Unable to collect "
+        }
+      },
+      "label-added-event": {
+        "as": "Labeled as",
+        "labels": {
+          "active": "Active",
+          "offboard_fraud": "Offboard (Fraud)",
+          "offboard_other": "Offboard (Other)"
+        }
+      },
+      "data-collected-event": {
+        "title": "Collected",
+        "title-prefill": "Prefilled",
+        "title-from-other-org": "Collected (from other companies) ",
+        "title-edited": " edited",
+        "end-prefill": "from user's existing data in Footprint"
+      },
+      "onboarding-decision-event": {
+        "uploaded-docs": "Finished uploading requested documents",
+        "onboarded-onto": "Onboarded onto <playbook />{{outcome}}",
+        "with-outcome": " with {{ status }} outcome",
+        "decision-status": {
+          "pass": "Pass",
+          "fail": "Fail",
+          "none": "None",
+          "step_up": "Step up required"
+        },
+        "cleared-reviews": {
+          "title": "Manual review cleared by <actor/>"
+        },
+        "human-decision": {
+          "title": "Manually reviewed and marked as {{decision}} by <actor />",
+          "see-details": "See details",
+          "pin-note": "Pin note to the top of the page"
+        },
+        "not-verified-details": {
+          "drawer": {
+            "details-title": "Details",
+            "field-title": "Field validations",
+            "no-data": "Match data not available",
+            "error": "There was an error loading the data. Try again later.",
+            "tabs": {
+              "rules": "Rules",
+              "field-validations": "Field validations"
+            }
+          },
+          "view-details": "View details",
+          "field-validations": {
+            "attributes": {
+              "phone": "Phone number",
+              "name": "Name",
+              "address": "Address",
+              "dob": "Date of birth",
+              "email": "Email",
+              "ssn": "SSN",
+              "document": "Document",
+              "businessName": "Business name",
+              "businessTin": "Business TIN",
+              "businessAddress": "Business address",
+              "businessBeneficialOwners": "Business beneficial owners",
+              "businessPhoneNumber": "Business phone number"
+            },
+            "match-level": {
+              "exact": "Matched",
+              "no_match": "Did not match",
+              "could_not_match": "Could not match",
+              "partial": "Partial match",
+              "verified": "Verified",
+              "not_verified": "Not verified"
+            }
+          }
+        }
+      },
+      "abandoned-event": {
+        "title": {
+          "person": "User dropped off before providing all information.",
+          "business": "All business information was not collected."
+        }
+      },
+      "watchlist-check-event": {
+        "title": "<b>Watchlist</b> check performed",
+        "drawer-title": "Watchlist check performed",
+        "status": {
+          "pass": "User was not found on a watchlist",
+          "fail": "User was found on a watchlist",
+          "not_needed": "Watchlist check was not required for the user",
+          "error": "There was error running this watchlist check"
+        },
+        "previous-checks-button": {
+          "label": "View all checks"
+        },
+        "previous-checks-drawer": {
+          "title": "Watchlist checks"
+        }
+      },
+      "vault-created-event": {
+        "user-created-by": "User created by "
+      },
+      "auth-method-updated": {
+        "user": "User",
+        "action": {
+          "replace": "updated the <b>{{kind}}</b> used as a Footprint login method",
+          "add_primary": "registered <b>{{kind}}</b> as a Footprint login method"
+        },
+        "kind": {
+          "phone": "Phone number",
+          "email": "Email",
+          "passkey": "Passkey"
+        }
+      },
+      "external-integration-called": {
+        "true": "Successfully submitted user to {{kind}} ",
+        "false": "Unsuccessfully submitted user to {{kind}} ",
+        "alpaca_cip": "Alpaca CIP",
+        "uuid": "UUID: "
+      },
+      "workflow-triggered-event": {
+        "user-requested-to": "Requested to {{action}} <playbook /> by <actor />",
+        "actions": {
+          "onboard": "onboard onto",
+          "redo_kyc": "reonboard onto playbook",
+          "id_document": "upload ID photo",
+          "custom_document": "upload {{ docName }}",
+          "proof_of_ssn": "provide proof of SSN",
+          "proof_of_address": "provide proof of address"
+        },
+        "link-generated": "Generated a link for the user to complete this task",
+        "create-link": {
+          "label": "Create new link",
+          "no-permission": "You don't have permissions to generate a new link"
+        },
+        "tooltip": {
+          "copied": "Copied!",
+          "couldnt-copy": "Couldn't copy..."
+        },
+        "playbook": "playbook"
+      },
+      "workflow-started-event": {
+        "started-onboarding-onto": "Started onboarding onto",
+        "started-uploading-document": "Started uploading document"
+      },
+      "step-up-event": {
+        "step-up-required": "<b>Step-up</b> required",
+        "details": {
+          "title": "Details",
+          "view-details": "View details"
+        },
+        "kind": {
+          "document-requested_one": "Document requested: ",
+          "document-requested_other": "Documents requested: ",
+          "identity": "Identity",
+          "proof-of-ssn": "Proof of SSN",
+          "proof-of-address": "Proof of address"
+        }
+      },
+      "rule-set-results": {
+        "onboarding-decision": "Onboarding decision",
+        "is-present": "Rules present",
+        "is-not-present": "Rules not present",
+        "fail": {
+          "title": "Fail"
+        },
+        "manual-review": {
+          "title": "Fail + Manual review"
+        },
+        "step-up": {
+          "title": "Step-up",
+          "step-up-identity-proof-of-ssn": "Identity document and Proof of SSN",
+          "step-up-proof-of-address": "Proof of Address",
+          "step-up-identity": "Identity document"
+        },
+        "pass-with-manual-review": {
+          "title": "Pass + Manual review"
+        },
+        "pass": {
+          "title": "Pass"
+        },
+        "no-rules": "None"
+      }
+    }
+  },
+  "business-insights": {
+    "title": "Business insights",
+    "decrypt": {
+      "message-start": "For security reasons, this section requires you to explicitly",
+      "decrypt-all": "decrypt all",
+      "message-end": "to view these details.",
+      "not-allowed": "You're not allowed to decrypt data"
+    },
+    "tags": {
+      "verified": "Verified",
+      "not-verified": "Not verified",
+      "submitted": "Submitted",
+      "not-submitted": "Not submitted"
+    },
+    "name": {
+      "title": "Business name",
+      "table": {
+        "aria-label": "Business names",
+        "empty-state": "No names",
+        "header": {
+          "name": "Name",
+          "type": "Type",
+          "notes": "Notes"
+        },
+        "source": "Source: {{sources}}",
+        "legal": "Legal",
+        "dba": "Doing business as"
+      }
+    },
+    "details": {
+      "title": "Other business details",
+      "formation-date": "Formation date",
+      "formation-state": "Formation state",
+      "tin": "TIN (EIN)",
+      "entity-type": "Entity type",
+      "phone-number": "Phone number",
+      "website": "Website"
+    },
+    "people": {
+      "title": "People",
+      "table": {
+        "aria-label": "Business people",
+        "empty-state": "No associated people",
+        "header": {
+          "name": "Name",
+          "role": "Role"
+        }
+      }
+    },
+    "sos-filings": {
+      "title": "Secretary of State filings",
+      "status": {
+        "unknown": "Unknown",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "filters": {
+        "trigger": "Filter by state",
+        "title": "Apply filters",
+        "states": {
+          "label": "States"
+        },
+        "reset": "Clear filters",
+        "cta": "Apply"
+      },
+      "table": {
+        "aria-label": "Secretary of State filings",
+        "empty-state": "No filings",
+        "header": {
+          "state": "State",
+          "file-date": "File date",
+          "status": "Status"
+        }
+      },
+      "dialog": {
+        "title": "Secretary of State filing",
+        "status-details": {
+          "title": "Status details",
+          "jurisdiction": "Jurisdiction",
+          "sub-status": "Sub-status"
+        },
+        "entity-details": {
+          "title": "Entity details",
+          "name": "Business name",
+          "entity-type": "Entity type"
+        },
+        "addresses": {
+          "title": "Addresses"
+        },
+        "people": {
+          "title": "People",
+          "agent": "Registered agent"
+        },
+        "filing-details": {
+          "title": "Filing details",
+          "date": "Filed date",
+          "file-number": "File number",
+          "source": "SOS website"
+        }
+      }
+    },
+    "watchlist": {
+      "title": "Watchlist ({{count}})",
+      "select-label": "Hits for {{entity}}",
+      "tags": {
+        "business": "Business",
+        "person": "Person"
+      },
+      "table": {
+        "aria-label": "Watchlist",
+        "empty-state": "No hits found for {{entity}} in KYB response",
+        "empty-state-no-entity": "No hits found in KYB response",
+        "header": {
+          "hits": "Hits",
+          "agency": "Agency",
+          "list": "List",
+          "country": "Country"
+        }
+      }
+    },
+    "offices": {
+      "title": "Offices",
+      "empty": "No data",
+      "notes": "Notes",
+      "usps": "USPS",
+      "deliverable": "Deliverable",
+      "not-deliverable": "Not deliverable"
+    }
+  },
+  "risk-signals": {
+    "title": "Risk signals",
+    "empty-state": "No risk signals found",
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "info": "Info"
+    },
+    "table": {
+      "aria-label": "Risk signals",
+      "empty-state": "No risk signals found",
+      "header": {
+        "severity": "Severity",
+        "scopes": "Scopes",
+        "reason-code": "Reason code"
+      }
+    },
+    "filters": {
+      "severity": {
+        "label": "Severity"
+      },
+      "scope": {
+        "label": "Scope"
+      }
+    },
+    "details": {
+      "overview": {
+        "title": "Overview",
+        "severity": "Severity",
+        "scopes": "Scopes",
+        "description": "Description"
+      },
+      "matches": {
+        "protected-details": {
+          "title": "Protected details",
+          "description": "For security reasons, this section requires you to explicitly decrypt these details.",
+          "no-permission": {
+            "message": "You don't have permission to decrypt this data.",
+            "button": "Contact Admin"
+          },
+          "button": "Decrypt",
+          "error": {
+            "title": "Sorry, something went wrong!",
+            "description": "Decryption failed. Please try again."
+          }
+        },
+        "source-url": {
+          "label": "Source URL",
+          "read-full-report": "Read full match report",
+          "copy": "Copy source url"
+        },
+        "hits": {
+          "show-all": {
+            "label_one": "{{count}} more data match",
+            "label_other": "{{count}} more data matches",
+            "value": "Show all"
+          },
+          "media": "See more",
+          "copy": "Copy source url"
+        },
+        "hits-media": {
+          "drawer-title": "Relevant media",
+          "date": "Date",
+          "title": "Title",
+          "snippet": "Snippet",
+          "url": "Go to article"
+        }
+      }
+    }
+  },
+  "duplicate-data": {
+    "title": "Duplicate accounts",
+    "empty-state": "No duplicate accounts found",
+    "table": {
+      "aria-label": "Duplicate accounts",
+      "empty-state": "No matches in {{orgName}}",
+      "header": {
+        "fp-id": "Footprint ID",
+        "exact-match": "Exact match",
+        "status": "Status",
+        "created-at": "Created at",
+        "name": "Name"
+      }
+    },
+    "dupe-kinds": {
+      "ssn9": "SSN",
+      "email": "Email address",
+      "phone-number": "Phone number",
+      "name-dob": "Name + DOB",
+      "device-id": "Device ID",
+      "cookie-id": "Cookie ID",
+      "name-ssn4": "Name + SSN4",
+      "dob-ssn4": "DOB + SSN4",
+      "bank-routing-account": "Bank Routing + Account Number",
+      "card-number-cvc": "Card Number + CVC"
+    },
+    "other-tenants-summary": {
+      "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",
+      "description-empty-same-tenant": "<strong>{{numMatches}}</strong> matches in <strong>{{numTenants}}</strong> other companies",
+      "tooltip": "For security reasons, we can't show the details of these users"
+    }
+  },
+  "device-insights": {
+    "title": "Device insights",
+    "date-and-time": "Date & time",
+    "ip-address": "IP address",
+    "region": "Region",
+    "auth-method": "Method",
+    "auth-event-kind": {
+      "sms": "Phone OTP",
+      "email": "Email OTP",
+      "passkey": "Passkey",
+      "third-party": "Third party"
+    },
+    "country": "Country",
+    "scope": {
+      "onboarding": "Onboarding",
+      "auth": "Auth",
+      "my1fp": "My One Footprint"
+    },
+    "select": {
+      "placeholder": "Select...",
+      "business-address": "Business address",
+      "residential-address": "Home address"
+    },
+    "empty": {
+      "title": "No device insights",
+      "description": "Please select the device insights type to view them here and on the map"
+    },
+    "address-card": {
+      "cta": {
+        "link": "Decrypt full address",
+        "text": "<link/> to view location on the map"
+      },
+      "business": {
+        "header-text": "Business address"
+      },
+      "residential": {
+        "header-text": "Home address"
+      }
+    },
+    "instant-app": {
+      "label": "Instant App · ",
+      "yes": "Yes",
+      "about": "What's this?",
+      "dialog": {
+        "title": "What's an Instant App?",
+        "content": "Instant Apps deliver a native experience without the need for a full app download, harnessing superior device signal detection for precise identity checks. Unlike web platforms, they offer a swifter and more intuitive ID document flow, ensuring efficient selfie and doc uploads, all while maintaining a consistent and reliable user experience.",
+        "demo": "Here’s a demo so you can try it yourself:",
+        "instructions": "Use your camera app or QR code reader on your phone.",
+        "disclaimer": "This is just a preview and no real data will be collected."
+      }
+    },
+    "app-clip": {
+      "label": "App Clip · ",
+      "yes": "Yes",
+      "about": "What's this?",
+      "dialog": {
+        "title": "What's an App Clip?",
+        "content": "App Clip deliver a native experience without the need for a full app download, harnessing superior device signal detection for precise identity checks. Unlike web platforms, they offer a swifter and more intuitive ID document flow, ensuring efficient selfie and doc uploads, all while maintaining a consistent and reliable user experience.",
+        "demo": "Here’s a demo so you can try it yourself:",
+        "instructions": "Use your camera app or QR code reader on your phone.",
+        "disclaimer": "This is just a preview and no real data will be collected."
+      }
+    },
+    "no-insights": {
+      "title": "No device insights available"
+    }
+  },
+  "truncated-text": {
+    "see-more": "See more",
+    "see-less": "See less"
+  },
+  "historical-kyc-bar": {
+    "title": "Viewing user as in timeline event:",
+    "exit": "Exit"
   }
 }

@@ -35,8 +35,8 @@ const getRawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDa
 };
 
 const RawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDataProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.raw-json-data',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.raw-json-data',
   });
   const rawJsonData = getRawJsonData({
     vault,

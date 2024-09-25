@@ -11,8 +11,8 @@ type RequestDocumentProps = {
 };
 
 const RequestDocument = ({ visible }: RequestDocumentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info.form.document',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info.form.document',
   });
   const { register, watch } = useFormContext();
   const triggerKinds = watch('kinds');

@@ -18,7 +18,8 @@ const StepUpEventHeader = ({ data }: StepUpEventHeaderProps) => {
     <Stack direction="row" align="center" gap={2}>
       <Text variant="body-3">
         <Trans
-          i18nKey="pages.entity.audit-trail.timeline.step-up-event.step-up-required"
+          ns="entity-details"
+          i18nKey="audit-trail.timeline.step-up-event.step-up-required"
           components={{
             b: <Bold />,
           }}

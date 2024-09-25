@@ -15,8 +15,8 @@ export type UploadsProps = {
 };
 
 const Uploads = ({ vault, currentDocument }: UploadsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.uploads',
   });
   const { formatTime } = useIntl();
 

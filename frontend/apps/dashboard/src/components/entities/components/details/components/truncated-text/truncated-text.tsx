@@ -19,8 +19,8 @@ const TruncatedText = ({ text, maxTextViewHeight, textFontVariant, textStyleProp
     text,
     maxTextViewHeight,
   );
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.truncated-text',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'truncated-text',
   });
 
   return (

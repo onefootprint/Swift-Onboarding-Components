@@ -11,8 +11,8 @@ type ConfidenceScoresProps = {
 };
 
 const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.confidence-scores',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.confidence-scores',
   });
 
   const confidenceScores = [document?.documentScore, document?.ocrConfidenceScore, document?.selfieScore];

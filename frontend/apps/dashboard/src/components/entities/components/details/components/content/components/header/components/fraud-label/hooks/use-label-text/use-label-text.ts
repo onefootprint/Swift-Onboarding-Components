@@ -2,7 +2,7 @@ import { EntityLabel } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useLabelText = () => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'header.fraud-label.labels' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header-default.fraud-label.labels' });
 
   return (label: EntityLabel) => {
     if (label === EntityLabel.active) {

@@ -17,7 +17,7 @@ export type InactiveTagsProps = {
 
 const InactiveTags = ({ entityKind, activeTags, onClick }: InactiveTagsProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.edit-tags',
+    keyPrefix: 'header-default.actions.edit-tags',
   });
   const {
     data: { org },

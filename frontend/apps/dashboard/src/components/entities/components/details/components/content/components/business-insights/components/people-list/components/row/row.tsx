@@ -10,8 +10,8 @@ type RowProps = {
 };
 
 const Row = ({ person }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
   const { name, role, submitted, associationVerified, sources } = person;
 

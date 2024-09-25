@@ -16,7 +16,7 @@ export type ActiveTagsProps = {
 
 const ActiveTags = ({ activeTags, isAddingTag, onRemove, onRemoveNew, onAddNew }: ActiveTagsProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.edit-tags',
+    keyPrefix: 'header-default.actions.edit-tags',
   });
 
   return (

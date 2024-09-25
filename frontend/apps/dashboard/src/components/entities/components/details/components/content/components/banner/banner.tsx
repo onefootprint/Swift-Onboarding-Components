@@ -12,7 +12,7 @@ type BannerProps = WithEntityProps & {
 };
 
 const Banner = ({ entity, isDisabled }: BannerProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.banner' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'banner' });
 
   const handleClick = () => {
     const auditTrail = document.getElementById(AUDIT_TRAILS_ID);

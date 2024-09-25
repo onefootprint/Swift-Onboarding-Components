@@ -14,7 +14,7 @@ export type FieldValueProps = {
 };
 
 const FieldValue = ({ field, renderValue }: FieldValueProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'edit' });
   const { value, showEditView, canEdit, isDecrypted, name: di, transforms } = field;
   const name = di as string;
 

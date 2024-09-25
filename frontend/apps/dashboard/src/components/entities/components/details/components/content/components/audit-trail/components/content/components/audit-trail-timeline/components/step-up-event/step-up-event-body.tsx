@@ -11,8 +11,8 @@ type StepUpEventBodyProps = {
 };
 
 const StepUpEventBody = ({ data }: StepUpEventBodyProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.step-up-event.kind',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.step-up-event.kind',
   });
   const documents = data.map(document => t(`${kebabCase(document.kind)}` as ParseKeys<'common'>)).join(', ');
 

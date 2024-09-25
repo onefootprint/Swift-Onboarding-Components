@@ -14,8 +14,8 @@ type AnnotationNoteProps = {
 const DEFAULT_TEXT_VIEW_HEIGHT = 90;
 
 const AnnotationNote = ({ annotation, hidePinToggle }: AnnotationNoteProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event',
   });
   const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
   const updateMutation = useCurrentEntityUpdateAnnotation();

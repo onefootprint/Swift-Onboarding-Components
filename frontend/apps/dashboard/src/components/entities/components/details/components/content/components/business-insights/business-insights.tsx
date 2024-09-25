@@ -21,8 +21,8 @@ import Decrypt from './components/decrypt';
 export type BusinessInsightsProps = WithEntityProps;
 
 const BusinessInsights = ({ entity }: BusinessInsightsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
   const entityId = useEntityId();
   const { data: vaultData } = useEntityVault(entityId, entity);

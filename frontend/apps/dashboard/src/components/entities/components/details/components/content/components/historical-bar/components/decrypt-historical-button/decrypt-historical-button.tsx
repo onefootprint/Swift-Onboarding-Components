@@ -11,6 +11,7 @@ export type DecryptHistoricalProps = WithEntityProps;
 
 const DecryptHistoricalButton = ({ entity }: DecryptHistoricalProps) => {
   const { t } = useTranslation('common');
+  const { t: entityT } = useTranslation('entity-details');
   const decryptControls = useDecryptControls();
   const canDecrypt = !!entity.decryptableAttributes.length;
   const { data, update: updateVault } = useEntityVault(entity.id, entity);
@@ -26,18 +27,18 @@ const DecryptHistoricalButton = ({ entity }: DecryptHistoricalProps) => {
     <>
       {decryptControls.isIdle && (
         <Stack gap={3} align="center">
-          <Tooltip disabled={canDecrypt} text={t('pages.entity.decrypt.not-allowed')}>
+          <Tooltip disabled={canDecrypt} text={entityT('decrypt.not-allowed')}>
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
               options={[
                 {
-                  label: t('pages.entity.decrypt.start'),
+                  label: entityT('decrypt.start'),
                   value: 'start',
                   onSelect: decryptControls.start,
                 },
                 {
-                  label: t('pages.entity.decrypt.start-all'),
+                  label: entityT('decrypt.start-all'),
                   value: 'start-all',
                   onSelect: () => {
                     if (entityVault) {

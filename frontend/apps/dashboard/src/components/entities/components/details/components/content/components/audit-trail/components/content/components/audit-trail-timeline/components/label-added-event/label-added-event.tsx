@@ -9,8 +9,8 @@ type LabelAddedEventProps = {
 };
 
 const LabelAddedEvent = ({ data: { kind } }: LabelAddedEventProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.label-added-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.label-added-event',
   });
 
   return (

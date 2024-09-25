@@ -21,8 +21,8 @@ type HistoricalBarProps = WithEntityProps & {
 };
 
 const HistoricalBar = ({ entity, seqno }: HistoricalBarProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.historical-kyc-bar',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'historical-kyc-bar',
   });
   const id = useEntityId();
   const router = useRouter();

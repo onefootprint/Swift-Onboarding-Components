@@ -13,8 +13,8 @@ export type RuleListProps = {
 };
 
 const RuleList = ({ rules, stepUpAction }: RuleListProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.rule-set-results',
   });
   const actionName = kebabCase(stepUpAction);
 

@@ -38,7 +38,7 @@ const uploadDoc = async (authHeaders: AuthHeaders, { entityId, identifier, file 
 
 const useUploadDoc = () => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.upload-doc',
+    keyPrefix: 'header-default.actions.upload-doc',
   });
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();

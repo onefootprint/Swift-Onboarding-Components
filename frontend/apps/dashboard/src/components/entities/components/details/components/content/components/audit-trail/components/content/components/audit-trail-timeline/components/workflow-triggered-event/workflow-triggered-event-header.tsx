@@ -19,7 +19,8 @@ const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProp
     <>
       <Text variant="body-3" color="tertiary" display="flex" gap={2}>
         <Trans
-          i18nKey="pages.entity.audit-trail.timeline.workflow-triggered-event.user-requested-to"
+          ns="entity-details"
+          i18nKey="audit-trail.timeline.workflow-triggered-event.user-requested-to"
           values={{ action }}
           components={{
             playbook: <PlaybookContext data={data} />,
@@ -32,8 +33,8 @@ const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProp
 };
 
 const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.workflow-triggered-event',
   });
 
   const playbookId = data.config.kind === TriggerKind.Onboard ? data.config.data.playbookId : '';

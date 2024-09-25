@@ -14,8 +14,8 @@ type HitItemRowProps = {
 };
 
 const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlMedia }: HitItemRowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.details.matches.hits',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.details.matches.hits',
   });
 
   const renderMatchTypes = (matchTypes: string[]) => matchTypes.map((str: string) => toReadableString(str)).join(', ');

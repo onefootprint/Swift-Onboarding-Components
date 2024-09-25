@@ -17,8 +17,8 @@ export type ViewHistoricalDataDialogProps = {
 };
 
 const ViewHistoricalDataDialog = ({ open, onClose }: ViewHistoricalDataDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.view-historical-data',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.view-historical-data',
   });
   const router = useRouter();
   const entityId = useEntityId();

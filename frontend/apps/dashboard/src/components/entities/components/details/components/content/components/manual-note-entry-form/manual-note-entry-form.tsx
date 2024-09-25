@@ -19,8 +19,8 @@ type ManualNoteEntryFormProps = {
 };
 
 const ManualNoteEntryForm = ({ formId, prompt, placeholder, onSubmit, frequentNoteKind }: ManualNoteEntryFormProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.manual-note-entry-form',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'manual-note-entry-form',
   });
   const methods = useForm<ManualNoteFormData>({
     defaultValues: { note: '', isPinned: false },

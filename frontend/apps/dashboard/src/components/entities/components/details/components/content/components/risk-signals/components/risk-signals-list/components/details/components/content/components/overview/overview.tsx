@@ -17,9 +17,10 @@ type OverviewProps = {
 };
 
 const Overview = ({ description, scopes, severity }: OverviewProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('entity-details');
+  const { t: allT } = useTranslation('common');
   const uniqueScopes = Array.from(new Set(scopes));
-  const scopesList = uniqueScopes.map(scope => t(`signal-attributes.${scope}` as ParseKeys<'common'>));
+  const scopesList = uniqueScopes.map(scope => allT(`signal-attributes.${scope}` as ParseKeys<'common'>));
 
   const overviewRef = useRef<HTMLDivElement>(null);
   useEffectOnce(() => {
@@ -29,18 +30,16 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
   return (
     <OverviewSection ref={overviewRef}>
       <Header>
-        <Text variant="label-2">{t('pages.entity.risk-signals.details.overview.title')}</Text>
+        <Text variant="label-2">{t('risk-signals.details.overview.title')}</Text>
       </Header>
       <Fieldset>
         <Grid.Container columns={['1fr', '1fr']} gap={5}>
-          <Field label={t('pages.entity.risk-signals.details.overview.severity')}>
+          <Field label={t('risk-signals.details.overview.severity')}>
             <SeverityBadge severity={severity} />
           </Field>
-          <Field label={t('pages.entity.risk-signals.details.overview.scopes')}>
-            {createCapitalStringList(scopesList)}
-          </Field>
+          <Field label={t('risk-signals.details.overview.scopes')}>{createCapitalStringList(scopesList)}</Field>
         </Grid.Container>
-        <Field label={t('pages.entity.risk-signals.details.overview.description')}>{description}</Field>
+        <Field label={t('risk-signals.details.overview.description')}>{description}</Field>
       </Fieldset>
     </OverviewSection>
   );

@@ -16,7 +16,7 @@ export type UploadDocFormProps = {
 
 const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.upload-doc',
+    keyPrefix: 'header-default.actions.upload-doc',
   });
   const [doc, setDoc] = useState<{ file: File; url: string } | null>(null);
   const inputFileRef = useRef<HTMLInputElement>(null);

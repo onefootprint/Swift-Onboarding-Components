@@ -17,8 +17,8 @@ type UseDisplayLinkDialogProps = {
 const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) => {
   const sendLinkMutation = useSendTokenLinkMutation();
   const toast = useToast();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info',
   });
   const entityId = useEntityId();
   const userHasPhone = useEntity(entityId).data?.attributes?.includes(IdDI.phoneNumber);

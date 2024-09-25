@@ -8,8 +8,8 @@ export type AbandonedEventHeaderProps = {
 };
 
 const AbandonedEventHeader = ({ entity }: AbandonedEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.abandoned-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.abandoned-event',
   });
 
   return (

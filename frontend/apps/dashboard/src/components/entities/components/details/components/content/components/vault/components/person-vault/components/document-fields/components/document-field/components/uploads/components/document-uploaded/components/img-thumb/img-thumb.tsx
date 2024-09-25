@@ -10,8 +10,8 @@ type ImgThumbProps = {
 };
 
 const ImgThumb = ({ src, isSuccess }: ImgThumbProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.uploads',
   });
   return (
     <Box position="relative" width="80%">

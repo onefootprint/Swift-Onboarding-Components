@@ -11,8 +11,8 @@ type DataCollectedEventHeaderProps = {
 };
 
 const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.data-collected-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.data-collected-event',
   });
   const { attributes } = data;
 

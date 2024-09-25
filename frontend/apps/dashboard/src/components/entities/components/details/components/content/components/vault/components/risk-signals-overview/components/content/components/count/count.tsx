@@ -10,7 +10,7 @@ export type CountProps = {
 };
 
 const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.risks' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'risks' });
   const hasHighRisks = high.length > 0;
   const hasMediumRisks = medium.length > 0;
   const hasLowRisks = low.length > 0;
@@ -21,7 +21,12 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
   if (hasOnlyLowRisks) {
     return (
       <Text variant="label-3">
-        <Trans components={{ a: <Intensity data-level="low" /> }} count={low.length} i18nKey="pages.entity.risks.low" />
+        <Trans
+          ns="entity-details"
+          components={{ a: <Intensity data-level="low" /> }}
+          count={low.length}
+          i18nKey="risks.low"
+        />
       </Text>
     );
   }
@@ -30,9 +35,10 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{ a: <Intensity data-level="medium" /> }}
           count={medium.length}
-          i18nKey="pages.entity.risks.medium"
+          i18nKey="risks.medium"
         />
       </Text>
     );
@@ -42,9 +48,10 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{ a: <Intensity data-level="high" /> }}
           count={high.length}
-          i18nKey="pages.entity.risks.high"
+          i18nKey="risks.high"
         />
       </Text>
     );
@@ -54,13 +61,14 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{
             a: <Intensity data-level="high" />,
             b: <Intensity data-level="medium" />,
             c: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.entity.risks.low-medium-high"
+          i18nKey="risks.low-medium-high"
           values={{
             lowCount: low.length,
             mediumCount: medium.length,
@@ -75,12 +83,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{
             a: <Intensity data-level="medium" />,
             b: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.entity.risks.low-medium"
+          i18nKey="risks.low-medium"
           values={{ lowCount: low.length, mediumCount: medium.length }}
         />
       </Text>
@@ -91,12 +100,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{
             a: <Intensity data-level="medium" />,
             b: <Intensity data-level="low" />,
           }}
           count={high.length}
-          i18nKey="pages.entity.risks.low-high"
+          i18nKey="risks.low-high"
           values={{ lowCount: low.length, highCount: high.length }}
         />
       </Text>
@@ -107,12 +117,13 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
     return (
       <Text variant="label-3">
         <Trans
+          ns="entity-details"
           components={{
             a: <Intensity data-level="high" />,
             b: <Intensity data-level="medium" />,
           }}
           count={high.length}
-          i18nKey="pages.entity.risks.medium-high"
+          i18nKey="risks.medium-high"
           values={{ mediumCount: medium.length, highCount: high.length }}
         />
       </Text>

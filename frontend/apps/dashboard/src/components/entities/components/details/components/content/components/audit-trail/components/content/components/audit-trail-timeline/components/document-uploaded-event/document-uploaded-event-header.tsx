@@ -10,11 +10,14 @@ type DocumentUploadedEventHeaderProps = {
 
 const DocumentUploadedEventHeader = ({ data }: DocumentUploadedEventHeaderProps) => {
   const { t } = useTranslation('common');
+  const { t: entityT } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.document-uploaded-event',
+  });
 
   const statusT: Record<IdDocStatus, string> = {
-    [IdDocStatus.complete]: t('pages.entity.audit-trail.timeline.document-uploaded-event.title.complete'),
-    [IdDocStatus.pending]: t('pages.entity.audit-trail.timeline.document-uploaded-event.title.pending'),
-    [IdDocStatus.failed]: t('pages.entity.audit-trail.timeline.document-uploaded-event.title.failed'),
+    [IdDocStatus.complete]: entityT('title.complete'),
+    [IdDocStatus.pending]: entityT('title.pending'),
+    [IdDocStatus.failed]: entityT('title.failed'),
   };
 
   let documentType;

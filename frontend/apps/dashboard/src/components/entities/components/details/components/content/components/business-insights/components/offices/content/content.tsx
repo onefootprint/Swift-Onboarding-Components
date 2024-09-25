@@ -16,8 +16,8 @@ export type OfficesProps = {
 };
 
 const Content = ({ data }: OfficesProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.offices',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.offices',
   });
   const [detailsHidden, setDetailsHidden] = useState(false);
   const dataWithCoordinates = data.map(address => {

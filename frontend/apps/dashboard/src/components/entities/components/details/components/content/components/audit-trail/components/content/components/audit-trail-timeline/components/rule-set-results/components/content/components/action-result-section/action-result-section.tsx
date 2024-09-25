@@ -15,8 +15,8 @@ export type ActionResultSectionProps = {
 };
 
 const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.rule-set-results',
   });
   const [isOpen, setIsOpen] = useState(false);
   const [selectedResultGroup, setSelectedResultGroup] = useState<RuleResultGroup>(RuleResultGroup.isPresent);

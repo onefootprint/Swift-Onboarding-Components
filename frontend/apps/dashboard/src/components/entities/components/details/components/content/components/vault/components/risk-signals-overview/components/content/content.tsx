@@ -13,7 +13,7 @@ export type ContentProps = {
 };
 
 const Content = ({ high, medium, low }: ContentProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.risks' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'risks' });
   const hasAnyRisk = high.length > 0 || medium.length > 0 || low.length > 0;
 
   return (

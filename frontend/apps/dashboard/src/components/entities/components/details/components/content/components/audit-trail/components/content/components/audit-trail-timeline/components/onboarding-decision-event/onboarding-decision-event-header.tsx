@@ -14,8 +14,8 @@ type OnboardingDecisionEventHeaderProps = {
 };
 
 const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event',
   });
   const {
     decision: { workflowKind, source, status, obConfiguration: playbook, ruleSetResultId, clearedManualReviews },
@@ -61,7 +61,8 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
         <Stack align="center" testID="onboarding-decision-event-header">
           <Text variant="label-3" color={color} display="flex" gap={2} whiteSpace="nowrap">
             <Trans
-              i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.onboarded-onto"
+              ns="entity-details"
+              i18nKey="audit-trail.timeline.onboarding-decision-event.onboarded-onto"
               values={{ outcome }}
               components={{
                 playbook: <PlaybookLink playbook={playbook} />,
@@ -82,7 +83,8 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
         <Stack align="center" testID="onboarding-decision-event-header">
           <Text variant="body-3" color="tertiary">
             <Trans
-              i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.cleared-reviews.title"
+              ns="entity-details"
+              i18nKey="audit-trail.timeline.onboarding-decision-event.cleared-reviews.title"
               components={{
                 actor: <Actor actor={source} />,
               }}
@@ -98,7 +100,8 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
       <Stack align="center" testID="onboarding-decision-event-header">
         <Text variant="label-3" color={color}>
           <Trans
-            i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.human-decision.title"
+            ns="entity-details"
+            i18nKey="audit-trail.timeline.onboarding-decision-event.human-decision.title"
             values={{ decision: statusToText[status] }}
             components={{
               actor: <Actor actor={source} />,

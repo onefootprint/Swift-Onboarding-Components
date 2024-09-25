@@ -22,8 +22,8 @@ const DocStatusToUIState: Record<DocumentStatus, keyof UIStates> = {
 };
 
 const DocumentStatusBadge = ({ documents, documentType }: DocumentBadgeStatusProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.decrypt.status',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'decrypt.status',
   });
   const status = getDocumentStatus({ documents, documentType });
 

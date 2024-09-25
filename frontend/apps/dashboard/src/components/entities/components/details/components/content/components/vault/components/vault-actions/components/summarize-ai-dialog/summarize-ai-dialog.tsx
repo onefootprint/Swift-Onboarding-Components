@@ -17,8 +17,8 @@ export type SummarizeAiDialogProps = {
 };
 
 const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.summarize',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.summarize',
   });
   const generateSummaryMutation = useGenerateAiSummaryRequest();
   const showRequestErrorToast = useRequestErrorToast();

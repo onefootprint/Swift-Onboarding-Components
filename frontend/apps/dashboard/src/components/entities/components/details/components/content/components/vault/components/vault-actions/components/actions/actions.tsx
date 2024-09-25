@@ -32,9 +32,9 @@ enum ActionDialog {
 const DROPDOWN_ITEM_HEIGHT = '32px';
 
 const Actions = ({ entity }: WithEntityProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actions' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'actions' });
   const { t: newT } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions',
+    keyPrefix: 'header-default.actions',
   });
   const editControls = useEditControls();
   const { data: tags } = useTags(entity.id);

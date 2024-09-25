@@ -12,8 +12,8 @@ type SOSFilingsProps = {
 };
 
 const SOSFilings = ({ data, onOpen }: SOSFilingsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.sos-filings.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.sos-filings.table',
   });
   const filters = useSOSFilingsFilters();
   const stateFilterOptions = [

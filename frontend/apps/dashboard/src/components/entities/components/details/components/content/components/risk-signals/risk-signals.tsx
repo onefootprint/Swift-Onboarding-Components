@@ -5,8 +5,8 @@ import Section from '../section';
 import RiskSignalsList from './components/risk-signals-list';
 
 const RiskSignals = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals',
   });
 
   return (

@@ -20,8 +20,8 @@ const jsonKindToTranslationKey: Record<RawJsonKinds, string> = {
 };
 
 const CollapsibleSection = ({ rawJsonKind, rawJsonData }: CollapsibleSectionProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document.drawer.raw-json-data',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document.drawer.raw-json-data',
   });
   const [open, setOpen] = useState(false);
 

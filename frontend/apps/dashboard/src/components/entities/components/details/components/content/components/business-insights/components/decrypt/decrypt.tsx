@@ -8,8 +8,8 @@ type DecryptProps = {
 };
 
 const Decrypt = ({ canDecrypt }: DecryptProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.decrypt',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.decrypt',
   });
   const decryptControls = useDecryptControls();
 

@@ -8,8 +8,8 @@ type PersonListProps = {
 };
 
 const PersonList = ({ data }: PersonListProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.people.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.people.table',
   });
 
   const columns = [

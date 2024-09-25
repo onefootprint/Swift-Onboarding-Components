@@ -16,8 +16,8 @@ export type PinnedNoteProps = {
 const DEFAULT_TEXT_VIEW_HEIGHT = 60;
 
 const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.pinned-notes',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'pinned-notes',
   });
   const updateMutation = useCurrentEntityUpdateAnnotation();
 

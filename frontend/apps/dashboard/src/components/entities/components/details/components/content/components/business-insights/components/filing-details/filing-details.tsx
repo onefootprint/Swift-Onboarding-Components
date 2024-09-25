@@ -13,8 +13,8 @@ export type FilingDetailsProps = {
 };
 
 const FilingDetails = ({ filing, onClose }: FilingDetailsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.sos-filings',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.sos-filings',
   });
   const statusT = useFilingStatusText();
   const {

@@ -9,7 +9,7 @@ import type { EditSubmitData } from '../../../../vault.types';
 import useEditFields from './hooks/use-edit-fields';
 
 const useEditControls = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'edit' });
   const [state, send] = useEditMachine();
   const { context } = state;
   const editFields = useEditFields();

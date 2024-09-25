@@ -12,8 +12,8 @@ type DetailsProps = {
 };
 
 const Details = ({ ruleSetResultId }: DetailsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.step-up-event.details',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.step-up-event.details',
   });
   const entityId = useEntityId();
   const [isDrawerOpen, setDrawerOpen] = useState(false);

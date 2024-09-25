@@ -14,8 +14,8 @@ type CustomDocumentFieldProps = {
 };
 
 const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.custom',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.custom',
   });
   const [isDocOpen, setIsDocOpen] = useState(false);
   const { value } = useField(entity)(field.di);

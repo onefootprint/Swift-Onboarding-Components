@@ -14,6 +14,7 @@ import useRiskSignalDetails from './hooks/use-risk-signal-details';
 
 const Details = () => {
   const { t } = useTranslation();
+  const { t: entityT } = useTranslation('entity-details');
   const { query, clear } = useRiskSignalsFilters();
   const isOpen = !!query.risk_signal_id;
   const { data, isPending, error } = useRiskSignalDetails(query.risk_signal_id);
@@ -24,7 +25,7 @@ const Details = () => {
       if (data.scopes?.length) {
         const scopesTitle = createCapitalStringList(data.scopes);
         return amlMedia.length
-          ? `${t('pages.entity.risk-signals.details.matches.hits-media.drawer-title')} • ${scopesTitle}`
+          ? `${entityT('risk-signals.details.matches.hits-media.drawer-title')} • ${scopesTitle}`
           : scopesTitle;
       }
       return data.note;

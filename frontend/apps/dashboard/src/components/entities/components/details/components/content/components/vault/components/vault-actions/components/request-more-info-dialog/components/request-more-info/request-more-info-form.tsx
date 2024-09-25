@@ -21,8 +21,8 @@ type RequestMoreInfoFormProps = {
 };
 
 const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info.form',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info.form',
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);

@@ -15,8 +15,8 @@ export type ExtractedDocumentDataProps = {
 };
 
 const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: ExtractedDocumentDataProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document',
   });
   const relevantKeys = getRelevantKeys({
     vault,

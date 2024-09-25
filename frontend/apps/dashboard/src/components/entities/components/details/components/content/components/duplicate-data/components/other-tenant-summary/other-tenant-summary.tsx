@@ -10,8 +10,8 @@ type OtherTenantSummaryProps = {
 };
 
 const OtherTenantSummary = ({ isSameTenantDataEmpty, summary }: OtherTenantSummaryProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.duplicate-data.other-tenants-summary',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'duplicate-data.other-tenants-summary',
   });
   const { numMatches, numTenants } = summary;
 
@@ -30,10 +30,11 @@ const OtherTenantSummary = ({ isSameTenantDataEmpty, summary }: OtherTenantSumma
       </Box>
       <Text variant="body-3" testID="other-tenant-summary">
         <Trans
+          ns="entity-details"
           i18nKey={
             isSameTenantDataEmpty
-              ? 'pages.entity.duplicate-data.other-tenants-summary.description-empty-same-tenant'
-              : 'pages.entity.duplicate-data.other-tenants-summary.description'
+              ? 'duplicate-data.other-tenants-summary.description-empty-same-tenant'
+              : 'duplicate-data.other-tenants-summary.description'
           }
           values={{
             numMatches,

@@ -21,8 +21,8 @@ type CustomDataFieldsProps = WithEntityProps & {
 };
 
 const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: CustomDataFieldsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset',
   });
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();

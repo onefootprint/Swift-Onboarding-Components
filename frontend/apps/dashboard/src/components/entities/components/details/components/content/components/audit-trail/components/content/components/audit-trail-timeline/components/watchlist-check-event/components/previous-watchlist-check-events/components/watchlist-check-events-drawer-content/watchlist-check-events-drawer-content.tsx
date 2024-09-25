@@ -11,8 +11,8 @@ type WatchlistCheckEventsDrawerContentProp = {
 };
 
 const WatchlistCheckEventsDrawerContent = ({ data }: WatchlistCheckEventsDrawerContentProp) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.watchlist-check-event',
   });
   const timelineItems = data.map(event => {
     const { watchlistEvent, timestamp } = event;

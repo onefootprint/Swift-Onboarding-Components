@@ -14,8 +14,8 @@ import Filters from './components/filters';
 import Row from './components/row';
 
 const RiskSignalsList = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.table',
   });
   const isViewingHistorical = !!useEntitySeqno();
   const { isPending, error, data } = useCurrentEntityRiskSignals();

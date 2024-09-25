@@ -22,8 +22,8 @@ type InsightEventCardProps = {
 };
 
 const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCardProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.device-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'device-insights',
   });
   const context = useEntityContext();
   const { formatDateWithTime } = useIntl();

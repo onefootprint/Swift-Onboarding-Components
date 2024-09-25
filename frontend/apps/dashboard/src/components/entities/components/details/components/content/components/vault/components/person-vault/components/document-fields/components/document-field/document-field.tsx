@@ -21,8 +21,8 @@ export type DocumentFieldProps = {
 };
 
 const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset.document',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset.document',
   });
   const [isDrawerOpen, show, hide] = useToggle(false);
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(

@@ -15,8 +15,8 @@ export type MultiSelectOption = {
 };
 
 const useMultiSelectOptions = (entity: Entity, livenessData: AuthEvent[]) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.device-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'device-insights',
   });
 
   const allOptions: MultiSelectOption[] = [];

@@ -6,6 +6,7 @@ import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
 const RiskSignalsFilters = () => {
   const { t } = useTranslation('common');
+  const { t: entityT } = useTranslation('entity-details');
   const filters = useRiskSignalsFilters();
 
   return (
@@ -13,23 +14,23 @@ const RiskSignalsFilters = () => {
       controls={[
         {
           query: 'risk_signal_severity',
-          label: t('pages.entity.risk-signals.filters.severity.label'),
+          label: entityT('risk-signals.filters.severity.label'),
           kind: 'multi-select',
           options: [
             {
-              label: t('pages.entity.risk-signals.severity.high'),
+              label: entityT('risk-signals.severity.high'),
               value: 'high',
             },
             {
-              label: t('pages.entity.risk-signals.severity.medium'),
+              label: entityT('risk-signals.severity.medium'),
               value: 'medium',
             },
             {
-              label: t('pages.entity.risk-signals.severity.low'),
+              label: entityT('risk-signals.severity.low'),
               value: 'low',
             },
             {
-              label: t('pages.entity.risk-signals.severity.info'),
+              label: entityT('risk-signals.severity.info'),
               value: 'info',
             },
           ],
@@ -37,7 +38,7 @@ const RiskSignalsFilters = () => {
         },
         {
           query: 'risk_signal_scope',
-          label: t('pages.entity.risk-signals.filters.scope.label'),
+          label: entityT('risk-signals.filters.scope.label'),
           kind: 'multi-select',
           options: [
             {

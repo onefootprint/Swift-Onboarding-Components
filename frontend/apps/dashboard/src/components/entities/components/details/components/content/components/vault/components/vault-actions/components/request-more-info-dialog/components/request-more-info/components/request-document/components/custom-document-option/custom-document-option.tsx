@@ -10,8 +10,8 @@ import CustomDocRequestForm from 'src/components/custom-doc-request-form';
 import { RequestMoreInfoKind } from '../../../../types';
 
 const CustomDocumentOption = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info.form.document.custom-document',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info.form.document.custom-document',
   });
   const { register, watch, control, unregister, trigger } = useFormContext();
   const {

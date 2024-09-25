@@ -10,8 +10,8 @@ import Content from './components/content';
 export type ContentProps = WithEntityProps;
 
 const DeviceInsights = ({ entity }: ContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.device-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'device-insights',
   });
   const { error, data, isSuccess } = useCurrentEntityAuthEvents();
 

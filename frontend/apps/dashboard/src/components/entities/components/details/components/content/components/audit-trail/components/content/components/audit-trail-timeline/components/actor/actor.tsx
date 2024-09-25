@@ -9,7 +9,7 @@ type ActorProps = {
 };
 
 const Actor = ({ actor }: ActorProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actor' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'actor' });
 
   return (
     <Container>

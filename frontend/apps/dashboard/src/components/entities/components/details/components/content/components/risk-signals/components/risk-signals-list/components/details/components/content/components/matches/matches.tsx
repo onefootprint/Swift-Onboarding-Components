@@ -16,8 +16,8 @@ type MatchesProps = {
 };
 
 const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.details.matches',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.details.matches',
   });
   const cachedAmlHit = useCachedRiskSignalAmlHint(riskSignalId);
   const decryptMutation = useRiskSignalAmlHits();

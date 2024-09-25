@@ -9,8 +9,8 @@ import AddFreeFormNote from './components/add-free-form-note';
 import Content from './components/content';
 
 const AuditTrail = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail',
   });
   const { data, error } = useCurrentEntityTimeline();
 

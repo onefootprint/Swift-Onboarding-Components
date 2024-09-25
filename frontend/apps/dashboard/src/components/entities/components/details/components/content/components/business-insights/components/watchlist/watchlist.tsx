@@ -9,8 +9,8 @@ type WatchlistProps = {
 };
 
 const Watchlist = ({ data }: WatchlistProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.watchlist',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.watchlist',
   });
   const { watchlist } = data;
   const defaultSelection = Object.entries(watchlist).length ? Object.entries(watchlist)[0][0] : undefined;

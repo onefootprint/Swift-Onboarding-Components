@@ -12,8 +12,8 @@ type SendLinkMutationProps = {
 };
 
 const useSendTokenLinkMutation = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.send-link',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.send-link',
   });
   const generateTokenMutation = useGenerateTokenRequest();
   const showRequestErrorToast = useRequestErrorToast();

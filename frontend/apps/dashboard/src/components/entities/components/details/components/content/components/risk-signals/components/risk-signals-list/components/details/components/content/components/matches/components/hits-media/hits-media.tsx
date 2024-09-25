@@ -15,8 +15,8 @@ type HitsMediaProps = {
 };
 
 const HitsMedia = ({ mediaList }: HitsMediaProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.details.matches.hits-media',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.details.matches.hits-media',
   });
   const { formatDateWithShortMonth } = useIntl();
 

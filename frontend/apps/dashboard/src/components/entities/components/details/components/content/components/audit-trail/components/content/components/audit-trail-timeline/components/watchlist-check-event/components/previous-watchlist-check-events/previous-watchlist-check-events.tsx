@@ -11,8 +11,8 @@ type PreviousWatchlistCheckEventsProps = {
 };
 
 const PreviousWatchlistCheckEvents = ({ data }: PreviousWatchlistCheckEventsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.watchlist-check-event',
   });
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const hasPreviousWatchlistChecks = data.length > 0;

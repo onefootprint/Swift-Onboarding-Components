@@ -10,7 +10,7 @@ import useEditLabel from './hooks/use-edit-label';
 import useLabelText from './hooks/use-label-text';
 
 const FraudLabel = () => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'header.fraud-label' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header-default.fraud-label' });
   const labelT = useLabelText();
   const entityId = useEntityId();
   const { data: label, isPending, error } = useLabel(entityId);

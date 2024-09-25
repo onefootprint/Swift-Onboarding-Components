@@ -12,8 +12,8 @@ type RowProps = {
 };
 
 const Row = ({ businessName, onOpen }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
   const kindT = useBusinessNameKindText();
   const { name, sources, sourceSOSFilingId, submitted, verified, kind, notes } = businessName;

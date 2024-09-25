@@ -3,8 +3,8 @@ import { DocumentRequestKind, TriggerKind } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useGetActionName = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.workflow-triggered-event',
   });
 
   const getActionName = (config: WorkflowRequestConfig) => {

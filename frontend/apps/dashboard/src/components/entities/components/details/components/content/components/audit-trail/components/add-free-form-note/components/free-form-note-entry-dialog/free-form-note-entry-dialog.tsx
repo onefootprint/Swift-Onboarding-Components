@@ -15,8 +15,8 @@ export type FreeFormNoteEntryDialogProps = {
 };
 
 const FreeFormNoteEntryDialog = ({ open, onClose }: FreeFormNoteEntryDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.free-form-note',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.free-form-note',
   });
   const showRequestErrorToast = useRequestErrorToast();
   const submitFreeFormMutation = useSubmitFreeFormNote();

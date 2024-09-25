@@ -13,7 +13,8 @@ const WatchlistCheckEventHeader = ({ data }: WatchlistCheckEventHeaderProps) => 
   <>
     <Text variant="body-3" color="tertiary" testID="watchlist-check-event-header">
       <Trans
-        i18nKey="pages.entity.audit-trail.timeline.watchlist-check-event.title"
+        ns="entity-details"
+        i18nKey="audit-trail.timeline.watchlist-check-event.title"
         components={{
           b: <Bold />,
         }}

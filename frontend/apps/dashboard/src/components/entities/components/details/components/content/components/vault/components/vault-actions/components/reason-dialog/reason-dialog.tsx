@@ -13,7 +13,7 @@ type ReasonDialogProps = {
 };
 
 const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('entity-details');
   const decryptControls = useDecryptControls();
 
   const handleSubmit = (reason: string) => {
@@ -24,13 +24,13 @@ const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) =
   return (
     <Dialog
       size="compact"
-      title={t('pages.entity.decrypt.start')}
+      title={t('decrypt.start')}
       headerIcon={{ onClick: loading ? noop : onClose }}
       onClose={loading ? noop : onClose}
       open={open}
       primaryButton={{
         form: 'decrypt-reason-form',
-        label: t('pages.entity.decrypt.decrypt'),
+        label: t('decrypt.decrypt'),
         loading,
         type: 'submit',
       }}

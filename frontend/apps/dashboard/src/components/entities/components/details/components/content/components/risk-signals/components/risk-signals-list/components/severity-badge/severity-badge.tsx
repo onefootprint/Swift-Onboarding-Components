@@ -7,8 +7,8 @@ export type SeverityBadgeProps = {
 };
 
 const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.severity',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.severity',
   });
 
   return (

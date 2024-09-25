@@ -16,8 +16,8 @@ type DrawerFilterProps = {
 };
 
 const DrawerFilter = ({ states }: DrawerFilterProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.sos-filings.filters',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.sos-filings.filters',
   });
   const [open, setOpen] = useState(false);
   const filters = useSOSFilingsFilters();

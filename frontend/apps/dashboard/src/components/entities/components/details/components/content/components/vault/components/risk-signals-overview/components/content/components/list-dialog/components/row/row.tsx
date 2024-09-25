@@ -10,8 +10,8 @@ type RowProps = {
 };
 
 const Row = ({ riskSignal }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.severity',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.severity',
   });
 
   return (

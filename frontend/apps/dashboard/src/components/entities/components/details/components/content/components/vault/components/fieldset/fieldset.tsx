@@ -23,8 +23,8 @@ export type FieldsetProps = WithEntityProps & {
 };
 
 const Fieldset = ({ children, entity, fields, footer, iconComponent: IconComponent, title }: FieldsetProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset',
   });
   const isViewingHistorical = !!useEntitySeqno();
   const decrypt = useDecryptControls();

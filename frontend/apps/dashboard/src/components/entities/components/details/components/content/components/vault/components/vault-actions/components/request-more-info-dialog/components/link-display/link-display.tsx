@@ -8,8 +8,8 @@ export type LinkDisplayProps = {
 };
 
 const LinkDisplay = ({ linkData }: LinkDisplayProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info',
   });
 
   const expiresAt = linkData?.expiresAt ? new Date(linkData.expiresAt) : new Date();

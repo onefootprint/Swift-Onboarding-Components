@@ -15,8 +15,8 @@ export type ContentProps = {
 };
 
 const Content = ({ ruleResults, actionTriggered }: ContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.rule-set-results',
   });
   const isStepUpSubsection = [RuleAction.stepUpIdentity, RuleAction.stepUpPoA, RuleAction.stepUpIdentitySsn].includes(
     actionTriggered,

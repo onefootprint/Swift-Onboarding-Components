@@ -9,8 +9,8 @@ type BusinessNameListProps = {
 };
 
 const BusinessNameList = ({ data, onOpen }: BusinessNameListProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.name.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.name.table',
   });
 
   const columns = [

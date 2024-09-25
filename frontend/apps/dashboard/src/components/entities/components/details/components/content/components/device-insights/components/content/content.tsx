@@ -20,8 +20,8 @@ export type ContentProps = {
 };
 
 const Content = ({ entity, livenessData }: ContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.device-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'device-insights',
   });
   const [detailsHidden, setDetailsHidden] = useState(false);
 

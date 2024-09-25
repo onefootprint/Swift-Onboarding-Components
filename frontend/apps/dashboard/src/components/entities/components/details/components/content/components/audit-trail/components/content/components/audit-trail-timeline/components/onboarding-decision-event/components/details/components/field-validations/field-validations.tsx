@@ -17,8 +17,8 @@ export type FieldValidationsProps = {
 };
 
 const FieldValidations = ({ entityId }: FieldValidationsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
   });
   const { data, isError, error, isPending } = useEntityMatchSignals({
     id: entityId,

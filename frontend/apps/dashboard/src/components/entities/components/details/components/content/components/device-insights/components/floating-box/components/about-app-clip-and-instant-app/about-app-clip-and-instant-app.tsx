@@ -9,8 +9,8 @@ type AboutAppClipAndInstantAppProps = {
 };
 
 const AboutAppClipAndInstantApp = ({ kind }: AboutAppClipAndInstantAppProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: `pages.entity.device-insights.${kind}`,
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: `device-insights.${kind}`,
   });
   const [isOpen, setIsOpen] = useState(false);
 

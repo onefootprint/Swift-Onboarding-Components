@@ -10,8 +10,8 @@ export type RowProps = {
 };
 
 const Row = ({ duplicateDataItem }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.duplicate-data',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'duplicate-data',
   });
   const { dupeKinds, fpId, status, startTimestamp, data } = duplicateDataItem;
 

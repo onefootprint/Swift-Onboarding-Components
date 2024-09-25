@@ -16,8 +16,8 @@ export type ManualReviewDialogProps = {
 };
 
 const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.manual-review',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'manual-review',
   });
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();

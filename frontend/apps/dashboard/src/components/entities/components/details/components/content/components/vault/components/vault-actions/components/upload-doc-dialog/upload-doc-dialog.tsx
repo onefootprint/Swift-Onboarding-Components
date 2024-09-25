@@ -12,7 +12,7 @@ export type UploadDocDialogProps = {
 
 const UploadDocDialog = ({ open, onClose }: UploadDocDialogProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.upload-doc',
+    keyPrefix: 'header-default.actions.upload-doc',
   });
   const { t: allT } = useTranslation('common');
   const mutation = useUploadDoc();

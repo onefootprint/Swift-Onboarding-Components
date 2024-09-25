@@ -25,8 +25,8 @@ enum DialogState {
 }
 
 const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.request-more-info',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.request-more-info',
   });
   const submitActionsMutation = useSubmitActions();
   const showRequestErrorToast = useRequestErrorToast();

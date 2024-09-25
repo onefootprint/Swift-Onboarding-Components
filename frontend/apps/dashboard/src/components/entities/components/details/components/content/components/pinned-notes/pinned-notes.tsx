@@ -22,8 +22,8 @@ type PinnedNotesProps = {
 
 const PinnedNotes = ({ isDisabled }: PinnedNotesProps) => {
   const { data } = useCurrentEntityAnnotations();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.pinned-notes',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'pinned-notes',
   });
   const [sortedData, setSortedData] = useState(data);
   const [sortDirection, setSortDirection] = useState(SortOrder.descending);

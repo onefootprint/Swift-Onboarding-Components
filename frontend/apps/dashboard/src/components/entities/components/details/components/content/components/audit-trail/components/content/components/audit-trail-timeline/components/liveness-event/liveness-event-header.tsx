@@ -8,8 +8,8 @@ type LivenessEventHeaderProps = {
 };
 
 const LivenessEventHeader = ({ data }: LivenessEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.liveness-event',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.liveness-event',
   });
   const { source } = data;
 

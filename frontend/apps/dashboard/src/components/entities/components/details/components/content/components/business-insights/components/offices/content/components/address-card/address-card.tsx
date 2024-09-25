@@ -18,9 +18,10 @@ type AddressCardProps = {
 };
 
 const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
+
   const {
     id,
     addressLine1,

@@ -52,8 +52,8 @@ export type AuditTrailTimelineProps = {
 };
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail',
   });
   const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
 

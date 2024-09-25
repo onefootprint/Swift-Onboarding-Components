@@ -14,8 +14,8 @@ type ProtectedDetailsProps = {
 const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.middleName, IdDI.lastName, IdDI.dob];
 
 const ProtectedDetails = ({ entity, onClick, isPending }: ProtectedDetailsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.risk-signals.details.matches.protected-details',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'risk-signals.details.matches.protected-details',
   });
   const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(
     di => !entity.attributes.includes(di) || entity.decryptableAttributes.includes(di),

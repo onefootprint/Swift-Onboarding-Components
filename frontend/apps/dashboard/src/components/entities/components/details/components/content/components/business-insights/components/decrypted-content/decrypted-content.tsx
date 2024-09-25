@@ -19,8 +19,8 @@ export type DecryptedContentProps = WithEntityProps & {
 };
 
 const DecryptedContent = ({ insights }: DecryptedContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
   const [openFilingId, setOpenFilingId] = useState<string | undefined>(undefined);
   const openFiling = insights.registrations.find(filing => filing.id === openFilingId);

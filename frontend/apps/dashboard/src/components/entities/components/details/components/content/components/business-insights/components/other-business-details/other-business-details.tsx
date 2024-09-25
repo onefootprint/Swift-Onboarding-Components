@@ -10,8 +10,8 @@ type OtherBusinessDetailsProps = {
 };
 
 const OtherBusinessDetails = ({ data }: OtherBusinessDetailsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights',
   });
   const detailT = useOtherDetailText();
   const { formationDate, formationState, tin, entityType, phoneNumbers, website } = data;

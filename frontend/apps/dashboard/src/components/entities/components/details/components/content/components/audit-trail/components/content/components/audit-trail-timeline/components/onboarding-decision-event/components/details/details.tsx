@@ -16,8 +16,8 @@ type DetailsProps = {
 };
 
 const Details = ({ onboardingDecision, ruleSetResultId }: DetailsProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event.not-verified-details',
   });
   const { isLive } = useSession();
   const entityId = useEntityId();

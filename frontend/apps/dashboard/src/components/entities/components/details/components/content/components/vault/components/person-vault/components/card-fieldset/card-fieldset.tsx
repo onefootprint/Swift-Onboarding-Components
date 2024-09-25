@@ -24,8 +24,8 @@ export type FieldsetProps = WithEntityProps & {
 };
 
 const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.fieldset',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'fieldset',
   });
   const { t: tAll } = useTranslation('common');
 

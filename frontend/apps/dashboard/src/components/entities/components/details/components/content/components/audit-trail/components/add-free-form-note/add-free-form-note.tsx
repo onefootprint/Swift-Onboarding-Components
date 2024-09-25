@@ -7,8 +7,8 @@ import PermissionGate from 'src/components/permission-gate/';
 import FreeFormNoteEntryDialog from './components/free-form-note-entry-dialog';
 
 const AddFreeFormNote = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.free-form-note',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.free-form-note',
   });
   const [dialogOpen, setDialogOpen] = useState(false);
 

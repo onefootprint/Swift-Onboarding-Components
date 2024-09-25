@@ -19,7 +19,7 @@ export type FieldProps = {
 };
 
 const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldToDecryptForm }: FieldProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'decrypt' });
   const { register } = useFormContext();
   const field = useField(entity)(di);
   const decrypt = useDecryptControls();

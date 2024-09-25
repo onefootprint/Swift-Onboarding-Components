@@ -13,8 +13,8 @@ type ManualReviewTriggerProps = {
 };
 
 const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, open }: ManualReviewTriggerProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.manual-review',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'manual-review',
   });
   const pass = t(`status.${ReviewStatus.pass}` as ParseKeys<'common'>);
   const fail = t(`status.${ReviewStatus.fail}` as ParseKeys<'common'>);

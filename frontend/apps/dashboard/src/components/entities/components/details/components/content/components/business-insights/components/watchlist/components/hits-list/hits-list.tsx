@@ -9,8 +9,8 @@ type HitsListProps = {
 };
 
 const HitsList = ({ entity, hits }: HitsListProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.business-insights.watchlist.table',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'business-insights.watchlist.table',
   });
 
   const columns = [

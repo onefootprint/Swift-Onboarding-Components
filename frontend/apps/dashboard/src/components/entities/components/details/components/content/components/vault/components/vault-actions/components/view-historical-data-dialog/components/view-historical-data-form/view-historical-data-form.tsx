@@ -16,8 +16,8 @@ export type ViewHistoricalDataFormProps = {
 };
 
 const ViewHistoricalDataForm = ({ events, onSubmit }: ViewHistoricalDataFormProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.actions.view-historical-data.form',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'actions.view-historical-data.form',
   });
   const currentSeqno = useEntitySeqno();
   const {

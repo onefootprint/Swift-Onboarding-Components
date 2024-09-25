@@ -19,7 +19,7 @@ type DetailDrawerProps = WithEntityProps & {
 
 const DetailDrawer = ({ entity, open, onClose }: DetailDrawerProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header.actions.edit-vault-drawer',
+    keyPrefix: 'header-default.actions.edit-vault-drawer',
   });
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();

@@ -10,12 +10,12 @@ type AuthMethodUpdatedEventHeaderProps = {
 };
 
 const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.auth-method-updated',
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'audit-trail.timeline.auth-method-updated',
   });
 
   const getActionLabel = (action: AuthMethodAction) => {
-    const prefix = 'pages.entity.audit-trail.timeline.auth-method-updated';
+    const prefix = 'audit-trail.timeline.auth-method-updated';
     if (action === AuthMethodAction.add_primary) {
       return `${prefix}.action.add_primary`;
     }
@@ -37,6 +37,7 @@ const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProp
       <InsightEventPopover insightEvent={data.insightEvent}>{t('user')}</InsightEventPopover>
       <Text variant="body-3" color="tertiary" whiteSpace="nowrap">
         <Trans
+          ns="entity-details"
           i18nKey={getActionLabel(data.action)}
           components={{
             b: <Bold />,
