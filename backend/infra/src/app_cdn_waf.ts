@@ -49,7 +49,7 @@ export const APP_CDN_WAF_RULES = [
     liveApiKeyRateLimitRule({
       name: 'LiveApiKeyBasicAuthRateLimitRule',
       header: 'authorization',
-      action: countAction(),
+      action: rateLimitExceededAction(),
       priority: 7,
     }),
     sandboxApiKeyRateLimitRule({
@@ -61,7 +61,7 @@ export const APP_CDN_WAF_RULES = [
     sandboxApiKeyRateLimitRule({
       name: 'SandboxApiKeyBasicAuthRateLimitRule',
       header: 'authorization',
-      action: countAction(),
+      action: rateLimitExceededAction(),
       priority: 9,
     }),
     dashboardKeyRateLimitRule({
