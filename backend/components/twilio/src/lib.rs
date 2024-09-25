@@ -168,10 +168,10 @@ impl Client {
             to: destination.leak_to_string(),
             from,
             validity_period: Self::VALIDITY_PERIOD_SECS as u64,
+            status_callback: self.config.status_callback_url.clone(),
             // We only need to use these fields for whatsapp
             content_sid: None,
             content_variables: None,
-            status_callback: self.config.status_callback_url.clone(),
         }
     }
 
@@ -192,10 +192,10 @@ impl Client {
             validity_period: Self::VALIDITY_PERIOD_SECS as u64,
             content_sid: self.config.whatsapp_content_sid(message),
             content_variables,
+            status_callback: self.config.status_callback_url.clone(),
             // body cannot be used in whatsapp messages, so we send the message using
             // content_sid and content_variables
             body: None,
-            status_callback: self.config.status_callback_url.clone(),
         };
         Ok(message)
     }

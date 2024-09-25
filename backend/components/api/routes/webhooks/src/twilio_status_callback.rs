@@ -6,6 +6,7 @@ use api_core::types::ApiResponse;
 use api_core::utils::headers::get_header;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::AssertionError;
 use api_errors::ValidationError;
 use db::models::twilio_message_log::TwilioMessageLog;
 use itertools::Itertools;
@@ -90,7 +91,10 @@ impl FromRequest for VerifiedTwilioWebhook {
         .collect();
 
         let form = Form::<TwilioWebhookContents>::from_request(req, payload);
-        let uri = state.config.twilio_status_callback_url();
+        let uri = state
+            .config
+            .twilio_status_callback_url()
+            .ok_or(AssertionError("No twilio callback URL configured"));
 
         Box::pin(async move {
             let signature = signature?;
@@ -99,7 +103,7 @@ impl FromRequest for VerifiedTwilioWebhook {
                 .map_err(|_| ValidationError("Invalid twilio callback request body"))?
                 .into_inner();
 
-            let message = verify_twilio_webhook(uri, signature, params.other, clients)?;
+            let message = verify_twilio_webhook(uri?, signature, params.other, clients)?;
 
             Ok(Self { message })
         })

@@ -198,8 +198,10 @@ impl Config {
         load_from_env()
     }
 
-    pub fn twilio_status_callback_url(&self) -> String {
-        format!("{}/webhooks/twilio_status_callback", self.api_origin)
+    pub fn twilio_status_callback_url(&self) -> Option<String> {
+        // Twilio can't reach the callback API on a server that's running locally
+        (!self.service_config.is_local())
+            .then_some(format!("{}/webhooks/twilio_status_callback", self.api_origin))
     }
 }
 
