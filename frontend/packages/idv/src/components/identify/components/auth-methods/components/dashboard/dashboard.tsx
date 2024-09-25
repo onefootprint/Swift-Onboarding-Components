@@ -10,7 +10,7 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
 
-import { getLogger } from '../../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../../utils/logger';
 import useEffectOnceStrict from '../../../../hooks/use-effect-once-strict';
 import { useDecryptUser, useUserAuthMethods } from '../../../../queries';
 import { useAuthMethodsMachine } from '../../state';
@@ -69,7 +69,7 @@ const getUserAuthMethods = (list: UserAuthMethodsResponse): MethodsMap =>
     return objRef;
   }, Object.create(null));
 
-const { logWarn } = getLogger({ location: 'user-dashboard' });
+const { logInfo, logTrack, logWarn } = getLogger({ location: 'auth-methods-dashboard' });
 
 const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const [state, send] = useAuthMethodsMachine();
@@ -85,6 +85,27 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
     return methods ? getUserAuthMethods(methods) : EmptyMethodsMap;
   }, [qryUserAuthMethods.data]);
 
+  const handleOnEmailClick = () => {
+    const payload = actionKind(Boolean(methodsMap?.email?.isVerified));
+    trackAction('update-auth-methods:update-started', { kind: 'email', payload });
+    logTrack(`User clicked on ${payload} email`);
+    send({ type: 'updateEmail', payload });
+  };
+
+  const handleOnPhoneClick = () => {
+    const payload = actionKind(Boolean(methodsMap?.phone?.isVerified));
+    trackAction('update-auth-methods:update-started', { kind: 'phone', payload });
+    logTrack(`User clicked on ${payload} phone`);
+    send({ type: 'updatePhone', payload });
+  };
+
+  const handleOnPasskeyClick = () => {
+    const payload = actionKind(Boolean(methodsMap?.passkey?.isVerified));
+    trackAction('update-auth-methods:update-started', { kind: 'passkey', payload });
+    logTrack(`User clicked on ${payload} passkey`);
+    send({ type: 'updatePasskey', payload });
+  };
+
   useEffectOnceStrict(() => {
     if (!verifyToken) {
       logWarn(t('token-missing-error'));
@@ -96,7 +117,10 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
             toast.show(getDecryptErrorTexts(t));
             logWarn(t('decrypt-error'), err);
           },
-          onSuccess: res => send({ type: 'decryptUserDone', payload: res }),
+          onSuccess: res => {
+            logInfo("User's email and phone have been decrypted");
+            send({ type: 'decryptUserDone', payload: res });
+          },
         },
       );
     }
@@ -126,22 +150,14 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: methodsMap.email.isVerified,
               label: userDashboard.email?.label || t('email.label'),
               status: userDashboard.email?.status || 'empty',
-              onClick: () =>
-                send({
-                  type: 'updateEmail',
-                  payload: actionKind(methodsMap.email.isVerified),
-                }),
+              onClick: handleOnEmailClick,
             }
           : {
               isLoading,
               isVerified: false,
               label: t('email.label'),
               status: 'empty',
-              onClick: () =>
-                send({
-                  type: 'updateEmail',
-                  payload: UserChallengeActionKind.addPrimary,
-                }),
+              onClick: handleOnEmailClick,
             }
       }
       entryPhone={
@@ -151,22 +167,14 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: methodsMap.phone.isVerified,
               label: userDashboard.phone?.label || t('phone-number'),
               status: userDashboard.phone?.status || 'empty',
-              onClick: () =>
-                send({
-                  type: 'updatePhone',
-                  payload: actionKind(methodsMap.phone.isVerified),
-                }),
+              onClick: handleOnPhoneClick,
             }
           : {
               isLoading,
               isVerified: false,
               label: t('phone-number'),
               status: 'empty',
-              onClick: () =>
-                send({
-                  type: 'updatePhone',
-                  payload: UserChallengeActionKind.addPrimary,
-                }),
+              onClick: handleOnPhoneClick,
             }
       }
       entryPasskey={
@@ -177,11 +185,7 @@ const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
               isVerified: !!methodsMap.passkey?.isVerified,
               label: userDashboard.passkey?.label || t('passkey'),
               status: userDashboard.passkey?.status || 'empty',
-              onClick: () =>
-                send({
-                  type: 'updatePasskey',
-                  payload: actionKind(methodsMap.passkey?.isVerified),
-                }),
+              onClick: handleOnPasskeyClick,
             }
           : undefined
       }

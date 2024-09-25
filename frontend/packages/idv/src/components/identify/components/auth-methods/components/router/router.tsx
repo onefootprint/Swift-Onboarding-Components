@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
 import { useDeviceInfo } from '../../../../../../hooks';
 import Liveness from '../../../../../../plugins/liveness';
-import { getLogger } from '../../../../../../utils';
+import { getLogger, trackAction } from '../../../../../../utils';
 import checkIsIframe from '../../../../../../utils/check-is-in-iframe';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';
 import type { HeaderProps } from '../../../../types';
-import Notification from '../../../notification';
 import type { AuthMethodsMachineContext as MachineContext } from '../../state';
 import { useAuthMethodsMachine } from '../../state';
 import { getHeaderLeftNavButton } from '../../utils';
@@ -20,7 +19,7 @@ type AuthMethodsRouterProps = {
   onDone: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-const { logWarn } = getLogger({ location: 'auth-methods-router' });
+const { logInfo, logTrack, logWarn } = getLogger({ location: 'auth-methods-router' });
 
 const getHeader = (
   _ctx: MachineContext,
@@ -37,8 +36,12 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
   const device = context.device;
   const isDone = matches('success');
   const Header = getHeader(context, getHeaderLeftNavButton(state, send));
+
   useDeviceInfo(
-    payload => send({ type: 'setDevice', payload }),
+    payload => {
+      logTrack(`Webauthn support:${payload.hasSupportForWebauthn}`, payload);
+      send({ type: 'setDevice', payload });
+    },
     () => logWarn('Unable to collect device info'),
   );
 
@@ -49,7 +52,11 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
         variant={IdentifyVariant.updateLoginMethods}
         device={device}
         initialAuthToken={context.authToken}
-        onDone={({ authToken }) => send({ type: 'setVerifyToken', payload: authToken })}
+        onDone={({ authToken }) => {
+          trackAction('update-auth-methods:identify-completed');
+          logTrack('Identify completed');
+          send({ type: 'setVerifyToken', payload: authToken });
+        }}
         // Since we don't have a playbook for this flow, always treat it as live
         // TODO would be more correct to fetch whether the user defined by the auth token is
         // live or sandbox
@@ -68,6 +75,8 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
         actionKind={context.updateMethod}
         identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newEmail => {
+          trackAction('update-auth-methods:update-completed', { kind: 'email' });
+          logInfo('Email updated');
           send({
             type: 'updateUserDashboard',
             payload: {
@@ -87,6 +96,8 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
         actionKind={context.updateMethod}
         identifyVariant={IdentifyVariant.updateLoginMethods}
         onSuccess={newPhoneNumber => {
+          trackAction('update-auth-methods:update-completed', { kind: 'phone' });
+          logInfo('Phone updated');
           send({
             type: 'updateUserDashboard',
             payload: {
@@ -110,6 +121,8 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
             isInIframe: checkIsIframe(),
           }}
           onDone={() => {
+            trackAction('update-auth-methods:update-completed', { kind: 'passkey' });
+            logInfo('Passkey updated');
             send({
               type: 'updateUserDashboard',
               payload: {
@@ -120,11 +133,6 @@ const AuthMethodsRouter = ({ onDone }: AuthMethodsRouterProps): JSX.Element | nu
           }}
         />
       </>
-    );
-  }
-  if (matches('notFoundChallenge')) {
-    return (
-      <Notification title={t('notification.404-token-title')} subtitle={t('notification.404-token-description')} />
     );
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { AuthMethods, getLogger } from '@onefootprint/idv';
+import { AuthMethods, getLogger, trackAction } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -33,12 +33,15 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
   const confirmationDialog = useConfirmationDialog();
   const [authToken, setAuthToken] = useState<string>('');
   const [notification, setNotification] = useState<VoidOr<NotificationProps>>();
-  const isWebviewWithoutRedirect = fpProvider.getAdapterKind() === 'webview' && fpProvider.getRedirectUrl() === null;
+  const adapterKind = fpProvider.getAdapterKind();
+  const isWebviewWithoutRedirect = adapterKind === 'webview' && fpProvider.getRedirectUrl() === null;
 
   useProps<{ authToken: string }>(
     props => {
       const propAuthToken = props?.authToken;
       if (propAuthToken) {
+        trackAction('update-auth-methods:started', { adapterKind });
+        logTrack('Update auth methods started', { adapterKind });
         setAuthToken(propAuthToken);
       } else if (!propAuthToken && !authToken) {
         logError('No auth token provided');
@@ -66,7 +69,8 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
         label: t('yes'),
         onClick: () => {
           if (fpProvider.getLoadingStatus()) {
-            logTrack('auth methods app closed');
+            trackAction('update-auth-methods:canceled');
+            logTrack('Update auth methods cancelled');
             if (isWebviewWithoutRedirect) {
               return router.push('/user/closed');
             }
@@ -81,7 +85,8 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
 
   const handleOnDoneClick = () => {
     if (fpProvider.getLoadingStatus()) {
-      logTrack('auth methods app done');
+      trackAction('update-auth-methods:completed');
+      logTrack('Update auth methods completed');
       if (isWebviewWithoutRedirect) {
         return router.push('/user/done');
       }

@@ -22,13 +22,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates:
-    | 'dashboard'
-    | 'identify'
-    | 'notFoundChallenge'
-    | 'success'
-    | 'updateEmail'
-    | 'updatePasskey'
-    | 'updatePhone';
+  matchesStates: 'dashboard' | 'identify' | 'success' | 'updateEmail' | 'updatePasskey' | 'updatePhone';
   tags: never;
 }
