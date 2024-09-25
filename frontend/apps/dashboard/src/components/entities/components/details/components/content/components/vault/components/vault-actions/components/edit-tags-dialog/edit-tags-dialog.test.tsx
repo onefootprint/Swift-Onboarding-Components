@@ -211,7 +211,7 @@ describe('<EditTagsDialog />', () => {
     withRemoveTag('tag_2');
     withAddTag();
     withCreateOrgTag();
-    renderDialogAndWaitFinishLoading({ onSave });
+    renderDialog({ onSave });
 
     // Add another_org_tag tag
     const inactiveTags = await screen.findByRole('group', { name: 'Inactive tags' });

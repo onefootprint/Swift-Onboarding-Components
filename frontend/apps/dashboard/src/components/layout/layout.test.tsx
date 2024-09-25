@@ -4,7 +4,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from '../../hooks/use-session';
 import type { LayoutProps } from './layout';
 import Layout from './layout';
-import { withEntities, withOrgAuthRoles, withRiskSignals } from './layout.test.config';
+import { withEntities, withLogout, withOrg, withOrgAuthRoles, withRiskSignals } from './layout.test.config';
 
 const originalState = useStore.getState();
 
@@ -16,40 +16,45 @@ describe('<Layout />', () => {
 
   beforeAll(() => {
     withEntities();
+    withOrg();
     withRiskSignals();
   });
 
-  describe('when the user is NOT logged', () => {
+  describe('when the user is NOT logged in', () => {
     beforeEach(() => {
       mockRouter.setCurrentUrl('/authentication/sign-in');
       useStore.setState(originalState);
     });
 
-    it('should render the public layout', () => {
+    it('should render the public layout', async () => {
       renderLayout({});
-      expect(screen.getByTestId('public-layout')).toBeInTheDocument();
+      const element = await screen.findByTestId('public-layout');
+      expect(element).toBeInTheDocument();
     });
   });
 
-  describe('when the user is logged', () => {
+  describe('when the user is logged in', () => {
     beforeEach(() => {
       mockRouter.setCurrentUrl('/users');
       asAdminUser();
       withOrgAuthRoles();
+      withLogout();
     });
 
     afterAll(() => {
       resetUser();
     });
 
-    it('should render the default template', () => {
+    it('should render the default template', async () => {
       renderLayout({ name: 'default' });
-      expect(screen.getByTestId('private-default-layout')).toBeInTheDocument();
+      const element = await screen.findByTestId('private-default-layout');
+      expect(element).toBeInTheDocument();
     });
 
-    it('should render the blank template', () => {
+    it('should render the blank template', async () => {
       renderLayout({ name: 'blank' });
-      expect(screen.getByTestId('private-blank-layout')).toBeInTheDocument();
+      const element = await screen.findByTestId('private-blank-layout');
+      expect(element).toBeInTheDocument();
     });
   });
 });

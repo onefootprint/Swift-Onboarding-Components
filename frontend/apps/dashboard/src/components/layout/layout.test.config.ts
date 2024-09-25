@@ -80,3 +80,21 @@ export const withRiskSignals = () =>
     path: '/org/risk_signals',
     response: { data: [], meta: { count: 0 } },
   });
+
+export const withLogout = () =>
+  mockRequest({
+    method: 'post',
+    path: 'org/auth/logout',
+    response: {},
+  });
+
+export const withOrg = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org',
+    response: {
+      data: {
+        id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
+      },
+    },
+  });

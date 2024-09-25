@@ -17,6 +17,7 @@
     "start": "next start -p 3001",
     "test:watch": "NODE_OPTIONS=--max-old-space-size=9216 NODE_OPTIONS=--max-old-space-size=9216 jest --watch",
     "test": "jest",
+    "test:ci": "NODE_OPTIONS=--max-old-space-size=9216 jest --ci --bail --runInBand",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=9216 yarn tsc --noEmit"
   },
   "dependencies": {
