@@ -1,7 +1,8 @@
 use super::CanCheckTenantGuard;
-use super::TenantApiKey;
+use super::TenantApiKeyAuth;
 use super::TenantAuth;
 use crate::auth::AuthError;
+use crate::auth::Either;
 use actix_web::FromRequest;
 use newtypes::PreviewApiMarker;
 use newtypes::TenantScope;
@@ -10,10 +11,11 @@ use std::marker::PhantomData;
 use std::pin::Pin;
 use tracing::Instrument;
 
+// TODO: also this
 #[derive(Debug, Clone, derive_more::Deref)]
 /// Auth extractor that requires a tenant API key to be provided for a tenant that has access to the
 /// `PreviewApi` defined by `T`.
-pub struct TenantApiKeyGated<T>(#[deref] TenantApiKey, PhantomData<T>);
+pub struct TenantApiKeyGated<T>(#[deref] TenantApiKeyAuth, PhantomData<T>);
 
 impl<T: PreviewApiMarker> FromRequest for TenantApiKeyGated<T> {
     type Error = crate::ApiError;
@@ -21,12 +23,15 @@ impl<T: PreviewApiMarker> FromRequest for TenantApiKeyGated<T> {
 
     #[tracing::instrument("TenantApiKeyGated::from_request", skip_all)]
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let fut = TenantApiKey::from_request(req, payload);
+        let fut = TenantApiKeyAuth::from_request(req, payload);
         let extractor = async move {
             let auth = fut.await?;
             // Check preview API guard during extraction
             let preview_api = T::preview_api();
-            let tenant = auth.0.tenant();
+            let tenant = match &auth {
+                Either::Left(l) => l.0.tenant(),
+                Either::Right(r) => &r.0.tenant,
+            };
             if !tenant.can_access_preview(&preview_api) {
                 tracing::error!(tenant_id=%tenant.id, tenant_name=%tenant.name, api=%preview_api, "Tenant {} attempting to use unallowed preview API: {}", tenant.name, preview_api);
                 return Err(AuthError::CannotAccessPreviewApi.into());
@@ -45,11 +50,11 @@ impl<T> CanCheckTenantGuard for TenantApiKeyGated<T> {
     }
 
     fn auth(self) -> Box<dyn TenantAuth> {
-        Box::new(self.0 .0)
+        self.0.auth()
     }
 
     fn purpose(&self) -> Option<newtypes::TenantSessionPurpose> {
-        None
+        self.0.purpose()
     }
 }
 

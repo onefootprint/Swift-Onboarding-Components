@@ -1,5 +1,5 @@
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Either;
@@ -13,7 +13,7 @@ use strum::IntoEnumIterator;
 #[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Preview))]
 #[get("/org/risk_signals")]
 pub fn get(
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiListResponse<api_wire_types::PublicRiskSignalDescription> {
     let _auth = auth.check_guard(TenantGuard::Read)?;
 

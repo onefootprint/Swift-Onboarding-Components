@@ -5,7 +5,7 @@ use alpaca::DataComparsionBreakDown;
 use alpaca::ImageIntegrityBreakdown;
 use alpaca::VisualAuthenticity;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::features::{
@@ -94,7 +94,7 @@ use IdentityDataKind::*;
 #[actix::post("/users/{fp_id}/integrations/alpaca/cip")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<AlpacaCipRequest>,
     fp_id: FpIdPath,
 ) -> ApiResponse<AlpacaCipResponse> {
@@ -149,7 +149,7 @@ pub async fn post(
 #[actix::post("/integrations/alpaca/cip")]
 pub async fn post_old(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<DeprecatedAlpacaCipRequest>,
 ) -> ApiResponse<AlpacaCipResponse> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;

@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -94,7 +94,7 @@ pub async fn delete(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<DeleteRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     insight: InsightHeaders,
 ) -> ApiResponse<WithVaultVersionHeader<UserDeleteResponse>> {
     let DeleteRequest { delete_all, fields } = request.into_inner();
@@ -115,7 +115,7 @@ pub async fn delete_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<BusinessDeleteRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     insight: InsightHeaders,
 ) -> ApiResponse<WithVaultVersionHeader<BusinessDeleteResponse>> {
     let BusinessDeleteRequest { delete_all, fields } = request.into_inner();
@@ -132,7 +132,7 @@ async fn delete_inner(
     path: FpIdPath,
     delete_all: Option<bool>,
     fields: Option<Vec<DataIdentifier>>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     insight: InsightHeaders,
 ) -> ApiResponse<(HashMap<DataIdentifier, bool>, Option<ScopedVaultVersionNumber>)> {
     let fp_id = path.into_inner();

@@ -35,8 +35,12 @@ use newtypes::TenantSessionPurpose;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
 
+/// Shorthand for any tenant session-based auth
 pub type TenantSessionAuth<const IS_SECONDARY: bool = false> =
     Either<TenantRbAuthContext<IS_SECONDARY>, FirmEmployeeAssumeAuthContext<IS_SECONDARY>>;
+
+/// Shorthand for tenant API-key based auth. Also allows firm employee auth
+pub type TenantApiKeyAuth = Either<TenantApiKey, FirmEmployeeAssumeAuthContext<false>>;
 
 pub type PartnerTenantSessionAuth = PartnerTenantRbAuthContext;
 

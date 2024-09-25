@@ -335,6 +335,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1532,6 +1535,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1819,6 +1825,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1866,6 +1875,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -1910,6 +1922,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -2033,6 +2048,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -2634,6 +2652,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -2688,6 +2709,9 @@
                 "security": [
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             },
@@ -2750,6 +2774,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -2822,6 +2849,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -2921,6 +2951,9 @@
                 "security": [
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -3230,6 +3263,9 @@
                     },
                     {
                         "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
                     }
                 ]
             }
@@ -22460,6 +22496,9 @@
                                 "allow_international_residents": {
                                     "type": "boolean"
                                 },
+                                "allow_reonboard": {
+                                    "type": "boolean"
+                                },
                                 "allow_us_residents": {
                                     "type": "boolean"
                                 },
@@ -23006,6 +23045,7 @@
                             },
                             "required": [
                                 "allow_international_residents",
+                                "allow_reonboard",
                                 "allow_us_residents",
                                 "allow_us_territory_residents",
                                 "business_documents_to_collect",
@@ -23485,6 +23525,9 @@
                 "type": "object",
                 "properties": {
                     "allow_international_residents": {
+                        "type": "boolean"
+                    },
+                    "allow_reonboard": {
                         "type": "boolean"
                     },
                     "allow_us_residents": {
@@ -24033,6 +24076,7 @@
                 },
                 "required": [
                     "allow_international_residents",
+                    "allow_reonboard",
                     "allow_us_residents",
                     "allow_us_territory_residents",
                     "business_documents_to_collect",

@@ -19,6 +19,7 @@ use db::PgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
+use newtypes::InvokeVaultProxyPermission;
 use newtypes::TenantRoleKind;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
@@ -29,7 +30,7 @@ use std::sync::Arc;
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
 /// the DB using the information on the FirmEmployeeSession
 pub struct FirmEmployeeAssumeAuth {
-    tenant: Tenant,
+    pub(super) tenant: Tenant,
     tenant_user: TenantUser,
     role: TenantRole,
     is_risk_ops: bool,
@@ -140,7 +141,7 @@ impl FirmEmployeeAssumeAuth {
                 // In sandbox mode, all firm employees are allowed to have write access
                 vec![TenantScope::Admin]
             } else if self.is_risk_ops {
-                // Outside of sandbox, "risk ops" employees have some extended permissions
+                // Outside of sandbox, "risk ops" employees have extended permissions
                 vec![
                     TenantScope::OrgSettings,
                     TenantScope::DecryptAllExceptPciData,
@@ -149,6 +150,14 @@ impl FirmEmployeeAssumeAuth {
                     TenantScope::OnboardingConfiguration,
                     TenantScope::ApiKeys,
                     TenantScope::ManageWebhooks,
+                    TenantScope::CipIntegration,
+                    TenantScope::InvokeVaultProxy {
+                        data: InvokeVaultProxyPermission::Any,
+                    },
+                    TenantScope::AuthToken,
+                    TenantScope::Onboarding,
+                    TenantScope::LabelAndTag,
+                    TenantScope::ManageComplianceDocSubmission,
                 ]
             } else {
                 // But, firm employees are always allowed to edit org settings
@@ -216,6 +225,7 @@ mod test {
     use db::models::tenant_role::TenantRole;
     use db::tests::prelude::*;
     use macros::db_test_case;
+    use newtypes::InvokeVaultProxyPermission;
     use newtypes::TenantRoleKind;
     use newtypes::TenantScope;
     use newtypes::TenantSessionPurpose;
@@ -237,6 +247,14 @@ mod test {
         TenantScope::OnboardingConfiguration,
         TenantScope::ApiKeys,
         TenantScope::ManageWebhooks,
+        TenantScope::CipIntegration,
+        TenantScope::InvokeVaultProxy {
+            data: InvokeVaultProxyPermission::Any,
+        },
+        TenantScope::AuthToken,
+        TenantScope::Onboarding,
+        TenantScope::LabelAndTag,
+        TenantScope::ManageComplianceDocSubmission,
     ]; "risk ops has lots of permissions in live mode")]
     fn test_roles(
         conn: &mut TestPgConn,

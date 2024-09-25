@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
 use crate::errors::ValidationError;
@@ -48,7 +48,7 @@ use std::collections::HashMap;
 pub async fn create_non_portable_vault(
     state: web::Data<State>,
     request: HashMap<DataIdentifier, PiiJsonValue>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     sandbox_id: SandboxIdHeader,
@@ -165,7 +165,7 @@ pub async fn patch_vault(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: UpdateEntityRequest,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> FpResult<api_wire_types::LiteUser> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let tenant_id = auth.tenant().id.clone();

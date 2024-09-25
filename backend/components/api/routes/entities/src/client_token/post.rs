@@ -5,7 +5,7 @@ use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
 use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::ClientTenantScope;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::AssertionError;
@@ -38,7 +38,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: web::Json<CreateClientTokenRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     root_span: RootSpan,
 ) -> ApiResponse<CreateClientTokenResponse> {
     let CreateClientTokenRequest {

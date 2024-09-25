@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
@@ -100,7 +100,7 @@ pub struct SearchUsersRequestBody {
 pub async fn post_search(
     state: web::Data<State>,
     request: web::Json<SearchUsersRequestBody>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> CursorPaginatedResponse<api_wire_types::LiteUser, TimestampCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();

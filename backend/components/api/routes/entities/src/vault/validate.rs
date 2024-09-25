@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -41,7 +41,7 @@ pub async fn post(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<RawUserDataRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let request = request.into_inner().into();
@@ -62,7 +62,7 @@ pub async fn post_business(
     state: web::Data<State>,
     path: FpIdPath,
     request: Json<RawBusinessDataRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let request = request.into_inner().into();

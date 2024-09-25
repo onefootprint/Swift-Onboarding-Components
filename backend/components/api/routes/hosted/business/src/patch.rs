@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::State;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -15,7 +15,7 @@ pub async fn patch(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: Json<UpdateEntityRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> ApiResponse<api_wire_types::LiteUser> {
     let result = patch_vault(state, fp_id, request.into_inner(), auth).await?;
     Ok(result)

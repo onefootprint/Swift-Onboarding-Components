@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -31,7 +31,7 @@ use std::collections::HashMap;
 pub async fn get_dupes(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiResponse<api_wire_types::Dupes> {
     let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;

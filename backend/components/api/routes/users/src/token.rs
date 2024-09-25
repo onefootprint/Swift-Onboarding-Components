@@ -2,7 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::AuthError;
@@ -44,7 +44,7 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
     request: OptionalJson<CreateTokenRequest, true>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> ApiResponse<CreateTokenResponse> {
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let tenant = auth.tenant().clone();

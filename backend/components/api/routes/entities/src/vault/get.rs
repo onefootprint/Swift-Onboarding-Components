@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -83,7 +83,7 @@ pub async fn get(
     path: FpIdPath,
     request: Query<UserFieldsParam>,
     vault_version: VaultVersion,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiResponse<WithVaultVersionHeader<GetUserVaultResponse>> {
     let UserFieldsParam { fields } = request.into_inner();
     let (result, vault_version) = get_inner(state, path, fields, vault_version, auth).await?;
@@ -104,7 +104,7 @@ pub async fn get_business(
     path: FpIdPath,
     request: Query<BusinessFieldsParam>,
     vault_version: VaultVersion,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiResponse<WithVaultVersionHeader<GetBusinessVaultResponse>> {
     let BusinessFieldsParam { fields } = request.into_inner();
     let (result, vault_version) = get_inner(state, path, fields, vault_version, auth).await?;
@@ -120,7 +120,7 @@ async fn get_inner(
     path: FpIdPath,
     fields: Option<Csv<DataIdentifier>>,
     vault_version: VaultVersion,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiResponse<(HashMap<DataIdentifier, bool>, Option<ScopedVaultVersionNumber>)> {
     let fp_id = path.into_inner();
 

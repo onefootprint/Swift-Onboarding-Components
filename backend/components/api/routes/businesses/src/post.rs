@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::telemetry::RootSpan;
@@ -24,7 +24,7 @@ use paperclip::actix::web;
 pub async fn post(
     state: web::Data<State>,
     request: OptionalJson<RawBusinessDataRequest>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     sandbox_id: SandboxId,

@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
@@ -22,7 +22,7 @@ use paperclip::actix::web;
 pub async fn detail(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
 ) -> ApiResponse<api_wire_types::User> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

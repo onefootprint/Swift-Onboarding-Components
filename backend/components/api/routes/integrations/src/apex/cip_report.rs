@@ -1,5 +1,5 @@
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -27,7 +27,7 @@ use strum::IntoEnumIterator;
 #[actix::post("/users/{fp_id}/integrations/apex/cip_report")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<ApexCipReportRequest>,
     fp_id: FpIdPath,
 ) -> ApiResponse<ApexCipSummaryResults> {
@@ -49,7 +49,7 @@ pub async fn post(
 #[actix::post("/integrations/apex/cip_report")]
 pub async fn post_old(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<OldApexCipReportRequest>,
 ) -> ApiResponse<ApexCipSummaryResults> {
     let result = post_inner(state, auth, request.into_inner()).await?;
@@ -58,7 +58,7 @@ pub async fn post_old(
 
 pub async fn post_inner(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: OldApexCipReportRequest,
 ) -> ApiResponse<ApexCipSummaryResults> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;

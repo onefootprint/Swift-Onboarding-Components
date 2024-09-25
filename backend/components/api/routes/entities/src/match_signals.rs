@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantApiKey;
+use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
@@ -25,7 +25,7 @@ use paperclip::actix::web;
 pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
-    auth: Either<TenantSessionAuth, TenantApiKey>,
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
 ) -> ApiResponse<GetFieldValidationResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

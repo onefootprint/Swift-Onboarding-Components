@@ -7,7 +7,7 @@ use alpaca::types::account::Identity;
 use alpaca::types::account::TaxIdType;
 use alpaca::AlpacaCip;
 use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantApiKey;
+use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::errors::cip_error::CipError;
 use api_core::types::ApiResponse;
@@ -45,7 +45,7 @@ use std::str::FromStr;
 #[actix::post("/users/{fp_id}/integrations/alpaca/account")]
 pub async fn post(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<AlpacaCreateAccountRequest>,
     fp_id: FpIdPath,
 ) -> ApiResponse<AlpacaCreateAccountResponse> {
@@ -82,7 +82,7 @@ pub async fn post(
 #[actix::post("/integrations/alpaca/account")]
 pub async fn post_old(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: Json<DeprecatedAlpacaCreateAccountRequest>,
 ) -> ApiResponse<AlpacaCreateAccountResponse> {
     let result = post_inner(state, auth, request.into_inner()).await?;
@@ -91,7 +91,7 @@ pub async fn post_old(
 
 pub async fn post_inner(
     state: web::Data<State>,
-    auth: TenantApiKey,
+    auth: TenantApiKeyAuth,
     request: DeprecatedAlpacaCreateAccountRequest,
 ) -> ApiResponse<AlpacaCreateAccountResponse> {
     tracing::info!(%request.fp_user_id, %request.hostname, "/integrations/alpaca/cip request");
