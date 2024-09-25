@@ -468,6 +468,7 @@ export {
   EntityKind,
   EntityLabel,
   EntityStatus,
+  hasEntityBankAccounts,
   hasEntityCards,
   hasEntityCustomData,
   hasEntityDocuments,

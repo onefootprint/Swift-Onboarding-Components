@@ -90,6 +90,8 @@ export const hasEntityInvestorProfile = (entity: Entity) => {
   return values.some(investorProfileDi => entity.attributes.some(attribute => attribute === investorProfileDi));
 };
 
+export const hasEntityBankAccounts = (entity: Entity) => entity.attributes.some(attr => attr.startsWith('bank'));
+
 export const hasEntityCards = (entity: Entity) => entity.attributes.some(attr => attr.startsWith('card'));
 
 export const hasEntityCustomData = (entity: Entity) =>

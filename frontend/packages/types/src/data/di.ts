@@ -317,6 +317,14 @@ export enum CardDIField {
   country = 'billing_address.country',
 }
 
+export enum BankDIField {
+  name = 'name',
+  accountType = 'account_type',
+  routingNumber = 'ach_routing_number',
+  accountNumber = 'ach_account_number',
+  accountUd = 'ach_account_ud',
+}
+
 export type CardDI<T extends string = string> =
   | `card.${T}.${CardDIField.name}`
   | `card.${T}.${CardDIField.issuer}`
@@ -326,6 +334,13 @@ export type CardDI<T extends string = string> =
   | `card.${T}.${CardDIField.expiration}`
   | `card.${T}.${CardDIField.expirationMonth}`
   | `card.${T}.${CardDIField.expirationYear}`;
+
+export type BankDI<T extends string = string> =
+  | `bank.${T}.${BankDIField.name}`
+  | `bank.${T}.${BankDIField.accountType}`
+  | `bank.${T}.${BankDIField.routingNumber}`
+  | `bank.${T}.${BankDIField.accountNumber}`
+  | `bank.${T}.${BankDIField.accountUd}`;
 
 export type CustomDocumentIdentifier<T extends string = string> = `document.custom.${T}`;
 
