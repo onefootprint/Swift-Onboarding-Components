@@ -177,13 +177,3 @@ export const withOnboardingConfigs = (response = obConfigsFixture) =>
       },
     },
   });
-
-export const withLabel = (id: string) =>
-  mockRequest({
-    method: 'get',
-    path: `/entities/${id}/label`,
-    response: {
-      createdAt: '2023-03-27T14:43:47.444716Z',
-      kind: null,
-    },
-  });

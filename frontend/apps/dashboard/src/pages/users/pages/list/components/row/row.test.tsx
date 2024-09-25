@@ -10,14 +10,9 @@ import {
   entityOnWatchlistFixture,
   entityPassedFixture,
   entityVaultOnlyFixture,
-  withLabel,
 } from './row.test.config';
 
 describe('User table row <Row />', () => {
-  beforeEach(() => {
-    withLabel();
-  });
-
   const renderRow = (entity: Entity) =>
     customRender(
       <table>

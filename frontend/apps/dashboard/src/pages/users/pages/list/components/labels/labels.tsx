@@ -1,15 +1,15 @@
 import { type Entity, EntityLabel } from '@onefootprint/types';
 import { Stack, Tag } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import useLabel from 'src/hooks/use-label';
 
 export type TagsProps = {
   entity: Entity;
 };
 
-const Labels = ({ entity: { id, watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest } }: TagsProps) => {
+const Labels = ({
+  entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest, label },
+}: TagsProps) => {
   const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
-  const { data: label } = useLabel(id);
   const onWatchlist = watchlistCheck?.status === 'fail';
   const showLabels = hasOutstandingWorkflowRequest || onWatchlist || requiresManualReview || label;
 
