@@ -16,8 +16,8 @@ import { type IdentifyMachineArgs, SuccessfulIdentifier } from './types';
 import {
   getMachineArgs,
   hasSingleRequiredAuthMethod,
-  isEmailAndPhonePresent,
-  isEmailOrPhonePresent,
+  isEmailAndPhoneValid,
+  isEmailOrPhoneValid,
   isEmailVerificationRequired,
   isNoPhoneFlow,
   isPhoneVerificationRequired,
@@ -113,7 +113,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
         init: {
           always: [
             { target: 'initAuthToken', cond: ctx => !!ctx.initialAuthToken },
-            { target: 'initBootstrap', cond: isEmailOrPhonePresent },
+            { target: 'initBootstrap', cond: isEmailOrPhoneValid },
             { target: 'emailIdentification', cond: ctx => !isEmailValid(ctx.email?.value || '') },
             { target: 'phoneIdentification' },
           ],
@@ -123,12 +123,15 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             bootstrapReceived: [
               ...LOGIN_CHALLENGE_TRANSITIONS,
               // Otherwise, go to respective signup challenge screens
-              { target: 'emailChallenge', cond: isNoPhoneFlow }, // legacy
               {
                 target: 'emailChallenge',
-                cond: ctx => isEmailAndPhonePresent(ctx) && hasSingleRequiredAuthMethod('email', ctx),
+                cond: ctx => isNoPhoneFlow(ctx) && isEmailValid(ctx.email?.value || ''),
               },
-              { target: 'smsChallenge', cond: isEmailAndPhonePresent },
+              {
+                target: 'emailChallenge',
+                cond: ctx => isEmailAndPhoneValid(ctx) && hasSingleRequiredAuthMethod('email', ctx),
+              },
+              { target: 'smsChallenge', cond: isEmailAndPhoneValid },
               { target: 'emailIdentification', cond: ctx => !isEmailValid(ctx.email?.value || '') },
               { target: 'phoneIdentification' },
             ],
@@ -148,7 +151,11 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               // one available, go directly to that challenge
               ...LOGIN_CHALLENGE_TRANSITIONS,
               // If in a no-phone flow, go to signup challenge with only the email
-              { target: 'emailChallenge', cond: isNoPhoneFlow, actions: ['assignIdentifyResult'] }, // legacy
+              {
+                target: 'emailChallenge',
+                cond: isNoPhoneFlow,
+                actions: ['assignIdentifyResult'],
+              },
               // Otherwise, proceed to see if we can find the user by phone
               { target: 'phoneIdentification', actions: ['assignIdentifyResult'] },
             ],

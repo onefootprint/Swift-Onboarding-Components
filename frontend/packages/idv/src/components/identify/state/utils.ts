@@ -29,10 +29,10 @@ export const hasSingleRequiredAuthMethod = (kind: `${AuthMethodKind}`, ctx: Cont
 /** @deprecated we should rely requiredAuthMethods */
 export const isNoPhoneFlow = (ctx: Context): boolean => Boolean(ctx.config?.isNoPhoneFlow);
 
-export const isEmailOrPhonePresent = (ctx: Context): boolean =>
+export const isEmailOrPhoneValid = (ctx: Context): boolean =>
   isEmail(ctx?.email?.value || '') || isPhoneNumber(ctx?.phoneNumber?.value || '');
 
-export const isEmailAndPhonePresent = (ctx: Context): boolean =>
+export const isEmailAndPhoneValid = (ctx: Context): boolean =>
   isEmail(ctx?.email?.value || '') && isPhoneNumber(ctx?.phoneNumber?.value || '');
 
 export const getAvailableChallengeKinds = (device: Device, user: User) => {
