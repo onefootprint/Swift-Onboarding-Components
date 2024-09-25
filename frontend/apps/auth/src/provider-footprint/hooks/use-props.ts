@@ -23,7 +23,7 @@ const useProps = <T extends Obj>(onSuccess: (props?: T) => void, onError: (error
   const fpProvider = useFootprintProvider();
   const urlFragmentToken = getTokenFromUrlHash(windowUrl);
   const sdkToken = urlFragmentToken?.startsWith('sdktok_') ? urlFragmentToken : '';
-  const querySdkArgs = useGetSdkArgs<T>(sdkToken, fpProvider);
+  const querySdkArgs = useGetSdkArgs<T>(sdkToken);
   const isSdkArgsLoading = querySdkArgs.isLoading && querySdkArgs.isFetching;
   const [isFpProviderLoaded, setIsFpProviderLoaded] = useState(false);
 

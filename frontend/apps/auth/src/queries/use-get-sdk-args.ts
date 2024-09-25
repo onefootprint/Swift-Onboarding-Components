@@ -2,43 +2,25 @@ import { isTokenFormat } from '@onefootprint/core';
 import request from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 
-import type { ProviderReturn } from '../provider-footprint/types';
-
 type Obj = Record<string, unknown>;
 type GetSdkArgsResponse<T> = {
   args: { kind: string; data: T };
 };
 
-const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
-  let optionalSdkUrl = '';
-  let optionalSdkVersion = '';
-  try {
-    const fpModel = await fpProvider.load();
-    optionalSdkUrl = fpModel?.model?.sdkUrl || '';
-    optionalSdkVersion = fpModel?.model?.sdkVersion || '';
-  } catch {
-    /* empty */
-  }
-
+const getSdkArgs = async <T extends Obj>(authToken: string) => {
   const { data: response } = await request<GetSdkArgsResponse<T>>({
     method: 'GET',
     url: '/org/sdk_args',
-    headers: optionalSdkVersion
-      ? {
-          // TODO this version is kind of incorrect? this is coming from the auth app
-          'x-fp-client-version': `footprint-js ${optionalSdkVersion} ${optionalSdkUrl}`.trim(),
-          'x-fp-sdk-args-token': authToken,
-        }
-      : { 'x-fp-sdk-args-token': authToken },
+    headers: { 'x-fp-sdk-args-token': authToken },
   });
 
   return response;
 };
 
-const useGetSdkArgs = <T extends Obj>(authToken: string, fpProvider: ProviderReturn) =>
+const useGetSdkArgs = <T extends Obj>(authToken: string) =>
   useQuery({
     queryKey: [authToken, 'get-sdk-args'],
-    queryFn: () => getSdkArgs<T>(authToken, fpProvider),
+    queryFn: () => getSdkArgs<T>(authToken),
     enabled: isTokenFormat(authToken),
   });
 

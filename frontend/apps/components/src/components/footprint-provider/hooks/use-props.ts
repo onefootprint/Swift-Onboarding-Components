@@ -21,7 +21,7 @@ const useProps = <T extends Obj>(onSuccess?: (props?: T) => void, onError?: (err
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
   const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
-  const sdkArgsQuery = useGetSdkArgs<T>(sdkArgsToken, fpProvider);
+  const sdkArgsQuery = useGetSdkArgs<T>(sdkArgsToken);
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
   const timerId = useRef<ReturnType<typeof setTimeout>>();
 

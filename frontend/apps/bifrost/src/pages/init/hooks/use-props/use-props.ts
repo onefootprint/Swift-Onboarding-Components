@@ -23,7 +23,7 @@ const useProps = ({ onSuccess, onError }: UsePropsProps) => {
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
   const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
-  const sdkArgsQuery = useGetSdkArgs(sdkArgsToken, fpProvider);
+  const sdkArgsQuery = useGetSdkArgs(sdkArgsToken);
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
   const mergeOnboardingSession = useMergeOnboardingSession();
 
