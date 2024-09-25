@@ -31,6 +31,7 @@ const useGetOnboardingStatus = ({ authToken, enabled = true, options = {} }: Get
     queryFn: () => getOnboardingStatus({ authToken }),
     enabled: !!authToken && !!enabled,
     gcTime: 0, // we should never cache this query
+    staleTime: 0,
   });
 
   useEffect(() => {
