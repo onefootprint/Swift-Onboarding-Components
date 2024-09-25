@@ -136,6 +136,7 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     },
     documentsToCollect: null,
     promptForPasskey: true,
+    allowReonboard: false,
     businessDocumentsToCollect: [],
     requiredAuthMethods: [AuthMethodKind.phone],
     verificationChecks: [],

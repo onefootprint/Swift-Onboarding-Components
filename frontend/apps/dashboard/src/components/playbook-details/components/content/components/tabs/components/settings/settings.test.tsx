@@ -1,41 +1,42 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import Passkeys from './passkeys';
+import { OnboardingConfigKind } from '@onefootprint/types';
+import Settings from './settings';
 import {
   playbookWithPasskeysFixture,
   playbookWithoutPasskeysFixture,
   withUpdatePlaybook,
   withUpdatePlaybookError,
-} from './passkeys.test.config';
+} from './settings.test.config';
 
-describe('Passkeys', () => {
-  const renderPasskeys = (playbook = playbookWithPasskeysFixture) => customRender(<Passkeys playbook={playbook} />);
+describe('Settings', () => {
+  const renderSettings = (playbook = playbookWithPasskeysFixture) => customRender(<Settings playbook={playbook} />);
 
-  describe('when the passkeys is enabled', () => {
+  describe('when the settings is enabled', () => {
     it('should render the switch correctly', () => {
-      renderPasskeys();
+      renderSettings();
 
       const toggle = screen.getByRole('switch', { name: 'Enable passkey registration' }) as HTMLInputElement;
       expect(toggle.checked).toBe(true);
     });
   });
 
-  describe('when the passkeys is disabled', () => {
+  describe('when the settings is disabled', () => {
     it('should render the switch correctly', () => {
-      renderPasskeys(playbookWithoutPasskeysFixture);
+      renderSettings(playbookWithoutPasskeysFixture);
 
       const toggle = screen.getByRole('switch', { name: 'Enable passkey registration' }) as HTMLInputElement;
       expect(toggle.checked).toBe(false);
     });
   });
 
-  describe('when updating the passkeys', () => {
+  describe('when updating the passkeys settings', () => {
     describe('when it fails', () => {
       beforeEach(() => {
         withUpdatePlaybookError(playbookWithoutPasskeysFixture);
       });
 
       it('should render the switch correctly', async () => {
-        renderPasskeys();
+        renderSettings();
 
         const toggle = screen.getByRole('switch', { name: 'Enable passkey registration' }) as HTMLInputElement;
         await userEvent.click(toggle);
@@ -52,13 +53,36 @@ describe('Passkeys', () => {
       });
 
       it('should render the switch correctly', async () => {
-        renderPasskeys();
+        renderSettings();
 
         const toggle = screen.getByRole('switch', { name: 'Enable passkey registration' }) as HTMLInputElement;
         await userEvent.click(toggle);
 
         expect(toggle.checked).toBe(false);
       });
+    });
+  });
+
+  describe('reonboard settings', () => {
+    beforeEach(() => {
+      withUpdatePlaybook(playbookWithoutPasskeysFixture);
+    });
+
+    it('should not render the switch for KYC playbook', async () => {
+      renderSettings();
+      expect(screen.queryByRole('switch', { name: 'Allow reonboarding' })).toBeFalsy();
+    });
+
+    it('should render the switch correctly for KYB', async () => {
+      renderSettings({
+        ...playbookWithPasskeysFixture,
+        kind: OnboardingConfigKind.kyb,
+      });
+
+      const toggle = screen.getByRole('switch', { name: 'Allow reonboarding' }) as HTMLInputElement;
+      await userEvent.click(toggle);
+
+      expect(toggle.checked).toBe(true);
     });
   });
 });

@@ -468,7 +468,7 @@
     "tabs": {
       "data-collection": "Data collection",
       "verification-checks": "Verification checks",
-      "passkeys": "Passkeys",
+      "settings": "Settings",
       "rules": "Rules"
     },
     "data-collection": {
@@ -552,18 +552,24 @@
         }
       }
     },
-    "passkeys": {
-      "title": "Passkey registration",
-      "form": {
-        "enable": {
-          "label": "Enable passkey registration",
-          "hint": "We use passkeys to validate your users’ identity without the need for a password."
+    "settings": {
+      "passkeys": {
+        "title": "Passkey registration",
+        "form": {
+          "enable": {
+            "label": "Enable passkey registration",
+            "hint": "We use passkeys to validate your users’ identity without the need for a password."
+          }
+        },
+        "about": {
+          "title": "More about passkeys on",
+          "ios": "iOS devices",
+          "android": "Android devices"
         }
       },
-      "about": {
-        "title": "Learn more about passkeys",
-        "ios": "On iOS devices",
-        "android": "On Android devices"
+      "allow-reonboard": {
+        "title": "Allow reonboarding",
+        "description": "If the user has already onboarded onto this playbook, allow them to onboard again. Please note repeat onboardings incur normal charges. You are responsible for all charges incurred from repeat users onboarding onto your platform multiple times."
       }
     },
     "rules": {

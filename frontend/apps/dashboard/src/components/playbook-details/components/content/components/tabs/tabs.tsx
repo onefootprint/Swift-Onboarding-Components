@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import useGetQueryParam from 'src/hooks/use-query-param';
 import styled, { css } from 'styled-components';
 import DataCollection from './components/data-collection';
-import Passkeys from './components/passkeys';
 import Rules from './components/rules';
+import Settings from './components/settings';
 import VerificationChecks from './components/verification-checks';
 
 export type TabsProps = {
@@ -33,8 +33,8 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
       : [
           { value: 'data', label: t('tabs.data-collection') },
           { value: 'verification-checks', label: t('tabs.verification-checks') },
-          { value: 'passkeys', label: t('tabs.passkeys') },
           { value: 'rules', label: t('tabs.rules') },
+          { value: 'settings', label: t('tabs.settings') },
         ];
 
   const handleChange = (tab: PlaybookTabs) => {
@@ -48,8 +48,8 @@ const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => 
       <UITabs options={options} onChange={handleChange} disabled={isTabsDisabled} defaultValue={tab} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'verification-checks' && <VerificationChecks playbook={playbook} />}
-      {tab === 'passkeys' && <Passkeys playbook={playbook} />}
       {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
+      {tab === 'settings' && <Settings playbook={playbook} />}
     </Container>
   );
 };

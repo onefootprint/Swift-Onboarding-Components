@@ -8,7 +8,7 @@ const playbooksConfigQuery = z.object({
   onboarding_configs_search: z.string().optional(),
   onboarding_configs_status: onboardingStatusEnum.optional(),
 });
-const playbookTabsEnum = z.enum(['data', 'verification-checks', 'passkeys', 'rules']);
+const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings']);
 
 export type PlaybookTabs = z.infer<typeof playbookTabsEnum>;
 export type PlaybooksConfigQuery = z.infer<typeof playbooksConfigQuery>;

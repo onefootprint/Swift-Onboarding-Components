@@ -33,6 +33,7 @@ const basePlaybook: OnboardingConfig = {
   documentsToCollect: [],
   businessDocumentsToCollect: null,
   promptForPasskey: false,
+  allowReonboard: false,
   ruleSet: {
     version: 1,
   },

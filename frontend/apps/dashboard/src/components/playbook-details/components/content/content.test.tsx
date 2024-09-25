@@ -41,8 +41,8 @@ describe('<Content />', () => {
       const verificationChecksTab = screen.getByRole('tab', { name: 'Verification checks' });
       expect(verificationChecksTab).toBeInTheDocument();
 
-      const passkeysTab = screen.getByRole('tab', { name: 'Passkeys' });
-      expect(passkeysTab).toBeInTheDocument();
+      const settingsTab = screen.getByRole('tab', { name: 'Settings' });
+      expect(settingsTab).toBeInTheDocument();
 
       const rulesTab = screen.getByRole('tab', { name: 'Rules' });
       expect(rulesTab).toBeInTheDocument();
@@ -62,8 +62,8 @@ describe('<Content />', () => {
       const verificationChecksTab = screen.getByRole('tab', { name: 'Verification checks' });
       expect(verificationChecksTab).toBeInTheDocument();
 
-      const passkeysTab = screen.getByRole('tab', { name: 'Passkeys' });
-      expect(passkeysTab).toBeInTheDocument();
+      const settingsTab = screen.getByRole('tab', { name: 'Settings' });
+      expect(settingsTab).toBeInTheDocument();
 
       const rulesTab = screen.getByRole('tab', { name: 'Rules' });
       expect(rulesTab).toBeInTheDocument();
@@ -76,6 +76,9 @@ describe('<Content />', () => {
 
       const signUpText = await screen.findByText('Sign up information');
       expect(signUpText).toBeInTheDocument();
+
+      const settingsTab = screen.queryByRole('tab', { name: 'Settings' });
+      expect(settingsTab).not.toBeInTheDocument();
 
       const tablist = screen.queryByRole('tablist');
       expect(tablist).not.toBeInTheDocument();

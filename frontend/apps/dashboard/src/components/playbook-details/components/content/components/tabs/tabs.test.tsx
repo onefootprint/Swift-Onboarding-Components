@@ -20,8 +20,8 @@ describe('<Tabs />', () => {
     const verificationChecks = screen.getByRole('tab', { name: 'Verification checks' });
     expect(verificationChecks).toBeInTheDocument();
 
-    const passkeys = screen.getByRole('tab', { name: 'Passkeys' });
-    expect(passkeys).toBeInTheDocument();
+    const settings = screen.getByRole('tab', { name: 'Settings' });
+    expect(settings).toBeInTheDocument();
 
     const rules = screen.getByRole('tab', { name: 'Rules' });
     expect(rules).toBeInTheDocument();

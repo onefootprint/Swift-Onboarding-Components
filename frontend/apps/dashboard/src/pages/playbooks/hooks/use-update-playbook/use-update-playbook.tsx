@@ -4,16 +4,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updatePlaybook = async (authHeaders: AuthHeaders, playbook: OrgOnboardingConfigUpdateRequest) => {
+const updatePlaybook = async (authHeaders: AuthHeaders, requestData: OrgOnboardingConfigUpdateRequest) => {
+  const { id, ...data } = requestData;
   const response = await request<OrgOnboardingConfigUpdateResponse>({
     headers: authHeaders,
     method: 'PATCH',
-    url: `/org/onboarding_configs/${playbook.id}`,
-    data: {
-      status: playbook.status,
-      name: playbook.name,
-      promptForPasskey: playbook.promptForPasskey,
-    },
+    url: `/org/onboarding_configs/${id}`,
+    data,
   });
 
   return response.data;
