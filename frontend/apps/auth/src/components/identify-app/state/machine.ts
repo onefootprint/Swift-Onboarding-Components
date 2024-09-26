@@ -81,11 +81,15 @@ const createAuthIdentifyAppMachine = (_args: AuthIdentifyAppMachineArgs) =>
             passkeyProcessingError: [{ target: 'passkeyError' }],
           },
         },
+        passkeyCancelled: {
+          on: { passkeyRegistrationSkip: { target: 'done' } },
+        },
+        passkeyError: {
+          on: { passkeyRegistrationSkip: { target: 'done' } },
+        },
         done: { type: 'final' },
         invalidAuthConfig: { type: 'final' },
         invalidConfig: { type: 'final' },
-        passkeyCancelled: { type: 'final' },
-        passkeyError: { type: 'final' },
         sdkUrlNotAllowed: { type: 'final' },
         unexpectedError: { type: 'final' },
       },

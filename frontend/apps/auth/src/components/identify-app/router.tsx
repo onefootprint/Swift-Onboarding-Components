@@ -86,11 +86,11 @@ const IdentifyRouter = () => {
   }
 
   if (state.matches('passkeyCancelled')) {
-    return <PasskeyCancelled />;
+    return <PasskeyCancelled onClick={() => send({ type: 'passkeyRegistrationSkip' })} />;
   }
 
   if (state.matches('passkeyError')) {
-    return <PasskeyError />;
+    return <PasskeyError onClick={() => send({ type: 'passkeyRegistrationSkip' })} />;
   }
 
   if (state.matches('invalidAuthConfig')) {

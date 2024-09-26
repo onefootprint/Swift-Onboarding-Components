@@ -4,7 +4,7 @@ import type { Variant } from '@/src/types';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { getLogger, trackAction } from '@onefootprint/idv';
 
-import { useConfirmationDialog } from '@onefootprint/ui';
+import { Box, useConfirmationDialog } from '@onefootprint/ui';
 import truncate from 'lodash/truncate';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,8 +26,10 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
   const confirmationDialog = useConfirmationDialog();
   const { t } = useTranslation('common');
   const isDone = state.matches('done');
-  const shouldHideCloseButton = state.matches('passkeyOptionalRegistration');
   const isSandbox = config?.isLive === false;
+
+  const shouldHideNavigationCloseButton =
+    state.matches('passkeyOptionalRegistration') || state.matches('passkeyCancelled') || state.matches('passkeyError');
 
   const handleCompleteWithValidationToken = (validationToken?: string): void => {
     if (validationToken) {
@@ -72,9 +74,10 @@ const Layout = ({ children, variant }: LayoutProps): JSX.Element | null => {
     <ClientLayout
       config={state.context.config}
       isSandbox={isSandbox}
-      onClose={shouldHideCloseButton ? undefined : handleClose}
+      onClose={shouldHideNavigationCloseButton ? undefined : handleClose}
       variant={variant}
     >
+      {shouldHideNavigationCloseButton ? <Box height="56px" /> : null}
       {children}
     </ClientLayout>
   );

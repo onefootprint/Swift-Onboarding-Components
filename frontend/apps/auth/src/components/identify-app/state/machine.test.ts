@@ -192,6 +192,9 @@ describe('Auth Identify App Machine', () => {
     state = machine.send({ type: 'passkeyRegistrationError', payload: new Error('error') });
     expect(state.value).toEqual('passkeyError');
 
+    state = machine.send({ type: 'passkeyRegistrationSkip' });
+    expect(state.value).toEqual('done');
+
     expect(state.done).toEqual(true);
   });
 
@@ -234,6 +237,9 @@ describe('Auth Identify App Machine', () => {
 
     state = machine.send({ type: 'passkeyProcessingCancelled' });
     expect(state.value).toEqual('passkeyCancelled');
+
+    state = machine.send({ type: 'passkeyRegistrationSkip' });
+    expect(state.value).toEqual('done');
 
     expect(state.done).toEqual(true);
   });
