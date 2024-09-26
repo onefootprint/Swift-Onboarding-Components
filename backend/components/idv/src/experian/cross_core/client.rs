@@ -43,14 +43,12 @@ pub struct ExperianClientAdapter {
     environment: ClientEnvironment,
     subscriber_code: PiiString,
     cross_core_url: String,
-    is_master_subcode: bool,
 }
 
 impl ExperianClientAdapter {
     pub fn new(credentials: ExperianCredentials) -> Result<Self, Error> {
         let client_mode = Self::get_environment(&credentials.auth_username)?;
         let cross_core_url = Self::get_cross_core_url(&client_mode);
-        let is_master_subcode = credentials.is_master_subcode();
 
         let cross_core_credentials = CrossCoreRequestCredentials::new(
             credentials.cross_core_username,
@@ -68,7 +66,6 @@ impl ExperianClientAdapter {
             environment: client_mode,
             subscriber_code: credentials.subscriber_code,
             cross_core_url,
-            is_master_subcode,
         })
     }
 
@@ -158,13 +155,12 @@ impl ExperianClientAdapter {
         &self,
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
-        tenant_identifier: String,
     ) -> Result<serde_json::Value, Error> {
         let idv_data = validated_idv_data.into_idv_data();
         let vreq_id = idv_data.verification_request_id.clone();
         let req_struct = &CrossCoreAPIRequest::try_from(
             idv_data,
-            self.config(vreq_id, tenant_identifier),
+            self.config(vreq_id),
             self.environment == ClientEnvironment::Production,
         )?;
         let req = serde_json::to_string(req_struct)?;
@@ -242,7 +238,6 @@ impl ExperianClientAdapter {
         &self,
         client: &FootprintVendorHttpClient,
         validated_idv_data: ValidatedIdvData,
-        tenant_identifier: String,
     ) -> Result<serde_json::Value, Error> {
         let retry_strategy = FixedInterval::from_millis(200).take(3);
 
@@ -250,13 +245,7 @@ impl ExperianClientAdapter {
         // Would be cool if we could pass in an Extension that had a lambda retry policy
         let response = RetryIf::spawn(
             retry_strategy,
-            || {
-                self.send_precise_id_request(
-                    client,
-                    validated_idv_data.to_owned(),
-                    tenant_identifier.to_owned(),
-                )
-            },
+            || self.send_precise_id_request(client, validated_idv_data.to_owned()),
             Self::should_retry,
         )
         .await
@@ -265,13 +254,9 @@ impl ExperianClientAdapter {
         Ok(response)
     }
 
-    fn config(
-        &self,
-        verification_request_id: Option<VerificationRequestId>,
-        tenant_identifier: String,
-    ) -> PreciseIDRequestConfig {
+    fn config(&self, verification_request_id: Option<VerificationRequestId>) -> PreciseIDRequestConfig {
         PreciseIDRequestConfig {
-            control_options: self.control_options(tenant_identifier),
+            control_options: self.control_options(),
             tenant_id: "105408b68cde455a92e95a3eaa989e".into(),
             request_type: "PreciseIdOnly".into(),
             client_reference_id: verification_request_id
@@ -281,8 +266,8 @@ impl ExperianClientAdapter {
         }
     }
 
-    fn control_options(&self, tenant_identifier: String) -> Vec<ControlOption> {
-        let mut options = vec![
+    fn control_options(&self) -> Vec<ControlOption> {
+        vec![
             // secrets
             ControlOption {
                 option: "PID_USERNAME".to_string().into(),
@@ -319,17 +304,7 @@ impl ExperianClientAdapter {
                 option: "DETAIL_REQUEST".to_string().into(),
                 value: "D".to_string().into(),
             },
-        ];
-
-        // if we are using the master subcode, experian requested 2024-09-09 to add this value
-        if self.is_master_subcode {
-            options.push(ControlOption {
-                option: "END_USER".to_string().into(),
-                value: tenant_identifier.into(),
-            })
-        }
-
-        options
+        ]
     }
 
     /// We cannot send test data to production, or production data to test environment
@@ -433,8 +408,7 @@ mod tests {
             auth_client_secret,
             cross_core_username,
             cross_core_password,
-            subscriber_code: subscriber_code.clone(),
-            master_subscriber_code: subscriber_code,
+            subscriber_code,
         }
     }
     fn sandbox_client() -> Result<ExperianClientAdapter, Error> {
@@ -455,7 +429,6 @@ mod tests {
             cross_core_username,
             cross_core_password,
             subscriber_code,
-            master_subscriber_code,
         } = load_sandbox_credentials();
 
         // client with wrong auth username
@@ -467,7 +440,6 @@ mod tests {
             cross_core_username,
             cross_core_password,
             subscriber_code,
-            master_subscriber_code,
         });
 
         let assertion = match res {
@@ -514,7 +486,6 @@ mod tests {
         let request = ExperianCrossCoreRequest {
             idv_data,
             credentials,
-            tenant_identifier: "master".to_string(),
         };
 
         let res = send_precise_id_request(&fp_client, request).await.unwrap();
@@ -541,16 +512,13 @@ mod tests {
         assert!(idv_data.phone_number.is_some());
         assert!(idv_data.email.is_some());
         // sandbox we don't send email/phone
-        let req =
-            CrossCoreAPIRequest::try_from(idv_data.clone(), client.config(None, "master".to_string()), false)
-                .unwrap();
+        let req = CrossCoreAPIRequest::try_from(idv_data.clone(), client.config(None), false).unwrap();
         let contact = req.payload.contacts[0].clone();
         assert!(contact.emails.is_empty());
         assert!(contact.telephones.is_empty());
 
         // prod we do send email/phone
-        let req =
-            CrossCoreAPIRequest::try_from(idv_data, client.config(None, "master".to_string()), true).unwrap();
+        let req = CrossCoreAPIRequest::try_from(idv_data, client.config(None), true).unwrap();
         let contact = req.payload.contacts[0].clone();
         assert!(!contact.emails.is_empty());
         assert!(!contact.telephones.is_empty());

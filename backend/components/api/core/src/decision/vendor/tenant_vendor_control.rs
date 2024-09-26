@@ -327,10 +327,16 @@ impl From<&Config> for ExperianCredentialBuilder {
                 auth_client_secret: config.experian.auth_client_secret.clone(),
                 cross_core_username: config.experian.cross_core_username.clone(),
                 cross_core_password: config.experian.cross_core_password.clone(),
-                master_subscriber_code: config.experian.subscriber_code.clone(),
             }
         } else {
-            ExperianCredentialBuilder::default()
+            ExperianCredentialBuilder {
+                auth_username: PiiString::from(""),
+                auth_password: PiiString::from(""),
+                auth_client_id: PiiString::from(""),
+                auth_client_secret: PiiString::from(""),
+                cross_core_username: PiiString::from(""),
+                cross_core_password: PiiString::from(""),
+            }
         }
     }
 }

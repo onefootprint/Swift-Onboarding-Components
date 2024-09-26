@@ -18,6 +18,6 @@ pub async fn send_precise_id_request(
     let validated_data = client_adapter.validate_data(request.idv_data)?;
 
     client_adapter
-        .send_precise_id_request_with_retries(client, validated_data, request.tenant_identifier)
+        .send_precise_id_request_with_retries(client, validated_data)
         .await
 }
