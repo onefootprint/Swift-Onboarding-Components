@@ -189,7 +189,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "3jmlksncdcsaapnqww",
+          sandboxId: "3jmlksncdcvfevdsaww",
           // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
           child: const Kyc(),
         ),
@@ -709,16 +709,24 @@ class Ssn extends StatelessWidget {
     )
         .then(
       (_) {
-        utilMethods.handoff(
-          onComplete: (token) {
-            onCompleted(token);
+        utilMethods.process().then((validationToken) {
+          onCompleted(validationToken);
+        }).catchError(
+          (err) {
+            print("Process Error $err");
+            utilMethods.handoff(
+              onComplete: (token) {
+                onCompleted(token);
+              },
+              onError: (err) {
+                print("Handoff error $err");
+              },
+              onCancel: () {
+                print("Handoff canceled");
+              },
+            );
           },
-          onError: (err) {
-            print("Handoff error $err");
-          },
-          onCancel: () {
-            print("Handoff canceled");
-          },
+          test: (err) => err is InlineProcessException,
         );
       },
     ).catchError(

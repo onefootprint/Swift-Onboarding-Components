@@ -7,10 +7,14 @@ import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/inline_process_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_status.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/process.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/save.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/validate_onboarding.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/browser.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_data_after_verify.dart';
@@ -37,11 +41,14 @@ typedef HandoffHandler = void Function({
   void Function()? onCancel,
 });
 
+typedef ProcessHandler = Future<String> Function();
+
 ({
   IdentifyLauncher launchIdentify,
   SaveHandler save,
   HandoffHandler handoff,
-  AuthMethodChecker requiresAuth
+  AuthMethodChecker requiresAuth,
+  ProcessHandler process
 }) getFootprintService(BuildContext context, WidgetRef ref) {
   final fpWebview = Browser();
 
@@ -329,10 +336,39 @@ typedef HandoffHandler = void Function({
     fpWebview.init(config, OnboardingStep.onboard, context);
   }
 
+  Future<String> processOnboarding() async {
+    final fpContext = ref.read(fpContextNotifierProvider);
+    final authToken = fpContext.verifiedAuthToken;
+
+    if (authToken == null) {
+      throw Exception('No auth token found. Please authenticate first.');
+    }
+
+    try {
+      await process(authToken);
+    } catch (e) {
+      throw InlineProcessException("Failed to process onboarding. Error: $e");
+    }
+
+    final requirements = await getOnboardingStatus(authToken);
+    final validationToken =
+        (await validateOnboarding(authToken)).validationToken;
+
+    for (var requirement in requirements.requirements.all) {
+      if (!requirement.isMet) {
+        throw InlineProcessException(
+            "Process error. Onboarding requirements not met.");
+      }
+    }
+
+    return validationToken;
+  }
+
   return (
     launchIdentify: launchIdentify,
     save: vault,
     handoff: handoff,
-    requiresAuth: requiresAuth
+    requiresAuth: requiresAuth,
+    process: processOnboarding
   );
 }

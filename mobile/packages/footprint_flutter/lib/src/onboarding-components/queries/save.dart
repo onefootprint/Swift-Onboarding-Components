@@ -24,30 +24,20 @@ Future<SaveDataResponse> save(SaveDataRequest payload) async {
     throw Exception("You can't submit id and business at the same time");
   }
 
-  try {
-    final url =
-        dataKind.hasBusiness ? '/hosted/business/vault' : '/hosted/user/vault';
-    var response = await http.patch(
-      Uri.parse('$apiBaseUrl$url'),
-      headers: {
-        AUTH_HEADER: payload.authToken,
-        'Content-Type': 'application/json'
-      },
-      body: jsonEncode(data),
-    );
+  final url =
+      dataKind.hasBusiness ? '/hosted/business/vault' : '/hosted/user/vault';
+  var response = await http.patch(
+    Uri.parse('$apiBaseUrl$url'),
+    headers: {
+      AUTH_HEADER: payload.authToken,
+      'Content-Type': 'application/json'
+    },
+    body: jsonEncode(data),
+  );
 
-    if (response.statusCode == 200) {
-      return SaveDataResponse(data: response.body);
-    } else {
-      throw Exception('Failed to save data. Error: ${response.body}');
-    }
-  } catch (e) {
-    var errorMsg = 'Could not save data.';
-    try {
-      errorMsg = e.toString();
-    } catch (e) {
-      //
-    }
-    throw Exception(errorMsg);
+  if (response.statusCode == 200) {
+    return SaveDataResponse(data: response.body);
+  } else {
+    throw Exception('Failed to save data. Error: ${response.body}');
   }
 }
