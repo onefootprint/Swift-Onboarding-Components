@@ -17,7 +17,7 @@ const DeviceInsights = ({ entity }: ContentProps) => {
 
   return (
     <Section title={t('title')}>
-      <ErrorComponent error={error} />
+      {error && <ErrorComponent error={error} />}
       {isSuccess && <Content entity={entity} livenessData={data} />}
     </Section>
   );
