@@ -98,7 +98,34 @@ impl VaultWrapper<Business> {
         let dis = &[BDK::BeneficialOwners.into(), BDK::KycedBeneficialOwners.into()];
         let mut decrypted = self.decrypt_unchecked(&state.enclave_client, dis).await?;
 
-        let results = if let Some(vault_bos) = decrypted.remove(&BDK::BeneficialOwners.into()) {
+        let results = if let Some(kyced_bos) = decrypted.remove(&BDK::KycedBeneficialOwners.into()) {
+            // Bifrost-initiated flow. There should be a linked_bo for each vault_bo
+            let kyced_bos: Vec<KycedBusinessOwnerData> = kyced_bos.deserialize()?;
+            kyced_bos
+                .into_iter()
+                .map(|vault_bo| -> FpResult<_> {
+                    let linked_bo = linked_bos
+                        .iter()
+                        .find(|bo| bo.0.link_id == vault_bo.link_id)
+                        .cloned()
+                        .ok_or(BusinessError::LinkedBoNotFound)?;
+                    Ok((vault_bo, linked_bo))
+                })
+                .map_ok(|(vault_bo, (linked_bo, linked_bo_data))| BusinessOwnerInfo {
+                    // Vaulted BO fields
+                    first_name: Some(vault_bo.first_name),
+                    last_name: Some(vault_bo.last_name),
+                    phone_number: vault_bo.phone_number,
+                    email: vault_bo.email,
+                    ownership_stake: Some(vault_bo.ownership_stake),
+                    // Linked BO fields
+                    kind: linked_bo.kind,
+                    linked_bo: Some(linked_bo),
+                    scoped_user: linked_bo_data.map(|(su, _)| su),
+                    from_kyced_beneficial_owners: true,
+                })
+                .collect::<FpResult<Vec<_>>>()?
+        } else if let Some(vault_bos) = decrypted.remove(&BDK::BeneficialOwners.into()) {
             // Either bifrost-initiated flow or API-initiated flow. There will be at most one linked BO (for
             // bifrost)
             let vault_bos: Vec<BusinessOwnerData> = vault_bos.deserialize()?;
@@ -133,33 +160,6 @@ impl VaultWrapper<Business> {
                     kind,
                 })
                 .collect_vec()
-        } else if let Some(kyced_bos) = decrypted.remove(&BDK::KycedBeneficialOwners.into()) {
-            // Bifrost-initiated flow. There should be a linked_bo for each vault_bo
-            let kyced_bos: Vec<KycedBusinessOwnerData> = kyced_bos.deserialize()?;
-            kyced_bos
-                .into_iter()
-                .map(|vault_bo| -> FpResult<_> {
-                    let linked_bo = linked_bos
-                        .iter()
-                        .find(|bo| bo.0.link_id == vault_bo.link_id)
-                        .cloned()
-                        .ok_or(BusinessError::LinkedBoNotFound)?;
-                    Ok((vault_bo, linked_bo))
-                })
-                .map_ok(|(vault_bo, (linked_bo, linked_bo_data))| BusinessOwnerInfo {
-                    // Vaulted BO fields
-                    first_name: Some(vault_bo.first_name),
-                    last_name: Some(vault_bo.last_name),
-                    phone_number: vault_bo.phone_number,
-                    email: vault_bo.email,
-                    ownership_stake: Some(vault_bo.ownership_stake),
-                    // Linked BO fields
-                    kind: linked_bo.kind,
-                    linked_bo: Some(linked_bo),
-                    scoped_user: linked_bo_data.map(|(su, _)| su),
-                    from_kyced_beneficial_owners: true,
-                })
-                .collect::<FpResult<Vec<_>>>()?
         } else {
             // API-initiated flow with BOs linked via API, or bifrost-initiated flow with only primary BO
             // before the full list of BOs has been collected

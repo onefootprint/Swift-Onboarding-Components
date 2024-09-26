@@ -164,6 +164,12 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
         .await?;
 
     let dbo = bvw.decrypt_business_owners(state, &tenant.id).await?;
+
+    if obc.verification_checks().skip_kyc() {
+        // Safe to proceed, don't need to wait for any BOs
+        return Ok(true);
+    }
+
     send_missing_secondary_bo_links(state, biz_wf, &bvw, tenant, &dbo).await?;
 
     // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF
@@ -174,9 +180,7 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Fp
             .map(|su| su.status.is_terminal())
             .unwrap_or(false)
     });
-
-    let should_run_kyb = obc.verification_checks().skip_kyc() || all_bo_kyc_complete;
-    Ok(should_run_kyb)
+    Ok(all_bo_kyc_complete)
 }
 
 #[tracing::instrument(skip(state))]
