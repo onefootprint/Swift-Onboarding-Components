@@ -15,6 +15,7 @@ pub struct ExperianCredentialBuilder {
     pub auth_client_secret: PiiString,
     pub cross_core_username: PiiString,
     pub cross_core_password: PiiString,
+    pub master_subscriber_code: PiiString,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
@@ -97,6 +98,7 @@ impl ExperianCredentialBuilder {
             auth_client_secret: self.auth_client_secret,
             cross_core_username: self.cross_core_username,
             cross_core_password: self.cross_core_password,
+            master_subscriber_code: self.master_subscriber_code,
         }
     }
 }
@@ -110,6 +112,13 @@ pub struct ExperianCredentials {
     pub auth_client_secret: PiiString,
     pub cross_core_username: PiiString,
     pub cross_core_password: PiiString,
+    pub master_subscriber_code: PiiString,
+}
+
+impl ExperianCredentials {
+    pub fn is_master_subcode(&self) -> bool {
+        self.subscriber_code == self.master_subscriber_code
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]

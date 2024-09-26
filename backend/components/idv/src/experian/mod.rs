@@ -21,6 +21,7 @@ lazy_static::lazy_static! {
 pub struct ExperianCrossCoreRequest {
     pub idv_data: IdvData,
     pub credentials: ExperianCredentials,
+    pub tenant_identifier: String,
 }
 
 #[derive(Clone)]

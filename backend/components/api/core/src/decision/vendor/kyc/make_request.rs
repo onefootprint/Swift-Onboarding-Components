@@ -137,6 +137,7 @@ pub async fn send_idv_request(
             let request = ExperianCrossCoreRequest {
                 idv_data,
                 credentials: tvc.experian_credentials(),
+                tenant_identifier: tvc.tenant_identifier(),
             };
             send_experian_idv_request(
                 request,
