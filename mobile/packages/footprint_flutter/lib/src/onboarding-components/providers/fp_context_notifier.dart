@@ -2,6 +2,7 @@ import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/provider_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -67,6 +68,10 @@ class FpContextNotifier extends Notifier<ProviderContext> {
     state = state.copyWith(authValidationToken: authValidationToken);
   }
 
+  void updateVaultData(FormData vaultData) {
+    state = state.copyWith(vaultData: vaultData);
+  }
+
   void update({
     FootprintAppearance? appearance,
     FootprintSupportedLocale? locale,
@@ -79,6 +84,7 @@ class FpContextNotifier extends Notifier<ProviderContext> {
     String? redirectUrl,
     String? sandboxId,
     SandboxOutcome? sandboxOutcome,
+    FormData? vaultData,
   }) {
     state = state.copyWith(
       appearance: appearance,
@@ -92,6 +98,7 @@ class FpContextNotifier extends Notifier<ProviderContext> {
       redirectUrl: redirectUrl,
       sandboxId: sandboxId,
       sandboxOutcome: sandboxOutcome,
+      vaultData: vaultData,
     );
   }
 
@@ -114,5 +121,6 @@ final fpContextNotifierProvider =
     redirectUrl: '',
     sandboxId: null,
     sandboxOutcome: null,
+    vaultData: null,
   )),
 );

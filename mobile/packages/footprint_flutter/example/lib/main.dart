@@ -189,7 +189,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "3jmlksncdcvfevdsaww",
+          sandboxId: "3jmlksncdsvbvsbevdsaww",
           // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
           child: const Kyc(),
         ),
@@ -208,6 +208,11 @@ class Kyc extends StatefulWidget {
 class _KycState extends State<Kyc> {
   Steps currentStep = Steps.identify;
   String validationToken = '';
+
+  // We get requirements, vaultData, and several other helpful data from the verification result
+  // We can pass around the verification result to the next steps
+  // However, we also can get some of those data from FootprintUtils which is what I am going to do in this example
+  // This state variable is just for demonstration purposes
   VerificationResult? verificationResult;
 
   handleComplete({String? token}) {
@@ -245,26 +250,17 @@ class _KycState extends State<Kyc> {
                 useAuthToken: false,
               ),
             if (currentStep == Steps.basicInfo)
-              BasicData(
-                onCompleted: () {
-                  handleComplete();
-                },
-                vaultData: verificationResult?.vaultData,
-              ),
+              BasicData(onCompleted: () {
+                handleComplete();
+              }),
             if (currentStep == Steps.address)
-              AddressData(
-                onCompleted: () {
-                  handleComplete();
-                },
-                vaultData: verificationResult?.vaultData,
-              ),
+              AddressData(onCompleted: () {
+                handleComplete();
+              }),
             if (currentStep == Steps.ssn)
-              Ssn(
-                onCompleted: (String token) {
-                  handleComplete(token: token);
-                },
-                vaultData: verificationResult?.vaultData,
-              ),
+              Ssn(onCompleted: (String token) {
+                handleComplete(token: token);
+              }),
             if (currentStep == Steps.complete)
               Container(
                 padding: const EdgeInsets.all(20),
@@ -494,19 +490,22 @@ class _IdentifyState extends State<Identify> {
 }
 
 class BasicData extends StatelessWidget {
-  const BasicData({super.key, required this.onCompleted, this.vaultData});
-  final FormData? vaultData;
+  const BasicData({super.key, required this.onCompleted});
 
   final void Function() onCompleted;
 
   void handleComplete(BuildContext context, FormData formData) {
     footprintUtils(context)
-        .save(
+        .vault(
       formData,
     )
         .then(
       (_) {
-        onCompleted();
+        // for demonstration purposes, let's also print the requirements after this step
+        footprintUtils(context).getRequirements().then((requirements) {
+          print("Requirements: $requirements");
+          onCompleted();
+        });
       },
     ).catchError(
       (err) {
@@ -517,6 +516,8 @@ class BasicData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FormData? vaultData = footprintUtils(context).vaultData;
+
     return FootprintForm(
       initialData: {
         DataIdentifier.idFirstName: vaultData?.firstName,
@@ -586,19 +587,22 @@ class BasicData extends StatelessWidget {
 }
 
 class AddressData extends StatelessWidget {
-  const AddressData({super.key, required this.onCompleted, this.vaultData});
-  final FormData? vaultData;
+  const AddressData({super.key, required this.onCompleted});
 
   final void Function() onCompleted;
 
   void handleComplete(BuildContext context, FormData formData) {
     footprintUtils(context)
-        .save(
+        .vault(
       formData,
     )
         .then(
       (_) {
-        onCompleted();
+        // for demonstration purposes, let's also print the requirements after this step
+        footprintUtils(context).getRequirements().then((requirements) {
+          print("Requirements: $requirements");
+          onCompleted();
+        });
       },
     ).catchError(
       (err) {
@@ -609,6 +613,7 @@ class AddressData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FormData? vaultData = footprintUtils(context).vaultData;
     return FootprintForm(
       initialData: {
         DataIdentifier.idAddressLine1: vaultData?.addressLine1,
@@ -696,15 +701,14 @@ class AddressData extends StatelessWidget {
 }
 
 class Ssn extends StatelessWidget {
-  const Ssn({super.key, required this.onCompleted, this.vaultData});
-  final FormData? vaultData;
+  const Ssn({super.key, required this.onCompleted});
 
   final void Function(String token) onCompleted;
 
   void handleComplete(BuildContext context, FormData formData) {
     var utilMethods = footprintUtils(context);
     utilMethods
-        .save(
+        .vault(
       formData,
     )
         .then(
@@ -738,6 +742,7 @@ class Ssn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FormData? vaultData = footprintUtils(context).vaultData;
     return FootprintForm(
       initialData: {
         DataIdentifier.idSsn9: vaultData?.ssn9,

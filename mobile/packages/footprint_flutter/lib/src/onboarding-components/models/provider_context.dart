@@ -2,6 +2,7 @@ import 'package:footprint_flutter/src/models/appearance.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 
 class ProviderContext {
@@ -18,6 +19,7 @@ class ProviderContext {
   final String redirectUrl;
   final String? sandboxId;
   final SandboxOutcome? sandboxOutcome;
+  final FormData? vaultData;
 
   ProviderContext({
     required this.publicKey,
@@ -32,6 +34,7 @@ class ProviderContext {
     this.onboardingConfig,
     this.sandboxId,
     this.sandboxOutcome,
+    this.vaultData,
   });
 
   ProviderContext copyWith({
@@ -47,6 +50,7 @@ class ProviderContext {
     String? redirectUrl,
     String? sandboxId,
     SandboxOutcome? sandboxOutcome,
+    FormData? vaultData,
   }) {
     return ProviderContext(
       publicKey: publicKey ?? this.publicKey,
@@ -61,6 +65,7 @@ class ProviderContext {
       redirectUrl: redirectUrl ?? this.redirectUrl,
       sandboxId: sandboxId ?? this.sandboxId,
       sandboxOutcome: sandboxOutcome ?? this.sandboxOutcome,
+      vaultData: vaultData ?? this.vaultData,
     );
   }
 }

@@ -34,21 +34,23 @@ typedef AuthMethodCheckerResult = ({
   VerificationResult? verificationResult,
 });
 typedef AuthMethodChecker = Future<AuthMethodCheckerResult> Function();
-typedef SaveHandler = Future<void> Function(FormData data);
+typedef VaultHandler = Future<void> Function(FormData data);
 typedef HandoffHandler = void Function({
   void Function(String validationToken)? onComplete,
   void Function(Object err)? onError,
   void Function()? onCancel,
 });
-
 typedef ProcessHandler = Future<String> Function();
+typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
 
 ({
   IdentifyLauncher launchIdentify,
-  SaveHandler save,
+  VaultHandler vault,
   HandoffHandler handoff,
   AuthMethodChecker requiresAuth,
-  ProcessHandler process
+  ProcessHandler process,
+  GetRequirementsHandler getRequirements,
+  FormData? vaultData,
 }) getFootprintService(BuildContext context, WidgetRef ref) {
   final fpWebview = Browser();
 
@@ -75,7 +77,7 @@ typedef ProcessHandler = Future<String> Function();
                 requirements: null,
                 vaultData: null,
               )
-            : await getDataAfterVerify(authToken, locale);
+            : await getDataAfterVerify(authToken, locale, ref);
     return (
       fields: fields,
       requirements: requirements,
@@ -364,11 +366,25 @@ typedef ProcessHandler = Future<String> Function();
     return validationToken;
   }
 
+  Future<GetOnboardingStatusResult> getRequirements() async {
+    final fpContext = ref.read(fpContextNotifierProvider);
+    final authToken = fpContext.verifiedAuthToken;
+
+    if (authToken == null) {
+      throw Exception('No auth token found. Please authenticate first.');
+    }
+
+    final requirements = await getOnboardingStatus(authToken);
+    return requirements;
+  }
+
   return (
     launchIdentify: launchIdentify,
-    save: vault,
+    vault: vault,
     handoff: handoff,
     requiresAuth: requiresAuth,
-    process: processOnboarding
+    process: processOnboarding,
+    getRequirements: getRequirements,
+    vaultData: ref.read(fpContextNotifierProvider).vaultData,
   );
 }

@@ -83,15 +83,24 @@ class _WrapperState extends ConsumerState<Wrapper> {
   @override
   Widget build(BuildContext context) {
     final fpContext = ref.watch(fpContextNotifierProvider);
-    final (:launchIdentify, :save, :handoff, :requiresAuth, :process) =
-        getFootprintService(context, ref);
+    final (
+      :launchIdentify,
+      :vault,
+      :handoff,
+      :requiresAuth,
+      :process,
+      :getRequirements,
+      :vaultData
+    ) = getFootprintService(context, ref);
     return FootprintService(
       launchIdentify: launchIdentify,
-      save: save,
+      vault: vault,
       handoff: handoff,
       requiresAuth: requiresAuth,
       isReady: fpContext.onboardingConfig != null,
       process: process,
+      getRequirements: getRequirements,
+      vaultData: vaultData,
       child: widget.child,
     );
   }

@@ -189,7 +189,7 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
                 vaultData: null,
               )
             : await getDataAfterVerify(
-                authToken, locale ?? FootprintSupportedLocale.enUS);
+                authToken, locale ?? FootprintSupportedLocale.enUS, ref);
 
     ref.read(fpContextNotifierProvider.notifier).update(
           verifiedAuthToken: authToken,
