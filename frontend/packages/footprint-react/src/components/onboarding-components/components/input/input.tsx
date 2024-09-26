@@ -21,9 +21,24 @@ const Input = ({ className, id, ...props }: InputProps) => {
       if (cleaveInstance) cleaveInstance.destroy();
     };
   });
-  const formOptions = {
-    ...validations,
-    ...transforms,
+
+  useEffect(() => {
+    // This commits the currently editing text field before submitting the form.
+    // There is a conflict with cleave and react hook form that force us doing this
+    if (mask) {
+      document.addEventListener('keydown', handleEnterKeyPress);
+      return () => {
+        document.removeEventListener('keydown', handleEnterKeyPress);
+      };
+    }
+  }, [mask]);
+
+  const handleEnterKeyPress = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      const currentFocus = document.activeElement;
+      (currentFocus as HTMLElement)?.blur?.();
+      (currentFocus as HTMLElement)?.focus?.();
+    }
   };
 
   return (
@@ -32,7 +47,8 @@ const Input = ({ className, id, ...props }: InputProps) => {
       {...props}
       className={cx('fp-input', baseClassName, className)}
       {...register(name, {
-        ...formOptions,
+        ...validations,
+        ...transforms,
         onBlur: props.onBlur,
         onChange: props.onChange,
       })}

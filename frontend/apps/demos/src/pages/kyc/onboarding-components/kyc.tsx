@@ -1,7 +1,6 @@
 import type { FormValues } from '@onefootprint/footprint-react';
 import { Fp, InlineOtpNotSupported, InlineProcessError, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, LoadingSpinner, Stack, Stepper, Text } from '@onefootprint/ui';
-import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import Header from './components/header';
@@ -101,20 +100,16 @@ const Demo = () => {
 const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
   const fp = useFootprint();
   const [showOtp, setShowOtp] = useState(false);
-  const createChallengeMutation = useMutation({
-    mutationFn: (data: { email: string; phoneNumber: string }) => fp.createEmailPhoneBasedChallenge(data),
-  });
-  const verifyMutation = useMutation({
-    mutationFn: (verificationCode: string) => fp.verify({ verificationCode }),
-  });
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmitData = async (formValues: FormValues) => {
     const email = formValues['id.email'];
     const phoneNumber = formValues['id.phone_number'];
     if (!email || !phoneNumber) return null;
 
+    setIsPending(true);
     try {
-      await createChallengeMutation.mutateAsync({ email, phoneNumber });
+      await fp.createEmailPhoneBasedChallenge({ email, phoneNumber });
       setShowOtp(true);
     } catch (e) {
       if (e instanceof InlineOtpNotSupported) {
@@ -127,19 +122,23 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
           },
         );
       }
+    } finally {
+      setIsPending(false);
     }
   };
 
   const handleSubmitPin = async (verificationCode: string) => {
+    setIsPending(true);
     try {
-      const response = await verifyMutation.mutateAsync(verificationCode);
+      const response = await fp.verify({ verificationCode });
       const isBasicDataCompleted =
         response.vaultData['id.first_name'] && response.vaultData['id.last_name'] && response.vaultData['id.dob'];
       onDone(isBasicDataCompleted ? 2 : 1);
-      onDone();
     } catch (error) {
       console.error('Error verifying pin:', error);
       // Handle the error appropriately
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -154,7 +153,7 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
             </Text>
           </Box>
           <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
-          {verifyMutation.isPending && (
+          {isPending && (
             <Box marginTop={6}>
               <LoadingSpinner />
             </Box>
@@ -181,8 +180,8 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
                 <Fp.FieldErrors />
               </Fp.Field>
               <Divider marginBlock={3} />
-              <Button type="submit" disabled={createChallengeMutation.isPending}>
-                {createChallengeMutation.isPending ? 'Loading...' : 'Continue'}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? 'Loading...' : 'Continue'}
               </Button>
             </Stack>
           </Fp.Form>
@@ -195,18 +194,18 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
 const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
   const { vaultData } = fp;
-
-  const vaultMutation = useMutation({
-    mutationFn: (formValues: FormValues) => fp.vault(formValues),
-  });
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (formValues: FormValues) => {
+    setIsPending(true);
     try {
-      await vaultMutation.mutateAsync(formValues);
+      await fp.vault(formValues);
       onDone();
     } catch (error) {
       console.error('Error vaulting personal data:', error);
       // Handle the error appropriately
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -249,8 +248,8 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
-          <Button type="submit" disabled={vaultMutation.isPending}>
-            {vaultMutation.isPending ? 'Loading...' : 'Continue'}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Loading...' : 'Continue'}
           </Button>
         </Stack>
       </Fp.Form>
@@ -261,18 +260,18 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
 const Address = ({ onDone, onBack }: { onDone: () => void; onBack: () => void }) => {
   const fp = useFootprint();
   const { vaultData } = fp;
-
-  const vaultMutation = useMutation({
-    mutationFn: (formValues: FormValues) => fp.vault(formValues),
-  });
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (formValues: FormValues) => {
+    setIsPending(true);
     try {
-      await vaultMutation.mutateAsync(formValues);
+      await fp.vault(formValues);
       onDone();
     } catch (error) {
       console.error('Error vaulting address data:', error);
       // Handle the error appropriately
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -329,8 +328,8 @@ const Address = ({ onDone, onBack }: { onDone: () => void; onBack: () => void })
             <Button onClick={onBack} variant="secondary" fullWidth>
               Back
             </Button>
-            <Button type="submit" disabled={vaultMutation.isPending} fullWidth>
-              {vaultMutation.isPending ? 'Loading...' : 'Continue'}
+            <Button type="submit" disabled={isPending} fullWidth>
+              {isPending ? 'Loading...' : 'Continue'}
             </Button>
           </Stack>
         </Stack>
@@ -342,21 +341,20 @@ const Address = ({ onDone, onBack }: { onDone: () => void; onBack: () => void })
 const Ssn = ({ onDone, onBack }: { onDone: (validationToken: string) => void; onBack: () => void }) => {
   const fp = useFootprint();
   const { vaultData } = fp;
-  const processMutation = useMutation({
-    mutationFn: async (formValues: FormValues) => {
-      await fp.vault(formValues);
-      return fp.process();
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (formValues: FormValues) => {
+    setIsPending(true);
     try {
-      const { validationToken } = await processMutation.mutateAsync(formValues);
+      await fp.vault(formValues);
+      const { validationToken } = await fp.process();
       onDone(validationToken);
     } catch (e) {
       if (e instanceof InlineProcessError) {
         fp.handoff({ onComplete: onDone });
       }
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -385,8 +383,8 @@ const Ssn = ({ onDone, onBack }: { onDone: (validationToken: string) => void; on
             <Button onClick={onBack} variant="secondary" fullWidth>
               Back
             </Button>
-            <Button type="submit" disabled={processMutation.isPending} fullWidth>
-              {processMutation.isPending ? 'Loading...' : 'Continue'}
+            <Button type="submit" disabled={isPending} fullWidth>
+              {isPending ? 'Loading...' : 'Continue'}
             </Button>
           </Stack>
         </Stack>
