@@ -117,8 +117,8 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
     // Used in case the form context is updated calling setValue in tenant code
     // or when tenant provides initial data to the form
     ref.listen(formContextNotifierProvider, (prevContext, newContext) {
-      final prevValue = prevContext?.formData.toJson()[name];
-      final newValue = newContext.formData.toJson()[name];
+      final prevValue = prevContext?.formData.toJson()[name.toString()];
+      final newValue = newContext.formData.toJson()[name.toString()];
       if (prevValue != newValue && newValue is String) {
         _controller.text = newValue;
       }

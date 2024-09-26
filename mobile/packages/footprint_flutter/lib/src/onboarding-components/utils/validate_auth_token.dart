@@ -5,7 +5,6 @@ import 'package:footprint_flutter/src/onboarding-components/models/identify_scop
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/create_otp_challenge.dart';
-import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/validate_onboarding.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_identify_scope_from_ob_config_kind.dart';
@@ -63,15 +62,8 @@ Future<ValidateAuthTokenResult> validateAuthToken({
   OnboardingConfigKind? obConfigKind;
 
   if (onboardingConfig == null) {
-    // Normally for other util functions, we would just throw an error if the onboardingConfig is null
-    // But this function is meant to be called in the beginning right after the first frame
-    // The context may not have the onboardingConfig yet
-    // So we need to fetch the onboardingConfig if it is null
-    final obConfig = await getOnboardingConfig(publicKey);
-    ref
-        .read(fpContextNotifierProvider.notifier)
-        .updateOnboardingConfig(obConfig);
-    obConfigKind = obConfig.kind;
+    throw Exception(
+        'Onboarding config not found. Please make sure you have the correct publicKey and "isReady" is true');
   } else {
     obConfigKind = onboardingConfig.kind;
   }

@@ -6,14 +6,14 @@ class FootprintService extends InheritedWidget {
   final SaveHandler save;
   final HandoffHandler handoff;
   final AuthMethodChecker requiresAuth;
-  final bool isReadyForAuth;
+  final bool isReady;
 
   const FootprintService({
     required this.launchIdentify,
     required this.save,
     required this.handoff,
     required this.requiresAuth,
-    required this.isReadyForAuth,
+    required this.isReady,
     required Widget child,
     Key? key,
   }) : super(key: key, child: child);
@@ -27,6 +27,6 @@ class FootprintService extends InheritedWidget {
         save != oldWidget.save ||
         handoff != oldWidget.handoff ||
         requiresAuth != oldWidget.requiresAuth ||
-        isReadyForAuth != oldWidget.isReadyForAuth;
+        isReady != oldWidget.isReady;
   }
 }

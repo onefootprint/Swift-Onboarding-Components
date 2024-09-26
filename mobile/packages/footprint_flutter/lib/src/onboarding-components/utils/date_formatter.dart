@@ -25,6 +25,28 @@ String strInputToUSDate(FootprintSupportedLocale locale, String str) {
       : '$month/$day/$year';
 }
 
+/// Converts a US date string to a date string based on the locale.
+///
+/// [locale] should be a locale string like 'en_US' or 'es_MX'.
+/// [str] is a date string in the format '12/25/1997' or '25/12/1997'.
+///
+/// Returns a date string in the locale format 'MM/DD/YYYY' or 'DD/MM/YYYY'.
+String fromUsDateToStringInput(FootprintSupportedLocale locale, String str) {
+  if (str.isEmpty || !isString(str) || locale.name.isEmpty) return '';
+
+  final parts = str.trim().split('/');
+
+  final day = parts.isNotEmpty ? parts[0].padLeft(2, '0') : '';
+  final month = parts.length > 1 ? parts[1].padLeft(2, '0') : '';
+  final year = parts.length > 2 ? parts[2] : '';
+
+  if (day.isEmpty || month.isEmpty || year.isEmpty) return '';
+
+  return locale == FootprintSupportedLocale.enUS
+      ? '$month/$day/$year'
+      : '$day/$month/$year';
+}
+
 /// Converts a US date string to ISO 8601 format.
 ///
 /// [date] is a date string in the format '12/25/1997' or '1/1/1997'.
@@ -42,5 +64,25 @@ String? fromUSDateToISO8601Format(String? date) {
 
   return (day.isNotEmpty && month.isNotEmpty && year.isNotEmpty)
       ? '$year-${month.padLeft(2, '0')}-${day.padLeft(2, '0')}'
+      : null;
+}
+
+/// Converts an ISO 8601 date string to US date format.
+///
+/// [date] is a date string in the format 'YYYY-MM-DD'.
+///
+/// Returns a date string in US format 'MM/DD/YYYY' or null if the input is invalid.
+String? fromISO8601ToUSDate(String? date) {
+  if (date == null || !isString(date) || date.isEmpty) return null;
+
+  final parts = date.trim().split('-');
+  if (parts.length != 3) return null;
+
+  final year = parts[0];
+  final month = parts[1];
+  final day = parts[2];
+
+  return (day.isNotEmpty && month.isNotEmpty && year.isNotEmpty)
+      ? '$month/$day/$year'
       : null;
 }

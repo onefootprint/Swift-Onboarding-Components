@@ -11,14 +11,14 @@ _FootprintUtils footprintUtils(BuildContext context) {
   final save = helpers.save;
   final handoff = helpers.handoff;
   final requiresAuth = helpers.requiresAuth;
-  final isReadyForAuth = helpers.isReadyForAuth;
+  final isReady = helpers.isReady;
 
   return _FootprintUtils(
     launchIdentify: launchIdentify,
     save: save,
     handoff: handoff,
     requiresAuth: requiresAuth,
-    isReadyForAuth: isReadyForAuth,
+    isReady: isReady,
   );
 }
 
@@ -27,13 +27,13 @@ class _FootprintUtils {
   final SaveHandler save;
   final HandoffHandler handoff;
   final AuthMethodChecker requiresAuth;
-  final bool isReadyForAuth;
+  final bool isReady;
 
   _FootprintUtils({
     required this.launchIdentify,
     required this.save,
     required this.handoff,
     required this.requiresAuth,
-    required this.isReadyForAuth,
+    required this.isReady,
   });
 }

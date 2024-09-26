@@ -90,7 +90,7 @@ class _WrapperState extends ConsumerState<Wrapper> {
       save: save,
       handoff: handoff,
       requiresAuth: requiresAuth,
-      isReadyForAuth: fpContext.onboardingConfig != null,
+      isReady: fpContext.onboardingConfig != null,
       child: widget.child,
     );
   }

@@ -13,8 +13,10 @@ import 'package:footprint_flutter/src/onboarding-components/providers/fp_context
 import 'package:footprint_flutter/src/onboarding-components/queries/save.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/browser.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_data_after_verify.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/save_utils.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/validate_auth_token.dart';
+import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_otp.dart';
 
 typedef IdentifyLauncher = void Function({
   String? email,
@@ -25,7 +27,7 @@ typedef IdentifyLauncher = void Function({
 });
 typedef AuthMethodCheckerResult = ({
   bool requiresAuth,
-  String? validationToken,
+  VerificationResult? verificationResult,
 });
 typedef AuthMethodChecker = Future<AuthMethodCheckerResult> Function();
 typedef SaveHandler = Future<void> Function(FormData data);
@@ -53,6 +55,28 @@ typedef HandoffHandler = void Function({
     throw Exception('Invalid auth token. Please use a valid auth token.');
   }
 
+  Future<VerificationResult> getVerificationResult({
+    required String authToken,
+    required String validationToken,
+    required OnboardingConfigKind obConfigKind,
+    required FootprintSupportedLocale locale,
+  }) async {
+    final (:fields, :requirements, :vaultData) =
+        obConfigKind == OnboardingConfigKind.auth
+            ? (
+                fields: null,
+                requirements: null,
+                vaultData: null,
+              )
+            : await getDataAfterVerify(authToken, locale);
+    return (
+      fields: fields,
+      requirements: requirements,
+      validationToken: validationToken,
+      vaultData: vaultData,
+    );
+  }
+
   Future<AuthMethodCheckerResult> requiresAuth() async {
     final fpContext = ref.read(fpContextNotifierProvider);
     final vaultingToken = fpContext.vaultingToken;
@@ -61,10 +85,24 @@ typedef HandoffHandler = void Function({
     final authTokenStatus = fpContext.authTokenStatus;
     final authValidationToken = fpContext.authValidationToken;
     final obConfigKind = fpContext.onboardingConfig?.kind;
+    final locale = fpContext.locale ?? FootprintSupportedLocale.enUS;
+    if (obConfigKind == null) {
+      throw Exception('Onboarding config kind not found');
+    }
 
     // If we already have a vaulting token, we don't need to authenticate
-    if (vaultingToken != null && vaultingToken.isNotEmpty) {
-      return (requiresAuth: false, validationToken: authValidationToken);
+    if (vaultingToken != null &&
+        vaultingToken.isNotEmpty &&
+        verifiedAuthToken != null) {
+      return (
+        requiresAuth: false,
+        verificationResult: await getVerificationResult(
+          authToken: verifiedAuthToken,
+          validationToken: authValidationToken ?? "",
+          obConfigKind: obConfigKind,
+          locale: locale,
+        )
+      );
     }
 
     // If we have a verified auth token, we don't need to authenticate
@@ -76,7 +114,15 @@ typedef HandoffHandler = void Function({
             .read(fpContextNotifierProvider.notifier)
             .updateVaultingToken(vaultingToken.token);
       }
-      return (requiresAuth: false, validationToken: authValidationToken);
+      return (
+        requiresAuth: false,
+        verificationResult: await getVerificationResult(
+          authToken: verifiedAuthToken,
+          validationToken: authValidationToken ?? "",
+          obConfigKind: obConfigKind,
+          locale: locale,
+        )
+      );
     }
 
     // If we have an auth token, we need to check if it's valid
@@ -90,22 +136,49 @@ typedef HandoffHandler = void Function({
           sandboxOutcome: fpContext.sandboxOutcome,
           onboardingConfig: fpContext.onboardingConfig,
         );
+        final shouldAuth = authTokenStatusToRequiresAuthResult(
+            tokenValidationResult.authTokenStatus);
+        if (shouldAuth) {
+          return (
+            requiresAuth: true,
+            verificationResult: null,
+          );
+        } else {
+          return (
+            requiresAuth: false,
+            verificationResult: await getVerificationResult(
+              authToken: authToken,
+              validationToken: tokenValidationResult.validationToken ?? "",
+              obConfigKind: obConfigKind,
+              locale: locale,
+            )
+          );
+        }
+      }
+
+      final shouldAuth = authTokenStatusToRequiresAuthResult(authTokenStatus);
+      if (shouldAuth) {
         return (
-          requiresAuth: authTokenStatusToRequiresAuthResult(
-              tokenValidationResult.authTokenStatus),
-          validationToken: tokenValidationResult.validationToken,
+          requiresAuth: true,
+          verificationResult: null,
+        );
+      } else {
+        return (
+          requiresAuth: false,
+          verificationResult: await getVerificationResult(
+            authToken: authToken,
+            validationToken: authValidationToken ?? "",
+            obConfigKind: obConfigKind,
+            locale: locale,
+          )
         );
       }
-      return (
-        requiresAuth: authTokenStatusToRequiresAuthResult(authTokenStatus),
-        validationToken: authValidationToken,
-      );
     }
 
     return (
       requiresAuth: true,
-      validationToken: authValidationToken
-    ); // Validation token should be null here
+      verificationResult: null,
+    );
   }
 
   void launchIdentify({
@@ -183,7 +256,7 @@ typedef HandoffHandler = void Function({
 
     if (onboardingConfig == null) {
       throw Exception(
-          'No onboarding config found. Please make sure that the publicKey is correct.');
+          'No onboarding config found. Please make sure that the publicKey is correct and "isReady" is true.');
     }
 
     if (onboardingConfig.kind == OnboardingConfigKind.auth) {

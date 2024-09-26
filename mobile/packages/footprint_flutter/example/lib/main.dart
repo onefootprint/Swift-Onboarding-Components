@@ -147,14 +147,20 @@ class Hosted extends StatelessWidget {
 // Example of how to use the Footprint Flutter Onboarding Components to create an onboarding flow
 enum Steps {
   identify,
-  dataCollection,
+  basicInfo,
+  address,
+  ssn,
   complete;
 
   Steps getNextStep() {
     switch (this) {
       case Steps.identify:
-        return Steps.dataCollection;
-      case Steps.dataCollection:
+        return Steps.basicInfo;
+      case Steps.basicInfo:
+        return Steps.address;
+      case Steps.address:
+        return Steps.ssn;
+      case Steps.ssn:
         return Steps.complete;
       case Steps.complete:
         return Steps.complete;
@@ -170,8 +176,39 @@ class OnboardingComponents extends StatefulWidget {
 }
 
 class _OnboardingComponentsState extends State<OnboardingComponents> {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (_context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Onboarding Components'),
+        ),
+        body: FootprintProvider(
+          publicKey: "pb_test_MtqfcQk0Ezi5stVfnxHLPm",
+          redirectUrl: "com.footprint.fluttersdk://example",
+          sandboxOutcome: SandboxOutcome(
+            overallOutcome: OverallOutcome.fail,
+          ),
+          sandboxId: "3jmlksncdcsaapnqww",
+          // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
+          child: const Kyc(),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _KycState();
+}
+
+class _KycState extends State<Kyc> {
   Steps currentStep = Steps.identify;
   String validationToken = '';
+  VerificationResult? verificationResult;
 
   handleComplete({String? token}) {
     setState(() {
@@ -182,60 +219,74 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (_context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Onboarding Components'),
-        ),
-        body: FootprintProvider(
-          publicKey: "pb_test_tO6WpT0Tgrw2ZWNZOw0bZB",
-          redirectUrl: "com.footprint.fluttersdk://example",
-          sandboxOutcome: SandboxOutcome(
-            overallOutcome: OverallOutcome.fail,
-          ),
-          sandboxId: "3ruc9MwHkjmlksnapnqww",
-          // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
-          child: Container(
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (currentStep == Steps.identify)
-                    Identify(
-                      handleAuthenticated: () {
-                        handleComplete();
-                      },
-                      useAuthToken:
-                          false, // True if an auth token was provided to the FootprintProvider
-                    ),
-                  if (currentStep == Steps.dataCollection)
-                    DataCollection(
-                      onCompleted: (String token) {
-                        handleComplete(token: token);
-                      },
-                    ),
-                  if (currentStep == Steps.complete)
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          const Text("KYC Complete"),
-                          const SizedBox(height: 12),
-                          const Text("Validation Token:"),
-                          const SizedBox(height: 8),
-                          Text(validationToken),
-                        ],
-                      ),
-                    ),
-                ],
+    if (!footprintUtils(context).isReady) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (currentStep == Steps.identify)
+              Identify(
+                handleAuthenticated: (VerificationResult? verificationResult) {
+                  print(
+                      "Validation Token: ${verificationResult?.validationToken}");
+                  setState(() {
+                    this.verificationResult = verificationResult;
+                  });
+                  handleComplete();
+                },
+                useAuthToken: false,
               ),
-            ),
-          ),
+            if (currentStep == Steps.basicInfo)
+              BasicData(
+                onCompleted: () {
+                  handleComplete();
+                },
+                vaultData: verificationResult?.vaultData,
+              ),
+            if (currentStep == Steps.address)
+              AddressData(
+                onCompleted: () {
+                  handleComplete();
+                },
+                vaultData: verificationResult?.vaultData,
+              ),
+            if (currentStep == Steps.ssn)
+              Ssn(
+                onCompleted: (String token) {
+                  handleComplete(token: token);
+                },
+                vaultData: verificationResult?.vaultData,
+              ),
+            if (currentStep == Steps.complete)
+              Container(
+                padding: const EdgeInsets.all(20),
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    const Text("KYC Complete"),
+                    const SizedBox(height: 12),
+                    const Text("Validation Token:"),
+                    const SizedBox(height: 8),
+                    Text(validationToken),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Close demo'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -272,7 +323,8 @@ class Identify extends StatefulWidget {
       required this.handleAuthenticated,
       required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
   final bool useAuthToken;
 
   @override
@@ -289,10 +341,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        print(
-            "Requires Auth: ${response.requiresAuth}, Validation Token: ${response.validationToken}");
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -309,13 +359,13 @@ class _IdentifyState extends State<Identify> {
     });
   }
 
-  void handleVerfied() {
-    widget.handleAuthenticated();
+  void handleVerfied(VerificationResult? verificationResult) {
+    widget.handleAuthenticated(verificationResult);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -329,8 +379,7 @@ class _IdentifyState extends State<Identify> {
               (_) {
                 footprintUtils(context).launchIdentify(
                     onAuthenticated: (String validationToken) {
-                  print("Validation Token: $validationToken");
-                  widget.handleAuthenticated();
+                  widget.handleAuthenticated(null);
                 } // Don't pass email and phone number - it's going to use auth token
                     );
               },
@@ -348,9 +397,8 @@ class _IdentifyState extends State<Identify> {
               onSubmitted: (value) {
                 otpUtils
                     .verifyOtpChallenge(verificationCode: value)
-                    .then((validationToken) {
-                  print("Validation Token: $validationToken");
-                  handleVerfied();
+                    .then((verificationResult) {
+                  handleVerfied(verificationResult);
                 });
               },
             ),
@@ -416,8 +464,7 @@ class _IdentifyState extends State<Identify> {
                     email: formData.email,
                     phoneNumber: formData.phoneNumber,
                     onAuthenticated: (String validationToken) {
-                      print("Validation Token: $validationToken");
-                      widget.handleAuthenticated();
+                      widget.handleAuthenticated(null);
                     },
                   );
                 },
@@ -435,9 +482,8 @@ class _IdentifyState extends State<Identify> {
             onSubmitted: (value) {
               otpUtils
                   .verifyOtpChallenge(verificationCode: value)
-                  .then((validationToken) {
-                print("Validation Token: $validationToken");
-                handleVerfied();
+                  .then((verificationResult) {
+                handleVerfied(verificationResult);
               });
             },
           ),
@@ -447,30 +493,20 @@ class _IdentifyState extends State<Identify> {
   }
 }
 
-class DataCollection extends StatelessWidget {
-  const DataCollection({super.key, required this.onCompleted});
+class BasicData extends StatelessWidget {
+  const BasicData({super.key, required this.onCompleted, this.vaultData});
+  final FormData? vaultData;
 
-  final void Function(String token) onCompleted;
+  final void Function() onCompleted;
 
   void handleComplete(BuildContext context, FormData formData) {
-    var utilMethods = footprintUtils(context);
-    utilMethods
+    footprintUtils(context)
         .save(
       formData,
     )
         .then(
       (_) {
-        utilMethods.handoff(
-          onComplete: (token) {
-            onCompleted(token);
-          },
-          onError: (err) {
-            print("Handoff error $err");
-          },
-          onCancel: () {
-            print("Handoff canceled");
-          },
-        );
+        onCompleted();
       },
     ).catchError(
       (err) {
@@ -482,6 +518,12 @@ class DataCollection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FootprintForm(
+      initialData: {
+        DataIdentifier.idFirstName: vaultData?.firstName,
+        DataIdentifier.idMiddleName: vaultData?.middleName,
+        DataIdentifier.idLastName: vaultData?.lastName,
+        DataIdentifier.idDob: vaultData?.dob,
+      },
       createForm: (handleSubmit, props) {
         return Padding(
           padding: const EdgeInsets.all(20.0),
@@ -522,6 +564,191 @@ class DataCollection extends StatelessWidget {
                   child: FootprintTextInput(
                     labelText: "Date of Birth",
                     decoration: inputDecoration("Date of Birth"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    handleSubmit();
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+
+class AddressData extends StatelessWidget {
+  const AddressData({super.key, required this.onCompleted, this.vaultData});
+  final FormData? vaultData;
+
+  final void Function() onCompleted;
+
+  void handleComplete(BuildContext context, FormData formData) {
+    footprintUtils(context)
+        .save(
+      formData,
+    )
+        .then(
+      (_) {
+        onCompleted();
+      },
+    ).catchError(
+      (err) {
+        print("Save Error $err");
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      initialData: {
+        DataIdentifier.idAddressLine1: vaultData?.addressLine1,
+        DataIdentifier.idAddressLine2: vaultData?.addressLine2,
+        DataIdentifier.idCity: vaultData?.city,
+        DataIdentifier.idState: vaultData?.state,
+        DataIdentifier.idZip: vaultData?.zip,
+        DataIdentifier.idCountry: vaultData?.country,
+      },
+      createForm: (handleSubmit, props) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Text("Address Information",
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                FootprintField(
+                  name: DataIdentifier.idAddressLine1,
+                  child: FootprintTextInput(
+                    labelText: "Address Line 1",
+                    decoration: inputDecoration("Address Line 1"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: DataIdentifier.idAddressLine2,
+                  child: FootprintTextInput(
+                    labelText: "Address Line 2",
+                    decoration: inputDecoration("Address Line 2"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: DataIdentifier.idCity,
+                  child: FootprintTextInput(
+                    labelText: "City",
+                    decoration: inputDecoration("City"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: DataIdentifier.idState,
+                  child: FootprintTextInput(
+                    labelText: "State",
+                    decoration: inputDecoration("State"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: DataIdentifier.idZip,
+                  child: FootprintTextInput(
+                    labelText: "Zip",
+                    decoration: inputDecoration("Zip"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FootprintField(
+                  name: DataIdentifier.idCountry,
+                  child: FootprintTextInput(
+                    labelText: "Country",
+                    decoration: inputDecoration("Country"),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    handleSubmit();
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      onSubmit: (formData) {
+        handleComplete(context, formData);
+      },
+    );
+  }
+}
+
+class Ssn extends StatelessWidget {
+  const Ssn({super.key, required this.onCompleted, this.vaultData});
+  final FormData? vaultData;
+
+  final void Function(String token) onCompleted;
+
+  void handleComplete(BuildContext context, FormData formData) {
+    var utilMethods = footprintUtils(context);
+    utilMethods
+        .save(
+      formData,
+    )
+        .then(
+      (_) {
+        utilMethods.handoff(
+          onComplete: (token) {
+            onCompleted(token);
+          },
+          onError: (err) {
+            print("Handoff error $err");
+          },
+          onCancel: () {
+            print("Handoff canceled");
+          },
+        );
+      },
+    ).catchError(
+      (err) {
+        print("Save Error $err");
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FootprintForm(
+      initialData: {
+        DataIdentifier.idSsn9: vaultData?.ssn9,
+      },
+      createForm: (handleSubmit, props) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Text("SSN", style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 16),
+                FootprintField(
+                  name: DataIdentifier.idSsn9,
+                  child: FootprintTextInput(
+                    labelText: "SSN (full 9 digits)",
+                    decoration: inputDecoration("SSN (full 9 digits)"),
                   ),
                 ),
                 const SizedBox(height: 12),

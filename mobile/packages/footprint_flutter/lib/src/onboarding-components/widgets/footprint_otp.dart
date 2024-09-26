@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/internal/auth_method.dart';
+import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
+import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_kind.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/inline_otp_not_supported_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/create_otp_challenge.dart';
+import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/verify_otp_challenge.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/get_data_after_verify.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_identify_scope_from_ob_config_kind.dart';
+
+typedef VerificationResult = ({
+  Fields? fields,
+  Requirements? requirements,
+  String validationToken,
+  FormData? vaultData
+});
 
 typedef BuildOtpProps = ({
   Future<ChallengeKind> Function(
       {required String email,
       required String phoneNumber}) createEmailPhoneBasedChallenge,
   Future<ChallengeKind> Function() createAuthTokenBasedChallenge,
-  Future<String> Function(
+  Future<VerificationResult> Function(
       {required String verificationCode}) verifyOtpChallenge,
 });
 
@@ -145,10 +157,11 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     return challengeResponse.challengeData!.challengeKind;
   }
 
-  Future<String> verify({required String verificationCode}) async {
+  Future<VerificationResult> verify({required String verificationCode}) async {
     final sandboxOutcome = ref.read(fpContextNotifierProvider).sandboxOutcome;
     final obConfigKind =
         ref.read(fpContextNotifierProvider).onboardingConfig?.kind;
+    final locale = ref.read(fpContextNotifierProvider).locale;
 
     if (obConfigKind == null) {
       throw Exception('Onboarding config kind not found');
@@ -168,6 +181,16 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
       scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
 
+    final (:fields, :requirements, :vaultData) =
+        obConfigKind == OnboardingConfigKind.auth
+            ? (
+                fields: null,
+                requirements: null,
+                vaultData: null,
+              )
+            : await getDataAfterVerify(
+                authToken, locale ?? FootprintSupportedLocale.enUS);
+
     ref.read(fpContextNotifierProvider.notifier).update(
           verifiedAuthToken: authToken,
           vaultingToken: vaultingToken,
@@ -175,7 +198,12 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
           authValidationToken: validationToken,
         );
 
-    return validationToken;
+    return (
+      validationToken: validationToken,
+      vaultData: vaultData,
+      fields: fields,
+      requirements: requirements
+    );
   }
 
   @override

@@ -1,14 +1,54 @@
 import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
+import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/date_formatter.dart';
 import 'package:http/http.dart' as http;
 
 typedef GetDecryptedDataRequest = ({
   String authToken,
   List<DataIdentifier> dis,
+  FootprintSupportedLocale locale,
 });
+
+Map<String, dynamic> formatDecryptedData(
+    Map<String, dynamic> data, FootprintSupportedLocale locale) {
+  if (data['id.dob'] is String) {
+    final usDobString = fromISO8601ToUSDate(data['id.dob']);
+    data['id.dob'] = fromUsDateToStringInput(locale, usDobString ?? '');
+    if (data['id.dob'] == null || data['id.dob'] == '') {
+      throw Exception('Invalid date format. Error in formatting date.');
+    }
+  }
+
+  if (data["id.visa_expiration_date"] is String) {
+    final usVisaExpirationDateString =
+        fromISO8601ToUSDate(data["id.visa_expiration_date"]);
+    data["id.visa_expiration_date"] =
+        fromUsDateToStringInput(locale, usVisaExpirationDateString ?? '');
+    if (data["id.visa_expiration_date"] == null ||
+        data["id.visa_expiration_date"] == '') {
+      throw Exception(
+          "Invalid date format. Error in formatting visa expiration date.");
+    }
+  }
+
+  if (data["business.formation_date"] is String) {
+    final usFormationDateString =
+        fromISO8601ToUSDate(data["business.formation_date"]);
+    data["business.formation_date"] =
+        fromUsDateToStringInput(locale, usFormationDateString ?? '');
+    if (data["business.formation_date"] == null ||
+        data["business.formation_date"] == '') {
+      throw Exception(
+          "Invalid date format. Error in formatting formation date.");
+    }
+  }
+
+  return data;
+}
 
 Future<Map<String, dynamic>> getDecryptedUserData(
     String authToken, List<String> dis) async {
@@ -57,7 +97,7 @@ Future<Map<String, dynamic>> getDecryptedBusinessData(
 }
 
 Future<FormData> getDecryptedData(GetDecryptedDataRequest requestData) async {
-  final (:authToken, :dis) = requestData;
+  final (:authToken, :dis, :locale) = requestData;
 
   // We can't decrypt these fields for now
   // they will require a step up, which we don't support yet
@@ -92,7 +132,8 @@ Future<FormData> getDecryptedData(GetDecryptedDataRequest requestData) async {
       mergedData[key] = value;
     }
   });
+  final formattedData = formatDecryptedData(mergedData, locale);
 
-  final formData = FormData.fromJson(mergedData);
+  final formData = FormData.fromJson(formattedData);
   return formData;
 }

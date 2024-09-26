@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
@@ -18,7 +19,7 @@ class FootprintForm extends StatelessWidget {
   final void Function(FormData formData) onSubmit;
   final Widget Function(void Function() handleSubmit, FormProps props)
       createForm;
-  final Map<String, dynamic>? initialData;
+  final Map<DataIdentifier, dynamic>? initialData;
 
   const FootprintForm({
     required this.onSubmit,
@@ -54,7 +55,7 @@ class FormWrapper extends ConsumerStatefulWidget {
   final void Function(FormData formData) onSubmit;
   final Widget Function(void Function() handleSubmit, FormProps props)
       createForm;
-  final Map<String, dynamic>? initialData;
+  final Map<DataIdentifier, dynamic>? initialData;
 
   @override
   ConsumerState<FormWrapper> createState() => _FootprintFormState();
@@ -68,9 +69,14 @@ class _FootprintFormState extends ConsumerState<FormWrapper> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.initialData != null) {
+        // convert dataIdentifier to string
+        var stringKeyInitialData = widget.initialData!.map((key, value) {
+          return MapEntry(key.toString(), value);
+        });
+
         ref
             .read(formContextNotifierProvider.notifier)
-            .updateFormData(FormData.fromJson(widget.initialData!));
+            .updateFormData(FormData.fromJson(stringKeyInitialData));
       }
     });
   }

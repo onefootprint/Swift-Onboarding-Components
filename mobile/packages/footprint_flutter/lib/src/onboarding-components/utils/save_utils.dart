@@ -19,5 +19,28 @@ Map<String, dynamic> formatBeforeSave(
       throw Exception('Invalid date format. Error in formatting date.');
     }
   }
+
+  if (data["id.visa_expiration_date"] is String) {
+    final usVisaExpirationDateString =
+        strInputToUSDate(locale, data["id.visa_expiration_date"]);
+    data["id.visa_expiration_date"] =
+        fromUSDateToISO8601Format(usVisaExpirationDateString);
+    if (data["id.visa_expiration_date"] == null) {
+      throw Exception(
+          "Invalid date format. Error in formatting visa expiration date.");
+    }
+  }
+
+  if (data["business.formation_date"] is String) {
+    final usFormationDateString =
+        strInputToUSDate(locale, data["business.formation_date"]);
+    data["business.formation_date"] =
+        fromUSDateToISO8601Format(usFormationDateString);
+    if (data["business.formation_date"] == null) {
+      throw Exception(
+          "Invalid date format. Error in formatting formation date.");
+    }
+  }
+
   return removeEmpty(data);
 }
