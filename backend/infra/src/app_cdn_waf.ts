@@ -64,9 +64,21 @@ export const APP_CDN_WAF_RULES = [
       action: rateLimitExceededAction(),
       priority: 9,
     }),
-    dashboardKeyRateLimitRule({
+    headerKeyRateLimitRule({
       name: 'DashboardKeyRateLimitRule',
+      header: 'x-fp-dashboard-authorization',
+      limit: 5000,
+      evaluationWindowSec: 60,
+      action: rateLimitExceededAction(),
       priority: 10,
+    }),
+    headerKeyRateLimitRule({
+      name: 'FpAuthRateLimitRule',
+      header: 'x-fp-authorization',
+      limit: 1000,
+      evaluationWindowSec: 60,
+      action: countAction(),
+      priority: 11,
     }),
 ];
 
@@ -361,20 +373,20 @@ function sandboxApiKeyRateLimitRule(args: {name: string, header: string, action:
   };
 }
 
-function dashboardKeyRateLimitRule(args: {name: string, priority: number}) {
+function headerKeyRateLimitRule(args: {name: string, header: string, limit: number, evaluationWindowSec: number, action: object, priority: number}) {
   return {
     name: args.name,
     priority: args.priority,
-    action: rateLimitExceededAction(),
+    action: args.action,
     statement: {
       rateBasedStatement: {
-        limit: 5000,
-        evaluationWindowSec: 60,
+        limit: args.limit,
+        evaluationWindowSec: args.evaluationWindowSec,
         aggregateKeyType: 'CUSTOM_KEYS',
         customKeys: [
           {
             header: {
-              name: 'x-fp-dashboard-authorization',
+              name: args.header,
               textTransformations: [
                 {
                   priority: 0,
@@ -392,7 +404,7 @@ function dashboardKeyRateLimitRule(args: {name: string, priority: number}) {
           sizeConstraintStatement: {
             fieldToMatch: {
               singleHeader: {
-                name: 'x-fp-dashboard-authorization',
+                name: args.header,
               }
             },
             comparisonOperator: 'GT',
