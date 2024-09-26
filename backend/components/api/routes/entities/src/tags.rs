@@ -80,7 +80,7 @@ pub async fn get(
     fp_id: FpIdPath,
     auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Tags>>,
 ) -> ApiListResponse<api_wire_types::UserTag> {
-    let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
+    let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -109,7 +109,7 @@ pub async fn delete(
     path: FpIdPathPlus<TagId>,
     auth: Either<TenantSessionAuth, TenantApiKeyGated<preview_api::Tags>>,
 ) -> ApiResponse<api_wire_types::Empty> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
+    let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let actor: DbActor = auth.actor().into();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
