@@ -73,11 +73,8 @@ impl ObConfigurationKind {
     pub fn reonboardable() -> Vec<Self> {
         Self::iter()
             .filter(|cdo| match cdo {
-                Self::Kyb | Self::Kyc => true,
-                // Technically, Document is "re-onboardable" because it has a Workflow. But
-                // behavior is probably not such that when requesting "Redo KYC" from the workflow
-                // that you want them to redo the Document playbook they onboarded onto
-                Self::Auth | Self::Document => false,
+                Self::Kyb | Self::Kyc | Self::Document => true,
+                Self::Auth => false,
             })
             .collect()
     }

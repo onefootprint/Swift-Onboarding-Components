@@ -123,7 +123,8 @@ pub(super) fn apply_trigger_request(
         obc
     } else {
         // For all other trigger kinds, just associate the last playbook with the WFR.
-        // This applies the same rules to from the last playbook to the WF that this creates.
+        // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
+        // associated a playbook with these WFRs
         let (_, obc) =
             Workflow::latest_reonboardable(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
         obc

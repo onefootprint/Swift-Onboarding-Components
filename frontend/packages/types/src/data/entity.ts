@@ -73,6 +73,7 @@ export enum WorkflowStatus {
   fail = 'fail',
   incomplete = 'incomplete',
   pending = 'pending',
+  none = 'none',
 }
 
 export type EntityWorkflow = {

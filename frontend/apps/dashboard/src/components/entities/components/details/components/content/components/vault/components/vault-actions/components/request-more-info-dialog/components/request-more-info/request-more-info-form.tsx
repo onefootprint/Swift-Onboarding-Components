@@ -27,7 +27,7 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const hasPriorOnboarding = !!entity.data?.workflows.some(
-    wf => wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
+    wf => wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail || wf.status === WorkflowStatus.none,
   );
   const defaultVariant = hasPriorOnboarding ? 'document' : 'onboard';
   const [requestVariant, setRequestVariant] = useState<RequestVariant>(defaultVariant);
