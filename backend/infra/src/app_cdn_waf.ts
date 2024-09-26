@@ -30,39 +30,52 @@ export const APP_CDN_WAF_RULES = [
     awsManagedRule('AWSManagedRulesKnownBadInputsRuleSet', 2),
     ipBlockRule({
       name: 'BlockedIpSet',
+      action: rateLimitExceededAction(),
       priority: 3,
     }),
     ipRateLimitRule({
       name: 'IpRateLimitRule',
+      action: rateLimitExceededAction(),
       priority: 4,
+    }),
+    anonymousIpRateLimitRule({
+      name: 'AnonymousIpRateLimitRule',
+      authHeaders: [
+        'authorization',
+        'x-fp-authorization',
+        'x-footprint-secret-key',
+        'x-footprint-dashboard-authorization',
+      ],
+      action: countAction(),
+      priority: 5,
     }),
     sandboxApiIpRateLimitRule({
       name: 'SandboxApiIpRateLimitRule',
-      priority: 5,
+      priority: 6,
     }),
     liveApiKeyRateLimitRule({
       name: 'LiveApiKeyRateLimitRule',
       header: 'x-footprint-secret-key',
       action: rateLimitExceededAction(),
-      priority: 6,
+      priority: 7,
     }),
     liveApiKeyRateLimitRule({
       name: 'LiveApiKeyBasicAuthRateLimitRule',
       header: 'authorization',
       action: rateLimitExceededAction(),
-      priority: 7,
+      priority: 8,
     }),
     sandboxApiKeyRateLimitRule({
       name: 'SandboxApiKeyRateLimitRule',
       header: 'x-footprint-secret-key',
       action: rateLimitExceededAction(),
-      priority: 8,
+      priority: 9,
     }),
     sandboxApiKeyRateLimitRule({
       name: 'SandboxApiKeyBasicAuthRateLimitRule',
       header: 'authorization',
       action: rateLimitExceededAction(),
-      priority: 9,
+      priority: 10,
     }),
     headerKeyRateLimitRule({
       name: 'DashboardKeyRateLimitRule',
@@ -70,7 +83,7 @@ export const APP_CDN_WAF_RULES = [
       limit: 5000,
       evaluationWindowSec: 60,
       action: rateLimitExceededAction(),
-      priority: 10,
+      priority: 11,
     }),
     headerKeyRateLimitRule({
       name: 'FpAuthRateLimitRule',
@@ -78,7 +91,7 @@ export const APP_CDN_WAF_RULES = [
       limit: 1000,
       evaluationWindowSec: 60,
       action: countAction(),
-      priority: 11,
+      priority: 12,
     }),
 ];
 
@@ -107,7 +120,7 @@ function awsManagedRule(name: string, priority: number) {
 
 // WAF rule to block requests from specific IP addresses, to respond to DOS
 // attacks or other abuse.
-function ipBlockRule(args: { name: string, priority: number})  {
+function ipBlockRule(args: { name: string, action: object, priority: number})  {
   let blockedIpv4 = [
     // Entries must be in CIDR notation
     //
@@ -141,7 +154,7 @@ function ipBlockRule(args: { name: string, priority: number})  {
   return {
     name: args.name,
     priority: args.priority,
-    action: rateLimitExceededAction(),
+    action: args.action,
     statement: {
       orStatement: {
         statements: [
@@ -167,11 +180,11 @@ function ipBlockRule(args: { name: string, priority: number})  {
   };
 }
 
-function ipRateLimitRule(args: {name: string, priority: number}) {
+function ipRateLimitRule(args: {name: string, action: object, priority: number}) {
   return {
     name: args.name,
     priority: args.priority,
-    action: rateLimitExceededAction(),
+    action: args.action,
     statement: {
       rateBasedStatement: {
         limit: 10000,
@@ -181,6 +194,62 @@ function ipRateLimitRule(args: {name: string, priority: number}) {
           headerName: 'x-forwarded-for',
           fallbackBehavior: 'NO_MATCH',
         }
+      }
+    },
+    visibilityConfig: {
+      metricName: args.name,
+      cloudwatchMetricsEnabled: true,
+      // Critical: Disable sampling to avoid leaking API keys.
+      sampledRequestsEnabled: false,
+    }
+  };
+}
+
+function anonymousIpRateLimitRule(args: {name: string, authHeaders: string[], action: object, priority: number}) {
+  let headersMissingStatements = args.authHeaders.map(header => {
+    return {
+      notStatement: {
+        statements: [
+          {
+            sizeConstraintStatement: {
+              fieldToMatch: {
+                singleHeader: {
+                  name: header,
+                }
+              },
+              comparisonOperator: 'GT',
+              size: 0,
+              textTransformations: [
+                {
+                  priority: 0,
+                  type: 'NONE',
+                }
+              ],
+            }
+          }
+        ]
+      }
+    };
+  });
+
+  return {
+    name: args.name,
+    priority: args.priority,
+    action: args.action,
+    statement: {
+      rateBasedStatement: {
+        limit: 1000,
+        evaluationWindowSec: 60,
+        aggregateKeyType: 'FORWARDED_IP',
+        forwardedIpConfig: {
+          headerName: 'x-forwarded-for',
+          fallbackBehavior: 'NO_MATCH',
+        },
+        scopeDownStatement: {
+          andStatement: {
+            statements: headersMissingStatements,
+          }
+        },
       }
     },
     visibilityConfig: {
