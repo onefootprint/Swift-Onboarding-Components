@@ -4,9 +4,9 @@ import { useContext } from 'react';
 import type { FormValues } from '../../../types';
 import { InlineProcessError } from '../../../types/request';
 import { Context } from '../components/provider';
-import { getValidationToken } from '../queries/challenge';
 import getRequirementsReq from '../queries/get-onboarding-status';
 import processReq from '../queries/process';
+import validateOnboarding from '../queries/validate-onboarding';
 import vaultReq from '../queries/vault';
 import { lockBody } from '../utils/dom-utils';
 import transformBeforeVault from '../utils/transform-before-vault';
@@ -57,7 +57,7 @@ export const useFootprint = () => {
     }
     const [{ requirements }, { validationToken }] = await Promise.all([
       getRequirementsReq({ authToken: context.verifiedAuthToken }),
-      getValidationToken({ authToken: context.verifiedAuthToken }),
+      validateOnboarding({ authToken: context.verifiedAuthToken }),
     ]);
 
     requirements.all.forEach(req => {
@@ -131,11 +131,7 @@ export const useFootprint = () => {
     process,
     vault,
     ...otp,
-    data: {
-      onboardingConfig: context.onboardingConfig,
-      challengeData: context.challengeData,
-      vaultData: context.vaultData,
-    },
+    vaultData: context.vaultData,
   };
 };
 

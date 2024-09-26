@@ -194,7 +194,7 @@ const Identify = ({ onDone }: { onDone: (step?: number) => void }) => {
 
 const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-  const { vaultData } = fp.data;
+  const { vaultData } = fp;
 
   const vaultMutation = useMutation({
     mutationFn: (formValues: FormValues) => fp.vault(formValues),
@@ -260,7 +260,7 @@ const PersonalData = ({ onDone }: { onDone: () => void }) => {
 
 const Address = ({ onDone, onBack }: { onDone: () => void; onBack: () => void }) => {
   const fp = useFootprint();
-  const { vaultData } = fp.data;
+  const { vaultData } = fp;
 
   const vaultMutation = useMutation({
     mutationFn: (formValues: FormValues) => fp.vault(formValues),
@@ -341,7 +341,7 @@ const Address = ({ onDone, onBack }: { onDone: () => void; onBack: () => void })
 
 const Ssn = ({ onDone, onBack }: { onDone: (validationToken: string) => void; onBack: () => void }) => {
   const fp = useFootprint();
-  const { vaultData } = fp.data;
+  const { vaultData } = fp;
   const processMutation = useMutation({
     mutationFn: async (formValues: FormValues) => {
       await fp.vault(formValues);
