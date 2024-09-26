@@ -1,11 +1,12 @@
 'use client';
 
 import useGetOnboardingConfig from '@/src/queries/use-get-onboarding-config';
-import { isSdkUrlAllowed } from '@/src/utils';
+import { isEmbeddedInIframe, isSdkUrlAllowed } from '@/src/utils';
 import type { FootprintAuthDataProps } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
-import { getLogger, isAuth, trackAction, useDeviceInfo } from '@onefootprint/idv';
+import { Logger, getLogger, isAuth, trackAction, useDeviceInfo } from '@onefootprint/idv';
 import Loading from '@onefootprint/idv/src/components/identify/components/loading';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect, useState } from 'react';
 import { useFootprintProvider } from '../../../../provider-footprint';
 import useProps from '../../../../provider-footprint/hooks/use-props';
@@ -14,6 +15,18 @@ import { useAuthIdentifyAppMachine } from '../../state';
 type AuthDataPropsWithToken = FootprintAuthDataProps & { authToken?: string };
 
 const { logError, logInfo, logWarn } = getLogger({ location: 'identify-app-layout' });
+
+const setupLogger = (config: PublicOnboardingConfig) => {
+  Logger.startSessionReplay();
+  Logger.setGlobalContext({
+    allowedOrigins: config?.allowedOrigins?.join(',') || '',
+    iframe: isEmbeddedInIframe(),
+    kind: String(config.kind),
+    orgId: config.orgId,
+    orgName: config.orgName,
+    publicKey: config.key,
+  });
+};
 
 const Init = (): JSX.Element | null => {
   const fpProvider = useFootprintProvider();
@@ -51,6 +64,7 @@ const Init = (): JSX.Element | null => {
       send({ type: 'sdkUrlNotAllowedReceived' });
     }
 
+    setupLogger(onboardingConfig.data);
     trackAction('auth:started');
     send({
       type: 'initPropsReceived',

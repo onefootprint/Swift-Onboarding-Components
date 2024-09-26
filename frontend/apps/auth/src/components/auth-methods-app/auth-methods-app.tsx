@@ -1,7 +1,7 @@
 'use client';
 
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { AuthMethods, getLogger, trackAction } from '@onefootprint/idv';
+import { AuthMethods, Logger, getLogger, trackAction } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,6 +12,7 @@ import { useFootprintProvider } from '@/src/provider-footprint';
 import useProps from '@/src/provider-footprint/hooks/use-props';
 import type { Variant } from '@/src/types';
 
+import { isEmbeddedInIframe } from '@/src/utils';
 import Layout from '../client-layout';
 import type { NotificationProps } from '../notification';
 import Notification from '../notification';
@@ -24,6 +25,11 @@ const EmptyConfig = {} as PublicOnboardingConfig;
 const { canceled, closed, completed } = FootprintPublicEvent;
 
 const { logError, logTrack } = getLogger({ location: 'auth-methods-app' });
+
+const setupLogger = (authToken: string) => {
+  Logger.startSessionReplay();
+  Logger.setGlobalContext({ authToken, iframe: isEmbeddedInIframe() });
+};
 
 const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element | null => {
   const fpProvider = useFootprintProvider();
@@ -40,6 +46,7 @@ const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element |
     props => {
       const propAuthToken = props?.authToken;
       if (propAuthToken) {
+        setupLogger(propAuthToken);
         trackAction('update-auth-methods:started', { adapterKind });
         logTrack('Update auth methods started', { adapterKind });
         setAuthToken(propAuthToken);
