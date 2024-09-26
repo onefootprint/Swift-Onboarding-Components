@@ -21,23 +21,90 @@ describe('<SegmentedControl />', () => {
       },
     ],
     value = 'option-1',
+    variant = 'primary',
+    size = 'default',
   }: Partial<SegmentedControlProps>) =>
-    customRender(<SegmentedControl aria-label={ariaLabel} onChange={onChange} options={options} value={value} />);
+    customRender(
+      <SegmentedControl
+        aria-label={ariaLabel}
+        onChange={onChange}
+        options={options}
+        value={value}
+        variant={variant}
+        size={size}
+      />,
+    );
 
-  it('should render the options', () => {
+  it('should render two options', () => {
     renderSegmentedControl({});
-    expect(screen.getByRole('button', { name: 'Option 1' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Option 2' })).toBeInTheDocument();
+    const options = screen.getAllByRole('button');
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveTextContent('Option 1');
+    expect(options[1]).toHaveTextContent('Option 2');
+  });
+
+  it('should render three options', () => {
+    const threeOptions = [
+      { label: 'Option 1', value: 'option-1' },
+      { label: 'Option 2', value: 'option-2' },
+      { label: 'Option 3', value: 'option-3' },
+    ];
+    renderSegmentedControl({ options: threeOptions });
+    const options = screen.getAllByRole('button');
+    expect(options).toHaveLength(3);
+    expect(options[0]).toHaveTextContent('Option 1');
+    expect(options[1]).toHaveTextContent('Option 2');
+    expect(options[2]).toHaveTextContent('Option 3');
   });
 
   describe('when an option is selected', () => {
-    it('should have a different style in order to highlight it', () => {
-      renderSegmentedControl({
-        value: 'option-2',
+    describe('primary variant', () => {
+      it('should have a different style in order to highlight it', () => {
+        renderSegmentedControl({
+          value: 'option-2',
+          variant: 'primary',
+        });
+        const selectedOption = screen.getByRole('button', { name: 'Option 2' });
+        expect(selectedOption).toHaveStyle({
+          backgroundColor: themes.light.backgroundColor.primary,
+          color: themes.light.color.primary,
+        });
       });
-      const selectedOption = screen.getByRole('button', { name: 'Option 2' });
-      expect(selectedOption).toHaveStyle({
-        backgroundColor: themes.light.backgroundColor.tertiary,
+
+      it('should have the correct background color for non-selected options', () => {
+        renderSegmentedControl({
+          value: 'option-2',
+          variant: 'primary',
+        });
+        const nonSelectedOption = screen.getByRole('button', { name: 'Option 1' });
+        expect(nonSelectedOption).toHaveStyle({
+          backgroundColor: themes.light.backgroundColor.secondary,
+        });
+      });
+    });
+
+    describe('secondary variant', () => {
+      it('should have a different style in order to highlight it', () => {
+        renderSegmentedControl({
+          value: 'option-2',
+          variant: 'secondary',
+        });
+        const selectedOption = screen.getByRole('button', { name: 'Option 2' });
+        expect(selectedOption).toHaveStyle({
+          backgroundColor: themes.light.backgroundColor.primary,
+          color: themes.light.color.primary,
+        });
+      });
+
+      it('should have the correct background color for non-selected options', () => {
+        renderSegmentedControl({
+          value: 'option-2',
+          variant: 'secondary',
+        });
+        const nonSelectedOption = screen.getByRole('button', { name: 'Option 1' });
+        expect(nonSelectedOption).toHaveStyle({
+          backgroundColor: themes.light.backgroundColor.senary,
+        });
       });
     });
   });
@@ -49,6 +116,24 @@ describe('<SegmentedControl />', () => {
       const option = screen.getByRole('button', { name: 'Option 2' });
       await userEvent.click(option);
       expect(onChange).toHaveBeenCalledWith('option-2');
+    });
+  });
+
+  describe('when using different sizes', () => {
+    it('should have correct padding for default size', () => {
+      renderSegmentedControl({ size: 'default' });
+      const option = screen.getByRole('button', { name: 'Option 1' });
+      expect(option).toHaveStyle({
+        padding: `${themes.light.spacing[2]} ${themes.light.spacing[4]}`,
+      });
+    });
+
+    it('should have correct padding for compact size', () => {
+      renderSegmentedControl({ size: 'compact' });
+      const option = screen.getByRole('button', { name: 'Option 1' });
+      expect(option).toHaveStyle({
+        padding: `${themes.light.spacing[1]} ${themes.light.spacing[4]}`,
+      });
     });
   });
 });

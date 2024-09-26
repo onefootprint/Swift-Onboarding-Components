@@ -3,40 +3,53 @@ import styled, { css } from 'styled-components';
 
 import type { SegmentedControlOptionFields } from './components/segmented-control-option';
 import SegmentedControlOption from './components/segmented-control-option';
-
 export type SegmentedControlProps = {
   'aria-label': string;
   options: SegmentedControlOptionFields[];
   value: string;
   onChange: (value: string) => void;
+  size?: SegmentedControlSize;
+  variant?: SegmentedControlVariant;
 };
 
-const SegmentedControl = ({ 'aria-label': ariaLabel, value, options, onChange }: SegmentedControlProps) => (
-  <Tabs.Root value={value} onValueChange={onChange}>
-    <OptionsContainer aria-label={ariaLabel}>
-      {options.map(({ value: optionValue, label, IconComponent }) => (
+export type SegmentedControlSize = 'compact' | 'default';
+export type SegmentedControlVariant = 'primary' | 'secondary';
+
+const SegmentedControl = ({
+  'aria-label': ariaLabel,
+  value,
+  options,
+  onChange,
+  size = 'default',
+  variant = 'primary',
+}: SegmentedControlProps) => (
+  <Tabs.Root value={value} onValueChange={onChange} activationMode="manual">
+    <OptionsContainer aria-label={ariaLabel} size={size} variant={variant}>
+      {options.map(({ value: optionValue, label }) => (
         <SegmentedControlOption
+          size={size}
           value={optionValue}
           label={label}
-          IconComponent={IconComponent}
           key={optionValue}
           selected={optionValue === value}
+          variant={variant}
         />
       ))}
     </OptionsContainer>
   </Tabs.Root>
 );
 
-const OptionsContainer = styled(Tabs.List)`
-  ${({ theme }) => css`
+const OptionsContainer = styled(Tabs.List)<{ size: SegmentedControlSize; variant: SegmentedControlVariant }>`
+  ${({ theme, variant }) => css`
     display: flex;
     flex-direction: row;
     border-radius: ${theme.borderRadius.full};
     overflow: hidden;
     width: fit-content;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[2]};
-    background-color: ${theme.backgroundColor.primary};
+    border: none;
+    padding: ${theme.spacing[1]};
+    gap: ${theme.spacing[1]};
+    background-color: ${variant === 'primary' ? theme.backgroundColor.secondary : theme.backgroundColor.senary};
   `};
 `;
 

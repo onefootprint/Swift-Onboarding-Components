@@ -1,13 +1,14 @@
-import type { Icon } from '@onefootprint/icons';
 import * as Tabs from '@radix-ui/react-tabs';
 import styled, { css } from 'styled-components';
 
 import Text from '../../../text';
+import type { SegmentedControlSize, SegmentedControlVariant } from '../../segmented-control';
 
 export type SegmentedControlOptionFields = {
   value: string;
   label: string;
-  IconComponent?: Icon;
+  size?: SegmentedControlSize;
+  variant?: SegmentedControlVariant;
 };
 
 export type SegmentedControlOptionProps = SegmentedControlOptionFields & {
@@ -18,60 +19,46 @@ const SegmentedControlOption = ({
   value: optionValue,
   label,
   selected,
-  IconComponent,
+  size = 'default',
+  variant = 'primary',
 }: SegmentedControlOptionProps) => (
-  <OptionTrigger role="button" value={optionValue} key={optionValue} data-selected={selected}>
-    {IconComponent && (
-      <IconContainer>
-        <IconComponent color={selected ? 'quinary' : 'tertiary'} />
-      </IconContainer>
-    )}
-    <Text variant="label-3">{label}</Text>
+  <OptionTrigger
+    role="button"
+    value={optionValue}
+    key={optionValue}
+    data-selected={selected}
+    size={size}
+    variant={variant}
+    tabIndex={0}
+  >
+    <Text variant={selected ? 'label-3' : 'body-3'}>{label}</Text>
   </OptionTrigger>
 );
 
-const IconContainer = styled.div<{ selected?: boolean }>`
-  ${({ theme, selected }) => css`
-    color: ${theme.backgroundColor.secondary};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: ${theme.spacing[2]};
-
-    ${
-      selected &&
-      css`
-      border: 0;
-      color: ${theme.backgroundColor.primary};
-    `
-    }
-  `}
-`;
-
-const OptionTrigger = styled(Tabs.Trigger)`
-  ${({ theme }) => css`
+const OptionTrigger = styled(Tabs.Trigger)<{ size: SegmentedControlSize; variant: SegmentedControlVariant }>`
+  ${({ theme, size, variant }) => css`
     border: none;
-    background-color: transparent;
     border-radius: ${theme.borderRadius.full};
-    padding: ${theme.spacing[2]} ${theme.spacing[4]};
+    padding: ${size === 'compact' ? `${theme.spacing[1]} ${theme.spacing[4]}` : `${theme.spacing[2]} ${theme.spacing[4]}`};
     display: flex;
     justify-content: center;
     align-items: center;
-
     &[data-state='active'] {
-      background-color: ${theme.backgroundColor.tertiary};
-
-      & > * {
-        font-weight: 700;
-        color: ${theme.color.quinary};
-      }
+      background-color: ${theme.backgroundColor.primary};
+      color: ${theme.color.primary};
+      box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.15);
     }
 
     &[data-state='inactive'] {
-      & > * {
-        color: ${theme.color.tertiary};
+      cursor: pointer;
+      background-color: ${variant === 'primary' ? theme.backgroundColor.secondary : theme.backgroundColor.senary};
+      color: ${theme.color.tertiary};
+      &:hover {
+        background-color: ${variant === 'primary' ? 'rgba(14, 20, 56, 0.06)' : 'rgba(14, 20, 56, 0.1)'};
       }
     }
+
+
   `}
 `;
 

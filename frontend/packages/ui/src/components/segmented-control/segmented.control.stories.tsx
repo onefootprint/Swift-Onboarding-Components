@@ -1,9 +1,19 @@
-import { IcoFaceid16, IcoFingerprint16 } from '@onefootprint/icons';
 import type { Meta, StoryFn } from '@storybook/react';
 import React, { useEffect } from 'react';
 
 import type { SegmentedControlProps } from './segmented-control';
 import SegmentedControl from './segmented-control';
+
+const twoOptions = [
+  { label: 'Option 1', value: 'option-1' },
+  { label: 'Option 2', value: 'option-2' },
+];
+
+const threeOptions = [
+  { label: 'Option 1', value: 'option-1' },
+  { label: 'Option 2', value: 'option-2' },
+  { label: 'Option 3', value: 'option-3' },
+];
 
 export default {
   component: SegmentedControl,
@@ -20,12 +30,35 @@ export default {
     },
     options: {
       control: 'select',
-      options: ['option-1', 'option-2'],
-      description: 'Array of options in tabs',
+      options: ['Two options', 'Three options'],
+      mapping: {
+        'Two options': twoOptions,
+        'Three options': threeOptions,
+      },
+      description: 'Choose between two or three options',
+      required: true,
+    },
+    size: {
+      control: 'select',
+      options: ['compact', 'default'],
+      description: 'Size of the segmented control',
+      required: true,
+    },
+    variant: {
+      control: 'select',
+      options: ['primary', 'secondary'],
+      description: 'Variant of the segmented control',
       required: true,
     },
     value: {
-      control: 'text',
+      control: 'select',
+      options: ['Option 1', 'Option 2', 'Option 3'],
+      mapping: {
+        'Option 1': 'option-1',
+        'Option 2': 'option-2',
+        // No easy way to hide this, which will be an invalid option if we only have two options. Will fail silently, though, so no worries
+        'Option 3': 'option-3',
+      },
       description: 'Value of the selected option',
       required: true,
     },
@@ -36,6 +69,8 @@ const Template: StoryFn<SegmentedControlProps> = ({
   'aria-label': ariaLabel,
   onChange,
   options,
+  size,
+  variant,
   value,
 }: SegmentedControlProps) => {
   const [segment, setSegment] = React.useState(value);
@@ -48,28 +83,22 @@ const Template: StoryFn<SegmentedControlProps> = ({
     setSegment(value);
   }, [value]);
 
-  return <SegmentedControl aria-label={ariaLabel} onChange={handleChange} options={options} value={segment} />;
+  return (
+    <SegmentedControl
+      aria-label={ariaLabel}
+      onChange={handleChange}
+      options={options}
+      size={size}
+      variant={variant}
+      value={segment}
+    />
+  );
 };
 
 export const Base = Template.bind({});
 Base.args = {
   'aria-label': 'Segmented Control',
   onChange: console.log, // eslint-disable-line no-console
-  options: [
-    {
-      label: 'Option 1',
-      value: 'option-1',
-      IconComponent: IcoFaceid16,
-    },
-    {
-      label: 'Option 2',
-      value: 'option-2',
-      IconComponent: IcoFingerprint16,
-    },
-    {
-      label: 'Option 3',
-      value: 'option-3',
-    },
-  ],
+  options: twoOptions,
   value: 'option-1',
 };
