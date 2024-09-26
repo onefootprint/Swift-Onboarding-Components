@@ -322,7 +322,7 @@ export enum BankDIField {
   accountType = 'account_type',
   routingNumber = 'ach_routing_number',
   accountNumber = 'ach_account_number',
-  accountUd = 'ach_account_ud',
+  accountId = 'ach_account_id',
 }
 
 export type CardDI<T extends string = string> =
@@ -333,14 +333,16 @@ export type CardDI<T extends string = string> =
   | `card.${T}.${CardDIField.cvc}`
   | `card.${T}.${CardDIField.expiration}`
   | `card.${T}.${CardDIField.expirationMonth}`
-  | `card.${T}.${CardDIField.expirationYear}`;
+  | `card.${T}.${CardDIField.expirationYear}`
+  | `card.${T}.${CardDIField.zip}`
+  | `card.${T}.${CardDIField.country}`;
 
 export type BankDI<T extends string = string> =
   | `bank.${T}.${BankDIField.name}`
   | `bank.${T}.${BankDIField.accountType}`
   | `bank.${T}.${BankDIField.routingNumber}`
   | `bank.${T}.${BankDIField.accountNumber}`
-  | `bank.${T}.${BankDIField.accountUd}`;
+  | `bank.${T}.${BankDIField.accountId}`;
 
 export type CustomDocumentIdentifier<T extends string = string> = `document.custom.${T}`;
 
@@ -360,4 +362,5 @@ export type DataIdentifier =
   | DocumentDI
   | VersionedDocumentDI
   | CardDI
+  | BankDI
   | CustomDI;

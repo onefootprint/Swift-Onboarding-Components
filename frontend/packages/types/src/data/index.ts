@@ -71,6 +71,7 @@ export type {
 export {
   BusinessDI,
   CardDIField,
+  BankDIField,
   DataIdentifierKeys,
   DocumentDI,
   IdDI,
@@ -104,6 +105,7 @@ export {
   WorkflowStatus,
 } from './entity';
 export type { EntityCard } from './entity-cards';
+export type { EntityBankAccount } from './entity-bank-account';
 export type { FootprintAppearance } from './footprint-appearance';
 export { default as HostedUrlType } from './hosted-url-type';
 export type { IdDIData, ValueTypeForIdDI } from './id-di-data';
