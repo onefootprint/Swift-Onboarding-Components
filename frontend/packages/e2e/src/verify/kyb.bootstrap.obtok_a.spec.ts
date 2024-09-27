@@ -65,7 +65,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/components/verify?app_url=${appUrl}&f=${flowId}#${session.token}`);
+  await page.goto(`/components/verify?app_url=${appUrl}&f=${flowId}&ob_key=${session.token}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);

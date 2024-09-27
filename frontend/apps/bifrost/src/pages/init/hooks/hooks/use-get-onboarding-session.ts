@@ -3,7 +3,6 @@ import request from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
 export type GetOnboardingSessionResponse = {
-  key?: string;
   bootstrapData: FootprintVerifyDataProps['bootstrapData'];
 };
 

@@ -66,6 +66,9 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
+  // NOTE: this is the legacy syntax where the pbtok is passed in the `authToken` argument of the SDK instead
+  // of in the `publicKey` argument. Only Yieldstreet is doing this. We can migrate to pass as the `publicKey`
+  // in the future once Yieldstreet has migrated away from this flow
   await page.goto(`/components/verify?app_url=${appUrl}&f=${flowId}#${session.token}`);
   await page.waitForLoadState();
 
