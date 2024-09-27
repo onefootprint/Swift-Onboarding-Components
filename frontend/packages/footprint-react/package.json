@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-react",
   "private": false,
   "type": "module",
-  "version": "7.6.0",
+  "version": "7.7.0",
   "main": "./dist/footprint-react.cjs",
   "module": "./dist/footprint-react.js",
   "unpkg": "./dist/footprint-react.js",

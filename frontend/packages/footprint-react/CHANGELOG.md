@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 7.7.0
+
+### Minor Changes
+
+- ec75c90fac: Bug fixes
+
 ## 7.6.0
 
 ### Minor Changes
