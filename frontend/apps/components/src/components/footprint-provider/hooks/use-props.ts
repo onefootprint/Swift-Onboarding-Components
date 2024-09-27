@@ -1,5 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import { getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
+import { Logger, getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -35,9 +35,19 @@ const useProps = <T extends Obj>(onSuccess?: (props?: T) => void, onError?: (err
   };
 
   useEffectOnce(() => {
-    fpProvider.load().then(() => {
-      setIsAdapterLoaded(true);
-    });
+    fpProvider
+      .load()
+      .then(data => {
+        const sdkVersion = data?.model?.sdkVersion;
+        if (sdkVersion) {
+          Logger.appendGlobalContext({ sdkVersion: `footprint-js@${sdkVersion}` });
+        }
+        Logger.info('Footprint provider successfully loaded');
+        setIsAdapterLoaded(true);
+      })
+      .catch(error => {
+        Logger.error('Footprint provider failed to load', error);
+      });
   });
 
   useEffect(() => {
