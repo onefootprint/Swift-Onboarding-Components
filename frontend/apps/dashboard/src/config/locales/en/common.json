@@ -993,13 +993,6 @@
         }
       }
     },
-    "settings": {
-      "page-title": "Footprint | Settings",
-      "header": {
-        "title": "Settings",
-        "theme": "Theme"
-      }
-    },
     "roles": {
       "table": {
         "aria-label": "Table of organization roles",
