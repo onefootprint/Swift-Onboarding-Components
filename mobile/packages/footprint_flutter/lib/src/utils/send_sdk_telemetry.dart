@@ -5,7 +5,11 @@ import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 
 @internal
-Future<void> sendSdkTelemetry(String message, String kind) async {
+Future<void> sendSdkTelemetry(
+  String message,
+  String kind, {
+  required String sdkKind,
+}) async {
   try {
     await http.post(
       Uri.parse('$apiBaseUrl/org/sdk_telemetry'),

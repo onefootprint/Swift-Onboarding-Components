@@ -40,7 +40,7 @@ Future<SdkArgsResponse> _sendSdkArgsRecursive(
 }
 
 Future<SdkArgsResponse> sendSdkArgs(Configuration data,
-    {bool? isComponentSdk}) async {
+    {required String sdkKind, bool? isComponentSdk}) async {
   final dataJson = data.toJson();
   if (isComponentSdk != null) {
     dataJson['is_components_sdk'] = isComponentSdk;

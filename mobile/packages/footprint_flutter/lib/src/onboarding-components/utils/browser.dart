@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/utils/create_url.dart';
@@ -25,6 +26,7 @@ class Browser {
   void Function({required String authToken, required String vaultingToken})?
       _handAuthComplete;
   OnboardingStep? _step;
+  late bool _isAuthPlaybook;
   _ResultType? _result;
 
   Browser() {
@@ -54,17 +56,24 @@ class Browser {
       _result = null; // reset result
       _latestUri = null; // reset latestUri
     });
-    var response = await sendSdkArgs(config, isComponentSdk: true);
+    _isAuthPlaybook = config.isAuthPlaybook ?? false;
+    final sdkKind =
+        config.isAuthPlaybook ?? false ? sdkKindAuth : sdkKindVerify;
+    var response = await sendSdkArgs(
+      config,
+      isComponentSdk: true,
+      sdkKind: sdkKind,
+    );
 
     if (response.failed) {
-      logError(response.error);
+      logError(response.error, sdkKind: sdkKind);
       _handleError("Sdk args failed - please check your public key");
       return;
     }
 
     var token = response.data;
     if (token == null) {
-      logError('Token is null');
+      logError('Token is null', sdkKind: sdkKind);
       _handleError("Could not fetch sdk args");
       return;
     }
@@ -73,7 +82,11 @@ class Browser {
       return;
     }
 
-    var url = createUrl(token: token, config: config);
+    var url = createUrl(
+      baseUrl: config.isAuthPlaybook ?? false ? authBaseUrl : bifrostBaseUrl,
+      token: token,
+      config: config,
+    );
     _openWebView(url);
   }
 
@@ -105,7 +118,7 @@ class Browser {
     if (uri == null || uri == _latestUri || step == null) return;
     _latestUri = uri;
     final queryParameters = uri.queryParameters;
-    if (_step == OnboardingStep.auth) {
+    if (_step == OnboardingStep.auth && !_isAuthPlaybook) {
       if (queryParameters.containsKey('auth_token') &&
           queryParameters.containsKey('components_vault_token')) {
         _result = _ResultType.authCompleted;
@@ -116,7 +129,7 @@ class Browser {
         _result = _ResultType.canceled;
         _handleCancel?.call();
       }
-    } else if (_step == OnboardingStep.onboard) {
+    } else if (_step == OnboardingStep.onboard || _isAuthPlaybook) {
       if (queryParameters.containsKey('validation_token')) {
         _result = _ResultType.completed;
         _handleComplete?.call(queryParameters['validation_token']!);

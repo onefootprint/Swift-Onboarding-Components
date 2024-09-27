@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/utils/create_url.dart';
 import 'package:footprint_flutter/src/utils/logger.dart';
@@ -42,17 +43,19 @@ class _Footprint {
       _result = null; // reset result
       _latestUri = null; // reset latestUri
     });
+    final sdkKind =
+        config.isAuthPlaybook ?? false ? sdkKindAuth : sdkKindVerify;
 
-    var response = await sendSdkArgs(config);
+    var response = await sendSdkArgs(config, sdkKind: sdkKind);
 
     if (response.failed) {
-      logError(response.error);
+      logError(response.error, sdkKind: sdkKind);
       return;
     }
 
     var token = response.data;
     if (token == null) {
-      logError('Token is null');
+      logError('Token is null', sdkKind: sdkKind);
       return;
     }
 
@@ -60,7 +63,11 @@ class _Footprint {
       return;
     }
 
-    var url = createUrl(token: token, config: config);
+    var url = createUrl(
+      baseUrl: config.isAuthPlaybook ?? false ? authBaseUrl : bifrostBaseUrl,
+      token: token,
+      config: config,
+    );
     _openWebView(url);
   }
 

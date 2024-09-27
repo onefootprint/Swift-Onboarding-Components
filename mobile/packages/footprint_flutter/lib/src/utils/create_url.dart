@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 
 @internal
 String createUrl({
+  required String baseUrl,
   Configuration? config,
   String? redirectUrl,
   required String token,
@@ -45,7 +46,7 @@ String createUrl({
     }
   }
 
-  return 'https://id.onefootprint.com?$searchParams#$token';
+  return '$baseUrl?$searchParams#$token';
 }
 
 String _encode(Map<String, dynamic>? obj) {

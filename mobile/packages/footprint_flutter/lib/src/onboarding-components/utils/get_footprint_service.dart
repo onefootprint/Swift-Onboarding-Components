@@ -10,6 +10,7 @@ import 'package:footprint_flutter/src/onboarding-components/models/form_data.dar
 import 'package:footprint_flutter/src/onboarding-components/models/inline_process_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/verification_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/process.dart';
@@ -25,7 +26,7 @@ import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_ot
 typedef IdentifyLauncher = void Function({
   String? email,
   String? phoneNumber,
-  void Function(String validationToken)? onAuthenticated,
+  void Function(VerificationResult verificationResult)? onAuthenticated,
   void Function(Object err)? onError,
   void Function()? onCancel,
 });
@@ -193,7 +194,7 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
   void launchIdentify({
     String? email,
     String? phoneNumber,
-    void Function(String validationToken)? onAuthenticated,
+    void Function(VerificationResult verificationResult)? onAuthenticated,
     void Function(Object err)? onError,
     void Function()? onCancel,
   }) {
@@ -203,6 +204,15 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final sandboxId = ref.read(fpContextNotifierProvider).sandboxId;
     final appearance = ref.read(fpContextNotifierProvider).appearance;
     final authToken = ref.read(fpContextNotifierProvider).authToken;
+    final locale = ref.read(fpContextNotifierProvider).locale;
+    final obConfigKind =
+        ref.read(fpContextNotifierProvider).onboardingConfig?.kind;
+
+    if (obConfigKind == null) {
+      onError?.call(Exception(
+          'Onboarding config kind not found. Please make sure that the publicKey is correct and "isReady" is true.'));
+      return;
+    }
 
     final hasEmailAndPhone = email != null && phoneNumber != null;
     final hasAuthToken = authToken != null;
@@ -231,22 +241,60 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
         sandboxOutcome: sandboxOutcome,
         sandboxId: sandboxId,
         shouldRelayToComponents: true,
+        isAuthPlaybook: obConfigKind == OnboardingConfigKind.auth,
         authToken: authToken,
-        onAuthComplete: (
-            {required String authToken, required String vaultingToken}) {
-          ref
-              .read(fpContextNotifierProvider.notifier)
-              .updateVerifiedAuthToken(authToken);
-          ref
-              .read(fpContextNotifierProvider.notifier)
-              .updateAuthTokenStatus(AuthTokenStatus.validWithSufficientScope);
-          ref
-              .read(fpContextNotifierProvider.notifier)
-              .updateVaultingToken(vaultingToken);
-          getValidationToken(authToken).then((validationToken) {
-            onAuthenticated?.call(validationToken.validationToken);
-          });
-        },
+        onAuthComplete: obConfigKind !=
+                OnboardingConfigKind
+                    .auth // Only for KYC and KYB playbook auth is a separate step
+            ? ({required String authToken, required String vaultingToken}) {
+                ref
+                    .read(fpContextNotifierProvider.notifier)
+                    .updateVerifiedAuthToken(authToken);
+                ref
+                    .read(fpContextNotifierProvider.notifier)
+                    .updateAuthTokenStatus(
+                        AuthTokenStatus.validWithSufficientScope);
+                ref
+                    .read(fpContextNotifierProvider.notifier)
+                    .updateVaultingToken(vaultingToken);
+                Future.wait([
+                  getValidationToken(authToken),
+                  getDataAfterVerify(
+                      authToken, locale ?? FootprintSupportedLocale.enUS, ref)
+                ]).then((value) {
+                  final validationToken =
+                      (value[0] as ValidationTokenResponse).validationToken;
+                  final dataAfterVerification =
+                      (value[1] as GetDataAfterVerifyResponse);
+                  final (:fields, :requirements, :vaultData) =
+                      dataAfterVerification;
+                  onAuthenticated?.call(
+                    (
+                      fields: fields,
+                      requirements: requirements,
+                      validationToken: validationToken,
+                      vaultData: vaultData,
+                    ),
+                  );
+                }).catchError((err) {
+                  onError?.call(err);
+                });
+              }
+            : null,
+        onComplete: obConfigKind ==
+                OnboardingConfigKind
+                    .auth // For auth playbook, the whole flow is completed in the auth step
+            ? (validationTokenResult) => {
+                  onAuthenticated?.call(
+                    (
+                      fields: null,
+                      requirements: null,
+                      validationToken: validationTokenResult,
+                      vaultData: null,
+                    ),
+                  )
+                }
+            : null,
         onError: (err) {
           onError?.call(err);
         },
@@ -341,6 +389,12 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
   Future<String> processOnboarding() async {
     final fpContext = ref.read(fpContextNotifierProvider);
     final authToken = fpContext.verifiedAuthToken;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
+
+    if (obConfigKind == OnboardingConfigKind.auth) {
+      throw Exception(
+          "Processing is not allowed for auth playbooks. Please use a KYC or KYB playbook.");
+    }
 
     if (authToken == null) {
       throw Exception('No auth token found. Please authenticate first.');
@@ -369,6 +423,13 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
   Future<GetOnboardingStatusResult> getRequirements() async {
     final fpContext = ref.read(fpContextNotifierProvider);
     final authToken = fpContext.verifiedAuthToken;
+    final obConfigKind = fpContext.onboardingConfig?.kind;
+
+    if (obConfigKind == OnboardingConfigKind.auth) {
+      throw Exception(
+        "Getting requirements is not allowed for auth playbooks. Please use a KYC or KYB playbook.",
+      );
+    }
 
     if (authToken == null) {
       throw Exception('No auth token found. Please authenticate first.');

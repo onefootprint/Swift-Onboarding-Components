@@ -36,6 +36,7 @@ Future<ValidateAuthTokenResult> handleOnboardConfigKind({
   required SandboxOutcome? sandboxOutcome,
 }) async {
   final validationToken = (await getValidationToken(authToken)).validationToken;
+  await initOnboarding(authToken, sandboxOutcome?.overallOutcome);
   final vaultingToken = await createVaultingToken(authToken);
   ref.read(fpContextNotifierProvider.notifier).update(
         verifiedAuthToken: authToken,
@@ -43,8 +44,6 @@ Future<ValidateAuthTokenResult> handleOnboardConfigKind({
         authValidationToken: validationToken,
         vaultingToken: vaultingToken.token,
       );
-
-  await initOnboarding(authToken, sandboxOutcome?.overallOutcome);
   return (
     authTokenStatus: AuthTokenStatus.validWithSufficientScope,
     validationToken: validationToken

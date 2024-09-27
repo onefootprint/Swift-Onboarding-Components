@@ -17,6 +17,7 @@ class Configuration {
   final String? authToken;
   final String? publicKey;
   final String redirectUrl;
+  final bool? isAuthPlaybook;
   final void Function()? onCancel;
 
   Configuration({
@@ -32,6 +33,7 @@ class Configuration {
     this.options,
     this.publicKey,
     required this.redirectUrl,
+    this.isAuthPlaybook,
   });
 
   @internal
@@ -45,6 +47,7 @@ class Configuration {
       "fixture_result": sandboxOutcome?.overallOutcome?.toString(),
       "document_fixture_result": sandboxOutcome?.idDocOutcome?.toString(),
       "sandbox_id": sandboxId,
+      "is_auth_playbook": isAuthPlaybook,
     };
     map.removeWhere((key, value) => value == null);
     return map;

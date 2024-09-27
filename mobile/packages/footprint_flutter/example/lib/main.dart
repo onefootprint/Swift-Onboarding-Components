@@ -105,15 +105,17 @@ class Hosted extends StatelessWidget {
         businessZip: "94107");
 
     var config = FootprintConfiguration(
-        appearance: FootprintAppearance(
-            variables: FootprintAppearanceVariables(buttonPrimaryBg: 'red')),
-        l10n: FootprintL10n(language: FootprintSupportedLanguage.en),
-        onCancel: () => print("onCancel"),
-        onComplete: (String token) => print("onComplete $token"),
-        publicKey:
-            "pb_test_pZoERpZeZkGW7RRVeBawSm", // using kyb public key to test the business bootstrap data as well
-        redirectUrl: "com.footprint.fluttersdk://example",
-        bootstrapData: bootstrapData);
+      appearance: FootprintAppearance(
+          variables: FootprintAppearanceVariables(buttonPrimaryBg: 'red')),
+      l10n: FootprintL10n(language: FootprintSupportedLanguage.en),
+      onCancel: () => print("onCancel"),
+      onComplete: (String token) => print("onComplete $token"),
+      // isAuthPlaybook: true, // Uncomment this line to use the Auth Playbook
+      publicKey:
+          "pb_test_pZoERpZeZkGW7RRVeBawSm", // using kyb public key to test the business bootstrap data as well
+      redirectUrl: "com.footprint.fluttersdk://example",
+      bootstrapData: bootstrapData,
+    );
     footprint.init(config, context);
   }
 
@@ -191,7 +193,71 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           ),
           sandboxId: "3jmlksncdsvbvsbevdsaww",
           // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
-          child: const Kyc(),
+          child: const Kyc(), // Use Auth() for Auth Playbook
+        ),
+      ),
+    );
+  }
+}
+
+// This widget for cases where you use auth playbooks
+class Auth extends StatefulWidget {
+  const Auth({super.key});
+
+  @override
+  State<Auth> createState() => _AuthState();
+}
+
+class _AuthState extends State<Auth> {
+  VerificationResult? verificationResult;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!footprintUtils(context).isReady) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (verificationResult == null ||
+                verificationResult?.validationToken.isEmpty == true)
+              Identify(
+                handleAuthenticated: (VerificationResult? verificationResult) {
+                  setState(() {
+                    this.verificationResult = verificationResult;
+                  });
+                },
+                useAuthToken: false,
+              ),
+            if (verificationResult?.validationToken.isNotEmpty == true)
+              Container(
+                padding: const EdgeInsets.all(20),
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    const Text("Auth Complete"),
+                    const SizedBox(height: 12),
+                    const Text("Validation Token:"),
+                    const SizedBox(height: 8),
+                    Text(verificationResult?.validationToken ?? ''),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Close demo'),
+                    ),
+                  ],
+                ),
+              )
+          ],
         ),
       ),
     );
@@ -374,8 +440,8 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                    onAuthenticated: (String validationToken) {
-                  widget.handleAuthenticated(null);
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
                 } // Don't pass email and phone number - it's going to use auth token
                     );
               },
@@ -406,68 +472,65 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: DataIdentifier.idEmail,
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
-                    ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: DataIdentifier.idPhoneNumber,
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: (String validationToken) {
-                      widget.handleAuthenticated(null);
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
                     },
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
         return Container(
           padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),

@@ -17,6 +17,7 @@ class FootprintConfiguration extends Configuration {
     super.publicKey,
     super.sandboxId,
     super.sandboxOutcome,
+    super.isAuthPlaybook,
     required super.redirectUrl,
     this.bootstrapData,
   });
@@ -34,6 +35,7 @@ class FootprintConfiguration extends Configuration {
       "fixture_result": sandboxOutcome?.overallOutcome?.toString(),
       "document_fixture_result": sandboxOutcome?.idDocOutcome?.toString(),
       "sandbox_id": sandboxId,
+      "is_auth_playbook": isAuthPlaybook,
     };
     map.removeWhere((key, value) => value == null);
     return map;

@@ -26,7 +26,7 @@ String _getStringMessage(dynamic msg) {
   return 'Something went wrong';
 }
 
-String _log(LogLevel level, dynamic message) {
+String _log(LogLevel level, dynamic message, String sdkKind) {
   final String formattedMessage = _getStringMessage(message);
   final String messageWithPrefix = '$logPrefix: $formattedMessage';
 
@@ -34,16 +34,20 @@ String _log(LogLevel level, dynamic message) {
     final logPrefix = level == LogLevel.error ? 'ERROR' : 'WARNING';
     print('$logPrefix: $messageWithPrefix');
   } else {
-    sendSdkTelemetry(formattedMessage, level.toString());
+    sendSdkTelemetry(formattedMessage, level.toString(), sdkKind: sdkKind);
   }
 
   return messageWithPrefix;
 }
 
-String logError(dynamic message) {
-  return _log(LogLevel.error, message);
+String logError(dynamic message, {required String sdkKind}) {
+  return _log(LogLevel.error, message, sdkKind);
 }
 
-String logWarn(dynamic message) {
-  return _log(LogLevel.warn, message);
+String logWarn(dynamic message, {required String sdkKind}) {
+  return _log(
+    LogLevel.warn,
+    message,
+    sdkKind,
+  );
 }
