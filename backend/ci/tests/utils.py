@@ -88,7 +88,13 @@ def _make_request(
         **IT_DYNAMIC_HEADERS,
     }
     response = method(
-        url(path), headers=headers, json=data, data=raw_data, params=params, files=files
+        url(path),
+        headers=headers,
+        json=data,
+        data=raw_data,
+        params=params,
+        files=files,
+        timeout=60,
     )
     if response.status_code != status_code:
         raise HttpError(
