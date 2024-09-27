@@ -15,7 +15,7 @@ export type PermissionsProps = {
 const Permissions = ({ kind }: PermissionsProps) => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
   const [animateProxyConfigSelect] = useAutoAnimate<HTMLDivElement>();
-  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
+  const { t } = useTranslation('roles');
   const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
   const { options: decryptOptions, allOption: decryptAllOption } = useDecryptOptions();

@@ -9,7 +9,7 @@ export type DecryptOptionProps = {
 };
 
 const DecryptOptions = ({ options }: DecryptOptionProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
+  const { t } = useTranslation('roles');
 
   if (options.length > 0) {
     const fields = options.map(scope => t(`scopes.decrypt.${scope}` as ParseKeys<'common'>)).join(', ');

@@ -14,6 +14,7 @@ import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
 import playbooks from '../locales/en/playbooks.json';
+import roles from '../locales/en/roles.json';
 import securityLogs from '../locales/en/security-logs.json';
 import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
@@ -33,6 +34,7 @@ i18next.use(initReactI18next).init({
       internal,
       lists,
       playbooks,
+      roles,
       ui,
       users,
       home,
@@ -53,6 +55,7 @@ i18next.use(initReactI18next).init({
     'internal',
     'lists',
     'playbooks',
+    'roles',
     'switch-org',
     'ui',
     'users',

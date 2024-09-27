@@ -17,8 +17,8 @@ export type RemoveProps = {
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
   const { id, numActiveUsers, name, numActiveApiKeys } = role;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.roles.remove',
+  const { t } = useTranslation('roles', {
+    keyPrefix: 'remove',
   });
   const [open, setOpen] = useState(false);
   const removeRoleMutation = useRemoveRole(name);
@@ -78,7 +78,8 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
       title={t('confirmation.title')}
     >
       <Trans
-        i18nKey="pages.roles.remove.confirmation.description"
+        ns="roles"
+        i18nKey="remove.confirmation.description"
         components={{
           b: <Bold />,
         }}

@@ -27,8 +27,8 @@ const Form = ({
   },
   kind,
 }: FormProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.roles.form',
+  const { t } = useTranslation('roles', {
+    keyPrefix: 'form',
   });
   const formMethods = useForm<FormData>({ defaultValues });
   const {

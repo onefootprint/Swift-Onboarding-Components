@@ -18,8 +18,8 @@ export type ActionsProps = {
 
 const Actions = ({ role }: ActionsProps) => {
   const { name } = role;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.roles.table.actions',
+  const { t } = useTranslation('roles', {
+    keyPrefix: 'table.actions',
   });
   const [openDropdown, setOpenDropdown] = useState(false);
   const removeRef = useRef<RemoveHandler>(null);

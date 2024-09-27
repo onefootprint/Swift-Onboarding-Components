@@ -13,6 +13,7 @@ import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
 import type onboardingResource from '../config/locales/en/onboarding.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
+import type rolesResource from '../config/locales/en/roles.json';
 import type securityLogsResource from '../config/locales/en/security-logs.json';
 import type settingsResource from '../config/locales/en/settings.json';
 import type switchOrgresource from '../config/locales/en/switch-org.json';
@@ -41,6 +42,7 @@ declare module 'i18next' {
       settings: typeof settingsResource;
       onboarding: typeof onboardingResource;
       'security-logs': typeof securityLogsResource;
+      roles: typeof rolesResource;
     };
   }
 }

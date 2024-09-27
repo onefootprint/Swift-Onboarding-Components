@@ -12,7 +12,8 @@ export type CreateDialogProps = {
 };
 
 const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {
-  const { t } = useTranslation('common');
+  const { t: allT } = useTranslation('common');
+  const { t: rolesT } = useTranslation('roles');
   const createRoleMutation = useCreateRole();
   const handleSubmit = (payload: CreateRoleRequest) => {
     createRoleMutation.mutate(payload, { onSuccess: handleClose });
@@ -22,16 +23,16 @@ const CreateDialog = ({ open, handleClose, kind }: CreateDialogProps) => {
       onClose={handleClose}
       open={open}
       size="compact"
-      title={t('pages.roles.create.title')}
+      title={rolesT('create.title')}
       primaryButton={{
         form: 'roles-form',
-        label: t('create'),
+        label: allT('create'),
         loading: createRoleMutation.isPending,
         type: 'submit',
       }}
       secondaryButton={{
         disabled: createRoleMutation.isPending,
-        label: t('cancel'),
+        label: allT('cancel'),
         onClick: handleClose,
       }}
     >

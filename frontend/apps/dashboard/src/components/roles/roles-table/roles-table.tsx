@@ -14,7 +14,7 @@ type RolesTableProps = {
 };
 
 const RolesTable = ({ data, errorMessage, isPending, kind }: RolesTableProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.roles' });
+  const { t } = useTranslation('roles');
   const filters = useRolesFilters();
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '19%' },

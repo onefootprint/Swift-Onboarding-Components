@@ -1,0 +1,162 @@
+{
+  "table": {
+    "aria-label": "Table of organization roles",
+    "header": {
+      "role": "Role",
+      "active-users": "Active users",
+      "active-api-keys": "Active API keys",
+      "created": "Created at",
+      "permissions": "Permissions"
+    },
+    "empty-state": "No roles found",
+    "actions": {
+      "aria-label": "Open actions for role {{name}}",
+      "not-allowed": "You are not allowed to manage roles",
+      "remove": "Delete role",
+      "edit": "Edit role"
+    }
+  },
+  "create": {
+    "title": "Create role",
+    "not-allowed": "You are not allowed to add roles",
+    "notifications": {
+      "success": {
+        "title": "Role created",
+        "description": "Role {{name}} was created successfully."
+      },
+      "error": {
+        "title": "Error creating role"
+      }
+    }
+  },
+  "edit": {
+    "title": "Edit role",
+    "notifications": {
+      "success": {
+        "title": "Role updated",
+        "description": "Role {{name}} was updated successfully."
+      },
+      "error": {
+        "title": "Error updating role"
+      }
+    }
+  },
+  "remove": {
+    "confirmation": {
+      "title": "Delete role",
+      "description": "You’re about to delete the role <b>{{name}}</b>. Are you sure?"
+    },
+    "errors": {
+      "num-active-users": {
+        "title": "Role can't be deleted",
+        "description_one": "One user is assigned to this role. Please assign those users to a different role.",
+        "description_other": "{{count}} users are assigned to this role. Please assign those users to a different role."
+      },
+      "num-active-api-keys": {
+        "title": "Role can't be deleted",
+        "description_one": "One API key is active on this role. Please assign a different role to this API key.",
+        "description_other": "{{count}} API keys are active on this role. Please assign different roles to these API keys."
+      }
+    },
+    "feedback": {
+      "success": {
+        "title": "Role deleted",
+        "description": "{{name}} role has been deleted."
+      },
+      "error": {
+        "title": "Error removing role"
+      }
+    }
+  },
+  "form": {
+    "name": {
+      "label": "Name",
+      "placeholder": "Customer support",
+      "errors": {
+        "required": "Please enter a name"
+      }
+    },
+    "permissions": {
+      "title": "Permissions"
+    },
+    "proxy-configs": {
+      "label": "Allowed proxy configs",
+      "errors": {
+        "required": "Must select at least one proxy configuration"
+      }
+    },
+    "decrypt": {
+      "label": "Decrypt data",
+      "errors": {
+        "required": "Must select at least one permissible attribute"
+      }
+    },
+    "decrypt-attributes": {
+      "label": "Permissible attributes"
+    }
+  },
+  "scopes": {
+    "admin": "Everything",
+    "decrypt_fields_one": "Decrypt {{field}}",
+    "decrypt_fields_other": "Decrypt {{count}} fields",
+    "read": "Read-only",
+    "onboarding_configuration": "Manage Playbooks",
+    "api_keys": "Manage API keys",
+    "manage_vault_proxy": "Manage vault proxy configurations",
+    "invoke_vault_proxy_options": {
+      "all": "All",
+      "jit": "Just-in-time proxy"
+    },
+    "invoke_vault_proxy": {
+      "checkbox": "Invoke vault proxy",
+      "all": "Invoke all vault proxies",
+      "jit": "Invoke just-in-time proxy",
+      "one": "Invoke one vault proxy",
+      "other": "Invoke {{ count }} vault proxies"
+    },
+    "cip_integration": "Make CIP proxy requests",
+    "org_settings": "Manage access control and org settings",
+    "manual_review": "Perform manual review",
+    "write_entities": "Create and update users",
+    "trigger_kyc": "Manually initiate KYC",
+    "trigger_kyb": "Manually initiate KYB",
+    "auth_token": "Create auth tokens",
+    "decrypt_all": "Everything",
+    "decrypt_custom": "Custom attributes",
+    "decrypt_documents": "Documents",
+    "onboarding": "Onboarding",
+    "manage_webhooks": "Manage webhook configuration",
+    "decrypt": {
+      "all": "Everything",
+      "name": "Full name",
+      "email": "Email",
+      "phone_number": "Phone number",
+      "ssn9": "SSN",
+      "ssn4": "SSN (last 4)",
+      "dob": "Date of birth",
+      "documents": "Documents",
+      "full_address": "Address",
+      "custom": "Custom attributes",
+      "us_legal_status": "Legal status in the U.S.",
+      "investor_profile": "Broker questions (Investor profile)",
+      "card": "Card data"
+    },
+    "hints": {
+      "read": "Basic read-only access",
+      "playbooks": "Create and update Playbooks",
+      "api_keys": "Add, edit, and decrypt secret API keys and their roles",
+      "manage_vault_proxy": "Create and update vault proxy configurations",
+      "invoke_vault_proxy": "Invoke the specified vault proxies",
+      "cip_integration": "Forward identity data to a CIP integration",
+      "org_settings": "Administer roles, users, and org settings",
+      "manual_review": "Make new decisions, add annotations, re-trigger KYC",
+      "write_entities": "Create new vaults and update existing vaults' information",
+      "trigger_kyc": "Run KYC checks on an existing vaulted user",
+      "trigger_kyb": "Run KYB checks on an existing vaulted business",
+      "auth_token": "Generate user-scoped auth tokens for Footprint.js",
+      "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
+      "manage_webhooks": "Configure webhook endpoints",
+      "decrypt": "Decrypt the specified attributes"
+    }
+  }
+}
