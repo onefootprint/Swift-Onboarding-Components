@@ -993,53 +993,6 @@
         }
       }
     },
-    "security-logs": {
-      "page-title": "Footprint | Security logs",
-      "header": {
-        "title": "Security logs"
-      },
-      "filters": {
-        "search": "Search by FP ID...",
-        "attributes": {
-          "id": {
-            "label": "Personal data",
-            "basic": {
-              "title": "Basic data"
-            },
-            "identity": {
-              "title": "Identity data"
-            },
-            "address": {
-              "title": "Address data"
-            },
-            "legal-status": {
-              "title": "Legal status data"
-            }
-          },
-          "business": {
-            "label": "Business data",
-            "basic": {
-              "title": "Basic data"
-            },
-            "address": {
-              "title": "Address data"
-            }
-          }
-        },
-        "date-range": {
-          "label": "Date"
-        }
-      },
-      "body": {
-        "footprint-token": "Footprint Token",
-        "metadata": "Metadata",
-        "region": "Region",
-        "ip-address": "IP address",
-        "country": "Country",
-        "device-os": "Device/OS",
-        "user": "User"
-      }
-    },
     "settings": {
       "page-title": "Footprint | Settings",
       "header": {

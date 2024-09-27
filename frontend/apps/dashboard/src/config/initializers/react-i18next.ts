@@ -14,6 +14,7 @@ import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
 import playbooks from '../locales/en/playbooks.json';
+import securityLogs from '../locales/en/security-logs.json';
 import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
 import users from '../locales/en/users.json';
@@ -38,6 +39,7 @@ const configureReactI18next = () => {
         home,
         settings,
         onboarding,
+        securityLogs,
       },
     },
     lng: 'en',
@@ -59,6 +61,7 @@ const configureReactI18next = () => {
       'home',
       'api-keys',
       'onboarding',
+      'security-logs',
     ],
     returnNull: false,
     interpolation: {

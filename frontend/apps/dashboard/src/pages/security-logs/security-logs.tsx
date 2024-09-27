@@ -15,7 +15,7 @@ import useGetAccessEvents from './hooks/use-get-access-events';
 import useSecurityLogsFilters from './hooks/use-security-logs-filters';
 
 const SecurityLogs = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.security-logs' });
+  const { t } = useTranslation('security-logs');
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
   const accessEvents: AccessEvent[] =

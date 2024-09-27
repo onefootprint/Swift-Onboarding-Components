@@ -10,8 +10,8 @@ type SecurityLogBodyProps = {
 };
 
 const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.security-logs.body',
+  const { t } = useTranslation('security-logs', {
+    keyPrefix: 'body',
   });
   const { insightEvent } = accessEvent;
   const { fpId, reason } = accessEvent.detail.data;

@@ -7,8 +7,8 @@ import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
 
 const SecurityLogsFilters = () => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.security-logs.filters',
+  const { t } = useTranslation('security-logs', {
+    keyPrefix: 'filters',
   });
   const filters = useSecurityLogsFilters();
 
