@@ -993,18 +993,6 @@
         }
       }
     },
-    "members": {
-      "table": {
-        "actions": {
-          "remove": {
-            "confirmation": {
-              "title": "Remove team member",
-              "description": "You're about to remove <b>{{name}}</b> from your team. Are you sure?"
-            }
-          }
-        }
-      }
-    },
     "playbooks": {
       "page-title": "Footprint | Playbooks",
       "header": {
