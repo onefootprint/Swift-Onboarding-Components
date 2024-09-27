@@ -377,11 +377,8 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_id = bifrost.sandbox_id
 
-    # Don't finish onboarding. Grab fp_id from dashboard
-    data = dict(pagination=dict(page_size=100))
-    body = post("entities/search", data, *sandbox_tenant.db_auths)
-    user = next(u for u in body["data"] if u["sandbox_id"] == sandbox_id)
-    fp_id = user["id"]
+    # Don't finish onboarding, but get the fp_id
+    fp_id = get("hosted/user/private_info", None, bifrost.auth_token)["fp_id"]
 
     # Trigger
     expected_error = (

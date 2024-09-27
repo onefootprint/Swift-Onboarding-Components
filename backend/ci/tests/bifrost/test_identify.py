@@ -20,9 +20,9 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
         SandboxId(sandbox_id),
     )
 
-    # Make sure entity is created after initiating signup challenge. Should be hidden
+    # Make entity should be hidden after signup challenge
     pagination = dict(pagination=dict(page_size=100))
-    body = post("entities/search", data, *sandbox_tenant.db_auths)
+    body = post("entities/search", pagination, *sandbox_tenant.db_auths)
     assert not any(e["sandbox_id"] == sandbox_id for e in body["data"])
 
     # But we can find it with show_all
