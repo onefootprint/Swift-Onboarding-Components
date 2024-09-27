@@ -7,8 +7,8 @@ type BasicConfigurationProps = {
 };
 
 const BasicConfiguration = ({ proxyConfig }: BasicConfigurationProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details.basic-configuration',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details.basic-configuration',
   });
 
   return (

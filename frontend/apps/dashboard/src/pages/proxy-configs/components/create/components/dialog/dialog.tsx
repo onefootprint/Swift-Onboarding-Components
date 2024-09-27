@@ -17,8 +17,8 @@ type DialogProps = {
 
 const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form',
   });
   const mutation = useCreateProxyConfig();
   const confirmationDialog = useConfirmationDialog();

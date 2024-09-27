@@ -17,8 +17,8 @@ const removeProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveProxyConfig = (proxyConfig: ProxyConfig) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.notifications.remove',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'notifications.remove',
   });
   const toast = useToast();
   const session = useSession();

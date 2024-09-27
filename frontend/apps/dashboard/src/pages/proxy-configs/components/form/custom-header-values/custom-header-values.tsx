@@ -9,8 +9,8 @@ import FormGrid from '../form-grid';
 const defaultHeader = { name: '', value: '', secret: false };
 
 const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.custom-header',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.custom-header',
   });
   const { handleSubmit, control, register } = useForm<FormData>({
     defaultValues: {

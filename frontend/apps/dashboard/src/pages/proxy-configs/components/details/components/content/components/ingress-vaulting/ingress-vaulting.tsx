@@ -9,8 +9,8 @@ type IngressVaultingProps = {
 };
 
 const IngressVaulting = ({ proxyConfig }: IngressVaultingProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details.ingress-vaulting',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details.ingress-vaulting',
   });
   if (!proxyConfig.ingressContentType) {
     return (

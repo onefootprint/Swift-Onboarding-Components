@@ -12,7 +12,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isPending, errorMessage }: TableProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
+  const { t } = useTranslation('proxy-configs');
   const filters = useFilters();
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '11.5%' },

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.basic-configuration',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.basic-configuration',
   });
   const { handleSubmit, register, formState } = useForm<FormData>({
     defaultValues: {

@@ -10,8 +10,8 @@ import UploadFile from '../upload-file';
 const defaultValue = { certificate: '' };
 
 const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.pinned-server-certificates',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.pinned-server-certificates',
   });
   const { control, handleSubmit, register, setValue } = useForm<FormData>({
     defaultValues: {

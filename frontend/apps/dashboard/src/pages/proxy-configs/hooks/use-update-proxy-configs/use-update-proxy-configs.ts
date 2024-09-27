@@ -19,8 +19,8 @@ const updateProxyConfig = async (authHeaders: AuthHeaders, payload: UpdateProxyC
 };
 
 const useUpdateProxyConfig = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.notifications.update',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'notifications.update',
   });
   const toast = useToast();
   const session = useSession();

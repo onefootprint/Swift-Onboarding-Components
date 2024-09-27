@@ -1,0 +1,234 @@
+{
+  "page-title": "Footprint | Vault Proxy",
+  "header": {
+    "title": "Vault Proxy configurations",
+    "subtitle": "Manage your vault proxy configurations"
+  },
+  "status": {
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "table": {
+    "aria-label": "Proxy configurations",
+    "header": {
+      "name": "Name",
+      "id": "ID",
+      "url": "URL",
+      "method": "HTTP method",
+      "status": "Status",
+      "created_at": "Created at"
+    },
+    "empty-state": "You haven't created any vault proxy configurations just yet."
+  },
+  "actions": {
+    "aria-label": "Open actions for proxy config {{name}}",
+    "not-allowed": "You are not allowed to manage proxy configs",
+    "remove": {
+      "cta": "Remove",
+      "confirmation": {
+        "title": "Remove proxy config",
+        "description": "You’re about to remove the proxy config <b>{{name}}</b>. Are you sure?"
+      }
+    },
+    "status": {
+      "enable": {
+        "cta": "Enable",
+        "confirmation": {
+          "title": "Enable proxy config",
+          "description": "You’re about to enable the proxy config <b>{{name}}</b>. Are you sure?"
+        }
+      },
+      "disable": {
+        "cta": "Disable",
+        "confirmation": {
+          "title": "Disable proxy config",
+          "description": "You’re about to disable the proxy config <b>{{name}}</b>. Are you sure?"
+        },
+        "feedback": {
+          "error": {
+            "title": "Error disabling proxy config"
+          }
+        }
+      },
+      "feedback": {
+        "success": {
+          "title": "Proxy config updated",
+          "description": "{{name}} proxy config has been updated."
+        },
+        "error": {
+          "title": "Error updating proxy config"
+        }
+      }
+    }
+  },
+  "details": {
+    "basic-configuration": {
+      "title": "Basic configuration",
+      "name": "Name",
+      "url": "URL",
+      "method": "HTTP Method",
+      "access-reason": "Access reason"
+    },
+    "custom-headers": {
+      "empty": "There are no custom header values",
+      "name": "Name",
+      "secret": "Secret",
+      "title": "Custom header values",
+      "value": "Value"
+    },
+    "client-certificate": {
+      "title": "Client certificate authentication (mTLS)",
+      "certificate": "Certificate",
+      "download": "Download client certificate",
+      "empty": "There's no client certificate authentication (mTLS)"
+    },
+    "pinned-server-certificates": {
+      "title": "Pinned server certificates",
+      "certificate": "Certificate",
+      "download_one": "Download pinned server certificate",
+      "download_other": "Download {{count}} pinned server certificates",
+      "empty": "There are no pinned server certificates"
+    },
+    "ingress-vaulting": {
+      "title": "Ingress vaulting",
+      "empty": "None",
+      "content-type": {
+        "label": "Content type"
+      },
+      "target": "Source",
+      "token": "Vault token"
+    }
+  },
+  "create": {
+    "cta": "Create vault proxy config",
+    "cta-not-allowed": "You're not allowed to create vault proxy configurations",
+    "form": {
+      "title": "Create vault proxy config",
+      "basic-configuration": {
+        "title": "Basic configuration",
+        "name": {
+          "label": "Name",
+          "placeholder": "My vault proxy config",
+          "errors": {
+            "required": "Please enter a name"
+          }
+        },
+        "url": {
+          "label": "URL",
+          "placeholder": "https://acme.com",
+          "errors": {
+            "required": "Please enter a url"
+          }
+        },
+        "method": {
+          "label": "HTTP Method",
+          "placeholder": "Select a method",
+          "errors": {
+            "required": "Please enter a method"
+          }
+        },
+        "access-reason": {
+          "label": "Access reason",
+          "placeholder": "Reason",
+          "errors": {
+            "required": "Please enter a reason"
+          }
+        }
+      },
+      "custom-header": {
+        "title": "Custom header values",
+        "name": {
+          "label": "Name"
+        },
+        "value": {
+          "label": "Value"
+        },
+        "secret": {
+          "label": "Secret"
+        },
+        "remove": "Remove",
+        "add-more": "Add another"
+      },
+      "client-identity": {
+        "title": "Client certificate authentication (mTLS)",
+        "certificate": {
+          "label": "Certificate",
+          "placeholder": "Paste blob",
+          "cta": "Upload PEM file"
+        },
+        "key": {
+          "label": "Key (Encrypted)",
+          "placeholder": "Paste blob",
+          "cta": "Upload PEM file"
+        }
+      },
+      "pinned-server-certificates": {
+        "title": "Pinned server certificates",
+        "certificate": {
+          "label": "Certificate",
+          "placeholder": "Paste blob",
+          "cta": "Upload PEM file"
+        },
+        "add-more": "Add another"
+      },
+      "ingress-vaulting": {
+        "title": "Ingress vaulting",
+        "content-type": {
+          "placeholder": "Your content type",
+          "label": "Content type"
+        },
+        "vaulting-rules": {
+          "title": "Vaulting rules",
+          "token": {
+            "label": "Vault token",
+            "placeholder": "custom.bank_account_number",
+            "errors": {
+              "required": "A vault token is required"
+            }
+          },
+          "target": {
+            "label": "Source",
+            "placeholder": "bank.account_number",
+            "errors": {
+              "required": "A source is required"
+            }
+          }
+        },
+        "add-more": "Add another"
+      },
+      "upload-file": {
+        "or": "or",
+        "remove": "Remove file"
+      }
+    }
+  },
+  "notifications": {
+    "create": {
+      "success": {
+        "title": "Vault proxy configuration created",
+        "description": "Vault Proxy config {{name}} was created successfully"
+      },
+      "error": {
+        "title": "Error creating vault proxy configuration"
+      }
+    },
+    "update": {
+      "success": {
+        "title": "Vault proxy configuration updated",
+        "description": "Vault proxy configuration was updated successfully"
+      },
+      "error": {
+        "title": "Error updating vault proxy configuration"
+      }
+    },
+    "remove": {
+      "success": {
+        "title": "Vault proxy configuration removed",
+        "description": "Vault Proxy config was removed successfully"
+      },
+      "error": {
+        "title": "Error removing vault proxy configuration"
+      }
+    }
+  }
+}

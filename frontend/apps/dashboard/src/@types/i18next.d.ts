@@ -13,6 +13,7 @@ import type internalResource from '../config/locales/en/internal.json';
 import type listsResource from '../config/locales/en/lists.json';
 import type onboardingResource from '../config/locales/en/onboarding.json';
 import type playbookResource from '../config/locales/en/playbooks.json';
+import type proxyConfigsResource from '../config/locales/en/proxy-configs.json';
 import type rolesResource from '../config/locales/en/roles.json';
 import type securityLogsResource from '../config/locales/en/security-logs.json';
 import type settingsResource from '../config/locales/en/settings.json';
@@ -40,6 +41,7 @@ declare module 'i18next' {
       users: typeof usersResource;
       home: typeof homeResource;
       settings: typeof settingsResource;
+      'proxy-configs': typeof proxyConfigsResource;
       onboarding: typeof onboardingResource;
       'security-logs': typeof securityLogsResource;
       roles: typeof rolesResource;

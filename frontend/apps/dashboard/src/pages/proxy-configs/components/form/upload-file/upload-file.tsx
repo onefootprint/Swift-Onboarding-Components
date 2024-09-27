@@ -27,8 +27,8 @@ const UploadFile = ({
   onChange,
   onRemove,
 }: UploadFileProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.upload-file',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.upload-file',
   });
   const [fileName, setFileName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);

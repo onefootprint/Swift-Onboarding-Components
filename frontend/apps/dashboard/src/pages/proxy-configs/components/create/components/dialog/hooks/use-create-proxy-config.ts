@@ -18,8 +18,8 @@ const createProxyConfig = async (authHeaders: AuthHeaders, payload: CreateProxyC
 };
 
 const useCreateProxyConfig = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.notifications.create',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'notifications.create',
   });
   const toast = useToast();
   const session = useSession();

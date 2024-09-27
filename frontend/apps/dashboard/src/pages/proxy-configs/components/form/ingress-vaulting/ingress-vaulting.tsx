@@ -9,8 +9,8 @@ import FormGrid from '../form-grid';
 const defaultRule = { token: '', target: '' };
 
 const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.ingress-vaulting',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.ingress-vaulting',
   });
   const { handleSubmit, control, register, watch } = useForm<FormData>({
     defaultValues: {

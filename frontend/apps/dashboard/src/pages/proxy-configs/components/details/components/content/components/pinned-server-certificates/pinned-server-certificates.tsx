@@ -11,8 +11,8 @@ export type PinnedServerCertificatesProps = {
 };
 
 const PinnedServerCertificates = ({ proxyConfig }: PinnedServerCertificatesProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details.pinned-server-certificates',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details.pinned-server-certificates',
   });
   const shouldShow = proxyConfig.pinnedServerCertificates.length > 0;
 

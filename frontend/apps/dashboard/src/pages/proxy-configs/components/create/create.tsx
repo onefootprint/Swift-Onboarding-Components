@@ -8,7 +8,7 @@ import { CREATE_DEFAULT_VALUES } from 'src/pages/proxy-configs/constants';
 import Dialog from './components/dialog';
 
 const Create = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
+  const { t } = useTranslation('proxy-configs');
   const [isOpen, open, close] = useToggle(false);
 
   return (

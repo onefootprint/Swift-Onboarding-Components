@@ -15,8 +15,8 @@ export type StatusProps = {
 };
 
 const Status = forwardRef<StatusHandler, StatusProps>(({ proxyConfig }, ref) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.actions.status',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'actions.status',
   });
   const [open, setOpen] = useState(false);
   const mutation = useUpdateProxyConfigs();
@@ -63,10 +63,11 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ proxyConfig }, ref) => 
       title={proxyConfig.status === 'enabled' ? t('disable.confirmation.title') : t('enable.confirmation.title')}
     >
       <Trans
+        ns="proxy-configs"
         i18nKey={
           proxyConfig.status === 'enabled'
-            ? 'pages.proxy-configs.actions.status.disable.confirmation.description'
-            : 'pages.proxy-configs.actions.status.enable.confirmation.description'
+            ? 'actions.status.disable.confirmation.description'
+            : 'actions.status.enable.confirmation.description'
         }
         components={{
           b: <Bold />,

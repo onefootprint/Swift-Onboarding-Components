@@ -16,8 +16,8 @@ export type RemoveProps = {
 };
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(({ proxyConfig }, ref) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.actions.remove',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'actions.remove',
   });
   const [open, setOpen] = useState(false);
   const mutation = useRemoveProxyConfig(proxyConfig);
@@ -56,7 +56,8 @@ const Remove = forwardRef<RemoveHandler, RemoveProps>(({ proxyConfig }, ref) => 
       title={t('confirmation.title')}
     >
       <Trans
-        i18nKey="pages.proxy-configs.actions.remove.confirmation.description"
+        ns="proxy-configs"
+        i18nKey="actions.remove.confirmation.description"
         components={{
           b: <Bold />,
         }}

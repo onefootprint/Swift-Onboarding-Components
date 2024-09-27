@@ -8,7 +8,7 @@ import Table from './components/table';
 import useProxyConfigs from './hooks/use-proxy-configs';
 
 const ProxyConfigs = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
+  const { t } = useTranslation('proxy-configs');
   const { data, errorMessage, isPending } = useProxyConfigs();
 
   return (

@@ -16,8 +16,8 @@ type ContentProps = {
 };
 
 const Content = ({ proxyConfig }: ContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details',
   });
 
   const sections = [

@@ -14,6 +14,7 @@ import internal from '../locales/en/internal.json';
 import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
 import playbooks from '../locales/en/playbooks.json';
+import proxyConfigs from '../locales/en/proxy-configs.json';
 import roles from '../locales/en/roles.json';
 import securityLogs from '../locales/en/security-logs.json';
 import settings from '../locales/en/settings.json';
@@ -42,6 +43,7 @@ const configureReactI18next = () => {
         settings,
         onboarding,
         securityLogs,
+        proxyConfigs,
       },
     },
     lng: 'en',
@@ -65,6 +67,7 @@ const configureReactI18next = () => {
       'api-keys',
       'onboarding',
       'security-logs',
+      'proxy-configs',
     ],
     returnNull: false,
     interpolation: {

@@ -7,8 +7,8 @@ import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.
 import UploadFile from '../upload-file';
 
 const ClientIdentity = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.create.form.client-identity',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'create.form.client-identity',
   });
   const { handleSubmit, register, setValue } = useForm<FormData>({
     defaultValues: {

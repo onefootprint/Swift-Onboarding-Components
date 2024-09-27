@@ -11,8 +11,8 @@ export type ClientCertificateProps = {
 };
 
 const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details.client-certificate',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details.client-certificate',
   });
 
   const handleClick = (content: string) => () => {

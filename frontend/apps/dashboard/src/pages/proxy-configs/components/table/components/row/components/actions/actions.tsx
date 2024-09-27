@@ -18,8 +18,8 @@ export type ActionsProps = {
 const Actions = ({ proxyConfig }: ActionsProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { name } = proxyConfig;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.actions',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'actions',
   });
   const statusRef = useRef<StatusHandler>(null);
   const removeRef = useRef<RemoveHandler>(null);

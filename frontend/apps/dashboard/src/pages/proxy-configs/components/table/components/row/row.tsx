@@ -10,7 +10,7 @@ export type RowProps = {
 };
 
 const Row = ({ proxyConfig }: RowProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
+  const { t } = useTranslation('proxy-configs');
   const { formatDateWithTime } = useIntl();
   const { name, url, method, status, createdAt } = proxyConfig;
 

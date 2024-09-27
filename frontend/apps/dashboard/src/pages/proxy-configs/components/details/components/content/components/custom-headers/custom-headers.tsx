@@ -9,8 +9,8 @@ export type CustomHeadersProps = {
 };
 
 const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.proxy-configs.details.custom-headers',
+  const { t } = useTranslation('proxy-configs', {
+    keyPrefix: 'details.custom-headers',
   });
   const shouldShow = proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
 
