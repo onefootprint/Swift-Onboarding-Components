@@ -95,10 +95,28 @@ pub async fn post(
     } = ctx;
 
     let v_id = vw.vault.id.clone();
+
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
-        // Don't issue a new identified token
-        (user_auth.auth_token, user_auth.data.session.scopes)
+        // If the user was identified by an auth token, mutate the existing auth token with any metadata
+        // from the onboarding session token
+        let allow_reonboard = ob_context
+            .as_ref()
+            .and_then(|obc| obc.ob_session())
+            .map(|obs| obs.trusted_metadata.allow_reonboard);
+        let args = NewUserSessionContext {
+            allow_reonboard,
+            ..Default::default()
+        };
+        let scopes = user_auth.scopes.clone();
+        let session = user_auth.update(args, vec![], scope.into(), None)?;
+        let session_key = state.session_sealing_key.clone();
+        let (auth_token, _) = state
+            .db_pool
+            .db_query(move |conn| user_auth.create_derived(conn, &session_key, session, None))
+            .await?;
+        (auth_token, scopes)
     } else {
+        // Otherwise, make a new identified token
         create_identified_token(&state, v_id, scope, sv, ob_context).await?
     };
 
@@ -157,6 +175,11 @@ pub(super) async fn create_identified_token(
     ob_context: Option<ObConfigAuth>,
 ) -> FpResult<(SessionAuthToken, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
+    // Add metadata from the onboarding session token
+    let allow_reonboard = ob_context
+        .as_ref()
+        .and_then(|obc| obc.ob_session())
+        .map(|obs| obs.trusted_metadata.allow_reonboard);
     let token = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
@@ -184,6 +207,7 @@ pub(super) async fn create_identified_token(
                 sb_id: sb.map(|sb| sb.id),
                 bo_id: bo.map(|bo| bo.id),
                 obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
+                allow_reonboard,
                 ..Default::default()
             };
             let args = NewUserSessionArgs {

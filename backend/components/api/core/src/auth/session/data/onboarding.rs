@@ -16,6 +16,16 @@ pub struct DeprecatedOnboardingSession {
 pub struct OnboardingSession {
     pub key: ObConfigurationKey,
     pub bootstrap_data: UserDataV1,
+    #[serde(default)]
+    pub trusted_metadata: OnboardingSessionTrustedMetadata,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)]
+/// Metadata that should not be serialized to the client in the normal `/hosted/onboarding/session`
+/// flow. This metadata is generally only read in contexts that accept `ObSessionAuth`
+/// where we need guarantees that its value has not been spoofed by the client.
+pub struct OnboardingSessionTrustedMetadata {
+    pub allow_reonboard: bool,
 }
 
 /// A business-owner specific session. This is issued when sending out links to each owner of a

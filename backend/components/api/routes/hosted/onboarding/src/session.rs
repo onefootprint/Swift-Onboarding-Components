@@ -19,7 +19,15 @@ pub struct OnboardingSessionResponse {
 )]
 #[get("/hosted/onboarding/session")]
 fn get(session: ObSessionAuth) -> ApiResponse<OnboardingSessionResponse> {
-    let OnboardingSession { key, bootstrap_data } = session.data.data;
+    let OnboardingSession {
+        key,
+        bootstrap_data,
+        // Specifically do not serialize any trusted_metadata to the client since any values we send to the
+        // client here can be spoofed.
+        // trusted_metadata should instead be read by APIs that accept `OnboardingSessionContext` auth
+        // directly.
+        trusted_metadata: _,
+    } = session.data.data;
     let result = OnboardingSessionResponse { key, bootstrap_data };
     Ok(result)
 }

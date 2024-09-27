@@ -5354,6 +5354,10 @@
             "CreateOnboardingSessionRequest": {
                 "type": "object",
                 "properties": {
+                    "allow_reonboard": {
+                        "description": "Allow the user to re-onboard onto this playbook even if they have already onboarded onto\n it. Defaults to false.",
+                        "type": "boolean"
+                    },
                     "bootstrap_data": {
                         "example": {
                             "id.first_name": "Jane",
@@ -5363,7 +5367,7 @@
                         "type": "object"
                     },
                     "key": {
-                        "description": "Optionally, the playbook key that should be used for the onboarding.",
+                        "description": "The playbook key that should be used for the onboarding.",
                         "type": "string"
                     }
                 },

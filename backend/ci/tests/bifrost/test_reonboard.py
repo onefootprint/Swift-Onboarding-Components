@@ -1,5 +1,5 @@
 from tests.identify_client import IdentifyClient
-from tests.headers import FpAuth
+from tests.headers import FpAuth, PlaybookKey
 from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
@@ -120,3 +120,44 @@ def test_allow_reonboard_user_token(sandbox_tenant, must_collect_data):
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
+
+
+def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(sandbox_tenant, "obc", must_collect_data)
+    bifrost1 = BifrostClient.new_user(obc)
+    user = bifrost1.run()
+
+    def reonboard(allow_reonboard: bool):
+        bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
+        bifrost2.run()
+        return bifrost2
+
+    data = dict(key=obc.key.value, allow_reonboard=True)
+    body = post("/onboarding/session", data, sandbox_tenant.s_sk)
+    ob_token = PlaybookKey(body["token"])
+
+    # Re-onboard onto the playbook, identified by PII
+    auth_token = IdentifyClient.from_user(
+        user, override_playbook_auth=ob_token
+    ).inherit()
+    bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
+    bifrost2.run()
+    assert [r["kind"] for r in bifrost2.handled_requirements] == ["process"]
+
+    # Re-onboard onto the playbook, identified by an auth token. The auth token initially has
+    # `allow_reonboard` disabled and then is overriden by the ob session token's setting
+    data = dict(kind="user", allow_reonboard=False)
+    body = post(f"/users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
+    auth_token = FpAuth(body["token"])
+    auth_token = IdentifyClient.from_token(
+        auth_token, override_playbook_auth=ob_token
+    ).step_up()
+    bifrost3 = BifrostClient.raw_auth(
+        obc,
+        auth_token,
+        bifrost1.sandbox_id,
+        # NOTE: provide_playbook_auth isn't technically what happens in bifrost - we would normally pass the ob session token
+        provide_playbook_auth=True,
+    )
+    bifrost3.run()
+    assert [r["kind"] for r in bifrost3.handled_requirements] == ["process"]

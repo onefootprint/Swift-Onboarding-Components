@@ -2,6 +2,7 @@ mod bo_session;
 mod ob_public_key;
 mod pb_token;
 
+use super::session::onboarding::OnboardingSession;
 use super::Either;
 pub use bo_session::*;
 use db::models::business_owner::BusinessOwner;
@@ -36,6 +37,15 @@ impl ObConfigAuth {
     pub fn secondary_business_owner(&self) -> Option<&BusinessOwner> {
         match self {
             Either::Right(Either::Right(a)) => Some(&a.bo),
+            _ => None,
+        }
+    }
+
+    /// Returns onboarding session metadata, if the current `ObConfigAuth` is an onboarding session
+    /// token.
+    pub fn ob_session(&self) -> Option<&OnboardingSession> {
+        match self {
+            Either::Right(Either::Left(a)) => Some(&a.data.data),
             _ => None,
         }
     }

@@ -4,6 +4,7 @@ use crate::utils::session::AuthSession;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::session::onboarding::OnboardingSession;
+use api_core::auth::session::onboarding::OnboardingSessionTrustedMetadata;
 use api_core::auth::session::sdk_args::UserDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
@@ -22,7 +23,7 @@ use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {
-    /// Optionally, the playbook key that should be used for the onboarding.
+    /// The playbook key that should be used for the onboarding.
     pub key: ObConfigurationKey,
     /// Optionally, any user or business bootstrap data that you would like to pass into the
     /// onboarding flow.
@@ -31,6 +32,12 @@ pub struct CreateOnboardingSessionRequest {
     #[openapi(example = r#"{"id.first_name": "Jane", "id.last_name": "Doe"}"#)]
     #[openapi(optional)]
     pub bootstrap_data: UserDataV1,
+    /// Allow the user to re-onboard onto this playbook even if they have already onboarded onto
+    /// it. Defaults to false.
+    // TODO: this is really weird that the default here is different from user-specific sessions
+    #[serde(default)]
+    #[openapi(optional)]
+    pub allow_reonboard: bool,
 }
 
 #[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
@@ -54,7 +61,11 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
-    let CreateOnboardingSessionRequest { key, bootstrap_data } = request.into_inner();
+    let CreateOnboardingSessionRequest {
+        key,
+        bootstrap_data,
+        allow_reonboard,
+    } = request.into_inner();
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state
@@ -62,7 +73,11 @@ pub async fn post(
         .db_query(move |conn| -> FpResult<_> {
             // Check ownership of Playbook
             ObConfiguration::get_enabled(conn, (&key, &tenant.id, is_live))?;
-            let data = OnboardingSession { key, bootstrap_data };
+            let data = OnboardingSession {
+                key,
+                bootstrap_data,
+                trusted_metadata: OnboardingSessionTrustedMetadata { allow_reonboard },
+            };
             let expires_in = chrono::Duration::hours(1);
             let session = AuthSession::create_sync(conn, &sealing_key, data, expires_in)?;
             Ok(session)

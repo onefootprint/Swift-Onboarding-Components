@@ -22,10 +22,6 @@ class BusinessOwnerAuth(BaseAuth):
     HEADER_NAME = "X-Kyb-Bo-Token"
 
 
-class OnboardingSessionToken(BaseAuth):
-    HEADER_NAME = "X-Onboarding-Session-Token"
-
-
 class TenantSecretAuth(BaseAuth):
     HEADER_NAME = "X-Footprint-Secret-Key"
 
