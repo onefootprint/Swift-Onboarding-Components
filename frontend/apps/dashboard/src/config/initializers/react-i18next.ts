@@ -20,6 +20,7 @@ import securityLogs from '../locales/en/security-logs.json';
 import settings from '../locales/en/settings.json';
 import switchOrg from '../locales/en/switch-org.json';
 import users from '../locales/en/users.json';
+import webhooks from '../locales/en/webhooks.json';
 
 const configureReactI18next = () => {
   i18next.use(initReactI18next).init({
@@ -44,6 +45,7 @@ const configureReactI18next = () => {
         onboarding,
         securityLogs,
         proxyConfigs,
+        webhooks,
       },
     },
     lng: 'en',
@@ -68,6 +70,7 @@ const configureReactI18next = () => {
       'onboarding',
       'security-logs',
       'proxy-configs',
+      'webhooks',
     ],
     returnNull: false,
     interpolation: {

@@ -1190,15 +1190,6 @@
         }
       }
     },
-    "webhooks": {
-      "page-title": "Footprint | Webhooks",
-      "header": {
-        "title": "Webhooks",
-        "subtitle": "Setup webhooks to receive updates when events happen in Footprint.",
-        "not-allowed": "You're not allowed to create or modify webhooks"
-      },
-      "loading": "Loading..."
-    },
     "dialog-test-onboarding": {
       "heading": "Test playbook'",
       "title": "One last recommendation:",

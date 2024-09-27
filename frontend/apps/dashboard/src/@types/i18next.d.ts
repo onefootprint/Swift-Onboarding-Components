@@ -19,6 +19,7 @@ import type securityLogsResource from '../config/locales/en/security-logs.json';
 import type settingsResource from '../config/locales/en/settings.json';
 import type switchOrgresource from '../config/locales/en/switch-org.json';
 import type usersResource from '../config/locales/en/users.json';
+import type webhooksResource from '../config/locales/en/webhooks.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -45,6 +46,7 @@ declare module 'i18next' {
       onboarding: typeof onboardingResource;
       'security-logs': typeof securityLogsResource;
       roles: typeof rolesResource;
+      webhooks: typeof webhooksResource;
     };
   }
 }

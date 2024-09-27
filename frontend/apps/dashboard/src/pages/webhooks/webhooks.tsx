@@ -10,7 +10,7 @@ import useFakeSpinnerTimeout from './hooks/use-fake-spinner-timeout';
 import useWebhookPortal from './hooks/use-webhooks-portal';
 
 const Webhooks = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.webhooks' });
+  const { t } = useTranslation('webhooks');
   const { data, error, isPending } = useWebhookPortal();
   const showSpinner = useFakeSpinnerTimeout();
 
