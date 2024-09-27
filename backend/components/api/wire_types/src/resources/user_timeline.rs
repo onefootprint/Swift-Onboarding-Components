@@ -21,6 +21,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::ExternalIntegrationKind;
 use newtypes::LabelKind;
 use newtypes::WorkflowRequestConfig;
+use newtypes::WorkflowSource;
 use serde::Deserialize;
 
 /// Describes a liveness event that took place
@@ -44,6 +45,7 @@ pub enum UserTimelineEvent {
     OnboardingDecision {
         decision: TimelineOnboardingDecision,
         annotation: Option<Annotation>,
+        workflow_source: WorkflowSource,
     },
     Annotation(Annotation),
     WatchlistCheck(WatchlistCheck),

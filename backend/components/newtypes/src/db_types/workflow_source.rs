@@ -4,7 +4,19 @@ use diesel::FromSqlRow;
 use strum_macros::Display;
 use strum_macros::EnumString;
 
-#[derive(Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
+#[derive(
+    Debug,
+    Eq,
+    PartialEq,
+    Display,
+    Hash,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    serde_with::SerializeDisplay,
+)]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum WorkflowSource {
