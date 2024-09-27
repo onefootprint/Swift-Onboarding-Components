@@ -24,7 +24,7 @@ const usePlaybooks = () => {
   const { requestParams } = filters;
   const { authHeaders, isLive } = useSession();
   const onboardingConfigsQuery = useQuery({
-    queryKey: ['onboarding_configs', isLive, requestParams],
+    queryKey: ['playbooks', isLive, requestParams],
     queryFn: () => getPlaybooks(authHeaders, { ...requestParams }),
     enabled: filters.isReady,
   });
@@ -32,7 +32,7 @@ const usePlaybooks = () => {
   const pagination = usePagination({
     count: data?.meta?.count,
     next: data?.meta?.nextPage,
-    onChange: newPage => filters.push({ onboarding_configs_page: newPage }),
+    onChange: newPage => filters.push({ page: newPage }),
     page: filters.values.page,
     pageSize: 10,
   });

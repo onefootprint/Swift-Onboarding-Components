@@ -26,9 +26,12 @@ const Table = ({ data, isPending, errorMessage }: TableProps) => {
     { id: 'actions', text: '', width: '5%' },
   ];
 
+  const handleSearchChange = (search: string) => {
+    filters.push({ search, page: undefined });
+  };
+
   const handleRowClick = (config: OnboardingConfig) => {
     const query: z.infer<typeof tabsRouterSchema> = { ...filters.query, tab: 'data' };
-
     router.push({
       pathname: `/playbooks/${config.id}`,
       query,
@@ -45,6 +48,7 @@ const Table = ({ data, isPending, errorMessage }: TableProps) => {
       isLoading={isPending}
       items={data}
       onRowClick={handleRowClick}
+      onChangeSearchText={handleSearchChange}
       renderTr={({ item: playbook }) => <Row playbook={playbook} />}
     />
   );

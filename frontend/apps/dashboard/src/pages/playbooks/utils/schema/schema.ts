@@ -3,10 +3,11 @@ import { z } from 'zod';
 
 const onboardingStatusEnum = z.enum([OnboardingConfigStatus.disabled, OnboardingConfigStatus.enabled]);
 const playbooksConfigQuery = z.object({
-  onboarding_config_id: z.string().optional(),
-  onboarding_configs_page: z.string().optional(),
-  onboarding_configs_search: z.string().optional(),
-  onboarding_configs_status: onboardingStatusEnum.optional(),
+  id: z.string().optional(),
+  page: z.string().optional(),
+  search: z.string().optional(),
+  kind: z.string().optional(),
+  status: onboardingStatusEnum.optional(),
 });
 const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings']);
 

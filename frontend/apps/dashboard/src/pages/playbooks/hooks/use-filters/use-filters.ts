@@ -2,25 +2,26 @@ import useBaseFilters from 'src/hooks/use-filters';
 import type { PlaybooksConfigQuery } from '../../utils/schema/schema';
 
 const defaultQueryParams: PlaybooksConfigQuery = {
-  onboarding_config_id: undefined,
-  onboarding_configs_page: undefined,
-  onboarding_configs_search: undefined,
-  onboarding_configs_status: undefined,
+  id: undefined,
+  kind: undefined,
+  page: undefined,
+  search: undefined,
+  status: undefined,
 };
 
 const useFilters = () => {
   const filters = useBaseFilters<PlaybooksConfigQuery>(defaultQueryParams);
   const { query } = filters;
   const values = {
-    status: query.onboarding_configs_status,
-    page: query.onboarding_configs_page ? Number.parseInt(query.onboarding_configs_page, 10) : 0,
-    id: query.onboarding_config_id,
-    search: query.onboarding_configs_search,
+    id: query.id,
+    page: query.page ? Number.parseInt(query.page, 10) : 0,
+    search: query.search,
+    status: query.status,
   };
   const requestParams = {
-    status: values.status,
     page: values.page,
     search: values.search,
+    status: values.status,
   };
 
   return {
