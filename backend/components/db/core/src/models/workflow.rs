@@ -27,6 +27,7 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
+use newtypes::DbActor;
 use newtypes::DocumentConfig;
 use newtypes::DocumentState;
 use newtypes::Fingerprint as FingerprintData;
@@ -426,8 +427,8 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument("Workflow::get_with_decisions", skip_all)]
-    pub fn get_with_decisions(
+    #[tracing::instrument("Workflow::get_with_fp_decision", skip_all)]
+    pub fn get_with_fp_decision(
         conn: &mut PgConn,
         sv_ids: Vec<ScopedVaultId>,
         obc_id: &ObConfigurationId,
@@ -440,7 +441,9 @@ impl Workflow {
             .left_join(
                 onboarding_decision::table.on(onboarding_decision::workflow_id
                     .eq(workflow::id)
-                    .and(onboarding_decision::deactivated_at.is_null())),
+                    // Grab the Footprint decision even if it's deactivated. We only use the Footprint
+                    // decision of user workflows to determine the business's workflow status
+                    .and(onboarding_decision::actor.eq(DbActor::Footprint))),
             )
             .get_results(conn)?;
 

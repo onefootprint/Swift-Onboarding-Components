@@ -50,7 +50,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Vec<
 
     let wfs = state
         .db_pool
-        .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &wf.ob_configuration_id))
+        .db_query(move |conn| Workflow::get_with_fp_decision(conn, sv_ids, &wf.ob_configuration_id))
         .await?;
     let wfs_without_decision: Vec<_> = wfs
         .iter()
