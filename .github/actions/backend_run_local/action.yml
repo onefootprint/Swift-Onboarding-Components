@@ -64,6 +64,7 @@ runs:
         echo "CI_IMAGE_ENCLAVE_PROXY=${REGISTRY}/enclave-proxy-dev:${TAG}" >> "$GITHUB_ENV"
         echo "CI_IMAGE_ENCLAVE=${REGISTRY}/enclave-dev:${TAG}" >> "$GITHUB_ENV"
         echo "CI_IMAGE_INTEGRATION_TESTS=${REGISTRY}/integration-tests:${TAG}" >> "$GITHUB_ENV"
+        echo "CI_IMAGE_CACHE_REGISTRY=${REGISTRY}" >> "$GITHUB_ENV"
 
     # These will build any images that are missing.
     - name: Run API in background
