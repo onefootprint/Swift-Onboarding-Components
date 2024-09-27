@@ -70,6 +70,7 @@ use newtypes::IdentityDataKind;
 use newtypes::ManualReviewKind;
 use newtypes::MatchLevel;
 use newtypes::OcrDataKind;
+use newtypes::OnboardingStatus;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::ReviewReason;
@@ -233,7 +234,7 @@ pub(crate) async fn create_cip_request(
     let (
         uvw,
         wf,
-        decision,
+        latest_decision_created_at,
         scoped_vault,
         obc,
         actor,
@@ -285,8 +286,11 @@ pub(crate) async fn create_cip_request(
                         OnboardingDecision::list(conn, &sv.id, filters, OffsetPagination::page(1))?;
                     let (obd_manual, _, _) = decisions.pop().ok_or(CipError::EntityDecisionStatusNotPass)?;
 
-                    if obd_manual.status != DecisionStatus::Pass {
-                        return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
+                    // Ultimately, we don't care if the latest manual review has a Pass, it could be
+                    // DecisionStatus::None. We just want to know if this user is `Pass`
+                    // (with our current way of modeling statuses as of 2024-09)
+                    if sv.status != OnboardingStatus::Pass {
+                        return Err(CipError::EntityDecisionManualReviewStatusNotPass.into());
                     }
 
                     // randomly take the latest review annotation, hoping this is the one that is most like
@@ -311,7 +315,7 @@ pub(crate) async fn create_cip_request(
             Ok((
                 uvw,
                 wf,
-                decision,
+                decision.created_at,
                 sv,
                 obc,
                 actor,
@@ -326,7 +330,7 @@ pub(crate) async fn create_cip_request(
 
     tracing::info!(
         ?wf,
-        ?decision,
+        ?latest_decision_created_at,
         ?scoped_vault,
         ?obc,
         ?actor,
@@ -364,7 +368,7 @@ pub(crate) async fn create_cip_request(
     let kyc = kyc(
         &scoped_vault,
         &wf,
-        &decision,
+        latest_decision_created_at,
         insight,
         actor,
         default_approver,
@@ -385,12 +389,12 @@ pub(crate) async fn create_cip_request(
     let watchlist = watchlist(
         &scoped_vault,
         &obc,
-        &decision,
+        latest_decision_created_at,
         &risk_signals,
         mr.as_ref(),
         watchlist_result_response,
     )?;
-    let identity = identity(&scoped_vault, &decision, risk_signals);
+    let identity = identity(&scoped_vault, latest_decision_created_at, risk_signals);
     let (document, photo) =
         if let Some((identity_document, document_request)) = latest_identity_document_and_request {
             let (ocr_response, _) = load_response_for_vendor_api(
@@ -442,7 +446,7 @@ pub(crate) async fn create_cip_request(
 fn kyc(
     scoped_vault: &ScopedVault,
     wf: &Workflow,
-    decision: &OnboardingDecision,
+    decision_created_at: DateTime<Utc>,
     insight: Option<InsightEvent>,
     actor: Option<SaturatedActor>,
     default_approver: PiiString,
@@ -529,13 +533,13 @@ fn kyc(
         },
         postal_code: decrypted_data.get_di(Zip)?.into(),
         country_of_residency: decrypted_data.get_di(Country)?.into(),
-        kyc_completed_at: Some(decision.created_at),
+        kyc_completed_at: Some(decision_created_at),
         ip_address: pii!(insight.and_then(|ie| ie.ip_address).unwrap_or("0.0.0.0".into())).into(),
         check_initiated_at: wf.authorized_at,
-        check_completed_at: Some(decision.created_at),
+        check_completed_at: Some(decision_created_at),
         approval_status: alpaca::ApprovalStatus::Approved,
         approved_by,
-        approved_at: decision.created_at,
+        approved_at: decision_created_at,
 
         approved_reason: Some(approved_reason),
 
@@ -547,7 +551,7 @@ fn kyc(
 /// helper for building the alpaca idenity sub-response
 fn identity(
     scoped_vault: &ScopedVault,
-    decision: &OnboardingDecision,
+    decision_created_at: DateTime<Utc>,
     risk_signals: Vec<RiskSignal>,
 ) -> alpaca::Identity {
     let (reason_codes, vendors): (Vec<_>, Vec<_>) = risk_signals
@@ -589,7 +593,7 @@ fn identity(
         id: scoped_vault.fp_id.clone(),
         result: overall_result,
         status: alpaca::CipStatus::Complete,
-        created_at: decision.created_at,
+        created_at: decision_created_at,
         matched_address: matched_address_result,
         matched_addresses: vendors.clone(),
         date_of_birth: dob_result,
@@ -604,7 +608,7 @@ fn identity(
 fn watchlist(
     scoped_vault: &ScopedVault,
     obc: &ObConfiguration,
-    decision: &OnboardingDecision,
+    decision_created_at: DateTime<Utc>,
     risk_signals: &[RiskSignal],
     mr: Option<&ManualReview>,
     watchlist_result_response: WatchlistResultResponse,
@@ -677,7 +681,7 @@ fn watchlist(
         id: scoped_vault.fp_id.clone(),
         result: overall_result,
         status: alpaca::CipStatus::Complete,
-        created_at: decision.created_at,
+        created_at: decision_created_at,
         politically_exposed_person: pep_result,
         monitored_lists: monitored_lists_result,
         sanction: sanctions_result,
