@@ -23,7 +23,7 @@ use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Link an existing fp_id to the provided business as a beneficial owner.",
-    tags(Businesses, Preview)
+    tags(Businesses, Preview, HideWhenLocked)
 )]
 #[post("/businesses/{fp_bid}/owners")]
 pub async fn post(

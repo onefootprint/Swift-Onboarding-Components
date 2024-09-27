@@ -434,7 +434,8 @@
             "post": {
                 "tags": [
                     "Businesses",
-                    "Preview"
+                    "Preview",
+                    "HideWhenLocked"
                 ],
                 "description": "Link an existing fp_id to the provided business as a beneficial owner.",
                 "parameters": [
