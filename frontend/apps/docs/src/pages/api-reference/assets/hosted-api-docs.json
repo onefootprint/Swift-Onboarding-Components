@@ -3645,6 +3645,10 @@
             "OnboardingResponse": {
                 "type": "object",
                 "properties": {
+                    "auth_token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    },
                     "onboarding_config": {
                         "description": "The public onboarding configuration",
                         "type": "object",
@@ -4031,6 +4035,7 @@
                     }
                 },
                 "required": [
+                    "auth_token",
                     "onboarding_config"
                 ]
             },

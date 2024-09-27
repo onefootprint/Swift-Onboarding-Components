@@ -106,7 +106,7 @@ pub async fn post(
         .verification_checks()
         .get(VerificationCheckKind::NeuroId)
         .is_some();
-    state
+    let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, FpError> {
             // TODO: allow_reonboard here technically allows creating multiple Workflows per auth token. This
@@ -149,9 +149,12 @@ pub async fn post(
                 ..Default::default()
             };
             let session = user_auth.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
+            let (auth_token, _) = user_auth.create_derived(conn, &session_key, session.clone(), None)?;
+            // We need to keep mutating the existing session for backwards compatibility,
+            // but we should deprecate this eventually
             user_auth.update_session(conn, &session_key, session)?;
 
-            Ok(())
+            Ok(auth_token)
         })
         .await?;
 
@@ -162,5 +165,6 @@ pub async fn post(
     Ok(OnboardingResponse {
         // Omit appearance serialization here
         onboarding_config,
+        auth_token,
     })
 }
