@@ -24,9 +24,7 @@ export const useFootprint = () => {
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found. Make sure that the publicKey is correct');
     }
-    if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
-      throw new Error('Onboarding components only support kyc and kyb kind');
-    }
+
     const data = transformBeforeVault(formValues, { vaultValues: context.vaultData }) as FormValues;
     await vaultReq({ data, bootstrapDis: [], authToken: verifiedAuthToken });
 

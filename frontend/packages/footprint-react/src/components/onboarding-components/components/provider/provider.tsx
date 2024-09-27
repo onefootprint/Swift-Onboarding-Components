@@ -126,6 +126,9 @@ const Provider = ({
 
   const getOnboardingConfig = async (pKey: string) => {
     const response = await getOnboardingConfigReq(pKey);
+    if (response.kind !== 'kyc') {
+      throw new Error('Only kyc playbooks are supported');
+    }
     const { sandboxId, sandboxOutcome } = getSandboxProps(response);
     setContext(prev => ({
       ...prev,

@@ -229,81 +229,6 @@ const getCommonProps = (): Record<string, Field> => ({
   },
 });
 
-const getBusinessProps = (): Record<string, Field> => ({
-  name: {
-    className: 'fp-business-name-input',
-    validations: {
-      required: 'Business name cannot be empty or is invalid',
-    },
-  },
-  dba: {},
-  tin: {
-    className: 'fp-business-tin-input',
-    mask: {
-      numericOnly: true,
-      delimiters: ['-'],
-      blocks: [2, 7],
-    },
-    validations: {
-      required: 'TIN cannot be empty or is invalid',
-      pattern: {
-        value: /^\d{2}-\d{7}$/,
-        message: 'TIN must be in the format XX-XXXXXXX',
-      },
-    },
-  },
-  website: {
-    type: 'url',
-    className: 'fp-business-website-input',
-    mask: {
-      numericOnly: true,
-      delimiters: ['-'],
-      blocks: [2, 7],
-    },
-    validations: {
-      required: 'Website cannot be empty',
-    },
-  },
-  phoneNumber: {
-    autoComplete: 'tel',
-    className: 'fp-business-phone-input',
-    type: 'tel',
-    mask: {
-      prefix: '+',
-      noImmediatePrefix: true,
-      numericOnly: true,
-    },
-    validations: {
-      required: 'Phone is required',
-      validate: (value: string) => {
-        if (!isPhoneNumber(value)) {
-          return 'Phone is invalid';
-        }
-        return true;
-      },
-    },
-  },
-  corporationType: {
-    className: 'fp-business-corporation-type-input',
-    validations: {
-      required: 'Corporation type is required',
-    },
-  },
-});
-
-const getBoProps = (): Record<string, Field> => ({
-  ownershipStake: {
-    className: 'fp-bo-ownership-stake-input',
-    type: 'number',
-    validations: {
-      required: 'Stake is required',
-    },
-    transforms: {
-      valueAsNumber: true,
-    },
-  },
-});
-
 const getProps = (
   name: string,
   options: {
@@ -312,8 +237,6 @@ const getProps = (
 ) => {
   const person = getPersonProps(options);
   const common = getCommonProps();
-  const business = getBusinessProps();
-  const bo = getBoProps();
 
   if (name === 'id.phone_number') {
     return person.phoneNumber;
@@ -357,46 +280,8 @@ const getProps = (
   if (name === 'id.zip' || name === 'business.zip') {
     return common.zip;
   }
-  if (name === 'business.name') {
-    return business.name;
-  }
   if (name.startsWith('custom')) {
     return common.custom;
-  }
-  if (name === 'business.dba') {
-    return business.dba;
-  }
-  if (name === 'business.tin') {
-    return business.tin;
-  }
-  if (name === 'business.website') {
-    return business.website;
-  }
-  if (name === 'business.phone_number') {
-    return business.phoneNumber;
-  }
-  if (name === 'business.corporation_type') {
-    return business.corporationType;
-  }
-  if (name.startsWith('business.beneficial_owners')) {
-    if (name.endsWith('first_name')) {
-      return person.firstName;
-    }
-    if (name.endsWith('middle_name')) {
-      return person.middleName;
-    }
-    if (name.endsWith('last_name')) {
-      return person.lastName;
-    }
-    if (name.endsWith('phone_number')) {
-      return person.phoneNumber;
-    }
-    if (name.endsWith('emai;')) {
-      return person.email;
-    }
-    if (name.endsWith('ownership_stake')) {
-      return bo.ownershipStake;
-    }
   }
   return null;
 };

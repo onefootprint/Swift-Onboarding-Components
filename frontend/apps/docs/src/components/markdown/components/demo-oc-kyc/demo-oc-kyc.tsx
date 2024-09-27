@@ -172,7 +172,7 @@ const Step5 = () => {
             <Fp.Input className="fp-c-input" placeholder="MM/DD/YYYY" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="business.country">
+          <Fp.Field name="id.country">
             <Fp.Input placeholder="US" defaultValue="US" type="hidden" />
           </Fp.Field>
           <Fp.Field name="id.address_line1" className="fp-c-field">
