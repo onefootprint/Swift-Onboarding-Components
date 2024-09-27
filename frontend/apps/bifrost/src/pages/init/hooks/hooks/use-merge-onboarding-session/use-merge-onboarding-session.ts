@@ -1,8 +1,7 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import useGetOnboardingSession, { type GetOnboardingSessionResponse } from '../use-get-onboarding-session';
 
-// TODO maybe can stop supporting obtok now
-const OB_TOKEN_PREFIXES = ['obtok_', 'pbtok_'];
+const OB_TOKEN_PREFIXES = ['pbtok_'];
 
 const isObSessionToken = (tok?: string) => OB_TOKEN_PREFIXES.some(prefix => tok?.startsWith(prefix));
 
