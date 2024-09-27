@@ -1311,5 +1311,8 @@
   "historical-kyc-bar": {
     "title": "Viewing user as in timeline event:",
     "exit": "Exit"
-  }
+  },
+  "cancel": "Cancel",
+  "next": "Next",
+  "save": "Save"
 }
