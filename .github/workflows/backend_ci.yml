@@ -288,6 +288,19 @@ jobs:
           docker compose --env-file /dev/null run --quiet-pull integration_tests \
             pytest -n 6 ${{ env.FLAGS }} ci/tests/ 2>&1 | tee integration_test_output.txt
 
+      - name: Extract Docker logs if tests failed
+        if: ${{ failure() }}
+        working-directory: ./backend
+        run: |
+          docker compose --env-file /dev/null logs > docker_logs.txt
+
+      - name: Upload Docker logs if tests failed
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # ratchet:actions/upload-artifact@v4
+        with:
+          name: docker_logs.txt
+          path: ./backend/docker_logs.txt
+
       - name: Create results for PR
         id: test_results
         if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}

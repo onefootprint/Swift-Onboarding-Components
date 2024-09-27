@@ -166,10 +166,10 @@ services:
     environment:
       EXPECTED_SERVER_VERSION: ${EXPECTED_SERVER_VERSION:-}
       TEST_URL: ${TEST_URL:-http://localhost:8000}
-      IT_TWILIO_ACCOUNT_SID: ${IT_TWILIO_ACCOUNT_SID}
-      IT_TWILIO_SECRET_AUTH_TOKEN: ${IT_TWILIO_SECRET_AUTH_TOKEN}
+      IT_TWILIO_ACCOUNT_SID: ${IT_TWILIO_ACCOUNT_SID:-}
+      IT_TWILIO_SECRET_AUTH_TOKEN: ${IT_TWILIO_SECRET_AUTH_TOKEN:-}
       DITTO_URL: ${DITTO_URL:-https://ditto.footprint.dev}
-      IT_SVIX_API_KEY: ${IT_SVIX_API_KEY}
+      IT_SVIX_API_KEY: ${IT_SVIX_API_KEY:-}
       ENVIRONMENT: ${ENVIRONMENT:-local}
       # Used by diesel migration tests.
       DATABASE_URL: "postgresql://postgres:postgres@localhost:9432/postgres"
