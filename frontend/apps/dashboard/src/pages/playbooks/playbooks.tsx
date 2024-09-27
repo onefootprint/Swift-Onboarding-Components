@@ -13,7 +13,7 @@ import useFilters from './hooks/use-filters';
 import usePlaybooks from './hooks/use-playbooks';
 
 const Playbooks = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
+  const { t } = useTranslation('playbooks');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hasHadPlaybook, setHasHadPlaybook] = useState(false);
   const { data: response, errorMessage, isPending, pagination } = usePlaybooks();

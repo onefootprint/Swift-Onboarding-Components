@@ -18,8 +18,8 @@ export type EditNameProps = {
 type FormData = { name: string };
 
 const EditName = forwardRef<EditNameHandler, EditNameProps>(({ playbook }, ref) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.table.actions.edit-name',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'table.actions.edit-name',
   });
   const [open, setOpen] = useState(false);
   const mutation = useUpdatePlaybook();

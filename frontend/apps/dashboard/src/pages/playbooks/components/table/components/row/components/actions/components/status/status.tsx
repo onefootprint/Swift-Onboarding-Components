@@ -18,8 +18,8 @@ export type StatusProps = {
 };
 
 const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.table.actions.status',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'table.actions.status',
   });
   const [open, setOpen] = useState(false);
   const mutation = useUpdatePlaybook();
@@ -72,10 +72,11 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
       title={playbook.status === 'enabled' ? t('disable.confirmation.title') : t('enable.confirmation.title')}
     >
       <Trans
+        ns="playbooks"
         i18nKey={
           playbook.status === 'enabled'
-            ? 'pages.playbooks.table.actions.status.disable.confirmation.description'
-            : 'pages.playbooks.table.actions.status.enable.confirmation.description'
+            ? 'table.actions.status.disable.confirmation.description'
+            : 'table.actions.status.enable.confirmation.description'
         }
         components={{
           b: <Bold />,

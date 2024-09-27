@@ -7,7 +7,7 @@ type UseOptionsProps = {
 };
 
 const useOptions = ({ template }: UseOptionsProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.dialog' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'dialog' });
 
   const createAuthOptions = () => {
     return [

@@ -10,8 +10,8 @@ export type CreateDialogProps = {
 };
 
 const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'dialog',
   });
 
   return (

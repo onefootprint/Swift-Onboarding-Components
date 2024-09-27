@@ -19,8 +19,8 @@ type FormData = {
 
 const StepKind = ({ onSubmit, defaultKind }: StepKindProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog.who-to-onboard',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'dialog.who-to-onboard',
   });
   const {
     data: { org },

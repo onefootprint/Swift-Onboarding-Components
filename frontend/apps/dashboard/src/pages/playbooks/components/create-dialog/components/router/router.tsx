@@ -38,8 +38,8 @@ export type RouterProps = {
 const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind, onboardingTemplate } = state.context;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'dialog',
   });
   const toast = useToast();
   const showRequestError = useRequestErrorToast();

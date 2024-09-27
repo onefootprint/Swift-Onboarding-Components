@@ -15,8 +15,8 @@ export type StepResidencyProps = {
 
 const StepResidency = ({ defaultValues, onBack, onSubmit }: StepResidencyProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog.residency',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'dialog.residency',
   });
   const { handleSubmit, register, watch, control, setValue } = useForm<ResidencyFormData>({
     defaultValues,

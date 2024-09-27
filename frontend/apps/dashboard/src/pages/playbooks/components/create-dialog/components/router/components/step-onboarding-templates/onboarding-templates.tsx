@@ -18,8 +18,8 @@ export type OnboardingTemplatesProps = {
 
 const OnboardingTemplates = ({ onSubmit, onBack }: OnboardingTemplatesProps) => {
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog.onboarding-templates',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'dialog.onboarding-templates',
   });
   const { handleSubmit, control } = useForm<TemplateFormData>({
     defaultValues: { template: OnboardingTemplate.Custom },

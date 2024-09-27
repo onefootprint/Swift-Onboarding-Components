@@ -17,8 +17,8 @@ export type CopyLinkProps = {
 };
 
 const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.table.actions.copy-link',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'table.actions.copy-link',
   });
   const [open, setOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);

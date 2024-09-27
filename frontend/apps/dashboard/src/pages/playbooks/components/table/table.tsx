@@ -14,7 +14,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isPending, errorMessage }: TableProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
+  const { t } = useTranslation('playbooks');
   const router = useRouter();
   const filters = useFilters();
   const columns = [

@@ -22,8 +22,8 @@ type ActionsProps = {
 const Actions = ({ playbook }: ActionsProps) => {
   const { name, status, kind } = playbook;
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.table.actions',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'table.actions',
   });
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);

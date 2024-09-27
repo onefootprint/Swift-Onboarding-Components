@@ -15,8 +15,8 @@ export type RowProps = {
 };
 
 const Row = ({ playbook }: RowProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.table.row',
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'table.row',
   });
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt, kind } = playbook;
