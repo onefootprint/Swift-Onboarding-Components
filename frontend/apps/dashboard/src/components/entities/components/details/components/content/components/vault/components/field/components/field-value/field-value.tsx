@@ -5,8 +5,8 @@ import { Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
-import Editable from '../editable';
-import EncryptedInput from '../encrypted-input';
+import Editable from '../../../vault-actions/components/edit-vault-drawer/components/editable';
+import EncryptedInput from '../../../vault-actions/components/edit-vault-drawer/components/encrypted-input';
 
 export type FieldValueProps = {
   field: Record<string, boolean | string | DataIdentifier | VaultValue | Transforms | null | undefined>;
@@ -14,7 +14,9 @@ export type FieldValueProps = {
 };
 
 const FieldValue = ({ field, renderValue }: FieldValueProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'edit' });
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets',
+  });
   const { value, showEditView, canEdit, isDecrypted, name: di, transforms } = field;
   const name = di as string;
 

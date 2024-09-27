@@ -9,10 +9,10 @@ import get from 'lodash/get';
 import type { WithEntityProps } from '../../../with-entity';
 import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
-import EditForm from './components/edit-form';
-import convertFormData from './components/edit-form/utils/convert-form-data';
 import PersonVault from './components/person-vault';
 import VaultActions, { useDecryptControls, useEditControls } from './components/vault-actions';
+import EditForm from './components/vault-actions/components/edit-vault-drawer/components/edit-form';
+import convertFormData from './components/vault-actions/components/edit-vault-drawer/utils/convert-form-data';
 import type { DecryptFormData } from './vault.types';
 
 type VaultProps = WithEntityProps;

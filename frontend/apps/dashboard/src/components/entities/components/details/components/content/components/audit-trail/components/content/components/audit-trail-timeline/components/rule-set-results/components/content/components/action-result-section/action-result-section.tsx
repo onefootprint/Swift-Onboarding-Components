@@ -51,7 +51,7 @@ const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) 
             </Stack>
           </Dropdown.Trigger>
           <Dropdown.Portal>
-            <Dropdown.Content align="end" sideOffset={4} asChild>
+            <Dropdown.Content align="end" sideOffset={4}>
               <Dropdown.Group>
                 {Object.values(RuleResultGroup).map(group => {
                   const label = t(kebabCase(group) as ParseKeys<'common'>);

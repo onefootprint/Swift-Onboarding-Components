@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next';
 import type { VaultType } from '@/entities/hooks/use-entity-vault';
 
 import { Event, State, useEditMachine } from '../../../../../edit-machine';
-import type { EditSubmitData } from '../../../../vault.types';
+import type { EditSubmitData } from '../../components/edit-vault-drawer/edit-vault-drawer.types';
 import useEditFields from './hooks/use-edit-fields';
 
 const useEditControls = () => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'edit' });
+  const { t } = useTranslation('entity-details', {
+    keyPrefix: 'header-default.actions.edit-vault-drawer',
+  });
   const [state, send] = useEditMachine();
   const { context } = state;
   const editFields = useEditFields();

@@ -83,6 +83,35 @@ const useDecryptControls = () => {
     );
   };
 
+  /** Bypasses the state machine and directly decrypts the provided fields with the provided reason, used for vault editing */
+  const decryptManually = (
+    payload: {
+      reason: string;
+      dis?: DataIdentifier[];
+      documents?: SupportedIdDocTypes[];
+      entityId: string;
+      vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
+    },
+    callbacks?: {
+      onSuccess?: (response: EntityVault) => void;
+      onError?: (error: unknown) => void;
+    },
+  ) => {
+    const { reason, dis = [], documents = [], entityId, vaultData = {} } = payload;
+    decryptFields(
+      { reason, dis, documents, entityId, vaultData },
+      {
+        onSuccess: results => {
+          callbacks?.onSuccess?.(results);
+        },
+        onError: (error: unknown) => {
+          showRequestErrorToast(error);
+          callbacks?.onError?.(error);
+        },
+      },
+    );
+  };
+
   return {
     submitReason,
     context,
@@ -96,6 +125,7 @@ const useDecryptControls = () => {
     inProgress,
     inProgressDecryptingAll,
     decrypt,
+    decryptManually,
   };
 };
 

@@ -21,7 +21,7 @@ import VisaKind from './components/visa-kind';
 
 type CustomFieldProp = { di: DataIdentifier; entity: Entity };
 
-const useFieldsets = (excludeNationality?: boolean): Fieldset => {
+const useFieldsets = (includeNationality?: boolean): Fieldset => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.user.vault' });
 
   const fieldsets = {
@@ -133,7 +133,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     },
   };
 
-  if (!excludeNationality) {
+  if (includeNationality) {
     fieldsets.identity.fields.push({
       di: IdDI.nationality,
       renderCustomField: ({ di, entity }: CustomFieldProp) => <Nationality di={di} entity={entity} />,

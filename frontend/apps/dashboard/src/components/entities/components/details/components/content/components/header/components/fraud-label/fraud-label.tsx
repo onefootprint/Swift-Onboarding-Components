@@ -61,7 +61,7 @@ const FraudLabel = () => {
         </NoLabelContainer>
       )}
       <Dropdown.Portal>
-        <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4} asChild>
+        <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4}>
           <Content>
             <Dropdown.Group>
               {Object.values(EntityLabel).map(labelOption => (

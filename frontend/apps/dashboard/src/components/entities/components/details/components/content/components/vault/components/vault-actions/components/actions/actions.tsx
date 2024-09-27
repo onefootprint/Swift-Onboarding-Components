@@ -38,14 +38,16 @@ const Actions = ({ entity }: WithEntityProps) => {
   });
   const editControls = useEditControls();
   const { data: tags } = useTags(entity.id);
+  // Both states are necessary to ensure that the dropdown is closed before the dialog is opened
+  // otherwise after the dialog is closed, a transparent overlay remains blocking the screen
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const {
     data: { user },
   } = useSession();
   const { hasPermission } = usePermissions();
   const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
   const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleCloseDialog = () => {
     setOpenDialog(null);

@@ -1,6 +1,5 @@
 import type { DataIdentifier } from '@onefootprint/types';
-
-import type { EditFormData } from '../vault/vault.types';
+import type { EditFormData } from '../vault/components/vault-actions/components/edit-vault-drawer/edit-vault-drawer.types';
 
 export enum State {
   idle = 'idle',

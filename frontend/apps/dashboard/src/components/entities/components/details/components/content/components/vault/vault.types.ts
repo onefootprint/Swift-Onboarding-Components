@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import type { DataIdentifier, Entity, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, Entity, SupportedIdDocTypes } from '@onefootprint/types';
 
 /**
  * For legacy reasons, decryption controls expect fields to be registered as just the DI.
@@ -15,10 +15,6 @@ type DecryptDocumentFormData = {
 };
 
 export type DecryptFormData = DecryptDiFormData & DecryptDocumentFormData;
-
-export type EditFormData = Record<string, Record<string, VaultValue>>; // Eg {id: {first_name: ..., last_name: ...}}
-
-export type EditSubmitData = Partial<Record<DataIdentifier, VaultValue>>;
 
 export type DiField = {
   di: DataIdentifier;

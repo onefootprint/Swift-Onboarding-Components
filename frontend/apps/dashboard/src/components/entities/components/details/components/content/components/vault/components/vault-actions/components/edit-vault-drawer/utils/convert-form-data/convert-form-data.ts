@@ -1,7 +1,7 @@
 import type { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 import { BusinessDI, IdDI } from '@onefootprint/types';
-import EMPTY_SELECT_VALUE from '../../../../constants';
-import type { EditSubmitData } from '../../../../vault.types';
+import { EMPTY_SELECT_VALUE } from '../../constants';
+import type { EditSubmitData } from '../../edit-vault-drawer.types';
 import formatDisplayDate from '../format-display-date';
 
 const convertFormData = (data: Record<string, VaultValue>, previousData?: EntityVault) => {

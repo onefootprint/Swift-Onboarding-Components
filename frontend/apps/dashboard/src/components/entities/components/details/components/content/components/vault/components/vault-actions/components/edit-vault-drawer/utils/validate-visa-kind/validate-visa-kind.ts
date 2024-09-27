@@ -1,6 +1,6 @@
 import { UsLegalStatus } from '@onefootprint/types';
 
-import EMPTY_SELECT_VALUE from '../../../../../constants';
+import { EMPTY_SELECT_VALUE } from '../../constants';
 
 export enum VisaKindValidationError {
   SHOULD_BE_EMPTY = 0,

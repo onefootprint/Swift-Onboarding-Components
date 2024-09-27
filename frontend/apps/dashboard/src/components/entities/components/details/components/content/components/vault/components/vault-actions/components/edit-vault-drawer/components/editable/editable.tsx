@@ -3,8 +3,8 @@ import { Form } from '@onefootprint/ui';
 import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import EMPTY_SELECT_VALUE from '../../../../constants';
-import useFieldProps from '../utils/use-field-props';
+import { EMPTY_SELECT_VALUE, FIELD_VALUE_WIDTH } from '../../constants';
+import useFieldProps from '../../utils/use-field-props';
 
 export type EditableProps = {
   value: VaultValue;
@@ -44,7 +44,7 @@ const Editable = ({ value, fieldName }: EditableProps) => {
     <InputValueContainer>
       <Form.Input
         size="compact"
-        width="fit-content"
+        width={FIELD_VALUE_WIDTH}
         placeholder={inputOptions?.placeholder ?? ''}
         type={inputOptions?.type || 'text'}
         defaultValue={value as string}
@@ -67,11 +67,15 @@ const Editable = ({ value, fieldName }: EditableProps) => {
 
 const SelectValueContainer = styled.div`
   ${({ theme }) => css`
-    height: ${theme.spacing[8]};
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     flex: 1;
+
+    select {
+      height: ${theme.spacing[8]};
+      min-width: ${FIELD_VALUE_WIDTH};
+    }
   `}
 `;
 
@@ -81,7 +85,7 @@ const InputValueContainer = styled.div`
   align-items: flex-end;
 
   input {
-    min-width: 220px;
+    min-width: ${FIELD_VALUE_WIDTH};
   }
 `;
 

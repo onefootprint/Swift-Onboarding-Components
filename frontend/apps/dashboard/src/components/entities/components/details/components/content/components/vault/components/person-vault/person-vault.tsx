@@ -26,8 +26,9 @@ type PersonVaultProps = {
 
 const PersonVault = ({ entity }: PersonVaultProps) => {
   const hasUsLegalStatus = hasEntityUsLegalStatus(entity);
-  const { basic, address, usLegalStatus, identity, investorProfile, documents, cards, custom } =
-    useFieldsets(hasUsLegalStatus);
+  const { basic, address, usLegalStatus, identity, investorProfile, documents, cards, custom } = useFieldsets(
+    !hasUsLegalStatus,
+  );
   const hasCards = hasEntityCards(entity);
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);

@@ -476,6 +476,7 @@ export {
   hasEntityDocuments,
   hasEntityInvestorProfile,
   hasEntityUsLegalStatus,
+  hasEntityNationality,
   HostedUrlType,
   IdDI,
   IdDocImageProcessingError,

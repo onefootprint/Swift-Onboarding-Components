@@ -102,6 +102,7 @@ export {
   hasEntityDocuments,
   hasEntityInvestorProfile,
   hasEntityUsLegalStatus,
+  hasEntityNationality,
   WorkflowStatus,
 } from './entity';
 export type { EntityCard } from './entity-cards';

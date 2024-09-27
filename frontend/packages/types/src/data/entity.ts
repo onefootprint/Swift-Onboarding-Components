@@ -1,7 +1,7 @@
 import CdoToAllDisMap from './cdo-to-di-map';
 import { CollectedKycDataOption } from './collected-data-option';
 import type { DataIdentifier } from './di';
-import { DocumentDI, InvestorProfileDI } from './di';
+import { DocumentDI, IdDI, InvestorProfileDI } from './di';
 import type { EntityCard } from './entity-cards';
 import type { InsightEvent } from './insight-event';
 import type { Tag } from './tag';
@@ -85,6 +85,8 @@ export type EntityWorkflow = {
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>
   entity.attributes.some(attr => CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr));
+
+export const hasEntityNationality = (entity: Entity) => entity.attributes.some(attr => attr === IdDI.nationality);
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);

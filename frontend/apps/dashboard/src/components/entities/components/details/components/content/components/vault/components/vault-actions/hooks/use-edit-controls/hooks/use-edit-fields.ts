@@ -1,7 +1,7 @@
 import type { EntityVault } from '@onefootprint/types';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 
-import type { EditSubmitData } from '../../../../../vault.types';
+import type { EditSubmitData } from '../../../components/edit-vault-drawer/edit-vault-drawer.types';
 import transformResponseToVaultFormat from '../../utils/transform-response-to-vault-format';
 import useEditText from './hooks/use-edit';
 

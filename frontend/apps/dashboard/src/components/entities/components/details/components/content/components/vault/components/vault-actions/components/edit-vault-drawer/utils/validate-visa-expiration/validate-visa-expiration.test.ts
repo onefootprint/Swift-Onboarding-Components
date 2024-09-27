@@ -1,6 +1,6 @@
 import { UsLegalStatus } from '@onefootprint/types';
 
-import EMPTY_SELECT_VALUE from '../../../../../constants';
+import { EMPTY_SELECT_VALUE } from '../../constants';
 import validateVisaExpiration, { VisaExpirationValidationError } from './validate-visa-expiration';
 
 describe('ValidateVisaKind', () => {
