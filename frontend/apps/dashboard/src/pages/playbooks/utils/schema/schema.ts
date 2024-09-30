@@ -4,8 +4,9 @@ const playbooksConfigQuery = z.object({
   id: z.string().optional(),
   page: z.string().optional(),
   search: z.string().optional(),
-  kind: z.string().optional(),
+  kinds: z.string().optional(),
   hide_disabled: z.string().optional(),
+  show_filters: z.string().optional(),
 });
 const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings']);
 

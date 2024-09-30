@@ -36,6 +36,15 @@ export const stringToArray = (value?: string) => {
   return value.split(',');
 };
 
+export const arrayToQuery = (value?: string[] | string): string | undefined => {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    if (value.length === 0) return undefined;
+    return value.join(',');
+  }
+  return value;
+};
+
 export const queryToArray = (value?: string | string[]) => {
   if (!value) return [];
   if (typeof value === 'string') {

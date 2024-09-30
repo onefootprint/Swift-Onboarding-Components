@@ -1,9 +1,9 @@
-import { IcoFilter16 } from '@onefootprint/icons';
 import { EntityLabel } from '@onefootprint/types';
 import { Checkbox, DateRangeInput, Drawer, Radio, Stack, TextInput, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import FilterButton from 'src/components/filter-button';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
@@ -66,10 +66,9 @@ const DrawerFilter = () => {
 
   return (
     <>
-      <DrawerTrigger onClick={openDrawer} data-checked={hasFilters}>
-        <IcoFilter16 />
+      <FilterButton onClick={openDrawer} data-checked={hasFilters}>
         {t('trigger')} {hasFilters && `(${filtersCount})`}
-      </DrawerTrigger>
+      </FilterButton>
       <Drawer
         title={t('title')}
         open={open}
@@ -166,42 +165,6 @@ const DrawerFilter = () => {
     </>
   );
 };
-
-const DrawerTrigger = styled.button`
-  ${({ theme }) =>
-    css`
-    ${createFontStyles('label-3')};
-    align-items: center;
-    background: ${theme.backgroundColor.primary};
-    border-color: ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    border-style: dashed;
-    border-width: ${theme.borderWidth[1]};
-    color: ${theme.color.secondary};
-    cursor: pointer;
-    display: flex;
-    gap: ${theme.spacing[2]};
-    height: 32px;
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    transition: all 200ms ease-in-out;
-
-    @media (hover: hover) {
-      &:hover {
-        background: ${theme.backgroundColor.secondary};
-      }
-    }
-
-    &[data-checked='true'] {
-      background: ${theme.backgroundColor.tertiary};
-      border-color: transparent;
-      color: ${theme.color.quinary};
-
-      path {
-        stroke: ${theme.color.quinary};
-      }
-    }
-  `}
-`;
 
 const Form = styled.form`
   height: 100%;
