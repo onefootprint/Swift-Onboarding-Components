@@ -38,7 +38,7 @@ Please follow `footprint_flutter` installation instructions [here](/articles/sdk
 
 To use Onboarding Components, you need to start by wrapping all of you onboarding-related widgets with the `FootprintProvider` widget. This widget provides the necessary context for the Footprint components to work. `FootprintProvider` constructor has three required arguments that you must pass - `String publicKey` , `String redirectUrl` , `Widget child` .
 
-```dart highlight="2,24,25,26,27,28"
+```dart highlight="2,19, 20, 21, 22, 23"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -46,14 +46,9 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -63,8 +58,8 @@ class _MyAppState extends State<MyApp> {
             title: const Text('Footprint Flutter Demo'),
           ),
           body: FootprintProvider(
-            publicKey: 'YOUR_PUBLIC_KEY',
-            redirectUrl: 'YOUR_REDIRECT_URL',
+            publicKey: "YOUR PUBLIC KEY",
+            redirectUrl: "YOUR REDIRECT URL",
             child: Text("A widget containing the onboarding components."),
           ),
         ),
@@ -85,20 +80,11 @@ List of all of the arguments to `FootprintProvider`
 | `locale`      | `FootprintSupportedLocale?` |
 | `redirectUrl` | `String`                    |
 
-## 4. Identify your user
+## 4. Create your onboarding widget
 
-With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. You can identify a user using authToken (that you pass to the Provider ) or email/phone that you collect from user during the identification process. We support creating auth flow inline as well as doing the auth on a webview. We suggest using the webview auth as a backup for rare cases when inline auth is not supported. Here is how you can build auth flow using our SDK.
+Let's create a widget called `Kyc` to contain the onboarding flow. Before we can do anything, we need to make sure that `footprintUtils(context).isReady == true`.
 
-### 4.1 Check auth requirements
-
-We start by calling the function `requiresAuth()` . This function needs to be called only once and after the first frame is render. So, we put it inside `initState()` in a callback to `WidgetsBinding.instance.addPostFrameCallback` . `requiresAuth` will return `({String? validationToken, bool requiresAuth})` .
-
-- `requiresAuth` will tell you if you need to authenticate at all. If you provided a fully scoped `authToken` , you will most likely not need to authenticate again.
-- The `String? validationToken` will provide you a validation token that you can use to find the `fp_id` using [this API](/api-reference#post-onboarding-session-validate). It's going to be `null` if the `requiresAuth` prop above returns `true` i.e. if you need to authenticate.
-
-_Note: You can skip calling this function if you didn’t provide auth token and authenticate using email and phone._
-
-```dart highlight="54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91"
+```dart highlight="26, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -106,14 +92,9 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -129,22 +110,7 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Identify(
-                      handleAuthenticated: () {},
-                    )
-                  ],
-                ),
-              ),
-            ),
+            child: const Kyc(),
           ),
         ),
       ),
@@ -152,17 +118,126 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
 
-  final void Function() handleAuthenticated;
+  @override
+  State<Kyc> createState() => _KycState();
+}
+
+class _KycState extends State<Kyc> {@override
+  Widget build(BuildContext context) {
+    if (footprintUtils(context).isReady == false) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Container();
+  }
+}
+```
+
+## 5. Identify your user
+
+With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. You can identify a user using authToken (that you pass to the Provider ) or email/phone that you collect from user during the identification process. We support creating auth flow inline as well as doing the auth on a webview. We suggest using the webview auth as a backup for rare cases when inline auth is not supported. Here is how you can build auth flow using our SDK.
+
+### 5.1 Check auth requirements
+
+We start by calling the function `requiresAuth()` . This function needs to be called only once and after the first frame is render. So, we put it inside `initState()` in a callback to `WidgetsBinding.instance.addPostFrameCallback` . `requiresAuth` will return `({bool requiresAuth, VerificationResult? verificationResult})` .
+
+- `requiresAuth` will tell you if you need to authenticate at all. If you provided a fully scoped `authToken` , you will most likely not need to authenticate again.
+- The `VerificationResult? verificationResult` will provide you a record `({Fields? fields, Requirements? requirements, String validationToken, FormData? vaultData})`.
+  - You can use the validation token to find the `fp_id` using [this API](/api-reference#post-onboarding-session-validate). `VerificationResult` will be `null` if the `requiresAuth` prop above returns `true` i.e. if you need to authenticate.
+  - `Fields? fields` contains `({List<DataIdentifier> missing, List<DataIdentifier> collected, List<DataIdentifier> optional})` to help you guide through the fields you need to collect and the ones that has already been collected.
+  - `Requirements? requirements` more contexts on requirements for the flow such as whether data-collection part is done, or id-doc is required, etc.
+  - `FormData? vaultData` is an object containing the decrypted data that has already been vaulted before this flow started possibly (but not always) using API or in an incomplete flow.
+
+Note that you can get the updated `Fields` and `Requirements` in the middle of the flow by calling `footprintUtils(context).getRequirements()`.
+
+_Note: You can skip calling this function if you didn’t provide auth token and authenticate using email and phone._
+
+```dart highlight="53, 54, 55, 56, 57, 58, 59, 60, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105"
+import 'package:flutter/material.dart';
+import 'package:footprint_flutter/footprint_flutter.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Builder(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Footprint Flutter Demo'),
+          ),
+          body: FootprintProvider(
+            publicKey: "pb_test_GfF2M0HxXQwrcB3ETl0yhe",
+            redirectUrl: "com.footprint.fluttersdk://example",
+            sandboxOutcome: SandboxOutcome(
+              overallOutcome: OverallOutcome.fail,
+            ),
+            sandboxId: "3ruc9MwH2LRm9",
+            child: const Kyc(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Identify(
+              handleAuthenticated: (VerificationResult? verificationResult) {
+                print(
+                    "Validation Token: ${verificationResult?.validationToken}");
+                // handleComplete();
+              },
+              useAuthToken: false,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Identify extends StatefulWidget {
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
+
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
 }
 
 class _IdentifyState extends State<Identify> {
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -170,12 +245,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -192,7 +263,7 @@ class _IdentifyState extends State<Identify> {
 }
 ```
 
-### 4.2 Create challenge
+### 5.2 Create challenge
 
 Next we create challenge based on the response from the previous step. We have a widget, few helper functions and values to accomplish this.
 
@@ -202,7 +273,7 @@ Next we create challenge based on the response from the previous step. We have a
 
 Additionally, to collect email and phone from the user, we need to create a form with the user's email and phone number using a set of form, field, and input widgets we provide with our SDK. Our widgets are raw, meaning that you have to provide necessary styles to match your application's design.
 
-```dart highlight="54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217"
+```dart highlight="127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 108, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -210,14 +281,9 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -233,23 +299,42 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Identify(
-                      handleAuthenticated: () {},
-                    )
-                  ],
-                ),
-              ),
-            ),
+            child: const Kyc(),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Identify(
+              handleAuthenticated: (VerificationResult? verificationResult) {
+                print(
+                    "Validation Token: ${verificationResult?.validationToken}");
+                // handleComplete();
+              },
+              useAuthToken: false,
+            )
+          ],
         ),
       ),
     );
@@ -281,9 +366,14 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -292,7 +382,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -300,12 +389,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -324,12 +409,11 @@ class _IdentifyState extends State<Identify> {
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (
-        authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -338,14 +422,17 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
             return const Center(child: CircularProgressIndicator());
           }
+
+          return const CircularProgressIndicator();
         },
       );
     }
@@ -353,80 +440,78 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: "id.email",
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
+                    },
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
                     ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: "id.phone_number",
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
-
-        return const Center(child: CircularProgressIndicator());
+        return const CircularProgressIndicator();
       },
     );
   }
 }
 ```
 
-### 4.2 Verify challenge
+### 5.3 Verify challenge
 
-Finally we need verify the challenge using `verifyOtpChallenge` returns a `validationToken` that you can use to find the fp_id.
+Finally we need to verify the challenge using `verifyOtpChallenge` returns a `verificationResult`.
 
-```dart highlight="148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 120, 121, 122"
+```dart highlight="134, 135, 136, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -434,14 +519,9 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -457,23 +537,42 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Identify(
-                      handleAuthenticated: () {},
-                    )
-                  ],
-                ),
-              ),
-            ),
+            child: const Kyc(),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Identify(
+              handleAuthenticated: (VerificationResult? verificationResult) {
+                print(
+                    "Validation Token: ${verificationResult?.validationToken}");
+                // handleComplete();
+              },
+              useAuthToken: false,
+            )
+          ],
         ),
       ),
     );
@@ -505,9 +604,14 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -516,7 +620,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -524,12 +627,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -546,17 +645,17 @@ class _IdentifyState extends State<Identify> {
     });
   }
 
-  void handleVerfied() {
-    widget.handleAuthenticated();
+  void handleVerfied(VerificationResult? verificationResult) {
+    widget.handleAuthenticated(verificationResult);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -565,9 +664,10 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
@@ -581,9 +681,10 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((validationToken) {
-                  print(validationToken); // Use the validation token to retrieve fp_id if you want. We will skip this line in the rest of the docs
-                  handleVerfied();
+                otpUtils
+                    .verifyOtpChallenge(verificationCode: value)
+                    .then((verificationResult) {
+                  handleVerfied(verificationResult);
                 });
               },
             ),
@@ -595,66 +696,65 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: "id.email",
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
+                    },
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
                     ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: "id.phone_number",
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
         return Container(
           padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
@@ -663,9 +763,10 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((validationToken) {
-                print(validationToken); // Use the validation token to retrieve fp_id if you want. We will skip this line in the rest of the docs
-                handleVerfied();
+              otpUtils
+                  .verifyOtpChallenge(verificationCode: value)
+                  .then((verificationResult) {
+                handleVerfied(verificationResult);
               });
             },
           ),
@@ -676,15 +777,15 @@ class _IdentifyState extends State<Identify> {
 }
 ```
 
-## 5. Collecting user’s data
+## 6. Collecting user’s data
 
 Once the authentication is completed, you can start collecting user data.
 
-### 5.1 Data collection form
+### 6.1 Data collection form
 
 The data collection form is constructed similarly to the identification form.
 
-```dart highlight="4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354"
+```dart highlight="4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -709,23 +810,8 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Steps currentStep = Steps.identify;
-  String validationToken = '';
-
-  handleComplete({String? token}) {
-    setState(() {
-      currentStep = currentStep.getNextStep();
-      validationToken = token ?? '';
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -742,32 +828,59 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (currentStep == Steps.identify)
-                      Identify(
-                        handleAuthenticated: () {
-                          handleComplete();
-                        },
-                      ),
-                    if (currentStep == Steps.dataCollection)
-                      DataCollection(
-                        onCompleted: () {
-                          handleComplete();
-                        },
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            child: const Kyc(),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (currentStep == Steps.identify)
+              Identify(
+                handleAuthenticated: (VerificationResult? verificationResult) {
+                  print(
+                      "Validation Token: ${verificationResult?.validationToken}");
+                  handleComplete();
+                },
+                useAuthToken: false,
+              ),
+            if (currentStep == Steps.dataCollection)
+              DataCollection(
+                onCompleted: () {
+                  handleComplete();
+                },
+              ),
+          ],
         ),
       ),
     );
@@ -799,9 +912,14 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -810,7 +928,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -818,12 +935,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -840,17 +953,17 @@ class _IdentifyState extends State<Identify> {
     });
   }
 
-  void handleVerfied() {
-    widget.handleAuthenticated();
+  void handleVerfied(VerificationResult? verificationResult) {
+    widget.handleAuthenticated(verificationResult);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -859,9 +972,10 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
@@ -875,8 +989,10 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                  handleVerfied();
+                otpUtils
+                    .verifyOtpChallenge(verificationCode: value)
+                    .then((verificationResult) {
+                  handleVerfied(verificationResult);
                 });
               },
             ),
@@ -888,66 +1004,65 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: "id.email",
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
+                    },
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
                     ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: "id.phone_number",
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
         return Container(
           padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
@@ -956,8 +1071,10 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                handleVerfied();
+              otpUtils
+                  .verifyOtpChallenge(verificationCode: value)
+                  .then((verificationResult) {
+                handleVerfied(verificationResult);
               });
             },
           ),
@@ -972,7 +1089,7 @@ class DataCollection extends StatelessWidget {
 
   final void Function() onCompleted;
 
-  void handleComplete(BuildContext context, FootprintBootstrapData formData) {
+  void handleComplete(BuildContext context, FormData formData) {
     onCompleted();
   }
 
@@ -991,7 +1108,7 @@ class DataCollection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 16),
                 FootprintField(
-                  name: "id.first_name",
+                  name: DataIdentifier.idFirstName,
                   child: FootprintTextInput(
                     labelText: "First Name",
                     decoration: inputDecoration("First Name"),
@@ -999,7 +1116,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.middle_name",
+                  name: DataIdentifier.idMiddleName,
                   child: FootprintTextInput(
                     labelText: "Middle Name (Optional)",
                     decoration: inputDecoration("Middle Name (Optional)"),
@@ -1007,7 +1124,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.last_name",
+                  name: DataIdentifier.idLastName,
                   child: FootprintTextInput(
                     labelText: "Last Name",
                     decoration: inputDecoration("Last Name"),
@@ -1015,7 +1132,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.dob",
+                  name: DataIdentifier.idDob,
                   child: FootprintTextInput(
                     labelText: "Date of Birth",
                     decoration: inputDecoration("Date of Birth"),
@@ -1041,11 +1158,11 @@ class DataCollection extends StatelessWidget {
 }
 ```
 
-### 5.2 Saving data
+### 6.2 Saving data
 
-You can save the collected calling the `save` function which can be accessed by calling `footprintUtils` function.
+You can save the collected calling the `vault` function which can be accessed by calling `footprintUtils` function.
 
-```dart highlight="289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301"
+```dart highlight="305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -1070,23 +1187,8 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Steps currentStep = Steps.identify;
-  String validationToken = '';
-
-  handleComplete({String? token}) {
-    setState(() {
-      currentStep = currentStep.getNextStep();
-      validationToken = token ?? '';
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1103,32 +1205,59 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (currentStep == Steps.identify)
-                      Identify(
-                        handleAuthenticated: () {
-                          handleComplete();
-                        },
-                      ),
-                    if (currentStep == Steps.dataCollection)
-                      DataCollection(
-                        onCompleted: () {
-                          handleComplete();
-                        },
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            child: const Kyc(),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (currentStep == Steps.identify)
+              Identify(
+                handleAuthenticated: (VerificationResult? verificationResult) {
+                  print(
+                      "Validation Token: ${verificationResult?.validationToken}");
+                  handleComplete();
+                },
+                useAuthToken: false,
+              ),
+            if (currentStep == Steps.dataCollection)
+              DataCollection(
+                onCompleted: () {
+                  handleComplete();
+                },
+              ),
+          ],
         ),
       ),
     );
@@ -1160,9 +1289,14 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -1171,7 +1305,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -1179,12 +1312,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -1201,17 +1330,17 @@ class _IdentifyState extends State<Identify> {
     });
   }
 
-  void handleVerfied() {
-    widget.handleAuthenticated();
+  void handleVerfied(VerificationResult? verificationResult) {
+    widget.handleAuthenticated(verificationResult);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -1220,9 +1349,10 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
@@ -1236,8 +1366,10 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                  handleVerfied();
+                otpUtils
+                    .verifyOtpChallenge(verificationCode: value)
+                    .then((verificationResult) {
+                  handleVerfied(verificationResult);
                 });
               },
             ),
@@ -1249,66 +1381,65 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: "id.email",
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
+                    },
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
                     ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: "id.phone_number",
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
         return Container(
           padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
@@ -1317,8 +1448,10 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                handleVerfied();
+              otpUtils
+                  .verifyOtpChallenge(verificationCode: value)
+                  .then((verificationResult) {
+                handleVerfied(verificationResult);
               });
             },
           ),
@@ -1335,7 +1468,7 @@ class DataCollection extends StatelessWidget {
 
   void handleComplete(BuildContext context, FormData formData) {
     footprintUtils(context)
-        .save(
+        .vault(
       formData,
     )
         .then(
@@ -1364,7 +1497,7 @@ class DataCollection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 16),
                 FootprintField(
-                  name: "id.first_name",
+                  name: DataIdentifier.idFirstName,
                   child: FootprintTextInput(
                     labelText: "First Name",
                     decoration: inputDecoration("First Name"),
@@ -1372,7 +1505,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.middle_name",
+                  name: DataIdentifier.idMiddleName,
                   child: FootprintTextInput(
                     labelText: "Middle Name (Optional)",
                     decoration: inputDecoration("Middle Name (Optional)"),
@@ -1380,7 +1513,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.last_name",
+                  name: DataIdentifier.idLastName,
                   child: FootprintTextInput(
                     labelText: "Last Name",
                     decoration: inputDecoration("Last Name"),
@@ -1388,7 +1521,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.dob",
+                  name: DataIdentifier.idDob,
                   child: FootprintTextInput(
                     labelText: "Date of Birth",
                     decoration: inputDecoration("Date of Birth"),
@@ -1414,13 +1547,16 @@ class DataCollection extends StatelessWidget {
 }
 ```
 
-The `save` function can be called with one or more data fields meaning you can create as many data collection forms as you need and separately save each form.
+The `vault` function can be called with one or more data fields meaning you can create as many data collection forms as you need and separately save each form.
 
-## 6. Finalizing the onboarding
+## 7. Finalizing the onboarding
 
-With all the data collected, we need to now handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `handoff` function which can be accessed by calling `footprintUtils` function.
+Once all the data are collected, we need to finalizing the onboarding. We can verify if all the data are collected by checking the response from `footprintUtils(context).getRequirements()`. In order to finalize the onboarding, we have two options:
 
-```dart highlight="75, 76, 77, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 300, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320"
+- If all requirements are completed and there is no passkey and id-doc requirements, we can call `footprintUtils(context).process()` for process the onbaording inline. `footprintUtils(context).process()` return a validation token.
+- `footprintUtils(context).process()` will throw an `InlineProcessException` if all requirements are not completed or if inline process is not supported for this case. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `handoff` function which can be accessed by calling `footprintUtils` function.
+
+```dart highlight="91,92,93, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -1445,23 +1581,8 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Steps currentStep = Steps.identify;
-  String validationToken = '';
-
-  handleComplete({String? token}) {
-    setState(() {
-      currentStep = currentStep.getNextStep();
-      validationToken = token ?? '';
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1478,46 +1599,72 @@ class _MyAppState extends State<MyApp> {
               overallOutcome: OverallOutcome.fail,
             ),
             sandboxId: "3ruc9MwH2LRm9",
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+            child: const Kyc(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Kyc extends StatefulWidget {
+  const Kyc({super.key});
+
+  @override
+  State<Kyc> createState() => _Kyc();
+}
+
+class _Kyc extends State<Kyc> {
+  Steps currentStep = Steps.identify;
+  String validationToken = '';
+
+  handleComplete({String? token}) {
+    setState(() {
+      currentStep = currentStep.getNextStep();
+      validationToken = token ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (currentStep == Steps.identify)
+              Identify(
+                handleAuthenticated: (VerificationResult? verificationResult) {
+                  print(
+                      "Validation Token: ${verificationResult?.validationToken}");
+                  handleComplete();
+                },
+                useAuthToken: false,
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (currentStep == Steps.identify)
-                      Identify(
-                        handleAuthenticated: () {
-                          handleComplete();
-                        },
-                      ),
-                    if (currentStep == Steps.dataCollection)
-                      DataCollection(
-                        onCompleted: (String token) {
-                          handleComplete(token: token);
-                        },
-                      ),
-                    if (currentStep == Steps.complete)
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            const Text("KYC Complete"),
-                            const SizedBox(height: 12),
-                            const Text("Validation Token:"),
-                            const SizedBox(height: 8),
-                            Text(validationToken),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+            if (currentStep == Steps.dataCollection)
+              DataCollection(
+                onCompleted: (String token) {
+                  handleComplete(token: token);
+                },
+              ),
+            Container(
+              padding: const EdgeInsets.all(20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  const Text("KYC Complete"),
+                  const SizedBox(height: 12),
+                  const Text("Validation Token:"),
+                  const SizedBox(height: 8),
+                  Text(validationToken),
+                ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -1549,9 +1696,14 @@ InputDecoration inputDecoration(String hintText, {String? errorText}) {
 }
 
 class Identify extends StatefulWidget {
-  const Identify({super.key, required this.handleAuthenticated});
+  const Identify(
+      {super.key,
+      required this.handleAuthenticated,
+      required this.useAuthToken});
 
-  final void Function() handleAuthenticated;
+  final void Function(VerificationResult? verificationResult)
+      handleAuthenticated;
+  final bool useAuthToken;
 
   @override
   State<Identify> createState() => _IdentifyState();
@@ -1560,7 +1712,6 @@ class Identify extends StatefulWidget {
 class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
-  FootprintAuthMethods? authMethod;
   var requiresAuth;
 
   @override
@@ -1568,12 +1719,8 @@ class _IdentifyState extends State<Identify> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       footprintUtils(context).requiresAuth().then((response) {
-        setState(() {
-          authMethod = response.authMethod;
-        });
-
         if (response.requiresAuth == false) {
-          widget.handleAuthenticated();
+          widget.handleAuthenticated(response.verificationResult);
         } else {
           setState(() {
             requiresAuth = response.requiresAuth;
@@ -1590,17 +1737,17 @@ class _IdentifyState extends State<Identify> {
     });
   }
 
-  void handleVerfied() {
-    widget.handleAuthenticated();
+  void handleVerfied(VerificationResult? verificationResult) {
+    widget.handleAuthenticated(verificationResult);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (requiresAuth == null || !footprintUtils(context).isReadyForAuth) {
+    if (requiresAuth == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (authMethod == FootprintAuthMethods.authToken) {
+    if (widget.useAuthToken) {
       return FootprintOtp(
         buildOtp: (otpUtils) {
           if (!isChallengeCreated) {
@@ -1609,9 +1756,10 @@ class _IdentifyState extends State<Identify> {
             }).catchError(
               (_) {
                 footprintUtils(context).launchIdentify(
-                  onAuthenticated: widget
-                      .handleAuthenticated, // Don't pass email and phone number - it's going to use auth token
-                );
+                    onAuthenticated: (verificationResult) {
+                  widget.handleAuthenticated(verificationResult);
+                } // Don't pass email and phone number - it's going to use auth token
+                    );
               },
               test: (err) => err is InlineOtpNotSupportedException,
             );
@@ -1625,8 +1773,10 @@ class _IdentifyState extends State<Identify> {
                 "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
               ),
               onSubmitted: (value) {
-                otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                  handleVerfied();
+                otpUtils
+                    .verifyOtpChallenge(verificationCode: value)
+                    .then((verificationResult) {
+                  handleVerfied(verificationResult);
                 });
               },
             ),
@@ -1638,66 +1788,65 @@ class _IdentifyState extends State<Identify> {
     return FootprintOtp(
       buildOtp: (otpUtils) {
         if (!isChallengeCreated) {
-          return FootprintForm(
-            createForm: (handleSubmit, props) {
-              return Container(
-                padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Text("Identification",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 16),
-                    FootprintField(
-                      name: "id.email",
-                      createField: ({error}) {
-                        return FootprintTextInput(
-                          labelText: "Email",
-                          decoration: inputDecoration("Email",
-                              errorText: error?.message),
-                        );
-                      },
-                      // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+          return FootprintForm(createForm: (handleSubmit, props) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Text("Identification",
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  FootprintField(
+                    name: DataIdentifier.idEmail,
+                    createField: ({error}) {
+                      return FootprintTextInput(
+                        labelText: "Email",
+                        decoration:
+                            inputDecoration("Email", errorText: error?.message),
+                      );
+                    },
+                    // NOTE: Alternatively, you can use the `child` property to pass in a widget (example below for phone number)
+                  ),
+                  const SizedBox(height: 12),
+                  FootprintField(
+                    name: DataIdentifier.idPhoneNumber,
+                    child: FootprintTextInput(
+                      labelText: "Phone Number",
+                      decoration: inputDecoration("Phone Number"),
                     ),
-                    const SizedBox(height: 12),
-                    FootprintField(
-                      name: "id.phone_number",
-                      child: FootprintTextInput(
-                        labelText: "Phone Number",
-                        decoration: inputDecoration("Phone Number"),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        handleSubmit();
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            onSubmit: (formData) {
-              otpUtils
-                  .createEmailPhoneBasedChallenge(
-                email: formData.email ?? '',
-                phoneNumber: formData.phoneNumber ?? "",
-              )
-                  .then((challegeKind) {
-                handleChallengeCreated(challegeKind);
-              }).catchError(
-                (_) {
-                  footprintUtils(context).launchIdentify(
-                    email: formData.email,
-                    phoneNumber: formData.phoneNumber,
-                    onAuthenticated: widget.handleAuthenticated,
-                  );
-                },
-                test: (err) => err is InlineOtpNotSupportedException,
-              );
-            },
-          );
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      handleSubmit();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            );
+          }, onSubmit: (formData) {
+            otpUtils
+                .createEmailPhoneBasedChallenge(
+              email: formData.email ?? '',
+              phoneNumber: formData.phoneNumber ?? "",
+            )
+                .then((challegeKind) {
+              handleChallengeCreated(challegeKind);
+            }).catchError(
+              (_) {
+                footprintUtils(context).launchIdentify(
+                  email: formData.email,
+                  phoneNumber: formData.phoneNumber,
+                  onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  },
+                );
+              },
+              test: (err) => err is InlineOtpNotSupportedException,
+            );
+          });
         }
         return Container(
           padding: const EdgeInsets.fromLTRB(48, 20, 48, 20),
@@ -1706,8 +1855,10 @@ class _IdentifyState extends State<Identify> {
               "Enter OTP from ${challengeKind == ChallengeKind.sms ? 'SMS' : 'Email'}",
             ),
             onSubmitted: (value) {
-              otpUtils.verifyOtpChallenge(verificationCode: value).then((_) {
-                handleVerfied();
+              otpUtils
+                  .verifyOtpChallenge(verificationCode: value)
+                  .then((verificationResult) {
+                handleVerfied(verificationResult);
               });
             },
           ),
@@ -1720,26 +1871,26 @@ class _IdentifyState extends State<Identify> {
 class DataCollection extends StatelessWidget {
   const DataCollection({super.key, required this.onCompleted});
 
-  final void Function(String token) onCompleted;
+  final void Function(String validationToken) onCompleted;
 
   void handleComplete(BuildContext context, FormData formData) {
-    var utilMethods = footprintUtils(context);
-    utilMethods
-        .save(
+    footprintUtils(context)
+        .vault(
       formData,
     )
         .then(
       (_) {
-        utilMethods.handoff(
-          onComplete: (token) {
-            onCompleted(token);
+        footprintUtils(context).process().then((vTok) {
+          onCompleted(vTok);
+        }).catchError(
+          (error) {
+            footprintUtils(context).handoff(
+              onComplete: (validationToken) => onCompleted(validationToken),
+              onCancel: () => print("Handoff Cancelled"),
+              onError: (err) => print("Handoff Error $err"),
+            );
           },
-          onError: (err) {
-            print("Handoff error $err");
-          },
-          onCancel: () {
-            print("Handoff canceled");
-          },
+          test: (error) => error is InlineProcessException,
         );
       },
     ).catchError(
@@ -1764,7 +1915,7 @@ class DataCollection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 16),
                 FootprintField(
-                  name: "id.first_name",
+                  name: DataIdentifier.idFirstName,
                   child: FootprintTextInput(
                     labelText: "First Name",
                     decoration: inputDecoration("First Name"),
@@ -1772,7 +1923,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.middle_name",
+                  name: DataIdentifier.idMiddleName,
                   child: FootprintTextInput(
                     labelText: "Middle Name (Optional)",
                     decoration: inputDecoration("Middle Name (Optional)"),
@@ -1780,7 +1931,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.last_name",
+                  name: DataIdentifier.idLastName,
                   child: FootprintTextInput(
                     labelText: "Last Name",
                     decoration: inputDecoration("Last Name"),
@@ -1788,7 +1939,7 @@ class DataCollection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FootprintField(
-                  name: "id.dob",
+                  name: DataIdentifier.idDob,
                   child: FootprintTextInput(
                     labelText: "Date of Birth",
                     decoration: inputDecoration("Date of Birth"),
@@ -1812,9 +1963,9 @@ class DataCollection extends StatelessWidget {
     );
   }
 }
+
 ```
 
-## 7. Examples
+## 8. Examples
 
 - Example of a complete **KYC** flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/blob/master/idv/mobile-flutter/lib/widgets/onboarding_components/widgets/kyc.dart).
-- Example of a complete **KYB** flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/blob/master/idv/mobile-flutter/lib/widgets/onboarding_components/widgets/kyb.dart).
