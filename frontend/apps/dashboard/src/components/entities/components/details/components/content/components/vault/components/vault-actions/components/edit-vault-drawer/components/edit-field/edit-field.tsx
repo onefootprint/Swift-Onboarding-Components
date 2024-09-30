@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { FIELD_VALUE_WIDTH } from '../../constants';
 import useEditField from '../../hooks/use-edit-field';
-import Editable from './components/editable';
+import Editable from '../editable';
 import EncryptedInput from './components/encrypted-input';
-import ErrorOrHint from './components/error';
+import ErrorOrHint from './components/error-or-hint';
 
 export type EditFieldProps = {
   di: DataIdentifier;

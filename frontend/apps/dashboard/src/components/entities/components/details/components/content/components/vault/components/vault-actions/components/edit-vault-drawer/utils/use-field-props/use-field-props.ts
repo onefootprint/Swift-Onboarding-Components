@@ -41,6 +41,7 @@ type Option = {
 type Common = {
   validate?: (value: string) => boolean | string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  fullWidth?: boolean;
 };
 
 type InputOptions = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'pattern'> &
@@ -67,13 +68,13 @@ type RadioOptions = React.InputHTMLAttributes<HTMLInputElement> &
     hasError?: boolean;
   };
 
-type CheckboxOptions = React.InputHTMLAttributes<HTMLInputElement> &
-  Common & {
-    options: Option[];
-    defaultSelectedOptions?: Option[];
-    hint?: string;
-    hasError?: boolean;
-  };
+type CheckboxOptions = React.InputHTMLAttributes<HTMLInputElement> & {
+  options: Option[];
+  defaultSelectedOptions?: Option[];
+  hint?: string;
+  hasError?: boolean;
+  validate?: (value: string[]) => boolean | string;
+};
 
 type FieldProps =
   | {
@@ -334,9 +335,10 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
         options: [
           { value: 'employed', label: entityT('investor-profile.employment-status-mapping.employed') },
           { value: 'unemployed', label: entityT('investor-profile.employment-status-mapping.unemployed') },
-          { value: 'retired', label: entityT('investor-profile.employment-status-mapping.unemployed') },
-          { value: 'student', label: entityT('investor-profile.employment-status-mapping.unemployed') },
+          { value: 'retired', label: entityT('investor-profile.employment-status-mapping.retired') },
+          { value: 'student', label: entityT('investor-profile.employment-status-mapping.student') },
         ],
+        fullWidth: true,
         validate: (value: string) => {
           if (!value || value === EMPTY_SELECT_VALUE) {
             return previousValue ? entityT('errors.employment-status.required') : true;
@@ -353,10 +355,11 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (isEmployed && !value) {
-            return previousValue ? entityT('errors.occupation.required') : true;
+            return entityT('errors.occupation.required');
           }
           return true;
         },
+        fullWidth: true,
       },
     };
   }
@@ -367,10 +370,11 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (isEmployed && !value) {
-            return previousValue ? entityT('errors.employer.required') : true;
+            return entityT('errors.employer.required');
           }
           return true;
         },
+        fullWidth: true,
       },
     };
   }
@@ -479,9 +483,9 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
             label: entityT('investor-profile.funding-sources-mapping.family'),
           },
         ],
-        validate: (value: string) => {
-          if (!value) {
-            return entityT('errors.funding-sources.required');
+        validate: (value: string[]) => {
+          if (!value || !value.length) {
+            return previousValue?.length ? entityT('errors.funding-sources.required') : true;
           }
           return true;
         },
@@ -517,9 +521,9 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
             label: entityT('investor-profile.investment-goals-mapping.other'),
           },
         ],
-        validate: (value: string) => {
-          if (!value) {
-            return entityT('errors.investment-goals.required');
+        validate: (value: string[]) => {
+          if (!value || !value.length) {
+            return previousValue?.length ? entityT('errors.investment-goals.required') : true;
           }
           return true;
         },
