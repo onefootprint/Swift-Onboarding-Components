@@ -317,6 +317,14 @@
     },
     "command": {
       "erase-search": "Erase search"
+    },
+    "combo": {
+      "input-placeholder": "Search...",
+      "erase-search": "Erase search",
+      "empty-state-default": "No results found",
+      "item": {
+        "aria-label-default": "Select"
+      }
     }
   }
 }
