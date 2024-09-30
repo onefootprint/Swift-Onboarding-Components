@@ -17,10 +17,18 @@
       "created": "Created at"
     },
     "filters": {
-      "status": {
-        "label": "Status",
-        "enabled": "Enabled",
-        "disabled": "Disabled"
+      "cta": "Filters",
+      "hide-disabled": "Hide disabled playbooks",
+      "drawer": {
+        "title": "Apply filters",
+        "playbook-type": "Playbook type",
+        "all": "All",
+        "kyc": "KYC",
+        "kyb": "KYB",
+        "auth": "Auth",
+        "document": "Document",
+        "clear-all": "Clear all",
+        "apply-filters": "Apply filters"
       }
     },
     "actions": {

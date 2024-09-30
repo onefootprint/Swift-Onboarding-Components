@@ -1,13 +1,11 @@
-import { OnboardingConfigStatus } from '@onefootprint/types';
 import { z } from 'zod';
 
-const onboardingStatusEnum = z.enum([OnboardingConfigStatus.disabled, OnboardingConfigStatus.enabled]);
 const playbooksConfigQuery = z.object({
   id: z.string().optional(),
   page: z.string().optional(),
   search: z.string().optional(),
   kind: z.string().optional(),
-  status: onboardingStatusEnum.optional(),
+  hide_disabled: z.string().optional(),
 });
 const playbookTabsEnum = z.enum(['data', 'verification-checks', 'rules', 'settings']);
 
