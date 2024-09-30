@@ -21,12 +21,11 @@ const JoinUs = () => {
           <Text variant="body-1" color="secondary" tag="p">
             {t('description')}
           </Text>
-
           <CtaContainer>
             <Text variant="body-1" color="secondary" tag="p">
               {t('pre-cta')}
             </Text>
-            <LinkButton href={`mailto:${t('email-address')}`} iconComponent={IcoArrowRightSmall16}>
+            <LinkButton variant="label-1" href={`mailto:${t('email-address')}`} iconComponent={IcoArrowRightSmall16}>
               {t('cta')}
             </LinkButton>
           </CtaContainer>
@@ -44,6 +43,7 @@ const Container = styled.div`
     justify-content: stretch;
     padding: ${theme.spacing[11]} 0 ${theme.spacing[12]} 0;
     gap: ${theme.spacing[8]};
+    max-width: 880px;
 
     ${media.greaterThan('md')`
         flex-direction: row;

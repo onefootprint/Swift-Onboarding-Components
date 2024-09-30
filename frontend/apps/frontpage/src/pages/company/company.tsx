@@ -6,10 +6,11 @@ import {
   IcoLeaf40,
   IcoShield40,
 } from '@onefootprint/icons';
-import { Divider, Text, media } from '@onefootprint/ui';
+import { Divider, Stack, Text, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { Container } from '@onefootprint/ui';
 import SEO from '../../components/seo';
 import CompanyPhotos from './components/company-photos';
 import JoinUs from './components/join-us';
@@ -164,6 +165,20 @@ const Company = () => {
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/rodrigo-pagnuzzi-b21669107/',
     },
+    {
+      name: 'Geronimo Nores',
+      avatarSrc: '/team/member-geronimo.png',
+      role: 'Growth',
+      linkedin: 'https://www.linkedin.com/in/geronimonores/',
+      twitter: 'https://twitter.com/Geronimo_Nores',
+    },
+    {
+      name: 'Surya Kaza',
+      avatarSrc: '/team/member-surya.png',
+      role: 'Growth',
+      linkedin: 'https://www.linkedin.com/in/suryakaza/',
+      twitter: 'https://twitter.com/suryawashere',
+    },
   ].sort((a, b) => a.name.localeCompare(b.name));
 
   const companyPhotos = [
@@ -180,15 +195,23 @@ const Company = () => {
   return (
     <>
       <SEO title={t('html-title')} description={t('html-description')} slug="/company" />
-      <Container>
-        <HeroContainer>
+      <Container align="center">
+        <Stack
+          direction="column"
+          maxWidth="700px"
+          align="center"
+          justify="center"
+          textAlign="center"
+          marginTop={10}
+          marginBottom={10}
+        >
           <Text variant="display-2" tag="h1" marginBottom={5}>
             {t('title')}
           </Text>
           <Text variant="display-4" tag="h2" color="secondary">
             {t('subtitle')}
           </Text>
-        </HeroContainer>
+        </Stack>
         <CompanyPhotosContainer>
           <CompanyPhotos photos={companyPhotos} />
         </CompanyPhotosContainer>
@@ -215,29 +238,10 @@ const CompanyPhotosContainer = styled.div`
   `}
 `;
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    margin: 0 auto;
-    max-width: 960px;
-    padding: 0 ${theme.spacing[5]};
-
-    ${media.greaterThan('lg')`
-      padding: 0;
-    `}
-  `}
-`;
-
-const HeroContainer = styled.div`
-  ${({ theme }) => css`
-    margin: 0 auto ${theme.spacing[10]};
-    max-width: 700px;
-    text-align: center;
-  `}
-`;
-
 const ValuesContainer = styled.section`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[10]};
+    max-width: 880px;
 
     ${media.greaterThan('lg')`
       margin-bottom: ${theme.spacing[11]};
@@ -248,6 +252,7 @@ const ValuesContainer = styled.section`
 const TeamContainer = styled.section`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[10]};
+    max-width: 880px;
 
     ${media.greaterThan('lg')`
       margin-bottom: ${theme.spacing[12]};
