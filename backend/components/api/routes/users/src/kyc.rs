@@ -123,6 +123,10 @@ pub async fn post(
         .map(|country_code| country_code.is_us_including_territories())
         .unwrap_or(false);
 
+    if !is_us_country_code {
+        return Err(TenantError::ValidationError("Cannot trigger KYC on non-US addresses".into()).into());
+    }
+
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
@@ -142,6 +146,10 @@ pub async fn post(
             tracing::info!(playbook_key=%obc.key, "Post /kyc with playbook");
             if obc.kind != ObConfigurationKind::Kyc {
                 return Err(ValidationError("Must use playbook of kind KYC").into());
+            }
+
+            if obc.collects_document() {
+                return Err(ValidationError("Playbook must not collect document").into());
             }
 
             let unaccessable_cdos: Vec<_> = obc
@@ -226,11 +234,6 @@ pub async fn post(
                 return Err(err.into());
             }
 
-            if !is_us_country_code {
-                return Err(
-                    TenantError::ValidationError("Cannot trigger KYC on non-US addresses".into()).into(),
-                );
-            }
 
             Ok((wf, obc))
         })

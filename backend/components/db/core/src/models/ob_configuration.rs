@@ -27,6 +27,7 @@ use newtypes::AppearanceId;
 use newtypes::AuthMethodKind;
 use newtypes::CipKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::CollectedDataOptionKind as CDOK;
 use newtypes::DataIdentifierDiscriminant;
 use newtypes::DbActor;
 use newtypes::DocumentAndCountryConfiguration;
@@ -277,6 +278,21 @@ impl ObConfiguration {
     // More useful public interface for working with VerificationChecks
     pub fn verification_checks(&self) -> VerificationChecks {
         VerificationChecks::from_existing(self)
+    }
+
+    pub fn collects_document(&self) -> bool {
+        // Legacy backcompat
+        let has_document_cdo = self
+            .must_collect_data
+            .iter()
+            .any(|d| CDOK::from(d) == CDOK::Document);
+        let has_other_document = self
+            .documents_to_collect
+            .as_ref()
+            .map(|d| !d.is_empty())
+            .unwrap_or(false);
+
+        has_document_cdo || has_other_document
     }
 }
 

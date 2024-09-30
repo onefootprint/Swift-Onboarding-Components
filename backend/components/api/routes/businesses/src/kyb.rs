@@ -99,12 +99,12 @@ pub async fn post(
         return Err(TenantError::CannotRunKybForPortable.into());
     }
 
-    // fetch country code and validate is US or US territory.
+    // fetch country code and validate is US
     let is_us_country_code = bvw
         .decrypt_unchecked_single(&state.enclave_client, BusinessDataKind::Country.into())
         .await?
         .and_then(|country_code_str| country_code_str.parse_into::<Iso3166TwoDigitCountryCode>().ok())
-        .map(|country_code| country_code.is_us_including_territories())
+        .map(|country_code| country_code.is_us())
         .unwrap_or(false);
 
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
