@@ -89,6 +89,8 @@ pub enum BoolFlag<'a> {
     ApiKycSkipEmailAndPhoneRequirements(&'a TenantId),
     #[strum(to_string = "CanSendSmsToHighFraudCountries")]
     CanSendSmsToHighFraudCountries(&'a TenantId),
+    #[strum(to_string = "RunSentilinkForPlaybookTemporary")]
+    RunSentilinkForPlaybookTemporary(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -138,6 +140,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseKycWaterfallV2Rollout(k) => Some(k.to_string()),
             Self::ApiKycSkipEmailAndPhoneRequirements(k) => Some(k.to_string()),
             Self::CanSendSmsToHighFraudCountries(k) => Some(k.to_string()),
+            Self::RunSentilinkForPlaybookTemporary(k) => Some(k.to_string()),
         }
     }
 
@@ -183,6 +186,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseKycWaterfallV2Rollout(_) => false,
             Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
             Self::CanSendSmsToHighFraudCountries(_) => false,
+            Self::RunSentilinkForPlaybookTemporary(_) => false,
         }
     }
 
@@ -231,6 +235,7 @@ impl<'a> BoolFlag<'a> {
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
             | Self::CanSendSmsToHighFraudCountries(_)
+            | Self::RunSentilinkForPlaybookTemporary(_)
             | Self::ApiKycSkipEmailAndPhoneRequirements(_) => false,
             // These are migrated to the newer format
             Self::PreferWhatsapp(_) => true,

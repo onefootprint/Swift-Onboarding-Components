@@ -8,6 +8,7 @@ use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::neuro_id::run_neuro_call;
+use crate::decision::vendor::sentilink::application_risk::run_sentilink_application_risk;
 use crate::decision::vendor::twilio::run_twilio_call;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_result::VendorResult;
@@ -44,6 +45,7 @@ use db::PgConn;
 use db::TxnPgConn;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use idv::sentilink::application_risk::response::ApplicationRiskResponse;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
@@ -139,6 +141,28 @@ pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Optio
         })
         .await?;
     run_curp_validation_check(state, &di, &wf.id).await
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn run_application_risk(
+    state: &State,
+    wf_id: &WorkflowId,
+) -> FpResult<Option<ApplicationRiskResponse>> {
+    let wfid = wf_id.clone();
+    let (wf, di) = state
+        .db_pool
+        .db_transaction(move |conn| -> FpResult<_> {
+            let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
+            let di = DecisionIntent::get_or_create_for_workflow(
+                conn,
+                &wf.scoped_vault_id,
+                &wfid,
+                DecisionIntentKind::OnboardingKyc,
+            )?;
+            Ok((wf, di))
+        })
+        .await?;
+    run_sentilink_application_risk(state, &di, &wf.id).await
 }
 
 #[tracing::instrument(skip(state))]

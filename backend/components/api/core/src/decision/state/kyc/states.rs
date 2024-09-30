@@ -47,6 +47,7 @@ use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
+use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
@@ -257,6 +258,26 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             }
             None
         };
+
+        // TODO: Figure out the right way to represent in our product (e.g. VerificationChecks)
+        //   FF is temporary to avoid serializing stuff in DB that we need to fix later
+        // TODO: FP reason codes
+        // TODO: models for storing score-specific reason codes
+        let _ = if state
+            .ff_client
+            .flag(BoolFlag::RunSentilinkForPlaybookTemporary(&obc.key))
+        {
+            match common::run_application_risk(state, &self.wf_id).await {
+                Ok(res) => res,
+                Err(err) => {
+                    tracing::warn!(?err, wf_id=?self.wf_id, "error running sentilink");
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
 
         let aml_vendor_result = match obc.verification_checks().enhanced_aml() {
             EnhancedAmlOption::No => None,
