@@ -9,9 +9,10 @@ const businessDataRequest = async (payload: BusinessDataRequest) => {
     Object.entries(payload.data).filter(([_key, value]) => !!value && value !== 'scrubbed'),
   );
 
+  const isSpeculative = payload.speculative === true;
   const response = await requestWithoutCaseConverter<BusinessDataResponse>({
-    method: 'PATCH',
-    url: '/hosted/business/vault',
+    method: isSpeculative ? 'POST' : 'PATCH',
+    url: isSpeculative ? '/hosted/business/vault/validate' : '/hosted/business/vault',
     data,
     headers: {
       [AUTH_HEADER]: payload.authToken,

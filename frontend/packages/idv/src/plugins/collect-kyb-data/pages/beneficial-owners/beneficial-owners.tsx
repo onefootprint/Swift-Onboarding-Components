@@ -20,6 +20,7 @@ type BeneficialOwnersProps = {
   onComplete?: () => void;
 };
 
+const OnlyValidateDataWithoutSaving = true;
 const { logError } = getLogger({ location: 'kyb-beneficial-owners' });
 
 const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: BeneficialOwnersProps) => {
@@ -60,8 +61,15 @@ const BeneficialOwners = ({ ctaLabel, hideHeader, onCancel, onComplete }: Benefi
     syncData({
       authToken,
       data: payload,
+      speculative: OnlyValidateDataWithoutSaving,
       onSuccess: () => {
-        send({ type: 'beneficialOwnersSubmitted', payload });
+        send({
+          type: 'beneficialOwnersSubmitted',
+          payload: {
+            data: payload,
+            vaultBusinessData: OnlyValidateDataWithoutSaving ? ({} as typeof payload) : payload,
+          },
+        });
         onComplete?.();
       },
       onError: (error: string) => {

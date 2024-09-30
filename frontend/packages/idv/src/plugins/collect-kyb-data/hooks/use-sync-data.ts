@@ -14,6 +14,7 @@ type SyncDataArgs = {
   data: BusinessDIData;
   onSuccess?: (data: BusinessDataResponse) => void;
   onError?: (error: string) => void;
+  speculative?: boolean;
 };
 
 const useSyncData = () => {
@@ -24,7 +25,7 @@ const useSyncData = () => {
   const locale = useL10nContext()?.locale || 'en-US';
   const { kybRequirement, vaultBusinessData } = state.context;
 
-  const syncData = ({ authToken, data, onSuccess, onError }: SyncDataArgs) => {
+  const syncData = ({ authToken, data, onSuccess, onError, speculative }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),
@@ -61,6 +62,7 @@ const useSyncData = () => {
       {
         authToken,
         data: payload,
+        speculative,
       },
       {
         onSuccess,
@@ -70,7 +72,9 @@ const useSyncData = () => {
             description: t('invalid-inputs.description'),
             variant: 'error',
           });
-          onError?.(`KYB useSyncData encountered error while syncing data: ${getErrorMessage(error)}`);
+          onError?.(
+            `KYB useSyncData encountered error while syncing data ${speculative ? ' speculatively' : ''}: ${getErrorMessage(error)}`,
+          );
         },
       },
     );

@@ -14,12 +14,8 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'stepUpAuthTokenCompleted';
-    assignData:
-      | 'basicDataSubmitted'
-      | 'beneficialOwnersSubmitted'
-      | 'businessAddressSubmitted'
-      | 'stepUpDecryptionCompleted';
-    assignVaultData: 'businessDataLoadSuccess';
+    assignData: 'basicDataSubmitted' | 'businessAddressSubmitted' | 'stepUpDecryptionCompleted';
+    assignVaultData: 'beneficialOwnersSubmitted' | 'businessDataLoadSuccess';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

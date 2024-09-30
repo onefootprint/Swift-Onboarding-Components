@@ -49,15 +49,16 @@ export type MachineContext = {
   dataCollectionScreensToShow: StateValue[];
 };
 
-export type LoadSuccessEvent = {
-  type: 'businessDataLoadSuccess';
-  payload: { data: BusinessDIData; vaultBusinessData: BusinessDIData };
-};
-
 export type MachineEvents =
   | { type: 'basicDataSubmitted'; payload: BusinessDIData }
   | { type: 'beneficialOwnerKycSubmitted' }
-  | { type: 'beneficialOwnersSubmitted'; payload: BeneficialOwnersData }
+  | {
+      type: 'beneficialOwnersSubmitted';
+      payload: {
+        data: BeneficialOwnersData;
+        vaultBusinessData: BeneficialOwnersData;
+      };
+    }
   | { type: 'businessAddressSubmitted'; payload: BusinessAddressData }
   | { type: 'businessDataLoadError' }
   | { type: 'confirmed' }
@@ -65,4 +66,10 @@ export type MachineEvents =
   | { type: 'navigatedToPrevPage' }
   | { type: 'stepUpAuthTokenCompleted'; payload: string }
   | { type: 'stepUpDecryptionCompleted'; payload: BusinessDIData }
-  | LoadSuccessEvent;
+  | {
+      type: 'businessDataLoadSuccess';
+      payload: {
+        data: BusinessDIData;
+        vaultBusinessData: BusinessDIData;
+      };
+    };

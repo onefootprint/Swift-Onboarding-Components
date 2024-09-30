@@ -11,7 +11,7 @@ import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks';
 import createCollectKybDataMachine from './machine';
-import type { MachineContext } from './types';
+import type { BeneficialOwnersData, MachineContext } from './types';
 
 describe('Collect KYB Data Machine Tests', () => {
   const TestOnboardingConfig: PublicOnboardingConfig = {
@@ -135,20 +135,23 @@ describe('Collect KYB Data Machine Tests', () => {
 
     state = machine.send('beneficialOwnersSubmitted', {
       payload: {
-        [BusinessDI.beneficialOwners]: [
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'John',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-            [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-          },
-          {
-            [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-            [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-          },
-        ],
+        data: {
+          [BusinessDI.beneficialOwners]: [
+            {
+              [BeneficialOwnerDataAttribute.firstName]: 'John',
+              [BeneficialOwnerDataAttribute.lastName]: 'Doey',
+              [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
+              [BeneficialOwnerDataAttribute.ownershipStake]: 30,
+            },
+            {
+              [BeneficialOwnerDataAttribute.firstName]: 'Jane',
+              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+              [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
+              [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+            },
+          ],
+        },
+        vaultBusinessData: {} as BeneficialOwnersData,
       },
     });
     expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([
@@ -180,7 +183,13 @@ describe('Collect KYB Data Machine Tests', () => {
     expect(state.value).toEqual('businessAddress');
     state = machine.send('businessAddressSubmitted', {});
     expect(state.value).toEqual('beneficialOwners');
-    state = machine.send('beneficialOwnersSubmitted', {});
+    state = machine.send({
+      type: 'beneficialOwnersSubmitted',
+      payload: {
+        data: {} as BeneficialOwnersData,
+        vaultBusinessData: {} as BeneficialOwnersData,
+      },
+    });
     expect(state.value).toEqual('confirm');
 
     state = machine.send({ type: 'confirmed' });
@@ -299,20 +308,23 @@ describe('Collect KYB Data Machine Tests', () => {
       });
       state = machine.send('beneficialOwnersSubmitted', {
         payload: {
-          [BusinessDI.beneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'John',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doey',
-              [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 30,
-            },
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'Jane',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-              [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-            },
-          ],
+          data: {
+            [BusinessDI.beneficialOwners]: [
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'John',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doey',
+                [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 30,
+              },
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'Jane',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+                [BeneficialOwnerDataAttribute.email]: 'jane@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+              },
+            ],
+          },
+          vaultBusinessData: {} as BeneficialOwnersData,
         },
       });
 
@@ -357,22 +369,25 @@ describe('Collect KYB Data Machine Tests', () => {
       state = machine.send({
         type: 'beneficialOwnersSubmitted',
         payload: {
-          [BusinessDI.beneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'Jake',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-              [BeneficialOwnerDataAttribute.email]: 'jake@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 20,
-              [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-            },
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'Lilly',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-              [BeneficialOwnerDataAttribute.email]: 'lilly@gmail.com',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 40,
-              [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-            },
-          ],
+          data: {
+            [BusinessDI.beneficialOwners]: [
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'Jake',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+                [BeneficialOwnerDataAttribute.email]: 'jake@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 20,
+                [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
+              },
+              {
+                [BeneficialOwnerDataAttribute.firstName]: 'Lilly',
+                [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+                [BeneficialOwnerDataAttribute.email]: 'lilly@gmail.com',
+                [BeneficialOwnerDataAttribute.ownershipStake]: 40,
+                [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
+              },
+            ],
+          },
+          vaultBusinessData: {} as BeneficialOwnersData,
         },
       });
       expect(state.context.data[BusinessDI.beneficialOwners]).toEqual([

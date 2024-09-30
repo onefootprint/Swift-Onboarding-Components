@@ -142,7 +142,10 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
         },
         beneficialOwners: {
           on: {
-            beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners'),
+            beneficialOwnersSubmitted: nextScreenTransitions('beneficialOwners').map(config => ({
+              ...config,
+              actions: ['assignVaultData'],
+            })),
             navigatedToPrevPage: prevScreenTransitions('beneficialOwners'),
           },
         },
@@ -154,7 +157,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             ],
             basicDataSubmitted: { actions: 'assignData' },
             businessAddressSubmitted: { actions: 'assignData' },
-            beneficialOwnersSubmitted: { actions: 'assignData' },
+            beneficialOwnersSubmitted: { actions: ['assignVaultData'] },
             navigatedToPrevPage: prevScreenTransitions('confirm'),
             stepUpAuthTokenCompleted: { actions: ['assignAuthToken'] },
             stepUpDecryptionCompleted: { actions: ['assignData'] },
