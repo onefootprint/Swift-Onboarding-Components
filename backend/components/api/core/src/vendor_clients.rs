@@ -50,6 +50,8 @@ use idv::samba::request::SambaGetLVReportRequest;
 use idv::samba::response::license_validation::CreateLVOrderResponse;
 use idv::samba::response::license_validation::GetLVOrderResponse;
 use idv::samba::SambaAPIResponse;
+use idv::sentilink::SentilinkAPIResponse;
+use idv::sentilink::SentilinkApplicationRiskRequest;
 use idv::socure::client::SocureClient;
 use idv::socure::SocureIDPlusAPIResponse;
 use idv::socure::SocureIDPlusRequest;
@@ -266,6 +268,33 @@ impl SambaClients {
         }
     }
 }
+
+#[derive(Clone)]
+pub struct SentilinkClients {
+    pub sentilink_application_risk:
+        VendorClient<SentilinkApplicationRiskRequest, SentilinkAPIResponse, idv::sentilink::error::Error>,
+}
+
+impl SentilinkClients {
+    #[cfg(test)]
+    pub fn new_with_mocks() -> Self {
+        use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+        Self {
+            sentilink_application_risk: Arc::new(MockVendorAPICall::<
+                SentilinkApplicationRiskRequest,
+                SentilinkAPIResponse,
+                idv::sentilink::error::Error,
+            >::new()),
+        }
+    }
+
+    pub fn new(footprint_client: Arc<FootprintVendorHttpClient>) -> Self {
+        Self {
+            sentilink_application_risk: footprint_client.clone(),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct VendorClients {
     pub socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
@@ -284,6 +313,7 @@ pub struct VendorClients {
     pub neuro_id: VendorClient<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>,
     pub incode: IncodeClients,
     pub samba: SambaClients,
+    pub sentilink: SentilinkClients,
 }
 
 impl VendorClients {
@@ -309,7 +339,8 @@ impl VendorClients {
             stytch_lookup: Arc::new(stytch_client),
             neuro_id: footprint_client.clone(),
             incode: IncodeClients::new(footprint_client.clone()),
-            samba: SambaClients::new(footprint_client),
+            samba: SambaClients::new(footprint_client.clone()),
+            sentilink: SentilinkClients::new(footprint_client),
         }
     }
 
@@ -370,6 +401,7 @@ impl VendorClients {
             >::new()),
             incode: IncodeClients::new_with_mocks(),
             samba: SambaClients::new_with_mocks(),
+            sentilink: SentilinkClients::new_with_mocks(),
         }
     }
 }

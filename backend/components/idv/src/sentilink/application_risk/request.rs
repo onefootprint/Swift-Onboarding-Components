@@ -128,7 +128,7 @@ impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
             last_name: get_di(IdentityDataKind::LastName)?,
             dob: get_di(IdentityDataKind::Dob)?,
             ssn: idv_data.get(IdentityDataKind::Ssn9).cloned(),
-            address_line_1: get_di(IdentityDataKind::Dob)?,
+            address_line_1: get_di(IdentityDataKind::AddressLine1)?,
             // Does this always have to be US?
             country_code: idv_data.get(IdentityDataKind::Country).cloned(),
             city: get_di(IdentityDataKind::City)?,
