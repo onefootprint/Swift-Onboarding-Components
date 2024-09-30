@@ -285,6 +285,8 @@ pub enum Error {
     NeuroIdError(#[from] neuro_id::error::Error),
     #[error("SambaSafetyError: {0}")]
     SambaSafetyError(#[from] samba::error::Error),
+    #[error("SentilinkError: {0}")]
+    SentilinkError(#[from] sentilink::error::Error),
 }
 
 impl api_errors::FpErrorTrait for Error {

@@ -45,6 +45,7 @@ pub enum Vendor {
     Stytch,
     NeuroId,
     SambaSafety,
+    Sentilink,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -108,6 +109,7 @@ pub enum VendorAPI {
     SambaLicenseValidationCreate,
     SambaLicenseValidationGetStatus,
     SambaLicenseValidationGetReport,
+    SentilinkApplicationRisk,
 }
 impl_enum_str_diesel!(VendorAPI);
 pub use vendor_api_struct::*;
@@ -149,6 +151,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::SambaLicenseValidationCreate => Self::SambaSafety,
             VendorAPI::SambaLicenseValidationGetStatus => Self::SambaSafety,
             VendorAPI::SambaLicenseValidationGetReport => Self::SambaSafety,
+            VendorAPI::SentilinkApplicationRisk => Self::Sentilink,
         }
     }
 }

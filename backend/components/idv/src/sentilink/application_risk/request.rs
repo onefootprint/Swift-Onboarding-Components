@@ -1,10 +1,15 @@
+use crate::sentilink::error::Error as SentilinkError;
+use crate::sentilink::SentilinkApplicationRiskRequest;
 use chrono::DateTime;
 use chrono::Utc;
+use newtypes::output::Csv;
 use newtypes::sentilink::SentilinkProduct;
+use newtypes::IdentityDataKind;
 use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use serde::Deserialize;
 use serde::Serialize;
+use uuid::Uuid;
 
 #[derive(Serialize)]
 pub struct ApplicationRiskRequest {
@@ -12,14 +17,15 @@ pub struct ApplicationRiskRequest {
     pub products: Vec<SentilinkProduct>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Application {
     // ID of application.
     application_id: String,
     // Timestamp string of application, default: timestamp string for when SentiLink receives the request.
     application_created: DateTime<Utc>,
     // ID of customer.
-    user_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_id: Option<String>,
     // Timestamp string of customer account. creation. Other accepted formats: "2017-01-02", "2017-01-02
     // `00:00:00", "01022017", "02Jan2017", "01/22/2017".
     user_created: DateTime<Utc>,
@@ -35,13 +41,16 @@ pub struct Application {
     address_line_1: PiiString,
     #[serde(skip_serializing_if = "Option::is_none")]
     address_line_2: Option<PiiString>,
-    country_code: PiiString,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    country_code: Option<PiiString>,
     city: PiiString,
     state_code: PiiString,
     // Zipcode of customer address. Other accepted formats: "12345-9999".
     zipcode: PiiString,
-    phone: PiiString,
-    email: PiiString,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    phone: Option<PiiString>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    email: Option<PiiString>,
     // TODO: figure out which IP address best represents the "one associated with the application". from wf
     // creation or from handoff?
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,4 +70,80 @@ pub struct Application {
     // Any other data in JSON format.
     #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<PiiJsonValue>,
+}
+
+
+impl TryFrom<SentilinkApplicationRiskRequest> for ApplicationRiskRequest {
+    type Error = SentilinkError;
+
+    fn try_from(value: SentilinkApplicationRiskRequest) -> Result<Self, Self::Error> {
+        let SentilinkApplicationRiskRequest {
+            idv_data,
+            products,
+            credentials: _,
+        } = value;
+        // Check products
+        if products.is_empty() {
+            return Err(SentilinkError::AssertionError(
+                "no products specified".to_string(),
+            ));
+        }
+
+        // Check data is present
+        let present_dis = idv_data.present_data_attributes();
+        let missing_required_fields: Vec<_> = products
+            .iter()
+            .map(|p| {
+                let missing: Vec<_> = p
+                    .required_identity_data_kinds()
+                    .into_iter()
+                    .filter(|d| !present_dis.contains(d))
+                    .collect();
+                (*p, Csv::from(missing))
+            })
+            .filter(|(_, missing)| !missing.is_empty())
+            .collect();
+
+        if !missing_required_fields.is_empty() {
+            return Err(SentilinkError::MissingRequiredFields(missing_required_fields));
+        };
+
+        let get_di = |idk: IdentityDataKind| -> Result<PiiString, SentilinkError> {
+            idv_data
+                .get(idk)
+                .cloned()
+                .ok_or(SentilinkError::MissingRequiredField(idk))
+        };
+
+        // TODO: ip_address, user_id, user_created, device_id
+        let application = Application {
+            application_id: idv_data
+                .verification_request_id
+                .clone()
+                .map(|v| v.to_string())
+                .unwrap_or(Uuid::new_v4().to_string()),
+            // TODO: wf_created
+            application_created: Utc::now(),
+            first_name: get_di(IdentityDataKind::FirstName)?,
+            last_name: get_di(IdentityDataKind::LastName)?,
+            dob: get_di(IdentityDataKind::Dob)?,
+            ssn: idv_data.get(IdentityDataKind::Ssn9).cloned(),
+            address_line_1: get_di(IdentityDataKind::Dob)?,
+            // Does this always have to be US?
+            country_code: idv_data.get(IdentityDataKind::Country).cloned(),
+            city: get_di(IdentityDataKind::City)?,
+            state_code: get_di(IdentityDataKind::State)?,
+            zipcode: get_di(IdentityDataKind::Zip)?,
+            phone: idv_data.get(IdentityDataKind::PhoneNumber).cloned(),
+            email: idv_data.get(IdentityDataKind::Email).cloned(),
+            ..Default::default()
+        };
+
+        let req = ApplicationRiskRequest {
+            application,
+            products,
+        };
+
+        Ok(req)
+    }
 }

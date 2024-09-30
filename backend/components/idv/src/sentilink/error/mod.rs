@@ -1,4 +1,7 @@
 use error_code::SentilinkErrorCode;
+use newtypes::output::Csv;
+use newtypes::sentilink::SentilinkProduct;
+use newtypes::IdentityDataKind;
 
 pub mod error_code;
 
@@ -17,4 +20,10 @@ pub enum Error {
     ErrorCode(SentilinkErrorCode),
     #[error("Sentilink unknown error")]
     UnknownError(String),
+    #[error("MissingRequiredFields: {0:?}")]
+    MissingRequiredFields(Vec<(SentilinkProduct, Csv<IdentityDataKind>)>),
+    #[error("MissingRequiredField: {0}")]
+    MissingRequiredField(IdentityDataKind),
+    #[error("AssertionError: {0}")]
+    AssertionError(String),
 }

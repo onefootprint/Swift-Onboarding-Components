@@ -430,6 +430,7 @@ mod tests {
             }
             VendorAPI::SambaLicenseValidationGetStatus => todo!(),
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
+            VendorAPI::SentilinkApplicationRisk => todo!(),
         };
 
         assert!(test_ran)
@@ -586,6 +587,7 @@ mod tests {
             }
             VendorAPI::SambaLicenseValidationGetStatus => todo!(),
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
+            VendorAPI::SentilinkApplicationRisk => todo!(),
         }
     }
 }

@@ -1,4 +1,7 @@
 use application_risk::response::ApplicationRiskResponse;
+use newtypes::sentilink::SentilinkProduct;
+use newtypes::vendor_credentials::SentilinkCredentials;
+use newtypes::IdvData;
 use strum::EnumDiscriminants;
 use strum::EnumString;
 
@@ -9,6 +12,7 @@ use error::Error as SentilinkError;
 use newtypes::PiiJsonValue;
 use newtypes::ScrubbedPiiVendorResponse;
 use reqwest::StatusCode;
+
 
 pub type SentilinkResult<T> = Result<T, SentilinkError>;
 
@@ -129,6 +133,13 @@ impl SentilinkAPIResponse {
             }
         }
     }
+}
+
+
+pub struct SentilinkApplicationRiskRequest {
+    pub idv_data: IdvData,
+    pub credentials: SentilinkCredentials,
+    pub products: Vec<SentilinkProduct>,
 }
 
 
