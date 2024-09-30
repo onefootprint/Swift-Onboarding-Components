@@ -8,6 +8,7 @@ import EditForm from './components/edit-form';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import BusinessVaultFieldsets from './components/business-vault-fieldsets';
 import PersonVaultFieldsets from './components/person-vault-fieldsets';
 import convertFormData from './utils/convert-form-data';
 
@@ -80,7 +81,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
           {t('decrypt-alert.text')}
         </InlineAlert>
         <EditForm onSubmit={handleBeforeEditSubmit}>
-          {isPersonVault && <PersonVaultFieldsets entity={entity} />}
+          {isPersonVault ? <PersonVaultFieldsets entity={entity} /> : <BusinessVaultFieldsets />}
         </EditForm>
       </Stack>
     </Drawer>
