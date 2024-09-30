@@ -4,6 +4,7 @@ export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
     'xstate.init': { type: 'xstate.init' };
+    'xstate.stop': { type: 'xstate.stop' };
   };
   invokeSrcNameMap: {};
   missingImplementations: {
@@ -22,6 +23,7 @@ export interface Typegen0 {
       | 'investmentGoalsSubmitted'
       | 'netWorthSubmitted'
       | 'riskToleranceSubmitted';
+    setDeclarationStateVisited: 'declarationsSubmitted' | 'navigatedToPrevPage' | 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

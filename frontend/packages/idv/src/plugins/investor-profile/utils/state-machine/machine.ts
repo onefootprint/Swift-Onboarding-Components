@@ -2,6 +2,7 @@ import { InvestorProfileDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks';
+import { isStringValid } from '../../../../utils/type-guards';
 import type { MachineContext, MachineEvents } from './types';
 
 export type CreateInvestorProfileArgs = {
@@ -67,6 +68,35 @@ export const trackInitializedSteps = (tracker: (action: string) => void, data: M
   }
 };
 
+export const hasAnyDeclarationsData = ({ data }: MachineContext): boolean => {
+  if (isStringValid(data?.[InvestorProfileDI.brokerageFirmEmployer])) {
+    return true;
+  }
+  if (isStringValid(data?.[InvestorProfileDI.politicalOrganization])) {
+    return true;
+  }
+
+  const familyMemberNamesValue = data?.[InvestorProfileDI.familyMemberNames];
+  if (
+    Array.isArray(familyMemberNamesValue) &&
+    familyMemberNamesValue.length > 0 &&
+    familyMemberNamesValue.every(isStringValid)
+  ) {
+    return true;
+  }
+
+  const seniorExecutiveSymbolsValue = data?.[InvestorProfileDI.seniorExecutiveSymbols];
+  if (
+    Array.isArray(seniorExecutiveSymbolsValue) &&
+    seniorExecutiveSymbolsValue.length > 0 &&
+    seniorExecutiveSymbolsValue.every(isStringValid)
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransition }: CreateInvestorProfileArgs) =>
   createMachine(
     {
@@ -89,7 +119,7 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
         init: {
           on: {
             initDone: { target: 'redirectTo', actions: ['assignData'] },
-            initFailed: { target: 'employment' },
+            initFailed: { target: 'redirectTo' },
           },
         },
         redirectTo: {
@@ -100,69 +130,63 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
             { target: 'fundingSources', cond: isMissingFundingSources },
             { target: 'investmentGoals', cond: isMissingInvestmentGoalsData },
             { target: 'riskTolerance', cond: isMissingRiskToleranceData },
-            { target: 'declarations', cond: isMissingDeclarationsData },
+            {
+              /** Once "declarations" becomes not optional, we can remove the isDeclarationStateVisited context.prop */
+              target: 'declarations',
+              cond: ctx => {
+                if (isMissingDeclarationsData(ctx)) {
+                  return true;
+                }
+                if (hasAnyDeclarationsData(ctx)) {
+                  return false;
+                }
+                return !ctx.isDeclarationStateVisited;
+              },
+            },
             { target: 'confirm' },
           ],
         },
         employment: {
           on: {
-            employmentSubmitted: [
-              {
-                target: 'income',
-                actions: 'assignData',
-                cond: (_, event) => !!event.payload[InvestorProfileDI.occupation],
-              },
-              { target: 'income', actions: 'assignData' },
-            ],
+            employmentSubmitted: { target: 'redirectTo', actions: 'assignData' },
           },
         },
         income: {
           on: {
-            incomeSubmitted: { target: 'netWorth', actions: 'assignData' },
+            incomeSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'employment' },
           },
         },
         netWorth: {
           on: {
-            netWorthSubmitted: {
-              target: 'fundingSources',
-              actions: 'assignData',
-            },
+            netWorthSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'income' },
           },
         },
         fundingSources: {
           on: {
-            fundingSourcesSubmitted: {
-              target: 'investmentGoals',
-              actions: 'assignData',
-            },
+            fundingSourcesSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'netWorth' },
           },
         },
         investmentGoals: {
           on: {
-            investmentGoalsSubmitted: {
-              target: 'riskTolerance',
-              actions: 'assignData',
-            },
+            investmentGoalsSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'fundingSources' },
           },
         },
         riskTolerance: {
           on: {
-            riskToleranceSubmitted: {
-              target: 'declarations',
-              actions: 'assignData',
-            },
+            riskToleranceSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'investmentGoals' },
           },
         },
         declarations: {
           on: {
-            declarationsSubmitted: { target: 'confirm', actions: 'assignData' },
+            declarationsSubmitted: { target: 'redirectTo', actions: 'assignData' },
             navigatedToPrevPage: { target: 'riskTolerance' },
           },
+          exit: 'setDeclarationStateVisited',
         },
         confirm: {
           on: {
@@ -192,6 +216,9 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
                 ...context,
                 data: { ...context.data, ...event.payload },
               };
+        }),
+        setDeclarationStateVisited: assign(context => {
+          return { ...context, isDeclarationStateVisited: true };
         }),
       },
     },

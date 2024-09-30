@@ -37,6 +37,7 @@ export type MachineContext = {
   showTransition?: boolean;
   data: InvestorProfileData;
   declarationFiles?: File[];
+  isDeclarationStateVisited?: boolean;
 };
 
 export type MachineEvents =
