@@ -229,6 +229,9 @@ export abstract class ServiceContainers {
         secretsStore.sambaSafetyBaseUrl.arn,
         secretsStore.sambaSafetyAuthUsername.arn,
         secretsStore.sambaSafetyAuthPassword.arn,
+        secretsStore.sentilinkBaseUrl.arn,
+        secretsStore.sentilinkAuthUsername.arn,
+        secretsStore.sentilinkAuthPassword.arn,
       ])
       .apply(
         ([
@@ -293,6 +296,9 @@ export abstract class ServiceContainers {
           sambaSafetyBaseUrl,
           sambaSafetyAuthUsername,
           sambaSafetyAuthPassword,
+          sentilinkBaseUrl,
+          sentilinkAuthUsername,
+          sentilinkAuthPassword,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -526,6 +532,18 @@ export abstract class ServiceContainers {
               {
                 name: 'SAMBA_AUTH_PASSWORD',
                 valueFrom: sambaSafetyAuthPassword,
+              },
+              {
+                name: 'SENTILINK_BASE_URL',
+                valueFrom: sentilinkBaseUrl,
+              },
+              {
+                name: 'SENTILINK_AUTH_USERNAME',
+                valueFrom: sentilinkAuthUsername,
+              },
+              {
+                name: 'SENTILINK_AUTH_PASSWORD',
+                valueFrom: sentilinkAuthPassword,
               },
             ],
             environment: [

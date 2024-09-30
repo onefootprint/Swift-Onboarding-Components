@@ -180,6 +180,9 @@ pub struct Config {
     pub samba_safety_config: SambaSafetyConfig,
 
     #[envconfig(nested = true)]
+    pub sentilink_config: SentilinkConfig,
+
+    #[envconfig(nested = true)]
     pub vault_dr_config: VaultDrConfig,
 }
 
@@ -504,6 +507,16 @@ pub struct SambaSafetyConfig {
     #[envconfig(from = "SAMBA_AUTH_USERNAME")]
     pub auth_username: PiiString,
     #[envconfig(from = "SAMBA_AUTH_PASSWORD")]
+    pub auth_password: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct SentilinkConfig {
+    #[envconfig(from = "SENTILINK_BASE_URL")]
+    pub base_url: PiiString,
+    #[envconfig(from = "SENTILINK_AUTH_USERNAME")]
+    pub auth_username: PiiString,
+    #[envconfig(from = "SENTILINK_AUTH_PASSWORD")]
     pub auth_password: PiiString,
 }
 

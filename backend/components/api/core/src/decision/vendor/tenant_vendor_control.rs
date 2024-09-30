@@ -15,6 +15,7 @@ use newtypes::vendor_credentials::LexisCredentials;
 use newtypes::vendor_credentials::MiddeskCredentials;
 use newtypes::vendor_credentials::NeuroIdApiKeys;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
+use newtypes::vendor_credentials::SentilinkCredentials;
 use newtypes::IncodeEnvironment;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -36,6 +37,7 @@ pub struct TenantVendorControl {
     tbi: Option<newtypes::TenantBusinessInfo>,
     neuro_id_api_key: NeuroIdApiKeys,
     samba_safety_credentials: SambaSafetyCredentials,
+    sentilink_credentials: SentilinkCredentials,
 }
 
 impl TenantVendorControl {
@@ -77,6 +79,10 @@ impl TenantVendorControl {
 
     pub fn samba_credentials(&self) -> SambaSafetyCredentials {
         self.samba_safety_credentials.clone()
+    }
+
+    pub fn sentilink_credentials(&self) -> SentilinkCredentials {
+        self.sentilink_credentials.clone()
     }
 
     pub fn incode_credentials(&self, incode_environment: IncodeEnvironment) -> IncodeCredentials {
@@ -131,6 +137,7 @@ impl TenantVendorControl {
 
         let lexis_credentials = LexisCredentials::from(config);
         let samba_safety_credentials = SambaSafetyCredentials::from(config);
+        let sentilink_credentials = SentilinkCredentials::from(config);
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
         let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
@@ -176,6 +183,7 @@ impl TenantVendorControl {
             tbi,
             neuro_id_api_key,
             samba_safety_credentials,
+            sentilink_credentials,
         };
 
         Ok(control)
@@ -312,6 +320,16 @@ impl From<&Config> for SambaSafetyCredentials {
             base_url: config.samba_safety_config.base_url.clone(),
             auth_username: config.samba_safety_config.auth_username.clone(),
             auth_password: config.samba_safety_config.auth_password.clone(),
+        }
+    }
+}
+
+impl From<&Config> for SentilinkCredentials {
+    fn from(config: &Config) -> Self {
+        SentilinkCredentials {
+            base_url: config.sentilink_config.base_url.clone(),
+            auth_username: config.sentilink_config.auth_username.clone(),
+            auth_password: config.sentilink_config.auth_password.clone(),
         }
     }
 }

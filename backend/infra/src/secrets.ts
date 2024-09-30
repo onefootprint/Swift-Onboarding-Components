@@ -78,6 +78,9 @@ export interface StaticSecrets {
   sambaSafetyBaseUrl: aws.ssm.Parameter;
   sambaSafetyAuthUsername: aws.ssm.Parameter;
   sambaSafetyAuthPassword: aws.ssm.Parameter;
+  sentilinkBaseUrl: aws.ssm.Parameter;
+  sentilinkAuthUsername: aws.ssm.Parameter;
+  sentilinkAuthPassword: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -105,6 +108,7 @@ interface SecretConstants {
   openaiApiKey: string;
   datadogApiKey: string;
   samba: Samba;
+  sentilink: Sentilink;
 }
 
 interface ElasticSecrets {
@@ -213,6 +217,12 @@ interface Neuro {
 
 interface Samba {
   apiKey: string;
+  baseUrl: string;
+  authUsername: string;
+  authPassword: string;
+}
+
+interface Sentilink {
   baseUrl: string;
   authUsername: string;
   authPassword: string;
@@ -549,6 +559,18 @@ export async function LoadSecrets(
     sambaSafetyAuthPassword: createSecretParameter(
       `sambaSafetyAuthPassword-${stack}`,
       secretConstants.samba.authPassword,
+    ),
+    sentilinkBaseUrl: createSecretParameter(
+      `sentilinkBaseUrl-${stack}`,
+      secretConstants.sentilink.baseUrl,
+    ),
+    sentilinkAuthUsername: createSecretParameter(
+      `sentilinkAuthUsername-${stack}`,
+      secretConstants.sentilink.authUsername,
+    ),
+    sentilinkAuthPassword: createSecretParameter(
+      `sentilinkAuthPassword-${stack}`,
+      secretConstants.sentilink.authPassword,
     ),
   };
 }

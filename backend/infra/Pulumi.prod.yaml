@@ -15,19 +15,19 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-      - args:
-          - create-overdue-watchlist-check-tasks
-          - --limit=1000
-        cpuUnits: 1024
-        memoryMB: 2048
-        name: overdue-watchlist
-        schedule: cron(0 0/4 * * ? *)
-      - args:
-          - generate-invoices
-        cpuUnits: 1024
-        memoryMB: 2048
-        name: generate-invoices
-        schedule: cron(0 * * * ? *)
+    - args:
+      - create-overdue-watchlist-check-tasks
+      - --limit=1000
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: overdue-watchlist
+      schedule: cron(0 0/4 * * ? *)
+    - args:
+      - generate-invoices
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: generate-invoices
+      schedule: cron(0 * * * ? *)
     db:
       deletionProtection: true
       maxAcus: 128
@@ -155,6 +155,13 @@ config:
       apiKey:
         secure: v1:bKv7D+zTxpPdjHoO:qfXikLY0jplLN/CmQ4/P0/Ts4akQLZttRFJKjW08xIEQDuFGW5DUK2VnihJq1OVtS0CgV81VJTeHdJfE5YesX4GCRVdO03bnR010AC5tJeyPnHPs/Q==
       fromEmail: verify@noreply.onefootprint.com
+    sentilink:
+      authPassword:
+        secure: v1:UIVHA0OMuVdAWW9h:3OegtLPZn5UOQ/nPdKTn//YRCbmnPjoEpkJKU2X+8lFzNd4rtGsiIu+vUQbqQ0Hi
+      authUsername:
+        secure: v1:z7Oq6w2O3ZXAnoaw:p/U+JrVXZv/kHigcxT4gc+w7GV2KTc77/YaenM6znyJHBmjiBnswd2Ee
+      baseUrl:
+        secure: v1:1XRZ/Jmx/viRqBte:rbvfUHm8LM13Xx1fhdj9UOB2kqmklrEtUabMU3WuKBcxjFXwd5XJdeK795UkwHdHfw==
     socure:
       certificationApiKey:
         secure: v1:hu3JSlQDBxn2W+wI:kawQei7qPaCswzA51+1I4VNbr273Wqs1OSNpH1iLAYuLtMhfTRNDHdgvGoo9SsoaR3z6Yg==
@@ -179,51 +186,40 @@ config:
         secure: v1:Md3FtwNwl+7bxKrr:ihwacs4t71LgGl8FlkIdS4XuCKbyvVEkaNmUku27OFcThcrr87SuH9GLz1RiTvezia4=
       apiKeySecret:
         secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
+      authKeyWebhooks:
+        secure: v1:gt8L7/PMbqD+jhTS:3nMrZw2YBq7z3GgGWgbWpVFra6DqWkVXKJGJC/9xJpKkFWMzE1DbvAu/TudfpWTa
       phoneNumber: "+14152129648"
       whatsappOtpTemplateId: HX728369d784be2b98babfae0e399b8d1f
       whatsappSenderId: MGf4b90d6bc32195702ba16a4606f049bf
-      authKeyWebhooks:
-        secure: v1:gt8L7/PMbqD+jhTS:3nMrZw2YBq7z3GgGWgbWpVFra6DqWkVXKJGJC/9xJpKkFWMzE1DbvAu/TudfpWTa
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
+      authKeyWebhooks:
+        secure: v1:CbIyz98KwI5EGHI4:ok6AkfSs6eN5dopxxb5dWNe9p7IzmKeXjCSzrqrJRSDDAMWxFiQ/SxNGo50Fo8VH
       phoneNumber: "+15105883668"
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
-      authKeyWebhooks:
-        secure: v1:CbIyz98KwI5EGHI4:ok6AkfSs6eN5dopxxb5dWNe9p7IzmKeXjCSzrqrJRSDDAMWxFiQ/SxNGo50Fo8VH
-
     workerTasks:
-      - args:
-          - execute-tasks
-          - --batch-size=50
-          - --poll-period-ms=500
-        cpuUnits: 1024
-        memoryMB: 2048
-        name: execute-tasks
-      - args:
-          - vault-dr-worker
-          - --blob-batch-size=1024
-          - --manifest-batch-size=0
-          - --poll-period-ms=5000
-          - --record-task-concurrency=128
-          - --manifest-task-concurrency=128
-        cpuUnits: 4096
-        memoryMB: 16384
-        name: vault-dr
-      # - args:
-      #     - vault-dr-worker
-      #     - --blob-batch-size=0
-      #     - --manifest-batch-size=1024
-      #     - --poll-period-ms=5000
-      #     - --record-task-concurrency=128
-      #     - --manifest-task-concurrency=128
-      #   cpuUnits: 4096
-      #   memoryMB: 16384
-      #   name: vault-dr-manifest-backfill
+    - args:
+      - execute-tasks
+      - --batch-size=50
+      - --poll-period-ms=500
+      cpuUnits: 1024
+      memoryMB: 2048
+      name: execute-tasks
+    - args:
+      - vault-dr-worker
+      - --blob-batch-size=1024
+      - --manifest-batch-size=0
+      - --poll-period-ms=5000
+      - --record-task-concurrency=128
+      - --manifest-task-concurrency=128
+      cpuUnits: 4096
+      memoryMB: 16384
+      name: vault-dr
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

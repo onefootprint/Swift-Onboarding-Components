@@ -117,7 +117,7 @@ pub struct ComplyAdvantageCredentials {
     pub api_key: PiiString,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct SentilinkCredentials {
     pub base_url: PiiString,
     pub auth_username: PiiString,

@@ -69,8 +69,8 @@ mod tests {
     use newtypes::sentilink::SentilinkProduct;
 
     fn get_credentials() -> SentilinkCredentials {
-        let auth_username = PiiString::from(dotenv::var("SENTILINK_ACCOUNT").unwrap());
-        let auth_password = PiiString::from(dotenv::var("SENTILINK_TOKEN").unwrap());
+        let auth_username = PiiString::from(dotenv::var("SENTILINK_AUTH_USERNAME").unwrap());
+        let auth_password = PiiString::from(dotenv::var("SENTILINK_AUTH_PASSWORD").unwrap());
         let base_url = PiiString::from(dotenv::var("SENTILINK_BASE_URL").unwrap());
         SentilinkCredentials {
             base_url,
