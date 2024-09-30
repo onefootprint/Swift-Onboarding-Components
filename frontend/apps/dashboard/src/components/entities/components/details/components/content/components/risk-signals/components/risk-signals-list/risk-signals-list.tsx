@@ -46,7 +46,7 @@ const RiskSignalsList = () => {
         items={data}
         onChangeSearchText={handleSearchChange}
         onRowClick={handleRowClick}
-        renderActions={() => <Filters />}
+        renderSubActions={() => <Filters />}
         renderTr={renderTr}
       />
       <Details />

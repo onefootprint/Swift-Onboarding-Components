@@ -8,6 +8,7 @@ import type * as CSS from 'csstype';
 import { createFontStyles } from '../../utils';
 import type { LabelTooltipProps } from '../label';
 import Shimmer from '../shimmer';
+import Stack from '../stack';
 import Text from '../text';
 import Tooltip from '../tooltip';
 import TableFilters from './components/table-filters';
@@ -36,6 +37,7 @@ export type TableProps<T> = {
   onChangeSearchText?: (text: string) => void;
   onRowClick?: (item: T) => void;
   renderActions?: () => React.ReactNode;
+  renderSubActions?: () => React.ReactNode;
   renderTr: (row: TableRow<T>) => JSX.Element;
   hasRowEmphasis?: (item: T) => boolean;
   searchPlaceholder?: string;
@@ -54,22 +56,32 @@ const Table = <T,>({
   onChangeSearchText,
   onRowClick,
   renderActions,
+  renderSubActions,
   renderTr,
   hasRowEmphasis,
   searchPlaceholder = 'Search...',
 }: TableProps<T>) => {
-  const shouldRenderFilters = onChangeSearchText || renderActions;
+  const shouldRenderFilters = onChangeSearchText || renderActions || renderSubActions;
   const shouldShowEmptyState = !isLoading && !items?.length;
   const shouldShowData = !isLoading && !!items;
   const columnsCount = columns.length;
 
   return (
     <>
-      {shouldRenderFilters ? (
-        <TableFilters initialValue={initialSearch} onChangeText={onChangeSearchText} placeholder={searchPlaceholder}>
-          {renderActions?.()}
-        </TableFilters>
-      ) : null}
+      {shouldRenderFilters && (
+        <Stack marginBottom={5} flexDirection="column" gap={5}>
+          {(onChangeSearchText || renderActions) && (
+            <TableFilters
+              initialValue={initialSearch}
+              onChangeText={onChangeSearchText}
+              placeholder={searchPlaceholder}
+            >
+              {renderActions?.()}
+            </TableFilters>
+          )}
+          {renderSubActions?.()}
+        </Stack>
+      )}
       <TableContainer aria-live="polite" aria-busy={isLoading} aria-label={ariaLabel}>
         <colgroup>
           {columns.map(column => (

@@ -37,7 +37,7 @@ const MembersTable = ({ data, isPending, errorMessage }: MembersTableProps) => {
       isLoading={isPending}
       items={data}
       onChangeSearchText={handleSearchChange}
-      renderActions={() => <Filters />}
+      renderSubActions={() => <Filters />}
       renderTr={({ item: member }) => <Row member={member} />}
     />
   ) : null;

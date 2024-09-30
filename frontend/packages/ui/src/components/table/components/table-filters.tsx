@@ -2,10 +2,10 @@
 
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 import { useDebounce, useUpdateEffect } from 'usehooks-ts';
 
 import SearchInput from '../../search-input';
+import Stack from '../../stack';
 
 type TableFilterProps = {
   children: React.ReactNode;
@@ -32,29 +32,20 @@ const TableFilter = ({ children, onChangeText, initialValue = '', placeholder }:
   }, [debouncedSearch]);
 
   return (
-    <TableFilterContainer>
+    <Stack gap={5}>
       <SearchInput
         autoCapitalize="off"
         autoComplete="off"
         autoCorrect="off"
         onChangeText={handleChangeText}
         placeholder={placeholder}
+        size="compact"
         value={search}
         width="330px"
-        size="compact"
       />
       {children}
-    </TableFilterContainer>
+    </Stack>
   );
 };
-
-const TableFilterContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    margin-bottom: ${theme.spacing[5]};
-    gap: ${theme.spacing[5]};
-  `}
-`;
 
 export default TableFilter;

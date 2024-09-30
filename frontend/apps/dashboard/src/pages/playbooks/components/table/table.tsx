@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 import useFilters from '../../hooks/use-filters';
+import Filters from './components/filters';
 import Row from './components/row';
 
 type TableProps = {
@@ -47,8 +48,9 @@ const Table = ({ data, isPending, errorMessage }: TableProps) => {
       getKeyForRow={onboardingConfig => onboardingConfig.id}
       isLoading={isPending}
       items={data}
-      onRowClick={handleRowClick}
       onChangeSearchText={handleSearchChange}
+      onRowClick={handleRowClick}
+      renderActions={() => <Filters />}
       renderTr={({ item: playbook }) => <Row playbook={playbook} />}
     />
   );

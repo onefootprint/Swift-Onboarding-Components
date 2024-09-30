@@ -26,7 +26,7 @@ const Table = ({ 'aria-label': ariaLabel, columns, emptyStateText, searchPlaceho
       items={context.data}
       onChangeSearchText={context.onSearchChange}
       onRowClick={context.onRowClick}
-      renderActions={() => <Filters />}
+      renderSubActions={() => <Filters />}
       renderTr={({ item }) => renderTr(item)}
       searchPlaceholder={searchPlaceholder}
     />
