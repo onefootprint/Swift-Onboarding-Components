@@ -1,18 +1,16 @@
-import type { DataIdentifier, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, SupportedIdDocTypes } from '@onefootprint/types';
 import { EntityKind } from '@onefootprint/types';
 
-import useEntityVault from '@/entities/hooks/use-entity-vault';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 import flat from 'flat';
 import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import type { WithEntityProps } from '../../../with-entity';
 import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
 import PersonVault from './components/person-vault';
-import VaultActions, { useDecryptControls, useEditControls } from './components/vault-actions';
-import EditForm from './components/vault-actions/components/edit-vault-drawer/components/edit-form';
-import convertFormData from './components/vault-actions/components/edit-vault-drawer/utils/convert-form-data';
+import VaultActions, { useDecryptControls } from './components/vault-actions';
 import type { DecryptFormData } from './vault.types';
 
 type VaultProps = WithEntityProps;
@@ -20,20 +18,13 @@ type VaultProps = WithEntityProps;
 const Vault = ({ entity }: VaultProps) => {
   const context = useEntityContext();
   const decrypt = useDecryptControls();
-  const edit = useEditControls();
-  const vaultWithTransforms = useEntityVault(entity.id, entity);
-  const showEditForm = edit.inProgress;
-
-  const handleBeforeEditSubmit = (flattenedFormData: Record<string, VaultValue>) => {
-    const previousData = vaultWithTransforms.data?.vault;
-    const convertedData = convertFormData(flattenedFormData, previousData);
-    edit.submitFields(convertedData);
-    edit.saveEdit(entity.id, convertedData, {
-      onSuccess: vaultWithTransforms.update,
-    });
-  };
 
   const handleBeforeDecryptSubmit = (formData: DecryptFormData) => {
+    // Return early if this is triggered from subbmitting EditForm or ViewHistoricalDataForm
+    if (isEmpty(formData)) {
+      return;
+    }
+
     const { documents: documentsMap, ...dis } = formData;
     // Convert the form data
     const fields = Object.keys(flat(dis))
@@ -47,16 +38,10 @@ const Vault = ({ entity }: VaultProps) => {
 
   return (
     <>
-      <VaultActions entity={entity} />
-      {showEditForm ? (
-        <EditForm onSubmit={handleBeforeEditSubmit}>
-          {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
-        </EditForm>
-      ) : (
-        <DecryptForm onSubmit={handleBeforeDecryptSubmit}>
-          {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
-        </DecryptForm>
-      )}
+      <DecryptForm onSubmit={handleBeforeDecryptSubmit}>
+        <VaultActions entity={entity} />
+        {context.kind === EntityKind.person ? <PersonVault /> : <BusinessVault />}
+      </DecryptForm>
     </>
   );
 };

@@ -7,7 +7,7 @@ import { useEventListener } from 'usehooks-ts';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
-import { DECRYPT_VAULT_FORM_ID, EDIT_VAULT_FORM_ID, HEADER_ACTIONS_SELECTOR } from '@/entity/constants';
+import { DECRYPT_VAULT_FORM_ID, HEADER_ACTIONS_SELECTOR } from '@/entity/constants';
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
@@ -29,8 +29,8 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
-  const isIdle = decryptControls.isIdle && editControls.isIdle;
-  const isInProgress = decryptControls.inProgress || editControls.inProgress;
+  const isIdle = decryptControls.isIdle;
+  const isInProgress = decryptControls.inProgress;
   const canDecrypt = !!entity.decryptableAttributes.length;
 
   const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
@@ -86,15 +86,11 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   const renderInProgressControls = () => (
     <Stack gap={3}>
-      <Button variant="secondary" onClick={decryptControls.inProgress ? decryptControls.cancel : editControls.cancel}>
+      <Button variant="secondary" onClick={decryptControls.cancel}>
         {t('cancel')}
       </Button>
-      <Button
-        form={decryptControls.inProgress ? DECRYPT_VAULT_FORM_ID : EDIT_VAULT_FORM_ID}
-        type="submit"
-        loading={!!editControls.isPending}
-      >
-        {decryptControls.inProgress ? t('next') : t('save')}
+      <Button form={DECRYPT_VAULT_FORM_ID} type="submit">
+        {t('next')}
       </Button>
     </Stack>
   );

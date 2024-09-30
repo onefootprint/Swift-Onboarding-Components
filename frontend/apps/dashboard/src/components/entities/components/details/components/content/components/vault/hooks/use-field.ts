@@ -1,18 +1,17 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { BusinessDI, IdDI, isVaultDataDecrypted, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
+import { isVaultDataDecrypted, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 
-import { useDecryptControls, useEditControls } from '../components/vault-actions';
+import { useDecryptControls } from '../components/vault-actions';
 
 const useField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
   const entityVaultWithTransforms = useEntityVault(entity.id, entity);
 
   const decryptControls = useDecryptControls();
-  const editControls = useEditControls();
 
   const showCheckbox = decryptControls.inProgress;
 
@@ -22,30 +21,6 @@ const useField = (entity: Entity) => {
     const value = entityVaultWithTransforms.data?.vault[di];
     return canDecryptField(di) && isVaultDataEncrypted(value);
   };
-
-  const canEditField = (di: DataIdentifier) => {
-    const uneditableFields: DataIdentifier[] = [
-      IdDI.email,
-      IdDI.phoneNumber,
-      BusinessDI.phoneNumber,
-      BusinessDI.beneficialOwners,
-      BusinessDI.kycedBeneficialOwners,
-    ];
-    if (uneditableFields.includes(di)) {
-      return false;
-    }
-    // temporary!
-    if (di in BusinessDI) {
-      return false;
-    }
-    // BE updates both ssn4 and ssn9 when ssn9 is changed and errors if only ssn4 is updated
-    if (di === IdDI.ssn4) {
-      return !entityVaultWithTransforms.data?.vault[IdDI.ssn9];
-    }
-    return di.startsWith('id') || di.startsWith('business');
-  };
-
-  const showEditView = editControls.inProgress;
 
   const getProps = (di: DataIdentifier) => {
     const value = entityVaultWithTransforms.data?.vault[di];
@@ -61,8 +36,6 @@ const useField = (entity: Entity) => {
       transforms,
       isDecrypted: isVaultDataDecrypted(value),
       isEmpty: isVaultDataEmpty(value),
-      canEdit: canEditField(di),
-      showEditView,
     };
   };
 

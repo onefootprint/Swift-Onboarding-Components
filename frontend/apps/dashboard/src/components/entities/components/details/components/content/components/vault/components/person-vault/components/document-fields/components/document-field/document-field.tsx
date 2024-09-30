@@ -1,12 +1,11 @@
 import { useToggle } from '@onefootprint/hooks';
 import type { Document, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
-import { Drawer, LinkButton, Text } from '@onefootprint/ui';
+import { Drawer, LinkButton } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { useEditControls } from '../../../../../vault-actions';
 import { getDocumentVersion } from '../../utils';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
@@ -28,7 +27,6 @@ const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) =
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
     getDocumentVersion(documents[documents.length - 1], documents),
   );
-  const { inProgress: showEditView } = useEditControls();
 
   let currentDocument = documents.find(document => document?.completedVersion?.toString() === activeDocumentVersion);
   if (!currentDocument) {
@@ -42,13 +40,7 @@ const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) =
   return documentType ? (
     <Container>
       <Inner>
-        {showEditView ? (
-          <Text variant="body-3" color="tertiary">
-            {t('cannot-edit')}
-          </Text>
-        ) : (
-          <LinkButton onClick={show}>{t('see-details')}</LinkButton>
-        )}
+        <LinkButton onClick={show}>{t('see-details')}</LinkButton>
       </Inner>
       <Drawer
         closeAriaLabel={t('close-aria-label')}

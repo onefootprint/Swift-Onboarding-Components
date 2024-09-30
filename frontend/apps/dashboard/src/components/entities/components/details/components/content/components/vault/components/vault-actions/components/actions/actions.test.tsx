@@ -23,6 +23,7 @@ import {
   entityWithPhoneFixture,
   entityWithoutPhoneFixture,
   withData,
+  withDocuments,
   withEntity,
   withLists,
   withTags,
@@ -43,7 +44,7 @@ const renderActions = async (isNoPhone?: boolean) =>
 
 describe('<Actions />', () => {
   beforeEach(() => {
-    mockRouter.setCurrentUrl(`/entities/${entityId}&mode=sandbox`);
+    mockRouter.setCurrentUrl(`/entities/${entityId}`);
     mockRouter.query = {
       id: entityId,
     };
@@ -51,6 +52,7 @@ describe('<Actions />', () => {
     withPlaybooks();
     withLists();
     withTags();
+    withDocuments();
     withData();
     mockRequest({
       method: 'get',

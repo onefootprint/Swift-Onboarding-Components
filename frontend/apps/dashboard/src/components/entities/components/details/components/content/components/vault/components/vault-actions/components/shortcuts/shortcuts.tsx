@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 
 import useDecryptControls from '../../hooks/use-decrypt-controls';
-import useEditControls from '../../hooks/use-edit-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
+import EditVaultDrawer from '../edit-vault-drawer';
 import ManualReviewDialog from '../manual-review/components/manual-review-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import Footer from './components/footer/footer';
@@ -43,7 +43,6 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const { t } = useTranslation('common');
   const { data: entityData } = useCurrentEntity();
   const decryptControls = useDecryptControls();
-  const editControls = useEditControls();
   const { kind } = useEntityContext();
   const canDecrypt = !!entity.decryptableAttributes.length;
 
@@ -66,6 +65,10 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   const handleOpenFailDialog = () => {
     setOpenDialog(CmdKDialog.reviewFail);
+  };
+
+  const handleOpenEditVaultDrawer = () => {
+    setOpenDialog(CmdKDialog.editVault);
   };
 
   const handleOpenRequestMoreInfoDialog = () => {
@@ -155,7 +158,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label: t('components.cmdk.actions.edit'),
           value: 'edit',
-          onSelect: editControls.start,
+          onSelect: handleOpenEditVaultDrawer,
           closeAfterSelect: true,
         },
         {
@@ -216,6 +219,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         </Command.List>
         <Footer />
       </Command.Container>
+      {openDialog === CmdKDialog.editVault && <EditVaultDrawer open onClose={handleCloseDialog} />}
       {openDialog === CmdKDialog.requestMoreInfo && <RequestMoreInfoDialog open onClose={handleCloseDialog} />}
       {(openDialog === CmdKDialog.reviewPass || openDialog === CmdKDialog.reviewFail) && (
         <ManualReviewDialog

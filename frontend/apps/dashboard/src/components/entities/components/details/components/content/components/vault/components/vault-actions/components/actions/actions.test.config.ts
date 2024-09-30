@@ -4,6 +4,7 @@ import {
   ActorKind,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  DataKind,
   DecisionStatus,
   EntityKind,
   EntityStatus,
@@ -204,16 +205,57 @@ export const withTimeline = (entity = entityWithPhoneFixture, response = timelin
     response,
   });
 
-export const withData = (entity = entityWithPhoneFixture, response = {}) =>
+export const historicalDataFixture = [
+  {
+    identifier: IdDI.lastName,
+    source: 'hosted',
+    isDecryptable: true,
+    dataKind: DataKind.vaultData,
+    value: null,
+    transforms: {
+      prefix_1: 'D',
+    },
+  },
+  {
+    identifier: IdDI.firstName,
+    source: 'hosted',
+    isDecryptable: true,
+    dataKind: DataKind.vaultData,
+    value: 'Jane',
+    transforms: {},
+  },
+];
+
+export const withData = (entity = entityWithPhoneFixture, response = historicalDataFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/data`,
     response,
   });
 
-export const withTags = (entity = entityWithPhoneFixture, response = []) =>
+export const tagsFixture = [
+  {
+    id: 'tag_id_1',
+    tag: 'Tag 1',
+    createdAt: '2023-09-05T11:16:13.599001Z',
+  },
+  {
+    id: 'tag_id_2',
+    tag: 'Tag 2',
+    createdAt: '2023-09-05T11:16:13.599001Z',
+  },
+];
+
+export const withTags = (entity = entityWithPhoneFixture, response = tagsFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/tags`,
+    response,
+  });
+
+export const withDocuments = (entity = entityWithPhoneFixture, response = []) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/documents`,
     response,
   });

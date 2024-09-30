@@ -8,6 +8,7 @@ import EditForm from './components/edit-form';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import { useEffectOnce } from 'usehooks-ts';
 import BusinessVaultFieldsets from './components/business-vault-fieldsets';
 import PersonVaultFieldsets from './components/person-vault-fieldsets';
 import convertFormData from './utils/convert-form-data';
@@ -26,6 +27,15 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
   const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
   const isPersonVault = entity.kind === EntityKind.person;
 
+  useEffectOnce(() => {
+    editControls.start();
+  });
+
+  const handleClose = () => {
+    editControls.cancel();
+    onClose();
+  };
+
   const handleBeforeEditSubmit = (flattenedFormData: Record<string, VaultValue>) => {
     const previousData = vaultData?.vault;
     const convertedData = convertFormData(flattenedFormData, previousData);
@@ -33,7 +43,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
     editControls.saveEdit(entity.id, convertedData, {
       onSuccess: response => {
         updateVault(response);
-        onClose();
+        handleClose();
       },
     });
   };
@@ -67,7 +77,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
       }}
       secondaryButton={{
         label: t('cancel'),
-        onClick: editControls.cancel,
+        onClick: handleClose,
       }}
     >
       <Stack direction="column" gap={7}>

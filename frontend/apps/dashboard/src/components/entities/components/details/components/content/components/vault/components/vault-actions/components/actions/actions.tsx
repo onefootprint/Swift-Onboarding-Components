@@ -4,15 +4,16 @@ import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { WithEntityProps } from '@/entity/components/with-entity';
 import useTags from '@/entity/hooks/use-tags';
 import PermissionGate from 'src/components/permission-gate';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
-import type { WithEntityProps } from '../../../../../../../with-entity';
-import useEditControls from '../../hooks/use-edit-controls';
+import DecryptMachineProvider from '../../../../../decrypt-machine';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
 import AddToListDialog from '../add-to-list-dialog';
 import EditTagsDialog from '../edit-tags-dialog';
+import EditVaultDrawer from '../edit-vault-drawer';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
@@ -27,6 +28,7 @@ enum ActionDialog {
   summarize = 4,
   uploadDoc = 5,
   editTags = 6,
+  editVault = 7,
 }
 
 const DROPDOWN_ITEM_HEIGHT = '32px';
@@ -36,7 +38,6 @@ const Actions = ({ entity }: WithEntityProps) => {
   const { t: newT } = useTranslation('entity-details', {
     keyPrefix: 'header-default.actions',
   });
-  const editControls = useEditControls();
   const { data: tags } = useTags(entity.id);
   // Both states are necessary to ensure that the dropdown is closed before the dialog is opened
   // otherwise after the dialog is closed, a transparent overlay remains blocking the screen
@@ -51,6 +52,11 @@ const Actions = ({ entity }: WithEntityProps) => {
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
+  };
+
+  const handleOpenEditVaultDrawer = () => {
+    setDropdownOpen(false);
+    setOpenDialog(ActionDialog.editVault);
   };
 
   const handleOpenRequestMoreInfoDialog = () => {
@@ -90,20 +96,20 @@ const Actions = ({ entity }: WithEntityProps) => {
 
   return entity.kind === EntityKind.person ? (
     <>
-      <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
-        <Dropdown.Trigger asChild>
-          <Box>
-            <IconButton variant="outline" aria-label={t('cta')} size="compact">
+      <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
+        <Dropdown.Trigger>
+          <IconButton variant="outline" aria-label={t('cta')} size="compact">
+            <Box>
               <IcoDotsHorizontal24 />
-            </IconButton>
-          </Box>
+            </Box>
+          </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
             <Dropdown.Group>
               <Dropdown.GroupTitle>{t('groups.user-management')}</Dropdown.GroupTitle>
               {hasPermission(RoleScopeKind.writeEntities) && (
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={editControls.start}>
+                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleOpenEditVaultDrawer}>
                   {t('edit-user.label')}
                 </Dropdown.Item>
               )}
@@ -155,6 +161,9 @@ const Actions = ({ entity }: WithEntityProps) => {
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
+      <DecryptMachineProvider>
+        <EditVaultDrawer open={openDialog === ActionDialog.editVault} onClose={handleCloseDialog} />
+      </DecryptMachineProvider>
       <RequestMoreInfoDialog open={openDialog === ActionDialog.requestMoreInfo} onClose={handleCloseDialog} />
       <UpdateAuthDialog open={openDialog === ActionDialog.auth} onClose={handleCloseDialog} />
       <AddToListDialog open={openDialog === ActionDialog.addToList} onClose={handleCloseDialog} />
@@ -166,11 +175,19 @@ const Actions = ({ entity }: WithEntityProps) => {
       )}
     </>
   ) : (
-    <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
-      <IconButton variant="outline" aria-label={t('edit-business.label')} size="compact" onClick={editControls.start}>
-        <IcoPencil16 />
-      </IconButton>
-    </PermissionGate>
+    <>
+      <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-business.not-allowed')}>
+        <IconButton
+          variant="outline"
+          aria-label={t('edit-business.label')}
+          size="compact"
+          onClick={handleOpenEditVaultDrawer}
+        >
+          <IcoPencil16 />
+        </IconButton>
+      </PermissionGate>
+      <EditVaultDrawer open={openDialog === ActionDialog.editVault} onClose={handleCloseDialog} />
+    </>
   );
 };
 

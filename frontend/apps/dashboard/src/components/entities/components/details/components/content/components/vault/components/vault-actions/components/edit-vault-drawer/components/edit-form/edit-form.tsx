@@ -6,7 +6,7 @@ import { EDIT_VAULT_FORM_ID } from '@/entity/constants';
 import type { VaultValue } from '@onefootprint/types';
 import isPlainObject from 'lodash/isPlainObject';
 import { useEffect } from 'react';
-import { useEditControls } from '../../../..';
+import useEditControls from '../../../../hooks/use-edit-controls';
 import type { EditFormData } from '../../edit-vault-drawer.types';
 
 export type EditFormProps = {
