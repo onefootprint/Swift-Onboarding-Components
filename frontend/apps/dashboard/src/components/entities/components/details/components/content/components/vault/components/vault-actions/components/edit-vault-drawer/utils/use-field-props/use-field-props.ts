@@ -18,6 +18,8 @@ import {
   IdDI,
   InvestorProfileAnnualIncome,
   InvestorProfileDI,
+  InvestorProfileFundingSources,
+  InvestorProfileInvestmentGoal,
   InvestorProfileNetWorth,
   InvestorProfileRiskTolerance,
   UsLegalStatus,
@@ -31,7 +33,7 @@ import useFormValues, { type EditDetailsFormData } from '../use-form-values';
 import validateCitizenships, { CitizenshipsValidationError } from '../validate-citizenships';
 import validateName, { NameValidationError } from '../validate-name';
 
-type SelectOption = {
+type Option = {
   label: string;
   value: string;
 };
@@ -53,18 +55,50 @@ type InputOptions = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'pattern'>
 
 type SelectOptions = React.SelectHTMLAttributes<HTMLSelectElement> &
   Common & {
-    options: SelectOption[];
-    defaultOption?: SelectOption;
+    options: Option[];
+    defaultOption?: Option;
+  };
+
+type RadioOptions = React.InputHTMLAttributes<HTMLInputElement> &
+  Common & {
+    options: Option[];
+    defaultSelectedOption?: Option;
+    hint?: string;
+    hasError?: boolean;
+  };
+
+type CheckboxOptions = React.InputHTMLAttributes<HTMLInputElement> &
+  Common & {
+    options: Option[];
+    defaultSelectedOptions?: Option[];
+    hint?: string;
+    hasError?: boolean;
   };
 
 type FieldProps =
   | {
       inputOptions: InputOptions;
       selectOptions?: never;
+      radioOptions?: never;
+      checkboxOptions?: never;
     }
   | {
       inputOptions?: never;
       selectOptions: SelectOptions;
+      radioOptions?: never;
+      checkboxOptions?: never;
+    }
+  | {
+      inputOptions?: never;
+      selectOptions?: never;
+      radioOptions?: never;
+      checkboxOptions: CheckboxOptions;
+    }
+  | {
+      inputOptions?: never;
+      selectOptions?: never;
+      radioOptions: RadioOptions;
+      checkboxOptions?: never;
     };
 
 const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
@@ -239,7 +273,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
             value: EMPTY_SELECT_VALUE,
             label: entityT('legal-status.nationality-mapping.none'),
           },
-          ...(COUNTRIES as SelectOption[]),
+          ...(COUNTRIES as Option[]),
         ],
         validate: (value: string) => {
           if (formLegalStatus !== EMPTY_SELECT_VALUE && value === EMPTY_SELECT_VALUE) {
@@ -342,7 +376,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   }
   if (di === InvestorProfileDI.annualIncome) {
     return {
-      selectOptions: {
+      radioOptions: {
         options: [
           { value: InvestorProfileAnnualIncome.le25k, label: entityT('investor-profile.annual-income-mapping.le25k') },
           {
@@ -385,7 +419,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   }
   if (di === InvestorProfileDI.netWorth) {
     return {
-      selectOptions: {
+      radioOptions: {
         options: [
           { value: InvestorProfileNetWorth.le50k, label: entityT('investor-profile.net-worth-mapping.le50k') },
           {
@@ -416,9 +450,85 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
       },
     };
   }
+  if (di === InvestorProfileDI.fundingSources) {
+    return {
+      checkboxOptions: {
+        options: [
+          {
+            value: InvestorProfileFundingSources.employmentIncome,
+            label: entityT('investor-profile.funding-sources-mapping.employment_income'),
+          },
+          {
+            value: InvestorProfileFundingSources.investments,
+            label: entityT('investor-profile.funding-sources-mapping.investments'),
+          },
+          {
+            value: InvestorProfileFundingSources.inheritance,
+            label: entityT('investor-profile.funding-sources-mapping.inheritance'),
+          },
+          {
+            value: InvestorProfileFundingSources.businessIncome,
+            label: entityT('investor-profile.funding-sources-mapping.business_income'),
+          },
+          {
+            value: InvestorProfileFundingSources.savings,
+            label: entityT('investor-profile.funding-sources-mapping.savings'),
+          },
+          {
+            value: InvestorProfileFundingSources.family,
+            label: entityT('investor-profile.funding-sources-mapping.family'),
+          },
+        ],
+        validate: (value: string) => {
+          if (!value) {
+            return entityT('errors.funding-sources.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.investmentGoals) {
+    return {
+      checkboxOptions: {
+        options: [
+          {
+            value: InvestorProfileInvestmentGoal.growth,
+            label: entityT('investor-profile.investment-goals-mapping.growth'),
+          },
+          {
+            value: InvestorProfileInvestmentGoal.income,
+            label: entityT('investor-profile.investment-goals-mapping.income'),
+          },
+          {
+            value: InvestorProfileInvestmentGoal.preserveCapital,
+            label: entityT('investor-profile.investment-goals-mapping.preserve_capital'),
+          },
+          {
+            value: InvestorProfileInvestmentGoal.speculation,
+            label: entityT('investor-profile.investment-goals-mapping.speculation'),
+          },
+          {
+            value: InvestorProfileInvestmentGoal.diversification,
+            label: entityT('investor-profile.investment-goals-mapping.diversification'),
+          },
+          {
+            value: InvestorProfileInvestmentGoal.other,
+            label: entityT('investor-profile.investment-goals-mapping.other'),
+          },
+        ],
+        validate: (value: string) => {
+          if (!value) {
+            return entityT('errors.investment-goals.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
   if (di === InvestorProfileDI.riskTolerance) {
     return {
-      selectOptions: {
+      radioOptions: {
         options: [
           {
             value: InvestorProfileRiskTolerance.conservative,
@@ -447,7 +557,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.country || di === BusinessDI.country) {
     return {
       selectOptions: {
-        options: COUNTRIES as SelectOption[],
+        options: COUNTRIES as Option[],
         validate: (value: string) => {
           if (!value) {
             return previousValue ? entityT('errors.country.required') : true;
