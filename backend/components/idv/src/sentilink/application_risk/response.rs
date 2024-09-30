@@ -1,8 +1,10 @@
 use crate::sentilink::error::error_code::SentilinkErrorCode;
+use crate::sentilink::error::Error;
 use crate::sentilink::SentilinkResponseStatus;
 use crate::sentilink::SentilinkResult;
 use chrono::DateTime;
 use chrono::Utc;
+use newtypes::sentilink::SentilinkProduct;
 use newtypes::ScrubbedPiiJsonValue;
 use serde::Deserialize;
 use serde::Serialize;
@@ -38,7 +40,32 @@ impl ApplicationRiskResponse {
         SentilinkResponseStatus::from_str(self.response_status.as_str())
             .unwrap_or(SentilinkResponseStatus::Failure)
     }
+
+    pub fn validate(self) -> SentilinkResult<ValidatedApplicationRiskResponse> {
+        let synthentic = self
+            .sentilink_synthetic_score
+            .ok_or(Error::MissingScore(SentilinkProduct::SyntheticScore))?
+            .score()?;
+        let id_theft = self
+            .sentilink_id_theft_score
+            .ok_or(Error::MissingScore(SentilinkProduct::IdTheftScore))?
+            .score()?;
+
+        let validated = ValidatedApplicationRiskResponse {
+            synthetic_score: synthentic,
+            id_theft_score: id_theft,
+        };
+
+        Ok(validated)
+    }
 }
+
+// Note: Assumes we are always requesting synthetic and ID theft!
+pub struct ValidatedApplicationRiskResponse {
+    pub synthetic_score: Score,
+    pub id_theft_score: Score,
+}
+
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]

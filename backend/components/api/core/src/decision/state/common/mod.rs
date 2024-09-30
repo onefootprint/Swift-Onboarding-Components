@@ -45,7 +45,7 @@ use db::PgConn;
 use db::TxnPgConn;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
-use idv::sentilink::application_risk::response::ApplicationRiskResponse;
+use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use itertools::Itertools;
 use newtypes::vendor_api_struct::IncodeFetchOcr;
 use newtypes::CipKind;
@@ -147,7 +147,7 @@ pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Optio
 pub async fn run_application_risk(
     state: &State,
     wf_id: &WorkflowId,
-) -> FpResult<Option<ApplicationRiskResponse>> {
+) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
         .db_pool

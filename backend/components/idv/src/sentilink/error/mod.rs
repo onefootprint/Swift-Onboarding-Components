@@ -26,4 +26,6 @@ pub enum Error {
     MissingRequiredField(IdentityDataKind),
     #[error("AssertionError: {0}")]
     AssertionError(String),
+    #[error("Missing score {0:?}")]
+    MissingScore(SentilinkProduct),
 }

@@ -12,11 +12,12 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
-use idv::sentilink::application_risk::response::ApplicationRiskResponse;
+use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use idv::sentilink::SentilinkApplicationRiskRequest;
 use newtypes::sentilink::SentilinkProduct;
 use newtypes::SentilinkApplicationRisk;
 use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 
 
@@ -25,7 +26,7 @@ pub async fn run_sentilink_application_risk(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
-) -> FpResult<Option<ApplicationRiskResponse>> {
+) -> FpResult<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
 
     let (vw, tenant_id, curr_seqno) = state
@@ -99,7 +100,7 @@ pub async fn run_sentilink_application_risk(
         VendorAPI::SentilinkApplicationRisk,
     );
 
-    let _ = args.save(&state.db_pool).await?;
+    let (vres_id, _) = args.save(&state.db_pool).await?;
 
     let resp = res
         .map_err(into_fp_error)?
@@ -107,5 +108,7 @@ pub async fn run_sentilink_application_risk(
         .into_success()
         .map_err(into_fp_error)?;
 
-    Ok(Some(resp))
+    let validated = resp.validate().map_err(into_fp_error)?;
+
+    Ok(Some((validated, vres_id)))
 }

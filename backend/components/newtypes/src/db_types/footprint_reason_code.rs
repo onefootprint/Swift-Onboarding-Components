@@ -551,6 +551,16 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Email, additional_scopes = vec![], match_level = None]
         #[note = "High risk email domain", severity = SignalSeverity::Low,  description = "The domain has been reported as fraud or is potentially fraudulent."]
         EmailHighRiskDomain,
+        // ~~~~~~~~~~~~~ Sythentic ~~~~~~~~~~~~~
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "High synthetic identity fraud risk", severity = SignalSeverity::High,  description = "The information submitted has a high risk of being a synthetic identity. "]
+        SyntheticIdentityHighRisk,
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "Medium synthetic identity fraud risk", severity = SignalSeverity::Medium,  description = "The information submitted has a medium risk of being a synthetic identity."]
+        SyntheticIdentityMediumRisk,
+        #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Address, SignalScope::Name ], match_level = None]
+        #[note = "Lower synthetic identity fraud risk", severity = SignalSeverity::Low,  description = "The information submitted has a lower risk of being a synthetic identity."]
+        SyntheticIdentityLowRisk,
 
         // ~~~~~~~~~~~~ Phone Number ~~~~~~~~~~~~
 

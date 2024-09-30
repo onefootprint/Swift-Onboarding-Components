@@ -51,6 +51,7 @@ use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentRequestKind;
@@ -159,6 +160,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Option<VendorResult>,
         Option<(NeuroIdAnalyticsResponse, VerificationResultId)>,
         Option<(LookupV2Response, VerificationResultId)>,
+        Option<(ValidatedApplicationRiskResponse, VerificationResultId)>,
     )>;
 
     #[tracing::instrument(
@@ -262,8 +264,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         // TODO: Figure out the right way to represent in our product (e.g. VerificationChecks)
         //   FF is temporary to avoid serializing stuff in DB that we need to fix later
         // TODO: FP reason codes
-        // TODO: models for storing score-specific reason codes
-        let _ = if state
+        // TODO: models for storing score-specific reason codes?
+        let sentilink_result = if state
             .ff_client
             .flag(BoolFlag::RunSentilinkForPlaybookTemporary(&obc.key))
         {
@@ -297,6 +299,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             curp_result,
             neuro_result,
             twilio_result,
+            sentilink_result,
         )))
     }
 
@@ -316,6 +319,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             curp_result,
             neuro_result,
             twilio_result,
+            sentilink_result,
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
@@ -351,6 +355,17 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
             let rsg = RiskSignalGroup::get_or_create(conn, &self.sv_id, RiskSignalGroupKind::Behavior)?;
             RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
+        }
+
+        if let Some((sentilink_res, vres_id)) = sentilink_result {
+            let vendor_api: VendorAPI = VendorAPI::SentilinkApplicationRisk;
+            let sentilink_frc = features::sentilink::footprint_reason_codes(&sentilink_res)
+                .into_iter()
+                .map(|frc| (frc, vendor_api, vres_id.clone()))
+                .collect();
+
+            let rsg = RiskSignalGroup::create(conn, &self.sv_id, RiskSignalGroupKind::Synthetic)?;
+            RiskSignal::bulk_add(conn, sentilink_frc, false, rsg.id)?;
         }
 
         if let Some((twilio_res, vres_id)) = twilio_result {

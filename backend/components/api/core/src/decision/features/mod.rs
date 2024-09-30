@@ -10,6 +10,7 @@ pub mod lexis;
 pub mod middesk;
 pub mod neuro_id;
 pub mod risk_signals;
+pub mod sentilink;
 pub mod socure_idplus;
 pub mod stytch;
 pub mod twilio;
