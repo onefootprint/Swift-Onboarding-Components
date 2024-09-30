@@ -40,22 +40,6 @@ enum DataIdentifier {
   idCitizenships("id.citizenships"),
   idUsTaxId("id.us_tax_id"),
   idItin("id.itin"),
-  businessName("business.name"),
-  businessDba("business.dba"),
-  businessWebsite("business.website"),
-  businessPhoneNumber("business.phone_number"),
-  businessTin("business.tin"),
-  businessCorporationType("business.corporation_type"),
-  businessBeneficialOwners("business.beneficial_owners"),
-  businessKycedBeneficialOwners("business.kyced_beneficial_owners"),
-  businessAddressLine1("business.address_line1"),
-  businessAddressLine2("business.address_line2"),
-  businessCity("business.city"),
-  businessState("business.state"),
-  businessCountry("business.country"),
-  businessZip("business.zip"),
-  businessFormationState("business.formation_state"),
-  businessFormationDate("business.formation_date"),
   custom("custom.");
 
   final String value;
@@ -131,38 +115,6 @@ enum DataIdentifier {
         return DataIdentifier.idUsTaxId;
       case "id.itin":
         return DataIdentifier.idItin;
-      case "business.name":
-        return DataIdentifier.businessName;
-      case "business.dba":
-        return DataIdentifier.businessDba;
-      case "business.website":
-        return DataIdentifier.businessWebsite;
-      case "business.phone_number":
-        return DataIdentifier.businessPhoneNumber;
-      case "business.tin":
-        return DataIdentifier.businessTin;
-      case "business.corporation_type":
-        return DataIdentifier.businessCorporationType;
-      case "business.beneficial_owners":
-        return DataIdentifier.businessBeneficialOwners;
-      case "business.kyced_beneficial_owners":
-        return DataIdentifier.businessKycedBeneficialOwners;
-      case "business.address_line1":
-        return DataIdentifier.businessAddressLine1;
-      case "business.address_line2":
-        return DataIdentifier.businessAddressLine2;
-      case "business.city":
-        return DataIdentifier.businessCity;
-      case "business.state":
-        return DataIdentifier.businessState;
-      case "business.country":
-        return DataIdentifier.businessCountry;
-      case "business.zip":
-        return DataIdentifier.businessZip;
-      case "business.formation_state":
-        return DataIdentifier.businessFormationState;
-      case "business.formation_date":
-        return DataIdentifier.businessFormationDate;
       case "custom":
         return DataIdentifier.custom;
       default:

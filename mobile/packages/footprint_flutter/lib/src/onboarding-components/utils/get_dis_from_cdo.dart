@@ -40,29 +40,6 @@ List<DataIdentifier> getDisFromCdo(CollectedDataOption cdo) {
         DataIdentifier.idCitizenships,
         DataIdentifier.idNationality,
       ];
-    case CollectedDataOption.businessName:
-      return [DataIdentifier.businessName, DataIdentifier.businessDba];
-    case CollectedDataOption.businessTin:
-      return [DataIdentifier.businessTin];
-    case CollectedDataOption.businessAddress:
-      return [
-        DataIdentifier.businessAddressLine1,
-        DataIdentifier.businessAddressLine2,
-        DataIdentifier.businessCity,
-        DataIdentifier.businessState,
-        DataIdentifier.businessZip,
-        DataIdentifier.businessCountry,
-      ];
-    case CollectedDataOption.businessPhoneNumber:
-      return [DataIdentifier.businessPhoneNumber];
-    case CollectedDataOption.businessWebsite:
-      return [DataIdentifier.businessWebsite];
-    case CollectedDataOption.businessCorporationType:
-      return [DataIdentifier.businessCorporationType];
-    case CollectedDataOption.businessBeneficialOwners:
-      return [DataIdentifier.businessBeneficialOwners];
-    case CollectedDataOption.businessKycedBeneficialOwners:
-      return [DataIdentifier.businessKycedBeneficialOwners];
     case CollectedDataOption.investorProfile:
       return [
         DataIdentifier.investorEmploymentStatus,

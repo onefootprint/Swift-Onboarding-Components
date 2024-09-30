@@ -31,6 +31,7 @@ Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
   final headers = {
     'Content-Type': 'application/json',
     'X-Onboarding-Config-Key': requestData.obConfig,
+    'x-fp-client-version': clientVersion
   };
   if (requestData.sandboxId != null) {
     headers['X-Sandbox-Id'] = requestData.sandboxId!;
@@ -62,7 +63,11 @@ Future<ChallengeResponse> loginChallenge(
     {String kind = "sms", required String token}) async {
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify/login_challenge'),
-    headers: {'Content-Type': 'application/json', 'X-Fp-Authorization': token},
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Fp-Authorization': token,
+      'x-fp-client-version': clientVersion,
+    },
     body: jsonEncode({"preferred_challenge_kind": kind}),
   );
 
@@ -89,7 +94,8 @@ Future<ChallengeResponse> signupChallenge(
   final headers = {
     'Content-Type': 'application/json',
     'X-Onboarding-Config-Key': requestData.obConfig,
-    'X-Fp-Is-Components-Sdk': 'true'
+    'X-Fp-Is-Components-Sdk': 'true',
+    'x-fp-client-version': clientVersion
   };
   if (requestData.sandboxId != null) {
     headers['X-Sandbox-Id'] = requestData.sandboxId!;

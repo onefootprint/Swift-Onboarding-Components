@@ -7,7 +7,11 @@ import 'package:http/http.dart' as http;
 Future<ValidationTokenResponse> validateOnboarding(String token) async {
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/onboarding/validate'),
-    headers: {'Content-Type': 'application/json', 'X-Fp-Authorization': token},
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Fp-Authorization': token,
+      'x-fp-client-version': clientVersion,
+    },
   );
 
   if (response.statusCode == 200) {

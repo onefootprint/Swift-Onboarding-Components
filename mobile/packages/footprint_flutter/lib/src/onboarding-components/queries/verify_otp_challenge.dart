@@ -1,5 +1,6 @@
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/init_onboarding_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'dart:convert';
 
@@ -30,7 +31,8 @@ Future<VerificationResponse> verify(
     Uri.parse('$apiBaseUrl/hosted/identify/verify'),
     headers: {
       'Content-Type': 'application/json',
-      'X-Fp-Authorization': requestData.token
+      'X-Fp-Authorization': requestData.token,
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode({
       'challenge_response': requestData.verificationCode,
@@ -50,7 +52,11 @@ Future<VerificationResponse> verify(
 Future<ValidationTokenResponse> getValidationToken(String token) async {
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/identify/validation_token'),
-    headers: {'Content-Type': 'application/json', 'X-Fp-Authorization': token},
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Fp-Authorization': token,
+      'x-fp-client-version': clientVersion,
+    },
   );
 
   if (response.statusCode == 200) {
@@ -61,13 +67,15 @@ Future<ValidationTokenResponse> getValidationToken(String token) async {
   }
 }
 
-Future initOnboarding(String token, OverallOutcome? overallOutcome) async {
+Future<InitOnboardingResponse> initOnboarding(
+    String token, OverallOutcome? overallOutcome) async {
   final fixtureResult = overallOutcome == null ? null : "$overallOutcome";
   final response = await http.post(
     Uri.parse('$apiBaseUrl/hosted/onboarding'),
     headers: {
       'Content-Type': 'application/json',
       'X-Fp-Authorization': token,
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode({
       'fixture_result': fixtureResult,
@@ -76,7 +84,7 @@ Future initOnboarding(String token, OverallOutcome? overallOutcome) async {
 
   if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
-    return responseBody;
+    return InitOnboardingResponse.fromJson(responseBody);
   } else {
     throw Exception('Failed to initialize onboarding');
   }
@@ -87,7 +95,8 @@ Future<VaultingTokenResponse> createVaultingToken(String authToken) async {
     Uri.parse('$apiBaseUrl/hosted/user/tokens'),
     headers: {
       'Content-Type': 'application/json',
-      'X-Fp-Authorization': authToken
+      'X-Fp-Authorization': authToken,
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode({
       "requested_scope": "onboarding_components",
@@ -108,15 +117,18 @@ Future<VerifyOtpChallengeResponse> verifyOtpChallenge(
   final authToken = response.authToken;
   late String vTok;
   String? vaultingToken;
+  late String updatedAuthToken;
   if (requestData.onboardingConfigKind == OnboardingConfigKind.auth) {
     vTok = (await validateOnboarding(authToken)).validationToken;
   } else {
     vTok = (await getValidationToken(authToken)).validationToken;
-    await initOnboarding(authToken, requestData.overallOutcome);
-    vaultingToken = (await createVaultingToken(authToken)).token;
+    updatedAuthToken =
+        (await initOnboarding(authToken, requestData.overallOutcome))
+            .authToken; // treat this updated auth token as the new auth token
+    vaultingToken = (await createVaultingToken(updatedAuthToken)).token;
   }
   return (
-    authToken: authToken,
+    authToken: updatedAuthToken,
     vaultingToken: vaultingToken,
     validationToken: vTok,
   );

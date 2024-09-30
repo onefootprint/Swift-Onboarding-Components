@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
@@ -33,6 +34,11 @@ class _WrapperState extends ConsumerState<Wrapper> {
     // we initialize the provider with the context after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getOnboardingConfig(widget.publicKey).then((config) {
+        if (config.kind == OnboardingConfigKind.kyb) {
+          throw Exception(
+              'KYB is not supported yet in the sdk. Please use the hosted flow for KYB.');
+        }
+
         if (config.isLive && widget.sandboxId != null) {
           throw Exception('sandboxId is not allowed in live mode');
         }

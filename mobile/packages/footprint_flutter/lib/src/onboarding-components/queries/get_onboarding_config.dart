@@ -9,7 +9,10 @@ Future<OnboardingConfig> _getOnboardingConfigRecursive(
   try {
     var response = await http.get(
       Uri.parse('$apiBaseUrl/hosted/onboarding/config'),
-      headers: {'X-Onboarding-Config-Key': obConfig},
+      headers: {
+        'X-Onboarding-Config-Key': obConfig,
+        'x-fp-client-version': clientVersion,
+      },
     );
 
     if (response.statusCode == 200) {

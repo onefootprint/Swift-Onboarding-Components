@@ -30,7 +30,8 @@ Future<SaveDataResponse> save(SaveDataRequest payload) async {
     Uri.parse('$apiBaseUrl$url'),
     headers: {
       AUTH_HEADER: payload.authToken,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode(data),
   );

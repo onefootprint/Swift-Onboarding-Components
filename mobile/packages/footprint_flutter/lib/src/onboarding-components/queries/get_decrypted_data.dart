@@ -60,7 +60,8 @@ Future<Map<String, dynamic>> getDecryptedUserData(
     Uri.parse('$apiBaseUrl/hosted/user/vault/decrypt'),
     headers: {
       'Content-Type': 'application/json',
-      'X-Fp-Authorization': authToken
+      'X-Fp-Authorization': authToken,
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode(data),
   );
@@ -83,7 +84,8 @@ Future<Map<String, dynamic>> getDecryptedBusinessData(
     Uri.parse('$apiBaseUrl/hosted/business/vault/decrypt'),
     headers: {
       'Content-Type': 'application/json',
-      'X-Fp-Authorization': authToken
+      'X-Fp-Authorization': authToken,
+      'x-fp-client-version': clientVersion
     },
     body: jsonEncode(data),
   );
@@ -106,8 +108,7 @@ Future<FormData> getDecryptedData(GetDecryptedDataRequest requestData) async {
         (di) =>
             di != DataIdentifier.idSsn4 &&
             di != DataIdentifier.idSsn9 &&
-            di != DataIdentifier.idUsTaxId &&
-            di != DataIdentifier.businessTin,
+            di != DataIdentifier.idUsTaxId,
       )
       .toList();
 

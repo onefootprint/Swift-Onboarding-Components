@@ -31,6 +31,7 @@ Future<OnboardingStatusResponse> getOnboardingRequirements(
     headers: {
       'Content-Type': 'application/json',
       'X-Fp-Authorization': authToken,
+      'x-fp-client-version': clientVersion
     },
   );
 

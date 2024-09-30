@@ -6,5 +6,6 @@ const String sdkKindVerify = 'verify_v1';
 const String sdkKindAuth = 'auth_v1';
 const String sdkName = 'footprint-flutter';
 const String sdkVersion = '2.0.0-beta.3';
+const String clientVersion = '$sdkName:$sdkVersion';
 const int numRetries = 3;
 const bool debugMode = false;

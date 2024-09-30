@@ -35,9 +35,7 @@ FieldProps getFieldProps(
     throw Exception('Field name is empty');
   }
 
-  if (name == DataIdentifier.businessKycedBeneficialOwners ||
-      name == DataIdentifier.businessBeneficialOwners ||
-      name == DataIdentifier.custom) {
+  if (name == DataIdentifier.custom) {
     if (additionalIdentifier == null) {
       throw Exception('Field $name requires additional identifier');
     }
@@ -465,8 +463,6 @@ InputProps? getProps(DataIdentifier name, String? additionalIdentifier,
     FootprintSupportedLocale? locale) {
   final personProps = getPersonProps(locale);
   final commonProps = getCommonProps();
-  final businessProps = getBusinessProps();
-  final boProps = getBoProps();
 
   switch (name) {
     case DataIdentifier.idEmail:
@@ -485,60 +481,21 @@ InputProps? getProps(DataIdentifier name, String? additionalIdentifier,
       return personProps['lastName'];
     case DataIdentifier.idMiddleName:
       return personProps['middleName'];
-    case DataIdentifier.idCountry || DataIdentifier.businessCountry:
+    case DataIdentifier.idCountry:
       return commonProps['country'];
-    case DataIdentifier.idCity || DataIdentifier.businessCity:
+    case DataIdentifier.idCity:
       return commonProps['city'];
-    case DataIdentifier.idAddressLine1 || DataIdentifier.businessAddressLine1:
+    case DataIdentifier.idAddressLine1:
       return commonProps['addressLine1'];
-    case DataIdentifier.idAddressLine2 || DataIdentifier.businessAddressLine2:
+    case DataIdentifier.idAddressLine2:
       return commonProps['addressLine2'];
-    case DataIdentifier.idZip || DataIdentifier.businessZip:
+    case DataIdentifier.idZip:
       return commonProps['zip'];
-    case DataIdentifier.idState || DataIdentifier.businessState:
+    case DataIdentifier.idState:
       return commonProps['state'];
-    case DataIdentifier.businessName:
-      return businessProps['businessName'];
-    case DataIdentifier.businessDba:
-      return businessProps['dba'];
-    case DataIdentifier.businessTin:
-      return businessProps['businessTin'];
-    case DataIdentifier.businessWebsite:
-      return businessProps['businessWebsite'];
-    case DataIdentifier.businessPhoneNumber:
-      return businessProps['businessPhoneNumber'];
-    case DataIdentifier.businessCorporationType:
-      return businessProps['businessCorporationType'];
     case DataIdentifier.custom:
       return commonProps['custom'];
     default:
-      if (name == DataIdentifier.businessBeneficialOwners ||
-          name == DataIdentifier.businessKycedBeneficialOwners) {
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("first_name")) {
-          return personProps['firstName'];
-        }
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("last_name")) {
-          return personProps['lastName'];
-        }
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("middle_name")) {
-          return personProps['middleName'];
-        }
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("email")) {
-          return personProps['email'];
-        }
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("phone_number")) {
-          return personProps['phoneNumber'];
-        }
-        if (additionalIdentifier != null &&
-            additionalIdentifier.endsWith("ownership_stake")) {
-          return boProps['ownershipStake'];
-        }
-      }
       return null;
   }
 }
