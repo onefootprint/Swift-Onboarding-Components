@@ -13,6 +13,7 @@ use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::sentilink::application_risk::response::ApplicationRiskResponse;
 use idv::ParsedResponse;
 use newtypes::vendor_api_struct::*;
 use newtypes::VendorAPIMarker;
@@ -173,4 +174,9 @@ impl VendorParsable for FootprintDeviceAttestation {
 // Twilio
 impl VendorParsable for TwilioLookupV2 {
     type ParsedType = LookupV2Response;
+}
+
+// Sentilink
+impl VendorParsable for SentilinkApplicationRisk {
+    type ParsedType = ApplicationRiskResponse;
 }
