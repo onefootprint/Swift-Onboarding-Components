@@ -1,5 +1,11 @@
 import useEntityVault from '@/entities/hooks/use-entity-vault';
-import { type DataIdentifier, type Entity, isVaultDataDecrypted, isVaultDataEmpty } from '@onefootprint/types';
+import {
+  type DataIdentifier,
+  type Entity,
+  InvestorProfileDI,
+  isVaultDataDecrypted,
+  isVaultDataEmpty,
+} from '@onefootprint/types';
 import { BusinessDI, IdDI } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +13,29 @@ import { useTranslation } from 'react-i18next';
 const useEditField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
   const { data: vaultData } = useEntityVault(entity.id, entity);
+
+  const getLabel = (di: DataIdentifier, isDecrypted: boolean) => {
+    const isInvestorProfileDI = (Object.values(InvestorProfileDI) as DataIdentifier[]).includes(di);
+    if (isInvestorProfileDI) {
+      const noLabelDIs = [
+        InvestorProfileDI.annualIncome,
+        InvestorProfileDI.netWorth,
+        InvestorProfileDI.fundingSources,
+        InvestorProfileDI.investmentGoals,
+        InvestorProfileDI.riskTolerance,
+      ];
+      if (!isDecrypted || noLabelDIs.includes(di as InvestorProfileDI)) {
+        return null;
+      }
+    }
+
+    const hasLegalStatus = !!vaultData?.vault[IdDI.usLegalStatus];
+    if (di === IdDI.nationality && hasLegalStatus) {
+      return t('id.country_of_birth');
+    }
+
+    return t(di as ParseKeys<'common'>);
+  };
 
   const canEditField = (di: DataIdentifier) => {
     if (di === IdDI.ssn4) {
@@ -31,6 +60,14 @@ const useEditField = (entity: Entity) => {
       IdDI.visaKind,
       IdDI.visaExpirationDate,
       IdDI.citizenships,
+      InvestorProfileDI.employmentStatus,
+      InvestorProfileDI.occupation,
+      InvestorProfileDI.employer,
+      InvestorProfileDI.annualIncome,
+      InvestorProfileDI.netWorth,
+      InvestorProfileDI.fundingSources,
+      InvestorProfileDI.investmentGoals,
+      InvestorProfileDI.riskTolerance,
       BusinessDI.name,
       BusinessDI.doingBusinessAs,
       BusinessDI.website,
@@ -49,16 +86,14 @@ const useEditField = (entity: Entity) => {
   };
 
   const getProps = (di: DataIdentifier) => {
-    const hasLegalStatus = !!vaultData?.vault[IdDI.usLegalStatus];
-    const label =
-      di === IdDI.nationality && hasLegalStatus ? t('id.country_of_birth') : (t(di as ParseKeys<'common'>) as string);
     const value = vaultData?.vault[di];
+    const isDecrypted = isVaultDataDecrypted(value);
 
     return {
-      label,
+      label: getLabel(di, isDecrypted),
       value,
       transforms: vaultData?.transforms[di],
-      isDecrypted: isVaultDataDecrypted(value),
+      isDecrypted,
       isEmpty: isVaultDataEmpty(value),
       canEdit: canEditField(di),
     };

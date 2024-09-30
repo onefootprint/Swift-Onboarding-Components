@@ -13,11 +13,15 @@
     },
     "actions": {
       "edit-vault-drawer": {
-        "user-title": "Edit user info",
+        "person-title": "Edit user info",
         "business-title": "Edit business info",
         "decrypt-alert": {
           "text": "Only decrypted data can be edited.",
           "cta": "Decrypt all"
+        },
+        "tabs": {
+          "general-info": "General information",
+          "investor-profile": "Investor profile"
         },
         "cancel": "Cancel",
         "cta": "Save",
@@ -57,6 +61,57 @@
           },
           "state-mapping": {
             "none": "Select"
+          },
+          "investor-profile": {
+            "encrypted": "This data is encrypted.",
+            "employment-status-mapping": {
+              "employed": "Employed",
+              "unemployed": "Unemployed",
+              "retired": "Retired",
+              "student": "Student"
+            },
+            "annual-income-mapping": {
+              "le25k": "Under $25,000",
+              "gt25kLe50k": "$25,001 - $50,000",
+              "gt50kLe100k": "$50,001 - $100,000",
+              "gt100kLe200k": "$100,001 - $200,000",
+              "gt200kLe300k": "$200,001 - $300,000",
+              "gt300kLe500k": "$300,001 - $500,000",
+              "gt500kLe1200k": "$500,001 - $1,200,000",
+              "gt1200k": "$1,200,001+"
+            },
+            "net-worth-mapping": {
+              "le50k": "Under $50,000",
+              "gt50kLe100k": "$50,001 - $100,000",
+              "gt100kLe200k": "$100,001 - $200,000",
+              "gt200kLe500k": "$200,001 - $500,000",
+              "gt500kLe1m": "$500,000 - $1,000,000",
+              "gt1mLe5m": "$1,000,001 - $5,000,000",
+              "gt5m": "$5,000,000+"
+            },
+            "funding-sources-mapping": {
+              "employment_income": "Employment income",
+              "investments": "Investments",
+              "inheritance": "Inheritance",
+              "business_income": "Business income",
+              "savings": "Savings",
+              "family": "Family",
+              "empty-selection": "Please select at least one funding source"
+            },
+            "investment-goals-mapping": {
+              "growth": "Growth",
+              "income": "Income",
+              "preserve_capital": "Preserve capital",
+              "speculation": "Speculation",
+              "diversification": "Diversification",
+              "other": "Other",
+              "empty-selection": "Please select at least one goal"
+            },
+            "risk-tolerance-mapping": {
+              "conservative": "Conservative",
+              "moderate": "Moderate",
+              "aggressive": "Aggressive"
+            }
           },
           "errors": {
             "name": {
@@ -126,6 +181,30 @@
               "hint": "Cannot contain special characters",
               "required": "Cannot be empty",
               "invalid": "Cannot be invalid or contain special characters"
+            },
+            "employment-status": {
+              "required": "Cannot be empty"
+            },
+            "occupation": {
+              "required": "Cannot be empty if the employment status is Employed"
+            },
+            "employer": {
+              "required": "Cannot be empty if the employment status is Employed"
+            },
+            "annual-income": {
+              "required": "Cannot be empty"
+            },
+            "net-worth": {
+              "required": "Cannot be empty"
+            },
+            "funding-sources": {
+              "required": "Please select at least one"
+            },
+            "investment-goals": {
+              "required": "Please select at least one"
+            },
+            "risk-tolerance": {
+              "required": "Cannot be empty"
             }
           }
         }

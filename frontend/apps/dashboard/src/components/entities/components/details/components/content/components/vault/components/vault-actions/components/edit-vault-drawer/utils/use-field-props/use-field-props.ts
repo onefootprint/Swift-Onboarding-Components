@@ -10,7 +10,17 @@ import {
   isValidDate,
 } from '@onefootprint/core';
 import { COUNTRIES, STATES } from '@onefootprint/global-constants';
-import { BusinessDI, CorporationType, type DataIdentifier, IdDI, UsLegalStatus } from '@onefootprint/types';
+import {
+  BusinessDI,
+  CorporationType,
+  type DataIdentifier,
+  IdDI,
+  InvestorProfileAnnualIncome,
+  InvestorProfileDI,
+  InvestorProfileNetWorth,
+  InvestorProfileRiskTolerance,
+  UsLegalStatus,
+} from '@onefootprint/types';
 import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -272,6 +282,156 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           }
           if (validationError?.errorType === CitizenshipsValidationError.INVALID) {
             return entityT('errors.citizenships.invalid', { countries: validationError.data });
+          }
+          return true;
+        },
+      },
+    };
+  }
+
+  // InvestorProfileDI fields
+  if (di === InvestorProfileDI.employmentStatus) {
+    return {
+      selectOptions: {
+        options: [
+          { value: 'employed', label: entityT('investor-profile.employment-status-mapping.employed') },
+          { value: 'unemployed', label: entityT('investor-profile.employment-status-mapping.unemployed') },
+          { value: 'retired', label: entityT('investor-profile.employment-status-mapping.unemployed') },
+          { value: 'student', label: entityT('investor-profile.employment-status-mapping.unemployed') },
+        ],
+        validate: (value: string) => {
+          if (!value || value === EMPTY_SELECT_VALUE) {
+            return entityT('errors.employment-status.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.occupation) {
+    const formEmployment = get(formValues, InvestorProfileDI.employmentStatus);
+    const isEmployed = formEmployment === 'employed';
+    return {
+      inputOptions: {
+        validate: (value: string) => {
+          if (isEmployed && !value) {
+            return entityT('errors.occupation.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.employer) {
+    const formEmployment = get(formValues, InvestorProfileDI.employmentStatus);
+    const isEmployed = formEmployment === 'employed';
+    return {
+      inputOptions: {
+        validate: (value: string) => {
+          if (isEmployed && !value) {
+            return entityT('errors.employer.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.annualIncome) {
+    return {
+      selectOptions: {
+        options: [
+          { value: InvestorProfileAnnualIncome.le25k, label: entityT('investor-profile.annual-income-mapping.le25k') },
+          {
+            value: InvestorProfileAnnualIncome.gt25kLe50k,
+            label: entityT('investor-profile.annual-income-mapping.gt25kLe50k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt50kLe100k,
+            label: entityT('investor-profile.annual-income-mapping.gt50kLe100k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt100kLe200k,
+            label: entityT('investor-profile.annual-income-mapping.gt100kLe200k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt200kLe300k,
+            label: entityT('investor-profile.annual-income-mapping.gt200kLe300k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt300kLe500k,
+            label: entityT('investor-profile.annual-income-mapping.gt300kLe500k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt500kLe1200k,
+            label: entityT('investor-profile.annual-income-mapping.gt500kLe1200k'),
+          },
+          {
+            value: InvestorProfileAnnualIncome.gt1200k,
+            label: entityT('investor-profile.annual-income-mapping.gt1200k'),
+          },
+        ],
+        validate: (value: string) => {
+          if (!value || value === EMPTY_SELECT_VALUE) {
+            return entityT('errors.annual-income.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.netWorth) {
+    return {
+      selectOptions: {
+        options: [
+          { value: InvestorProfileNetWorth.le50k, label: entityT('investor-profile.net-worth-mapping.le50k') },
+          {
+            value: InvestorProfileNetWorth.gt50kLe100k,
+            label: entityT('investor-profile.net-worth-mapping.gt50kLe100k'),
+          },
+          {
+            value: InvestorProfileNetWorth.gt100kLe200k,
+            label: entityT('investor-profile.net-worth-mapping.gt100kLe200k'),
+          },
+          {
+            value: InvestorProfileNetWorth.gt200kLe500k,
+            label: entityT('investor-profile.net-worth-mapping.gt200kLe500k'),
+          },
+          {
+            value: InvestorProfileNetWorth.gt500kLe1m,
+            label: entityT('investor-profile.net-worth-mapping.gt500kLe1m'),
+          },
+          { value: InvestorProfileNetWorth.gt1mLe5m, label: entityT('investor-profile.net-worth-mapping.gt1mLe5m') },
+          { value: InvestorProfileNetWorth.gt5m, label: entityT('investor-profile.net-worth-mapping.gt5m') },
+        ],
+        validate: (value: string) => {
+          if (!value || value === EMPTY_SELECT_VALUE) {
+            return entityT('errors.net-worth.required');
+          }
+          return true;
+        },
+      },
+    };
+  }
+  if (di === InvestorProfileDI.riskTolerance) {
+    return {
+      selectOptions: {
+        options: [
+          {
+            value: InvestorProfileRiskTolerance.conservative,
+            label: entityT('investor-profile.risk-tolerance-mapping.conservative'),
+          },
+          {
+            value: InvestorProfileRiskTolerance.moderate,
+            label: entityT('investor-profile.risk-tolerance-mapping.moderate'),
+          },
+          {
+            value: InvestorProfileRiskTolerance.aggressive,
+            label: entityT('investor-profile.risk-tolerance-mapping.aggressive'),
+          },
+        ],
+        validate: (value: string) => {
+          if (!value || value === EMPTY_SELECT_VALUE) {
+            return entityT('errors.net-worth.required');
           }
           return true;
         },

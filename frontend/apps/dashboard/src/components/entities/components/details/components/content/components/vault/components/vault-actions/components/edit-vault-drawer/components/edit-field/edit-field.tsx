@@ -39,7 +39,7 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   };
 
   return (
-    <Container role="row" aria-label={label}>
+    <Container role="row" aria-label={label ?? di}>
       <Form.Field variant="horizontal">
         <LabelContainer>
           <Text variant="body-3" color="tertiary">

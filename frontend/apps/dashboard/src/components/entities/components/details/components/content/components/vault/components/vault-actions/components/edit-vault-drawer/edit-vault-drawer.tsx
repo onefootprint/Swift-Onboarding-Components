@@ -68,7 +68,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
     <Drawer
       open={open}
       onClose={onClose}
-      title={isPersonVault ? t('user-title') : t('business-title')}
+      title={isPersonVault ? t('person-title') : t('business-title')}
       primaryButton={{
         label: t('cta'),
         loading: !!editControls.isPending,
