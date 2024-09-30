@@ -1,8 +1,12 @@
+use crate::sentilink::error::error_code::SentilinkErrorCode;
+use crate::sentilink::SentilinkResponseStatus;
+use crate::sentilink::SentilinkResult;
 use chrono::DateTime;
 use chrono::Utc;
 use newtypes::ScrubbedPiiJsonValue;
 use serde::Deserialize;
 use serde::Serialize;
+use std::str::FromStr;
 
 
 #[derive(Serialize, Deserialize)]
@@ -11,8 +15,8 @@ pub struct ApplicationRiskResponse {
     pub customer_id: String,
     pub environment: String,
     pub latency_ms: i64,
-    pub sentilink_synthetic_score: Option<Score>,
-    pub sentilink_id_theft_score: Option<Score>,
+    pub sentilink_synthetic_score: Option<ScoreResult>,
+    pub sentilink_id_theft_score: Option<ScoreResult>,
     // A Facets bundle containing all attributes offered by SentiLink.
     pub all_attributes: Option<ScrubbedPiiJsonValue>,
 
@@ -28,22 +32,60 @@ pub struct ApplicationRiskResponse {
     // could not be returned, or ERROR if no requested products could be returned.
     pub response_status: String,
 }
-// TODO: sentilink docs give conflicting guidance on how errors manifest. Is it embedded in this or in a diff Error object? https://docs.sentilink.com/v2/errors/#score
+
+impl ApplicationRiskResponse {
+    pub fn response_status(&self) -> SentilinkResponseStatus {
+        SentilinkResponseStatus::from_str(self.response_status.as_str())
+            .unwrap_or(SentilinkResponseStatus::Failure)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ScoreResult {
+    Score(Score),
+    Error(ScoreError),
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Score {
     pub version: String,
     // A value between 0 (low risk) and 1000 (high risk).
     pub score: i32,
     // A list of the three most important features supporting the score.
     pub reason_codes: Vec<ReasonCode>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ScoreError {
     // A list of error messages. errors is an optional field that is only present when a requested score
     // cannot be calculated.
-    pub errors: Option<Vec<String>>,
-    // An error code. error_code is an optional field that is only present when a requested score cannot be
-    // calculated.
-    pub error_code: Option<i32>,
+    errors: Vec<String>,
+    // An error code. error_code is an optional field that is only present when a requested score cannot
+    // be calculated.
+    error_code: i32,
 }
-#[derive(Serialize, Deserialize)]
+
+impl ScoreError {
+    #[allow(unused)]
+    pub fn error_code(&self) -> SentilinkErrorCode {
+        self.error_code.into()
+    }
+}
+
+impl ScoreResult {
+    #[allow(unused)]
+    pub fn score(&self) -> SentilinkResult<Score> {
+        match self {
+            ScoreResult::Score(score) => Ok(score.clone()),
+            ScoreResult::Error(score_error) => Err(crate::sentilink::error::Error::ErrorCode(
+                score_error.error_code(),
+            )),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ReasonCode {
     // A code indicating the reason.
     pub code: String,

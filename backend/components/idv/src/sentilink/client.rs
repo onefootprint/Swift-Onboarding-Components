@@ -1,12 +1,11 @@
 use super::application_risk::request::ApplicationRiskRequest;
-use super::error::Error as SentilinkError;
+use super::SentilinkResult;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::SentilinkCredentials;
 use newtypes::PiiString;
 use reqwest::header;
 use reqwest::header::HeaderMap;
 
-type SentilinkResult<T> = Result<T, SentilinkError>;
 
 #[derive(Clone)]
 pub struct SentilinkClientAdapter {
@@ -102,8 +101,9 @@ mod tests {
 
         let parsed: ApplicationRiskResponse = serde_json::from_value(raw_response).unwrap();
 
-        assert!(parsed.sentilink_synthetic_score.unwrap().score > 0);
-        assert!(parsed.sentilink_id_theft_score.unwrap().score > 0);
+        assert!(parsed.sentilink_synthetic_score.unwrap().score().unwrap().score > 0);
+        assert!(parsed.sentilink_id_theft_score.unwrap().score().unwrap().score > 0);
+        assert!(!parsed.response_status.is_empty())
     }
 
     fn test_application() -> Application {
