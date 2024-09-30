@@ -14,6 +14,7 @@ import {
   BusinessDI,
   CorporationType,
   type DataIdentifier,
+  type Entity,
   IdDI,
   InvestorProfileAnnualIncome,
   InvestorProfileDI,
@@ -24,6 +25,7 @@ import {
 import get from 'lodash/get';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import { EMPTY_SELECT_VALUE } from '../../constants';
 import useFormValues, { type EditDetailsFormData } from '../use-form-values';
 import validateCitizenships, { CitizenshipsValidationError } from '../validate-citizenships';
@@ -65,7 +67,7 @@ type FieldProps =
       selectOptions: SelectOptions;
     };
 
-const useFieldProps = (di: DataIdentifier): FieldProps => {
+const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.business.vault.basic',
   });
@@ -75,6 +77,8 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
   const { clearErrors } = useFormContext<EditDetailsFormData>();
   const formValues = useFormValues();
   const fieldValue = get(formValues, di as keyof EditDetailsFormData);
+  const { data: previousData } = useEntityVault(entity.id, entity);
+  const previousValue = (previousData?.vault[di] as string) ?? '';
 
   // IdDI fields
   if (di === IdDI.firstName) {
@@ -82,7 +86,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.name.required');
+            return previousValue ? entityT('errors.name.required') : true;
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
@@ -111,7 +115,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.name.required');
+            return previousValue ? entityT('errors.name.required') : true;
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
@@ -132,7 +136,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           message: entityT('errors.dob.pattern'),
         },
         validate: (value: string) => {
-          if (!value) return entityT('errors.dob.required');
+          if (!value) return previousValue ? entityT('errors.dob.required') : true;
           if (!isValidDate(value)) return entityT('errors.dob.pattern');
           if (isDobInTheFuture(value)) return entityT('errors.dob.future-date');
           if (isDobTooOld(value)) return entityT('errors.dob.too-old');
@@ -148,7 +152,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         type: 'tel',
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.ssn.required');
+            return previousValue ? entityT('errors.ssn.required') : true;
           }
           if (!isSSN9Flexible(value)) {
             return entityT('errors.ssn.pattern');
@@ -163,7 +167,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.ssn.required');
+            return previousValue ? entityT('errors.ssn.required') : true;
           }
           if (!isSsn4(value)) {
             return entityT('errors.ssn.pattern');
@@ -178,7 +182,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.address-line.required');
+            return previousValue ? entityT('errors.address-line.required') : true;
           }
           if (!isAddressLine(value)) {
             return entityT('errors.address-line.pattern');
@@ -192,7 +196,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     return {
       inputOptions: {
         validate: (value: string) => {
-          if (!value || typeof value !== 'string') return entityT('errors.city');
+          if (!value || typeof value !== 'string') return previousValue ? entityT('errors.city') : true;
           return true;
         },
       },
@@ -207,7 +211,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           'aria-label': 'state',
           validate: (value: string) => {
             if (!value || value === EMPTY_SELECT_VALUE) {
-              return entityT('errors.state.required');
+              return previousValue ? entityT('errors.state.required') : true;
             }
             return true;
           },
@@ -218,7 +222,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.state.required');
+            return previousValue ? entityT('errors.state.required') : true;
           }
           return true;
         },
@@ -239,7 +243,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         ],
         validate: (value: string) => {
           if (formLegalStatus !== EMPTY_SELECT_VALUE && value === EMPTY_SELECT_VALUE) {
-            return entityT('errors.nationality');
+            return previousValue ? entityT('errors.nationality') : true;
           }
           return true;
         },
@@ -272,7 +276,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         validate: (countriesStr: string) => {
           const validationError = validateCitizenships(countriesStr, formLegalStatus);
           if (validationError?.errorType === CitizenshipsValidationError.REQUIRED) {
-            return entityT('errors.citizenships.required');
+            return previousValue ? entityT('errors.citizenships.required') : true;
           }
           if (validationError?.errorType === CitizenshipsValidationError.SHOULD_BE_EMPTY) {
             return entityT('errors.citizenships.should-be-empty');
@@ -301,7 +305,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         ],
         validate: (value: string) => {
           if (!value || value === EMPTY_SELECT_VALUE) {
-            return entityT('errors.employment-status.required');
+            return previousValue ? entityT('errors.employment-status.required') : true;
           }
           return true;
         },
@@ -315,7 +319,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (isEmployed && !value) {
-            return entityT('errors.occupation.required');
+            return previousValue ? entityT('errors.occupation.required') : true;
           }
           return true;
         },
@@ -329,7 +333,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (isEmployed && !value) {
-            return entityT('errors.employer.required');
+            return previousValue ? entityT('errors.employer.required') : true;
           }
           return true;
         },
@@ -372,7 +376,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         ],
         validate: (value: string) => {
           if (!value || value === EMPTY_SELECT_VALUE) {
-            return entityT('errors.annual-income.required');
+            return previousValue ? entityT('errors.annual-income.required') : true;
           }
           return true;
         },
@@ -405,7 +409,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         ],
         validate: (value: string) => {
           if (!value || value === EMPTY_SELECT_VALUE) {
-            return entityT('errors.net-worth.required');
+            return previousValue ? entityT('errors.net-worth.required') : true;
           }
           return true;
         },
@@ -431,7 +435,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         ],
         validate: (value: string) => {
           if (!value || value === EMPTY_SELECT_VALUE) {
-            return entityT('errors.net-worth.required');
+            return previousValue ? entityT('errors.net-worth.required') : true;
           }
           return true;
         },
@@ -446,7 +450,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         options: COUNTRIES as SelectOption[],
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.country.required');
+            return previousValue ? entityT('errors.country.required') : true;
           }
           return true;
         },
@@ -460,7 +464,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.name.required');
+            return previousValue ? entityT('errors.name.required') : true;
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
@@ -476,7 +480,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.name.required');
+            return previousValue ? entityT('errors.name.required') : true;
           }
           const validationResult = validateName(value);
           if (validationResult === NameValidationError.SPECIAL_CHARS) {
@@ -493,7 +497,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
         placeholder: entityT('errors.website.placeholder'),
         validate: (value: string) => {
           if (!isURL(value ?? '')) {
-            return entityT('errors.website.invalid');
+            return previousValue ? entityT('errors.website.invalid') : true;
           }
           return true;
         },
@@ -505,7 +509,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.tin.required');
+            return previousValue ? entityT('errors.tin.required') : true;
           }
           if (!isTin(value)) {
             return entityT('errors.tin.invalid');
@@ -552,7 +556,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.address-line.required');
+            return previousValue ? entityT('errors.address-line.required') : true;
           }
           if (!isAddressLine(value)) {
             return entityT('errors.address-line.pattern');
@@ -566,7 +570,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
     return {
       inputOptions: {
         validate: (value: string) => {
-          if (!value || typeof value !== 'string') return entityT('errors.city');
+          if (!value || typeof value !== 'string') return previousValue ? entityT('errors.city') : true;
           return true;
         },
       },
@@ -580,7 +584,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           options: STATES,
           validate: (value: string) => {
             if (!value || value === EMPTY_SELECT_VALUE) {
-              return entityT('errors.state.required');
+              return previousValue ? entityT('errors.state.required') : true;
             }
             return true;
           },
@@ -591,7 +595,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
       inputOptions: {
         validate: (value: string) => {
           if (!value) {
-            return entityT('errors.state.required');
+            return previousValue ? entityT('errors.state.required') : true;
           }
           return true;
         },
@@ -619,7 +623,7 @@ const useFieldProps = (di: DataIdentifier): FieldProps => {
           message: entityT('errors.dob.pattern'),
         },
         validate: (value: string) => {
-          if (!value) return entityT('errors.dob.required');
+          if (!value) return previousValue ? entityT('errors.dob.required') : true;
           if (!isValidDate(value)) return entityT('errors.dob.pattern');
           if (isDobInTheFuture(value)) return entityT('errors.dob.future-date');
           return true;

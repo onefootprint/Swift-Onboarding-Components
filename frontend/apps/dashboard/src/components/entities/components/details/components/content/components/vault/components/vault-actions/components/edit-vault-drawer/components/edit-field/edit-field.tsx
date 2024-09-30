@@ -1,11 +1,12 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { Box, Form, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { Form, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { FIELD_VALUE_WIDTH } from '../../constants';
 import useEditField from '../../hooks/use-edit-field';
-import Editable from '../editable';
-import EncryptedInput from '../encrypted-input';
+import Editable from './components/editable';
+import EncryptedInput from './components/encrypted-input';
+import ErrorOrHint from './components/error';
 
 export type EditFieldProps = {
   di: DataIdentifier;
@@ -22,7 +23,7 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   const renderValue = () => {
     if (isDecrypted || isEmpty) {
       return canEdit ? (
-        <Editable value={value} fieldName={di as DataIdentifier} />
+        <Editable entity={entity} value={value} fieldName={di as DataIdentifier} />
       ) : (
         <Tooltip text={t('not-allowed')} position="bottom">
           <TextInput
@@ -42,27 +43,32 @@ const EditField = ({ di, entity }: EditFieldProps) => {
     <Container role="row" aria-label={label ?? di}>
       <Form.Field variant="horizontal">
         <LabelContainer>
-          <Text variant="body-3" color="tertiary">
-            {label}
-          </Text>
+          <Form.Label>
+            <Text variant="body-3" color="tertiary">
+              {label}
+            </Text>
+          </Form.Label>
         </LabelContainer>
-        <Box maxWidth="70%">{renderValue()}</Box>
+        <Stack direction="column" align="flex-start" flex={1} maxWidth="fit-content">
+          {renderValue()}
+          <ErrorOrHint entity={entity} fieldName={di} />
+        </Stack>
       </Form.Field>
     </Container>
   );
 };
 
 const Container = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  > div {
+    align-items: flex-start;
+  }
 `;
 
-const LabelContainer = styled(Form.Label)`
+const LabelContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[2]};
-    flex-direction: column;
+    align-items: center;
+    height: ${theme.spacing[8]};
     max-width: 75%;
   `};
 `;

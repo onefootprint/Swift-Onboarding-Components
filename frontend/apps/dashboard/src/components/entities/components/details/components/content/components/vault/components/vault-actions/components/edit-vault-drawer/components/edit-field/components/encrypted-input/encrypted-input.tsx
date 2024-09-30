@@ -1,5 +1,5 @@
 import { TextInput } from '@onefootprint/ui';
-import { FIELD_VALUE_WIDTH } from '../../constants';
+import { FIELD_VALUE_WIDTH } from '../../../../constants';
 
 const EncryptedInput = () => (
   <TextInput
