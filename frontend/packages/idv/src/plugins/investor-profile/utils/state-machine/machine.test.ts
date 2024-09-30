@@ -6,6 +6,7 @@ import {
   isMissingInvestmentGoalsData,
   isMissingNetWorthData,
   isMissingRiskToleranceData,
+  trackInitializedSteps,
 } from './machine';
 
 describe('isMissingEmploymentData', () => {
@@ -162,5 +163,120 @@ describe('isMissingRiskToleranceData', () => {
       data: { [InvestorProfileDI.riskTolerance]: 'aggressive' },
     });
     expect(result).toBe(false);
+  });
+});
+
+describe('trackInitializedSteps', () => {
+  it('should not call tracker for empty data', () => {
+    const tracker = jest.fn();
+    const data = {};
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(0);
+  });
+
+  it('should track employment data 1/2', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'employed',
+      [InvestorProfileDI.occupation]: 'occupation',
+      [InvestorProfileDI.employer]: 'employer',
+    };
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(1);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+  });
+
+  it('should track employment data 2/2', () => {
+    const tracker = jest.fn();
+    const data = { [InvestorProfileDI.employmentStatus]: 'unemployed' };
+
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(1);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+  });
+
+  it('should track income data', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'unemployed',
+      [InvestorProfileDI.annualIncome]: 'le25k',
+    };
+    /** @ts-expect-error enum vs string */
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(2);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:income-submit');
+  });
+
+  it('should track net worth data', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'unemployed',
+      [InvestorProfileDI.annualIncome]: 'le25k',
+      [InvestorProfileDI.netWorth]: 'le50k',
+    };
+    /** @ts-expect-error enum vs string */
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(3);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:income-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:net-worth-submit');
+  });
+
+  it('should track funding sources data', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'unemployed',
+      [InvestorProfileDI.annualIncome]: 'le25k',
+      [InvestorProfileDI.netWorth]: 'le50k',
+      [InvestorProfileDI.fundingSources]: [InvestorProfileFundingSources.businessIncome],
+    };
+    /** @ts-expect-error enum vs string */
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(4);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:income-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:net-worth-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:funding-sources-submit');
+  });
+
+  it('should track investment goals data', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'unemployed',
+      [InvestorProfileDI.annualIncome]: 'le25k',
+      [InvestorProfileDI.netWorth]: 'le50k',
+      [InvestorProfileDI.fundingSources]: [InvestorProfileFundingSources.businessIncome],
+      [InvestorProfileDI.investmentGoals]: ['foo'],
+    };
+    /** @ts-expect-error enum vs string */
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(5);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:income-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:net-worth-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:funding-sources-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:investment-goals-submit');
+  });
+
+  it('should track risk tolerance data', () => {
+    const tracker = jest.fn();
+    const data = {
+      [InvestorProfileDI.employmentStatus]: 'unemployed',
+      [InvestorProfileDI.annualIncome]: 'le25k',
+      [InvestorProfileDI.netWorth]: 'le50k',
+      [InvestorProfileDI.fundingSources]: [InvestorProfileFundingSources.businessIncome],
+      [InvestorProfileDI.investmentGoals]: ['foo'],
+      [InvestorProfileDI.riskTolerance]: 'aggressive',
+    };
+    /** @ts-expect-error enum vs string */
+    trackInitializedSteps(tracker, data);
+    expect(tracker).toHaveBeenCalledTimes(6);
+    expect(tracker).toHaveBeenCalledWith('investor-profile:employment-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:income-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:net-worth-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:funding-sources-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:investment-goals-submit');
+    expect(tracker).toHaveBeenCalledWith('investor-profile:risk-tolerance-submit');
   });
 });

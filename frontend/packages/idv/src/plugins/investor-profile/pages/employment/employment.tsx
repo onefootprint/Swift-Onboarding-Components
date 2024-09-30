@@ -1,5 +1,5 @@
 import { InvestorProfileDI } from '@onefootprint/types';
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { EmploymentData } from '../../utils/state-machine/types';
@@ -13,6 +13,7 @@ const Employment = () => {
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (employmentData: EmploymentData) => {
+    trackAction('investor-profile:employment-submit');
     syncData({
       authToken,
       data: employmentData,

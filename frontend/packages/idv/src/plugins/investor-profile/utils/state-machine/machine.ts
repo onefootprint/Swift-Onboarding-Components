@@ -47,6 +47,26 @@ export const isMissingDeclarationsData = (_: MachineContext): boolean => {
   return false; /** Declarations are not mandatory step */
 };
 
+/** Triggers track actions for initial missing data in the investor profile. */
+export const trackInitializedSteps = (tracker: (action: string) => void, data: MachineContext['data'] = {}): void => {
+  const flowOrder = [
+    { isMissing: isMissingEmploymentData, action: 'investor-profile:employment-submit' },
+    { isMissing: isMissingIncomeData, action: 'investor-profile:income-submit' },
+    { isMissing: isMissingNetWorthData, action: 'investor-profile:net-worth-submit' },
+    { isMissing: isMissingFundingSources, action: 'investor-profile:funding-sources-submit' },
+    { isMissing: isMissingInvestmentGoalsData, action: 'investor-profile:investment-goals-submit' },
+    { isMissing: isMissingRiskToleranceData, action: 'investor-profile:risk-tolerance-submit' },
+  ];
+
+  for (const { isMissing, action } of flowOrder) {
+    if (!isMissing({ data })) {
+      tracker(action);
+    } else {
+      break;
+    }
+  }
+};
+
 const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransition }: CreateInvestorProfileArgs) =>
   createMachine(
     {

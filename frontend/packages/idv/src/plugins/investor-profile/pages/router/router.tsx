@@ -7,6 +7,7 @@ import { useLogStateMachine } from '../../../../hooks';
 import { trackAction } from '../../../../utils/logger';
 import { getLogger } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
+import { trackInitializedSteps } from '../../utils/state-machine/machine';
 import Animation from '../animation';
 import Confirm from '../confirm/confirm';
 import Declarations from '../declarations';
@@ -49,7 +50,10 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <Init
         authToken={state.context.authToken}
-        onSuccess={payload => send({ type: 'initDone', payload })}
+        onSuccess={payload => {
+          trackInitializedSteps(trackAction, { ...state.context.data, ...payload });
+          send({ type: 'initDone', payload });
+        }}
         onError={error => {
           logError('error fetching investor_profile.*', error);
           send({ type: 'initFailed' });

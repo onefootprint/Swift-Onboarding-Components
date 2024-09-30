@@ -1,7 +1,7 @@
 import { InvestorProfileDI } from '@onefootprint/types';
 import type React from 'react';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -14,9 +14,7 @@ type FundingSourcesProps = {
 };
 
 const fundingSources = InvestorProfileDI.fundingSources;
-const { logError } = getLogger({
-  location: 'investor-profile-funding-sources',
-});
+const { logError } = getLogger({ location: 'investor-profile-funding-sources' });
 
 const FundingSources = ({ onSuccess, renderFooter }: FundingSourcesProps) => {
   const [state, send] = useInvestorProfileMachine();
@@ -24,6 +22,7 @@ const FundingSources = ({ onSuccess, renderFooter }: FundingSourcesProps) => {
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (data: FundingSourcesData) => {
+    trackAction('investor-profile:funding-sources-submit');
     syncData({
       authToken,
       data,

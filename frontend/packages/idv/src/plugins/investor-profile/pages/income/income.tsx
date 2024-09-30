@@ -1,7 +1,7 @@
 import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import type React from 'react';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -22,6 +22,7 @@ const Income = ({ onSuccess, renderFooter }: IncomeProps) => {
   const { mutation, syncData } = useSyncData();
 
   const handleSubmit = (incomeData: IncomeData) => {
+    trackAction('investor-profile:income-submit');
     syncData({
       authToken,
       data: incomeData,
