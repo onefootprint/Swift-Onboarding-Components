@@ -13,7 +13,7 @@ const skipLiveness = async (payload: SkipLivenessRequest) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => setTimeout(resolve, 500));
   return response.data;
 };
 
