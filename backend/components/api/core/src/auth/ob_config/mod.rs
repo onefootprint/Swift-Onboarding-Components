@@ -8,6 +8,7 @@ pub use bo_session::*;
 use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
+use newtypes::WorkflowId;
 pub use ob_public_key::*;
 pub use pb_token::ObSessionAuth;
 
@@ -34,9 +35,9 @@ impl ObConfigAuth {
     }
 
     /// The BusinessOwner associated with this auth session. Only non-null for BoSessionAuth
-    pub fn secondary_business_owner(&self) -> Option<&BusinessOwner> {
+    pub fn business_info(&self) -> Option<(&BusinessOwner, Option<&WorkflowId>)> {
         match self {
-            Either::Right(Either::Right(a)) => Some(&a.bo),
+            Either::Right(Either::Right(a)) => Some((&a.bo, a.data.data.biz_wf_id.as_ref())),
             _ => None,
         }
     }

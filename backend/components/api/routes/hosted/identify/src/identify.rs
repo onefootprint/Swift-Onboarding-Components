@@ -184,28 +184,28 @@ pub(super) async fn create_identified_token(
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let scopes = vec![];
-            let (bo, sb) = if let Some(obc) = ob_context.as_ref() {
-                if let Some(bo) = obc.secondary_business_owner().cloned() {
-                    let sb = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant().id))?;
-                    (Some(bo), Some(sb))
-                } else {
-                    (None, None)
-                }
+            let biz_info = ob_context
+                .as_ref()
+                .and_then(|obc| obc.business_info().map(|bo| (bo, obc.tenant())));
+            let (bo_id, sb_id, biz_wf_id) = if let Some(((bo, biz_wf_id), tenant)) = biz_info {
+                let sb = ScopedVault::get(conn, (&bo.business_vault_id, &tenant.id))?;
+                (Some(bo.id.clone()), Some(sb.id), biz_wf_id.cloned())
             } else {
-                (None, None)
+                (None, None, None)
             };
             let purposes = chain!(
                 Some(scope.into()),
                 // TODO we should migrate the BO tokens to use these new un-authed, identified tokens.
                 // Then the purpose here would come from the SecondayBo token. But for now, we'll just
                 // manually add this purpose to keep track of when the auth session is for a secondary BO.
-                bo.is_some().then_some(TokenCreationPurpose::SecondaryBo),
+                bo_id.is_some().then_some(TokenCreationPurpose::SecondaryBo),
             )
             .collect();
             let context = NewUserSessionContext {
                 su_id: sv.map(|sv| sv.id),
-                sb_id: sb.map(|sb| sb.id),
-                bo_id: bo.map(|bo| bo.id),
+                sb_id,
+                bo_id,
+                biz_wf_id,
                 obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
                 allow_reonboard,
                 ..Default::default()

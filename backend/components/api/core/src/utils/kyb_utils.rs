@@ -33,7 +33,7 @@ use std::pin::Pin;
 #[tracing::instrument(skip_all)]
 pub async fn send_missing_secondary_bo_links(
     state: &State,
-    wf: &Workflow,
+    biz_wf: &Workflow,
     bvw: &TenantVw<Business>,
     tenant: &Tenant,
     dbos: &[BusinessOwnerInfo],
@@ -59,19 +59,19 @@ pub async fn send_missing_secondary_bo_links(
         .map(|bo| {
             let session_data = BoSession {
                 bo_id: bo.id.clone(),
-                ob_config_id: wf.ob_configuration_id.clone(),
+                ob_config_id: biz_wf.ob_configuration_id.clone(),
+                biz_wf_id: Some(biz_wf.id.clone()),
             };
             (bo.link_id.clone(), session_data)
         })
         .collect_vec();
-    let tokens = state
+    let tokens: Vec<_> = state
         .db_pool
-        .db_query(move |conn| -> FpResult<Vec<_>> {
+        .db_query(move |conn| {
             sessions_to_make
                 .into_iter()
-                .map(|(l_id, d)| -> FpResult<_> {
-                    let (token, _) = AuthSession::create_sync(conn, &sealing_key, d, duration)?;
-                    Ok((l_id, token))
+                .map(|(l, d)| {
+                    AuthSession::create_sync(conn, &sealing_key, d, duration).map(|(token, _)| (l, token))
                 })
                 .collect()
         })

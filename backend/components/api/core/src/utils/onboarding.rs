@@ -193,6 +193,11 @@ pub fn get_or_create_business_wf(
         su,
     } = common_args;
 
+    if let Some(biz_wf_id) = user_auth.business_workflow_id() {
+        let biz_wf = Workflow::get(conn, &biz_wf_id)?;
+        return Ok(biz_wf);
+    };
+
     let uv = Vault::lock(conn, &su.vault_id)?;
     if obc.kind != ObConfigurationKind::Kyb {
         return ValidationError("Cannot onboard a business to a non-KYB playbook").into();

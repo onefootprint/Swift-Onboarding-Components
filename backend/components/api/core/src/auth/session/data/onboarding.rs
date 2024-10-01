@@ -3,6 +3,7 @@ use newtypes::BoId;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKey;
 use newtypes::TenantId;
+use newtypes::WorkflowId;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Short-lived session representing an ob config, instead of using the long-lived publishable keys
@@ -34,4 +35,6 @@ pub struct OnboardingSessionTrustedMetadata {
 pub struct BoSession {
     pub bo_id: BoId,
     pub ob_config_id: ObConfigurationId,
+    // TODO make optional after all tokens expire
+    pub biz_wf_id: Option<WorkflowId>,
 }

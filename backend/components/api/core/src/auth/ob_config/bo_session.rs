@@ -1,3 +1,4 @@
+use crate::auth::session::onboarding::BoSession;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
@@ -25,6 +26,7 @@ pub struct ParsedBoSession {
     pub tenant: Tenant,
     pub ob_config: ObConfiguration,
     pub bo: BusinessOwner,
+    pub data: BoSession,
 }
 
 /// Auth extractor for a session to KYC a business owner
@@ -60,6 +62,7 @@ impl ExtractableAuthSession for ParsedBoSession {
             ob_config,
             tenant,
             bo,
+            data,
         })
     }
 
