@@ -69,7 +69,7 @@ const Table = <T,>({
   return (
     <>
       {shouldRenderFilters && (
-        <Stack marginBottom={5} flexDirection="column" gap={5}>
+        <Stack marginBottom={4} flexDirection="column" gap={5}>
           {(onChangeSearchText || renderActions) && (
             <TableFilters
               initialValue={initialSearch}
