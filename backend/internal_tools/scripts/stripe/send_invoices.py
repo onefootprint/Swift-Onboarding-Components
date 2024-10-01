@@ -1,4 +1,5 @@
 import arrow
+import argparse
 import stripe
 from PyInquirer import prompt
 from termcolor import colored
@@ -71,8 +72,8 @@ def print_invoice_comparison(invoice: stripe.Invoice):
     )
 
     # Fetch the line items for each invoice
-    get_lis = lambda id: reversed(
-        stripe.Invoice.list_lines(id, expand=["data.price.product"]).data
+    get_lis = lambda id: list(
+        reversed(stripe.Invoice.list_lines(id, expand=["data.price.product"]).data)
     )
     this_month = get_lis(invoice.id)
     last_month = get_lis(last_month_invoice.id) if last_month_invoice else []
@@ -186,7 +187,7 @@ def send_invoice(invoice: stripe.Invoice):
     if invoice.total < SMALL_INVOICE_NOTIONAL_CENTS:
         # For small invoices, let tenants pay via card
         payment_methods.append("card")
-        payment_methods.append("cash_app")
+        payment_methods.append("cashapp")
 
     # TODO next month: some of these might fail for customers that don't have a billing email
     invoice_update = dict(
@@ -214,6 +215,13 @@ def send_invoice(invoice: stripe.Invoice):
 
 
 if __name__ == "__main__":
-    invoices = get_invoices("2024-08")
+    parser = argparse.ArgumentParser(
+        prog="Send invoices",
+    )
+    parser.add_argument("-d", "--date", required=True)
+    args = parser.parse_args()
+    date = args.date
+
+    invoices = get_invoices(args.date)
     for invoice in invoices:
         send_invoice(invoice)
