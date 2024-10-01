@@ -16,7 +16,7 @@ This will add the `footprint_flutter` dependency to your project’s `pubspec.ya
 
 ```yaml
 dependencies:
-  footprint_flutter: ^2.0.0-beta.3
+  footprint_flutter: ^2.0.0-beta.3.1
 ```
 
 Alternatively, you can manually edit the `pubspec.yaml` file to add the dependency and run `flutter pub get` from the terminal to install the dependency.
@@ -27,7 +27,7 @@ After the installation, you need to link the InAppBrowser dependency. For iOS, m
 cd ios && pod install && cd ..
 ```
 
-**To use onboarding components, please install version 2.0.0-beta.3**
+**To use onboarding components, please install version 2.0.0-beta.3.1**
 
 ## Hosted flow
 

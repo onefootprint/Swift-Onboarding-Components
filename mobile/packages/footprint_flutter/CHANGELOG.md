@@ -28,3 +28,7 @@
 - The return type of `requiresAuth()` function has been updated to return helpful information such as already vaulted data, requirements, etc.
 - `getRequirements()` is a new helper function that lets to get the requirements at any point during the flow.
 - We provide an inline `process()` function to complete the flow inline if you aren’t collecting docs and passkeys.
+
+## 2.0.0-beta.3.1
+
+Late initialization bug fix

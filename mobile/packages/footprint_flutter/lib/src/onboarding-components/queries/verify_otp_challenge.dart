@@ -117,7 +117,7 @@ Future<VerifyOtpChallengeResponse> verifyOtpChallenge(
   final authToken = response.authToken;
   late String vTok;
   String? vaultingToken;
-  late String updatedAuthToken;
+  String updatedAuthToken = authToken;
   if (requestData.onboardingConfigKind == OnboardingConfigKind.auth) {
     vTok = (await validateOnboarding(authToken)).validationToken;
   } else {
