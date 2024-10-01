@@ -212,7 +212,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
     # Test identity doc uploaded via API
     id_card = next(i for i in body if i["kind"] == "id_card")
     assert not id_card["status"]
-    assert not id_card["started_at"]
+    assert id_card["started_at"]
     assert id_card["upload_source"] == "api"
     assert all(u["failure_reasons"] == [] for u in id_card["uploads"])
     assert any(u["side"] == "front" for u in id_card["uploads"])

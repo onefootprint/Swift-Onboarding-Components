@@ -13117,7 +13117,6 @@
                         "format": "double"
                     },
                     "started_at": {
-                        "description": "Non-null for images uploaded via the UI",
                         "type": "string",
                         "format": "date-time"
                     },

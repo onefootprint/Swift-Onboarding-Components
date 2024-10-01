@@ -110,6 +110,8 @@ pub async fn get(
             .collect::<FpResult<Vec<_>>>()?,
         api_docs.into_iter().map(api_wire_types::Document::from_db),
     )
+    .sorted_by_key(|d| d.started_at)
+    .rev()
     .collect();
     Ok(response)
 }

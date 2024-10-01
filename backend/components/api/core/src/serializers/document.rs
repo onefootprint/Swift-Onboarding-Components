@@ -86,6 +86,7 @@ impl<'a> TryDbToApi<(&'a Document, &'a DocumentRequest, DocumentUpload)> for api
 
 impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
     fn from_db((kind, uploads): DocumentVaultInfo) -> Self {
+        let started_at = uploads.iter().map(|(_, dl)| dl.created_at).min();
         let uploads = uploads
             .into_iter()
             .map(api_wire_types::DocumentUpload::from_db)
@@ -93,7 +94,7 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
 
         Self {
             kind,
-            started_at: None,
+            started_at,
             status: None,
             review_status: None,
             completed_version: None,
