@@ -273,7 +273,7 @@ def test_replace_verified_ci(sandbox_tenant, investor_profile_ob_config):
         if not body["user"]:
             return None
         token = FpAuth(body["user"]["token"])
-        body = get("hosted/user/private_info", None, token)
+        body = get("hosted/user/private/token", None, token)
         return body["fp_id"]
 
     # Write a new phone number

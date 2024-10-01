@@ -1,6 +1,4 @@
-use crate::auth::user::UserAuthContext;
-use api_core::auth::Any;
-use api_core::errors::ValidationError;
+use crate::auth::user::ItUserAuthContext;
 use api_core::web;
 use api_core::ApiResponse;
 use api_core::State;
@@ -24,19 +22,10 @@ pub struct PrivateUserInfo {
     tags(User, Hosted),
     description = "Returns information about the auth token. Can only be used in sandbox mode for demo tenants."
 )]
-#[actix::get("/hosted/user/private_info")]
-pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ApiResponse<PrivateUserInfo> {
-    let user_auth = user_auth.check_guard(Any)?;
-    // This method is only used for integration tests to be able to get an fp_id from an incomplete
-    // session. NOTE: Do not remove these validations below.
-    if !user_auth.tenant().is_some_and(|t| t.is_demo_tenant) {
-        return ValidationError("Can only use for demo tenants").into();
-    }
-    if user_auth.user.is_live {
-        return ValidationError("Can only use in sandbox mode").into();
-    }
-
-    let sb_id = user_auth.scoped_business_id();
+#[actix::get("/hosted/user/private/token")]
+pub async fn get(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiResponse<PrivateUserInfo> {
+    let user_auth = user_auth.into_inner();
+    let sb_id = user_auth.data.scoped_business_id();
     let sb = state
         .db_pool
         .db_query(move |conn| sb_id.map(|sb_id| ScopedVault::get(conn, &sb_id)).transpose())

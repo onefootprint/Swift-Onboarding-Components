@@ -49,7 +49,7 @@ pub async fn send_missing_secondary_bo_links(
 
     // If we created any BOs in the DB, create an auth session for each of the BOs - we will send
     // this token in a link to each BO
-    // TODO what happens when the session expires? similar to email link
+    // TODO what happens when the session expires?
     let duration = chrono::Duration::days(30);
     let sealing_key = state.session_sealing_key.clone();
     let sessions_to_make = missing_kyc_secondary_bos

@@ -34,7 +34,7 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
 
     # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to
     # make a token that inherits auth
-    foo_fp_id = get("hosted/user/private_info", None, foo_bifrost.auth_token)["fp_id"]
+    foo_fp_id = get("hosted/user/private/token", None, foo_bifrost.auth_token)["fp_id"]
 
     def get_scopes():
         body = post(

@@ -1594,7 +1594,7 @@
                 "security": []
             }
         },
-        "/hosted/user/private_info": {
+        "/hosted/user/private/token": {
             "get": {
                 "tags": [
                     "User",
@@ -1604,7 +1604,7 @@
                 "responses": {},
                 "security": [
                     {
-                        "User Token": []
+                        "Integration Testing User Onboarding Token": []
                     }
                 ]
             }
@@ -2151,6 +2151,12 @@
                 "in": "header",
                 "name": "X-Kyb-Bo-Token",
                 "description": "Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner."
+            },
+            "Integration Testing User Onboarding Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Authorization",
+                "description": "Short-lived auth token for an integration testing user during bifrost."
             },
             "Onboarding Config Publishable Key": {
                 "type": "apiKey",

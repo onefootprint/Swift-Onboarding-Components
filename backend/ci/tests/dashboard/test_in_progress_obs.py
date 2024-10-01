@@ -30,7 +30,7 @@ def test_in_progress_onboardings(sandbox_tenant, foo_sandbox_tenant):
     bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
-    fp_id3 = get("hosted/user/private_info", None, bifrost.auth_token)["fp_id"]
+    fp_id3 = get("hosted/user/private/token", None, bifrost.auth_token)["fp_id"]
 
     # Only fp_id3 should show in in-progress onboardings
     data = dict(is_live="false")

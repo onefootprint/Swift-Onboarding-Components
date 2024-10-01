@@ -105,7 +105,7 @@ def vault2(sandbox_id, sandbox_tenant):
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
     user = bifrost.run()
-    return get("hosted/user/private_info", None, user.client.auth_token)
+    return get("hosted/user/private/token", None, user.client.auth_token)
 
 
 @pytest.fixture(scope="function")
@@ -151,7 +151,7 @@ def vault4(sandbox_id, foo_sandbox_tenant):
         foo_sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
     user = bifrost.run()
-    return get("hosted/user/private_info", None, user.client.auth_token)
+    return get("hosted/user/private/token", None, user.client.auth_token)
 
 
 @pytest.fixture(scope="session")
@@ -205,7 +205,7 @@ def test_identify_priority(
     for i, (tenant, obc, expected_vault_id, expected_fp_id) in enumerate(tests):
         # TODO test identifying on email
         auth_token = IdentifyClient(obc, sandbox_id).inherit()
-        body = get("hosted/user/private_info", None, auth_token)
+        body = get("hosted/user/private/token", None, auth_token)
         assert body["vault_id"] == expected_vault_id
 
         if expected_fp_id:
@@ -234,7 +234,7 @@ def test_identify_with_non_portable_api_vault(
     fp_id_c = body["id"]
 
     auth_token = IdentifyClient(tenant_sandbox_obc, sandbox_id).inherit()
-    body = get("hosted/user/private_info", None, auth_token)
+    body = get("hosted/user/private/token", None, auth_token)
     assert body["fp_id"] == fp_id_c
 
 

@@ -378,7 +378,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     sandbox_id = bifrost.sandbox_id
 
     # Don't finish onboarding, but get the fp_id
-    fp_id = get("hosted/user/private_info", None, bifrost.auth_token)["fp_id"]
+    fp_id = get("hosted/user/private/token", None, bifrost.auth_token)["fp_id"]
 
     # Trigger
     expected_error = (

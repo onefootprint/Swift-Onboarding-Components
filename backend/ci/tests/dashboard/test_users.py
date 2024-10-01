@@ -15,7 +15,7 @@ def sandbox_user2(sandbox_tenant):
 @pytest.fixture(scope="module")
 def incomplete_user(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
-    body = get("hosted/user/private_info", None, bifrost.auth_token)
+    body = get("hosted/user/private/token", None, bifrost.auth_token)
     return body["fp_id"]
 
 
