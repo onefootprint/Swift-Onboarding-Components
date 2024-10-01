@@ -37,7 +37,7 @@
     "@radix-ui/react-portal": "^1.1.1",
     "@radix-ui/react-primitive": "^1.0.3",
     "@radix-ui/react-scroll-area": "1.0.3",
-    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "1.0.5",
     "cleave.js": "https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9",
