@@ -298,7 +298,7 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
                             ]
                         }
                     };
-                    uvw.patch_data_test(conn, data, true).unwrap();
+                    uvw.patch_data_test_str(conn, data, true).unwrap();
                     Ok(())
                 })
                 .await

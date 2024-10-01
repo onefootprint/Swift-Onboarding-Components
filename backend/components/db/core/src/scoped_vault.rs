@@ -164,7 +164,6 @@ macro_rules! list_query {
             }
         }
 
-        // Filter on onboarding status: pass/fail/incomplete/vault only
         if !$params.statuses.is_empty() {
             query = query.filter(scoped_vault::status.eq_any(&$params.statuses))
         }

@@ -7,20 +7,10 @@ from tests.utils import _gen_random_ssn, create_ob_config, post
 from tests.utils import get, patch
 
 
-def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
-    status_code = 200 if expected_error is None else 400
+def send_trigger(fp_id, sandbox_tenant, trigger):
     action = dict(trigger=trigger, kind="trigger")
     data = dict(actions=[action])
-    res = post(
-        f"entities/{fp_id}/actions",
-        data,
-        *sandbox_tenant.db_auths,
-        status_code=status_code,
-    )
-
-    if expected_error:
-        assert res["message"] == expected_error
-        return
+    post(f"entities/{fp_id}/actions", data, *sandbox_tenant.db_auths)
 
     # Grab the trigger ID from the timeline
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
@@ -372,7 +362,7 @@ def test_collect_business_document(sandbox_tenant, kyb_sandbox_ob_config):
 )
 def test_trigger_incomplete(sandbox_tenant, trigger):
     """
-    Ensure we can initiate a trigger for a user that has only an incomplete workflow. We should error if an id doc is requested
+    Ensure we can initiate a trigger for a user that has only an incomplete workflow.
     """
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_id = bifrost.sandbox_id
@@ -380,15 +370,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     # Don't finish onboarding, but get the fp_id
     fp_id = get("hosted/user/private/token", None, bifrost.auth_token)["fp_id"]
 
-    # Trigger
-    expected_error = (
-        "Cannot reonboard user - user has no complete onboardings. Please request additional information by onboarding a user onto a specific Playbook."
-        if trigger["kind"] == "document"
-        else None
-    )
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, expected_error)
-    if expected_error:
-        return
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
     auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
         assert_had_no_scopes=True
     )

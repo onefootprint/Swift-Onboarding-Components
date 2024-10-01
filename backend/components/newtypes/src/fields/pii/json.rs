@@ -116,6 +116,10 @@ impl PiiJsonValue {
         Self(value)
     }
 
+    pub fn new_string(value: String) -> Self {
+        Self(serde_json::Value::String(value))
+    }
+
     pub fn leak(&self) -> &serde_json::Value {
         &self.0
     }

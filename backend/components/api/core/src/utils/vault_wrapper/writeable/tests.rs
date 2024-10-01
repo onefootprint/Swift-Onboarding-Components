@@ -27,6 +27,7 @@ use newtypes::Fingerprint;
 use newtypes::FingerprintScope;
 use newtypes::IdentityDataKind;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::ValidateArgs;
 use std::collections::HashMap;
@@ -116,7 +117,7 @@ async fn test_prefill_data(state: &mut State) {
                 (IDK::FirstName.into(), PiiString::new("Hayes".into())),
                 (IDK::LastName.into(), PiiString::new("Valley".into())),
             ];
-            vw.patch_data_test(conn, data, true).unwrap();
+            vw.patch_data_test_str(conn, data, true).unwrap();
             let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
             vw.portablize_identity_data(conn).unwrap();
             let vw = VaultWrapper::<Person>::build_portable(conn, &su1.vault_id).unwrap();
@@ -285,7 +286,7 @@ async fn test_prefill_data(state: &mut State) {
             // TODO uncomment this after we switch the source of truth for reading
             // let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             // let data = vec![(IDK::Ssn4.into(), PiiString::new("4321".into()))];
-            // vw2.patch_data_test(conn, data, true).unwrap();
+            // vw2.patch_data_test_str(conn, data, true).unwrap();
 
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.portablize_identity_data(conn).unwrap();
@@ -326,7 +327,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
                 (IDK::FirstName.into(), PiiString::new("Hayes".into())),
                 (IDK::LastName.into(), PiiString::new("Valley".into())),
             ];
-            vw.patch_data_test(conn, data, true).unwrap();
+            vw.patch_data_test_str(conn, data, true).unwrap();
             let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &test_data.su1.id).unwrap();
             vw.portablize_identity_data(conn).unwrap();
 
@@ -431,7 +432,7 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         (IDK::Email.into(), PiiString::new("test1@onefootprint.com".into())),
         (IDK::PhoneNumber.into(), phone_number.clone()),
     ];
-    vw.patch_data_test(conn, data, true).unwrap();
+    vw.patch_data_test_str(conn, data, true).unwrap();
 
     // Mark the phone number as verified
     let args = ValidateArgs::for_bifrost(false);
@@ -458,16 +459,29 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
 
 impl<Type> WriteableVw<Type> {
     /// Shorthand to add data to a vault in tests
-    pub fn patch_data_test(
+    pub fn patch_data_test_str(
         self,
         conn: &mut TxnPgConn,
         data: Vec<(DataIdentifier, PiiString)>,
         create_fingerprints: bool,
     ) -> FpResult<Vec<(DataIdentifier, ContactInfo)>> {
+        let data = data
+            .into_iter()
+            .map(|(k, v)| (k, PiiJsonValue::from_piistring(v)))
+            .collect();
+        self.patch_data_test(conn, data, create_fingerprints)
+    }
+
+    /// Shorthand to add data to a vault in tests
+    pub fn patch_data_test(
+        self,
+        conn: &mut TxnPgConn,
+        data: Vec<(DataIdentifier, PiiJsonValue)>,
+        create_fingerprints: bool,
+    ) -> FpResult<Vec<(DataIdentifier, ContactInfo)>> {
         let sv = ScopedVault::get(conn, &self.sv.id)?;
         let data = HashMap::from_iter(data);
-        let request =
-            DataRequest::clean_and_validate_str(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
+        let request = DataRequest::clean_and_validate(data, ValidateArgs::for_bifrost(self.vault.is_live))?;
         // Add fingerprints for ID data
         let fingerprints = request
             .iter()

@@ -1,4 +1,4 @@
-import { OrgFrequentNoteKind, WorkflowStatus } from '@onefootprint/types';
+import { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Divider, Hint, Radio, Stack, Toggle, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -26,9 +26,7 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
-  const hasPriorOnboarding = !!entity.data?.workflows.some(
-    wf => wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail || wf.status === WorkflowStatus.none,
-  );
+  const hasPriorOnboarding = !!entity.data?.workflows.length;
   const defaultVariant = hasPriorOnboarding ? 'document' : 'onboard';
   const [requestVariant, setRequestVariant] = useState<RequestVariant>(defaultVariant);
 

@@ -141,6 +141,9 @@ fn get_final_decision_status(
             // Default to pass if no rules were triggered
             None => (DecisionStatus::Pass, false),
         },
+        // Even if there's a doc manual review, we will unconditionally return `None` if rules didn't execute
+        // (and not fail the user). The rule to "fail a user if there's a document review" is kind of like
+        // an implicit rule, so we don't want to run it if rules don't run at all
         RulesOutcome::RulesNotExecuted => (DecisionStatus::None, false),
     }
 }

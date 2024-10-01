@@ -47,18 +47,6 @@ fn validate(
             fp_bid,
             business_configs,
         } => {
-            // Since the proceeding workflow would overwrite the scoped vault's status, we don't
-            // to allow running a document workflow unless the user has already onboarded onto
-            // another playbook and hopefully has a KYC status/risk signals.
-            // Otherwise, the a document workflow could change a user's status to pass before any
-            // KYC is run.
-            // The frontend also disables these options.
-            // TODO: theoretically we should be checking risk signals here too or that there's an FP decision,
-            // but maybe not
-            if !scoped_vault.status.is_terminal() {
-                return Err(UserError::NoCompleteOnboardings.into());
-            }
-
             DocumentRequestConfig::validate(configs)?;
             match (fp_bid, business_configs) {
                 (Some(fp_bid), business_configs) if !business_configs.is_empty() => {

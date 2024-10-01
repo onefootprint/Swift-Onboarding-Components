@@ -28,6 +28,7 @@ use newtypes::DataIdentifier;
 use newtypes::DocumentRequestKind;
 use newtypes::IdentityDataKind;
 use newtypes::Locked;
+use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
@@ -36,6 +37,7 @@ use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowSource;
+use serde_json::json;
 
 pub async fn create_user_and_onboarding(
     state: &State,
@@ -225,7 +227,7 @@ pub fn create_user_and_populate_vault(
     ];
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id).unwrap();
-    let new_ci = uvw.patch_data_test(conn, update, false).unwrap();
+    let new_ci = uvw.patch_data_test_str(conn, update, false).unwrap();
     let (_, ci) = new_ci
         .into_iter()
         .find(|(di, _)| di == &DataIdentifier::from(IdentityDataKind::PhoneNumber))
@@ -243,36 +245,48 @@ pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId, obc:
     let mut update = vec![
         (
             BusinessDataKind::BeneficialOwners.into(),
-            PiiString::new(
-                "[{\"first_name\": \"Bob\", \"last_name\": \"Boberto\", \"ownership_stake\": 88}]".to_owned(),
-            ),
+            PiiJsonValue::new(json! {
+                [{"first_name": "Bob", "last_name": "Boberto", "ownership_stake": 88}]
+            }),
         ),
         (
             BusinessDataKind::Name.into(),
-            PiiString::new("Waffle House".to_owned()),
+            PiiJsonValue::new_string("Waffle House".to_owned()),
         ),
-        (BusinessDataKind::Dba.into(), PiiString::new("Waho".to_owned())),
+        (
+            BusinessDataKind::Dba.into(),
+            PiiJsonValue::new_string("Waho".to_owned()),
+        ),
         (
             BusinessDataKind::Tin.into(),
-            PiiString::new("123456789".to_owned()),
+            PiiJsonValue::new_string("123456789".to_owned()),
         ),
     ];
     if !ein_only {
         vec![
             (
                 BusinessDataKind::AddressLine1.into(),
-                PiiString::new("1 Biz Blvd".to_owned()),
+                PiiJsonValue::new_string("1 Biz Blvd".to_owned()),
             ),
             (
                 BusinessDataKind::City.into(),
-                PiiString::new("Gwinsville".to_owned()),
+                PiiJsonValue::new_string("Gwinsville".to_owned()),
             ),
-            (BusinessDataKind::State.into(), PiiString::new("NY".to_owned())),
-            (BusinessDataKind::Zip.into(), PiiString::new("12345".to_owned())),
-            (BusinessDataKind::Country.into(), PiiString::new("US".to_owned())),
+            (
+                BusinessDataKind::State.into(),
+                PiiJsonValue::new_string("NY".to_owned()),
+            ),
+            (
+                BusinessDataKind::Zip.into(),
+                PiiJsonValue::new_string("12345".to_owned()),
+            ),
+            (
+                BusinessDataKind::Country.into(),
+                PiiJsonValue::new_string("US".to_owned()),
+            ),
             (
                 BusinessDataKind::AddressLine2.into(),
-                PiiString::new("Apt 2".to_owned()),
+                PiiJsonValue::new_string("Apt 2".to_owned()),
             ),
         ]
         .into_iter()
