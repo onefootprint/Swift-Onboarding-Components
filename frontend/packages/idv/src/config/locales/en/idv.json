@@ -12,10 +12,7 @@
     },
     "components": {
       "layout": {
-        "secured-by-footprint": "Secured by Footprint",
         "sandbox-banner": "Sandbox Mode",
-        "privacy": "Privacy",
-        "whats-this": "About",
         "whats-this-drawer": {
           "label": "What's this?",
           "title": "We care about your PII data and privacy",
@@ -36,9 +33,12 @@
         }
       },
       "footer": {
-        "whats-this": "About",
         "privacy": "Privacy",
+        "whats-this": "About",
+        "secured-by-footprint": "Secured by Footprint",
         "languages": "Languages",
+        "sandbox-mode": "Sandbox Mode",
+        "change-language": "Switch to:",
         "support": {
           "label": "Support",
           "email": {

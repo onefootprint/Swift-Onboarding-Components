@@ -7,8 +7,6 @@ import Item from './item';
 import ItemIndicator from './item-indicator';
 import RadioGroup from './radio-group';
 import RadioItem from './radio-item';
-import SubContent from './sub-content';
-import SubTrigger from './sub-trigger';
 import Trigger from './trigger';
 
 const Divider = styled(RadixDropdown.Separator)`
@@ -33,8 +31,6 @@ const Dropdown = {
   RadioItem: RadioItem,
   RadioIndicator: ItemIndicator,
   Item: Item,
-  SubContent: SubContent,
-  SubTrigger: SubTrigger,
 };
 
 export default Dropdown;

@@ -76,13 +76,15 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content sideOffset={8} minWidth="160px">
-          {supportLinks.map(({ label, contactLink, onSelect }) =>
-            label && contactLink ? (
-              <StyledItem key={label} size="tiny" onSelect={() => onSelect(contactLink)}>
-                {label}
-              </StyledItem>
-            ) : null,
-          )}
+          <Dropdown.Group>
+            {supportLinks.map(({ label, contactLink, onSelect }) =>
+              label && contactLink ? (
+                <Dropdown.Item key={label} size="tiny" onSelect={() => onSelect(contactLink)}>
+                  {label}
+                </Dropdown.Item>
+              ) : null,
+            )}
+          </Dropdown.Group>
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -122,25 +124,6 @@ const StyledTrigger = styled.button`
     &:hover {
       text-decoration: underline;
       text-decoration-thickness: 1.5px;
-    }
-  `}
-`;
-
-const StyledItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    all: unset;
-    ${createFontStyles('caption-1')}
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
-      ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.sm};
-    cursor: pointer;
-    gap: ${theme.spacing[2]};
-
-    &:hover {
-      background-color: ${theme.backgroundColor.senary};
     }
   `}
 `;

@@ -43,8 +43,6 @@
     "repr",
     "scopable",
     "sqlx",
-    "subcontent",
-    "subtrigger",
     "Tailscale",
     "testkey",
     "thiserror",

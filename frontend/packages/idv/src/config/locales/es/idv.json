@@ -12,10 +12,7 @@
     },
     "components": {
       "layout": {
-        "secured-by-footprint": "Protegido por Footprint",
         "sandbox-banner": "Modo de prueba",
-        "privacy": "Privacidad",
-        "whats-this": "Sobre Footprint",
         "whats-this-drawer": {
           "label": "¿Qué es esto?",
           "title": "Tus datos personales y tu privacidad son muy importantes para nosotros",
@@ -36,13 +33,16 @@
         }
       },
       "footer": {
-        "whats-this": "Sobre Footprint",
         "privacy": "Privacidad",
-        "languages": "Languages",
+        "whats-this": "Sobre Footprint",
+        "secured-by-footprint": "Asegurado por Footprint",
+        "languages": "Idiomas",
+        "sandbox-mode": "Modo de prueba",
+        "change-language": "Cambiar a:",
         "support": {
           "label": "Soporte",
           "email": {
-            "label": "Mándanos un email",
+            "label": "Envíanos un email",
             "toast-error": {
               "title": "Error",
               "description": "No pudimos abrir tu cliente de correo electrónico"
@@ -59,11 +59,11 @@
             "label": "Llámanos",
             "toast-success": {
               "title": "Copiado!",
-              "description": "El número de teléfono ha sido copiado al portapapeles"
+              "description": "El número de teléfono ha sido copiado en el portapapeles"
             },
             "toast-error": {
               "title": "Error",
-              "description": "No pudimos copiar el número de teléfono al portapapeles"
+              "description": "No pudimos copiar el número de teléfono en el portapapeles"
             }
           }
         }

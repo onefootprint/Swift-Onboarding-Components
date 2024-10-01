@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import useResizeObserver from 'use-resize-observer';
 
+import Link from 'next/link';
 import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
@@ -21,7 +22,7 @@ type FootprintFooterProps = {
 
 const FootprintFooter = ({ hideOnDesktop, onWhatsThisClick, config }: FootprintFooterProps) => {
   const { t /* i18n */ } = useTranslation('idv', {
-    keyPrefix: 'global.components.layout',
+    keyPrefix: 'global.components.footer',
   });
   const {
     footer: { options, set: updateFooterOptions },
@@ -53,13 +54,11 @@ const FootprintFooter = ({ hideOnDesktop, onWhatsThisClick, config }: FootprintF
             {t('whats-this')}
           </Text>
         </WhatsThisButton>
-        <div>
-          <a href={`${FRONTPAGE_BASE_URL}/privacy-policy`} target="_blank" rel="noreferrer" className="footer-link">
-            <Text variant="caption-1" color="secondary" tag="span">
-              {t('privacy')}
-            </Text>
-          </a>
-        </div>
+        <Link href={`${FRONTPAGE_BASE_URL}/privacy-policy`} target="_blank" rel="noreferrer" className="footer-link">
+          <Text variant="caption-1" color="secondary" tag="span">
+            {t('privacy')}
+          </Text>
+        </Link>
         <LanguageSelect />
       </LinksContainer>
       <ActionsWrapper>

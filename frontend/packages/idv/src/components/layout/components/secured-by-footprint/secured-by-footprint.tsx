@@ -3,13 +3,15 @@ import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 const SecuredByFootprint = () => {
-  const { t } = useTranslation('idv');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.footer',
+  });
   return (
     <Stack justify="center" align="center">
       <IcoFootprintShield16 color="secondary" />
       <Stack marginLeft={2}>
         <Text variant="caption-1" color="secondary">
-          {t('global.components.layout.secured-by-footprint')}
+          {t('secured-by-footprint')}
         </Text>
       </Stack>
     </Stack>
