@@ -62,29 +62,27 @@ const FraudLabel = () => {
       )}
       <Dropdown.Portal>
         <Dropdown.Content align={label ? 'end' : 'start'} sideOffset={4}>
-          <Content>
-            <Dropdown.Group>
-              {Object.values(EntityLabel).map(labelOption => (
-                <Dropdown.Item
-                  key={labelOption}
-                  onClick={() => handleEditLabel(labelOption)}
-                  checked={labelOption === label}
-                >
-                  {labelT(labelOption)}
+          <Dropdown.Group>
+            {Object.values(EntityLabel).map(labelOption => (
+              <Dropdown.Item
+                key={labelOption}
+                onClick={() => handleEditLabel(labelOption)}
+                checked={labelOption === label}
+              >
+                {labelT(labelOption)}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Group>
+          {label && (
+            <>
+              <Dropdown.Divider />
+              <Dropdown.Group>
+                <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
+                  {t('labels.remove')}
                 </Dropdown.Item>
-              ))}
-            </Dropdown.Group>
-            {label && (
-              <>
-                <Dropdown.Divider />
-                <Dropdown.Group>
-                  <Dropdown.Item onClick={() => handleEditLabel(null)} variant="destructive" iconLeft={IcoTrash16}>
-                    {t('labels.remove')}
-                  </Dropdown.Item>
-                </Dropdown.Group>
-              </>
-            )}
-          </Content>
+              </Dropdown.Group>
+            </>
+          )}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -157,17 +155,6 @@ const ChevronContainer = styled(Dropdown.Trigger)`
     }
 
   `}
-`;
-
-const Content = styled(Stack)`
-  ${({ theme }) => css`
-    width: 186px;
-    flex-direction: column;
-    padding: 0;
-    background-color: ${theme.backgroundColor.primary};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-  `};
 `;
 
 export default FraudLabel;
