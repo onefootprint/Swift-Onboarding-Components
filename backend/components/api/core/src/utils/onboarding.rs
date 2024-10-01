@@ -4,8 +4,12 @@ use super::vault_wrapper::TenantVw;
 use super::vault_wrapper::VaultWrapper;
 use super::vault_wrapper::WriteableVw;
 use crate::auth::tenant::AuthActor;
+use crate::auth::user::CheckedUserAuthContext;
+use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
+use api_errors::AssertionError;
+use api_errors::ValidationError;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
@@ -13,7 +17,6 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::IsNew;
 use db::models::scoped_vault::ScopedVault;
-use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::models::workflow::OnboardingWorkflowArgs;
@@ -27,6 +30,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::ObConfigurationKind;
 use newtypes::ScopedVaultId;
 use newtypes::Selfie;
 use newtypes::VaultKind;
@@ -176,7 +180,8 @@ pub fn get_or_create_business_wf(
     common_args: CommonWfArgs,
     // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's
     // but could one day
-    new_biz_args: NewBusinessWfArgs,
+    new_biz_keypair: VaultKeyPair,
+    user_auth: &CheckedUserAuthContext,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> FpResult<Workflow> {
     let CommonWfArgs {
@@ -187,54 +192,58 @@ pub fn get_or_create_business_wf(
         force_create,
         su,
     } = common_args;
-    let uv = Vault::lock(conn, &su.vault_id)?;
 
-    let sb = match new_biz_args {
-        NewBusinessWfArgs::NewWorkflow { sb_id } => {
-            // A scoped business has been attached to this session already, usually via user-specific
-            // sessions.
-            let sb = ScopedVault::get(conn, &sb_id)?;
-            let id = ScopedVaultIdentifier::OwnedFpBid {
-                fp_bid: &sb.fp_id,
-                uv_id: &uv.id,
-            };
-            ScopedVault::get(conn, id)?
-        }
-        NewBusinessWfArgs::MaybeNewVaultAndWf {
+    let uv = Vault::lock(conn, &su.vault_id)?;
+    if obc.kind != ObConfigurationKind::Kyb {
+        return ValidationError("Cannot onboard a business to a non-KYB playbook").into();
+    }
+
+    //
+    // Get or create a new business vault
+    //
+
+    let existing_businesses = (!force_create).then_some(BusinessOwner::list_businesses_for_playbook(
+        conn, &uv.id, &obc.id,
+    )?);
+    let sb_id = if let Some(sb_id) = user_auth.scoped_business_id() {
+        // A scoped business has been attached to this session already, usually via user-specific
+        // sessions.
+        // Also via secondary beneficial owner tokens
+        sb_id
+    } else if let Some((_, sb)) = existing_businesses.into_iter().flatten().next() {
+        // If the user has already started onboarding their business onto this exact ob config AND we aren't
+        // force creating a new workflow (which should also support force creating a new business), we
+        // should locate the existing business.
+        // This supports inheriting in-progress business onboaridngs and short-circuiting when a user has
+        // already onboarded onto a playbook.
+        sb.id
+    } else if !user_auth.is_secondary_bo() {
+        let (public_key, e_private_key) = new_biz_keypair;
+        // Otherwise, make a new business vault and scoped vault owned by the currently authed user
+        let args = NewVaultArgs {
             public_key,
             e_private_key,
-        } => {
-            // TODO don't always create a new business vault - once we have portable businesses,
-            // we should display to the client an ability to select the business they want to use
-            let existing_businesses = (!force_create).then_some(BusinessOwner::list_businesses_for_playbook(
-                conn, &uv.id, &obc.id,
-            )?);
-            if let Some(existing) = existing_businesses.into_iter().flatten().next() {
-                // If the user has already started onboarding their business onto this exact
-                // ob config AND the playbook doesn't support multiple onboardings, we should locate it.
-                // Note, this isn't quite portablizing the business since we only locate it
-                // when onboarding onto the exact same ob config.
-                return Ok(existing.1 .1);
-            }
-            // Otherwise, make a new business vault and scoped vault owned by the currently authed user
-            let args = NewVaultArgs {
-                public_key,
-                e_private_key,
-                is_live: uv.is_live,
-                kind: VaultKind::Business,
-                is_fixture: false,
-                sandbox_id: uv.sandbox_id.clone(), // Use the same sandbox ID for business vault
-                is_created_via_api: false,
-                duplicate_of_id: None,
-            };
-            let business_vault = Vault::create(conn, args)?;
-            BusinessOwner::create_primary(conn, uv.id.clone(), business_vault.id.clone())?;
-            let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
-            sb
-        }
+            is_live: uv.is_live,
+            kind: VaultKind::Business,
+            is_fixture: false,
+            sandbox_id: uv.sandbox_id.clone(), // Use the same sandbox ID for business vault
+            is_created_via_api: false,
+            duplicate_of_id: None,
+        };
+        let business_vault = Vault::create(conn, args)?;
+        BusinessOwner::create_primary(conn, uv.id.clone(), business_vault.id.clone())?;
+        let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
+        sb.id
+    } else {
+        return AssertionError("Secondary BO should already have associated business").into();
     };
+
+    //
+    // Get or create a new business workflow
+    //
+
     let ob_create_args = OnboardingWorkflowArgs {
-        scoped_vault_id: sb.id,
+        scoped_vault_id: sb_id,
         ob_configuration_id: obc.id.clone(),
         authorized: true,
         insight_event,

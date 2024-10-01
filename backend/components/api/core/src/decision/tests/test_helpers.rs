@@ -1,10 +1,8 @@
 use crate::decision::rule_engine;
 use crate::tests::fixtures::lib::random_phone_number;
-use crate::utils::onboarding::get_or_create_business_wf;
 use crate::utils::onboarding::get_or_create_user_workflow;
 use crate::utils::onboarding::CommonWfArgs;
 use crate::utils::onboarding::CreateUserWfArgs;
-use crate::utils::onboarding::NewBusinessWfArgs;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -18,6 +16,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
+use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::fixtures::{
@@ -53,15 +52,6 @@ pub async fn create_user_and_onboarding(
     Option<Workflow>, // Business workflow
 ) {
     let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
-    let biz_args = if create_business {
-        let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
-        Some(NewBusinessWfArgs::MaybeNewVaultAndWf {
-            public_key,
-            e_private_key,
-        })
-    } else {
-        None
-    };
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
@@ -107,11 +97,24 @@ pub async fn create_user_and_onboarding(
             let wf = Workflow::get(conn, &wf_id)?;
             assert!(wf.authorized_at.is_some());
 
-            let biz_wf = if let Some(biz_args) = biz_args {
-                let biz_wf = get_or_create_business_wf(conn, common_args, biz_args, kyc_fixture_result)?;
+            let biz_wf = if create_business {
+                let sandbox_id = uv.sandbox_id.as_ref().map(|id| id.to_string());
+                let bv = fixtures::vault::create(conn, VaultKind::Business, sandbox_id, true);
+                let sb = fixtures::scoped_vault::create(conn, &bv.id, &obc.id).into_inner();
+                let ob_create_args = OnboardingWorkflowArgs {
+                    scoped_vault_id: sb.id.clone(),
+                    ob_configuration_id: obc.id.clone(),
+                    authorized: true,
+                    insight_event: None,
+                    source: WorkflowSource::Hosted,
+                    fixture_result: kyc_fixture_result,
+                    is_one_click: false,
+                    wfr: None,
+                    is_neuro_enabled: false,
+                };
+                let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
                 assert!(biz_wf.authorized_at.is_some());
-                let sbv = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
-                populate_business_vault(conn, &sbv.id, &obc);
+                populate_business_vault(conn, &sb.id, &obc);
                 Some(biz_wf)
             } else {
                 None

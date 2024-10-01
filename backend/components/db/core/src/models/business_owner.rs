@@ -1,6 +1,5 @@
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
-use super::workflow::Workflow;
 use crate::DbError;
 use crate::DbResult;
 use crate::OffsetPaginatedResult;
@@ -13,6 +12,7 @@ use db_schema::schema::business_owner;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::vault;
 use db_schema::schema::workflow;
+use diesel::dsl::exists;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::BoId;
@@ -161,17 +161,18 @@ impl BusinessOwner {
         conn: &mut PgConn,
         uv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
-    ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Workflow))>> {
+    ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
         let result = business_owner::table
-            .inner_join(
-                scoped_vault::table
-                    .on(scoped_vault::vault_id.eq(business_owner::business_vault_id))
-                    .inner_join(workflow::table),
-            )
+            .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
             .filter(business_owner::user_vault_id.eq(uv_id))
             // Only get the ScopedVault for the businesses that onboarded onto the
             // same ob config
-            .filter(workflow::ob_configuration_id.eq(ob_config_id))
+            .filter(exists(
+                workflow::table
+                    .filter(workflow::scoped_vault_id.eq(scoped_vault::id))
+                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
+            ))
+            .order_by(scoped_vault::start_timestamp.desc())
             .get_results(conn)?;
         Ok(result)
     }
@@ -187,6 +188,7 @@ impl BusinessOwner {
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
             .filter(business_owner::user_vault_id.eq(uv_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .order_by(business_owner::created_at.asc())
             .get_results(conn)?;
         Ok(result)
     }

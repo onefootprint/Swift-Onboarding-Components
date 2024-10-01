@@ -17,7 +17,6 @@ use api_core::utils::onboarding::get_or_create_business_wf;
 use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateUserWfArgs;
-use api_core::utils::onboarding::NewBusinessWfArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -60,7 +59,6 @@ pub async fn post(
         .ob_configuration_id()
         .or(pk_obc_id)
         .ok_or(OnboardingError::NoObConfig)?;
-
     let wfr_id = user_auth.wfr_id.clone();
     let (scoped_user, ob_config, tenant, vw, wfr) = state
         .db_pool
@@ -80,20 +78,11 @@ pub async fn post(
         Some(WorkflowRequestConfig::Document { business_configs, .. }) => !business_configs.is_empty(),
         _ => false,
     };
-    let should_create_biz_wf = (ob_config.kind == ObConfigurationKind::Kyb || collecting_biz_doc)
-        && user_auth.business_workflow_id().is_none();
 
-    let maybe_new_biz_args = if should_create_biz_wf {
-        // If we're going to make a new business vault,
-        if let Some(sb_id) = user_auth.scoped_business_id() {
-            Some(NewBusinessWfArgs::NewWorkflow { sb_id })
-        } else {
-            let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-            Some(NewBusinessWfArgs::MaybeNewVaultAndWf {
-                public_key,
-                e_private_key,
-            })
-        }
+    let should_get_or_create_biz_wf = ob_config.kind == ObConfigurationKind::Kyb || collecting_biz_doc;
+    let maybe_new_biz_keypair = if should_get_or_create_biz_wf {
+        // Have to pre-generate the keypair since this is async
+        Some(state.enclave_client.generate_sealed_keypair().await?)
     } else {
         None
     };
@@ -138,8 +127,8 @@ pub async fn post(
             let (wf_id, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
             let kyb_fixture_result = request.kyb_fixture_result.or(request.fixture_result);
-            let biz_wf = maybe_new_biz_args
-                .map(|biz_args| get_or_create_business_wf(conn, common_args, biz_args, kyb_fixture_result))
+            let biz_wf = maybe_new_biz_keypair
+                .map(|kp| get_or_create_business_wf(conn, common_args, kp, &user_auth, kyb_fixture_result))
                 .transpose()?;
 
             // Update auth token with new identifiers
