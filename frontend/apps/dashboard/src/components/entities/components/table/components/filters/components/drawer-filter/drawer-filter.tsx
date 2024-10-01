@@ -74,7 +74,7 @@ const DrawerFilter = () => {
         open={open}
         onClose={close}
         primaryButton={{ label: t('cta'), onClick: handleSubmit(onSubmit) }}
-        secondaryButton={{ label: t('reset'), onClick: handleReset }}
+        linkButton={{ label: t('reset'), onClick: handleReset }}
       >
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(onSubmit)}>
