@@ -295,10 +295,6 @@ impl ScopedVault {
             None => Vault::insert(conn, new_user, idempotency_id)?,
         };
 
-        if !uv.is_created_via_api {
-            return Err(DbError::CannotCreatedScopedUser);
-        }
-
         let su = if is_new_vault {
             let start_timestamp = Utc::now();
             let seqno = DataLifetime::get_current_seqno(conn)?;

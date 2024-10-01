@@ -98,8 +98,6 @@ pub enum DbError {
     IncorrectTenantKind,
     #[error("Scoped user is_live doesn't match UserVault is_live")]
     SandboxMismatch,
-    #[error("Only portable vaults can be linked to an ob config")]
-    CannotCreatedScopedUser,
     #[error("TenantRole must have is_live set IFF it is an API key role")]
     InvalidRoleIsLive,
     #[error("Cannot update an immutable role {0}")]
@@ -205,7 +203,6 @@ impl FpErrorTrait for DbError {
             Self::IncorrectTenantRoleKind => StatusCode::BAD_REQUEST,
             Self::IncorrectTenantKind => StatusCode::BAD_REQUEST,
             Self::SandboxMismatch => StatusCode::BAD_REQUEST,
-            Self::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
             Self::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
             Self::NewtypesError(newtypes::Error::AssertionError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NewtypesError(_) => StatusCode::BAD_REQUEST,
