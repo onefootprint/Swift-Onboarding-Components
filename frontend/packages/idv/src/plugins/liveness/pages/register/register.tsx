@@ -13,7 +13,6 @@ import NavigationHeader from '../../../../components/layout/components/navigatio
 import { useSkipLiveness } from '../../../../queries';
 import { FPCustomEvents, sendCustomEvent } from '../../../../utils/custom-event';
 import { getLogger, trackAction } from '../../../../utils/logger';
-import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-register-biometric';
 
@@ -156,7 +155,6 @@ const Register = ({
         <Box marginBottom={3}>{icon}</Box>
         <HeaderTitle title={headerTitle} subtitle={headerSubtitle} />
         <Stack direction="column" marginTop={7} width="100%" gap={4}>
-          {biometricInitMutation.isSuccess && <LivenessSuccess />}
           {primaryButtonText && (
             <Button
               loading={biometricInitMutation.isPending}
