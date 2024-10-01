@@ -9,6 +9,7 @@ type ClientTokenFieldsRequest = {
 type ClientTokenFieldsResponse = {
   vault_fields: string[];
   expires_at: Date;
+  tenant?: { name: string };
 };
 
 const clientTokenFields = async (request: ClientTokenFieldsRequest) => {
@@ -24,6 +25,7 @@ const clientTokenFields = async (request: ClientTokenFieldsRequest) => {
   return {
     vaultFields: response.vault_fields,
     expiresAt: new Date(response.expires_at),
+    tenantName: response.tenant?.name,
   };
 };
 

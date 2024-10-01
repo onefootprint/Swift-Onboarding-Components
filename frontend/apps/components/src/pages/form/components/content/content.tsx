@@ -1,6 +1,6 @@
 import type { FootprintFormDataProps, FootprintVariant } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent, FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { getLogger } from '@onefootprint/idv';
+import { Logger, getLogger, trackAction } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -22,35 +22,46 @@ import Invalid from '../invalid';
 
 type ContentProps = { fallback: JSX.Element };
 
-const { logError, logInfo, logTrack, logWarn } = getLogger({
-  location: 'form',
-});
+const { logError, logInfo, logTrack, logWarn } = getLogger({ location: 'form' });
 
 const Content = ({ fallback }: ContentProps) => {
   const footprintProvider = useFootprintProvider();
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.secure-form',
-  });
-  const [props, setProps] = useState<FootprintFormDataProps>();
-  useProps<FootprintFormDataProps>(setProps);
+  const { t } = useTranslation('common', { keyPrefix: 'pages.secure-form' });
+  const { vaultData, usersVaultMutation } = useVaultData();
+
   const router = useRouter();
-  const variant = router.query.variant as FootprintVariant;
+  const variant = router.query.variant as FootprintVariant | undefined;
+
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>> | undefined>(undefined);
   const [formErrorMessage, setFormErrorMessage] = useState<string | undefined>();
 
+  const [props, setProps] = useState<FootprintFormDataProps>();
   const { authToken = '', title, options = {} } = props || {};
   const { hideFootprintLogo, hideCancelButton, hideButtons } = options;
-  useEffect(() => {
-    logTrack(
-      `Received form props: title=${title}, hideFootprintLogo=${
-        hideFootprintLogo ? 'true' : 'false'
-      }, hideCancelButton=${hideCancelButton ? 'true' : 'false'}, hideButtons=${
-        hideButtons ? 'true' : 'false'
-      }. ${authToken ? 'Has' : 'No'} auth token.`,
-    );
-  }, [authToken, title, hideFootprintLogo, hideButtons, hideCancelButton]);
-  const { vaultData, usersVaultMutation } = useVaultData();
+
   const clientTokenFields = useClientTokenFields(authToken);
+
+  useProps<FootprintFormDataProps>(props => {
+    trackAction('form:started');
+    setProps(props);
+  });
+
+  useEffect(() => {
+    const logParams = [
+      `title=${title ? 'present' : 'absent'}`,
+      `authToken=${authToken ? 'present' : 'absent'}`,
+      `hideButtons=${!!hideButtons}`,
+      `hideCancelButton=${!!hideCancelButton}`,
+      `hideFootprintLogo=${!!hideFootprintLogo}`,
+    ].join(', ');
+    logTrack(`Received form props: ${logParams}`);
+  }, [authToken, hideButtons, hideCancelButton, hideFootprintLogo, title]);
+
+  useEffect(() => {
+    if (!clientTokenFields.isLoading && clientTokenFields.data?.tenantName) {
+      Logger.appendGlobalContext({ orgName: clientTokenFields.data.tenantName });
+    }
+  }, [clientTokenFields.data, clientTokenFields.isLoading]);
 
   const handleCancel = () => {
     logTrack('Triggered form cancel');
@@ -64,13 +75,14 @@ const Content = ({ fallback }: ContentProps) => {
 
   const handleVaultDataError = (err: unknown, savedViaRef?: boolean) => {
     if (!err) {
+      logWarn('Unknown error while vaulting data');
       return;
     }
     if (typeof err === 'string') {
       if (savedViaRef) {
         handleRefSaveError(err);
       }
-      logWarn(`Setting form-wide error, ${err}`);
+      logWarn('Setting form-wide error', err);
       setFormErrorMessage(err);
       return;
     }
@@ -90,6 +102,7 @@ const Content = ({ fallback }: ContentProps) => {
   };
 
   const handleComplete = () => {
+    trackAction('form:completed');
     logTrack('Triggered form complete');
     // Triggers the onComplete callback on the SDK
     footprintProvider.send(FootprintPublicEvent.completed);
@@ -99,6 +112,7 @@ const Content = ({ fallback }: ContentProps) => {
 
   const handleRefSaveError = (error: string) => {
     // Rejects the promise returned from the save ref method
+    logError('Triggered form save via ref failed', error);
     footprintProvider.send(FootprintPrivateEvent.formSaveFailed, error);
   };
 
@@ -137,8 +151,7 @@ const Content = ({ fallback }: ContentProps) => {
     });
   };
 
-  const { data, isError, isLoading, error } = clientTokenFields;
-  if (isLoading) {
+  if (clientTokenFields.isLoading) {
     logTrack('Fetching client token fields');
     return fallback; // Default to a loading state here
   }
@@ -147,12 +160,15 @@ const Content = ({ fallback }: ContentProps) => {
     return fallback; // Default to a loading state here
   }
 
-  if (isError) {
-    logError(`Fetching client token fields failed with error: ${getErrorMessage(error)}.`, error);
+  if (clientTokenFields.isError) {
+    logError(
+      `Fetching client token fields failed with error: ${getErrorMessage(clientTokenFields.error)}.`,
+      clientTokenFields.error,
+    );
     return <Invalid onClose={handleClose} />;
   }
 
-  const { vaultFields, expiresAt } = data ?? {};
+  const { vaultFields, expiresAt } = clientTokenFields.data ?? {};
   const sections = getFormSectionsFromFields(vaultFields);
   if (!sections.length) {
     logError('Auth token is missing fields');
@@ -171,7 +187,7 @@ const Content = ({ fallback }: ContentProps) => {
     return <Invalid onClose={handleClose} />;
   }
 
-  if (!data) {
+  if (!clientTokenFields.data) {
     logError('Received empty response while fetching client token fields');
     return <Invalid onClose={handleClose} />;
   }
