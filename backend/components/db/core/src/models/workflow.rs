@@ -138,7 +138,7 @@ pub enum WorkflowIdentifier<'a> {
 }
 
 #[derive(Debug)]
-pub struct OnboardingWorkflowArgs {
+pub struct OnboardingWorkflowArgs<'a> {
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: Option<CreateInsightEvent>,
@@ -149,7 +149,7 @@ pub struct OnboardingWorkflowArgs {
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub is_one_click: bool,
     /// If starting from a WorkflowRequest, the config
-    pub wfr: Option<WorkflowRequest>,
+    pub wfr: Option<&'a WorkflowRequest>,
     pub is_neuro_enabled: bool,
 }
 
@@ -225,7 +225,7 @@ impl Workflow {
             }
         }
 
-        let config = if let Some(wfr_config) = wfr.as_ref().map(|wfr| &wfr.config) {
+        let config = if let Some(wfr_config) = wfr.map(|wfr| &wfr.config) {
             match wfr_config {
                 WorkflowRequestConfig::RedoKyc | WorkflowRequestConfig::Onboard { .. } => {
                     if v.kind != VaultKind::Person {

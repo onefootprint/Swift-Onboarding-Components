@@ -1,12 +1,12 @@
 use crate::decision::rule_engine;
 use crate::tests::fixtures::lib::random_phone_number;
+use crate::utils::onboarding::get_or_create_business_wf;
+use crate::utils::onboarding::get_or_create_user_workflow;
+use crate::utils::onboarding::CommonWfArgs;
+use crate::utils::onboarding::CreateUserWfArgs;
 use crate::utils::onboarding::NewBusinessWfArgs;
-use crate::utils::onboarding::NewOnboardingArgs;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::utils::{
-    self,
-};
 use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
@@ -84,48 +84,38 @@ pub async fn create_user_and_onboarding(
             let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
             let su = su.into_inner();
 
-            let args = NewOnboardingArgs {
-                existing_wf_id: None,
-                wfr_id: None,
-                force_create: false,
-                sv: &su,
-                seqno: DataLifetime::get_current_seqno(conn)?,
+            let common_args = CommonWfArgs {
                 obc: &obc,
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
-                new_biz_args: biz_args,
                 source: WorkflowSource::Hosted,
-                fixture_result: None,
-                kyb_fixture_result: None,
+                wfr: None,
+                force_create: false,
+                su: &su,
+            };
+            let args = CreateUserWfArgs {
+                existing_wf_id: None,
+                seqno: DataLifetime::get_current_seqno(conn)?,
+                fixture_result: kyc_fixture_result,
                 actor: None,
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,
-                is_secondary_bo: false,
             };
-            let (wf_id, biz_wf, _) = utils::onboarding::get_or_start_onboarding(conn, args).unwrap();
-            if let Some(fixture_result) = kyc_fixture_result {
-                Workflow::update_fixture_result(conn, &wf_id, fixture_result).unwrap();
-            }
+            let (wf_id, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
 
-            // Mark the onboardings as authorized since they would be authorized in prod by the
-            // time they're used here
-            Workflow::set_is_authorized(conn, &wf_id)?;
+            // Make sure the workflow is authorized since it would be authorized in prod by the time it's
+            // used here
             let wf = Workflow::get(conn, &wf_id)?;
+            assert!(wf.authorized_at.is_some());
 
-            let biz_wf = biz_wf
-                .map(|biz_wf| -> FpResult<_> {
-                    Workflow::set_is_authorized(conn, &biz_wf.id)?;
-                    let biz_wf = Workflow::get(conn, &biz_wf.id)?;
-                    Ok(biz_wf)
-                })
-                .transpose()?;
-
-            if let Some(biz_wf) = biz_wf.as_ref() {
+            let biz_wf = if let Some(biz_args) = biz_args {
+                let biz_wf = get_or_create_business_wf(conn, common_args, biz_args, kyc_fixture_result)?;
+                assert!(biz_wf.authorized_at.is_some());
                 let sbv = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
                 populate_business_vault(conn, &sbv.id, &obc);
-                if let Some(fixture_result) = kyc_fixture_result {
-                    Workflow::update_fixture_result(conn, &biz_wf.id, fixture_result).unwrap();
-                }
-            }
+                Some(biz_wf)
+            } else {
+                None
+            };
 
             Ok((tenant, wf, uv, su, obc.into_inner(), biz_wf))
         })

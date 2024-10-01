@@ -13,8 +13,11 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::onboarding::get_or_create_business_wf;
+use api_core::utils::onboarding::get_or_create_user_workflow;
+use api_core::utils::onboarding::CommonWfArgs;
+use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::onboarding::NewBusinessWfArgs;
-use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -73,7 +76,7 @@ pub async fn post(
         })
         .await?;
 
-    let collecting_biz_doc = match wfr.map(|wfr| wfr.config) {
+    let collecting_biz_doc = match wfr.clone().map(|wfr| wfr.config) {
         Some(WorkflowRequestConfig::Document { business_configs, .. }) => !business_configs.is_empty(),
         _ => false,
     };
@@ -116,27 +119,30 @@ pub async fn post(
             // If this auth token allows reonboarding OR the playbook is opted into always allow reonboarding,
             // force create a new workflwo
             let force_create = user_auth.data.allow_reonboard || ob_config.allow_reonboard;
-            let args = NewOnboardingArgs {
-                existing_wf_id: user_auth.workflow_id(),
-                wfr_id: user_auth.wfr_id.clone(),
-                force_create,
-                sv: &scoped_user,
-                seqno: vw.seqno,
+            let common_args = CommonWfArgs {
                 obc: &obc,
-                insight_event: Some(insight_event.clone()),
-                new_biz_args: maybe_new_biz_args,
+                insight_event: Some(insight_event),
                 source: WorkflowSource::Hosted,
+                wfr: wfr.as_ref(),
+                force_create,
+                su: &scoped_user,
+            };
+            let args = CreateUserWfArgs {
+                existing_wf_id: user_auth.workflow_id(),
+                seqno: vw.seqno,
                 fixture_result: request.fixture_result,
-                kyb_fixture_result: request.kyb_fixture_result,
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,
-                is_secondary_bo: user_auth.is_secondary_bo(),
             };
-            let (wf_id, biz_wf, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, _) = get_or_create_user_workflow(conn, common_args.clone(), args)?;
+
+            let kyb_fixture_result = request.kyb_fixture_result.or(request.fixture_result);
+            let biz_wf = maybe_new_biz_args
+                .map(|biz_args| get_or_create_business_wf(conn, common_args, biz_args, kyb_fixture_result))
+                .transpose()?;
 
             // Update auth token with new identifiers
-            // TODO should we issue a new token here for good measure?
             let (biz_wf_id, sb_id) = biz_wf.map(|wf| (wf.id, wf.scoped_vault_id)).unzip();
             let args = NewUserSessionContext {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf_id),

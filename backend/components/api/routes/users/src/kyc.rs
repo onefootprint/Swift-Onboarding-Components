@@ -17,7 +17,9 @@ use api_core::telemetry::RootSpan;
 use api_core::types::WithVaultVersionHeader;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::onboarding::get_or_create_user_workflow;
+use api_core::utils::onboarding::CommonWfArgs;
+use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::EntityInfo;
 use api_core::utils::requirements::GetRequirementsArgs;
@@ -164,25 +166,24 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let args = NewOnboardingArgs {
-                existing_wf_id: None,
-                wfr_id: None,
-                force_create: allow_reonboard,
-                sv: &sv,
-                seqno,
+            let common_args = CommonWfArgs {
                 obc: &obc,
                 insight_event: None,
-                new_biz_args: None, // currently dont support KYB for NPV
                 source: WorkflowSource::Tenant,
+                wfr: None,
+                force_create: allow_reonboard,
+                su: &sv,
+            };
+            let args = CreateUserWfArgs {
+                existing_wf_id: None,
+                seqno,
                 fixture_result: fixture_result.map(|fr| fr.into()),
-                kyb_fixture_result: None,
                 actor: Some(actor),
                 maybe_prefill_data: None,
                 // can't run neuro if using this path
                 is_neuro_enabled: false,
-                is_secondary_bo: false,
             };
-            let (wf_id, _, is_new_ob) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, is_new_ob) = get_or_create_user_workflow(conn, common_args, args)?;
             if !is_new_ob {
                 return Err(TfError::AlreadyOnboardedToPlaybook.into());
             }

@@ -34,7 +34,6 @@ use newtypes::VaultPublicKey;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
-use newtypes::WorkflowRequestId;
 use newtypes::WorkflowSource;
 
 #[derive(Debug)]
@@ -50,150 +49,145 @@ pub enum NewBusinessWfArgs {
     NewWorkflow { sb_id: ScopedVaultId },
 }
 
-pub struct NewOnboardingArgs<'a> {
-    pub existing_wf_id: Option<WorkflowId>,
-    pub wfr_id: Option<WorkflowRequestId>,
-    pub force_create: bool,
-    pub sv: &'a ScopedVault,
-    pub seqno: DataLifetimeSeqno,
+#[derive(Clone)]
+pub struct CommonWfArgs<'a> {
     pub obc: &'a ObConfiguration,
     pub insight_event: Option<CreateInsightEvent>,
-    // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could
-    // one day
-    pub new_biz_args: Option<NewBusinessWfArgs>,
-    pub fixture_result: Option<WorkflowFixtureResult>,
-    pub kyb_fixture_result: Option<WorkflowFixtureResult>,
     pub source: WorkflowSource,
+    pub wfr: Option<&'a WorkflowRequest>,
+    pub force_create: bool,
+    pub su: &'a ScopedVault,
+}
+
+pub struct CreateUserWfArgs {
+    pub existing_wf_id: Option<WorkflowId>,
+    pub seqno: DataLifetimeSeqno,
+    pub fixture_result: Option<WorkflowFixtureResult>,
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,
     pub is_neuro_enabled: bool,
-    pub is_secondary_bo: bool,
 }
 
-#[allow(clippy::too_many_arguments)]
-#[tracing::instrument("get_or_start_onboarding", skip_all)]
-pub fn get_or_start_onboarding(
+#[tracing::instrument("get_or_create_user_workflow", skip_all)]
+pub fn get_or_create_user_workflow(
     conn: &mut TxnPgConn,
-    args: NewOnboardingArgs,
-) -> FpResult<(WorkflowId, Option<Workflow>, IsNew)> {
-    let NewOnboardingArgs {
-        existing_wf_id,
-        wfr_id,
-        force_create,
-        sv,
-        seqno,
+    common_args: CommonWfArgs,
+    user_args: CreateUserWfArgs,
+) -> FpResult<(WorkflowId, IsNew)> {
+    let CommonWfArgs {
         obc,
         insight_event,
-        new_biz_args,
         source,
+        wfr,
+        force_create,
+        su,
+    } = common_args;
+    let CreateUserWfArgs {
+        existing_wf_id,
+        seqno,
         fixture_result,
-        kyb_fixture_result,
         actor,
         maybe_prefill_data,
         is_neuro_enabled,
-        is_secondary_bo,
-    } = args;
-    let user_vault = Vault::lock(conn, &sv.vault_id)?;
+    } = user_args;
+
+    if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
+        // This request has already been used to make a Workflow. Return that workflow.
+        return Ok((wf_id.clone(), false));
+    }
+    if let Some(wf_id) = existing_wf_id {
+        // The auth token already has a workflow_id in it, no need to make a new one
+        return Ok((wf_id, false));
+    }
+
+    //
+    // Get or create a workflow
+    //
+
+    Vault::lock(conn, &su.vault_id)?;
     if !obc.kind.can_onboard() {
         return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
     }
 
-    let wfr = wfr_id
-        .map(|id| WorkflowRequest::get(conn, &id, &sv.id))
-        .transpose()?;
-
-    let (wf_id, is_new_ob) = if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
-        // This request has already been used to make a Workflow. Return that workflow.
-        (wf_id.clone(), false)
-    } else if let Some(wf_id) = existing_wf_id {
-        // The auth token already has a workflow_id in it
-        (wf_id, false)
-    } else {
-        // Make a new workflow. The workflow is created either for the playbook specified in the
-        // auth token OR for the config specified in the WorkflowRequest
-        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_version(conn, &sv.id, seqno)?;
-        let (wfs, _) = Workflow::list(conn, &sv.id, OffsetPagination::new(None, 10))?;
-        let is_first_wf = wfs.is_empty();
-        let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
-        let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
-        // Create the workflow for this scoped user
-        let ob_create_args = OnboardingWorkflowArgs {
-            scoped_vault_id: sv.id.clone(),
-            ob_configuration_id: obc.id.clone(),
-            insight_event: insight_event.clone(),
-            // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
-            authorized: can_auto_authorize,
-            source,
-            fixture_result,
-            is_one_click: is_first_wf && has_prefill_data,
-            wfr: wfr.clone(),
-            is_neuro_enabled,
-        };
-        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
-
-        if is_new_ob && is_first_wf {
-            // For the first WF created at this tenant, prefill portable data into this tenant.
-            // TODO: the goal is to do this for all WFs in the future. But it's simpler to
-            // start with only prefilling data once
-            if let Some(prefill_data) = maybe_prefill_data {
-                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
-                tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
-            }
-        }
-        (wf.id, is_new_ob)
+    // Make a new workflow. The workflow is created either for the playbook specified in the
+    // auth token OR for the config specified in the WorkflowRequest
+    let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_version(conn, &su.id, seqno)?;
+    let (wfs, _) = Workflow::list(conn, &su.id, OffsetPagination::new(None, 10))?;
+    let is_first_wf = wfs.is_empty();
+    let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
+    let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
+    // Create the workflow for this scoped user
+    let ob_create_args = OnboardingWorkflowArgs {
+        scoped_vault_id: su.id.clone(),
+        ob_configuration_id: obc.id.clone(),
+        insight_event: insight_event.clone(),
+        // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
+        authorized: can_auto_authorize,
+        source,
+        fixture_result,
+        is_one_click: is_first_wf && has_prefill_data,
+        wfr,
+        is_neuro_enabled,
     };
+    let (wf, is_new_wf) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
-    if let Some(wfr) = wfr.clone() {
+    if is_new_wf && is_first_wf {
+        // For the first WF created at this tenant, prefill portable data into this tenant.
+        // TODO: the goal is to do this for all WFs in the future. But it's simpler to
+        // start with only prefilling data once
+        if let Some(prefill_data) = maybe_prefill_data {
+            let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+            tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
+        }
+    }
+
+    if let Some(wfr) = wfr {
         if wfr.workflow_id.is_none() {
             // If we're responding to a WorkflowRequest, save that we've created a WF for the request
-            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf_id)?;
+            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf.id)?;
         }
     }
 
-    let args = CreateBusinessWfArgs {
-        new_biz_args,
-        obc,
-        uv: &user_vault,
-        insight_event,
-        source,
-        wfr,
-        // Default to the same fixture result for KYB as KYC if none provided
-        fixture_result: kyb_fixture_result.or(fixture_result),
-        force_create,
-    };
-    let biz_wf = maybe_create_business_wf(conn, args)?;
-    if is_new_ob {
-        maybe_create_doc_requests(conn, &wf_id, biz_wf.as_ref(), obc, is_secondary_bo)?;
+    if is_new_wf {
+        let wf = Workflow::get(conn, &wf.id)?;
+        let user_doc_requests = match &wf.config {
+            WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain!(
+                // Identity documents are generally still represented in CDOs. We could migrate them
+                // to `obc.documents_to_collect` one day
+                obc.document_cdo().map(|cdo| DocumentRequestConfig::Identity {
+                    collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
+                }),
+                obc.documents_to_collect.clone().unwrap_or_default(),
+            )
+            .collect(),
+            WorkflowConfig::Document(DocumentConfig { configs, .. }) => configs.clone(),
+            WorkflowConfig::Kyb(_) => {
+                vec![]
+            }
+        };
+        create_doc_requests(conn, &user_doc_requests, &wf)?;
     }
-
-    Ok((wf_id, biz_wf, is_new_ob))
+    Ok((wf.id, is_new_wf))
 }
 
-struct CreateBusinessWfArgs<'a> {
-    new_biz_args: Option<NewBusinessWfArgs>,
-    obc: &'a ObConfiguration,
-    uv: &'a Vault,
-    insight_event: Option<CreateInsightEvent>,
-    source: WorkflowSource,
-    wfr: Option<WorkflowRequest>,
+#[tracing::instrument("get_or_create_business_workflow", skip_all)]
+pub fn get_or_create_business_wf(
+    conn: &mut TxnPgConn,
+    common_args: CommonWfArgs,
+    // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's
+    // but could one day
+    new_biz_args: NewBusinessWfArgs,
     fixture_result: Option<WorkflowFixtureResult>,
-    force_create: bool,
-}
-
-fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) -> FpResult<Option<Workflow>> {
-    let CreateBusinessWfArgs {
-        new_biz_args,
+) -> FpResult<Workflow> {
+    let CommonWfArgs {
         obc,
-        uv,
         insight_event,
         source,
         wfr,
-        fixture_result,
         force_create,
-    } = args;
-    let Some(new_biz_args) = new_biz_args else {
-        return Ok(None);
-    };
+        su,
+    } = common_args;
+    let uv = Vault::lock(conn, &su.vault_id)?;
 
     let sb = match new_biz_args {
         NewBusinessWfArgs::NewWorkflow { sb_id } => {
@@ -220,7 +214,7 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
                 // ob config AND the playbook doesn't support multiple onboardings, we should locate it.
                 // Note, this isn't quite portablizing the business since we only locate it
                 // when onboarding onto the exact same ob config.
-                return Ok(Some(existing.1 .1));
+                return Ok(existing.1 .1);
             }
             // Otherwise, make a new business vault and scoped vault owned by the currently authed user
             let args = NewVaultArgs {
@@ -250,64 +244,38 @@ fn maybe_create_business_wf(conn: &mut TxnPgConn, args: CreateBusinessWfArgs) ->
         wfr,
         is_neuro_enabled: false, // not now
     };
-    let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
-    Ok(Some(biz_wf))
-}
+    let (biz_wf, is_new_wf) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
-/// Create DocumentRequests associated with the provided wfs if the obc requires document collection
-fn maybe_create_doc_requests(
-    conn: &mut TxnPgConn,
-    wf_id: &WorkflowId,
-    biz_wf: Option<&Workflow>,
-    obc: &ObConfiguration,
-    is_secondary_bo: bool,
-) -> FpResult<()> {
-    let wf = Workflow::get(conn, wf_id)?;
-    let user_doc_requests = match wf.config {
-        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain(
-            // Identity documents are generally still represented in CDOs. We could migrate them
-            // to `obc.documents_to_collect` one day
-            obc.document_cdo().map(|cdo| DocumentRequestConfig::Identity {
-                collect_selfie: cdo.selfie() == Selfie::RequireSelfie,
-            }),
-            obc.documents_to_collect.clone().unwrap_or_default(),
-        )
-        .collect(),
-        WorkflowConfig::Document(DocumentConfig { ref configs, .. }) => configs.clone(),
-        WorkflowConfig::Kyb(_) => {
-            vec![]
-        }
-    };
-    let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf)).collect_vec();
-
-    let biz_doc_requests = if is_secondary_bo {
-        // The secondary BO is onboarding - its business workflow (and thus document requests) has already
-        // been created
-        vec![]
-    } else if let Some(biz_wf) = biz_wf {
+    if is_new_wf {
         let biz_doc_requests = match &biz_wf.config {
             WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => business_configs.as_slice(),
             WorkflowConfig::Kyb(_) => &obc.business_documents_to_collect,
             _ => &[],
         };
-        biz_doc_requests.iter().map(|r| (r.clone(), biz_wf)).collect_vec()
-    } else {
-        vec![]
-    };
+        create_doc_requests(conn, biz_doc_requests, &biz_wf)?;
+    }
 
-    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests)
-        .map(|(config, wf)| NewDocumentRequestArgs {
+    Ok(biz_wf)
+}
+
+fn create_doc_requests(
+    conn: &mut TxnPgConn,
+    configs: &[DocumentRequestConfig],
+    wf: &Workflow,
+) -> FpResult<()> {
+    if configs.is_empty() {
+        return Ok(());
+    }
+    let doc_requests_to_create = configs
+        .iter()
+        .cloned()
+        .map(|config| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             workflow_id: wf.id.clone(),
             rule_set_result_id: None,
             config,
         })
         .collect_vec();
-
-    if doc_requests_to_create.is_empty() {
-        return Ok(());
-    }
-
     DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
     Ok(())
 }

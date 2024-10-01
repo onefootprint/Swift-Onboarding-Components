@@ -18,7 +18,9 @@ use api_core::decision::vendor::incode::states::Fail;
 use api_core::errors::AssertionError;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
-use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::onboarding::get_or_create_user_workflow;
+use api_core::utils::onboarding::CommonWfArgs;
+use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::EntityInfo;
 use api_core::utils::requirements::GetRequirementsArgs;
@@ -266,25 +268,24 @@ pub async fn adhoc_create_document_and_workflow(
                 return Err(AssertionError("Must use playbook of kind Document or Document-First").into());
             }
 
-            let args = NewOnboardingArgs {
-                existing_wf_id: None,
-                wfr_id: None,
-                force_create: false,
-                sv: &sv,
-                seqno,
+            let common_args = CommonWfArgs {
                 obc: &obc,
                 insight_event: None,
-                new_biz_args: None,
                 source: WorkflowSource::Unknown,
+                wfr: None,
+                force_create: false,
+                su: &sv,
+            };
+            let args = CreateUserWfArgs {
+                existing_wf_id: None,
+                seqno,
                 actor: None,
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,
                 fixture_result: None,
-                kyb_fixture_result: None,
-                is_secondary_bo: false,
             };
 
-            let (wf_id, _, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, _) = get_or_create_user_workflow(conn, common_args, args)?;
             let document_request =
                 DocumentRequest::get(conn, &wf_id, DocumentRequestIdentifier::Kind(doc_kind))?
                     .ok_or(AssertionError("No document request found"))?;
