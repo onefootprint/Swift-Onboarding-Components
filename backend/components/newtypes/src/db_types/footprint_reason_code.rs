@@ -1579,6 +1579,11 @@ impl FootprintReasonCode {
                 | Self::IpAlertHighRiskTor // 2024-04-12 new naming for this one
         )
     }
+
+    pub fn can_be_used_for_fixture_data(&self) -> bool {
+        // This risk signal is raised properly even in sandbox mode, so don't use it for fixture data
+        !matches!(self, Self::BeneficialOwnerFailedKyc)
+    }
 }
 
 impl FootprintReasonCode {

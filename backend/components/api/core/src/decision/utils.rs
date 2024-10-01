@@ -9,6 +9,7 @@ use crate::FpResult;
 use db::models::decision_intent::DecisionIntent;
 use db::models::insight_event::InsightEvent;
 use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -155,16 +156,12 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
 
     let signals = sandbox::get_fixture_kyb_reason_codes(fixture_result);
-    RiskSignal::bulk_create(
-        conn,
-        &sb.id,
-        signals
-            .into_iter()
-            .map(|s| (s.0, s.1, vres.id.clone()))
-            .collect::<Vec<_>>(),
-        RiskSignalGroupKind::Kyb,
-        false,
-    )?;
+    let rsg = RiskSignalGroup::get_or_create(conn, &biz_wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
+    let rses = signals
+        .into_iter()
+        .map(|s| (s.0, s.1, vres.id.clone()))
+        .collect::<Vec<_>>();
+    RiskSignal::bulk_add(conn, rses, false, rsg.id)?;
 
     // write fixture derived vault data
     // if the decision likely would result in real derived data

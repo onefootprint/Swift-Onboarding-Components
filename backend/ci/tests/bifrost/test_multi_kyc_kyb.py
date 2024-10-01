@@ -258,6 +258,47 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
     assert bifrost.validate_response["business"]["status"] == "pass"
 
 
+@pytest.mark.parametrize(
+    "primary_bo_result,secondary_bo_result", [("pass", "fail"), ("fail", "pass")]
+)
+def test_kyb_fail_kyc(
+    kyb_sandbox_ob_config, sandbox_tenant, primary_bo_result, secondary_bo_result
+):
+    """
+    Test that the business's status is `fail` if either of the beneficial owners fails KYC.
+    """
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result=primary_bo_result,
+        kyb_fixture_result="use_rules_outcome",
+    )
+    primary_bo = bifrost.run()
+    assert primary_bo.client.validate_response["user"]["status"] == primary_bo_result
+    assert primary_bo.client.validate_response["business"]["status"] == "incomplete"
+
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result=secondary_bo_result,
+    )
+    secondary_bo = bifrost.run()
+    assert (
+        secondary_bo.client.validate_response["user"]["status"] == secondary_bo_result
+    )
+    assert secondary_bo.client.validate_response["business"]["status"] == "fail"
+
+    # Make sure we raise a risk signal
+    body = get(
+        f"entities/{secondary_bo.fp_bid}/risk_signals", None, sandbox_tenant.s_sk
+    )
+    bo_failed_rses = [
+        i for i in body if i["reason_code"] == "beneficial_owner_failed_kyc"
+    ]
+    assert len(bo_failed_rses) == 1
+
+
 def extract_bo_session_sms(twilio, phone_number, business_name):
     def inner():
         messages = twilio.messages.list(to=phone_number, limit=25)

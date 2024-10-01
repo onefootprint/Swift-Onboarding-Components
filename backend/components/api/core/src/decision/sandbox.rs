@@ -221,10 +221,11 @@ fn choose_random_reason_codes(
 
 fn build_reason_code_map(vault_kind: VaultKind) -> HashMap<SignalSeverity, Vec<FootprintReasonCode>> {
     FootprintReasonCode::iter()
+        .filter(|rs| !matches!(rs, FootprintReasonCode::BeneficialOwnerFailedKyc))
+        .filter(|rs| !rs.to_be_deprecated())
+        .filter(|rs| rs.can_be_used_for_fixture_data())
         .filter_map(|rs| {
-            if rs.to_be_deprecated() {
-                None
-            } else if rs.scopes().iter().all(|s| match vault_kind {
+            if rs.scopes().iter().all(|s| match vault_kind {
                 VaultKind::Person => s.is_for_person() && s.is_for_kyc(),
                 VaultKind::Business => !s.is_for_person() && s.is_for_kyb(),
             }) {
