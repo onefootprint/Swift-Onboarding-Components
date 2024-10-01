@@ -14,7 +14,7 @@ const useEditField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
   const { data: vaultData } = useEntityVault(entity.id, entity);
 
-  const getLabel = (di: DataIdentifier, isDecrypted: boolean) => {
+  const getLabel = (di: DataIdentifier, _isDecrypted: boolean) => {
     const isInvestorProfileDI = (Object.values(InvestorProfileDI) as DataIdentifier[]).includes(di);
     if (isInvestorProfileDI) {
       const noLabelDIs = [
@@ -24,7 +24,7 @@ const useEditField = (entity: Entity) => {
         InvestorProfileDI.investmentGoals,
         InvestorProfileDI.riskTolerance,
       ];
-      if (!isDecrypted || noLabelDIs.includes(di as InvestorProfileDI)) {
+      if (noLabelDIs.includes(di as InvestorProfileDI)) {
         return null;
       }
     }

@@ -49,7 +49,7 @@ const EditField = ({ di, entity }: EditFieldProps) => {
             </Text>
           </Form.Label>
         </LabelContainer>
-        <Stack direction="column" align="flex-start" flex={1} maxWidth="fit-content">
+        <Stack direction="column" align="flex-start" flex={1} maxWidth={FIELD_VALUE_WIDTH}>
           {renderValue()}
           <ErrorOrHint entity={entity} fieldName={di} />
         </Stack>
