@@ -25,7 +25,6 @@ use newtypes::BusinessOwnerKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
 use newtypes::PiiString;
-use newtypes::WorkflowKind;
 use newtypes::WorkflowState;
 use std::pin::Pin;
 
@@ -147,40 +146,20 @@ pub async fn send_missing_secondary_bo_links(
     Ok(())
 }
 
-#[tracing::instrument(skip(state))]
-async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> FpResult<bool> {
-    if !matches!(biz_wf.kind, WorkflowKind::Kyb) {
-        return Ok(false);
-    }
-    let svid = biz_wf.scoped_vault_id.clone();
-    let obc_id = biz_wf.ob_configuration_id.clone();
-    let (bvw, obc) = state
-        .db_pool
-        .db_query(move |conn| -> FpResult<_> {
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &svid)?;
-            let (obc, _) = ObConfiguration::get(conn, &obc_id)?;
-            Ok((bvw, obc))
-        })
-        .await?;
-
-    let dbo = bvw.decrypt_business_owners(state, &tenant.id).await?;
-
+async fn is_waiting_for_bo_kyc(dbo: &[BusinessOwnerInfo], obc: &ObConfiguration) -> FpResult<bool> {
     if obc.verification_checks().skip_kyc() {
         // Safe to proceed, don't need to wait for any BOs
-        return Ok(true);
+        return Ok(false);
     }
-
-    send_missing_secondary_bo_links(state, biz_wf, &bvw, tenant, &dbo).await?;
 
     // TODO: consolidate this with kyb state machine logic, we should check if there's a complete WF
     // for the obc_id https://linear.app/footprint/issue/BE-513/consolidate-logic-for-bo-is-done-with-kyc
-    let all_bo_kyc_complete = dbo.iter().filter(|bo| bo.linked_bo.is_some()).all(|bo| {
-        bo.scoped_user
-            .as_ref()
-            .map(|su| su.status.is_terminal())
-            .unwrap_or(false)
-    });
-    Ok(all_bo_kyc_complete)
+    // Or TODO: consolidate this to read BusinessWorkflowLink in the future
+    let all_bos_complete = dbo
+        .iter()
+        .filter(|bo| bo.linked_bo.is_some())
+        .all(|bo| bo.scoped_user.as_ref().is_some_and(|su| su.status.is_terminal()));
+    Ok(!all_bos_complete)
 }
 
 #[tracing::instrument(skip(state))]
@@ -207,8 +186,8 @@ pub async fn progress_business_workflow(
         }
     };
 
-    let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
     if let Some(action) = action {
+        let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
         let _ = ww
             .run(state, action)
             .await
@@ -216,31 +195,42 @@ pub async fn progress_business_workflow(
     }
 
     // Refresh the wf since it may have changed above
-    let biz_wf = state
+    let (biz_wf, bvw, obc) = state
         .db_pool
-        .db_query(move |conn| Workflow::get(conn, &wf_id))
+        .db_query(move |conn| -> FpResult<_> {
+            let biz_wf = Workflow::get(conn, &wf_id)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
+            let (obc, _) = ObConfiguration::get(conn, &biz_wf.ob_configuration_id)?;
+            Ok((biz_wf, bvw, obc))
+        })
         .await?;
 
-    let should_run_kyb = should_run_kyb(state, &biz_wf, tenant).await?;
-    tracing::info!(should_run_kyb, "should_run_kyb");
-    if should_run_kyb {
-        let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
-        let res = ww
-            .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
-            .await;
-        match res {
-            Ok(ww) => {
-                tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
-            }
-            Err(err) if !err.status_code().is_server_error() => {
-                // We want to expose HTTP 4xx errors to the client since they could be fixed by the client
-                tracing::error!(?err, "Non-server error running BoKycCompleted on KYB workflow");
-                return Err(err);
-            }
-            Err(err) => {
-                tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
-            }
-        };
+    let dbo = bvw.decrypt_business_owners(state, &tenant.id).await?;
+
+    let is_waiting_for_bo_kyc = is_waiting_for_bo_kyc(&dbo, &obc).await?;
+    tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
+
+    if is_waiting_for_bo_kyc {
+        send_missing_secondary_bo_links(state, &biz_wf, &bvw, tenant, &dbo).await?;
+        return Ok(());
     }
+
+    let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
+    let res = ww
+        .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
+        .await;
+    match res {
+        Ok(ww) => {
+            tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
+        }
+        Err(err) if !err.status_code().is_server_error() => {
+            // We want to expose HTTP 4xx errors to the client since they could be fixed by the client
+            tracing::error!(?err, "Non-server error running BoKycCompleted on KYB workflow");
+            return Err(err);
+        }
+        Err(err) => {
+            tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
+        }
+    };
     Ok(())
 }
