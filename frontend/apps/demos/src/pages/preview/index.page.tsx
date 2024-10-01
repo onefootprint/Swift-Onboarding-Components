@@ -7,7 +7,7 @@ type GetOnboardingConfigRequest = {
 const { API_BASE_URL } = process.env;
 
 const getOnboardingConfig = async (params: GetOnboardingConfigRequest) => {
-  const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
+  const response = await fetch(`${API_BASE_URL}/hosted/onboarding/config`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

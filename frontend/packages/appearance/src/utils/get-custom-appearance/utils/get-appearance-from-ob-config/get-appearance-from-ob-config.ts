@@ -27,7 +27,7 @@ const getAuthHeaders = (payload: OnboardingConfigRequestType) => {
 };
 
 const getOnboardingConfig = async (authHeaders: Record<string, string>): Promise<GetPublicOnboardingConfigResponse> => {
-  const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
+  const response = await fetch(`${API_BASE_URL}/hosted/onboarding/config`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

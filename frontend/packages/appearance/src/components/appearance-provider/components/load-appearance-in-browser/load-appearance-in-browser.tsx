@@ -27,7 +27,7 @@ const LoadAppearanceInBrowser = ({ options, children }: LoadAppearanceInBrowserP
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
     const type = params.get('type');
-    if (type) {
+    if (!type) {
       return undefined;
     }
     if (type === HostedUrlType.beneficialOwner) {
@@ -37,10 +37,16 @@ const LoadAppearanceInBrowser = ({ options, children }: LoadAppearanceInBrowserP
   };
 
   const getAppearance = async () => {
+    let authToken: undefined | string = getAuthToken();
+    const kybBoAuthToken = getKybBoAuthToken();
+    if (kybBoAuthToken) {
+      authToken = undefined;
+    }
+
     const response = await getCustomAppearance({
       ...options,
-      authToken: getAuthToken(),
-      kybBoAuthToken: getKybBoAuthToken(),
+      authToken,
+      kybBoAuthToken,
     });
     setTheme(response.theme);
     setAppearance(response.appearance);

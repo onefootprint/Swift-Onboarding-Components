@@ -8,7 +8,7 @@ const getServerSideProps: GetServerSideProps = async context => {
     return { notFound: true };
   }
   try {
-    const request = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
+    const request = await fetch(`${API_BASE_URL}/hosted/onboarding/config`, {
       headers: {
         'X-Onboarding-Config-Key': obKey as string,
       },
