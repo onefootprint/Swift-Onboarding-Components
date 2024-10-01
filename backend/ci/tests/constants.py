@@ -156,7 +156,7 @@ BUSINESS_DATA = {
             "first_name": "Franklin",
             "last_name": "Frog",
             "email": "sandbox@onefootprint.com",
-            "phone_number": LIVE_PHONE_NUMBER,
+            "phone_number": FIXTURE_PHONE_NUMBER2,
             "ownership_stake": 30,
         },
     ],

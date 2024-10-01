@@ -32,6 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(challenge::verify::post)
         .service(auth_methods::get)
         .service(private::token::get)
+        .service(private::bo_links::post)
         .service(attest_device::post_challenge)
         .service(attest_device::post_attestation);
 }

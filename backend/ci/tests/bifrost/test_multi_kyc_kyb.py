@@ -10,39 +10,42 @@ from tests.utils import (
 )
 from tests.bifrost_client import BifrostClient
 
+MULTI_KYC_KYB_CDOS = [
+    "business_name",
+    "business_tin",
+    "business_address",
+    "business_phone_number",
+    "business_website",
+    "business_kyced_beneficial_owners",
+]
+
 
 @pytest.fixture(scope="session")
-def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
-    kyb_cdos = [
-        "business_name",
-        "business_tin",
-        "business_address",
-        "business_phone_number",
-        "business_website",
-        "business_kyced_beneficial_owners",
-    ]
-    return create_ob_config(
-        sandbox_tenant,
-        "Multi-KYC Business config",
-        must_collect_data + kyb_cdos,
-        can_access_data + kyb_cdos,
-        kind="kyb",
-        business_documents_to_collect=[
-            dict(
-                kind="custom",
-                data=dict(
-                    name="Business document",
-                    identifier="document.custom.biz_doc",
-                    requires_human_review=False,
-                ),
-            ),
-        ],
-    )
+def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data):
+    cdos = must_collect_data + MULTI_KYC_KYB_CDOS
+    return create_ob_config(sandbox_tenant, "Multi-KYC KYB config", cdos, kind="kyb")
 
 
 @pytest.mark.flaky
-def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
+def test_onboard_secondary_bo_live_phone(
+    kyb_sandbox_ob_config, twilio, live_phone_number
+):
     bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bos = [
+        {
+            "first_name": "Piip",
+            "last_name": "Penguin",
+            "ownership_stake": 50,
+        },
+        {
+            "first_name": "Franklin",
+            "last_name": "Frog",
+            "email": "sandbox@onefootprint.com",
+            "phone_number": live_phone_number,
+            "ownership_stake": 30,
+        },
+    ]
+    bifrost.data["business.kyced_beneficial_owners"] = bos
     # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
     primary_bo = try_until_success(lambda: bifrost.run(), 60, retry_interval_s=15)
     assert bifrost.validate_response["user"]["status"] == "pass"
@@ -56,19 +59,40 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
 
     # Extract the link sent to the secondary BO's phone number and verify it contains references to
     # the business and the BO that invited them
-    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
     business_name = primary_bo.client.data["business.name"]
-    (sms_body, token) = extract_bo_session_sms(
+    (sms_body, secondary_bo_token) = extract_bo_session_sms(
         twilio, bos[1]["phone_number"], business_name
     )
     assert bos[0]["first_name"] in sms_body
     assert bos[0]["last_name"] in sms_body
     assert primary_bo.client.data["business.name"] in sms_body
-    secondary_bo_token = BusinessOwnerAuth(token)
+
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "pass"
+
+
+def test_onboard_secondary_bo(kyb_sandbox_ob_config):
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    primary_bo = bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == "pass"
+    assert bifrost.validate_response["business"]["status"] == "incomplete"
+    assert primary_bo.fp_id
+    assert primary_bo.fp_bid
+    assert any(
+        r["kind"] == "collect_business_data" for r in bifrost.handled_requirements
+    )
+
+    secondary_bo_token = extract_bo_token(bifrost)
 
     # Check the business information for the hosted bifrost flow associated with the secondary BO's
     # token
     body = get("hosted/business", None, secondary_bo_token)
+    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
+    business_name = primary_bo.client.data["business.name"]
     assert body["name"] == business_name
     assert body["inviter"]["first_name"] == primary_bo.client.data["id.first_name"]
     assert body["inviter"]["last_name"] == primary_bo.client.data["id.last_name"]
@@ -88,11 +112,6 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
         r["kind"] == "collect_business_data"
         for r in secondary_bo.client.already_met_requirements
         + secondary_bo.client.handled_requirements
-    )
-    # Only the first BO to fill out the KYB form should have to upload the business documents
-    assert not any(
-        req["kind"] == "collect_document"
-        for req in secondary_bo.client.handled_requirements
     )
 
     # fp_bid should be the same for each business owner
@@ -148,6 +167,38 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
     assert body["message"] == "This business owner has already started KYC"
 
 
+def test_secondary_bo_doesnt_collect_doc(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Multi-KYC Business config with docs",
+        must_collect_data + MULTI_KYC_KYB_CDOS,
+        kind="kyb",
+        business_documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Business document",
+                    identifier="document.custom.biz_doc",
+                    requires_human_review=False,
+                ),
+            ),
+        ],
+    )
+
+    bifrost = BifrostClient.new_user(obc)
+    bifrost.run()
+    assert any(r["kind"] == "collect_document" for r in bifrost.handled_requirements)
+
+    secondary_bo_token = extract_bo_token(bifrost)
+
+    bifrost = BifrostClient.new_user(obc, override_ob_config_auth=secondary_bo_token)
+    bifrost.run()
+    # Only the first BO to fill out the KYB form should have to upload the business documents
+    assert not any(
+        req["kind"] == "collect_document" for req in bifrost.handled_requirements
+    )
+
+
 @pytest.fixture(scope="session")
 def ob_config2(sandbox_tenant, must_collect_data):
     # Need a new ob config that has access to decrypt everything - otherwise, one-click workflows
@@ -160,70 +211,46 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-@pytest.mark.flaky
-def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
+def test_one_click_bos(ob_config2, kyb_sandbox_ob_config):
     # Create two users onboarded onto the default OB config
     bifrost = BifrostClient.new_user(ob_config2)
-    primary_bo = bifrost.run()
-    assert primary_bo.fp_id
-    assert not primary_bo.fp_bid
+    primary_bo_kyc = bifrost.run()
+    assert primary_bo_kyc.fp_id
+    assert not primary_bo_kyc.fp_bid
 
     bifrost = BifrostClient.new_user(ob_config2)
-    secondary_bo = bifrost.run()
-    assert secondary_bo.fp_id
-    assert not secondary_bo.fp_bid
+    secondary_bo_kyc = bifrost.run()
+    assert secondary_bo_kyc.fp_id
+    assert not secondary_bo_kyc.fp_bid
 
     # Onboard the primary_bo onto the KYB sandbox config
-    sandbox_id = primary_bo.client.sandbox_id
+    sandbox_id = primary_bo_kyc.client.sandbox_id
     bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, sandbox_id)
-    # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
-    # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
-    # succeeds
-    try:
-        time.sleep(5)
-        primary_bo = bifrost.run()
-        # Can only do this check if we passed on the first try and weren't rate limited, otherwise
-        # the retry will clear out `handled_requirements`
-        # Assert we only had business requirements to satisfy - identity data filled out in previous
-        # onboarding
-        # No Authorize since they already onboarded at this tenant
-        assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
-            "collect_business_data",
-            "process",
-        ]
-    except:
-        # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
-        primary_bo = try_until_success(lambda: bifrost.run(), 60)
-    assert primary_bo.fp_id
+    primary_bo = bifrost.run()
+    assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
+        "collect_business_data",
+        "process",
+    ]
+    assert primary_bo.fp_id == primary_bo_kyc.fp_id
     assert primary_bo.fp_bid
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
 
-    bos = primary_bo.client.data["business.kyced_beneficial_owners"]
-    business_name = primary_bo.client.data["business.name"]
-    (sms_body, token) = extract_bo_session_sms(
-        twilio, bos[1]["phone_number"], business_name
-    )
-    assert bos[0]["first_name"] in sms_body
-    assert bos[0]["last_name"] in sms_body
-    assert primary_bo.client.data["business.name"] in sms_body
-    secondary_bo_token = BusinessOwnerAuth(token)
+    secondary_bo_token = extract_bo_token(bifrost)
 
-    # Then, onboard the secondary_bo as a BO of primary_bo's business
-    sandbox_id = secondary_bo.client.sandbox_id
+    # Then, onboard the secondary_bo_kyc as a BO of primary_bo's business
+    sandbox_id = secondary_bo_kyc.client.sandbox_id
     bifrost = BifrostClient.inherit_user(
         kyb_sandbox_ob_config,
         sandbox_id,
         override_ob_config_auth=secondary_bo_token,
     )
     secondary_bo = bifrost.run()
-    assert secondary_bo.fp_id
+    assert secondary_bo.fp_id == secondary_bo_kyc.fp_id
     assert secondary_bo.fp_bid
     # Assert we had no requirements to satisfy - business filled out by primary_bo, and identity
     # filled out in previous onboarding
-    assert [r["kind"] for r in secondary_bo.client.handled_requirements] == [
-        "process",
-    ]
+    assert [r["kind"] for r in secondary_bo.client.handled_requirements] == ["process"]
 
     # fp_bid should be the same for each business owner
     assert primary_bo.fp_bid == secondary_bo.fp_bid
@@ -244,7 +271,13 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
             in m.body
         )
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
-        return (message.body, token)
+        return (message.body, BusinessOwnerAuth(token))
 
     time.sleep(2)
     return try_until_success(inner, 60)
+
+
+def extract_bo_token(bifrost: BifrostClient):
+    body = post("hosted/user/private/bo_links", None, bifrost.auth_token)
+    assert len(body) == 1
+    return BusinessOwnerAuth(body[0]["token"])

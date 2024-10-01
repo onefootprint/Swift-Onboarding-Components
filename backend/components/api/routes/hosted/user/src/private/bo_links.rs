@@ -1,0 +1,56 @@
+use crate::auth::user::ItUserAuthContext;
+use api_core::errors::ValidationError;
+use api_core::types::ApiListResponse;
+use api_core::utils::kyb_utils::generate_secondary_bo_links;
+use api_core::utils::vault_wrapper::Business;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::web;
+use api_core::FpResult;
+use api_core::State;
+use db::models::workflow::Workflow;
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    self,
+};
+
+#[derive(serde::Serialize, Apiv2Schema, macros::JsonResponder)]
+pub struct BoToken {
+    token: SessionAuthToken,
+    first_name: Option<PiiString>,
+    last_name: Option<PiiString>,
+}
+
+#[api_v2_operation(
+    tags(User, Hosted),
+    description = "Generate links for all secondary BOs to complete onboarding onto a KYB playbook that requires KYC of all BOs."
+)]
+#[actix::post("/hosted/user/private/bo_links")]
+pub async fn post(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiListResponse<BoToken> {
+    let user_auth = user_auth.into_inner();
+    let biz_wf_id = (user_auth.data.business_workflow_id())
+        .ok_or(ValidationError("No business associated with the session"))?;
+    let (biz_wf, bvw) = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            let biz_wf = Workflow::get(conn, &biz_wf_id)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
+            Ok((biz_wf, bvw))
+        })
+        .await?;
+
+    let dbos = bvw.decrypt_business_owners(&state).await?;
+    let tokens = generate_secondary_bo_links(&state, &biz_wf, &dbos).await?;
+
+    let results = tokens
+        .into_iter()
+        .map(|(bo_data, token)| BoToken {
+            token,
+            first_name: bo_data.first_name.clone(),
+            last_name: bo_data.last_name.clone(),
+        })
+        .collect();
+    Ok(results)
+}

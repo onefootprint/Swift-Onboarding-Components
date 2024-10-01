@@ -25,18 +25,15 @@ use newtypes::BusinessOwnerKind;
 use newtypes::DataLifetimeSeqno;
 use newtypes::KybState;
 use newtypes::PiiString;
+use newtypes::SessionAuthToken;
 use newtypes::WorkflowState;
 use std::pin::Pin;
 
-/// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
-#[tracing::instrument(skip_all)]
-pub async fn send_missing_secondary_bo_links(
-    state: &State,
-    biz_wf: &Workflow,
-    bvw: &TenantVw<Business>,
-    tenant: &Tenant,
-    dbos: &[BusinessOwnerInfo],
-) -> FpResult<()> {
+pub async fn generate_secondary_bo_links<'a>(
+    state: &'a State,
+    biz_wf: &'a Workflow,
+    dbos: &'a [BusinessOwnerInfo],
+) -> FpResult<Vec<(&'a BusinessOwnerInfo, SessionAuthToken)>> {
     let missing_kyc_secondary_bos = dbos
         .iter()
         .filter(|bo| bo.kind == BusinessOwnerKind::Secondary)
@@ -44,7 +41,7 @@ pub async fn send_missing_secondary_bo_links(
         .filter(|bo| bo.scoped_user.is_none())
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
-        return Ok(());
+        return Ok(vec![]);
     }
 
     // If we created any BOs in the DB, create an auth session for each of the BOs - we will send
@@ -69,13 +66,33 @@ pub async fn send_missing_secondary_bo_links(
         .db_query(move |conn| {
             sessions_to_make
                 .into_iter()
-                .map(|(l, d)| {
-                    AuthSession::create_sync(conn, &sealing_key, d, duration).map(|(token, _)| (l, token))
-                })
+                .map(|(l, d)| AuthSession::create_sync(conn, &sealing_key, d, duration).map(|(t, _)| (l, t)))
                 .collect()
         })
         .await?;
+    let tokens = tokens
+        .into_iter()
+        .map(|(l_id, token)| {
+            missing_kyc_secondary_bos
+                .iter()
+                .find(|bo| bo.linked_bo.as_ref().is_some_and(|bo| bo.link_id == l_id))
+                .ok_or(BusinessError::LinkedBoNotFound)
+                .map(|bo_data| (*bo_data, token))
+        })
+        .collect::<Result<_, _>>()?;
+    Ok(tokens)
+}
 
+/// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
+#[tracing::instrument(skip_all)]
+pub async fn send_missing_secondary_bo_links(
+    state: &State,
+    biz_wf: &Workflow,
+    bvw: &TenantVw<Business>,
+    tenant: &Tenant,
+    dbos: &[BusinessOwnerInfo],
+) -> FpResult<()> {
+    let tokens = generate_secondary_bo_links(state, biz_wf, dbos).await?;
     // Generate a link for each business owner
     let primary_bo = dbos
         .iter()
@@ -91,11 +108,7 @@ pub async fn send_missing_secondary_bo_links(
         .clone();
     let bo_sms_info = tokens
         .into_iter()
-        .map(|(l_id, token)| -> FpResult<_> {
-            let bo_data = missing_kyc_secondary_bos
-                .iter()
-                .find(|bo| bo.linked_bo.as_ref().is_some_and(|bo| bo.link_id == l_id))
-                .ok_or(BusinessError::LinkedBoNotFound)?;
+        .map(|(bo_data, token)| -> FpResult<_> {
             let url = state
                 .config
                 .service_config
@@ -106,7 +119,6 @@ pub async fn send_missing_secondary_bo_links(
                 tenant_name: tenant.name.clone(),
                 url: url.clone(),
             };
-
             let phone_number = bo_data
                 .phone_number
                 .as_ref()

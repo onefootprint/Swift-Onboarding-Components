@@ -1594,6 +1594,35 @@
                 "security": []
             }
         },
+        "/hosted/user/private/bo_links": {
+            "post": {
+                "tags": [
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Generate links for all secondary BOs to complete onboarding onto a KYB playbook that requires KYC of all BOs.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BoToken"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Integration Testing User Onboarding Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/user/private/token": {
             "get": {
                 "tags": [
@@ -2286,6 +2315,24 @@
                 "required": [
                     "can_access_data",
                     "org_name"
+                ]
+            },
+            "BoToken": {
+                "type": "object",
+                "properties": {
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
                 ]
             },
             "BusinessDecryptResponse": {
