@@ -2,6 +2,7 @@ use super::super::Business;
 use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::TenantVw;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
@@ -19,7 +20,6 @@ use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::KycedBusinessOwnerData;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
-use newtypes::TenantId;
 use std::collections::HashMap;
 use std::str::FromStr;
 
@@ -66,7 +66,7 @@ pub struct BusinessOwnerInfo {
     pub kind: BusinessOwnerKind,
 }
 
-impl VaultWrapper<Business> {
+impl TenantVw<Business> {
     #[tracing::instrument(skip_all)]
     /// A business owner may be defined either
     /// - In the vault under the `business.beneficial_owners` or `business.kyced_beneficial_owners`
@@ -76,13 +76,9 @@ impl VaultWrapper<Business> {
     /// This ties together any vaulted BO data with any linked BO data.
     /// NOTE: only vaults created via bifrost may have both vaulted and linked BOs. Vaults created
     /// via API may have only one or the other
-    pub async fn decrypt_business_owners(
-        &self,
-        state: &State,
-        tenant_id: &TenantId,
-    ) -> FpResult<Vec<BusinessOwnerInfo>> {
+    pub async fn decrypt_business_owners(&self, state: &State) -> FpResult<Vec<BusinessOwnerInfo>> {
         let vid = self.vault().id.clone();
-        let tid = tenant_id.clone();
+        let tid = self.scoped_vault.tenant_id.clone();
         let seqno = self.seqno;
         let (linked_bos, vws) = state
             .db_pool

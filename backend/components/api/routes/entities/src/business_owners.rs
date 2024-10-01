@@ -30,16 +30,16 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
 
-    let (vw, sv) = state
+    let vw = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            Ok((vw, sv))
+            Ok(vw)
         })
         .await?;
 
-    let decrypted_bos = vw.decrypt_business_owners(&state, &sv.tenant_id).await?;
+    let decrypted_bos = vw.decrypt_business_owners(&state).await?;
 
     let results = decrypted_bos
         .into_iter()

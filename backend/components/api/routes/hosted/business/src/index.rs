@@ -25,16 +25,16 @@ use paperclip::actix::{
 pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusiness> {
     let bv_id = bo_auth.bo.business_vault_id.clone();
     let ob_config_id = bo_auth.ob_config.id.clone();
-    let (bvw, sb) = state
+    let bvw = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
             let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
-            Ok((bvw, sb))
+            Ok(bvw)
         })
         .await?;
 
-    let dbos = bvw.decrypt_business_owners(&state, &sb.tenant_id).await?;
+    let dbos = bvw.decrypt_business_owners(&state).await?;
     let primary_bo = dbos
         .iter()
         .find(|bo| bo.kind == BusinessOwnerKind::Primary)

@@ -9,7 +9,6 @@ use crate::State;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
-use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use newtypes::email::Email;
@@ -215,21 +214,20 @@ pub async fn build_business_data_from_verification_request(
     state: &State,
     request: VerificationRequest,
 ) -> FpResult<BusinessDataFromVault> {
-    let (sv, bvw) = state
+    let VerificationRequest {
+        scoped_vault_id: sv_id,
+        uvw_snapshot_seqno: seqno,
+        ..
+    } = request;
+    let bvw: TenantVw<Business> = state
         .db_pool
-        .db_query(move |conn| -> FpResult<(ScopedVault, VaultWrapper<_>)> {
-            let sv = ScopedVault::get(conn, &request.scoped_vault_id)?;
-            let args = VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno);
-            let bvw = VaultWrapper::<Business>::build(conn, args)?;
-
-            Ok((sv, bvw))
-        })
+        .db_query(move |conn| VaultWrapper::build_for_tenant_version(conn, &sv_id, seqno))
         .await?;
 
     // Unfortunately we have no way of ensuring whether or not we BO first name + last name is present
     // so we just opportunistically send if we have both fn/ln
     let business_owners = bvw
-        .decrypt_business_owners(state, &sv.tenant_id)
+        .decrypt_business_owners(state)
         .await?
         .into_iter()
         .filter_map(|bo| {

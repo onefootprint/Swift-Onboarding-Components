@@ -13,13 +13,13 @@ use newtypes::WorkflowId;
 
 pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Vec<OnboardingDecision>> {
     let wfid = biz_wf_id.clone();
-    let (wf, sv, bvw, obc) = state
+    let (wf, bvw, obc) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            let (wf, sv) = Workflow::get_all(conn, &wfid)?;
-            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
+            let wf = Workflow::get(conn, &wfid)?;
+            let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &wf.scoped_vault_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-            Ok((wf, sv, bvw, obc))
+            Ok((wf, bvw, obc))
         })
         .await?;
 
@@ -27,7 +27,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Vec<
         return Ok(vec![]);
     }
 
-    let dbos = bvw.decrypt_business_owners(state, &sv.tenant_id).await?;
+    let dbos = bvw.decrypt_business_owners(state).await?;
     let dbos_expecting_kyc = dbos
         .into_iter()
         .filter(|bo| {

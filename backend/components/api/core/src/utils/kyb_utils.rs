@@ -205,7 +205,7 @@ pub async fn progress_business_workflow(
         })
         .await?;
 
-    let dbo = bvw.decrypt_business_owners(state, &tenant.id).await?;
+    let dbo = bvw.decrypt_business_owners(state).await?;
 
     let is_waiting_for_bo_kyc = is_waiting_for_bo_kyc(&dbo, &obc).await?;
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
