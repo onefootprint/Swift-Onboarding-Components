@@ -1345,7 +1345,7 @@ footprint_reason_code_enum! {
         BeneficialOwnersDoNotMatch,
 
         #[scope = SignalScope::BeneficialOwners, additional_scopes = vec![], match_level = None]
-        #[note = "Beneficial owner failed KYC", severity = SignalSeverity::Info,  description = "One or more Benificial Owners failed KYC"]
+        #[note = "Beneficial owner failed KYC", severity = SignalSeverity::High,  description = "One or more Benificial Owners failed KYC"]
         BeneficialOwnerFailedKyc,
 
         // ~~~~~~~~~ Secretary of State Filings ~~~~~~~~~~~
