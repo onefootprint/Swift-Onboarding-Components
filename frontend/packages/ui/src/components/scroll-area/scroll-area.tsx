@@ -2,11 +2,11 @@
 
 import type { Spacing } from '@onefootprint/design-tokens';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
-import type * as CSS from 'csstype';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
+
 type ScrollAreaProps = {
   asChild?: boolean;
   children: React.ReactNode;
@@ -18,8 +18,8 @@ type ScrollAreaProps = {
   paddingRight?: Spacing;
   paddingBottom?: Spacing;
   paddingLeft?: Spacing;
-  maxWidth?: CSS.Property.MaxWidth;
-  maxHeight?: CSS.Property.MaxHeight;
+  maxWidth?: string;
+  maxHeight?: string;
 };
 
 const ScrollArea = ({
@@ -149,8 +149,8 @@ const StyledViewport = styled(ScrollAreaRadix.Viewport)<{
   $paddingRight?: Spacing;
   $paddingBottom?: Spacing;
   $paddingLeft?: Spacing;
-  $maxWidth?: CSS.Property.MaxWidth;
-  $maxHeight?: CSS.Property.MaxHeight;
+  $maxWidth?: string;
+  $maxHeight?: string;
 }>`
   ${({ $padding, $paddingTop, $paddingRight, $paddingBottom, $paddingLeft, $maxWidth, $maxHeight }) => css`
     ${({ theme }) => css`

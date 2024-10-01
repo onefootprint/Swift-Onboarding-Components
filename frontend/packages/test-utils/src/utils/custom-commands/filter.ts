@@ -1,4 +1,10 @@
-import { screen, within, waitFor } from '@testing-library/react';
+import {
+  screen,
+  act,
+  fireEvent,
+  within,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const apply = async ({
@@ -11,7 +17,12 @@ const apply = async ({
   const triggerButton = screen.getByRole('button', { name: trigger });
   await userEvent.click(triggerButton);
 
-  const popover = await waitFor(() => screen.getByRole('dialog', { name: `Filter by ${trigger}` }));
+  await waitFor(() => {
+    const popover = screen.getByRole('dialog', { name: trigger });
+    expect(popover).toBeInTheDocument();
+  });
+
+  const popover = screen.getByRole('dialog', { name: trigger });
 
   const clickChoice = async (choice: string) => {
     const inputField = within(popover).getByLabelText(choice);
@@ -26,7 +37,6 @@ const apply = async ({
   expect(apply).toBeInTheDocument();
   await userEvent.click(apply);
 };
-
 const filterEvents = {
   apply,
 };

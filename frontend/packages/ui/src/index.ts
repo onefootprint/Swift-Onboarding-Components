@@ -82,6 +82,7 @@ export type {
   ToggleProps,
   TooltipProps,
   HintProps,
+  PopoverProps,
 } from './components';
 export {
   Hint,

@@ -40,14 +40,11 @@ describe('<SecurityLogsFilters />', () => {
     expect(businessData).toBeInTheDocument();
     await userEvent.click(businessData);
 
-    await waitFor(() => {
-      const popover = screen.getByRole('dialog');
-      expect(popover).toBeInTheDocument();
-    });
-
     expect(screen.getByText('Beneficial owner')).toBeInTheDocument();
     expect(screen.getByText('Address data')).toBeInTheDocument();
     expect(screen.getByText('Address line 1')).toBeInTheDocument();
+
+    // There will be 2 address fields, one for business, one for personal data
   });
 
   it('should change router path correctly when applying personal filters', async () => {
@@ -58,24 +55,21 @@ describe('<SecurityLogsFilters />', () => {
     });
 
     expect(personalData).toBeInTheDocument();
-
-    try {
-      await filterEvents.apply({
-        trigger: 'Personal data',
-        options: ['First name', 'Last name'],
-      });
-    } catch (error) {
-      console.error('Error applying filters:', error);
-      console.log(screen.debug());
-      throw error;
-    }
-
+    await userEvent.click(personalData);
     await waitFor(() => {
-      expect(mockRouter).toMatchObject({
-        query: {
-          data_attributes_personal: ['id.first_name', 'id.last_name'],
-        },
-      });
+      const popover = screen.getByRole('dialog');
+      expect(popover).toBeInTheDocument();
+    });
+
+    await filterEvents.apply({
+      trigger: 'Personal data',
+      options: ['First name', 'Last name'],
+    });
+
+    expect(mockRouter).toMatchObject({
+      query: {
+        data_attributes_personal: ['id.first_name', 'id.last_name'],
+      },
     });
   });
 

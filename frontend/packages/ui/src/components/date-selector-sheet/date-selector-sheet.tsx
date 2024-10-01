@@ -1,4 +1,4 @@
-import { Popover } from '@onefootprint/ui';
+import * as Popover from '@radix-ui/react-popover';
 import {
   add,
   eachDayOfInterval,
@@ -12,7 +12,7 @@ import {
 } from 'date-fns';
 import { motion } from 'framer-motion';
 import type React from 'react';
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import Stack from '../stack';
@@ -60,12 +60,6 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
         }),
       [firstDayCurrentMonth],
     );
-
-    useEffect(() => {
-      if (!open) {
-        setMovingDirection(undefined);
-      }
-    }, [open]);
 
     const goToDate = (targetDate?: Date) => {
       if (!targetDate) return;
@@ -126,61 +120,65 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
 
     return (
       <Popover.Root onOpenChange={onOpenChange} open={open}>
-        <Popover.Trigger asChild={asChild}>{children}</Popover.Trigger>
-        <Popover.Portal>
+        <Popover.Trigger style={{ cursor: 'pointer' }} asChild={asChild}>
+          {children}
+        </Popover.Trigger>
+        {open && (
           <Popover.Content
             sideOffset={8}
             align={position.alignment}
             side={position.side}
             avoidCollisions={position.avoidCollisions}
             asChild
+            forceMount
             onPointerDownOutside={onClickOutside}
-            aria-label={ariaLabel}
-            ref={ref}
-            maxWidth="312px"
           >
-            <Container transition={containerVariants} layout layoutRoot initial={false}>
-              <Header
-                handleMonthChange={handleMonthChange}
-                firstDayCurrentMonth={firstDayCurrentMonth}
-                movingDirection={movingDirection}
-                setMovingDirection={setMovingDirection}
-              />
-              <Stack direction="column" marginBottom={3}>
-                <RangeInputs
-                  onChange={handleRangeChange}
-                  onFocus={handleRangeInputFocus}
-                  startDate={startDate}
-                  endDate={endDate}
-                  disableFutureDates={disableFutureDates}
-                  disablePastDates={disablePastDates}
+            <Container aria-label={ariaLabel} ref={ref}>
+              <motion.span transition={containerVariants} layout layoutRoot>
+                <Header
+                  handleMonthChange={handleMonthChange}
+                  firstDayCurrentMonth={firstDayCurrentMonth}
+                  movingDirection={movingDirection}
+                  setMovingDirection={setMovingDirection}
                 />
-                <div id="error-message" />
-              </Stack>
-              <WeekHeader />
-              <Days
-                key={format(firstDayCurrentMonth, 'MMMM yyyy')}
-                initial={movingDirection ? 'initial' : false}
-                animate={movingDirection ? 'animate' : false}
-                exit="exit"
-                variants={movingDirection ? getMoveVariants(movingDirection) : {}}
-                transition={{ duration: 0.5 }}
-              >
-                {days.map(day => (
-                  <DayButton
-                    key={day.toISOString()}
-                    day={day}
-                    onClick={event => handleSelectDay(day, event)}
-                    visibleMonth={visibleMonth}
-                    activeStartDate={startDate}
-                    activeEndDate={endDate}
-                    disabled={(disableFutureDates && isAfter(day, today)) || (disablePastDates && isBefore(day, today))}
+                <Stack direction="column" marginBottom={3}>
+                  <RangeInputs
+                    onChange={handleRangeChange}
+                    onFocus={handleRangeInputFocus}
+                    startDate={startDate}
+                    endDate={endDate}
+                    disableFutureDates={disableFutureDates}
+                    disablePastDates={disablePastDates}
                   />
-                ))}
-              </Days>
+                  <div id="error-message" />
+                </Stack>
+                <WeekHeader />
+                <Days
+                  key={format(firstDayCurrentMonth, 'MMMM yyyy')}
+                  initial={movingDirection ? 'initial' : false}
+                  animate={movingDirection ? 'animate' : false}
+                  exit="exit"
+                  variants={movingDirection ? getMoveVariants(movingDirection) : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {days.map(day => (
+                    <DayButton
+                      key={day.toISOString()}
+                      day={day}
+                      onClick={event => handleSelectDay(day, event)}
+                      visibleMonth={visibleMonth}
+                      activeStartDate={startDate}
+                      activeEndDate={endDate}
+                      disabled={
+                        (disableFutureDates && isAfter(day, today)) || (disablePastDates && isBefore(day, today))
+                      }
+                    />
+                  ))}
+                </Days>
+              </motion.span>
             </Container>
           </Popover.Content>
-        </Popover.Portal>
+        )}
       </Popover.Root>
     );
   },
@@ -188,11 +186,17 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
 
 const Container = styled(motion.div)`
   ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    box-shadow: ${theme.elevation[2]};
     display: flex;
     flex-direction: column;
     isolation: isolate;
+    max-width: 312px;
     overflow: hidden;
     padding-bottom: ${theme.spacing[3]};
+    z-index: ${theme.zIndex.popover + 10};
   `}
 `;
 

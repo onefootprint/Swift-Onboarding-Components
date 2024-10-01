@@ -46,6 +46,7 @@
     "csstype": "^3.1.2",
     "date-fns": "^3.3.1",
     "downshift": "^6.1.7",
+    "focus-trap-react": "^10.2.1",
     "framer-motion": "^10.5.0",
     "google-libphonenumber": "^3.2.32",
     "json2mq": "^0.2.0",

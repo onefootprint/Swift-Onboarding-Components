@@ -256,7 +256,6 @@
     },
     "filters": {
       "clear-filters": "Clear filters",
-      "filter-by": "Filter by {{label}}",
       "popover": {
         "cancel": "Cancel",
         "apply": "Apply"

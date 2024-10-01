@@ -147,7 +147,7 @@ describe('<Members />', () => {
         await userEvent.click(filterTrigger);
 
         const filterDialog = screen.getByRole('dialog', {
-          name: 'Filter by Role',
+          name: 'Role',
         });
         const checkbox = within(filterDialog).getByLabelText(firstRole.name);
         await userEvent.click(checkbox);
