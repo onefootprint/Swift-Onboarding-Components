@@ -20,6 +20,7 @@ const BackPhotoCapture = () => {
     orgId,
     requirement,
     hasBadConnectivity,
+    device,
   } = state.context;
   const { getDocName, getSideName } = useDocName({
     docType,
@@ -67,6 +68,7 @@ const BackPhotoCapture = () => {
       onBack={handleClickBack}
       onCameraStuck={handleCameraStuck}
       onCameraErrored={handleCameraErrored}
+      deviceInfo={device}
     />
   );
 };

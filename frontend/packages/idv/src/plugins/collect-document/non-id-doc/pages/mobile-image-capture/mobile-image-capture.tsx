@@ -15,7 +15,7 @@ const MobileImageCapture = () => {
     keyPrefix: 'document-flow.non-id-doc.pages.mobile-image-capture',
   });
   const [state, send] = useNonIdDocMachine();
-  const { hasBadConnectivity, orgId, requirement } = state.context;
+  const { hasBadConnectivity, orgId, requirement, device } = state.context;
   const toast = useToast();
   const docName = useDocName(requirement.config);
 
@@ -57,6 +57,7 @@ const MobileImageCapture = () => {
         camera: upperFirst(docName),
         preview: upperFirst(docName),
       }}
+      deviceInfo={device}
     />
   );
 };

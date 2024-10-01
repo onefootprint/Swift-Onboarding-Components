@@ -13,7 +13,7 @@ const DesktopSelfie = () => {
     keyPrefix: 'document-flow.id-doc.pages.desktop-selfie',
   });
   const [state, send] = useIdDocMachine();
-  const { orgId, requirement, hasBadConnectivity } = state.context;
+  const { orgId, requirement, hasBadConnectivity, device } = state.context;
   const permissionState = useCameraPermission();
 
   const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
@@ -34,6 +34,7 @@ const DesktopSelfie = () => {
       }}
       subtitle={{ camera: t('header.subtitle.camera') }}
       onComplete={onComplete}
+      deviceInfo={device}
     />
   ) : (
     <DesktopCameraPermission permissionState={permissionState} />

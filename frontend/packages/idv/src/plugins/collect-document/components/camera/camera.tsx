@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
+import type { DeviceInfo } from '../../../../../src/hooks';
 import { getLogger, trackAction } from '../../../../utils/logger';
 import { DESKTOP_INTERACTION_BOX_HEIGHT } from '../../constants';
 import {
@@ -75,6 +76,7 @@ type CameraProps = {
   allowPdf: boolean;
   onCameraStuck: () => void;
   allowUpload: boolean;
+  deviceInfo: DeviceInfo;
 };
 
 const CountDownProps = {
@@ -94,7 +96,8 @@ const videoElementStateListener =
   (event: Event) => {
     if (!videoElement) return;
     logTrack(`Video event: ${event.type}`);
-    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event) && videoElement.readyState >= 2) {
+    // TODO: add `&& videoElement.readyState >= 2` condition after the experimentation
+    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event)) {
       setPlayingState(false);
       videoElement
         .play()
@@ -182,6 +185,7 @@ const Camera = ({
   onCameraStuck,
   allowUpload,
   hasBadConnectivity,
+  deviceInfo,
 }: CameraProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'document-flow.components.camera' });
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
@@ -227,6 +231,7 @@ const Camera = ({
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     logInfo('Setting video src object');
     videoRef.current.srcObject = mediaStream;
+    videoRef.current.load();
   } else {
     logTrack(
       `Could not set video src object. MediaStream ${mediaStream}, videoRef ${videoRef.current}, has srcObject ${!!videoRef?.current?.srcObject}`,
@@ -238,7 +243,7 @@ const Camera = ({
       if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
       logWarn('video play: not allowed - prompting user interaction', err);
     } else {
-      logError('video play: error', err);
+      logWarn('video play: error', err);
     }
   };
 
@@ -253,10 +258,11 @@ const Camera = ({
       logWarn('(onCanPlay) video ref not initialized');
       return;
     }
-    if (videoRef.current.readyState < 2) {
-      logWarn('(onCanPlay) video not ready to play');
-      return;
-    }
+    // TODO: uncomment or completely remove after the experimentation
+    // if (videoRef.current.readyState < 2) {
+    //   logWarn('(onCanPlay) video not ready to play');
+    //   return;
+    // }
     videoRef.current
       .play()
       .then(() => {
@@ -264,6 +270,33 @@ const Camera = ({
         setIsVideoPlaying(true);
       })
       .catch(handlePlayError);
+  };
+
+  const handleLoadMetadata = () => {
+    logTrack('(onLoadedMetadata) video metadata loaded');
+    if (deviceInfo.browser.toLowerCase().includes('safari')) {
+      logInfo('(onLoadedMetadata) Safari browser detected. Attempting to play video');
+      if (isVideoPlaying) {
+        logTrack('(onLoadedMetadata) video already playing');
+        return;
+      }
+      if (!videoRef.current) {
+        logWarn('(onLoadedMetadata) video ref not initialized');
+        return;
+      }
+      // TODO: uncomment or completely remove after the experimentation
+      // if (videoRef.current.readyState < 2) {
+      //   logWarn('(onCanPlay) video not ready to play');
+      //   return;
+      // }
+      videoRef.current
+        .play()
+        .then(() => {
+          logTrack('(onLoadedMetadata) video element status: playing');
+          setIsVideoPlaying(true);
+        })
+        .catch(handlePlayError);
+    }
   };
 
   useInterval(
@@ -286,13 +319,15 @@ const Camera = ({
         if (mediaStream?.active) {
           logInfo('(interval) setting video src object');
           videoRef.current.srcObject = mediaStream;
+          videoRef.current.load();
         }
         return;
       }
-      if (videoRef.current.readyState < 2) {
-        logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
-        return;
-      }
+      // TODO: uncomment or completely remove after the experimentation
+      // if (videoRef.current.readyState < 2) {
+      //   logWarn(`(interval) video not ready to play. Readystate: ${videoRef.current.readyState}`);
+      //   return;
+      // }
       videoRef.current
         .play()
         .then(() => {
@@ -461,6 +496,7 @@ const Camera = ({
             hidden={!isVideoPlaying}
             muted
             onCanPlay={handleCanPlay}
+            onLoadedMetadata={handleLoadMetadata}
             playsInline
             ref={videoRef}
           />
