@@ -4,7 +4,7 @@ import type React from 'react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-
+import type { DefaultTheme } from 'styled-components/dist/types';
 import media from '../../utils/media';
 import Box from '../box';
 import Button from '../button';
@@ -104,7 +104,7 @@ const Dialog = ({
                 </RadixDialog.Close>
               </CloseContainer>
               <RadixDialog.Title asChild>
-                <Text variant="label-2">{title}</Text>
+                <Text variant="label-3">{title}</Text>
               </RadixDialog.Title>
               <HeaderButtonContainer>
                 {headerButton && (
@@ -123,7 +123,7 @@ const Dialog = ({
               </HeaderButtonContainer>
             </Header>
             <ContentWrapper>
-              <ScrollArea paddingTop={7} paddingBottom={5} paddingLeft={7} paddingRight={7} maxHeight="100%">
+              <ScrollArea padding={7} maxHeight="100%" hideTopLine hideBottomLine>
                 {children}
               </ScrollArea>
             </ContentWrapper>
@@ -174,7 +174,7 @@ const Dialog = ({
   );
 };
 
-const getSize = (size: DialogSize, isConfirmation: boolean) => {
+const getSize = (size: DialogSize, isConfirmation: boolean, theme: DefaultTheme) => {
   if (isConfirmation) {
     switch (size) {
       case 'compact':
@@ -193,18 +193,18 @@ const getSize = (size: DialogSize, isConfirmation: boolean) => {
     case 'large':
       return '800px';
     case 'full-screen':
-      return '100vw';
+      return `calc(100vw - ${theme.spacing[7]} * 2)`;
     default:
       return '650px';
   }
 };
 
-const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize) => {
+const getDistanceFromTop = (isConfirmation: boolean, size: DialogSize, theme: DefaultTheme) => {
   if (isConfirmation) {
     return '50%';
   }
   if (size === 'full-screen') {
-    return '0';
+    return theme.spacing[7];
   }
   return false;
 };
@@ -222,16 +222,17 @@ const DialogContainer = styled(Box)<{
     justify-content: stretch;
     position: fixed;
     z-index: ${$isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
-    width: ${getSize(size, $isConfirmation)};
+    width: ${getSize(size, $isConfirmation, theme)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
-    height: ${size === 'full-screen' ? '100vh' : 'auto'};
-    max-height: ${size !== 'full-screen' ? `calc(100vh - 2 * ${theme.spacing[9]})` : 'inherit'};
-    border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
-    top: ${getDistanceFromTop($isConfirmation, size) || theme.spacing[9]};
+    height: ${size === 'full-screen' ? `calc(100vh - ${theme.spacing[7]} * 2)` : 'auto'};
+    max-height: ${size !== 'full-screen' ? `calc(100vh - ${theme.spacing[7]} * 2)` : 'inherit'};
+    border-radius: ${theme.borderRadius.default};
+    top: ${getDistanceFromTop($isConfirmation, size, theme) || theme.spacing[9]};
     box-shadow: ${theme.elevation[2]};
     left: 50%;
     transform: ${$isConfirmation ? 'translate(-50%, -50%)' : 'translate(-50%, 0%)'};
     z-index: ${$isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
+    padding: 0;
 
     ${
       !$disableResponsiveness &&
@@ -257,7 +258,7 @@ const Header = styled.header`
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     justify-content: center;
     padding: 0 ${theme.spacing[5]};
-    height: 48px;
+    height: 44px;
     position: sticky;
     top: 0;
     flex-shrink: 0;
@@ -268,7 +269,7 @@ const Header = styled.header`
 const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    left: ${theme.spacing[3]};
+    left: ${theme.spacing[4]};
   `}
 `;
 

@@ -32,7 +32,7 @@ const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
 const OverlayLayer = styled(motion.div)<{ $isConfirmation: boolean }>`
   ${({ theme, $isConfirmation }) => css`
     position: fixed;
-    background-color: ${theme.backgroundColor.senary}40;
+    background-color: ${theme.screenOverlay};
     height: 100vh;
     width: 100vw;
     left: 0;

@@ -399,10 +399,7 @@ const Content = styled.div`
 `;
 
 const Container = styled.div`
-  ${({ theme }) => css`
-    position: relative;
-    padding: ${theme.spacing[5]};
-  `}
+  position: relative;
 `;
 
 export default Router;
