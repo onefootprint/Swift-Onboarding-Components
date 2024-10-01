@@ -278,27 +278,24 @@ fn maybe_create_doc_requests(
             vec![]
         }
     };
-    let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf));
-    let biz_doc_requests = match wf.config {
-        WorkflowConfig::Document(DocumentConfig {
-            ref business_configs, ..
-        }) => business_configs.clone(),
-        _ => {
-            vec![]
-        }
+    let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf)).collect_vec();
+
+    let biz_doc_requests = if is_secondary_bo {
+        // The secondary BO is onboarding - its business workflow (and thus document requests) has already
+        // been created
+        vec![]
+    } else if let Some(biz_wf) = biz_wf {
+        let biz_doc_requests = match &biz_wf.config {
+            WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => business_configs.as_slice(),
+            WorkflowConfig::Kyb(_) => &obc.business_documents_to_collect,
+            _ => &[],
+        };
+        biz_doc_requests.iter().map(|r| (r.clone(), biz_wf)).collect_vec()
+    } else {
+        vec![]
     };
 
-    let biz_doc_requests = biz_doc_requests
-        .into_iter()
-        .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
-
-    let biz_docs_to_collect = (!is_secondary_bo)
-        .then_some(obc.business_documents_to_collect.clone())
-        .into_iter()
-        .flatten()
-        .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
-
-    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests, biz_docs_to_collect)
+    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests)
         .map(|(config, wf)| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             workflow_id: wf.id.clone(),
