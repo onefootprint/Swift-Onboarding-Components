@@ -4097,14 +4097,10 @@
                 "properties": {
                     "bootstrap_data": {
                         "type": "object"
-                    },
-                    "key": {
-                        "type": "string"
                     }
                 },
                 "required": [
-                    "bootstrap_data",
-                    "key"
+                    "bootstrap_data"
                 ]
             },
             "OnboardingStatusResponse": {

@@ -29,8 +29,9 @@ def test_onboarding_token(sandbox_tenant):
         ), "Onboarding token MUST start with `pbtok_`. Our frontend SDK matches on this string EXPLICITLY. Do not change this prefix"
         token = PlaybookKey(token)
         body = get("hosted/onboarding/session", None, token)
-        assert body["key"] == data.get("key", None)
         assert body["bootstrap_data"] == data.get("bootstrap_data", {})
+        body = get("hosted/onboarding/config", None, token)
+        assert body["key"] == data["key"]
 
 
 def test_onboarding_token_errors(sandbox_tenant, foo_sandbox_tenant):
