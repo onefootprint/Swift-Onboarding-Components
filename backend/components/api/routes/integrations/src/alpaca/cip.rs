@@ -22,7 +22,6 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::DecryptUncheckedResult;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AlpacaCipRequest;
@@ -703,13 +702,18 @@ fn document_and_photo(
 ) -> FpResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let expect_selfie = document_request.should_collect_selfie();
 
-    let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
-    let dk = ok_or(
-        identity_document.vaulted_document_type,
-        "missing vaulted_document_type on Document".into(),
-    )?;
+    let ocr_name = ocr_response.name.as_ref();
+    if ocr_name.is_none() {
+        tracing::warn!("missing ocr name");
+    }
+
+    let dk = identity_document
+        .vaulted_document_type
+        .unwrap_or(identity_document.document_type);
+
     let dob = ocr_response.dob().map(PiiString::from).ok();
-    let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true); // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18
+    // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18
+    let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true);
 
     // Construct all of the breakdown fields
     // TODO: load these once FRC<>VRes migration is done
@@ -731,15 +735,19 @@ fn document_and_photo(
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: check_started_at,
-        first_name: ocr_name
-            .first_name
-            .as_ref()
-            .map(|p| AlpacaPiiString::from(p.leak())),
-        last_name: ocr_name
-            .paternal_last_name
-            .as_ref()
-            .map(|p| (**p).clone())
-            .map(|a| a.into()),
+        first_name: ocr_name.and_then(|ocr_name| {
+            ocr_name
+                .first_name
+                .as_ref()
+                .map(|p| AlpacaPiiString::from(p.leak()))
+        }),
+        last_name: ocr_name.and_then(|ocr_name| {
+            ocr_name
+                .paternal_last_name
+                .as_ref()
+                .map(|p| (**p).clone())
+                .map(|a| a.into())
+        }),
         gender: ocr_response.gender.as_ref().map(|p| (**p).leak().into()),
         date_of_birth: dob.map(|d| d.into()),
         date_of_expiry: ocr_response
@@ -773,12 +781,6 @@ fn document_and_photo(
     };
 
     Ok((Some(document_photo_id), Some(photo_selfie)))
-}
-
-fn ok_or<T>(o: Option<T>, assert_msg: String) -> FpResult<T> {
-    let unwrapped = o.ok_or(ApiCoreError::AssertionError(assert_msg))?;
-
-    Ok(unwrapped)
 }
 
 struct DocumentCipResultHelper<'a> {
