@@ -186,7 +186,7 @@ impl<Type> VaultWrapper<Type> {
             .enclave_client
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fp)
             .await?;
-        let fingerprints = Fingerprints::new(fingerprints);
+        let fingerprints = Fingerprints::new(fingerprints, vec![]);
 
         // Collect the ContactInfo from the vault that has the portable phone/email, only for the
         // data that we will be prefilling.
@@ -211,7 +211,6 @@ impl<Type> VaultWrapper<Type> {
             .await?;
 
         tracing::info!(dis=%Csv::from(data.iter().map(|d| d.kind.clone()).collect_vec()), "Computed prefill data");
-
         let result = PrefillData {
             data,
             fingerprints,

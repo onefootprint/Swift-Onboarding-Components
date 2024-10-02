@@ -99,7 +99,7 @@ pub async fn get(
                     kind,
                 }),
                 Err(err) => {
-                    tracing::error!(?err, "Unable to parse fingeprint kind");
+                    tracing::error!(?err, "Unable to parse fingerprint kind");
                     None
                 }
             }

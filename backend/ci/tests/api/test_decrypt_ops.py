@@ -87,13 +87,19 @@ def test_vault_create_write_decrypt(tenant):
     audit_events = body["data"]
 
     assert audit_events[0]["name"] == "delete_user_data"
-    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == set(expected_deleted_fields)
+    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == set(
+        expected_deleted_fields + ["card.hayes.fingerprint"]
+    )
 
     assert audit_events[1]["name"] == "delete_user_data"
-    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == set(fields_to_delete)
+    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == set(
+        fields_to_delete
+    )
 
     assert audit_events[2]["name"] == "decrypt_user_data"
-    assert set(audit_events[2]["detail"]["data"]["decrypted_fields"]) == set(fields_to_decrypt)
+    assert set(audit_events[2]["detail"]["data"]["decrypted_fields"]) == set(
+        fields_to_decrypt
+    )
 
     data = dict(fields=["card.valley.cvc"], reason="try decrypt failure")
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key, status_code=200)
@@ -229,9 +235,14 @@ def test_delete(sandbox_tenant):
     audit_events = body["data"]
 
     assert audit_events[0]["name"] == "delete_user_data"
-    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == {"id.email", "custom.test_field"}
+    assert set(audit_events[0]["detail"]["data"]["deleted_fields"]) == {
+        "id.email",
+        "custom.test_field",
+    }
     assert audit_events[1]["name"] == "delete_user_data"
-    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == {"id.phone_number"}
+    assert set(audit_events[1]["detail"]["data"]["deleted_fields"]) == {
+        "id.phone_number"
+    }
 
 
 def test_card_expiration_transform(tenant):

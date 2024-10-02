@@ -7,8 +7,10 @@ use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::CompositeFingerprint;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
 use newtypes::DataRequest;
 use newtypes::Fingerprint;
+use newtypes::MissingFingerprint;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -24,6 +26,11 @@ pub struct FingerprintedDataRequest {
     pub(super) json_fields: Vec<DataIdentifier>,
     pub(super) fingerprints: Fingerprints,
 }
+
+type CompositeFingerprints = (
+    Vec<(CompositeFingerprint, Fingerprint)>,
+    HashMap<DataIdentifier, PiiString>,
+);
 
 impl FingerprintedDataRequest {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
@@ -51,6 +58,7 @@ impl FingerprintedDataRequest {
             .map(|pfpk| pfpk.di())
             .unique()
             .collect_vec();
+
         let data_to_fp = needed_fps
             .iter()
             .filter(|di| !new_dis.contains(di))
@@ -63,15 +71,35 @@ impl FingerprintedDataRequest {
                 fps.into_iter().map(|(salt, fp)| ((salt.clone(), d.lifetime_id.clone()), (salt, fp)))
             })
             .collect_vec();
+
         let fingerprints = state
             .enclave_client
             .batch_fingerprint_sealed(&vw.vault.e_private_key, data_to_fp)
             .await?;
-        let (addl_fingerprints, salt_to_dl_id) = fingerprints
+
+        let (addl_fingerprints, salt_to_dl_id): (
+            Vec<(FingerprintSalt, Fingerprint)>,
+            HashMap<FingerprintSalt, DataLifetimeId>,
+        ) = fingerprints
+            .clone()
             .into_iter()
             .map(|((salt, dl_id), fp)| ((salt.clone(), fp), (salt, dl_id)))
             .unzip();
-        res.fingerprints.extend(addl_fingerprints, salt_to_dl_id);
+
+        let fingerprints: HashMap<_, _> = res
+            .fingerprints
+            .iter()
+            .chain(addl_fingerprints.iter())
+            .cloned()
+            .collect();
+
+        let (composite_fingerprints, addl_dis) =
+            Self::generate_composite_fingerprints(&fingerprints, &vw.populated_dis(), &new_dis, t_id)?;
+
+        res.fingerprints
+            .extend(vec![], composite_fingerprints.clone(), salt_to_dl_id);
+
+        res.data.extend(addl_dis);
         Ok(res)
     }
 
@@ -85,8 +113,10 @@ impl FingerprintedDataRequest {
         data: DataRequest,
         tenant_id: &TenantId,
     ) -> FpResult<Self> {
-        let DataRequest { data, json_fields } = data;
-
+        let DataRequest {
+            mut data,
+            json_fields,
+        } = data;
         let data_to_fingerprint: Vec<_> = data
             .iter()
             .flat_map(|(di, pii)| di.get_fingerprint_payload(pii, Some(tenant_id)))
@@ -97,12 +127,64 @@ impl FingerprintedDataRequest {
             .batch_fingerprint(data_to_fingerprint)
             .await?;
 
+        let salt_to_fp: HashMap<_, _> = fingerprints.iter().cloned().collect();
+        let new_dis = data.keys().collect_vec();
+
+        let (composite_fingerprints, addl_dis) =
+            Self::generate_composite_fingerprints(&salt_to_fp, &[], &new_dis, tenant_id)?;
+
+        data.extend(addl_dis);
         let request = Self {
             data,
             json_fields,
-            fingerprints: Fingerprints::new(fingerprints),
+            fingerprints: Fingerprints::new(fingerprints, composite_fingerprints),
         };
         Ok(request)
+    }
+
+    fn generate_composite_fingerprints(
+        salt_to_fp: &HashMap<FingerprintSalt, Fingerprint>,
+        existing_dis: &[DataIdentifier],
+        new_dis: &[&DataIdentifier],
+        tenant_id: &TenantId,
+    ) -> FpResult<CompositeFingerprints> {
+        //
+        // Create composite fingerprints out of pre-computed transient fingerprints
+        //
+        let composite_fingerprints = CompositeFingerprint::list(tenant_id, new_dis)
+            .into_iter()
+            .filter(|cfp| cfp.should_generate(existing_dis, new_dis))
+            .map(|cfp| -> FpResult<_> {
+                // For each Composite FPK that has any DI represented in this data update, generate
+                // the new composite fingerprint out of the pre-computed transient fingerprints
+                let sh_data = match cfp.compute(salt_to_fp) {
+                    Ok(sh_data) => sh_data,
+                    Err(MissingFingerprint(salt)) => {
+                        tracing::error!(
+                            ?salt,
+                            "Failed to compute composite fingerprint. Missing fingerprint"
+                        );
+                        return Ok(None);
+                    }
+                };
+
+                Ok(Some((cfp, sh_data)))
+            })
+            .collect::<FpResult<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .collect_vec();
+
+        //
+        // Add additional DI's for all composite fingerprints that should be tokenized.
+        //
+        let addl_dis: HashMap<DataIdentifier, PiiString> = composite_fingerprints
+            .clone()
+            .into_iter()
+            .filter_map(|(cfp, fp)| cfp.to_token_di().map(|di| (di, fp.to_token())))
+            .collect();
+
+        Ok((composite_fingerprints, addl_dis))
     }
 
     /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying
@@ -111,7 +193,7 @@ impl FingerprintedDataRequest {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints: Fingerprints::new(fingerprints),
+            fingerprints: Fingerprints::new(fingerprints, vec![]),
         }
     }
 
@@ -121,7 +203,7 @@ impl FingerprintedDataRequest {
         Self {
             data: data.data,
             json_fields: data.json_fields,
-            fingerprints: Fingerprints::new(vec![]),
+            fingerprints: Fingerprints::new(vec![], vec![]),
         }
     }
 }

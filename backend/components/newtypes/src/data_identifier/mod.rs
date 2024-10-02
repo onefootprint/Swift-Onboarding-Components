@@ -171,6 +171,14 @@ impl DataIdentifier {
                     alias: _,
                     kind: CardDataKind::Issuer
                 })
+                | Self::Card(CardInfo {
+                    alias: _,
+                    kind: CardDataKind::Fingerprint
+                })
+                | Self::Bank(BankInfo {
+                    alias: _,
+                    kind: BankDataKind::Fingerprint
+                })
         )
     }
 
@@ -501,6 +509,14 @@ mod tests {
             DataIdentifier::Card(CardInfo {
                 alias: AliasId::fixture(),
                 kind: CardDataKind::Issuer,
+            }),
+            DataIdentifier::Card(CardInfo {
+                alias: AliasId::fixture(),
+                kind: CardDataKind::Fingerprint,
+            }),
+            DataIdentifier::Bank(BankInfo {
+                alias: AliasId::fixture(),
+                kind: BankDataKind::Fingerprint,
             }),
         ];
         assert!(dis

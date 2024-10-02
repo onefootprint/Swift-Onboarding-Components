@@ -18,12 +18,9 @@ pub enum BankDataKind {
     AchAccountNumber,
     AchAccountId,
     AccountType,
-}
 
-impl BankDataKind {
-    pub fn is_derived(&self) -> bool {
-        false
-    }
+    // Derived entries
+    Fingerprint,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

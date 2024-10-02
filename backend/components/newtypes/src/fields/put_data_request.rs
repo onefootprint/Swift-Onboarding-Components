@@ -67,7 +67,14 @@ impl PatchDataRequest {
                         CardDataKind::ExpMonth
                         | CardDataKind::ExpYear
                         | CardDataKind::Last4
+                        | CardDataKind::Fingerprint
                         | CardDataKind::Issuer => Some(DiValidationError::CannotSpecifyDerivedEntry.into()),
+                        _ => None,
+                    },
+                    DataIdentifier::Bank(k) => match k.kind {
+                        crate::BankDataKind::Fingerprint => {
+                            Some(DiValidationError::CannotSpecifyDerivedEntry.into())
+                        }
                         _ => None,
                     },
                     _ => None,

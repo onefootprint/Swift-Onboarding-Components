@@ -1,3 +1,4 @@
+use crate::PiiString;
 use derive_more::From;
 use derive_more::Into;
 use diesel::backend::Backend;
@@ -15,6 +16,16 @@ use serde::Serialize;
 #[serde(transparent)]
 #[diesel(sql_type = Binary)]
 pub struct Fingerprint(pub Vec<u8>);
+
+impl Fingerprint {
+    /// Converts Fingerprint content to a token, so that it can be saved as a searchable DI.
+    pub fn to_token(&self) -> PiiString {
+        let hash = crypto::sha256(&self.0);
+        let top16 = &hash[0..16];
+        let token = crypto::base64::encode_config(top16, crypto::base64::URL_SAFE_NO_PAD);
+        PiiString::new(token)
+    }
+}
 
 impl std::fmt::Debug for Fingerprint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

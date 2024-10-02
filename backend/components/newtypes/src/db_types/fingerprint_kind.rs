@@ -4,6 +4,10 @@ use crate::fingerprint_salt::TransientGlobalFingerprintKind;
 use crate::fingerprint_salt::TransientTenantFingerprintKind;
 use crate::util::impl_enum_string_diesel;
 use crate::AliasId;
+use crate::BankDataKind;
+use crate::BankInfo;
+use crate::CardDataKind;
+use crate::CardInfo;
 use crate::DataIdentifier;
 use crate::Fingerprint;
 use crate::FingerprintScope;
@@ -59,6 +63,16 @@ impl DataIdentifier {
     /// data with these types when added to the vault
     pub fn is_fingerprintable(&self) -> bool {
         Self::searchable().contains(self)
+            || matches!(
+                self,
+                Self::Card(CardInfo {
+                    alias: _,
+                    kind: CardDataKind::Fingerprint
+                }) | Self::Bank(BankInfo {
+                    alias: _,
+                    kind: BankDataKind::Fingerprint
+                })
+            )
     }
 }
 
@@ -85,7 +99,7 @@ impl std::fmt::Display for FingerprintKind {
     }
 }
 
-#[derive(strum_macros::EnumDiscriminants, Debug)]
+#[derive(strum_macros::EnumDiscriminants, Debug, Clone)]
 #[strum_discriminants(
     name(CompositeFingerprintKind),
     vis(pub),
@@ -221,6 +235,22 @@ impl CompositeFingerprint {
         .collect_vec();
         let composite_fp = Fingerprint(crypto::sha256(&sh_data).to_vec());
         Ok(composite_fp)
+    }
+
+    /// Returns Some if a corresponding Fingerprint should be tokenized, along with the DI where the
+    /// token should be stored.
+    pub fn to_token_di(&self) -> Option<DataIdentifier> {
+        match self {
+            Self::NameDob | Self::Name(_) | Self::NameSsn4(_) | Self::DobSsn4(_) => None,
+            Self::BankRoutingAccount(alias_id, _) => Some(DataIdentifier::Bank(BankInfo {
+                alias: alias_id.clone(),
+                kind: BankDataKind::Fingerprint,
+            })),
+            Self::CardNumberCvc(alias_id, _) => Some(DataIdentifier::Card(CardInfo {
+                alias: alias_id.clone(),
+                kind: CardDataKind::Fingerprint,
+            })),
+        }
     }
 }
 

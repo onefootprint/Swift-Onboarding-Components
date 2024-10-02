@@ -30,12 +30,13 @@ pub enum CardDataKind {
     #[strum(to_string = "number_last4")]
     Last4,
     Issuer,
+    Fingerprint,
 }
 
 impl CardDataKind {
     pub fn is_derived(&self) -> bool {
         match self {
-            Self::ExpMonth | Self::ExpYear | Self::Last4 | Self::Issuer => true,
+            Self::ExpMonth | Self::ExpYear | Self::Last4 | Self::Issuer | Self::Fingerprint => true,
             Self::Number
             | Self::Expiration
             | Self::Cvc

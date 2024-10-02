@@ -55,7 +55,7 @@ fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
             | IdentityDataKind::Itin => false,
         },
         DataIdentifier::Card(card_info) => match card_info.kind {
-            CardDataKind::BillingCountry | CardDataKind::Issuer => true,
+            CardDataKind::BillingCountry | CardDataKind::Issuer | CardDataKind::Fingerprint => true,
             CardDataKind::Number
             | CardDataKind::Expiration
             | CardDataKind::Cvc
@@ -69,7 +69,8 @@ fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
             BankDataKind::AchRoutingNumber
             | BankDataKind::AchAccountId
             | BankDataKind::AccountType
-            | BankDataKind::Name => true,
+            | BankDataKind::Name
+            | BankDataKind::Fingerprint => true,
             BankDataKind::AchAccountNumber => false,
         },
         DataIdentifier::Custom(_) => false,

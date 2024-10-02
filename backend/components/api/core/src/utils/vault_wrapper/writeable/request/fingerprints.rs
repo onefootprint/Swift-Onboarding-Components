@@ -13,41 +13,46 @@ use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::CompositeFingerprint;
 use newtypes::CompositeFingerprintKind;
-use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::Fingerprint;
 use newtypes::FingerprintKind;
 use newtypes::FingerprintScope;
 use newtypes::Locked;
-use newtypes::MissingFingerprint;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 pub(in super::super) struct Fingerprints {
     #[deref]
     fps: Vec<(FingerprintSalt, Fingerprint)>,
+    composite_fps: Vec<(CompositeFingerprint, Fingerprint)>,
     salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
 }
 
 pub(in super::super) struct ValidatedFingerprints {
     fingerprints: Fingerprints,
-
-    // Stored here since the VaultWrapper is invalidated after updating data.
-    dis_before_vw_update: Vec<DataIdentifier>,
 }
 
 impl Fingerprints {
-    pub(super) fn new(fps: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
+    pub(super) fn new(
+        fps: Vec<(FingerprintSalt, Fingerprint)>,
+        composite_fps: Vec<(CompositeFingerprint, Fingerprint)>,
+    ) -> Self {
         let salt_to_dl_id = HashMap::new();
-        Self { fps, salt_to_dl_id }
+        Self {
+            fps,
+            composite_fps,
+            salt_to_dl_id,
+        }
     }
 
     pub(super) fn extend(
         &mut self,
         fps: Vec<(FingerprintSalt, Fingerprint)>,
+        composite_fps: Vec<(CompositeFingerprint, Fingerprint)>,
         salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
     ) {
         self.fps.extend(fps);
+        self.composite_fps.extend(composite_fps);
         self.salt_to_dl_id.extend(salt_to_dl_id);
     }
 
@@ -67,10 +72,7 @@ impl Fingerprints {
             }
         }
 
-        Ok(ValidatedFingerprints {
-            fingerprints: self,
-            dis_before_vw_update: vw.populated_dis(),
-        })
+        Ok(ValidatedFingerprints { fingerprints: self })
     }
 }
 impl ValidatedFingerprints {
@@ -81,8 +83,12 @@ impl ValidatedFingerprints {
         new_vd: &[VaultData],
     ) -> FpResult<()> {
         let Self {
-            fingerprints: Fingerprints { fps, salt_to_dl_id },
-            dis_before_vw_update,
+            fingerprints:
+                Fingerprints {
+                    fps,
+                    composite_fps,
+                    salt_to_dl_id,
+                },
         } = self;
 
         struct FingerprintData<'a> {
@@ -91,6 +97,20 @@ impl ValidatedFingerprints {
             lifetime_ids: Vec<&'a DataLifetimeId>,
             scope: FingerprintScope,
         }
+
+        //
+        // Some DIs are stored in plaintext and searchable - we want to make fingerprint rows for these too
+        //
+        let p_data_fingerprints = new_vd
+            .iter()
+            .filter(|vd| vd.kind.store_plaintext() && vd.kind.is_fingerprintable())
+            .filter_map(|vd| vd.p_data.as_ref().map(|p_data| (p_data.clone(), vd)))
+            .map(|(p_data, vd)| FingerprintData {
+                kind: FingerprintKind::DI(vd.kind.clone()),
+                data: p_data.into(),
+                lifetime_ids: vec![&vd.lifetime_id],
+                scope: FingerprintScope::Plaintext,
+            });
 
         //
         // Create fingerprints for every piece of vault data we've saved
@@ -119,43 +139,12 @@ impl ValidatedFingerprints {
             .collect_vec();
 
         //
-        // Some DIs are stored in plaintext and searchable - we want to make fingeprint rows for these too
-        //
-        let p_data_fingerprints = new_vd
-            .iter()
-            .filter(|vd| vd.kind.store_plaintext() && vd.kind.is_fingerprintable())
-            .filter_map(|vd| vd.p_data.as_ref().map(|p_data| (p_data.clone(), vd)))
-            .map(|(p_data, vd)| FingerprintData {
-                kind: FingerprintKind::DI(vd.kind.clone()),
-                data: p_data.into(),
-                lifetime_ids: vec![&vd.lifetime_id],
-                scope: FingerprintScope::Plaintext,
-            });
-
-        //
         // Create composite fingerprints out of pre-computed transient fingerprints
         //
-        let fps: HashMap<_, _> = fps.into_iter().collect();
         let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
-        let vd_kinds = new_vd.keys().cloned().collect_vec();
-
-        let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id, &vd_kinds)
+        let composite_fingerprints = composite_fps
             .into_iter()
-            .filter(|cfp| cfp.should_generate(&dis_before_vw_update, &vd_kinds))
-            .map(|cfp| -> FpResult<_> {
-                // For each Composite FPK that has any DI represented in this data update, generate
-                // the new composite fingerprint out of the pre-computed transient fingerprints
-                let sh_data = match cfp.compute(&fps) {
-                    Ok(sh_data) => sh_data,
-                    Err(MissingFingerprint(salt)) => {
-                        tracing::error!(
-                            ?salt,
-                            "Failed to compute composite fingerprint. Missing fingerprint"
-                        );
-                        return Ok(None);
-                    }
-                };
-
+            .map(|(cfp, sh_data)| -> FpResult<_> {
                 // This composite fingerprint will be linked to multiple DataLifetimes, so when any
                 // of the constituent pieces of data is deactivated, this fingerprint will be too.
                 // The lifetime could be from a newly created VD, or from a VD that already exists.
@@ -187,7 +176,6 @@ impl ValidatedFingerprints {
         //
         // Save fingerprints to the database
         //
-
         let fingerprints = chain!(sh_data_fingerprints, p_data_fingerprints, composite_fingerprints)
             .map(|d| {
                 let FingerprintData {
@@ -210,8 +198,8 @@ impl ValidatedFingerprints {
                 }
             })
             .collect();
-        DbFingerprint::bulk_create(conn, fingerprints)?;
 
+        DbFingerprint::bulk_create(conn, fingerprints)?;
         Ok(())
     }
 }

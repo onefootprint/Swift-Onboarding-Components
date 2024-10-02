@@ -64,6 +64,7 @@ impl CleanAndValidate for CI {
             CDK::Issuer => (validate_issuer(value)?, None),
             CDK::ExpMonth => (Expiration::validate_month(value.leak())?, None),
             CDK::ExpYear => (Expiration::validate_year(value.leak())?, None),
+            CDK::Fingerprint => (value, None),
         };
 
         Ok(DataIdentifierValue {
