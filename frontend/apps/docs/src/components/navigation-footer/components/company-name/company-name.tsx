@@ -12,7 +12,7 @@ const CompanyName = ({ name, image }: CompanyNameProps) => {
   return (
     <Stack direction="row" alignItems="center" gap={3} maxWidth="100%" overflow="hidden" marginRight={3}>
       <LogoContainer>
-        {image ? <Image src={image} alt="company logo" width={16} height={16} /> : <IcoBuilding16 />}
+        {image ? <Image src={image} alt="company logo" width={16} height={16} priority /> : <IcoBuilding16 />}
       </LogoContainer>
       <Text variant="label-3" truncate>
         {name}
