@@ -103,6 +103,8 @@ pub struct VaultDrConfig {
     pub created_at: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
 
+    // There is at most one active VDR Config per (tenant_id, is_live), enforced by a DB unique
+    // index.
     pub tenant_id: TenantId,
     pub is_live: bool,
 
@@ -298,5 +300,56 @@ impl VaultDrManifest {
             .get_results(conn.conn())?;
 
         Ok(results)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::vault_dr::NewVaultDrAwsPreEnrollment;
+    use crate::models::vault_dr::NewVaultDrConfig;
+    use crate::models::vault_dr::VaultDrAwsPreEnrollment;
+    use crate::models::vault_dr::VaultDrConfig;
+    use crate::tests::fixtures;
+    use crate::tests::prelude::*;
+    use hex::ToHex;
+    use macros::db_test_case;
+
+    #[db_test_case(true)]
+    #[db_test_case(false)]
+    fn ensure_vault_dr_config_unique_for_tenant_is_live(conn: &mut TestPgConn, is_live: bool) {
+        // Test that we didn't accidentally drop the uniqueness constraint on
+        // vault_dr_config(tenant_id, is_live) since it's critical to the correctness of VDR. If
+        // there were multiple active VDR configs for the same (tenant_id, is_live), the VDR batch
+        // worker run for each config would overwrite each other's `backed_up_by_vdr_config_id`
+        // progress markers, so the worker would not make progress on those configs.
+
+        let tenant_id = fixtures::tenant::create(conn).id;
+
+        for should_fail in [false, true] {
+            let ape = NewVaultDrAwsPreEnrollment {
+                tenant_id: &tenant_id,
+                is_live,
+                aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
+            };
+            let ape = VaultDrAwsPreEnrollment::get_or_create(conn, ape).unwrap();
+
+            let new_vdr_cfg = NewVaultDrConfig {
+                created_at: Utc::now(),
+                tenant_id: &tenant_id,
+                is_live,
+                aws_pre_enrollment_id: &ape.id,
+                aws_account_id: "12345678".to_owned(),
+                aws_role_name: "my-role".to_owned(),
+                s3_bucket_name: "my-bucket".to_owned(),
+                recovery_public_key: "pub-key".to_owned(),
+                wrapped_recovery_key: "wrapped-recovery-key".to_owned(),
+                org_public_keys: vec!["org-pub-key".to_owned()],
+                bucket_path_namespace: "the-namespace".to_owned(),
+            };
+
+            let failed = VaultDrConfig::create(conn, new_vdr_cfg).is_err();
+            assert_eq!(failed, should_fail, "is_live={}", is_live);
+        }
     }
 }

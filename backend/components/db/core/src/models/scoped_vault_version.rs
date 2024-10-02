@@ -13,6 +13,7 @@ use newtypes::ScopedVaultId;
 use newtypes::ScopedVaultVersionId;
 use newtypes::ScopedVaultVersionNumber;
 use newtypes::TenantId;
+use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = scoped_vault_version)]
@@ -27,6 +28,11 @@ pub struct ScopedVaultVersion {
 
     pub tenant_id: TenantId,
     pub is_live: bool,
+
+    /// This field defaults to null until a Vault Disaster Recovery worker has backed up the Scoped
+    /// Vault Version. The VDR worker annotates the row with the corresponding VDR Config. Note that
+    /// this design requires that there is at most one active VDR Config per (tenant_id, is_live).
+    pub backed_up_by_vdr_config_id: Option<VaultDrConfigId>,
 }
 
 #[derive(Clone, Insertable)]
