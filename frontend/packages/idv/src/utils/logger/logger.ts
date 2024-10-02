@@ -144,8 +144,14 @@ const LoggerFactory = () => {
   const warn = (msg: string, extra?: PrimitiveData, err?: unknown) => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
+    const errorMessage = [msg, getErrorMessage(err)]
+      .filter(errorMsg => !!errorMsg && errorMsg !== 'Something went wrong')
+      .join(' ');
+    const errorObj: Error = err instanceof Error ? err : new Error(errorMessage);
 
-    if (isDDLogsEnabled) dataDogWarnEvent(msg, filteredExtra, err);
+    if (isDDLogsEnabled) {
+      dataDogWarnEvent(errorMessage, filteredExtra, errorObj);
+    }
   };
 
   const info = (msg: string, extra?: PrimitiveData) => {
