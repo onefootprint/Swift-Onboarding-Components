@@ -72,11 +72,9 @@ const UserActions = ({ entity }: WithEntityProps) => {
   return (
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <Dropdown.Trigger asChild>
+        <Dropdown.Trigger>
           <IconButton variant="outline" aria-label={t('trigger')} size="compact">
-            <Box>
-              <IcoDotsHorizontal24 />
-            </Box>
+            <IcoDotsHorizontal24 />
           </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Portal>
@@ -112,26 +110,30 @@ const UserActions = ({ entity }: WithEntityProps) => {
                 {t('management.summarize')}
               </Dropdown.Item>
             </Dropdown.Group>
-            <Dropdown.Divider />
             {hasPermission(RoleScopeKind.manualReview) && (
-              <Dropdown.Group>
-                <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
-                  {t('requests.request-more-info')}
-                </Dropdown.Item>
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleAuthMethods}>
-                  {t('requests.allow-updating-login-methods')}
-                </Dropdown.Item>
-              </Dropdown.Group>
+              <>
+                <Dropdown.Divider />
+                <Dropdown.Group>
+                  <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
+                  <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
+                    {t('requests.request-more-info')}
+                  </Dropdown.Item>
+                  <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleAuthMethods}>
+                    {t('requests.allow-updating-login-methods')}
+                  </Dropdown.Item>
+                </Dropdown.Group>
+              </>
             )}
-            <Dropdown.Divider />
             {user?.isFirmEmployee && isOpenDatadogEnabled && (
-              <Dropdown.Group>
-                <Dropdown.GroupTitle>{t('internal.title')}</Dropdown.GroupTitle>
-                <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={openDatadog}>
-                  {t('internal.datadog')}
-                </Dropdown.Item>
-              </Dropdown.Group>
+              <>
+                <Dropdown.Divider />
+                <Dropdown.Group>
+                  <Dropdown.GroupTitle>{t('internal.title')}</Dropdown.GroupTitle>
+                  <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={openDatadog}>
+                    {t('internal.datadog')}
+                  </Dropdown.Item>
+                </Dropdown.Group>
+              </>
             )}
           </Dropdown.Content>
         </Dropdown.Portal>

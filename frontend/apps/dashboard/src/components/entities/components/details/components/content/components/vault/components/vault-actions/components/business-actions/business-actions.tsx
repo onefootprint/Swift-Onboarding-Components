@@ -15,6 +15,8 @@ enum ActionDialog {
 
 const DROPDOWN_ITEM_HEIGHT = '32px';
 
+const IS_REQUEST_MORE_INFO_ENABLED = false;
+
 const BusinessActions = () => {
   const { t } = useTranslation('business-details', { keyPrefix: 'header.actions' });
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
@@ -30,15 +32,15 @@ const BusinessActions = () => {
     setOpenDialog(ActionDialog.EditVault);
   };
 
-  // const handleRequestMoreInfo = () => {
-  //   setDropdownOpen(false);
-  //   setOpenDialog(ActionDialog.RequestMoreInfo);
-  // };
+  const handleRequestMoreInfo = () => {
+    setDropdownOpen(false);
+    setOpenDialog(ActionDialog.RequestMoreInfo);
+  };
 
   return (
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <Dropdown.Trigger asChild>
+        <Dropdown.Trigger>
           <IconButton variant="outline" aria-label={t('trigger')} size="compact">
             <Box>
               <IcoDotsHorizontal24 />
@@ -52,11 +54,11 @@ const BusinessActions = () => {
                 {t('edit')}
               </Dropdown.Item>
             )}
-            {/* {hasPermission(RoleScopeKind.manualReview) && (
+            {IS_REQUEST_MORE_INFO_ENABLED && hasPermission(RoleScopeKind.manualReview) && (
               <Dropdown.Item height={DROPDOWN_ITEM_HEIGHT} onSelect={handleRequestMoreInfo}>
                 {t('request-info')}
               </Dropdown.Item>
-            )} */}
+            )}
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>

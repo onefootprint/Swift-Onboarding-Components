@@ -14,9 +14,8 @@ export type IconButtonProps = {
   'aria-label': string;
   children: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  disabled?: boolean;
-  testID?: string;
   size?: IconButtonSize;
+  testID?: string;
   variant?: 'outline' | 'ghost';
 };
 
@@ -26,10 +25,10 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       'aria-label': ariaLabel,
       children,
       onClick,
-      disabled,
-      testID,
       size = 'default',
+      testID,
       variant = 'ghost',
+      ...props
     }: IconButtonProps,
     ref,
   ) => {
@@ -40,15 +39,15 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
     return (
       <Container
+        $size={size}
+        $variant={variant}
         aria-label={ariaLabel}
         data-testid={testID}
         onClick={handleClick}
         ref={ref}
         tabIndex={0}
         type="button"
-        disabled={disabled}
-        size={size}
-        variant={variant}
+        {...props}
       >
         {children}
       </Container>
@@ -56,22 +55,22 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   },
 );
 
-const Container = styled.button<{ size: IconButtonSize; variant?: 'outline' | 'ghost' }>`
-  ${({ size, variant, theme }) => {
+const Container = styled.button<{ $size: IconButtonSize; $variant?: 'outline' | 'ghost' }>`
+  ${({ $size, $variant, theme }) => {
     const { button } = theme.components;
 
     const getVariantStyles = () => {
       const buttonSize = css`
-        height: ${iconButtonSizes[size]};
-        width: ${iconButtonSizes[size]};
+        height: ${iconButtonSizes[$size]};
+        width: ${iconButtonSizes[$size]};
       `;
 
-      if (variant === 'outline') {
+      if ($variant === 'outline') {
         return css`
           ${buttonSize}
           background-color: ${button.variant.secondary.bg};
           border: ${theme.borderWidth[1]} solid ${button.variant.secondary.borderColor};
-          border-radius: ${size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
+          border-radius: ${$size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
           box-shadow: ${button.variant.secondary.boxShadow};
           svg {
             path {
@@ -117,7 +116,7 @@ const Container = styled.button<{ size: IconButtonSize; variant?: 'outline' | 'g
         ${buttonSize}
         background: none;
         border: none;
-        border-radius: ${size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
+        border-radius: ${$size === 'tiny' ? theme.borderRadius.sm : theme.borderRadius.default};
 
         &:disabled {
           cursor: initial;
