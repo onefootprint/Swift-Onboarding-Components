@@ -134,5 +134,8 @@
     }
   },
   "search.followSymlinks": false,
-  "python.analysis.include": ["backend/ci/tests"]
+  "python.analysis.include": [
+    "backend/ci/tests"
+  ],
+  "tlaplus.tlc.modelChecker.options": "-workers auto"
 }
